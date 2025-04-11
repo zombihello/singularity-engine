@@ -12,7 +12,7 @@
 *.pch
 /.cache
 /build
-__pycache__/**
+**/__pycache__/**
 compile_commands.json
 
 # Game folder and compiled content
