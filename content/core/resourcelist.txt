@@ -1,0 +1,6 @@
+{
+	"resources": [
+		"materials/default.stex",
+		"materials/default.smat"
+	]
+}

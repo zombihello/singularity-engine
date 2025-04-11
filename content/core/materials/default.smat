@@ -1,0 +1,11 @@
+{
+	"output-dir":	"//CORE/materials/",
+	"shader": 		"unlitgeneric",
+	"parameters": [
+		{
+			"name": 	"baseTexture",
+			"type": 	"texture",
+			"value": 	"materials/default"
+		}
+	]
+}

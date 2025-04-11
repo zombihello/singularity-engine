@@ -1,0 +1,18 @@
+/**
+ * @file
+ * @addtogroup materialsystem materialsystem
+ */
+
+#include <string>
+#include <vector>
+#include <unordered_map>
+
+#include "interfaces/interfaces.h"
+#include "stdlib/convar.h"
+#include "core/core.h"
+#include "core/debug.h"
+#include "core/profile.h"
+#include "studiorender/studioapi/istudioapi.h"
+#include "studiorender/istudiorender.h"
+#include "materialsystem/ishadermgr.h"
+#include "materialsystem/materialsystem.h"

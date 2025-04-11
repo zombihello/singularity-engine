@@ -1,0 +1,230 @@
+/**
+ * @file
+ * @addtogroup core core
+ */
+
+#ifndef MEMORY_H
+#define MEMORY_H
+
+#include <cstdlib>
+
+#include "core/coreapi.h"
+#include "core/platform.h"
+#include "core/imemalloc.h"
+
+/**
+ * @ingroup core
+ * @brief Copies count characters from the object pointed to by pSrc to the object pointed to by pDest
+ * 
+ * @param pDest		Pointer to the memory location to copy to
+ * @param pSrc		Pointer to the memory location to copy from
+ * @param numBytes	Number of bytes to copy
+ * @return Returns pointer to the memory location to copy to (pDest)
+ */
+FORCEINLINE void* Mem_Memmove( void* pDest, const void* pSrc, size_t numBytes );
+
+/**
+ * @ingroup core
+ * @brief Compares the first count bytes of pBuf1 and pBuf2 arrays
+ * 
+ * @param pBuf1		Pointer to the memory buffers to compare
+ * @param pBuf2		Pointer to the memory buffers to compare
+ * @param numBytes	Number of bytes to examine
+ * @return Return negative value if the first differing byte in pBuf1 is less than the corresponding byte in pBuf2. 0 if all numBytes bytes of pBuf1 and pBuf2 are equal. Positive value if the first differing byte in pBuf1 is greater than the corresponding byte in pBuf2
+ */
+FORCEINLINE int32 Mem_Memcmp( const void* pBuf1, const void* pBuf2, size_t numBytes );
+
+/**
+ * @ingroup core
+ * @brief Copies the value c into each of the first numBytes characters of the object pointed to by pDest
+ * 
+ * @param pDest		Pointer to the object to fill
+ * @param c			Fill byte
+ * @param numBytes	Number of bytes to fill
+ * @return Return pointer to the object to fill (pDest)
+ */
+FORCEINLINE void* Mem_Memset( void* pDest, uint8 c, size_t numBytes );
+
+/**
+ * @ingroup core 
+ * @brief Fills each of the first numBytes characters by zero pointed to by pDest
+ * 
+ * @param pDest		Pointer to the object to fill
+ * @param numBytes	Number of bytes to fill
+ * @return Return pointer to the object to fill (pDest)
+ */
+FORCEINLINE void* Mem_Memzero( void* pDest, size_t numBytes );
+
+/**
+ * @ingroup core 
+ * @brief Copies numBytes bytes from the object pointed to by pSrc to the object pointed to by pDest
+ * 
+ * @param pDest		Pointer to the memory location to copy to
+ * @param pSrc		Pointer to the memory location to copy from
+ * @param numBytes	Number of bytes to copy
+ * @return Return pointer to the memory location to copy to (pDest)
+ */
+FORCEINLINE void* Mem_Memcpy( void* pDest, const void* pSrc, size_t numBytes );
+
+/**
+ * @ingroup core 
+ * @brief Allocates numBytes bytes of uninitialized storage
+ * 
+ * @param numBytes		Number of bytes to allocate. An integral multiple of alignment
+ * @param alignment		Specifies the alignment. Must be a valid alignment supported by the implementation
+ * @return On success, returns the pointer to the beginning of newly allocated memory. To avoid a memory leak, the returned pointer must be deallocated with L_free() or L_realloc(). On failure, returns a NULL pointer
+ */
+FORCEINLINE void* Mem_Malloc( size_t numBytes, uint32 alignment = DEFAULT_ALIGNMENT )
+{
+	return MemAlloc()->Malloc(numBytes, alignment);
+}
+
+/**
+ * @ingroup core 
+ * @brief Allocates numBytes bytes of uninitialized storage filed by zero
+ * 
+ * @param numBytes		Number of bytes to allocate. An integral multiple of alignment
+ * @param alignment		Specifies the alignment. Must be a valid alignment supported by the implementation
+ * @return On success, returns the pointer to the beginning of newly allocated memory. To avoid a memory leak, the returned pointer must be deallocated with L_free() or L_realloc(). On failure, returns a NULL pointer
+ */
+FORCEINLINE void* Mem_MallocZero( size_t numBytes, uint32 alignment = DEFAULT_ALIGNMENT )
+{
+	void*	pData = Mem_Malloc( numBytes, alignment );
+	Mem_Memzero( pData, numBytes );
+	return pData;
+}
+
+/**
+ * @ingroup core 
+ * @brief Reallocates the given area of memory. It must be previously allocated by L_malloc or L_malloc_zeroed and not yet freed with L_free, otherwise, the results are undefined
+ * 
+ * @param pOriginal		Pointer to the memory area to be reallocated
+ * @param numBytes		New size of the array
+ * @param alignment		Alignment
+ * @return On success, returns a pointer to the beginning of newly allocated memory. To avoid a memory leak, the returned pointer must be deallocated with L_free or L_realloc. The original pointer pOriginal is invalidated and any access to it is undefined behavior (even if reallocation was in-place). On failure, returns a null pointer. The original pointer pOriginal remains valid and may need to be deallocated with L_free
+ */
+FORCEINLINE void* Mem_Realloc( void* pOriginal, size_t numBytes, uint32 alignment = DEFAULT_ALIGNMENT )
+{
+	return MemAlloc()->Realloc( pOriginal, numBytes, alignment );
+}
+
+/**
+ * @ingroup core 
+ * @brief Deallocates the space previously allocated by L_malloc or L_realloc
+ * @param pOriginal		Pointer to the memory to deallocate
+ */
+FORCEINLINE void Mem_Free( void* pOriginal )
+{
+	return MemAlloc()->Free( pOriginal );
+}
+
+/**
+* @ingroup core 
+* @brief If possible determine the size of the memory allocated at the given address
+*
+* @param InOriginal		Pointer to memory we are checking the size of
+* @return If possible, returns the size of the passed in pointer, otherwise return 0
+*/
+FORCEINLINE size_t Mem_AllocSize( void* pOriginal )
+{
+	size_t	numBytes = 0;
+	return MemAlloc()->GetAllocationSize( pOriginal, numBytes ) ? numBytes : 0;
+}
+
+/**
+ * @ingroup core 
+ * @brief C style memory allocation that fall back to C runtime
+ *
+ * @param numBytes		Number of bytes to allocate
+ * @return On success, returns the pointer to the beginning of newly allocated memory. To avoid a memory leak, the returned pointer must be deallocated with L_free_system() or L_realloc_system(). On failure, returns a NULL pointer
+ */
+FORCEINLINE void* Mem_MallocSystem( size_t numBytes )
+{
+	return malloc( numBytes );
+}
+
+/**
+ * @ingroup core
+ * @brief Reallocates the given area of memory. It must be previously allocated by L_malloc_system and not yet freed with L_free_system, otherwise, the results are undefined
+ *
+ * @param pOriginal		Pointer to the memory area to be reallocated
+ * @param numBytes		New size of the array
+ * @return On success, returns a pointer to the beginning of newly allocated memory. To avoid a memory leak, the returned pointer must be deallocated with L_free_system or L_realloc_system. The original pointer pOriginal is invalidated and any access to it is undefined behavior (even if reallocation was in-place). On failure, returns a null pointer. The original pointer pOriginal remains valid and may need to be deallocated with L_free_system
+ */
+FORCEINLINE void* Mem_ReallocSystem( void* pOriginal, size_t numBytes )
+{
+	return realloc( pOriginal, numBytes );
+}
+
+/**
+ * @ingroup core 
+ * @brief C style memory deallocation that fall back to C runtime
+ * @param pOriginal		Pointer to the memory to deallocate
+ */
+FORCEINLINE void Mem_FreeSystem( void* pOriginal )
+{
+	free( pOriginal );
+}
+
+/**
+ * @ingroup core
+ * @brief Inherit from CUseSystemMemAllocForNew if you want your objects to be placed in memory
+ * allocated by the system memory allocator routines, bypassing engine's global the one
+ */
+class CUseSystemMemAllocForNew
+{
+public:
+	/**
+	 * @brief Overloaded new operator using the system allocator
+	 *
+	 * @param numBytes	Amount of memory to allocate (in bytes)
+	 * @return Return a pointer to a block of memory with size numBytes or NULL
+	 */
+	void* operator new( size_t numBytes )
+	{
+		return Mem_MallocSystem( numBytes );
+	}
+
+	/**
+	 * @brief Overloaded delete operator using the system allocator
+	 *
+	 * @param pPtr		Pointer to delete
+	 */
+	void operator delete( void* pPtr )
+	{
+		Mem_FreeSystem( pPtr );
+	}
+
+	/**
+	 * @brief Overloaded array new operator using the system allocator.
+	 *
+	 * @param numBytes	Amount of memory to allocate (in bytes)
+	 * @return Return a pointer to a block of memory with size numBytes or NULL
+	 */
+	void* operator new[]( size_t numBytes )
+	{
+		return Mem_MallocSystem( numBytes );
+	}
+
+	/**
+	 * @brief Overloaded array delete operator using the system allocator
+	 *
+	 * @param pPtr		Pointer to delete
+	 */
+	void operator delete[]( void* pPtr )
+	{
+		Mem_FreeSystem( pPtr );
+	}
+};
+
+// Include implementation of platform specific inline functions
+#if PLATFORM_WINDOWS
+	#include "core/platforms/windows/win_memory.inl"
+#else
+	#error Unknown platform
+#endif // PLATFORM_WINDOWS
+
+// Override the global memory allocator
+#include "core/memoverride.h"
+
+#endif // !MEMORY_H

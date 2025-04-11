@@ -1,0 +1,9 @@
+{
+	"resources": [
+		"materials/nelson.stex",
+		"materials/nelson.smat",
+		"materials/veh_btr_br.stex",
+		"materials/veh_btr_br.smat",
+		"models/veh_btr_br.smdl"
+	]
+}

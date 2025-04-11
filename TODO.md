@@ -1,0 +1,60 @@
+# Version 0.1.0 :: Now
+- [X] Implement AppFramework and interface system
+- [X] Create file system
+- [X] Create class for work with command line
+- [X] Create console system
+- [X] Create config system
+- [X] Create classes for work with threads and synchronization mechanisms (mutex, semaphore, etc)
+- [X] Basic functionality for working with a window
+- [ ] Implement Vulkan Studio API
+	- [X] Implement creating of Vulkan device
+	- [X] Add opportunity to clear surface by color
+	- [X] Implement compiling shaders for Vulkan
+	- [X] Implement loading and using shaders
+	- [X] Add opportunity to render a triangle
+	- [X] Add support of textures
+		- [X] Implement support of image barriers
+	- [X] Add support of constant, vertex and index buffers
+	- [X] Implement release ownership barrier and insert aqcuare ownership barrier to use VK_SHARING_MODE_EXCLUSIVE
+			For it may be need add TransferOwnershipToQueue into StudioAPI resource interfaces that will transfer ownership of VkBuffer/VkImage to another queue family
+			How it will work: On public side we call TransferOwnershipToQueue that will make a release barrier and on under hood in CStudioAPIPendingRenderStateVk::PrepareForDraw() we will make a barrier to aqcuare the ownership
+	- [X] Implement IStudioAPI::SyncSignal and IStudioAPI::SyncWait to separate command buffers and get more async execution
+			SyncSignal: Will submit the current buffer with a signal semaphore
+			SyncWait: Will submit the current buffer and will start a new one with a wait semaphore
+			Example: Draw( ... ); SyncSignal( ..., "DRAW_END" ); SyncWait( ..., "DRAW_END" ); Draw( ... );
+	- [X] Implement batching of barriers to optimize its using
+	- [X] Implement batching of command buffers to optimize its submit
+	- [X] Add support of making barriers by StudioAPI interfaces
+	- [X] Implement support of a memory barrier
+	- [X] Split studioAPIResourceState_t by two enums: studioAPIBufferState_t and studioAPITextureLayout_t
+	- [X] Refactor buffer classes in StudioAPI
+	- [X] Rework CStudioAPIBufferVk::MapMemory and CStudioAPIBufferVk::UnmapMemory to have transparent barriers
+	- [X] Implement update descriptor sets and binding the one
+		- [X] Refactor descriptor pool manager to remove GC
+	- [ ] Add support of compute shaders
+	- [ ] Add support of depth/stencil buffers
+	- [X] Implement support of custom render passes and subpasses
+	- [X] Implement support of custom frame buffers
+	- [ ] Add the ability to get the queue type from IStudioAPICmdList. It would be useful when we issue barrier and want to know which in type of queue a resource will be used
+	- [X] Implement deferred destroying Vulkan resources, because they can by used by a command buffer in that time
+	- [X] Add support of texture barriers for specific mip level and layer
+- [X] Add support textures
+	- [X] Implement compiling textures by tool
+	- [X] Implement loading textures by the engine
+- [X] Add support materials
+	- [X] Implement shader system
+	- [X] Implement loading materials by the engine
+- [ ] Add support models
+	- [X] Implement compiling models by tool
+	- [ ] Implement loading models by the engine
+- [X] Create render thread
+- [X] Fix loading identical resources that differ in path. i.g: //CORE/materials/default.stex_c and materials/default.stex_c, they are one resource
+- [X] Add set and slot into shader parameters in a shader library to improve to set a texture and a sampler there
+- [X] Remove file extensions in call IResourceSystem::FindOrLoadResource, the extension must be inserted by a resource factory while loading
+- [X] Rename next interfaces: ISMatTool, ISMdlTool and ISTexTool into something like that IMaterialTool
+- [X] Rework SMDL_Tool and implement combine models into one while compilation
+- [X] Integrate mesh optimizer into SMDL_Tool
+- [ ] Add possible to fly on scene
+- [ ] Migrate from STL to EASTL
+- [ ] Enable SIMD in GLM (#define GLM_FORCE_SSE2 and #define GLM_FORCE_ALIGNED)
+- [ ] Migrate from Premake5 to CMake
