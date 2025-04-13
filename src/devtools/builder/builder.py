@@ -10,6 +10,7 @@ from . import compiler
 from . import step
 from premake5 import premake5
 import utils
+import thirdparty
 
 # Global variables
 INTERMEDIATE_ROOT_DIR       = "intermediate/"
@@ -32,7 +33,8 @@ def _DeleteBuildDir( context ):
 
 # Generate project files for build
 def _GenerateBuildProjectFiles( context ):
-    premake5.ExecPremake5( PREMAKE5_ACTION, [f"--intermediate-dir={INTERMEDIATE_DEPLOY_DIR}", f"--build-dir={context.get( "build_dir" )}"] )
+    gameName        = context.get( "game" )
+    premake5.ExecPremake5( PREMAKE5_ACTION, [f"--intermediate-dir={INTERMEDIATE_DEPLOY_DIR}", f"--build-dir={context.get( "build_dir" )}", f"--game={gameName}" if gameName else ""] )
 
 # Get path to project file
 def _GetPathToProjectFile( repoRoot, projectName ):
@@ -87,6 +89,22 @@ def _GenerateShaderCppClasses( context ):
         print( "" )
         subprocess.run( [shaderCompilerExe, f"-makefile {makefile} -gencpp -outcpp {repoRoot}/src/{intermediateDir}/generated/{outputDir}/ -skipcompilation"], check=True )
 
+# Copy third party files
+def _CopyThirdPartyFiles( context ):
+    thirdParty          = context.get( "third_party" )
+    buildDir            = context.get( "build_dir" )
+    isCopyTools         = context.get( "is_copy_tools" )
+    gameDir             = context.get( "game_dir" )
+    thirdParty.CopyFiles( buildDir=buildDir, isCopyTools=isCopyTools, gameDir=gameDir )
+
+# Make a file with legal notices
+def _MakeLegalNoticesFile( context ):
+    thirdParty          = context.get( "third_party" )
+    buildDir            = context.get( "build_dir" )
+    isWithTools         = context.get( "with_tools" )
+    thirdParty.MakeLegalNoticesFile( buildDir=buildDir, isWithTools=isWithTools )
+
+
 # Builder class
 class Builder:
     # Initialize a builder
@@ -102,6 +120,7 @@ class Builder:
         self.buildPlatform          = buildPlatform
         self.sdkBinDir              = f"{self.sdkDir}/bin/" + f"{compiler.GetNativePlatform().value}_{compiler.Configuration.RELEASE.value}/".lower()
         self.isRebuild              = isRebuild
+        self.thirdParty             = thirdparty.ThirdParty( repoRoot=self.repoRoot, buildPlatform=self.buildPlatform, buildConfiguration=self.buildConfiguration )
         self._steps                 = []
 
         if not os.path.isfile( f"{self.sdkBinDir}/{SDK_SHADERCOMPILER_EXE}" ) or not os.path.isfile( f"{self.sdkBinDir}/{SDK_RESOURCECOMPILER_EXE}" ):
@@ -119,8 +138,8 @@ class Builder:
         self.AddStep_Custom( step.Step( "Delete Build Directory", _DeleteBuildDir, repo_root=self.repoRoot, build_dir=self.buildDir ) )
 
     # Add a generate build project files step
-    def AddStep_GenerateBuildProjectFiles( self ):
-        self.AddStep_Custom( step.Step( "Generate Project Files", _GenerateBuildProjectFiles, build_dir=self.buildDir ) )
+    def AddStep_GenerateBuildProjectFiles( self, gameName=None ):
+        self.AddStep_Custom( step.Step( "Generate Project Files", _GenerateBuildProjectFiles, build_dir=self.buildDir, game=gameName ) )
 
     # Add a compile projects
     def AddStep_CompileProjects( self, name, projects ):
@@ -160,6 +179,24 @@ class Builder:
                                        build_configuration=compiler.Configuration.RELEASE, 
                                        build_platform=compiler.GetNativePlatform(),
                                        is_rebuild=self.isRebuild ) )
+        
+        self.sdkThirdParty             = thirdparty.ThirdParty( repoRoot=self.repoRoot, buildPlatform=compiler.GetNativePlatform(), buildConfiguration=compiler.Configuration.RELEASE )
+        self.AddStep_Custom( step.Step( "[Build] Copy Third Party Files", _CopyThirdPartyFiles,
+                                       third_party=self.sdkThirdParty,
+                                       build_dir=f"{self.repoRoot}/game/",
+                                       is_copy_tools=False ) )
+
+    # Copy third party files
+    def AddStep_CopyThirdPartyFiles( self, name, isCopyTools=False, gameDir=None ):
+        self.AddStep_Custom( step.Step( name, _CopyThirdPartyFiles,
+                                       third_party=self.thirdParty,
+                                       build_dir=self.buildDir,
+                                       is_copy_tools=isCopyTools,
+                                       game_dir=gameDir ) )
+
+    # Make a file with legal notices
+    def AddStep_MakeLegalNoticesFile( self, name, isWithTools=False ):
+        self.AddStep_Custom( step.Step( name, _MakeLegalNoticesFile, third_party=self.thirdParty, build_dir=self.buildDir, with_tools=isWithTools ) )
 
     # Add generate C++ classes for step
     def AddStep_GenerateShaderCppClasses( self, name, makefiles, useDeployIntermediantDir=True ):

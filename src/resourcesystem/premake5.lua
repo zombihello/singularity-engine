@@ -38,7 +38,7 @@ project "resourcesystem"
 
     ----------- LINK THIRD PARTIES -----------------
 
-    GLM.Link()
+    ThirdParty.Link( ThirdParty.Libs.GLM )
 
     ---------- PLATFORM SPECIFIC SETTINGS ---------
 

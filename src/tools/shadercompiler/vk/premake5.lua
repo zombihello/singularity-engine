@@ -32,8 +32,8 @@ project "shadercompiler_vk"
 
 	----------- LINK THIRD PARTIES -----------------
 
-    GLM.Link()
-	VulkanSDK.SPIRV_Cross.Link()
-	VulkanSDK.GLSLang.Link()
-    VulkanSDK.SPIRV_Tools.Link()
-    VulkanSDK.ShaderC.Link()
+    ThirdParty.Link( ThirdParty.Libs.GLM )
+    ThirdParty.Link( ThirdParty.Libs.SPIRVCross )
+    ThirdParty.Link( ThirdParty.Libs.GLSLang )
+    ThirdParty.Link( ThirdParty.Libs.SPIRVTools )
+    ThirdParty.Link( ThirdParty.Libs.ShaderC )

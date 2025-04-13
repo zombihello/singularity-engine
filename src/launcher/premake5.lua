@@ -30,6 +30,7 @@ project "launcher"
     }
 
     dependson   {
+        "copy_thirdparty_files",
         "inputsystem",
         "filesystem",
 		"engine",
@@ -42,7 +43,7 @@ project "launcher"
 
     ----------- LINK THIRD PARTIES -----------------
 
-    GLM.Link()
+    ThirdParty.Link( ThirdParty.Libs.GLM )
 
 	---------- PLATFORM SPECIFIC SETTINGS ---------
 	

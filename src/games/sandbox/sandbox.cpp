@@ -1,4 +1,4 @@
-#include "pch_game.h"
+#include "pch_sandbox.h"
 #include "studiorender/studioapi/istudioapi.h"
 #include "studiorender/istudio_rendercmd.h"
 #include "studiorender/studio_vertextypes.h"
@@ -6,10 +6,10 @@
 #include "materialsystem/imaterial.h"
 #include "materialsystem/imaterialvar.h"
 #include "resourcesystem/iresourcesystem.h"
-#include "game/game.h"
+#include "gameframework/igame.h"
 
 /**
- * @ingroup game
+ * @ingroup sandbox
  * @brief Singularity Sandbox game
  */
 class CSandboxGame : public CGame
@@ -80,7 +80,7 @@ bool CSandboxGame::Init( createInterfaceFn_t pFactory )
 	{
 		return false;
 	}
-
+	
 	// Load a quad material
 	pQuadMaterial = g_pResourceSystem->FindOrLoadResource( "materials/nelson", RESOURCE_TYPE_MATERIAL );
 

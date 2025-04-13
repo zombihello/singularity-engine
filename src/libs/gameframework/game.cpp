@@ -1,5 +1,5 @@
-#include "pch_game.h"
-#include "game/game.h"
+#include "pch_gameframework.h"
+#include "gameframework/igame.h"
 
 /*
 ==================

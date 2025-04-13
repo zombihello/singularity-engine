@@ -54,17 +54,12 @@ project "studioapi_vk"
 
 	----------- LINK THIRD PARTIES -----------------
 
-    GLM.Link()
-	VulkanSDK.Link()
-	VulkanSDK.Volk.Link()
+    ThirdParty.Link( ThirdParty.Libs.GLM )
+    ThirdParty.Link( ThirdParty.Libs.Volk )
 	
 	---------- PLATFORM SPECIFIC SETTINGS ---------
 
     -- Exclude platform specific for other platforms
     filter "platforms:not Win64"
         excludes { "**/windows/**.*" }
-    filter {}
-
-    filter "platforms:Win64"
-        defines { "VK_USE_PLATFORM_WIN32_KHR" }
     filter {}

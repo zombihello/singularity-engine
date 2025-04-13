@@ -36,8 +36,8 @@ project "inputsystem"
 
     ----------- LINK THIRD PARTIES -----------------
 
-    GLM.Link()
-    SDL2.Link()
+    ThirdParty.Link( ThirdParty.Libs.GLM )
+    ThirdParty.Link( ThirdParty.Libs.SDL2 )
 
     ---------- PLATFORM SPECIFIC SETTINGS ---------
 

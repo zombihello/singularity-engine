@@ -7,58 +7,40 @@ project "sandbox"
     language    "C++"
     location( intermediateDir )
 	targetname	"game"
-	targetdir( buildDir .. "sandbox/" .. binariesDir .. outputDir )
+	targetdir( buildDir .. "sandbox/" .. outputBinDirSuffix )
 	
     ----------- PROJECT SETTINGS --------
 
-	defines { "SANDBOX_GAME_DLL" }
-
     files       {
-		-- Shared game code
-		"../*.inl", 
-        "../*.cpp",
-        "../*.h",
-		
 		-- Sandbox game code
 		"**.inl", 
         "**.cpp",
         "**.h",
 		
 		-- Public interfaces and shared code
-        "../../public/game/**.h",
-        "../../public/game/**.inl",
         "../../public/core/**.cpp"
     }
 
     -- Enable PCH file
-    pchheader       "pch_game.h"
-    pchsource       "../pch_game.cpp"
-    includedirs     { "./", "../" }
+    pchheader       "pch_sandbox.h"
+    pchsource       "pch_sandbox.cpp"
+    includedirs     { "./" }
 
     vpaths      {
-        ["src/*"]           = { "../*.h", "../*.inl", "../*.cpp" },
-        ["src/sandbox/*"]	= { "**.h", "**.inl", "**.cpp" },
+        ["src/*"]           = { "**.h", "**.inl", "**.cpp" },
 		["public/*"]        = { "../../public/**.h", "../../public/**.inl", "../../public/**.cpp" }
     }
 
     links       {
         "core",
         "stdlib",
-		"interfaces"
-    }
-
-	dependson   {
-        "inputsystem",
-        "filesystem",
-		"engine",
-        "studiorender",
-        "materialsystem",
-		"resourcesystem"
+		"interfaces",
+        "gameframework"
     }
 
 	----------- LINK THIRD PARTIES -----------------
 
-    GLM.Link()
+    ThirdParty.Link( ThirdParty.Libs.GLM )
 
     ---------- PLATFORM SPECIFIC SETTINGS ---------
 
@@ -70,5 +52,5 @@ project "sandbox"
     -- Windows
     filter "platforms:Win64"
         files   { "**.rc" }
-        vpaths  { ["src/sandbox/*"] = { "**.rc" } }
+        vpaths  { ["src/*"] = { "**.rc" } }
     filter {}

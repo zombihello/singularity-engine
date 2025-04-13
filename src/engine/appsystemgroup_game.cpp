@@ -1,6 +1,6 @@
 #include "pch_engine.h"
 #include "core/crashdump.h"
-#include "game/igame.h"
+#include "gameframework/igame.h"
 #include "filesystem/ifilesystem.h"
 #include "engine/engine.h"
 #include "engine/appsystemgroup_game.h"

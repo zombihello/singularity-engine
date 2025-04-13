@@ -20,4 +20,4 @@ project "pixelformatinfos"
 	
 	----------- LINK THIRD PARTIES -----------------
 
-    GLM.Link()
+    ThirdParty.Link( ThirdParty.Libs.GLM )

@@ -38,8 +38,8 @@ project "engine"
 
 	----------- LINK THIRD PARTIES -----------------
 
-    GLM.Link()
-	RapidJson.Link()
+    ThirdParty.Link( ThirdParty.Libs.GLM )
+    ThirdParty.Link( ThirdParty.Libs.RapidJSON )
 
     ---------- PLATFORM SPECIFIC SETTINGS ---------
 

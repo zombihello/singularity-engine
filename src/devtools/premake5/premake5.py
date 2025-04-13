@@ -5,7 +5,7 @@ import os
 
 # Execute premake5
 def ExecPremake5( action, args=None ):
-    subprocess.run( [f"premake5/premake5", action, "--file=../premake5.lua"] + args, check=True )
+    subprocess.run( [f"premake5/premake5", action, "--file=../premake5.lua"] + ( args if args else [ "" ] ), check=True )
 
 # Get premake5 action to generate project files depending on current platform
 def GetActionToGenerateProjectFiles():

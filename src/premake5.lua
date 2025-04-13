@@ -1,3 +1,5 @@
+include( "devtools/premake5/utils.lua" )
+
 -- Path to src folder
 root = _MAIN_SCRIPT_DIR .. "/"
 
@@ -5,7 +7,7 @@ newoption {
 	trigger		    = "game",
 	value		    = "game",
 	default         = "sandbox",
-	description     = "Game which the launcher will be depends on"
+	description     = "Choose game for generation (need to exist the folder './games/<game>')"
 }
 
 newoption {
@@ -30,19 +32,19 @@ newoption {
 }
 
 newoption {
-    trigger     = "build-monolithic-engine",
-    description = "Assemble the engine monolithically"       
+    trigger         = "monolithic",
+    description     = "Assemble the engine monolithically"       
 }
 
 newoption {
-    trigger     = "workspace-on-root",
-    description = "Place the workspace file in the root"
+    trigger         = "workspace-on-root",
+    description     = "Place the workspace file in the root"
 }
 
 --------- GLOBAL VARIABLES -----------------
 
 -- Path to intermediate directory for compiling the engine and the game
-intermediateDir				= root .. "/" .. _OPTIONS["intermediate-dir"] .. "/" .. _ACTION .. "/"
+intermediateDir				= root .. "/" .. _OPTIONS["intermediate-dir"] .. "/" .. ( _ACTION or "<INVALID_ACTION>" ) .. "/"
 
 -- Path to intermediate directory for third parties
 intermediateThirdPartyDir	= intermediateDir .. "thirdparty/"
@@ -53,11 +55,11 @@ intermediateOutputDir       = "%{string.lower(cfg.platform)}/%{string.lower(cfg.
 -- Path to build directory
 buildDir                    = _OPTIONS["build-dir"] .. "/"
 
--- Path to binaries directory
-binariesDir				    = "bin/"
-
 -- Output directory name
-outputDir			        = "%{string.lower(cfg.platform)}_%{string.lower(cfg.buildcfg)}/"
+outputBinDirSuffix			= "bin/%{string.lower(cfg.platform)}_%{string.lower(cfg.buildcfg)}/"
+
+-- Licenses directory
+licensesDir                 = buildDir .. "/licenses/"
 
 -- Workspace name
 workspaceName               = _OPTIONS["workspace-name"]
@@ -65,13 +67,20 @@ workspaceName               = _OPTIONS["workspace-name"]
 -- Game which the launcher depends on
 game                        = _OPTIONS["game"]
 
+-- Configurations
+buildConfigurations         = { "Debug", "Release", "Retail" }
+
+-- Platforms
+buildPlatforms              = { "Win64" }
+
 -- Print some information about configuration
 print( "Intermediate directory: " .. intermediateDir )
 print( "Build directory: " .. buildDir )
 print( "Workspace name: " .. workspaceName )
+print( "Game: " .. game )
 
 -- Is need assemble the engine monolithically
-if _OPTIONS["build-monolithic-engine"] then
+if _OPTIONS["monolithic"] then
     buildMonolithicEngine = true
     print( "Build type: Monolithically" )
 else
@@ -97,7 +106,6 @@ inputsystem                 = "inputsystem/"
 filesystem                  = "filesystem/"
 interfaces                  = "libs/interfaces/"
 engine						= "engine/"
-game_sandbox				= "game/sandbox"
 gameinfo					= "libs/gameinfo/"
 studiorender                = "studiorender/"
 studioapi_vk 				= "studiorender/studioapi/vk/"
@@ -116,15 +124,16 @@ pixelformatinfos			= "libs/pixelformatinfos/"
 material_tool               = "tools/material_tool/"
 smdldoc                     = "libs/smdldoc/"
 model_tool                  = "tools/model_tool/"
+gameframework               = "libs/gameframework"
 
 --------------- THIRD PARTIES ---------
 include( root .. "/thirdparty/thirdparty.lua" )
 
 workspace( workspaceName )
     location( workspaceLocation )
-    configurations 	    { "Debug", "Release", "Retail" }
-    platforms 		    { "Win64" }
-    defaultplatform	    "Win64"
+    configurations( buildConfigurations )
+    platforms( buildPlatforms )
+    defaultplatform( buildPlatforms[1] )
 
     ---------------- GLOBAL SETTINGS ---------------
 
@@ -133,7 +142,7 @@ workspace( workspaceName )
 	vectorextensions 	"SSE2"	
 	externalwarnings 	"Off"
 	
-    targetdir( buildDir .. binariesDir .. outputDir )
+    targetdir( buildDir .. outputBinDirSuffix )
 	objdir( intermediateDir .. intermediateOutputDir .. "%{prj.name}/" )
 
     flags           { "MultiProcessorCompile" }
@@ -166,7 +175,7 @@ workspace( workspaceName )
         architecture 	"x64"
         cppdialect 		"C++17"
         staticruntime 	"Off"
-        debugdir( buildDir .. binariesDir .. outputDir )
+        debugdir( buildDir .. outputBinDirSuffix )
 
         defines 		{
             "_WIN64",
@@ -190,13 +199,15 @@ workspace( workspaceName )
 
     filter "configurations:Release"
         defines 	        { "NDEBUG", "DEBUG=0", "RELEASE=1", "RETAIL=0" }
+        symbols             "Default"
         optimize 	        "Speed"
         runtime 			"Release"
         inlining            "Auto"
 
     filter "configurations:Retail"
         defines 	        { "NDEBUG", "DEBUG=0", "RELEASE=0", "RETAIL=1" }
-        optimize            "Speed"
+        symbols             "Off"
+        optimize            "Full"
         runtime 			"Release"
         inlining            "Auto"
     filter {}
@@ -217,6 +228,8 @@ workspace( workspaceName )
 
     ----------------- MODULES ------------------
 
+    group "/Premake5"
+        include( "devtools/premake5/copy_thirdparty_files_project.lua" )
     group "/Engine"
         include( launcher )
 		include( core )
@@ -240,6 +253,9 @@ workspace( workspaceName )
             include( stexdoc )
 			include( pixelformatinfos )
             include( smdldoc )
+            include( gameframework )
+            group "/Engine/Libraries/ThirdParty"
+                ThirdParty.SetupProjects()
     group "/Tools"
         group "/Tools/Shader Compile"
             include( shadercompiler )
@@ -249,5 +265,5 @@ workspace( workspaceName )
             include( texture_tool )
 			include( material_tool )
             include( model_tool )
-	group "/Game"
-		include( game_sandbox )
+	group "/Games"
+		include( "games/" .. game .. "/" )

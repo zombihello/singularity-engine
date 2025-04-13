@@ -39,12 +39,12 @@ project "core"
 	
     ----------- LINK THIRD PARTIES -----------------
 
-    Mimalloc.Link()
-    ZLib.Link()
-	SDL2.Link()
-	Optick.Link()
-	GLM.Link()
-    BugTrap.Link()
+    ThirdParty.Link( ThirdParty.Libs.Mimalloc )
+    ThirdParty.Link( ThirdParty.Libs.ZLib )
+    ThirdParty.Link( ThirdParty.Libs.SDL2 )
+    ThirdParty.Link( ThirdParty.Libs.Optick )
+    ThirdParty.Link( ThirdParty.Libs.GLM )
+    ThirdParty.Link( ThirdParty.Libs.BugTrap )
 
 	---------- PLATFORM SPECIFIC SETTINGS ---------
 	

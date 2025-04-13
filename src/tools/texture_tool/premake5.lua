@@ -36,9 +36,9 @@ project "texture_tool"
 
 	----------- LINK THIRD PARTIES -----------------
 
-    GLM.Link()
-	RapidJson.Link()
-    Compressonator.Link()
+    ThirdParty.Link( ThirdParty.Libs.GLM )
+    ThirdParty.Link( ThirdParty.Libs.RapidJSON )
+    ThirdParty.Link( ThirdParty.Libs.Compressonator )
 
     ---------- PLATFORM SPECIFIC SETTINGS ---------
 

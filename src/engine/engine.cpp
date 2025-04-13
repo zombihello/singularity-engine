@@ -8,7 +8,7 @@
 #include "filesystem/ifilesystem.h"
 #include "studiorender/istudiorender.h"
 #include "studiorender/studioapi/istudioapi.h"
-#include "game/igame.h"
+#include "gameframework/igame.h"
 #include "engine/engineapi.h"
 #include "engine/engine.h"
 

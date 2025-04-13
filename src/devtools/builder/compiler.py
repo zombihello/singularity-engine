@@ -104,6 +104,7 @@ def CompileProject( projectPath, buildConfiguration, buildPlatform, isRebuild=No
         # Windows (Visual Studio)
         case "Windows":
             build_cmd = [COMPILER_PATH, projectPath,
+                         "/m",
                          f"/t:Rebuild" if isRebuild else "/t:Build",
                          f"/p:Configuration={_TranslateCompileConfiguration( buildConfiguration, buildPlatform )}", 
                          f"/p:Platform={_TranslateCompilePlatform( buildPlatform )}"]

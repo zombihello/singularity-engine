@@ -57,4 +57,3 @@
 - [ ] Add possible to fly on scene
 - [ ] Migrate from STL to EASTL
 - [ ] Enable SIMD in GLM (#define GLM_FORCE_SSE2 and #define GLM_FORCE_ALIGNED)
-- [ ] Migrate from Premake5 to CMake

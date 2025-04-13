@@ -29,5 +29,7 @@ if __name__ == "__main__":
     _builder.AddStep_CompileProjects( "Build Engine", builder.ENGINE_PROJECTS )
     _builder.AddStep_CompileShaders( "Compile Engine Shaders", builder.ENGINE_SHADERLISTS, "shadercompiler_vk" )
     _builder.AddStep_CompileContent( "Compile Engine Content", builder.ENGINE_RESOURCELISTS )
+    _builder.AddStep_CopyThirdPartyFiles( "Copy Third Party Files", isCopyTools=True )
+    _builder.AddStep_MakeLegalNoticesFile( "Make Legal Notices File", isWithTools=True )
     _builder.AddStep_Custom( step.Step( "Deploy Singularity SDK", _DeployBuildStep, builder=_builder ) )
     _builder.Execute()

@@ -8,9 +8,11 @@ import utils
 
 # Deploy a build
 def _DeployBuildStep( context ):
-    _builder                = context.get( "builder" )
-    srcGameDir              = f"{_builder.repoRoot}/game/sandbox"
-    dstGameDir              = f"{_builder.buildDir}/sandbox"
+    _builder          = context.get( "builder" )
+    srcGameDir        = f"{_builder.repoRoot}/game/sandbox"
+    dstGameDir        = f"{_builder.buildDir}/sandbox"
+
+    # Copy gameinfo.txt and config.cfg
     if os.path.isdir( srcGameDir ) and ( not os.path.isdir( dstGameDir ) or not os.path.samefile( srcGameDir, dstGameDir ) ):
         srcGameInfoFile     = f"{srcGameDir}/gameinfo.txt"
         dstGameInfoFile     = f"{dstGameDir}/gameinfo.txt"
@@ -28,8 +30,8 @@ def _DeployBuildStep( context ):
 if __name__ == "__main__":
     # Initialize and parse arguments
     argsParser              = argparse.ArgumentParser(  description="Deploy Build (sandbox)" )
-    argsParser.add_argument( "build_configuration",     help="Build configuration" )
     argsParser.add_argument( "build_platform",          help="Build platform" )
+    argsParser.add_argument( "build_configuration",     help="Build configuration" )
     argsParser.add_argument( "--output_path", "-o",     help="Output path where will be a build" )
     argsParser.add_argument( "--rebuild", "-r",         help="Do need to build a build from scratch", action="store_true" )
     argsParser.add_argument( "--sdk", "-s",             help="Set custom Singularity SDK to build" )
@@ -52,7 +54,7 @@ if __name__ == "__main__":
                                                 buildConfiguration=buildConfiguration,
                                                 isRebuild=args.rebuild )
     _builder.AddStep_DeleteBuildDir()
-    _builder.AddStep_GenerateBuildProjectFiles()
+    _builder.AddStep_GenerateBuildProjectFiles( gameName="sandbox" )
     _builder.AddStep_GenerateShaderCppClasses( "Generate Shader C++ Classes (Engine)", builder.ENGINE_CPP_SHADERLISTS )
     if args.with_sdk:
         _builder.AddStep_CompileProjects( "Build Singularity SDK", builder.TOOL_PROJECTS )
@@ -61,5 +63,7 @@ if __name__ == "__main__":
     _builder.AddStep_CompileShaders( "Compile Engine Shaders", builder.ENGINE_SHADERLISTS, "shadercompiler_vk" )
     _builder.AddStep_CompileContent( "Compile Engine Content", builder.ENGINE_RESOURCELISTS )
     _builder.AddStep_CompileContent( "Compile Game (sandbox) Content", ["content/sandbox/resourcelist.txt"] )
+    _builder.AddStep_CopyThirdPartyFiles( "Copy Third Party Files", isCopyTools=args.with_sdk, gameDir="sandbox" )
+    _builder.AddStep_MakeLegalNoticesFile( "Make Legal Notices File", isWithTools=args.with_sdk )
     _builder.AddStep_Custom( step.Step( "Deploy Build", _DeployBuildStep, builder=_builder ) )
     _builder.Execute()

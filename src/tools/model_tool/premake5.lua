@@ -36,10 +36,10 @@ project "model_tool"
 
 	----------- LINK THIRD PARTIES -----------------
 
-    GLM.Link()
-	RapidJson.Link()
-    Assimp.Link()
-    MeshOptimizer.Link()
+    ThirdParty.Link( ThirdParty.Libs.GLM )
+    ThirdParty.Link( ThirdParty.Libs.RapidJSON )
+    ThirdParty.Link( ThirdParty.Libs.Assimp )
+    ThirdParty.Link( ThirdParty.Libs.MeshOptimizer )
 
     ---------- PLATFORM SPECIFIC SETTINGS ---------
 

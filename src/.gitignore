@@ -2,3 +2,4 @@
 /.vs
 *.sln
 *.bak
+/thirdparty/thirdparty.json
