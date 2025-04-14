@@ -7,7 +7,7 @@ newoption {
 	trigger		    = "game",
 	value		    = "game",
 	default         = "sandbox",
-	description     = "Choose game for generation (need to exist the folder './games/<game>')"
+	description     = "Choose game for generation (need to exist folders: './games/<game>' and './games/<game>_launcher')"
 }
 
 newoption {
@@ -267,3 +267,4 @@ workspace( workspaceName )
             include( model_tool )
 	group "/Games"
 		include( "games/" .. game .. "/" )
+        include( "games/" .. game .. "_launcher/" )

@@ -14,7 +14,7 @@ Singularity Engine is a 3D game engine inspired by Source Engine and Quake Engin
 6. Run `src/devtools/compile_engine_content.py`
 7. Run `compile_sandbox_content.py` (optional, it only if you want play in sandbox game)
 3. Open solution `src/singularity_engine.sln`.
-4. Build project `launcher`.
+4. Build project `<gameName>_launcher`.
 
 ## Current status
 - Not ready for any use

@@ -1,23 +1,17 @@
-#include "pch_launcher.h"
-#include <filesystem>
-
+#include "appframework/iappsystemgroup.h"
 #include "appframework/iwindowmgr.h"
+#include "stdlib/convar.h"
 #include "core/icommandline.h"
 #include "core/crashdump.h"
+#include "engine/iengineapi.h"
 #include "inputsystem/iinputsystem.h"
 #include "filesystem/ifilesystem.h"
 #include "studiorender/istudiorender.h"
 #include "materialsystem/imaterialsystem.h"
 #include "resourcesystem/iresourcesystem.h"
-#include "launcher/launcher.h"
-
-/**
- * @ingroup launcher
- * @brief Macros default game directory
- */
-#define DEFAULT_GAMEDIR					"sandbox"
 
 #if ENABLE_LOGGING
+#include <filesystem>
 static FILE*		s_pLogFile = NULL;		// Launcher's log file
 
 /*
@@ -77,13 +71,66 @@ void Launcher_InitLogOutput()
 #endif // ENABLE_LOGGING
 }
 
+
+/**
+ * @ingroup launcher
+ * @brief Singularity Engine application
+ */
+class CSingularityEngineApp : public CDefaultAppSystemGroup<CAppSystemGroup>
+{
+public:
+	/**
+	 * @brief Constructor
+	 * @param pGameDir		Game directory
+	 * @param pHInstance	Application instance handle
+	 */
+	CSingularityEngineApp( const achar* pGameDir, appInstanceHandle_t hInstance = NULL );
+
+	/**
+	 * @brief An installed application creation function, you should tell the group
+	 * the DLLs and the singleton interfaces you want to instantiate.
+	 *
+	 * @return Return FALSE if there's any problems and the app will abort
+	 */
+	virtual bool Create() override;
+
+	/**
+	 * @brief Allow the application to do some work after AppSystems are connected
+	 *
+	 * Allow the application to do some work after AppSystems are connected but
+	 * they aren't all Initialized
+	 *
+	 * @return Return FALSE if there's any problems and the app will abort
+	 */
+	virtual bool PreInit() override;
+
+	/**
+	 * @brief Main loop implemented by the application
+	 * @return Return exit code. If all ok returns zero
+	 */
+	virtual int32 Main() override;
+
+	/**
+	 * @brief Allow the application to do some work after all AppSystems are shut down
+	 */
+	virtual void PostShutdown() override;
+
+private:
+	appInstanceHandle_t		hInstance;			/**< Application instance handle */
+	const achar*			pGameDir;			/**< Game directory */
+	IWindowMgr*				pWindowMgr;			/**< Window manager */
+	IEngineAPI*				pEngineAPI;			/**< Engine API */
+};
+
+
 /*
 ==================
 CSingularityEngineApp::CSingularityEngineApp
 ==================
 */
-CSingularityEngineApp::CSingularityEngineApp( appInstanceHandle_t hInstance /* = nullptr */ )
+CSingularityEngineApp::CSingularityEngineApp( const achar* pGameDir, appInstanceHandle_t hInstance /* = NULL */ )
 	: hInstance( hInstance )
+	, pGameDir( pGameDir )
 	, pWindowMgr( NULL )
 	, pEngineAPI( NULL )
 {}
@@ -156,7 +203,7 @@ bool CSingularityEngineApp::PreInit()
 	// Set startup info
 	startupInfo_t						startupInfo;
 	startupInfo.pAppInstance			= hInstance;
-	startupInfo.pGame					= CommandLine()->HasParam( "game" ) ? CommandLine()->GetFirstValue( "game" ) : DEFAULT_GAMEDIR;
+	startupInfo.pGame					= CommandLine()->HasParam( "game" ) ? CommandLine()->GetFirstValue( "game" ) : pGameDir;
 	startupInfo.pParentAppSystemGroup	= this;
 	pEngineAPI->SetStartupInfo( startupInfo );
 	return true;
@@ -185,4 +232,29 @@ void CSingularityEngineApp::PostShutdown()
 
 	pWindowMgr = NULL;
 	pEngineAPI = NULL;
+}
+
+/*
+==================
+LauncherMain
+==================
+*/
+extern "C" DLL_EXPORT uint32 LauncherMain( appInstanceHandle_t hInstance, const achar* pGameDir, const achar* pCommandLine )
+{
+	// Initialize the main thread
+	Sys_InitMainThread();
+
+	// Init of launcher's log output and command line
+	Launcher_InitLogOutput();
+	CommandLine()->Init( pCommandLine );
+
+	// Initialize OS console if it need
+	if ( CommandLine()->HasParam( "console" ) )
+	{
+		Sys_SetupConsoleIO();
+	}
+
+	// Run application
+	CSingularityEngineApp		application( pGameDir, hInstance );
+	return application.Run();
 }

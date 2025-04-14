@@ -1,3 +1,5 @@
+IDI_ICON1               ICON        "launcher.ico"
+
 1 VERSIONINFO
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
@@ -18,7 +20,7 @@ BEGIN
             VALUE "InternalName", 		""
             VALUE "LegalCopyright", 	"Copyright 2024-2025 Broken Singularity"
             VALUE "OriginalFilename", 	""
-            VALUE "ProductName", 		"Singularity Launcher"
+            VALUE "ProductName", 		"Singularity Sandbox"
 			VALUE "ProductVersion", 	"0.1.0"
         END
     END

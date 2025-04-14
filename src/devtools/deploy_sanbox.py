@@ -59,7 +59,7 @@ if __name__ == "__main__":
     if args.with_sdk:
         _builder.AddStep_CompileProjects( "Build Singularity SDK", builder.TOOL_PROJECTS )
     _builder.AddStep_CompileProjects( "Build Engine", builder.ENGINE_PROJECTS )
-    _builder.AddStep_CompileProjects( "Build Game (sandbox)", ["sandbox"] )
+    _builder.AddStep_CompileProjects( "Build Game (sandbox)", ["sandbox", "sandbox_launcher"] )
     _builder.AddStep_CompileShaders( "Compile Engine Shaders", builder.ENGINE_SHADERLISTS, "shadercompiler_vk" )
     _builder.AddStep_CompileContent( "Compile Engine Content", builder.ENGINE_RESOURCELISTS )
     _builder.AddStep_CompileContent( "Compile Game (sandbox) Content", ["content/sandbox/resourcelist.txt"] )

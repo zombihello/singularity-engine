@@ -1,10 +1,7 @@
-project "launcher"
-    if not buildMonolithicEngine then
-        kind "SharedLib"
-    else
-        kind "StaticLib"
-    end
+project "sandbox_launcher"
+    kind        "WindowedApp"
     language    "C++"
+    targetname	"sandbox"
     location( intermediateDir )
 
 	----------- PROJECT SETTINGS --------
@@ -14,36 +11,26 @@ project "launcher"
         "**.inl", 
         "**.cpp",
 
-        "../public/launcher/**.h",
-        "../public/core/**.cpp"
+        "../../public/launcher/**.h",
+        "../../public/core/**.cpp"
     }
     includedirs     { "./" }
 
     vpaths      {
         ["src/*"]           = { "**.h", "**.inl", "**.cpp" },
-        ["public/*"]        = { "../public/**.cpp" }
+        ["public/*"]        = { "../../public/**.cpp" }
     }
 
-    links       {
+    links {
         "core",
-        "stdlib",
-        "appframework",
-        "interfaces"
+        "stdlib"
     }
 
     dependson   {
-        "inputsystem",
-        "filesystem",
-		"engine",
-        "studiorender",
-        "materialsystem",
-		"resourcesystem",
-		"stdshaders"
+        "copy_thirdparty_files",
+        "launcher",
+		"sandbox"
     }
-
-    ----------- LINK THIRD PARTIES -----------------
-
-    ThirdParty.Link( ThirdParty.Libs.GLM )
 
 	---------- PLATFORM SPECIFIC SETTINGS ---------
 	
