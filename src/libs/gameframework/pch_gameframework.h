@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+#include <flecs.h>
+
 #include "interfaces/interfaces.h"
 #include "stdlib/stdlib.h"
 #include "stdlib/convar.h"

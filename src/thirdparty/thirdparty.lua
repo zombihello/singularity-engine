@@ -786,3 +786,38 @@ ThirdParty.Libs.MeshOptimizer   = {
     },
     CreateProject               = nil
 }
+
+-- -------------------
+-- Flecs
+-- -------------------
+ThirdParty.Libs.Flecs           = {
+    Path                        = root .. "/thirdparty/flecs-4.0.5",
+    Licenses                    = { "LICENSE" },
+    IsForGameOnly               = true,
+    IsTools                     = false,
+    Win64                       = {
+        IncludeDirs             = { "include/" },
+        Debug                   = {
+            IsUsed              = true,
+            Defines             = nil,
+            Libs                = { "lib/win64/debug/flecs.lib" },
+            DLLs                = { "bin/win64/debug/flecs.dll" }
+        },
+        Release                 = {
+            IsUsed              = true,
+            Defines             = nil,
+            Libs                = { "lib/win64/release/flecs.lib" },
+            DLLs                = { "bin/win64/release/flecs.dll" }
+        },
+        Retail                  = {
+            IsUsed              = true,
+            Defines             = nil,
+            Libs                = { "lib/win64/release/flecs.lib" },
+            DLLs                = { "bin/win64/release/flecs.dll" }
+        },
+        Defines                 = { "FLECS_CPP_NO_AUTO_REGISTRATION" },
+        DLLs                    = nil,
+        Tools                   = nil
+    },
+    CreateProject               = nil
+}

@@ -26,3 +26,4 @@ project "gameframework"
     ----------- LINK THIRD PARTIES -----------------
 
     ThirdParty.Link( ThirdParty.Libs.GLM )
+    ThirdParty.Link( ThirdParty.Libs.Flecs )

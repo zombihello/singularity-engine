@@ -74,7 +74,8 @@ CStudioAPIMemoryMgrVk::Shutdown
 */
 void CStudioAPIMemoryMgrVk::Shutdown()
 {
-	// Execute all pending free command buffers and free memory  
+	// Execute all pending free command buffers and free memory
+	// TODO BS yehor.pohuliaka - Need rework it because time to time the application crash at this action (in Retail configuration) 
 	for ( uint32 frameIdx = 0; frameIdx < STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT; ++frameIdx )
 	{
 		cmdBuffer_t&		cmdBuffer = pendingFreeCmdBuffers[frameIdx];

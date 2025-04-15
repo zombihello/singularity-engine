@@ -54,6 +54,11 @@
 - [X] Rename next interfaces: ISMatTool, ISMdlTool and ISTexTool into something like that IMaterialTool
 - [X] Rework SMDL_Tool and implement combine models into one while compilation
 - [X] Integrate mesh optimizer into SMDL_Tool
-- [ ] Add possible to fly on scene
+- [ ] Implement ECS
+	- [X] Include Flecs
+	- [ ] Write code generator to register components, systems and queries in the ECS world
+	- [ ] Add possible to fly on scene
 - [ ] Migrate from STL to EASTL
 - [ ] Enable SIMD in GLM (#define GLM_FORCE_SSE2 and #define GLM_FORCE_ALIGNED)
+- [ ] Fix crush in Retail configuration. Need rework pending free Vulkan resources in CStudioAPIMemoryMgrVk::Shutdown
+- [ ] Clear code from unnecessary Doxygen comments 

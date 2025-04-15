@@ -93,6 +93,9 @@ int32 CGameAppSystemGroup::Main()
 		g_Engine.FrameUpdate();
 	}
 
+	// Flush render thread commands before shutdown the application
+	Studio_FlushRenderCommands();
+
 	// Shutdown the profiler
 	PROFILE_SHUTDOWN()
 	return 0;
