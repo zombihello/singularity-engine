@@ -16,7 +16,8 @@ project "sandbox"
 		"**.inl", 
         "**.cpp",
         "**.h",
-		
+		"**.ecs",
+
 		-- Public interfaces and shared code
         "../../public/core/**.cpp"
     }
@@ -24,12 +25,17 @@ project "sandbox"
     -- Enable PCH file
     pchheader       "pch_sandbox.h"
     pchsource       "pch_sandbox.cpp"
-    includedirs     { "./" }
+    includedirs     { "./", intermediateDir .. "/generated/" }
 
     vpaths      {
-        ["src/*"]           = { "**.h", "**.inl", "**.cpp" },
+        ["src/*"]           = { "**.h", "**.inl", "**.cpp", "**.ecs" },
 		["public/*"]        = { "../../public/**.h", "../../public/**.inl", "../../public/**.cpp" }
     }
+
+    -- Build commands for specific files
+    filter { "files:**.ecs" }
+        buildaction "None" 
+    filter {}
 
     links       {
         "core",

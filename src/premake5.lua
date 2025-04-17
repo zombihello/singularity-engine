@@ -97,6 +97,9 @@ end
 print( "Workspace file path: " .. workspaceLocation )
 print( "" )
 
+include( "devtools/premake5/rule_flex.lua" )
+include( "devtools/premake5/rule_bison.lua" )
+
 --------------- MODULES ---------------
 launcher                    = "launcher/"
 core                        = "core/"
@@ -125,6 +128,8 @@ material_tool               = "tools/material_tool/"
 smdldoc                     = "libs/smdldoc/"
 model_tool                  = "tools/model_tool/"
 gameframework               = "libs/gameframework"
+ecscompiler                 = "tools/ecscompiler/"
+parserlib                   = "libs/parserlib/"
 
 --------------- THIRD PARTIES ---------
 include( root .. "/thirdparty/thirdparty.lua" )
@@ -254,9 +259,11 @@ workspace( workspaceName )
 			include( pixelformatinfos )
             include( smdldoc )
             include( gameframework )
+            include( parserlib )
             group "/Engine/Libraries/ThirdParty"
                 ThirdParty.SetupProjects()
     group "/Tools"
+        include( ecscompiler )
         group "/Tools/Shader Compile"
             include( shadercompiler )
 			include( shadercompiler_vk )

@@ -16,13 +16,15 @@ import thirdparty
 INTERMEDIATE_ROOT_DIR       = "intermediate/"
 INTERMEDIATE_DEPLOY_DIR     = f"{INTERMEDIATE_ROOT_DIR}/deploy/"
 PREMAKE5_ACTION             = premake5.GetActionToGenerateProjectFiles()
-TOOL_PROJECTS               = ["core", "engine", "filesystem", "material_tool", "model_tool", "resourcecompiler", "texture_tool", "shadercompiler", "shadercompiler_vk"]
+TOOL_PROJECTS               = ["core", "engine", "filesystem", "material_tool", "model_tool", "resourcecompiler", "texture_tool", "shadercompiler", "shadercompiler_vk", "ecscompiler"]
 ENGINE_PROJECTS             = ["core", "engine", "filesystem", "inputsystem", "launcher", "materialsystem", "resourcesystem", "studioapi_vk", "studiorender", "stdshaders"]
 ENGINE_SHADERLISTS          = ["src/materialsystem/shaderlist.makefile", "src/materialsystem/stdshaders/shaderlist.makefile"]
 ENGINE_CPP_SHADERLISTS      = [("src/materialsystem/shaderlist.makefile", "materialsystem/"), ("src/materialsystem/stdshaders/shaderlist.makefile", "materialsystem/stdshaders/")]
+ENGINE_CPP_ECS              = [("src/public/libs/gameframework/ecs/ecs_movement.ecs", "gameframework/ecs/")]
 ENGINE_RESOURCELISTS        = ["content/core/resourcelist.txt"]
 SDK_SHADERCOMPILER_EXE      = f"shadercompiler{utils.GetExecutableExtension()}"
 SDK_RESOURCECOMPILER_EXE    = f"resourcecompiler{utils.GetExecutableExtension()}"
+SDK_ECSCOMPILER_EXE         = f"ecscompiler{utils.GetExecutableExtension()}"
 
 # Delete build directory step
 def _DeleteBuildDir( context ):
@@ -89,6 +91,19 @@ def _GenerateShaderCppClasses( context ):
         print( "" )
         subprocess.run( [shaderCompilerExe, f"-makefile {makefile} -gencpp -outcpp {repoRoot}/src/{intermediateDir}/generated/{outputDir}/ -skipcompilation"], check=True )
 
+# Compile ECS
+def _CompileEcs( context ):
+    ecsFiles                    = context.get( "ecsFiles" )
+    repoRoot                    = context.get( "repo_root" )
+    useDeployIntermediantDir    = context.get( "use_deploy_intermediant_dir" )
+    ecsCompilerExe              = f"{context.get( "sdk_bin_dir" )}/{SDK_ECSCOMPILER_EXE}"
+    intermediateDir             = f"{INTERMEDIATE_DEPLOY_DIR}/{PREMAKE5_ACTION}/" if useDeployIntermediantDir else f"{INTERMEDIATE_ROOT_DIR}/{PREMAKE5_ACTION}/"
+    for ecsFile, outputDir in ecsFiles:
+        print( "" )
+        print( f"> Compile ECS: {ecsFile}" )
+        print( "" )
+        subprocess.run( [ecsCompilerExe, f"-file {ecsFile} -output {repoRoot}/src/{intermediateDir}/generated/{outputDir}/"], check=True )
+
 # Copy third party files
 def _CopyThirdPartyFiles( context ):
     thirdParty          = context.get( "third_party" )
@@ -123,7 +138,7 @@ class Builder:
         self.thirdParty             = thirdparty.ThirdParty( repoRoot=self.repoRoot, buildPlatform=self.buildPlatform, buildConfiguration=self.buildConfiguration )
         self._steps                 = []
 
-        if not os.path.isfile( f"{self.sdkBinDir}/{SDK_SHADERCOMPILER_EXE}" ) or not os.path.isfile( f"{self.sdkBinDir}/{SDK_RESOURCECOMPILER_EXE}" ):
+        if not os.path.isfile( f"{self.sdkBinDir}/{SDK_SHADERCOMPILER_EXE}" ) or not os.path.isfile( f"{self.sdkBinDir}/{SDK_RESOURCECOMPILER_EXE}" ) or not os.path.isfile( f"{self.sdkBinDir}/{SDK_ECSCOMPILER_EXE}" ):
             if os.path.isdir( self.sdkDir ) and os.path.samefile( self.sdkDir, f"{self.repoRoot}/game/" ):
                 self._AddStep_BuildSDK()
             else:
@@ -205,6 +220,14 @@ class Builder:
             _makefiles.append( ( f"{self.repoRoot}/{makefile}", outputDir ) )
 
         self.AddStep_Custom( step.Step( name, _GenerateShaderCppClasses, makefiles=_makefiles, repo_root=self.repoRoot, sdk_bin_dir=self.sdkBinDir, use_deploy_intermediant_dir=useDeployIntermediantDir ) )
+
+    # Add compile a ECS file
+    def AddStep_CompileEcs( self, name, ecsFiles, useDeployIntermediantDir=True ):
+        _ecsFiles = []
+        for ecsFile, outputDir in ecsFiles:
+            _ecsFiles.append(  ( f"{self.repoRoot}/{ecsFile}", outputDir ) )
+        
+        self.AddStep_Custom( step.Step( name, _CompileEcs, ecsFiles=_ecsFiles, repo_root=self.repoRoot, sdk_bin_dir=self.sdkBinDir, use_deploy_intermediant_dir=useDeployIntermediantDir ) )
 
     # Execute the builder
     def Execute( self ):

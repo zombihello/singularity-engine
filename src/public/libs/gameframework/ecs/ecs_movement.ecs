@@ -1,0 +1,46 @@
+module Movement;
+using "stdlib/math/transform.h";
+using "stdlib/math/math.h";
+
+// This is comment
+/*
+*         ECS_LEXER_SCOPE_DEFAULT,   
+        ECS_LEXER_SCOPE_COMPONENT,  
+        ECS_LEXER_SCOPE_SYSTEM  
+*this is multi-line comment
+*/
+component Transform
+{
+	defaults =>
+		oldTransforms( 2 ), 
+		transform( vec3_t( 32.f, -43.f, 0.43f ) ), 
+		factor( 23.3f );
+		
+	std::vector<CTransform>		oldTransforms;
+	CTransform					transform;
+	float						factor;
+}
+
+component Velocity
+{
+	defaults => speed( 0.f );
+	
+	float speed;
+}
+
+component Moveable
+{
+	bool bVar;
+}
+
+component Freezed
+{}
+
+/*[stage=OnUpdate]
+system Movement
+{
+	[read] Transform transform;
+	[write] Velocity velocity;
+	[include] Moveable _;
+	[exclude] Freezed _;
+}*/

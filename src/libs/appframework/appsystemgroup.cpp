@@ -34,7 +34,7 @@ static_assert( CAppSystemGroup::APPSYSTEM_GROUP_STAGE_COUNT == ARRAYSIZE( s_pSta
 CAppSystemGroup::CAppSystemGroup
 ==================
 */
-CAppSystemGroup::CAppSystemGroup( CAppSystemGroup* pParentAppSystem /* = nullptr */ )
+CAppSystemGroup::CAppSystemGroup( CAppSystemGroup* pParentAppSystem /* = NULL */ )
 	: pParentAppSystemGroup( pParentAppSystem )
 	, currentStage( APPSYSTEM_STAGE_NONE )
 {}
@@ -216,7 +216,7 @@ appModule_t CAppSystemGroup::LoadModule( const achar* pDLLName )
 
 	Msg( "AppFramework: Loaded module '%s'", pDLLName );
 	int32	index = ( int32 )modules.size();
-	modules.push_back( module_t{ dllHandle, nullptr, pDLLName } );
+	modules.push_back( module_t{ dllHandle, NULL, pDLLName } );
 	return index;
 }
 
@@ -244,7 +244,7 @@ appModule_t CAppSystemGroup::LoadModule( createInterfaceFn_t pFactory )
 
 	Msg( "AppFramework: Loaded module '%p'", pFactory );
 	int32	index = ( int32 )modules.size();
-	modules.push_back( module_t{ nullptr, pFactory, "" } );
+	modules.push_back( module_t{ NULL, pFactory, "" } );
 	return index;
 }
 
@@ -257,7 +257,7 @@ IAppSystem* CAppSystemGroup::AddSystem( appModule_t module, const achar* pInterf
 {
 	if ( module == APP_MODULE_INVALID )
 	{
-		return nullptr;
+		return NULL;
 	}
 
 	if ( systemDict.find( pInterfaceName ) != systemDict.end() )
@@ -271,14 +271,14 @@ IAppSystem* CAppSystemGroup::AddSystem( appModule_t module, const achar* pInterf
 	if ( !pFactoryFn )
 	{
 		Warning( "AppFramework: Failed to get interface factory from '%s'", modules[module].name.c_str() );
-		return nullptr;
+		return NULL;
 	}
 
 	void*	pSystem = pFactoryFn( pInterfaceName );
 	if ( !pSystem )
 	{
 		Warning( "AppFramework: Unable to create system '%s'!", pInterfaceName );
-		return nullptr;
+		return NULL;
 	}
 
 	IAppSystem*	pAppSystem = ( IAppSystem* )pSystem;
@@ -372,7 +372,7 @@ void* CAppSystemGroup::FindSystem( const achar* pInterfaceName ) const
 		}
 	}
 
-	return nullptr;
+	return NULL;
 }
 
 /*

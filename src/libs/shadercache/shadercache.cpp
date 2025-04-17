@@ -88,7 +88,7 @@ bool CShaderCacheDoc::SaveFile( const achar* pPath )
 	Assert( g_pFileSystem );
 	if ( !g_pFileSystem )
 	{
-		Error( "CShaderCacheDoc: For use CShaderCacheDoc::SaveFile StdLib must be connected by ConnectStdLib" );
+		Error( "ShaderCacheDoc: For use CShaderCacheDoc::SaveFile StdLib must be connected by ConnectStdLib" );
 		return false;
 	}
 
@@ -96,7 +96,7 @@ bool CShaderCacheDoc::SaveFile( const achar* pPath )
 	TRefPtr<IStreamDataWriter>	pFile = g_pFileSystem->CreateFileWriter( pPath );
 	if ( !pFile )
 	{
-		Error( "CShaderCacheDoc: Failed to create file '%s'", pPath );
+		Error( "ShaderCacheDoc: Failed to create file '%s'", pPath );
 		return false;
 	}
 
@@ -152,13 +152,13 @@ bool CShaderCacheDoc::LoadFromFile( const achar* pPath )
 	pFile->Read( &version, sizeof( uint32 ) );
 	if ( magic != SSC_MAGIC )
 	{
-		Error( "CShaderCacheDoc: Invalid magic value in '%s'. Expected 0x%X, received 0x%X", pPath, SSC_MAGIC, magic );
+		Error( "ShaderCacheDoc: Invalid magic value in '%s'. Expected 0x%X, received 0x%X", pPath, SSC_MAGIC, magic );
 		return false;
 	}
 
 	if ( version != SSC_VERSION )
 	{
-		Error( "CShaderCacheDoc: Invalid version format in '%s'. Expected %i, received %i", pPath, SSC_VERSION, version );
+		Error( "ShaderCacheDoc: Invalid version format in '%s'. Expected %i, received %i", pPath, SSC_VERSION, version );
 		return false;
 	}
 	pFile->Read( &type, sizeof( studioAPIShaderType_t ) );
