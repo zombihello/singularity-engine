@@ -1,7 +1,8 @@
 %{
     #include "ecsfileparser_bison.cpp.h"
     #include "core/core.h"
-    #include "parserlib/token_stream.h"
+    #include "parserlib/tokenstream.h"
+    #include "parserlib/grammarinterface.h"
     #include "tools/ecscompiler/ecsfileparser.h"
 
     // Some Bison defines
@@ -10,9 +11,6 @@
     #define YYPARSE_PARAM           param 
     #define YYLEX_PARAM             param 
     #define YYSTYPE                 yystypeFile_t
-
-    #define g_pFileContext           ( ( CEcsFileParserInterface* )param )
-    #define g_pFileParser            ( ( ( CEcsFileParserInterface* )param )->GetFileParser() )
 
     /**
     * @ingroup ecscompiler
@@ -85,102 +83,9 @@
         std::string_view        token;      /**< Token in string format */
     };
 
-    /**
-    * @ingroup ecscompiler
-    * @brief ECS file parser interface
-    */
-    class CEcsFileParserInterface
-    {
-    public:
-        /**
-         * @brief Constructor
-         * @param tokens        Tokens stream
-         * @param pFileParser   File parser
-         */
-         CEcsFileParserInterface( CParserTokenStream& tokens, CEcsFileParser& pFileParser )
-            : pTokens( &tokens )
-            , pFileParser( &pFileParser )
-            , pCurrentToken( NULL )
-         {}
-
-        /**
-         * @brief Get next token
-         * @param lvalp   yystypeFile_t
-         * @return Return ID of the next token. If is end of stream returns 0
-         */
-        int yylex( YYSTYPE* lvalp )
-        {
-            if ( pTokens->IsEndOfStream() )
-            {
-                return 0;
-            }
-
-            // Get next token
-            parserToken_t&    token = pTokens->GetReadToken();
-            pTokens->IncrementReadPosition();
-
-            // Update yystypeFile_t
-            lvalp->pContext     = &token.context;
-		    lvalp->token        = token.tokenString;
-
-            // Remember current token
-            pCurrentToken = &token;
-            return token.tokenID;
-        }
-
-        /**
-         * @brief Emit error
-         * @param pMessage    Error message
-         * @param lvalp       yystypeFile_t
-         * @return Return zero if need continue, otherwise not-zero value
-         */
-        int yyerror( const achar* pMessage, YYSTYPE* lvalp )
-        {
-		    // Emit error and continue
-            pFileParser->EmitError( lvalp->pContext, S_Sprintf( "%s, near '%s'", pMessage, !lvalp->token.empty() ? lvalp->token.data() : "<TOKEN_EMPTY>" ).c_str() );
-		    return 0;
-        }
-
-        /**
-         * @brief Get file parser
-         * @return Return pointer to the file parser
-         */
-         CEcsFileParser* GetFileParser()
-	    {
-		    return pFileParser;
-	    }
-
-        /**
-         * @brief Get current token line
-         * @return Return current token line. If token isn't valid returns -1
-         */
-        int32 GetCurrentTokenLine() const
-        {
-            if( !pCurrentToken )
-            {
-                return -1;
-            }
-            return pCurrentToken->context.line;
-        }
-
-        /**
-         * @brief Get last token line
-         * @return Returns the line of the last token in current context
-         */       
-        int32 GetLastTokenLine() const
-        {
-            if ( pTokens->IsEmpty() )
-            {
-                return -1;
-            }
-            return pTokens->GetLastToken().context.line;
-        }
-
-    private:
-        CParserTokenStream*		pTokens;                /**< Tokens stream */
-	    CEcsFileParser*		    pFileParser;            /**< File parser */
-        parserToken_t*			pCurrentToken;          /**< Current token */
-    };
+    typedef TGrammarInterface<CEcsFileParser, yystypeFile_t>        ecsGrammarInterface_t;
+    #define g_pFileContext                                          ( ( ecsGrammarInterface_t* )param )
+    #define g_pFileParser                                           ( ( ( ecsGrammarInterface_t* )param )->GetFileParser() )
 
     // Some Bison functions
     /*
@@ -191,8 +96,9 @@
     */
     static int yyerror_file_thread_safe( const achar* pMessage, void* pParam, YYSTYPE* lvalp )
     {
-        CEcsFileParserInterface*     pFileParserInterface = ( CEcsFileParserInterface* )pParam;
-        return pFileParserInterface->yyerror( pMessage, lvalp );
+        ecsGrammarInterface_t*     pGrammarInterface = ( ecsGrammarInterface_t* )pParam;
+        pGrammarInterface->EmitError( pMessage, lvalp );
+        return 0;
     }
 
     /*
@@ -203,8 +109,8 @@
     */    
     static int yylex_file_thread_safe( YYSTYPE* lvalp, void* pParam )
     {
-        CEcsFileParserInterface*     pFileParserInterface = ( CEcsFileParserInterface* )pParam;
-        return pFileParserInterface->yylex( lvalp );	
+        ecsGrammarInterface_t*     pGrammarInterface = ( ecsGrammarInterface_t* )pParam;
+        return ( int )pGrammarInterface->GetNextToken( lvalp );	
     }
 
     // Redefine some Bison functions
@@ -328,6 +234,6 @@ semicolon
  */
 int EcsCode_GrammarFile( CParserTokenStream& tokens, CEcsFileParser& fileParser )
 {
-    CEcsFileParserInterface      fileParserInterface( tokens, fileParser );
-    return yyparse( &fileParserInterface );
+    ecsGrammarInterface_t      grammarInterface( tokens, fileParser );
+    return yyparse( &grammarInterface );
 }

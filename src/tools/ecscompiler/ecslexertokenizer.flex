@@ -18,7 +18,8 @@
 %{
     #include "ecsfileparser_bison.cpp.h"
     #include "core/debug.h"
-    #include "parserlib/lexer_listener.h"
+    #include "parserlib/lexerstate.h"
+    #include "parserlib/lexerlistener.h"
 
     #define YY_FATAL_ERROR( Message )           { yyguts_t* yyg = ( struct yyguts_t* )yyscanner; yyextra->EmitError( Message ); }
     #define YY_USER_ACTION                      yyextra->StoreTokenStart(); yyextra->UpdateContext( yytext, yyleng );
@@ -39,50 +40,6 @@
         ECS_LEXER_SCOPE_SYSTEM      /**< System */
     };
 
-    /*
-    ==================
-    EcsLexer_CountUtf8Bytes
-    ==================
-    */
-    static uint32 EcsLexer_CountUtf8Bytes( const achar uint8Byte )
-    {
-        unsigned long    index   = 0;
-        unsigned long    mask    = ( ~uint8Byte );
-
-        #if PLATFORM_WINDOWS
-            _BitScanReverse( &index, mask );
-        #else
-            // We're counting the bits 
-	        index = 31 - __lzcnt32( mask );
-        #endif // PLATFORM_WINDOWS
-
-        // We have the 0-index context of the most significant bit, which we need to turn into a count of the number of bits (or 1-index context)
-	    // Then reverse the order so that we have a count of the number of bits leading up to the MSB
-	    return 8 - ( index + 1 );
-    }
-
-    /*
-    ==================
-    EcsLexer_CountCharacters
-    ==================
-    */  
-    static uint32 EcsLexer_CountCharacters( const achar* pToken, uint32 size )
-    {
-        uint32      length = 0;
-	    for ( uint32 index = 0; index < size; ++index )
-	    {
-	    	if ( ( pToken[index] & 0x80 ) )
-	    	{
-	    		const uint32    sizeOfUtf8Character = EcsLexer_CountUtf8Bytes( pToken[index] );
-	    		const uint32    bytesToSkip         = sizeOfUtf8Character - 1;
-			    index += bytesToSkip;
-		    }
-		    ++length;
-	    }
-
-	    return length;   
-    }
-
     /**
      * @ingroup ecscompiler
      * @brief The lexer's internal state
@@ -94,92 +51,12 @@
          * @param pSource          The raw input buffer
          * @param pLexerListener   Lexer listener
          */
-         ecsLexerStateInternal_t( const achar* pSourceCode, CParserLexerListenerBase* pLexerListener )
-            : parserLexerState_t( pSourceCode )
+         ecsLexerStateInternal_t( const achar* pSourceCode, CParserLexerListener* pLexerListener )
+            : parserLexerState_t( pSourceCode, pLexerListener )
             , lexerScope( ECS_LEXER_SCOPE_DEFAULT )
             , bracketScopeLevel( 0 )
-            , pLexerListener( pLexerListener )
         {}
 
-        /**
-         * @brief Next line
-         */
-        FORCEINLINE void NextLine()
-        {
-            ++currentContext.line;
-            lineStart = currentContext;
-        }
-
-        /**
-         * @brief Start to store token
-         */
-        FORCEINLINE void StoreTokenStart()
-        {
-            tokenStart = currentContext;
-        }
-
-        /**
-         * @brief Start to store sequence
-         * @param charactersToSkip    Number characters to skip
-         */
-        FORCEINLINE void StoreSequenceStart( uint32 charactersToSkip = 0 )
-        {
-            sequenceStart = tokenStart;
-            if ( charactersToSkip )
-            {
-                sequenceStart.byteOffset    += charactersToSkip;
-                sequenceStart.charOffset    += charactersToSkip;
-            }
-
-            sequenceLineStart = lineStart;
-        }
-
-        /**
-         * @brief Update current context
-         * @param pToken            The token
-         * @param tokenByteLength   Length of the token in bytes
-         */
-        FORCEINLINE void UpdateContext( const achar* pToken, uint32 tokenByteLength )
-        {
-            currentContext.byteOffset += tokenByteLength;
-            currentContext.charOffset += EcsLexer_CountCharacters( pToken, tokenByteLength );
-        }
-
-        /**
-         * @brief Emit token
-         * @param tokenID     Token ID
-         */
-        FORCEINLINE void EmitToken( uint32 tokenID )
-        {
-            pLexerListener->Token( *this, tokenID );
-        }
-
-        /**
-         * @brief Emit sequence
-         * @param tokenID     Token ID
-         */
-        FORCEINLINE void EmitSequence( uint32 tokenID )
-        {
-            pLexerListener->Sequence( *this, tokenID );
-        }
-
-        /**
-         * @brief Emit comment
-         */
-        FORCEINLINE void EmitComment()
-        {
-            pLexerListener->Comment( *this );
-        }
-
-        /**
-         * @brief Emit error
-         * @param pMessage  Message
-         */
-        FORCEINLINE void EmitError( const achar* pMessage )
-        {
-            pLexerListener->Error( *this, pMessage );
-        }
- 
         /**
          * @brief Set lexer scope
          * @param lexerScope    A new lexer scope
@@ -215,11 +92,10 @@
             return ecsLexerStateInternal_t::lexerScope == lexerScope;
         }
 
-        uint32                          bracketScopeLevel;  /**< Bracket scope level */
+        uint32                      bracketScopeLevel;  /**< Bracket scope level */
 
     private:
-        ecsLexerScope_t                 lexerScope;         /**< Lexer scope */
-        CParserLexerListenerBase*       pLexerListener;     /**< Lexer listener */
+        ecsLexerScope_t             lexerScope;         /**< Lexer scope */
     };
 %}
 
@@ -357,7 +233,7 @@
  * @param pSourceCode      Source code
  * @param pLexerListener   Lexer listener
  */
-void EcsCode_Tokenize( const achar* pSourceCode, CParserLexerListenerBase* pLexerListener )
+void EcsCode_Tokenize( const achar* pSourceCode, CParserLexerListener* pLexerListener )
 {
     yyscan_t                    scanner;
     ecsLexerStateInternal_t     lexerState( pSourceCode, pLexerListener );

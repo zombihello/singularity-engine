@@ -3,10 +3,10 @@
  * @addtogroup parserlib parserlib
  */
 
-#ifndef TOKEN_EATER_H
-#define TOKEN_EATER_H
+#ifndef TOKENEATER_H
+#define TOKENEATER_H
 
-#include "parserlib/token_stream.h"
+#include "parserlib/tokenstream.h"
 #include "parserlib/stringbuffer.h"
 
 /**
@@ -61,4 +61,4 @@ protected:
 	CParserTokenStream&			tokens;		/**< Stream tokens. Here will be places all of parsed tokens */
 };
 
-#endif // !TOKEN_EATER_H
+#endif // !TOKENEATER_H

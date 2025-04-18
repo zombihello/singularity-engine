@@ -264,7 +264,7 @@ workspace( workspaceName )
                 ThirdParty.SetupProjects()
     group "/Tools"
         include( ecscompiler )
-        group "/Tools/Shader Compile"
+        group "/Tools/Shader Compiler"
             include( shadercompiler )
 			include( shadercompiler_vk )
         group "/Tools/Resource Compiler"

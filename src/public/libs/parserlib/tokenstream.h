@@ -3,8 +3,8 @@
  * @addtogroup parserlib parserlib
  */
 
-#ifndef TOKEN_STREAM_H
-#define TOKEN_STREAM_H
+#ifndef TOKENSTREAM_H
+#define TOKENSTREAM_H
 
 #include <vector>
 #include "parserlib/token.h"
@@ -170,4 +170,4 @@ private:
 	uint32		readPosition;	/**< Read position */
 };
 
-#endif // !TOKEN_STREAM_H
+#endif // !TOKENSTREAM_H

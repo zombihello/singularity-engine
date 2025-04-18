@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "stdlib/refcount.h"
-#include "parserlib/file_context.h"
+#include "parserlib/filecontext.h"
 
 /**
  * @ingroup ecscompiler

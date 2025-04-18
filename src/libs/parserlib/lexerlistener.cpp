@@ -1,22 +1,23 @@
 #include "pch_parserlib.h"
-#include "parserlib/lexer_emitter.h"
+#include "parserlib/lexerstate.h"
+#include "parserlib/lexerlistener.h"
 
 /*
 ==================
-CParserLexerEmitter::CParserLexerEmitter
+CParserLexerListener::CParserLexerListener
 ==================
 */
-CParserLexerEmitter::CParserLexerEmitter( CParserTokenEater& parserListener, const achar* pPath )
+CParserLexerListener::CParserLexerListener( CParserTokenEater& parserListener, const achar* pPath )
 	: parserListener( parserListener )
 	, path( pPath )
 {}
 
 /*
 ==================
-CParserLexerEmitter::Comment
+CParserLexerListener::Comment
 ==================
 */
-void CParserLexerEmitter::Comment( const parserLexerState_t& lexerState )
+void CParserLexerListener::Comment( const parserLexerState_t& lexerState )
 {
 	uint32			line				= lexerState.tokenStart.line + 1;
 	uint32			scopeLevel			= lexerState.scopeLevel;
@@ -32,10 +33,10 @@ void CParserLexerEmitter::Comment( const parserLexerState_t& lexerState )
 
 /*
 ==================
-CParserLexerEmitter::Token
+CParserLexerListener::Token
 ==================
 */
-void CParserLexerEmitter::Token( const parserLexerState_t& lexerState, uint32 tokenID )
+void CParserLexerListener::Token( const parserLexerState_t& lexerState, uint32 tokenID )
 {
 	uint32			line				= lexerState.tokenStart.line + 1;
 	uint32			scopeLevel			= lexerState.scopeLevel;
@@ -49,10 +50,10 @@ void CParserLexerEmitter::Token( const parserLexerState_t& lexerState, uint32 to
 
 /*
 ==================
-CParserLexerEmitter::Sequence
+CParserLexerListener::Sequence
 ==================
 */
-void CParserLexerEmitter::Sequence( const parserLexerState_t& lexerState, uint32 tokenID )
+void CParserLexerListener::Sequence( const parserLexerState_t& lexerState, uint32 tokenID )
 {
 	uint32			line				= lexerState.tokenStart.line + 1;
 	uint32			scopeLevel			= lexerState.scopeLevel;
@@ -68,10 +69,10 @@ void CParserLexerEmitter::Sequence( const parserLexerState_t& lexerState, uint32
 
 /*
 ==================
-CParserLexerEmitter::Error
+CParserLexerListener::Error
 ==================
 */
-void CParserLexerEmitter::Error( const parserLexerState_t& lexerState, const achar* pMessage )
+void CParserLexerListener::Error( const parserLexerState_t& lexerState, const achar* pMessage )
 {
 	uint32			line				= lexerState.tokenStart.line + 1;
 	uint32			charLineStart		= lexerState.lineStart.charOffset;

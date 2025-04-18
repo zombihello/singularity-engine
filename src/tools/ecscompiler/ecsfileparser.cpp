@@ -1,10 +1,10 @@
-#include "parserlib/token_stream.h"
-#include "parserlib/token_eater.h"
-#include "parserlib/lexer_emitter.h"
+#include "parserlib/tokenstream.h"
+#include "parserlib/tokeneater.h"
+#include "parserlib/lexerlistener.h"
 #include "tools/ecscompiler/ecsfileparser.h"
 
 // Entry function to call lexer to tokenize source code
-extern void EcsCode_Tokenize( const achar* pSourceCode, CParserLexerListenerBase* pLexerListener );
+extern void EcsCode_Tokenize( const achar* pSourceCode, CParserLexerListener* pLexerListener );
 
 // Entry function grammar to parse file source code
 extern int EcsCode_GrammarFile( CParserTokenStream& tokens, CEcsFileParser& fileParser );
@@ -35,8 +35,8 @@ bool CEcsFileParser::ParseFile( const achar* pPath, const achar* pCode )
 	// Tokenize the code
 	{
 		CParserTokenEater		tokenEater( tokens, pPath );
-		CParserLexerEmitter		lexerEmitter( tokenEater, pPath );
-		EcsCode_Tokenize( pCode, &lexerEmitter );
+		CParserLexerListener	lexerListener( tokenEater, pPath );
+		EcsCode_Tokenize( pCode, &lexerListener );
 	}
 
 	// Parser the code

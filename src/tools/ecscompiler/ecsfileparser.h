@@ -7,7 +7,7 @@
 #define ECSFILEPARSER_H
 
 #include "core/types.h"
-#include "parserlib/file_context.h"
+#include "parserlib/filecontext.h"
 #include "tools/ecscompiler/ecsfieldstubs.h"
 
 /**

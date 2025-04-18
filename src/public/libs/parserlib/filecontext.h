@@ -3,8 +3,8 @@
  * @addtogroup parserlib parserlib
  */
 
-#ifndef FILE_CONTEXT_H
-#define FILE_CONTEXT_H
+#ifndef FILECONTEXT_H
+#define FILECONTEXT_H
 
 #include "parserlib/stringbuffer.h"
 
@@ -136,4 +136,4 @@ struct parserFileContext_t
 	int32							charEndPosition;	/**< Character position at the end of the context */
 };
 
-#endif // !FILE_CONTEXT_H
+#endif // !FILECONTEXT_H

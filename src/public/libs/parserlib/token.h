@@ -6,7 +6,7 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
-#include "parserlib/file_context.h"
+#include "parserlib/filecontext.h"
 
 /**
  * @ingroup parserlib

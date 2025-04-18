@@ -3,8 +3,8 @@
  * @addtogroup parserlib parserlib
  */
 
-#ifndef LEXER_CONTEXT_H
-#define LEXER_CONTEXT_H
+#ifndef LEXERCONTEXT_H
+#define LEXERCONTEXT_H
 
 #include "core/platform.h"
 #include "core/types.h"
@@ -39,4 +39,4 @@ struct parserLexerContext_t
 	uint32		charOffset; /**< The associated position in the input buffer resolved as a utf-8 string */
 };
 
-#endif // !LEXER_CONTEXT_H
+#endif // !LEXERCONTEXT_H
