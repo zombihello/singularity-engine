@@ -6,181 +6,88 @@
 #include "materialsystem/ishader.h"
 #include "materialsystem/materialsystem.h"
 
-/**
- * @ingroup materialsystem
- * @brief Calculate a hash for a string to use it in std::unordered_map
- */
+//-----------------------------------------------------------------------------
+// Calculate a hash for a string to use it in std::unordered_map
+//-----------------------------------------------------------------------------
 struct insensitiveStringHash_t
 {
-	/**
-	 * @brief Calculate a hash for a string
-	 * @param pString	String
-	 * @return Return calculated hash for the string
-	 */
 	FORCEINLINE std::size_t operator()( const achar* pString ) const
 	{
 		return FastHashFromString( pString );
 	}
 };
 
-/**
- * @ingroup materialsystem
- * @brief Comparator for std::unordered_map to insensitive compre strings
- */
+
+//-----------------------------------------------------------------------------
+// Comparator for std::unordered_map to insensitive compre strings
+//-----------------------------------------------------------------------------
 struct insensitiveCompareString_t
 {
-	/**
-	 * @brief Compare two string
-	 * @param pLeft		First string
-	 * @param pRight	Second string
-	 * @return Return TRUE if they are is same, otherwise FALSE
-	 */
-	bool operator()( const achar* pLeft, const achar* pRight ) const
+	FORCEINLINE bool operator()( const achar* pLeft, const achar* pRight ) const
 	{
 		return !S_Stricmp( pLeft, pRight );
 	}
 };
 
-/**
- * @ingroup materialsystem
- * @brief Information about a shader library
- */
+
+//-----------------------------------------------------------------------------
+// Information about a shader library
+//-----------------------------------------------------------------------------
 struct shaderLibInfo_t
 {
-	/**
-	 * @brief Shaders dictionary type
-	 */
 	typedef std::unordered_map<const achar*, IShader*, insensitiveStringHash_t, insensitiveCompareString_t>		shadersDict_t;
 
-	std::string									fileName;									/**< File name */
-	dllHandle_t									moduleHandle;								/**< Module handle */
-	IShaderLib*									pShaderLib;									/**< Shader library */
-	bool										bGameShaderLib;								/**< TRUE if this is a game's shader library, in which case it's not allowed to override any existing shader names */
-	shadersDict_t								shadersDict;								/**< Shaders in this library */
-	std::vector<TRefPtr<IStudioAPIShader>>		shaderCaches[STUDIOAPI_SHADER_NUM_TYPES];	/**< Shader caches for each shader type */
+	std::string									fileName;
+	dllHandle_t									moduleHandle;
+	IShaderLib*									pShaderLib;
+	bool										bGameShaderLib;		// TRUE if this is a game's shader library, in which case it's not allowed to override any existing shader names
+	shadersDict_t								shadersDict;
+	std::vector<TRefPtr<IStudioAPIShader>>		shaderCaches[STUDIOAPI_SHADER_NUM_TYPES];
 };
 
-/**
- * @ingroup materialsystem
- * @brief Shader manager
- */
+
+//-----------------------------------------------------------------------------
+// Shader manager
+//-----------------------------------------------------------------------------
 class CShaderMgr : public IShaderMgr
 {
 public:
-	/**
-	 * @brief Initialize
-	 * This function initialize the manager and loads all engine shader DLLs
-	 */
+	// IShaderMgr interface
+	// Initialize and shutdown the manager
+	// NOTE: Those functions loads/unloads all engine shader DLLs
 	virtual void Init() override;
-
-	/**
-	 * @brief Shutdown
-	 * This function shutdown the manager and unloads all engine shader DLLs
-	 */
 	virtual void Shutdown() override;
 
-	/**
-	 * @brief Initialize for the game
-	 * This function loads all game specific shader DLLs
-	 */
+	// Initialize and shutdown the manager for the game
+	// NOTE: Those functions loads/unloads all game specific shader DLLs
 	virtual void GameInit() override;
-
-	/**
-	 * @brief Shutdown for the game
-	 * This function unloads all game specific shader DLLs
-	 */
 	virtual void GameShutdown() override;
 
-	/**
-	 * @brief Find a shader by name
-	 * @param pShaderName		Shader name
-	 * @return Return the shader instance, if not found return NULL
-	 */
 	virtual IShader* FindShader( const achar* pShaderName ) const override;
-
-	/**
-	 * @brief Get a StudioAPI shader
-	 * @param shaderLibIndex	Shader library index
-	 * @param shaderType		Shader type
-	 * @param shaderIndex		Shader index
-	 * @return Return the StudioAPI shader. If isn't return NULL
-	 */
 	virtual IStudioAPIShader* GetStudioAPIShader( uint32 shaderLibIndex, studioAPIShaderType_t shaderType, uint64 shaderIndex ) const override;
 
 private:
-	/**
-	 * @brief Load shader library
-	 * @param pPath				Path to shader library module
-	 * @param bGameShaderLib	Is this game's shader library
-	 * @return Return TRUE if shader library is loaded, otherwise returns FALSE
-	 */
 	bool LoadShaderLib( const achar* pPath, bool bGameShaderLib = false );
-
-	/**
-	 * @brief Unload shader library
-	 * @param index		Shader library index
-	 */
 	void UnloadShaderLib( uint32 index );
-
-	/**
-	 * @brief Initialize a shader library information
-	 * @param shaderLibInfo		Shader library info
-	 * @return Return TRUE if shader library information is initialized, otherwise returns FALSE
-	 */
+	uint32 FindShaderLib( const achar* pPath ) const;
 	bool InitShaderLibInfo( const shaderLibInfo_t& shaderLibInfo );
-
-	/**
-	 * @brief Sets up the shader dictionary for a library
-	 * @@param index		Shader library index
-	 */
 	void SetupShaderDictionary( uint32 index );
-
-	/**
-	 * @brief Load shader caches for a shader library
-	 * @param index		Shader library index
-	 * @return Return TRUE if all shader caches are loaded successfully, otherwise return FALSE
-	 */
+	
 	bool LoadShaderCaches( uint32 index );
-
-	/**
-	 * @brief Unload shader caches of a shader library
-	 * @param index		Shader library index
-	 */
 	void UnloadShaderCaches( uint32 index );
 
-	/**
-	 * @brief Find shader library by module path
-	 * @param pPath		Path to shader library module
-	 * @return Return shader library index, if not found returns INVALID_INDEX
-	 */
-	uint32 FindShaderLib( const achar* pPath ) const;
-
-	/**
-	 * @brief Load engine's shader libraries
-	 */
 	void LoadShaderLibs();
-
-	/**
-	 * @brief Unload engine's shader libraries
-	 */
 	void UnloadShaderLibs();
-
-	/**
-	 * @brief Load game's shader libraries
-	 */
 	void LoadGameShaderLibs();
-
-	/**
-	 * @brief Unload game's shader libraries
-	 */
 	void UnloadGameShaderLibs();
 
-	std::vector<shaderLibInfo_t>		shaderLibs;		/**< Loaded shader libraries */
+	std::vector<shaderLibInfo_t>		shaderLibs;
 };
 
 CShaderLib		g_ShaderLib( "default" );
 EXPOSE_SINGLE_INTERFACE( CShaderMgr, IShaderMgr, SHADERMGR_INTERFACE_VERSION );
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CShaderLib, IShaderLib, SHADERLIB_INTERFACE_VERSION, g_ShaderLib );
+
 
 /*
 ==================

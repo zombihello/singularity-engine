@@ -4,22 +4,16 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_syswm.h>
 
-/**
- * @ingroup appframework
- * @brief Delegate for process window event
- */
+//-----------------------------------------------------------------------------
+// SDL window delegates
+//-----------------------------------------------------------------------------
 DECLARE_MULTICAST_DELEGATE( COnProcessWindowEvent, const windowEvent_t& /* windowEvent */ );
-
-/**
- * @ingroup appframework
- * @brief Delegate for process input event
- */
 DECLARE_MULTICAST_DELEGATE( COnProcessInputEvent, const inputEvent_t& /* inputEvent */ );
 
-/**
- * @ingroup appframework
- * @brief Table for convert SDL scancode to engine button code
- */
+
+//-----------------------------------------------------------------------------
+// Table for convert SDL scancode to engine button code
+//-----------------------------------------------------------------------------
 static SDL_Scancode		s_ScanCodeToButtonCode[] =
 {
 	SDL_SCANCODE_UNKNOWN,				// BUTTON_CODE_NONE
@@ -132,6 +126,10 @@ static SDL_Scancode		s_ScanCodeToButtonCode[] =
 	SDL_SCANCODE_F12					// KEY_F12
 };
 
+
+//-----------------------------------------------------------------------------
+// Some helper functions to convert engine button code <-> SDL
+//-----------------------------------------------------------------------------
 /*
 ==================
 ScanCodeToButtonCode
@@ -150,6 +148,7 @@ static FORCEINLINE buttonCode_t ScanCodeToButtonCode( uint32 scancode )
 	return BUTTON_CODE_NONE;
 }
 
+
 /*
 ==================
 ButtonCodeToScanCode
@@ -160,6 +159,7 @@ static FORCEINLINE uint32 ButtonCodeToScanCode( buttonCode_t buttonCode )
 	Assert( buttonCode >= KEY_FIRST && buttonCode <= KEY_LAST );
 	return s_ScanCodeToButtonCode[( uint32 )buttonCode];
 }
+
 
 /*
 ==================
@@ -182,150 +182,61 @@ static FORCEINLINE buttonCode_t MouseButtonToButtonCode( uint8 buttonIndex )
 	}
 }
 
-/**
- * @ingroup appframework
- * @brief SDL window manager
- */
+
+//-----------------------------------------------------------------------------
+// SDL window manager
+//-----------------------------------------------------------------------------
 class CSDLWindowMgr : public CBaseAppSystem<IWindowMgr>
 {
 public:
-	/**
-	 * @brief Constructor
-	 */
 	CSDLWindowMgr();
-
-	/**
-	 * @brief Destructor
-	 */
 	~CSDLWindowMgr();
 
-	/**
-	 * @brief Create window
-	 *
-	 * @param pTitle	Title
-	 * @param width		Width
-	 * @param height	Height
-	 * @param flags		Combinations flags of EStyleWindow for set style of window
-	 * @return Return TRUE if window is created successfully, otherwise will return FALSE
-	 */
 	virtual bool Create( const achar* pTitle, uint32 width, uint32 height, uint32 flags = WINDOW_STYLE_DEFAULT ) override;
-
-	/**
-	 * @brief Close window
-	 */
 	virtual void Close() override;
 
-	/**
-	 * @brief Show window
-	 * @param bShowWindow	Is need show or hide window
-	 */
 	virtual void ShowWindow( bool bShowWindow = true ) override;
-
-	/**
-	 * @brief Maximize window
-	 */
 	virtual void Maximize() override;
-
-	/**
-	 * @brief Minimize window
-	 */
 	virtual void Minimize() override;
 
-	/**
-	 * @brief Process window events
-	 */
 	virtual void ProcessEvents() override;
 
-	/**
-	 * @brief Set title of window
-	 * @param pTitle	New title
-	 */
 	virtual void SetTitle( const achar* pTitle ) override;
-
-	/**
-	 * @brief Set size of window
-	 *
-	 * @param width		Width
-	 * @param height	Height
-	 */
 	virtual void SetSize( uint32 width, uint32 height ) override;
-
-	/**
-	 * @brief Set fullscreen mode
-	 * @param bFullscreen	Enable or disable fullscreen mode
-	 */
 	virtual void SetFullscreen( bool bFullscreen ) override;
 
-	/**
-	 * @brief Get delegate of process window event
-	 * @return Return delegate of process window event
-	 */
 	virtual IOnProcessWindowEvent* OnProcessWindowEvent() const override;
-
-	/**
-	 * @brief Get delegate of process input event
-	 * @return Return delegate of process input event
-	 */
 	virtual IOnProcessInputEvent* OnProcessInputEvent() const override;
 
-	/**
-	 * @brief Is window open
-	 * @return Return TRUE if window is opened, otherwise will return FALSE
-	 */
 	virtual bool IsOpen() const override;
-
-	/**
-	 * @brief Is enabled fullscreen mode
-	 * @return Return TRUE if fullscreen mode is enabled, otherwise will return FALSE
-	 */
 	virtual bool IsFullscreen() const override;
-
-	/**
-	 * @brief Get size window
-	 *
-	 * @param width		Output window width
-	 * @oaram height	Output window height
-	 */
 	virtual void GetSize( uint32& width, uint32& height ) const override;
-
-	/**
-	 * @brief Get window handle
-	 * @return Return window handle
-	 */
 	virtual windowHandle_t GetHandle() const override;
-
-	/**
-	 * @brief Get ID window in the engine
-	 * @return Return ID window in the engine. If window not created will return -1
-	 */
 	virtual uint32 GetID() const override;
-
-	/**
-	 * @brief Get SDL window handle
-	 * @return Return SDL window handle
-	 */
 	FORCEINLINE SDL_Window* GetSDLWindow() const 
 	{ 
 		return pSDLWindow; 
 	}
 
 private:
-	bool					bFullscreen;			/**< Is enabled fullscreen mode */
-
-	uint32					id;						/**< Window id */
-	SDL_Window*				pSDLWindow;				/**< Pointer to SDL window */
-	windowHandle_t			handle;					/**< OS window handle */
-	COnProcessWindowEvent	onProcessWindowEvent;	/**< Delegate for process window event */
-	COnProcessInputEvent	onProcessInputEvent;	/**< Delegate for process input event */
+	bool					bFullscreen;
+	uint32					id;
+	SDL_Window*				pSDLWindow;
+	windowHandle_t			handle;
+	COnProcessWindowEvent	onProcessWindowEvent;
+	COnProcessInputEvent	onProcessInputEvent;
 };
 
 
+//-----------------------------------------------------------------------------
+// Create a singleton window manager
+//-----------------------------------------------------------------------------
 /*
 ==================
 CreateWindowMgr
 ==================
 */
-static CSDLWindowMgr*			s_pSDLWindowMgr = nullptr;
+static CSDLWindowMgr*			s_pSDLWindowMgr = NULL;
 IWindowMgr* CreateWindowMgr()
 {
 	if ( !s_pSDLWindowMgr )
@@ -335,6 +246,10 @@ IWindowMgr* CreateWindowMgr()
 	return s_pSDLWindowMgr;
 }
 
+
+//-----------------------------------------------------------------------------
+// SDL window implementation
+//-----------------------------------------------------------------------------
 /*
 ==================
 CSDLWindowMgr::CSDLWindowMgr
@@ -343,7 +258,7 @@ CSDLWindowMgr::CSDLWindowMgr
 CSDLWindowMgr::CSDLWindowMgr()
 	: bFullscreen( false )
 	, id( -1 )
-	, pSDLWindow( nullptr )
+	, pSDLWindow( NULL )
 	, handle( INVALID_WINDOW_HANDLE )
 {}
 
@@ -451,7 +366,7 @@ bool CSDLWindowMgr::Create( const achar* pTitle, uint32 width, uint32 height, ui
 	// Do nothing if we already create the window
 	if ( pSDLWindow )
 	{
-		Warning( "CSDLWindowMgr::Create: Window already created" );
+		Warning( "SDLWindowMgr: Window already created" );
 		return true;
 	}
 
@@ -498,7 +413,7 @@ bool CSDLWindowMgr::Create( const achar* pTitle, uint32 width, uint32 height, ui
 	pSDLWindow = SDL_CreateWindow( pTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, sdlFlags );
 	if ( !pSDLWindow )
 	{
-		Sys_Error( "Failed to create window (%ix%i) with title '%s' and flags 0x%X. SDL error: %s", width, height, pTitle, flags, SDL_GetError() );
+		Sys_Error( "SDLWindowMgr: Failed to create window (%ix%i) with title '%s' and flags 0x%X. SDL error: %s", width, height, pTitle, flags, SDL_GetError() );
 		return false;
 	}
 	
@@ -513,7 +428,7 @@ bool CSDLWindowMgr::Create( const achar* pTitle, uint32 width, uint32 height, ui
 	#error Unknown platform
 #endif // PLATFORM_WINDOWS
 
-	Msg( "Window created (%ix%i) with title '%s', flags 0x%X and handle 0x%p", width, height, pTitle, flags, handle );
+	Msg( "SDLWindowMgr: Window created (%ix%i) with title '%s', flags 0x%X and handle 0x%p", width, height, pTitle, flags, handle );
 	id = SDL_GetWindowID( pSDLWindow );
 	return true;
 }
@@ -554,10 +469,10 @@ void CSDLWindowMgr::Close()
 	if ( pSDLWindow )
 	{
 		SDL_DestroyWindow( pSDLWindow );
-		Msg( "Window with handle 0x%p closed", handle );
+		Msg( "SDLWindowMgr: Window with handle 0x%p closed", handle );
 
 		id				= ( uint32 )-1;
-		pSDLWindow		= nullptr;
+		pSDLWindow		= NULL;
 		handle			= INVALID_WINDOW_HANDLE;
 		bFullscreen		= false;
 	}

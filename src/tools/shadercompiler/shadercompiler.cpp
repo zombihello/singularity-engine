@@ -81,83 +81,43 @@ void ConvShaderTypeToString( studioAPIShaderType_t shaderType, const achar*& pSh
 }
 
 
-/**
- * @ingroup shadercompiler
- * @brief Shader compile application
- */
+//-----------------------------------------------------------------------------
+// Shader compile application
+//-----------------------------------------------------------------------------
 class CShaderCompileApp : public CDefaultAppSystemGroup<CAppSystemGroup>
 {
 public:
-	/**
-	 * @brief Constructor
-	 */
-	CShaderCompileApp();
-
-	/**
-	 * @brief An installed application creation function, you should tell the group
-	 * the DLLs and the singleton interfaces you want to instantiate.
-	 *
-	 * @return Return FALSE if there's any problems and the app will abort
-	 */
+	// IAppSystemGroup interface
+	// An installed application creation function, you should tell the group
+	// the DLLs and the singleton interfaces you want to instantiate
+	// Return FALSE if there's any problems and the app will abort
 	virtual bool Create() override;
 
-	/**
-	 * @brief Allow the application to do some work after AppSystems are connected
-	 *
-	 * Allow the application to do some work after AppSystems are connected but
-	 * they aren't all Initialized
-	 *
-	 * @return Return FALSE if there's any problems and the app will abort
-	 */
+	// Allow the application to do some work after AppSystems are connected but
+	// they aren't all Initialized
+	// Return FALSE if there's any problems and the app will abort
 	virtual bool PreInit() override;
 
-	/**
-	 * @brief Main loop implemented by the application
-	 * @return Return exit code. If all ok returns zero
-	 */
+	// Main loop implemented by the application
+	// Return exit code. If all ok returns zero
 	virtual int32 Main() override;
 
-	/**
-	 * @brief Allow the application to do some work after all AppSystems are shut down
-	 */
+	// Allow the application to do some work after all AppSystems are shut down
 	virtual void PostShutdown() override;
 
+	CShaderCompileApp();
+
 private:
-	/**
-	 * @brief Generate helper C++ classes for shaders
-	 * @return Return TRUE if all C++ shader classes are generated, otherwise returns FALSE
-	 */
 	bool GenerateShaderCppClass();
-
-	/**
-	 * @brief Compile shaders
-	 * @return Return TRUE if all shaders were compiled, otherwise returns FALSE
-	 */
 	bool CompileShaders();
-
-	/**
-	 * @brief Compile shader
-	 * @param shader			Shader to compile
-	 * @param shaderCacheDoc	Shader cache document, there will be stored compiled shader
-	 * @return Return TRUE if all shaders were compiled, otherwise returns FALSE
-	 */
 	bool CompileShader( const shader_t& shader, CShaderCacheDoc& shaderCacheDoc );
-
-	/**
-	 * @brief Load backend
-	 * @return Return TRUE if backend was loaded, otherwise returns FALSE
-	 */
 	bool LoadBackend();
-
-	/**
-	 * @brief Unload backend
-	 */
 	void UnloadBackend();
 
-	bool					bDebugConfiguration;	/**< Is compile debug shader versions */
-	CMakeFile				makefile;				/**< Shader makefile */
-	dllHandle_t				backendHandle;			/**< Backend module handle */
-	IShaderCompilerBackend*	pShaderCompileBackend;	/**< Shader compile backend */
+	bool					bDebugConfiguration;
+	CMakeFile				makefile;
+	dllHandle_t				backendHandle;
+	IShaderCompilerBackend*	pShaderCompileBackend;
 };
 
 
@@ -168,8 +128,8 @@ CShaderCompileApp::CShaderCompileApp
 */
 CShaderCompileApp::CShaderCompileApp()
 	: bDebugConfiguration( false )
-	, backendHandle( nullptr )
-	, pShaderCompileBackend( nullptr )
+	, backendHandle( NULL )
+	, pShaderCompileBackend( NULL )
 {}
 
 /*
@@ -456,8 +416,8 @@ bool CShaderCompileApp::CompileShader( const shader_t& shader, CShaderCacheDoc& 
 			Error( "ShaderCompiler: Defines:" );
 			for ( uint32 defineIdx = 0, numDefines = shaderCompileEnvironment.GetNumDefines(); defineIdx < numDefines; ++defineIdx )
 			{
-				const achar*	pDefineName = nullptr;
-				const achar*	pDefineValue = nullptr;
+				const achar*	pDefineName		= NULL;
+				const achar*	pDefineValue	= NULL;
 				shaderCompileEnvironment.GetDefine( defineIdx, pDefineName, pDefineValue );
 				Error( "ShaderCompiler:\t %s: %s", pDefineName, pDefineValue );
 			}
@@ -573,8 +533,8 @@ void CShaderCompileApp::UnloadBackend()
 		}
 
 		Msg( "ShaderCompiler: Backend unloaded" );
-		backendHandle = nullptr;
-		pShaderCompileBackend = nullptr;
+		backendHandle			= NULL;
+		pShaderCompileBackend	= NULL;
 	}
 }
 

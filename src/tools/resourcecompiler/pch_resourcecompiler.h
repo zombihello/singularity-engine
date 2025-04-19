@@ -1,8 +1,3 @@
-/**
- * @file
- * @addtogroup resourcecompiler resourcecompiler
- */
-
 #include <cstdlib>
 #include <string>
 #include <vector>

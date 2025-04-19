@@ -10,6 +10,7 @@
 // Shader cache version
 #define SSC_VERSION				1
 
+
 /*
 ==================
 CShaderCacheDoc::shaderCache_t::Serialize

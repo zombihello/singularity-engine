@@ -17,7 +17,7 @@ TRefPtr<IStreamDataReader> Plat_CreateFileReader( const achar* pPath, uint32 fla
 	}
 
 	// Otherwise if we here it's mean what nothing found
-	return nullptr;
+	return NULL;
 }
 
 /*
@@ -43,7 +43,7 @@ TRefPtr<IStreamDataWriter> Plat_CreateFileWriter( const achar* pPath, uint32 fla
 	}
 
 	// Otherwise if we here it's mean what nothing found
-	return nullptr;
+	return NULL;
 }
 
 /*

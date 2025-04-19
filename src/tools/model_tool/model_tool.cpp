@@ -8,52 +8,36 @@
 #include <assimp/material.h>
 #include <meshoptimizer.h>
 
-/**
- * @ingroup model_tool
- * @brief Assimp mesh container
- */
+//-----------------------------------------------------------------------------
+// Assimp mesh container
+//-----------------------------------------------------------------------------
 struct modelToolAiMesh_t
 {
-	/**
-	 * @brief Constructor
-	 */
 	modelToolAiMesh_t()
 		: pMesh( NULL )
 	{}
-
-	/**
-	 * @brief Constructor
-	 * @param transformation	Transform matrix
-	 * @param pMesh				Assimp mesh
-	 */
 	modelToolAiMesh_t( const aiMatrix4x4& transformation, aiMesh* pMesh )
 		: transformation( transformation )
 		, pMesh( pMesh )
 	{}
 
-	aiMatrix4x4		transformation;		/**< Transformation matrix */
-	aiMesh*			pMesh;				/**< Assimp mesh */
+	aiMatrix4x4		transformation;
+	aiMesh*			pMesh;
 };
 
 
-/**
- * @brief Assimp meshes dictionary type
- * Material Index -> Ai meshes
- */
+// Assimp meshes dictionary type
+// Material Index -> Ai meshes
 typedef std::unordered_map<uint32, std::vector<modelToolAiMesh_t>>			modelToolAiMeshesMap_t;
 
 
-/**
- * @ingroup model_tool
- * @brief Mesh data
- */
 struct modelToolMeshData_t
 {
-	std::string						name;			/**< Mesh name */
-	std::vector<smdlVertex_t>		vertices;		/**< Vertices array */
-	std::vector<uint32>				indices;		/**< Indices array */
-	smdlSurface_t					surface;		/**< Mesh surfaces */
-	uint32							materialID;		/**< Assimp material ID */
+	std::string						name;
+	std::vector<smdlVertex_t>		vertices;
+	std::vector<uint32>				indices;
+	smdlSurface_t					surface;
+	uint32							materialID;
 };
 
 
@@ -89,55 +73,23 @@ static void ModelTool_ChangeAxisUp( aiVector3D& vector, axisUp_t axisUp )
 }
 
 
-/**
- * @ingroup model_tool
- * @brief Model tool
- */
+//-----------------------------------------------------------------------------
+// Model tool
+//-----------------------------------------------------------------------------
 class CModelTool : public CBaseAppSystem<IModelTool>
 {
 public:
-	/**
-	 * @brief Connect application system
-	 *
-	 * @param pFactory		Pointer to interface factory
-	 * @return Return TRUE if successes application system is connected, otherwise return FALSE
-	 */
+	// IAppSystem interface
 	virtual bool Connect( createInterfaceFn_t pFactory ) override;
-
-	/**
-	 * @brief Disconnect application system
-	 */
 	virtual void Disconnect() override;
 
-	/**
-	 * @brief Compile a model and save in the file system
-	 * @param compileParams		Compile parameters
-	 * @return Return TRUE if the model successfully compiled, otherwise FALSE
-	 */
+	// IModelTool interface
 	virtual bool CompileModel( const resourceToolCompileModelParams_t& compileParams ) const override;
 
 private:
-	/**
-	 * @brief Fill array meshes from the Assimp root scene
-	 * @param pNode			Assimp node
-	 * @param pScene		Assimp scene
-	 * @param meshesDict	Dictionary filled from the Assimp scene
-	 */
+	// Fill array meshes from the Assimp root scene
 	void ProcessNode( aiNode* pNode, const aiScene* pScene, modelToolAiMeshesMap_t& meshesDict ) const;
-
-	/**
-	 * @brief Parse models from a file
-	 * @param compileParams		Compile parameters
-	 * @param parsedMeshes		Output array with parsed meshes data
-	 * @param parsedMaterials	Output array with parsed materials
-	 * @return Return TRUE if the file was parsed successfully, otherwise return FALSE
-	 */
 	bool ParseModels( const resourceToolCompileModelParams_t& compileParams, std::vector<modelToolMeshData_t>& parsedMeshes, std::vector<std::string>& parsedMaterials ) const;
-
-	/**
-	 * @brief Optimize model
-	 * @param meshData		Model to optimize
-	 */
 	void OptimizeModel( modelToolMeshData_t& meshData ) const;
 };
 

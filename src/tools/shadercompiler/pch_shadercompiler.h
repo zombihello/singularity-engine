@@ -1,8 +1,3 @@
-/**
- * @file
- * @addtogroup shadercompiler shadercompiler
- */
-
 #include <string>
 #include <vector>
 

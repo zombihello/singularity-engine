@@ -3,7 +3,9 @@
 #include "filesystem/ifilesystem.h"
 #include "smatdoc/smat_source_doc.h"
 
+//-----------------------------------------------------------------------------
 // Table of variable type names
+//-----------------------------------------------------------------------------
 static const achar* s_pVarTypeNames[] =
 {
 	"undefined",		// SMAT_MATERIAL_VAR_TYPE_UNDEFINED
@@ -19,6 +21,10 @@ static const achar* s_pVarTypeNames[] =
 	"material"			// SMAT_MATERIAL_VAR_TYPE_MATERIAL
 };
 
+
+//-----------------------------------------------------------------------------
+// Functions to convert material type <-> text
+//-----------------------------------------------------------------------------
 /*
 ==================
 ConvTextToSMTMaterialVarType
@@ -297,7 +303,7 @@ bool CSMATSourceMaterialDoc::GrabData( const CJsonDoc& jsonDoc )
 
 						case SMAT_MATERIAL_VAR_TYPE_MATRIX:
 						{
-							matrix_t	value = math_t::matrixIdentity;
+							matrix_t	value = g_matrixIdentity;
 							if ( !GrabValueAsMatrix( jsonObject.GetValue( "value" ), value ) )
 							{
 								Error( "SMATDoc: Invalid value in '%s', must be object type with required vector 4D fields: 'row0', 'row1', 'row2', 'row3'. Each vector 4D must have number fields: 'x', 'y', 'z' and 'w' (parameter id: %i)", name.c_str(), varIdx );

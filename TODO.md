@@ -61,4 +61,4 @@
 - [ ] Migrate from STL to EASTL
 - [ ] Enable SIMD in GLM (#define GLM_FORCE_SSE2 and #define GLM_FORCE_ALIGNED)
 - [ ] Fix crush in Retail configuration. Need rework pending free Vulkan resources in CStudioAPIMemoryMgrVk::Shutdown
-- [ ] Clear code from unnecessary Doxygen comments 
+- [X] Clear code from unnecessary Doxygen comments 

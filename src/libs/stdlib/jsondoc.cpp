@@ -8,10 +8,10 @@
 
 /*
 ==================
-CJsonObject::ToJson
+CJsonObject::AsJson
 ==================
 */
-std::string CJsonObject::ToJson( uint32 countTabs /* = 0 */ ) const
+std::string CJsonObject::AsJson( uint32 countTabs /* = 0 */ ) const
 {
 	// Print tabs
 	std::stringstream	strStream;
@@ -25,7 +25,7 @@ std::string CJsonObject::ToJson( uint32 countTabs /* = 0 */ ) const
 	strStream << "{" << LINE_TERMINATOR;
 	for ( auto itValue = valuesDict.begin(), itValueEnd = valuesDict.end(); itValue != itValueEnd; ++itValue )
 	{
-		strStream << tabs << "\t\"" << itValue->first << "\": " << itValue->second.ToJson( countTabs );
+		strStream << tabs << "\t\"" << itValue->first << "\": " << itValue->second.AsJson( countTabs );
 		if ( std::next( itValue ) != itValueEnd )
 		{
 			strStream << "," << LINE_TERMINATOR;
@@ -138,10 +138,10 @@ void CJsonValue::Copy( const CJsonValue& copy )
 
 /*
 ==================
-CJsonValue::ToJson
+CJsonValue::AsJson
 ==================
 */
-std::string CJsonValue::ToJson( uint32 countTabs /* = 0 */ ) const
+std::string CJsonValue::AsJson( uint32 countTabs /* = 0 */ ) const
 {
 	// Convert JSON value to string
 	std::stringstream	strStream;
@@ -151,7 +151,7 @@ std::string CJsonValue::ToJson( uint32 countTabs /* = 0 */ ) const
 	case JSONVALUE_TYPE_FLOAT:		strStream << GetFloat();							break;
 	case JSONVALUE_TYPE_INT:		strStream << GetInt();								break;
 	case JSONVALUE_TYPE_STRING:		strStream << "\"" << GetString() << "\"";			break;
-	case JSONVALUE_TYPE_OBJECT:		strStream << GetObject().ToJson( countTabs + 1 );	break;
+	case JSONVALUE_TYPE_OBJECT:		strStream << GetObject().AsJson( countTabs + 1 );	break;
 	default:						strStream << "null";								break;
 	}
 
@@ -308,7 +308,7 @@ bool CJsonDoc::SaveToFile( const achar* path )
 	std::string		buffer;
 	if ( !SaveToBuffer( buffer ) )
 	{
-		Warning( "CJsonDoc::SaveToFile: Failed to save JSON document into buffer" );
+		Warning( "StdLib: Failed to save JSON document into buffer" );
 		return false;
 	}
 
@@ -316,7 +316,7 @@ bool CJsonDoc::SaveToFile( const achar* path )
 	TRefPtr<IStreamDataWriter>	file = g_pFileSystem->CreateFileWriter( path );
 	if ( !file )
 	{
-		Warning( "CJsonDoc::SaveToFile: Failed to create a file" );
+		Warning( "StdLib: Failed to create a file" );
 		return false;
 	}
 
@@ -336,7 +336,7 @@ bool CJsonDoc::SaveToBuffer( std::string& buffer )
 	buffer += LINE_TERMINATOR;
 	for ( valuesDict_t::const_iterator itValue = valuesDict.begin(), itValueEnd = valuesDict.end(); itValue != itValueEnd; ++itValue )
 	{
-		buffer += S_Sprintf( "\t\"%s\": %s", itValue->first.c_str(), itValue->second.ToJson( 0 ).c_str() );
+		buffer += S_Sprintf( "\t\"%s\": %s", itValue->first.c_str(), itValue->second.AsJson( 0 ).c_str() );
 		if ( std::next( itValue ) != itValueEnd )
 		{
 			buffer += ",";

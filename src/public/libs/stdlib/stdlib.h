@@ -1,8 +1,3 @@
-/**
- * @file
- * @addtogroup stdlib stdlib
- */
-
 #ifndef STDLIB_H
 #define STDLIB_H
 
@@ -13,19 +8,10 @@
 #include "stdlib/strtools.h"
 #include "stdlib/interface.h"
 
-/**
- * @ingroup stdlib
- * @brief Connect stdlib
- * 
- * @param pFactory   Factory with interfaces
- * @return Return TRUE if StdLib was successfully connected, otherwise returns FALSE
- */
+//-----------------------------------------------------------------------------
+// Connect and disconnect StdLib
+//-----------------------------------------------------------------------------
 bool ConnectStdLib( createInterfaceFn_t pFactory );
-
-/**
- * @ingroup stdlib
- * @brief Disconnect stdlib
- */
 void DisconnectStdLib();
 
 #endif // !STDLIB_H

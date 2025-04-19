@@ -139,8 +139,8 @@ void CMaterial::Clear()
 	// Clear some fields
 	vars.clear();
 	varsDict.clear();
-	bDirtyBuffers = false;
-	pShader = NULL;
+	bDirtyBuffers	= false;
+	pShader			= NULL;
 }
 
 /*

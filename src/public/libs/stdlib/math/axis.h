@@ -1,40 +1,31 @@
-/**
- * @file
- * @addtogroup stdlib stdlib
- */
-
 #ifndef AXIS_H
 #define AXIS_H
 
-/**
- * @ingroup stdlib
- * @brief Axis type
- */
+//-----------------------------------------------------------------------------
+// Axis types
+//-----------------------------------------------------------------------------
 enum axis_t
 {
-	AXIS_X			= 1 << 0,		/**< X axis */
-	AXIS_Y			= 1 << 1,		/**< Y axis */
-	AXIS_Z			= 1 << 2,		/**< Z axis */
+	AXIS_X			= 1 << 0,
+	AXIS_Y			= 1 << 1,
+	AXIS_Z			= 1 << 2,
 
-	AXIS_RIGHT		= AXIS_X,		/**< Right axis */
-	AXIS_UP			= AXIS_Y,		/**< Up axis */
-	AXIS_FORWARD	= AXIS_Z,		/**< Forward axis */
+	AXIS_RIGHT		= AXIS_X,
+	AXIS_UP			= AXIS_Y,
+	AXIS_FORWARD	= AXIS_Z,
 };
 
-/**
- * @ingroup stdlib
- * @brief Axis up type
- */
+
 enum axisUp_t
 {
-	AXIS_UP_PLUS_X,						/**< +X */
-	AXIS_UP_MINUS_X,					/**< -X */
-	AXIS_UP_PLUS_Y,						/**< +Y */
-	AXIS_UP_MINUS_Y,					/**< -Y */
-	AXIS_UP_PLUS_Z,						/**< +Z */
-	AXIS_UP_MINUS_Z,					/**< -Z */
-	AXIS_UP_NUM,						/**< Axis ups number */
-	AXIS_UP_DEFAULT	= AXIS_UP_PLUS_Y	/**< Default axis up */
+	AXIS_UP_PLUS_X,
+	AXIS_UP_MINUS_X,
+	AXIS_UP_PLUS_Y,
+	AXIS_UP_MINUS_Y,
+	AXIS_UP_PLUS_Z,
+	AXIS_UP_MINUS_Z,
+	AXIS_UP_NUM,
+	AXIS_UP_DEFAULT	= AXIS_UP_PLUS_Y
 };
 
 #endif // !AXIS_H

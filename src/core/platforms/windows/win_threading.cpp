@@ -1,10 +1,10 @@
 #include "pch_core.h"
 #include "core/crashdump_private.h"
 
-/**
-* Code setting the thread name for use in the debugger
-* http://msdn.microsoft.com/en-us/library/xcb2z8hs.aspx
-*/
+//-----------------------------------------------------------------------------
+// Code setting the thread name for use in the debugger
+// http://msdn.microsoft.com/en-us/library/xcb2z8hs.aspx
+//-----------------------------------------------------------------------------
 #define MS_VC_EXCEPTION				0x406D1388
 
 #pragma pack( push, 8 )
@@ -16,6 +16,7 @@ typedef struct tagTHREADNAME_INFO
 	DWORD		dwFlags;		// Reserved for future use, must be zero.
 } THREADNAME_INFO;
 #pragma pack( pop )
+
 
 /*
 ==================
@@ -63,16 +64,14 @@ CWindowsThreadMutex::CWindowsThreadMutex
 */
 CWindowsThreadMutex::CWindowsThreadMutex()
 {
-	/**
-	 * Constructor that initializes the aggregated critical section
-	 * MSDN: You can improve performance significantly by choosing a small spin count for a critical section
-	 * of short duration. The heap manager uses a spin count of roughly 4000 for its per-heap critical sections.
-	 * This gives great performance and scalability in almost all worst-case scenarios
-	 */
-	const int32 spinCount = 4000;
+	// Constructor that initializes the aggregated critical section
+	// MSDN: You can improve performance significantly by choosing a small spin count for a critical section
+	// of short duration. The heap manager uses a spin count of roughly 4000 for its per-heap critical sections.
+	// This gives great performance and scalability in almost all worst-case scenarios
+	const int32 SPIN_COUNT = 4000;
 
 	InitializeCriticalSection( &criticalSection );
-	SetCriticalSectionSpinCount( &criticalSection, spinCount );
+	SetCriticalSectionSpinCount( &criticalSection, SPIN_COUNT );
 }
 
 /*
@@ -560,7 +559,7 @@ DWORD STDCALL CWindowsThread::ThreadMain( LPVOID pThis )
 	// If the thread has not been initialized, close the thread
 	if ( !bInitResult )
 	{
-		Warning( "Thread '%s' failed to initialize", theThread->GetName() );
+		Warning( "Core: Thread '%s' failed to initialize", theThread->GetName() );
 		return theThread->exitCode;
 	}
 

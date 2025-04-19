@@ -2,10 +2,6 @@
 #include "stdlib/jsondoc.h"
 #include "tools/shadercompiler/makefile.h"
 
-/**
- * @ingroup shadercompiler
- * @brief Default output path for generated C++ classes
- */
 #define DEFAULT_CPPGEN_OUTPUT	"generated/"
 
 

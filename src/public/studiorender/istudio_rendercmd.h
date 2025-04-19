@@ -1,8 +1,3 @@
-/**
- * @file
- * @addtogroup studiorender studiorender
- */
-
 #ifndef ISTUDIO_RENDERCMD_H
 #define ISTUDIO_RENDERCMD_H
 
@@ -12,100 +7,44 @@
 #include "studiorender/istudio_cmdbuffer.h"
 #include "studiorender/istudiorender.h"
 
-/**
- * @ingroup studiorender
- * @brief Studio render command interface stored in the render command queue
- */
+//-----------------------------------------------------------------------------
+// Studio render command interface stored in the render command queue
+//-----------------------------------------------------------------------------
 class IStudioRenderCmd
 {
 public:
-	/**
-	 * @brief Destructor
-	 */
 	virtual ~IStudioRenderCmd() {}
-
-	/**
-	 * @brief Execute render command
-	 * @return Return size of render command
-	 */
 	virtual uint32 Execute() = 0;
-
-	/**
-	 * @brief Get size of render command
-	 * @return Return size of render command
-	 */
 	virtual uint32 GetSize() const = 0;
 
-	/**
-	 * @brief Overload operator new
-	 * 
-	 * @param size				Size
-	 * @param studioCmdAlloc	Studio allocated chunk in the render command buffer
-	 */
-	FORCEINLINE void* operator new( size_t size, const studioCmdAlloc_t& studioCmdAlloc )
-	{
-		return studioCmdAlloc.pAllocation;
-	}
-
-	/**
-	 * @brief Overload operator delete
-	 * 
-	 * @param pPtr				Pointer to data
-	 * @param studioCmdAlloc	Studio allocated chunk in the render command buffer
-	 */
-	FORCEINLINE void operator delete( void* pPtr, const studioCmdAlloc_t& studioCmdAlloc )
-	{}
+	void* operator new( size_t size, const studioCmdAlloc_t& studioCmdAlloc );
+	void operator delete( void* pPtr, const studioCmdAlloc_t& studioCmdAlloc );
 };
 
-/**
- * @ingroup studiorender
- * @brief A rendering command that simply consumes space in the render command queue
- */
+
+//-----------------------------------------------------------------------------
+// A rendering command that simply consumes space in the render command queue
+//-----------------------------------------------------------------------------
 class CStudioRenderCmd_Skip : public IStudioRenderCmd
 {
 public:
-	/**
-	 * @brief Constructor
-	 * @param numSkipBytes		Number skip bytes
-	 */
+	// IStudioRenderCmd interface
+	virtual uint32 Execute() override;
+	virtual uint32 GetSize() const override;
+
 	CStudioRenderCmd_Skip( uint32 numSkipBytes )
 		: numSkipBytes( numSkipBytes )
 	{}
 
-	/**
-	 * @brief Execute render command
-	 * @return Return size of render command
-	 */
-	virtual uint32 Execute() override
-	{
-		return numSkipBytes;
-	}
-
-	/**
-	 * @brief Get size of render command
-	 * @return Return size of render command
-	 */
-	virtual uint32 GetSize() const override
-	{
-		return numSkipBytes;
-	}
-
 private:
-	uint32	numSkipBytes;			/**< Number skip bytes */
+	uint32	numSkipBytes;
 };
 
-//
-// Macros for using render commands
-//
 
-/**
- * @ingroup studiorender
- * @brief Send a render command to the render thread
- * @warning For use g_pStudioRender must be valid
- * 
- * @param TypeName	Render command type name
- * @param Params	Render command parameters
- */
+//-----------------------------------------------------------------------------
+// Macros for using render commands
+// NOTE: For use g_pStudioRender must be valid
+//-----------------------------------------------------------------------------
 #define SEND_RENDER_COMMAND( TypeName, Params ) \
 	{ \
 		/** Send a render command to the render thread if we're not in it */ \
@@ -144,14 +83,6 @@ private:
 		} \
 	}
 
-/**
- * @ingroup studiorender
- * @brief Declares a render command type with 0 parameters
- * @warning For use g_pStudioRender must be valid
- * 
- * @param TypeName	Render command type name
- * @param Code		Executable code in the render thread
- */
 #define UNIQUE_RENDER_COMMAND( TypeName, Code ) \
 	class TypeName : public IStudioRenderCmd \
 	{ \
@@ -168,17 +99,6 @@ private:
 	}; \
 	SEND_RENDER_COMMAND( TypeName, );
 
-/**
- * @ingroup studiorender
- * @brief Declares a render command type with 1 parameters
- * @warning For use g_pStudioRender must be valid
- * 
- * @param TypeName		Render command type name
- * @param ParamType1	Type of param 1
- * @param ParamName1	Name of param 1
- * @param ParamValue1	Value of param 1
- * @param Code			Executable code in the render thread
- */
 #define UNIQUE_RENDER_COMMAND_ONEPARAMETER( TypeName, ParamType1, ParamName1, ParamValue1, Code ) \
 	class TypeName : public IStudioRenderCmd \
 	{ \
@@ -200,20 +120,6 @@ private:
 	}; \
 	SEND_RENDER_COMMAND( TypeName, ( ParamValue1 ) );
 
- /**
-  * @ingroup studiorender
-  * @brief Declares a render command type with 2 parameters
-  * @warning For use g_pStudioRender must be valid
-  *
-  * @param TypeName		Render command type name
-  * @param ParamType1	Type of param 1
-  * @param ParamName1	Name of param 1
-  * @param ParamValue1	Value of param 1
-  * @param ParamType2	Type of param 2
-  * @param ParamName2	Name of param 2
-  * @param ParamValue2	Value of param 2
-  * @param Code			Executable code in the render thread
-  */
 #define UNIQUE_RENDER_COMMAND_TWOPARAMETER( TypeName, ParamType1, ParamName1, ParamValue1, ParamType2, ParamName2, ParamValue2, Code ) \
 	class TypeName : public IStudioRenderCmd \
 	{ \
@@ -237,23 +143,6 @@ private:
 	}; \
 	SEND_RENDER_COMMAND( TypeName, ( ParamValue1, ParamValue2 ) );
 
-/**
- * @ingroup studiorender
- * @brief Declares a render command type with 3 parameters
- * @warning For use g_pStudioRender must be valid
- *
- * @param TypeName		Render command type name
- * @param ParamType1	Type of param 1
- * @param ParamName1	Name of param 1
- * @param ParamValue1	Value of param 1
- * @param ParamType2	Type of param 2
- * @param ParamName2	Name of param 2
- * @param ParamValue2	Value of param 2
- * @param ParamType3	Type of param 3
- * @param ParamName3	Name of param 3
- * @param ParamValue3	Value of param 3
- * @param Code			Executable code in the render thread
- */
 #define UNIQUE_RENDER_COMMAND_THREEPARAMETER( TypeName, ParamType1, ParamName1, ParamValue1, ParamType2, ParamName2, ParamValue2, ParamType3, ParamName3, ParamValue3, Code ) \
 	class TypeName : public IStudioRenderCmd \
 	{ \
@@ -279,26 +168,6 @@ private:
 	}; \
 	SEND_RENDER_COMMAND( TypeName, ( ParamValue1, ParamValue2, ParamValue3 ) );
 
-/**
- * @ingroup studiorender
- * @brief Declares a render command type with 4 parameters
- * @warning For use g_pStudioRender must be valid
- *
- * @param TypeName		Render command type name
- * @param ParamType1	Type of param 1
- * @param ParamName1	Name of param 1
- * @param ParamValue1	Value of param 1
- * @param ParamType2	Type of param 2
- * @param ParamName2	Name of param 2
- * @param ParamValue2	Value of param 2
- * @param ParamType3	Type of param 3
- * @param ParamName3	Name of param 3
- * @param ParamValue3	Value of param 3
- * @param ParamType4	Type of param 4
- * @param ParamName4	Name of param 4
- * @param ParamValue4	Value of param 4
- * @param Code			Executable code in the render thread
- */
 #define UNIQUE_RENDER_COMMAND_FOURPARAMETER( TypeName, ParamType1, ParamName1, ParamValue1, ParamType2, ParamName2, ParamValue2, ParamType3, ParamName3, ParamValue3, ParamType4, ParamName4, ParamValue4, Code ) \
 	class TypeName : public IStudioRenderCmd \
 	{ \
@@ -326,17 +195,12 @@ private:
 	}; \
 	SEND_RENDER_COMMAND( TypeName, ( ParamValue1, ParamValue2, ParamValue3, ParamValue4 ) );
 
-/**
- * @ingroup studiorender
- * @brief Flush render commands
- * @warning For use g_pStudioRender must be valid
- */
-FORCEINLINE void Studio_FlushRenderCommands()
-{
-	if ( !g_pStudioRender->IsInRenderThread() )
-	{
-		g_pStudioRender->GetCommandBuffer()->Flush();
-	}
-}
+
+//-----------------------------------------------------------------------------
+// Studio functions
+//-----------------------------------------------------------------------------
+void Studio_FlushRenderCommands();
+
+#include "studiorender/istudio_rendercmd.inl"
 
 #endif // !ISTUDIO_RENDERCMD_H

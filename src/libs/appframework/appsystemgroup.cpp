@@ -6,7 +6,7 @@
 //-----------------------------------------------------------------------------
 // This function is used to make this system appear to the outside world to
 // function exactly like the currently existing factory system
-CAppSystemGroup*	s_pCurrentAppSystem = nullptr;
+CAppSystemGroup*	s_pCurrentAppSystem = NULL;
 void* AppSystemCreateInterfaceFn( const achar* pName )
 {
 	return s_pCurrentAppSystem->FindSystem( pName );

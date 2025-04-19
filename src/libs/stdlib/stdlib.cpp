@@ -60,6 +60,6 @@ void DisconnectStdLib()
 
 	// Reset all app systems and variables
 	s_bConnected = false;
-	g_pFileSystem = nullptr;
-	g_pCvar = nullptr;
+	g_pFileSystem = NULL;
+	g_pCvar = NULL;
 }

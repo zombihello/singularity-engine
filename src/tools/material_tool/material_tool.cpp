@@ -2,31 +2,17 @@
 #include "smatdoc/smat_compiled_doc.h"
 #include "tools/resource_tools/imaterial_tool.h"
 
-/**
- * @ingroup material_tool
- * @brief Material tool
- */
+//-----------------------------------------------------------------------------
+// Material tool
+//-----------------------------------------------------------------------------
 class CMaterialTool : public CBaseAppSystem<IMaterialTool>
 {
 public:
-	/**
-	 * @brief Connect application system
-	 *
-	 * @param pFactory		Pointer to interface factory
-	 * @return Return TRUE if successes application system is connected, otherwise return FALSE
-	 */
+	// IAppSystem interface
 	virtual bool Connect( createInterfaceFn_t pFactory ) override;
-
-	/**
-	 * @brief Disconnect application system
-	 */
 	virtual void Disconnect() override;
 
-	/**
-	 * @brief Compile a material and save in the file system
-	 * @param compileParams		Compile parameters
-	 * @return Return TRUE if the material successfully compiled, otherwise FALSE
-	 */
+	// IMaterialTool interface
 	virtual bool CompileMaterial( const resourceToolCompileMaterialParams_t& compileParams ) const override;
 };
 

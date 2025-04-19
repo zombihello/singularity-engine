@@ -48,7 +48,7 @@ CStudioAPIFrameBufferVk::CStudioAPIFrameBufferVk( const studioAPIFrameBufferCrea
 			if ( createInfo.bClearColor )
 			{
 				VkClearValue&	vkClearValue	= vkClearValues[numClearValues++];
-				vec4_t			normalizedColor = createInfo.clearColor.ToNormalizedVector4D();
+				vec4_t			normalizedColor = createInfo.clearColor.AsNormalizedVector4D();
 				Mem_Memzero( &vkClearValue, sizeof( VkClearValue ) );
 				Mem_Memcpy( vkClearValue.color.float32, &normalizedColor.x, 4 * sizeof( float ) );
 			}

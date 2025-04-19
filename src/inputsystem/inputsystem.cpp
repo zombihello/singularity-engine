@@ -4,10 +4,9 @@
 #include "inputsystem/inputsystem_private.h"
 #include "inputsystem/iinputsystem.h"
 
-/**
- * @ingroup inputsystem
- * @brief Cvar mouse sensitivity
- */
+//-----------------------------------------------------------------------------
+// Global values and cvars
+//-----------------------------------------------------------------------------
 CConVar		mouse_sensitivity( "mouse_sensitivity", "0.5", "Mouse sensitivity" );
 
 // Table of button names
@@ -132,231 +131,73 @@ static const achar* s_pButtonNames[] =
 	"mousey"					// MOUSE_Y				
 };
 
-/**
- * @ingroup inputsystem
- * @brief Input system
- */
+
+//-----------------------------------------------------------------------------
+// Input system
+//-----------------------------------------------------------------------------
 class CInputSystem : public CBaseAppSystem<IInputSystem>
 {
 public:
-	/**
-	 * @brief Constructor
-	 */
 	CInputSystem();
-
-	/**
-	 * @brief Destructor
-	 */
 	~CInputSystem();
 
-	/**
-	 * @brief Connect application system
-	 *
-	 * @param pFactory		Pointer to interface factory
-	 * @return Return TRUE if successes application system is connected, otherwise return FALSE
-	 */
+	// IAppSystem interface
 	virtual bool Connect( createInterfaceFn_t pFactory ) override;
-
-	/**
-	 * @brief Disconnect application system
-	 */
 	virtual void Disconnect() override;
 
-	/**
-	 * @brief Init application system
-	 * @return Return TRUE if application system is inited
-	 */
+	// Initialize and shutdown
 	virtual bool Init() override;
-
-	/**
-	 * @brief Shutdown application system
-	 */
 	virtual void Shutdown() override;
 
-	/**
-	 * @brief Attach the input system to a window
-	 * @param pWindowMgr	Window manager
-	 */
+	// IInputSystem interface
 	virtual void AttachToWindow( IWindowMgr* pWindowMgr ) override;
-
-	/**
-	 * @brief Detach the input system from the window
-	 */
 	virtual void DetachFromWindow() override;
 
-	/**
-	 * @brief Clears the input state
-	 */
 	virtual void ClearInputState() override;
 
-	/**
-	 * @brief Set binding a key
-	 *
-	 * @param button	Button code
-	 * @param pCommand	Console command will be executed when the button is triggered
-	 */
+	// Functions set/get console command which binded on a button
 	virtual void SetBinding( buttonCode_t button, const achar* pCommand ) override;
-
-	/**
-	 * @brief Get binding for a key
-	 *
-	 * @param button	Button code
-	 * @return Return console command for a key. If not set returns empty string
-	 */
 	virtual const achar* GetBindingCommand( buttonCode_t button ) const override;
-
-	/**
-	 * @brief Unbind all keys
-	 */
 	virtual void UnbindAll() override;
 
-	/**
-	 * @brief Execute binding command of a key
-	 * @param button	Button code
-	 */
-	void ExecBindingCommand( buttonCode_t button );
-
-	/**
-	 * @brief Set relative mouse mode
-	 *
-	 * While the mouse is in relative mode, the cursor is hidden, and the
-	 * driver will try to report continuous motion in the current window.
-	 * Only relative motion events will be delivered, the mouse position
-	 * will not change.
-	 *
-	 * @param bEnabled	 Whether or not to enable relative mode
-	 */
+	// Set relative mouse mode
+	// While the mouse is in relative mode, the cursor is hidden, and the
+	// driver will try to report continuous motion in the current window.
+	// Only relative motion events will be delivered, the mouse position
+	// will not change. 
 	virtual void SetRelativeMouseMode( bool bEnabled ) override;
 
-	/**
-	 * @brief Is key down
-	 *
-	 * @param key	Key button
-	 * @return Return TRUE if key have event 'pressed', otherwise returns FALSE
-	 */
+	virtual bool IsRelativeMouseMode() const override;
 	virtual bool IsKeyDown( buttonCode_t key ) const override;
-
-	/**
-	 * @brief Is key up
-	 *
-	 * @param key	Key button
-	 * @return Return TRUE if key have event 'released', otherwise returns FALSE
-	 */
 	virtual bool IsKeyUp( buttonCode_t key ) const override;
-
-	/**
-	 * @brief Is mouse key down
-	 *
-	 * @param key	Key button
-	 * @return Return TRUE if mouse key have event 'pressed', otherwise returns FALSE
-	 */
 	virtual bool IsMouseKeyDown( buttonCode_t key ) const override;
-
-	/**
-	 * @brief Is mouse key up
-	 *
-	 * @param key	Key button
-	 * @return Return TRUE if key have event 'released', otherwise returns FALSE
-	 */
 	virtual bool IsMouseKeyUp( buttonCode_t key ) const override;
-
-	/**
-	 * @brief Is scrolled mouse wheel
-	 *
-	 * @param wheel		Side scrolled mouse wheel
-	 * @return Return TRUE if wheel have event 'scrolled', otherwise returns FALSE
-	 */
 	virtual bool IsMouseWheel( buttonCode_t wheel ) const override;
-
-	/**
-	 * @brief Is mouse moved
-	 *
-	 * @param mouseAxis		Axis of moved mouse
-	 * @return Return TRUE if mouse moved by axis, otherwise returns FALSE
-	 */
 	virtual bool IsMouseMoved( buttonCode_t mouseAxis ) const override;
 
-	/**
-	 * @brief Is relative mouse mode enabled
-	 * @return Return TRUE if relative mouse mode enabled, otherwise FALSE
-	 */
-	virtual bool IsRelativeMouseMode() const override;
-
-	/**
-	 * @brief Get mouse location on screen
-	 * @return Return mouse location on screen
-	 */
 	virtual vec2_t GetMouseLocation() const override;
-
-	/**
-	 * @brief Get mouse offset on current frame
-	 * @return Return mouse offset on current frame
-	 */
 	virtual vec2_t GetMouseOffset() const override;
-
-	/**
-	 * @brief Get mouse offset by axis
-	 *
-	 * @param mouseAxis	Axis of moved mouse
-	 * @return Return mouse offset by axis
-	 */
 	virtual float GetMouseOffset( buttonCode_t mouseAxis ) const override;
-
-	/**
-	 * @brief Get mouse sensitivity
-	 * @return Return mouse sensitivity
-	 */
 	virtual float GetMouseSensitivity() const override;
 
-	/**
-	 * @brief Get current event in button
-	 *
-	 * @param buttonCode	Button code
-	 * @return Return current event in button
-	 */
 	virtual buttonEvent_t GetButtonEvent( buttonCode_t buttonCode ) const override;
-
-	/**
-	 * @brief Get button code by name
-	 *
-	 * @param pButtonName	Button name
-	 * @return return button code, if button with name not found will return BC_NONE
-	 */
 	virtual buttonCode_t GetButtonCodeByName( const achar* pButtonName ) const override;
-
-	/**
-	 * @brief Get button name
-	 *
-	 * @param buttonCode	Button code
-	 * @return return button name, if button code not valid will return empty string
-	 */
 	virtual const achar* GetButtonName( buttonCode_t buttonCode ) const override;
 
-private:
-	/**
-	 * @brief Process window event
-	 *
-	 * @param pUserData		User data
-	 * @param windowEvent	Window event
-	 */
-	static void ProcessWindowEvent( void* pUserData, const windowEvent_t& windowEvent );
+	void ExecBindingCommand( buttonCode_t button );
 
-	/**
-	 * @brief Process input event
-	 *
-	 * @param pUserData		User data
-	 * @param inputEvent	Input event
-	 */
+private:
+	static void ProcessWindowEvent( void* pUserData, const windowEvent_t& windowEvent );
 	static void ProcessInputEvent( void* pUserData, const inputEvent_t& inputEvent );
 
-	bool									bRelativeMouseMode;					/**< Is relative mouse mode enabled */
-	IWindowMgr*								pWindowMgr;							/**< A window manager that was attached the input system */
-	IOnProcessWindowEvent::funcDelegate_t*	pWindowEventDelegate;				/**< Window event delegate */
-	IOnProcessInputEvent::funcDelegate_t*	pInputEventDelegate;				/**< Input event delegate */
-	buttonEvent_t							buttonEvents[BUTTON_CODE_COUNT];	/**< Events button */
-	vec2_t									mouseLocation;						/**< Location mouse on screen */
-	vec2_t									mouseOffset;						/**< Offset mouse on current frame */
-	std::string								binds[BUTTON_CODE_COUNT];			/**< Button binds */
+	bool									bRelativeMouseMode;
+	IWindowMgr*								pWindowMgr;							// A window manager that was attached the input system
+	IOnProcessWindowEvent::funcDelegate_t*	pWindowEventDelegate;
+	IOnProcessInputEvent::funcDelegate_t*	pInputEventDelegate;
+	buttonEvent_t							buttonEvents[BUTTON_CODE_COUNT];
+	vec2_t									mouseLocation;
+	vec2_t									mouseOffset;
+	std::string								binds[BUTTON_CODE_COUNT];
 };
 
 // Input system singleton
@@ -371,11 +212,11 @@ CInputSystem::CInputSystem
 */
 CInputSystem::CInputSystem() 
 	: bRelativeMouseMode( false )
-	, pWindowMgr( nullptr )
-	, pWindowEventDelegate( nullptr )
-	, pInputEventDelegate( nullptr )
-	, mouseLocation( math_t::vectorZero )
-	, mouseOffset( math_t::vectorZero )
+	, pWindowMgr( NULL )
+	, pWindowEventDelegate( NULL )
+	, pInputEventDelegate( NULL )
+	, mouseLocation( g_vectorZero )
+	, mouseOffset( g_vectorZero )
 {
 	Mem_Memset( &buttonEvents, BUTTON_EVENT_NONE, sizeof( buttonEvent_t ) * BUTTON_CODE_COUNT );
 }
@@ -460,9 +301,9 @@ void CInputSystem::DetachFromWindow()
 	{
 		pWindowMgr->OnProcessWindowEvent()->RemoveFunc( pWindowEventDelegate );
 		pWindowMgr->OnProcessInputEvent()->RemoveFunc( pInputEventDelegate );
-		pWindowMgr				= nullptr;
-		pWindowEventDelegate	= nullptr;
-		pInputEventDelegate		= nullptr;
+		pWindowMgr				= NULL;
+		pWindowEventDelegate	= NULL;
+		pInputEventDelegate		= NULL;
 	}
 }
 
@@ -582,7 +423,7 @@ void CInputSystem::ClearInputState()
 		}
 	}
 
-	mouseOffset = math_t::vectorZero;
+	mouseOffset = g_vectorZero;
 }
 
 /*
@@ -845,7 +686,7 @@ CON_COMMAND( bind, "Bind a key", FCVAR_NONE )
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_INPUT );
 	if ( argc < 2 || !argv )
 	{
-		Msg( "bind <key> <command> : Attach a command to a key" );
+		Msg( "InputSystem: bind <key> <command> : Attach a command to a key" );
 		return;
 	}
 
@@ -855,13 +696,13 @@ CON_COMMAND( bind, "Bind a key", FCVAR_NONE )
 	// Do nothing if button isn't valid
 	if ( buttonCode == BUTTON_CODE_NONE )
 	{
-		Warning( "bind: \"%s\" isn't a valid key", argv[0] );
+		Warning( "InputSystem: bind: \"%s\" isn't a valid key", argv[0] );
 		return;
 	}
 
 	// Set binding
 	s_InputSystem.SetBinding( buttonCode, argv[1] );
-	Msg( "bind: \"%s\" = \"%s\"", argv[0], argv[1] );
+	Msg( "InputSystem: bind: \"%s\" = \"%s\"", argv[0], argv[1] );
 }
 
 /*
@@ -874,7 +715,7 @@ CON_COMMAND( unbind, "Unbind a key", FCVAR_NONE )
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_INPUT );
 	if ( argc < 1 || !argv )
 	{
-		Msg( "unbind <key> : Remove commands from a key" );
+		Msg( "InputSystem: unbind <key> : Remove commands from a key" );
 		return;
 	}
 
@@ -884,13 +725,13 @@ CON_COMMAND( unbind, "Unbind a key", FCVAR_NONE )
 	// Do nothing if button isn't valid
 	if ( buttonCode == BUTTON_CODE_NONE )
 	{
-		Warning( "unbind: \"%s\" isn't a valid key", argv[0] );
+		Warning( "InputSystem: unbind: \"%s\" isn't a valid key", argv[0] );
 		return;
 	}
 
 	// Unbind a key
 	s_InputSystem.SetBinding( buttonCode, "" );
-	Msg( "unbind: \"%s\" is unbind", argv[0] );
+	Msg( "InputSystem: unbind: \"%s\" is unbind", argv[0] );
 }
 
 /*
@@ -902,5 +743,5 @@ CON_COMMAND( unbindall, "Unbind all keys", FCVAR_NONE )
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_INPUT );
 	s_InputSystem.UnbindAll();
-	Msg( "unbindall: All keys has been unbind" );
+	Msg( "InputSystem: unbindall: All keys has been unbind" );
 }

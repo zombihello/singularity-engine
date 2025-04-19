@@ -1,22 +1,21 @@
 #include "pch_stdlib.h"
 #include "stdlib/convar.h"
 
-cvarDLLIdentifier_t		CCvarLocalRegister::s_dllIdentifier = -1;
-IConCmdBase*			CCvarLocalRegister::s_pConCmdList = nullptr;
-ICvarAccessor*			CCvarLocalRegister::s_pAccessor = nullptr;
-bool					CCvarLocalRegister::s_bCVarsRegistered = false;
+//-----------------------------------------------------------------------------
+// Global variables
+//-----------------------------------------------------------------------------
+cvarDLLIdentifier_t		CCvarLocalRegister::s_dllIdentifier		= -1;
+IConCmdBase*			CCvarLocalRegister::s_pConCmdList		= NULL;
+ICvarAccessor*			CCvarLocalRegister::s_pAccessor			= NULL;
+bool					CCvarLocalRegister::s_bCVarsRegistered	= NULL;
 
-/**
- * @ingroup stdlib
- * @brief Default Cvar accessor
- */
+
+//-----------------------------------------------------------------------------
+// Default Cvar accessor
+//-----------------------------------------------------------------------------
 class CCvarDefaultAccessor : public ICvarAccessor
 {
 public:
-	/**
-	 * @brief Register a command in the console system
-	 * @param pCommand	IConVar/IConCmd to register
-	 */
 	virtual void RegisterCommand( IConCmdBase* pCommand ) override
 	{
 		// Link to engine's list instead
@@ -26,6 +25,9 @@ public:
 static CCvarDefaultAccessor		s_CvarDefaultAccessor;
 
 
+//-----------------------------------------------------------------------------
+// Register/unregister convars
+//-----------------------------------------------------------------------------
 /*
 ==================
 ConVar_Register
@@ -69,7 +71,7 @@ void ConVar_Unregister()
 	g_pCvar->UnregisterCommands( CCvarLocalRegister::s_dllIdentifier );
 	CCvarLocalRegister::s_dllIdentifier		= -1;
 	CCvarLocalRegister::s_bCVarsRegistered	= false;
-	CCvarLocalRegister::s_pAccessor			= nullptr;
+	CCvarLocalRegister::s_pAccessor			= NULL;
 }
 
 
@@ -506,7 +508,7 @@ void CConVarRef::Init( const achar* pName, bool bIgnoreMissing /* = false */ )
 		static bool		s_bFirst = true;
 		if ( s_bFirst )
 		{
-			Warning( "CConVarRef %s doesn't point to an existing IConVar", pName );
+			Warning( "StdLib: CConVarRef %s doesn't point to an existing IConVar", pName );
 			s_bFirst = false;
 		}
 	}

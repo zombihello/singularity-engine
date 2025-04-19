@@ -12,73 +12,35 @@
 
 createInterfaceFn_t		g_pAppSystemFactory = NULL;
 
-/**
- * @ingroup engine
- * @brief Main engine interface
- */
+//-----------------------------------------------------------------------------
+// Main engine interface
+//-----------------------------------------------------------------------------
 class CEngineAPI : public CBaseAppSystem<IEngineAPI>
 {
 public:
-	/**
-	 * @brief Connect application system
-	 *
-	 * @param pFactory		Pointer to interface factory
-	 * @return Return TRUE if successes application system is connected, otherwise return FALSE
-	 */
+	// IAppSystem interface
+	// Here's where the app systems get to learn about each other
 	virtual bool Connect( createInterfaceFn_t pFactory ) override;
-
-	/**
-	 * @brief Disconnect application system
-	 */
 	virtual void Disconnect() override;
 
-	/**
-	 * @brief Query interface
-	 *
-	 * Here's where systems can access other interfaces implemented by this object
-	 *
-	 * @param pInterfaceName	Interface name
-	 * @return Return pointer to interface, if doesn't implement the requested interface return NULL
-	 */
+	// Here's where systems can access other interfaces implemented by this object
+	// Returns NULL if it doesn't implement the requested interface
 	virtual void* QueryInterface( const achar* pInterfaceName ) override;
 
-	/**
-	 * @brief Init application system
-	 * @return Return TRUE if application system is inited
-	 */
+	// Initialize and shutdown
 	virtual bool Init() override;
-
-	/**
-	 * @brief Shutdown application system
-	 */
 	virtual void Shutdown() override;
 
-	/**
-	 * @brief Set startup info
-	 * @note This function must be called before Init()
-	 *
-	 * @param info	Startup info
-	 */
+	// IEngineAPI interface
+	// This function must be called before Init()
 	virtual void SetStartupInfo( const startupInfo_t& info ) override;
-
-	/**
-	 * @brief Run the engine
-	 * @return Return exit code. If all ok returns zero
-	 */
 	virtual int32 Run() override;
 
 private:
-	/**
-	 * @brief Initialize file system for game
-	 */
 	void Game_InitFileSystem();
-
-	/**
-	 * @brief Shutdown file system for game
-	 */
 	void Game_ShutdownFileSystem();
 
-	startupInfo_t		startupInfo;	/**< Startup info */
+	startupInfo_t		startupInfo;
 };
 
 static CEngineAPI		s_EngineAPI;
@@ -204,7 +166,7 @@ int32 CEngineAPI::Run()
 	// Load gameinfo.txt
 	if ( !g_Engine.LoadGameInfo( S_Sprintf( "//BASE_PATH/%s/gameinfo.txt", startupInfo.pGame ).c_str() ) )
 	{
-		Sys_Error( "CEngineAPI: Setup file 'gameinfo.txt' doesn't exist in subdirectory '%s'", startupInfo.pGame );
+		Sys_Error( "Engine: Setup file 'gameinfo.txt' doesn't exist in subdirectory '%s'", startupInfo.pGame );
 		return 1;
 	}
 
@@ -252,7 +214,7 @@ void CEngineAPI::Game_ShutdownFileSystem()
 	const CGameInfoDoc&		gameinfo = g_Engine.GetGameInfo();
 	if ( !gameinfo.IsLoaded() )
 	{
-		Warning( "CEngineAPI::Game_ShutdownFileSystem: gameinfo.txt not laoded, will be remove only search paths \"GAME\" and \"GAMEBIN\"" );
+		Warning( "Engine: gameinfo.txt not laoded, will be remove only search paths \"GAME\" and \"GAMEBIN\"" );
 		g_pFileSystem->RemoveSearchPath( "GAME" );
 		g_pFileSystem->RemoveSearchPath( "GAMEBIN" );
 		return;

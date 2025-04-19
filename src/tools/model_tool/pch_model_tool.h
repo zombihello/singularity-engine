@@ -1,8 +1,3 @@
-/**
- * @file
- * @addtogroup model_tool model_tool
- */
-
 #include <cstdlib>
 #include <string>
 #include <vector>

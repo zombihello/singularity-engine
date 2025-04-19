@@ -8,7 +8,7 @@
 Sys_CreateProc
 ==================
 */
-void* Sys_CreateProc( const achar* pPathToProcess, const achar* pParams, bool bLaunchDetached, bool bLaunchHidden, int32 priorityModifier, uint64* pProcessId /* = nullptr */ )
+void* Sys_CreateProc( const achar* pPathToProcess, const achar* pParams, bool bLaunchDetached, bool bLaunchHidden, int32 priorityModifier, uint64* pProcessId /* = NULL */ )
 {
 	std::string						commandLine = S_Sprintf( "%s %s", pPathToProcess, pParams );
 	PROCESS_INFORMATION				procInfo;
@@ -77,7 +77,7 @@ void* Sys_CreateProc( const achar* pPathToProcess, const achar* pParams, bool bL
 			*pProcessId = 0;
 		}
 
-		return nullptr;
+		return NULL;
 	}
 
 	if ( pProcessId )
@@ -135,7 +135,7 @@ Sys_DLL_LoadModule
 */
 dllHandle_t Sys_DLL_LoadModule( const achar* pDLLName )
 {
-	return LoadLibraryExA( pDLLName, nullptr, LOAD_WITH_ALTERED_SEARCH_PATH );
+	return LoadLibraryExA( pDLLName, NULL, LOAD_WITH_ALTERED_SEARCH_PATH );
 }
 
 /*
@@ -162,7 +162,7 @@ void* Sys_DLL_GetProcAddress( dllHandle_t pDLLHandle, const achar* pFuncName )
 	{
 		return GetProcAddress( pDLLHandle, pFuncName );
 	}
-	return nullptr;
+	return NULL;
 }
 
 /*
@@ -227,7 +227,7 @@ const achar* Sys_GetExecutablePath()
 	static achar	path[MAX_PATH] = "";
 	if ( !path[0] )
 	{
-		GetModuleFileNameA( nullptr, path, MAX_PATH );
+		GetModuleFileNameA( NULL, path, MAX_PATH );
 	}
 	return path;
 }

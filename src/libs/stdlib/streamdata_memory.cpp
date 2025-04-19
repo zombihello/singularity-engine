@@ -23,6 +23,16 @@ bool CStreamDataMemoryReader::IsReader() const
 	return true;
 }
 
+/*
+==================
+CStreamDataMemoryReader::GetSize
+==================
+*/
+uint64 CStreamDataMemoryReader::GetSize() const
+{
+	return size;
+}
+
 
 /*
 ==================
@@ -48,4 +58,14 @@ CStreamDataMemoryWriter::IsWriter
 bool CStreamDataMemoryWriter::IsWriter() const
 {
 	return true;
+}
+
+/*
+==================
+CStreamDataMemoryWriter::GetSize
+==================
+*/
+uint64 CStreamDataMemoryWriter::GetSize() const
+{
+	return ( uint64 )data.size();
 }

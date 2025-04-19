@@ -1,8 +1,3 @@
-/**
- * @file
- * @addtogroup material_tool material_tool
- */
-
 #include <cstdlib>
 #include <string>
 #include <vector>

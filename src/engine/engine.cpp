@@ -12,31 +12,14 @@
 #include "engine/engineapi.h"
 #include "engine/engine.h"
 
-// The game engine
+//-----------------------------------------------------------------------------
+// Global values and cvars
+//-----------------------------------------------------------------------------
 CEngine		g_Engine;
 
-/**
- * @ingroup engine
- * @brief Cvar window width
- */
 CConVar		r_windowwidth( "r_windowwidth", "1280", "Window width", FCVAR_ARCHIVE );
-
-/**
- * @ingroup engine
- * @brief Cvar window height
- */
 CConVar		r_windowheight( "r_windowheight", "720", "Window height", FCVAR_ARCHIVE );
-
-/**
- * @ingroup engine
- * @brief Cvar is need open window in fullscreen mode
- */
 CConVar		r_fullscreen( "r_fullscreen", "0", "Is need open the window in fullscreen mode", FCVAR_ARCHIVE );
-
-/**
- * @ingroup engine
- * @brief Cvar should use vertical synchronization (VSync)
- */
 CConVar		r_vsync( "r_vsync", "0", "Should use vertical synchronization (VSync)", FCVAR_ARCHIVE );
 
 
@@ -311,7 +294,7 @@ void CEngine::OverrideConfigurationFromCommandLine()
 	}
 
 	// Get width
-	const achar*	pWidthParam = nullptr;
+	const achar*	pWidthParam = NULL;
 	if ( pCommandLine->HasParam( "width" ) )
 	{
 		pWidthParam = "width";
@@ -328,7 +311,7 @@ void CEngine::OverrideConfigurationFromCommandLine()
 	}
 
 	// Get height
-	const achar*	pHeightParam = nullptr;
+	const achar*	pHeightParam = NULL;
 	if ( pCommandLine->HasParam( "height" ) )
 	{
 		pHeightParam = "height";

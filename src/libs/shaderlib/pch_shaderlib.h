@@ -1,8 +1,3 @@
-/**
- * @file
- * @addtogroup shaderlib shaderlib
- */
-
 #include <string>
 #include "interfaces/interfaces.h"
 #include "stdlib/stdlib.h"

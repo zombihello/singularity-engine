@@ -8,45 +8,29 @@
 #include "resourcesystem/iresourcesystem.h"
 #include "gameframework/igame.h"
 
-/**
- * @ingroup sandbox
- * @brief Singularity Sandbox game
- */
+//-----------------------------------------------------------------------------
+// Singularity Sandbox game
+//-----------------------------------------------------------------------------
 class CSandboxGame : public CGame
 {
 public:
-	/**
-	 * @brief Initialize the game DLL
-	 *
-	 * @param pFactory	Pointer to interface factory
-	 * @return Return TRUE if the game is initialized, otherwise returns FALSE
-	 */
+	// IGame interface
 	virtual bool Init( createInterfaceFn_t pFactory ) override;
-
-	/**
-	 * @brief Shutdown the game DLL
-	 */
 	virtual void Shutdown() override;
 
-	/**
-	 * @brief Process one game frame
-	 */
 	virtual void FrameUpdate() override;
 
-	/**
-	 * @brief Get game description
-	 * @return Return string describing current module. For example: Singularity Sandbox, Nuclear Frost, etc
-	 */
 	virtual const achar* GetGameDescription() const override;
 
 private:
-	TRefPtr<IStudioAPIBuffer>	pQuadVertexBuffer;	/**< StudioAPI quad vertex buffer */
-	TRefPtr<IStudioAPIBuffer>	pQuadIndexBuffer;	/**< StudioAPI quad index buffer */
-	TResourcePtr<IMaterial>		pQuadMaterial;		/**< Quad material */
+	TRefPtr<IStudioAPIBuffer>	pQuadVertexBuffer;
+	TRefPtr<IStudioAPIBuffer>	pQuadIndexBuffer;
+	TResourcePtr<IMaterial>		pQuadMaterial;
 };
 
 EXPOSE_SINGLE_INTERFACE( CSandboxGame, IGame, GAME_INTERFACE_VERSION );
 EXPOSE_SINGLE_INTERFACE( CGameAppSystems, IGameAppSystems, GAME_APPSYSTEMS_INTERFACE_VERSION );
+
 
 /*
 ==================

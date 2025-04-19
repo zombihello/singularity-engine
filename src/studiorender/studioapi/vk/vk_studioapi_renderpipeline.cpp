@@ -217,7 +217,7 @@ CStudioAPIRenderPipelineVk::CStudioAPIRenderPipelineVk( const studioAPIRenderPip
 	vkPipelineRasterizationStateCreateInfo.lineWidth					= createInfo.rasterizerState.lineWidth;
 	vkPipelineRasterizationStateCreateInfo.depthClampEnable				= VK_FALSE;
 	vkPipelineRasterizationStateCreateInfo.depthBiasEnable				= createInfo.rasterizerState.bDepthBiasEnable;
-	vkPipelineRasterizationStateCreateInfo.depthBiasConstantFactor		= math_t::Floor( createInfo.rasterizerState.depthBiasConstantFactor * ( float )( 1 << 24 ) );
+	vkPipelineRasterizationStateCreateInfo.depthBiasConstantFactor		= S_Floor( createInfo.rasterizerState.depthBiasConstantFactor * ( float )( 1 << 24 ) );
 	vkPipelineRasterizationStateCreateInfo.depthBiasClamp				= createInfo.rasterizerState.depthBiasClamp;
 	vkPipelineRasterizationStateCreateInfo.depthBiasSlopeFactor			= createInfo.rasterizerState.depthBiasSlopeFactor;
 	if ( createInfo.rasterizerState.cullMode == STUDIOAPI_RASTERIZER_CULL_MODE_NONE_REVERSED )

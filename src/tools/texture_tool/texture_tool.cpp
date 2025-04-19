@@ -177,86 +177,33 @@ static uint32 TextureTool_GetNumBytesPerChannel( CMP_FORMAT cmpFormat )
 }
 
 
-/**
- * @ingroup texture_tool
- * @brief Texture tool
- */
+//-----------------------------------------------------------------------------
+// Texture tool
+//-----------------------------------------------------------------------------
 class CTextureTool : public CBaseAppSystem<ITextureTool>
 {
 public:
-	/**
-	 * @brief Connect application system
-	 *
-	 * @param pFactory		Pointer to interface factory
-	 * @return Return TRUE if successes application system is connected, otherwise return FALSE
-	 */
+	// IAppSystem interface
+	// Here's where the app systems get to learn about each other
 	virtual bool Connect( createInterfaceFn_t pFactory ) override;
-
-	/**
-	 * @brief Disconnect application system
-	 */
 	virtual void Disconnect() override;
 
-	/**
-	 * @brief Init application system
-	 * @return Return TRUE if application system is inited
-	 */
+	// Initialize and shutdown
 	virtual bool Init() override;
-
-	/**
-	 * @brief Shutdown application system
-	 */
 	virtual void Shutdown() override;
 
-	/**
-	 * @brief Compile a texture and save in the file system
-	 * @param compileParams		Compile parameters
-	 * @return Return TRUE if the texture successfully compiled, otherwise FALSE
-	 */
+	// ITextureTool interface
 	virtual bool CompileTexture( const resourceToolCompileTextureParams_t& compileParams ) const override;
-
-	/**
-	 * @brief Is a pixel format support by the tool
-	 * @param pixelFormat	Pixel format to check
-	 * @return Return TRUE if the pixel format is support by the tool, otherwise FALSE
-	 */
 	virtual bool IsSupportPixelFormat( studioAPIPixelFormat_t pixelFormat ) const override;
 
 private:
-	/**
-	 * @brief Load an image
-	 * @param pPath			Path to an image to load
-	 * @param cmpMipSet		Output mipset of the loaded image
-	 * @return Return CMP_OK if an image is successes loaded, otherwise it is an error
-	 */
 	CMP_ERROR LoadImage( const achar* pPath, CMP_MipSet& cmpMipSet ) const;
-
-	/**
-	 * @brief Generate mipmaps
-	 * @param cmpMipSet		Input and output mipset of an image
-	 * @param mipmaps		Output mipmaps information. If the array is empty the function calculate mipmaps information, otherwise use it
-	 */
 	void GenerateMipmaps( CMP_MipSet& cmpMipSet, stexTextureMipMaps_t& mipmaps ) const;
 
-	/**
-	 * @brief Convert a texture data
-	 * The function convert the texture data into a new pixel format and copy it into output array
-	 * 
-	 * @param cmpMipSet			Input a mipset of the texture
-	 * @param cmpNewFormat		New pixel format
-	 * @param mipmaps			Mipmaps information
-	 * @param data				Output converted data of the texture
-	 * @param dataOffset		Data offset to begin write into the data
-	 * @return Return CMP_OK if the texture is successfully converted, otherwise it is an error
-	 */
+	// The function convert the texture data into a new pixel format and copy it into output array
 	CMP_ERROR ConvertMipsData( CMP_MipSet& cmpMipSet, CMP_FORMAT cmpNewFormat, const stexTextureMipMaps_t& mipmaps, std::vector<byte>& data, uint32 dataOffset = 0 ) const;
 
-	/**
-	 * @brief Copy a texture data as is
-	 * @param cmpMipSet		Input a mipset of the texture
-	 * @param data			Output data of the texture
-	 * @param dataOffset	Data offset to begin write into the data
-	 */
+	// Copy a texture data as is
 	void CopyMipsData( CMP_MipSet& cmpMipSet, std::vector<byte>& data, uint32 dataOffset = 0 ) const;
 };
 
@@ -462,7 +409,7 @@ void CTextureTool::GenerateMipmaps( CMP_MipSet& cmpMipSet, stexTextureMipMaps_t&
 	{
 		// Calculate mip count to request
 		uint32		maxSize			= Max<uint32>( cmpMipSet.m_nDepth, Max<uint32>( cmpMipSet.m_nWidth, cmpMipSet.m_nHeight ) );
-		uint32		requestMipCount	= ( uint32 )math_t::Floor( math_t::Log2( ( float )maxSize ) ) + 1;
+		uint32		requestMipCount	= ( uint32 )S_Floor( S_Log2( ( float )maxSize ) ) + 1;
 
 		// Calculate texture size for each mip level
 		mipmaps.resize( requestMipCount );
@@ -545,7 +492,7 @@ CMP_ERROR CTextureTool::ConvertMipsData( CMP_MipSet& cmpMipSet, CMP_FORMAT cmpNe
 			uint32				numSrcChannels		= TextureTool_GetNumChannels( cmpMipSet.m_format );
 			uint32				numDstChannels		= TextureTool_GetNumChannels( cmpNewFormat );
 			uint32				numBytesPerChannel	= TextureTool_GetNumBytesPerChannel( cmpNewFormat );
-			uint32				step				= Max<uint32>( ( uint32 )math_t::Abs( ( float )numSrcChannels - ( float )numDstChannels ), 1 );
+			uint32				step				= Max<uint32>( ( uint32 )S_Abs( ( float )numSrcChannels - ( float )numDstChannels ), 1 );
 			uint32				srcMipDataSize		= pCmpMipLevel->m_nWidth * pCmpMipLevel->m_nHeight * numSrcChannels;
 			uint32				dstMipDataSize		= pCmpMipLevel->m_nWidth * pCmpMipLevel->m_nHeight * numDstChannels * numBytesPerChannel;
 			data.resize( dstMipDataSize + dataOffset );

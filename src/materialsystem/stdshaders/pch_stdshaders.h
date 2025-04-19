@@ -1,8 +1,3 @@
-/**
- * @file
- * @addtogroup stdshaders stdshaders
- */
-
 #include <string>
 
 #include "interfaces/interfaces.h"

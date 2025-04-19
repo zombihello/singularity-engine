@@ -1,8 +1,3 @@
-/**
- * @file
- * @addtogroup filesystem filesystem
- */
-
 #ifndef WIN_FILESYSTEM_INL
 #define WIN_FILESYSTEM_INL
 
@@ -13,7 +8,7 @@ Plat_MakeDirectory
 */
 FORCEINLINE bool Plat_MakeDirectory( const achar* pPath )
 { 
-	return CreateDirectoryA( pPath, nullptr ) != 0 || GetLastError() == ERROR_ALREADY_EXISTS;
+	return CreateDirectoryA( pPath, NULL ) != 0 || GetLastError() == ERROR_ALREADY_EXISTS;
 }
 
 /*

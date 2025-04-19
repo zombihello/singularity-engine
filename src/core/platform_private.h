@@ -1,8 +1,3 @@
-/**
- * @file
- * @addtogroup core core
- */
-
 #ifndef PLATFORM_PRIVATE_H
 #define PLATFORM_PRIVATE_H
 

@@ -1,8 +1,3 @@
-/**
- * @file
- * @addtogroup core core
- */
-
 #ifndef WIN_PLATFORM_PRIVATE_H
 #define WIN_PLATFORM_PRIVATE_H
 

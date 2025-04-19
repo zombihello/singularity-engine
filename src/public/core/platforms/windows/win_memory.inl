@@ -1,28 +1,11 @@
-/**
- * @file
- * @addtogroup core core
- */
-
 #ifndef WIN_MEMORY_INL
 #define WIN_MEMORY_INL
 
-/**
- * @ingroup core
- * @brief Allocate memory at stack
- * @note This can't be a function, even FORCEINLINE'd because there's no guarantee that the memory returned in a function will stick around for the caller to use
- *
- * @param size	Size memory to allocate at stack
- */
+//-----------------------------------------------------------------------------
+// Macroses to allocate memory at stack
+// This can't be a function, even FORCEINLINE'd because there's no guarantee that the memory returned in a function will stick around for the caller to use
+//-----------------------------------------------------------------------------
 #define Mem_Alloca( size )									( size > 0 ? ( void* )( ( ( ptrint )alloca( size + 15 ) + 15 ) & ~15 ) : 0 )
-
-/**
- * @ingroup core
- * @brief Allocate memory at stack with specific alignment
- * @note This can't be a function, even FORCEINLINE'd because there's no guarantee that the memory returned in a function will stick around for the caller to use
- *
- * @param size			Size memory to allocate at stack
- * @param alignment		Required alignment
- */
 #define Mem_AllocaAligned( size, alignment )				( size > 0 ? ( alignment <= 16 ? Mem_Alloca( size ) : ( void* )( ( ( ptrint )alloca( size + alignment-1 ) + alignment-1 ) & ~( alignment-1 ) ) ) : 0 )
 
 /*

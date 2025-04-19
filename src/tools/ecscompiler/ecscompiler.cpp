@@ -1,8 +1,3 @@
-/**
- * @file
- * @addtogroup ecscompiler ecscompiler
- */
-
 #include "core/crashdump.h"
 #include "core/icommandline.h"
 #include "stdlib/filetools.h"
@@ -12,62 +7,33 @@
 #include "appframework/iappsystemgroup.h"
 #include "tools/ecscompiler/ecsfileparser.h"
 
-/**
- * @ingroup ecscompiler
- * @brief ECS compiler application
- */
+//-----------------------------------------------------------------------------
+// ECS compiler application
+//-----------------------------------------------------------------------------
 class CEcsCompilerApp : public CDefaultAppSystemGroup<CAppSystemGroup>
 {
 public:
-	/**
-	 * @brief An installed application creation function, you should tell the group
-	 * the DLLs and the singleton interfaces you want to instantiate.
-	 *
-	 * @return Return FALSE if there's any problems and the app will abort
-	 */
+	// IAppSystemGroup interface
+	// An installed application creation function, you should tell the group
+	// the DLLs and the singleton interfaces you want to instantiate
+	// Return FALSE if there's any problems and the app will abort
 	virtual bool Create() override;
 
-	/**
-	 * @brief Allow the application to do some work after AppSystems are connected
-	 *
-	 * Allow the application to do some work after AppSystems are connected but
-	 * they aren't all Initialized
-	 *
-	 * @return Return FALSE if there's any problems and the app will abort
-	 */
+	// Allow the application to do some work after AppSystems are connected but
+	// they aren't all Initialized
+	// Return FALSE if there's any problems and the app will abort
 	virtual bool PreInit() override;
 
-	/**
-	 * @brief Main loop implemented by the application
-	 * @return Return exit code. If all ok returns zero
-	 */
+	// Main loop implemented by the application
+	// Return exit code. If all ok returns zero
 	virtual int32 Main() override;
 
-	/**
-	 * @brief Allow the application to do some work after all AppSystems are shut down
-	 */
+	// Allow the application to do some work after all AppSystems are shut down
 	virtual void PostShutdown() override;
 
 private:
-	/**
-	 * @brief Print usage help
-	 */
 	void PrintUsageHelp();
-
-	/**
-	 * @brief Parse an ECS file
-	 * @param pPath		Path to an ECS file
-	 * @param stubs		Output ECS system stubs
-	 * @return Return TRUE if the ECS file successfully parser, otherwise FALSE
-	 */
 	bool ParseEcsFile( const achar* pPath, CEcsSystemStub& stubs );
-
-	/**
-	 * @brief Generate a C++ header
-	 * @param pPath			Output file
-	 * @param stubs			ECS system stubs
-	 * @return Return TRUE if the C++ header successfully generated, otherwise FALSE
-	 */
 	bool GenerateCppHeader( const achar* pPath, const CEcsStubModule* pEcsModule );
 };
 

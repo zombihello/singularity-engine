@@ -12,48 +12,22 @@
     #define YYLEX_PARAM             param 
     #define YYSTYPE                 yystypeFile_t
 
-    /**
-    * @ingroup ecscompiler
-    * @brief Structure to pass around parser parameters
-    */
     struct yystypeFile_t
     {
-        /**
-         * @brief Constructor
-         */
         yystypeFile_t()
             : pContext( NULL )
         {}
-
-        /**
-         * @brief Constructor of copy
-         * @param other   Other yystypeFile_t
-         */
         yystypeFile_t( const yystypeFile_t& other )
             : pContext( other.pContext )
             , token( other.token )
         {}
-
-        /**
-         * @brief Constructor of move
-         * @param other   Other yystypeFile_t
-         */
          yystypeFile_t( yystypeFile_t&& other )
             : pContext( std::move( other.pContext ) )
             , token( std::move( other.token ) )
         {}
-
-        /**
-         * @brief Destructor
-         */
         ~yystypeFile_t()
         {}
 
-        /**
-         * @brief Override operator of copy
-         * @param other   Other yystypeFile_t
-         * @return Return reference to self
-         */
         FORCEINLINE yystypeFile_t& operator=( const yystypeFile_t& other )
 	    {
 	    	if ( this != &other )
@@ -64,11 +38,6 @@
 	    	return *this;
 	    }
 
-        /**
-         * @brief Override operator of move
-         * @param other   Other yystypeFile_t
-         * @return Return reference to self
-         */
         FORCEINLINE yystypeFile_t& operator=( yystypeFile_t&& other )
 	    {
 	    	if ( this != &other )
@@ -79,8 +48,8 @@
 	    	return *this;
 	    }
 
-        parserFileContext_t*    pContext;   /**< Parser file context */
-        std::string_view        token;      /**< Token in string format */
+        parserFileContext_t*    pContext;
+        std::string_view        token;
     };
 
     typedef TGrammarInterface<CEcsFileParser, yystypeFile_t>        ecsGrammarInterface_t;
@@ -225,13 +194,6 @@ semicolon
 
 %%
 
-/**
- * @ingroup ecscompiler
- * @brief Entry function to parse grammar a ECS source code
- * @param tokens        Token stream
- * @param fileParser    File parser
- * @return Return the result returned by yyparse
- */
 int EcsCode_GrammarFile( CParserTokenStream& tokens, CEcsFileParser& fileParser )
 {
     ecsGrammarInterface_t      grammarInterface( tokens, fileParser );

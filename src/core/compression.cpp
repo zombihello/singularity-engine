@@ -66,7 +66,7 @@ bool Sys_CompressMemory( compressionType_t compressionType, void* pCompressedBuf
 		break;
 
 	default:
-		Warning( "Sys_CompressMemory: Compression type (0x%X) is not supported", compressionType );
+		Warning( "Core: Compression type (0x%X) is not supported", compressionType );
 		bResult = false;
 		break;
 	}
@@ -94,7 +94,7 @@ bool Sys_UncompressMemory( compressionType_t compressionType, void* pUncompresse
 		break;
 
 	default:
-		Warning( "Sys_UncompressMemory: Compression type (0x%X) is not supported", compressionType );
+		Warning( "Core: Compression type (0x%X) is not supported", compressionType );
 		bResult = false;
 		break;
 	}

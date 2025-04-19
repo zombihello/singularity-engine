@@ -72,54 +72,37 @@ void Launcher_InitLogOutput()
 }
 
 
-/**
- * @ingroup launcher
- * @brief Singularity Engine application
- */
+//-----------------------------------------------------------------------------
+// Singularity Engine application
+//-----------------------------------------------------------------------------
 class CSingularityEngineApp : public CDefaultAppSystemGroup<CAppSystemGroup>
 {
 public:
-	/**
-	 * @brief Constructor
-	 * @param pGameDir		Game directory
-	 * @param pHInstance	Application instance handle
-	 */
 	CSingularityEngineApp( const achar* pGameDir, appInstanceHandle_t hInstance = NULL );
 
-	/**
-	 * @brief An installed application creation function, you should tell the group
-	 * the DLLs and the singleton interfaces you want to instantiate.
-	 *
-	 * @return Return FALSE if there's any problems and the app will abort
-	 */
+	// IAppSystemGroup interface
+	// An installed application creation function, you should tell the group
+	// the DLLs and the singleton interfaces you want to instantiate
+	// Return FALSE if there's any problems and the app will abort
 	virtual bool Create() override;
 
-	/**
-	 * @brief Allow the application to do some work after AppSystems are connected
-	 *
-	 * Allow the application to do some work after AppSystems are connected but
-	 * they aren't all Initialized
-	 *
-	 * @return Return FALSE if there's any problems and the app will abort
-	 */
+	// Allow the application to do some work after AppSystems are connected but
+	// they aren't all Initialized
+	// Return FALSE if there's any problems and the app will abort
 	virtual bool PreInit() override;
 
-	/**
-	 * @brief Main loop implemented by the application
-	 * @return Return exit code. If all ok returns zero
-	 */
+	// Main loop implemented by the application
+	// Return exit code. If all ok returns zero
 	virtual int32 Main() override;
 
-	/**
-	 * @brief Allow the application to do some work after all AppSystems are shut down
-	 */
+	// Allow the application to do some work after all AppSystems are shut down
 	virtual void PostShutdown() override;
 
 private:
-	appInstanceHandle_t		hInstance;			/**< Application instance handle */
-	const achar*			pGameDir;			/**< Game directory */
-	IWindowMgr*				pWindowMgr;			/**< Window manager */
-	IEngineAPI*				pEngineAPI;			/**< Engine API */
+	appInstanceHandle_t		hInstance;
+	const achar*			pGameDir;
+	IWindowMgr*				pWindowMgr;
+	IEngineAPI*				pEngineAPI;
 };
 
 
@@ -143,7 +126,7 @@ CSingularityEngineApp::Create
 bool CSingularityEngineApp::Create()
 {
 	// Print some info about user
-	Msg( "User %s//%s", Sys_GetComputerName(), Sys_GetUserName() );
+	Msg( "Launcher: User %s//%s", Sys_GetComputerName(), Sys_GetUserName() );
 
 	// Load application systems
 	appSystemInfo_t		appSystemInfos[] =
@@ -196,7 +179,7 @@ bool CSingularityEngineApp::PreInit()
 	// Create a hidden window for we can init render context and other things links with the one
 	if ( !pWindowMgr->Create( "Singularity Engine", 1, 1, WINDOW_STYLE_DEFAULT | WINDOW_STYLE_HIDDEN ) )
 	{
-		Sys_Error( "Launcher: Failed to create window" );
+		Sys_Error( "Failed to create a window" );
 		return false;
 	}
 

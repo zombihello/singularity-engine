@@ -1,8 +1,3 @@
-/**
- * @file
- * @addtogroup materialsystem materialsystem
- */
-
 #include <string>
 #include <vector>
 #include <unordered_map>

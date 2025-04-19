@@ -1,8 +1,3 @@
-/**
- * @file
- * @addtogroup texture_tool texture_tool
- */
-
 #include <cstdlib>
 #include <string>
 #include <vector>

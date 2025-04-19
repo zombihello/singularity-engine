@@ -1,8 +1,3 @@
-/**
- * @file
- * @addtogroup parserlib parserlib
- */
-
 #include <string>
 
 #include "stdlib/template.h"

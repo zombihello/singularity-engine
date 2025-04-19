@@ -1,8 +1,3 @@
-/**
- * @file
- * @addtogroup smatdoc smatdoc
- */
-
 #ifndef SMAT_COMPILED_DOC_H
 #define SMAT_COMPILED_DOC_H
 
@@ -12,98 +7,31 @@
 #include "core/core.h"
 #include "smatdoc/smatvar.h"
 
-/**
- * @ingroup smatdoc
- * @brief Helper for work with compiled SMAT (Singularity Material) files
- */
+//-----------------------------------------------------------------------------
+// Helper for work with compiled SMAT (Singularity Material) files
+//-----------------------------------------------------------------------------
 class CSMATCompiledMaterialDoc
 {
 public:
-	/**
-	 * @brief Save the material document
-	 * @warning For use StdLib must be connected by ConnectStdLib
-	 *
-	 * @param pPath		Path to save
-	 * @return Return TRUE if the material was successes saved, otherwise return FALSE
-	 */
+	// Save and load a material document
+	// NOTE: For use StdLib must be connected by ConnectStdLib
 	bool SaveFile( const achar* pPath );
-
-	/**
-	 * @brief Load from a file
-	 * @warning For use StdLib must be connected by ConnectStdLib
-	 *
-	 * @param pPath		Path to file
-	 * @return Return TRUE when the file success loaded, otherwise return FALSE
-	 */
 	bool LoadFromFile( const achar* pPath );
 
-	/**
-	 * @brief Set shader name
-	 * @param pShaderName	Shader name
-	 */
-	FORCEINLINE void SetShaderName( const achar* pShaderName )
-	{
-		shaderName = pShaderName;
-	}
+	void SetShaderName( const achar* pShaderName );
+	void AddVar( const CSMATMaterialVar& var );
+	void RemoveVar( uint32 index );
+	void Clear();
 
-	/**
-	 * @brief Add variable
-	 * @param var	Material variable
-	 */
-	FORCEINLINE void AddVar( const CSMATMaterialVar& var )
-	{
-		vars.emplace_back( var );
-	}
-
-	/**
-	 * @brief Remove variable by index
-	 * @param index		Index
-	 */
-	FORCEINLINE void RemoveVar( uint32 index )
-	{
-		Assert( index < vars.size() );
-		vars.erase( vars.begin() + index );
-	}
-
-	/**
-	 * @brief Clear material document
-	 */
-	FORCEINLINE void Clear()
-	{
-		shaderName = "";
-		vars.clear();
-	}
-
-	/**
-	 * @brief Get number of material variables
-	 * @return Return number of material variables
-	 */
-	FORCEINLINE uint32 GetNumVars() const
-	{
-		return ( uint32 )vars.size();
-	}
-
-	/**
-	 * @brief Get array of material variables
-	 * @return Return array of material variables
-	 */
-	FORCEINLINE const std::vector<CSMATMaterialVar>& GetVars() const
-	{
-		return vars;
-	}
-
-	/**
-	 * @brief Get shader name
-	 * @return Return shader name. If isn't set return empty string
-	 */
-	FORCEINLINE const achar* GetShaderName() const
-	{
-		return shaderName.c_str();
-	}
+	uint32 GetNumVars() const;
+	const std::vector<CSMATMaterialVar>& GetVars() const;
+	const achar* GetShaderName() const;
 
 private:
-	std::string						shaderName;		/**< Shader name */
-	std::vector<CSMATMaterialVar>	vars;			/**< Material variables */
+	std::string						shaderName;
+	std::vector<CSMATMaterialVar>	vars;
 };
+
+#include "smatdoc/smat_compiled_doc.inl"
 
 #endif // !SMAT_COMPILED_DOC_H

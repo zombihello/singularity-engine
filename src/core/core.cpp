@@ -3,9 +3,9 @@
 #include "core/core_private.h"
 #include "core/crashdump_private.h"
 
-bool		g_bRequestingExit = false;
-double		g_SecondsPerCycle = Sys_GetSecondsPerCycle();
-bool		g_bConsoleIOInited = false;
+bool		g_bRequestingExit	= false;
+double		g_SecondsPerCycle	= Sys_GetSecondsPerCycle();
+bool		g_bConsoleIOInited	= false;
 
 /*
 ==================
@@ -61,7 +61,7 @@ void Sys_ShowMessageBox( const achar* pTitle, const achar* pMessage, messageBox_
 		break;
 	}
 
-	SDL_ShowSimpleMessageBox( sdlFlags, pTitle, pMessage, nullptr );
+	SDL_ShowSimpleMessageBox( sdlFlags, pTitle, pMessage, NULL );
 }
 
 /*

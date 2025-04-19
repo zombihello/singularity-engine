@@ -1,8 +1,3 @@
-/**
- * @file
- * @addtogroup sandbox sandbox
- */
-
 #include <cstdlib>
 #include <string>
 #include <vector>

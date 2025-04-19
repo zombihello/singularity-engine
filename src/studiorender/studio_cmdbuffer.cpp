@@ -1,10 +1,6 @@
 #include "pch_studiorender.h"
 #include "studiorender/studio_cmdbuffer.h"
 
-/**
- * @ingroup studiorender
- * @brief Mutex of studio command buffer
- */
 static CThreadMutex		s_StudioCmdBufferMutex;
 
 /*
@@ -13,11 +9,11 @@ CStudioCmdBuffer::CStudioCmdBuffer
 ==================
 */
 CStudioCmdBuffer::CStudioCmdBuffer( uint32 bufferSize, uint32 alignment /* = 1 */ )
-	: pData( nullptr )
-	, pDataEnd( nullptr )
-	, pWritePointer( nullptr )
+	: pData( NULL )
+	, pDataEnd( NULL )
+	, pWritePointer( NULL )
 	, bWriting( false )
-	, pReadPointer( nullptr )
+	, pReadPointer( NULL )
 	, alignment( alignment )
 {
 	pData			= new byte[bufferSize];
@@ -46,15 +42,15 @@ studioCmdAlloc_t CStudioCmdBuffer::GetAllocation( uint32 allocationSize )
 	s_StudioCmdBufferMutex.Lock();
 
 	// Only allow a single allocation chunk at a time
-	AssertMsg( !bWriting, "StudioRender: Only allow a single allocation chunk at a time" );
-	bWriting			= true;
+	AssertMsg( !bWriting, "Only allow a single allocation chunk at a time" );
+	bWriting				= true;
 	studioCmdAlloc_t		studioCmdAlloc;
 	Mem_Memzero( &studioCmdAlloc, sizeof( studioCmdAlloc_t ) );
 
 	// Check that the allocation will fit in the buffer
 	const uint32	alignedAllocationSize	= Align( allocationSize, alignment );
 	const uint32	bufferSize				= ( uint32 )( pDataEnd - pData );
-	AssertMsg( alignedAllocationSize < bufferSize, "StudioRender: No enough space for the allocation in the command buffer" );
+	AssertMsg( alignedAllocationSize < bufferSize, "No enough space for the allocation in the command buffer" );
 
 	// Use the memory referenced by WritePointer for the allocation, wrapped around to the beginning of the buffer
 	// if it was at the end
@@ -111,7 +107,7 @@ void CStudioCmdBuffer::CommitAllocation( studioCmdAlloc_t& allocContext )
 		s_StudioCmdBufferMutex.Unlock();
 
 		// Clear the allocation pointer, to signal that it has been committed
-		allocContext.pAllocation = nullptr;
+		allocContext.pAllocation = NULL;
 
 		// Trigger the data-written event to wake the reader thread
 		dataWrittenEvent.Trigger();
@@ -151,7 +147,7 @@ bool CStudioCmdBuffer::BeginRead( void*& pReadPointer, uint32& readSize )
 	}
 
 	// Determine whether the write pointer or the buffer end should delimit this contiguous read
-	byte*	pReadEndPointer = nullptr;
+	byte*	pReadEndPointer = NULL;
 	if ( pCurWritePointer >= CStudioCmdBuffer::pReadPointer )
 	{
 		pReadEndPointer = pCurWritePointer;

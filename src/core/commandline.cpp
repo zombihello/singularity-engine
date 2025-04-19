@@ -5,96 +5,27 @@
 #include "core/debug.h"
 #include "core/icommandline.h"
 
-/**
- * @ingroup core
- * @brief Command line
- * Holds parsed data from command line like strings
- *
- * Usage:
- * @code
- *		-<Param>=<Value>
- *		/<Param>=<Value>
- *		-<Param>="<Value> <Value>"
- *		/<Param>="<Value> <Value>"
- *		-<Param>
- *		/<Param>
- *		-<Param> <Value>
- *		/<Param> <Value>
- *		-<Param> "<Value> <Value>"
- *		/<Param> "<Value> <Value>"
- * @endcode
- */
 class CCommandLine : public ICommandLine
 {
 public:
-	/**
-	 * @brief Destructor
-	 */
 	virtual ~CCommandLine();
 
-	/**
-	 * @brief Init command line
-	 * @param pCommandLine	Command line
-	 */
+	// ICommandLine interface
 	virtual void Init( const achar* pCommandLine ) override;
-
-	/**
-	 * @brief Shutdown command line
-	 */
 	virtual void Shutdown() override;
 
-	/**
-	 * @brief Is has a param
-	 *
-	 * @param pParam	Param to find
-	 * @return Return TRUE if command line is containing a param, otherwise will returning FALSE
-	 */
 	virtual bool HasParam( const achar* pParam ) const override;
-
-	/**
-	 * @brief Is has a param with value
-	 *
-	 * @param pParam		Param to find
-	 * @param pValue		Value of param
-	 * @return Return TRUE if command line is containing a param with value, otherwise will returning FALSE
-	 */
 	virtual bool HasParam( const achar* pParam, const achar* pValue ) const override;
-
-	/**
-	 * @brief Get first value from param
-	 *
-	 * @param pParam	Param
-	 * @return Return first value in param. If not exist return empty string
-	 */
 	virtual const achar* GetFirstValue( const achar* pParam ) const override;
-
-	/**
-	 * @brief Get values from param
-	 *
-	 * @param pParam	Param
-	 * @param size		Output count values
-	 * @return Return array of values by param. If it is not exist in command line will return NULL
-	 */
 	virtual const achar** GetValues( const achar* pParam, uint32& size ) const override;
 
 private:
-	/**
-	 * @brief Type value array
-	 */
 	typedef std::vector<const achar*>	values_t;
-
-	/**
-	 * @brief Type of map parameters
-	 */
 	typedef std::unordered_map<std::string, values_t>	paramDict_t;
 
-	/**
-	 * @brief Parses a string into params (beginning with - or /) from other parameters
-	 * @param pCommandLine	Command line
-	 */
 	void Parse( const achar* pCommandLine );
 
-	paramDict_t		paramsDict;		/**< Dictionary of parameters */
+	paramDict_t		paramsDict;
 };
 
 
@@ -213,7 +144,7 @@ void CCommandLine::Init( const achar* pCommandLine )
 {
 	Shutdown();
 	Parse( pCommandLine );
-	Msg( "CommandLine: inited with arguments '%s'", pCommandLine );
+	Msg( "Core: inited with arguments '%s'", pCommandLine );
 }
 
 /*
@@ -260,7 +191,7 @@ void CCommandLine::Parse( const achar* pCommandLine )
 		else if ( itCurrentParam != paramsDict.end() )
 		{
 			uint32		size = ( uint32 )nextToken.size();
-			achar*		pData = ( achar* )malloc( ( size + 1 ) * sizeof( achar ) );
+			achar*		pData = ( achar* )Mem_Malloc( ( size + 1 ) * sizeof( achar ) );
 			S_Strcpy( pData, nextToken.data() );
 			pData[size]	= '\0';
 			itCurrentParam->second.push_back( pData );

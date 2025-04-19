@@ -29,38 +29,22 @@
     #define EMIT_COMMENT()                      yyextra->EmitComment()
     #define EMIT_ERROR( Message )               yyextra->EmitError( Message )
 
-    /**
-     * @ingroup ecscompiler
-     * @brief Lexer scope type
-     */
     enum ecsLexerScope_t
     {
-        ECS_LEXER_SCOPE_DEFAULT,    /**< Default */
-        ECS_LEXER_SCOPE_COMPONENT,  /**< Component */
-        ECS_LEXER_SCOPE_SYSTEM      /**< System */
+        ECS_LEXER_SCOPE_DEFAULT,
+        ECS_LEXER_SCOPE_COMPONENT,
+        ECS_LEXER_SCOPE_SYSTEM
     };
 
-    /**
-     * @ingroup ecscompiler
-     * @brief The lexer's internal state
-     */
+
     struct ecsLexerStateInternal_t : public parserLexerState_t
     {
-        /**
-         * @brief Constructor
-         * @param pSource          The raw input buffer
-         * @param pLexerListener   Lexer listener
-         */
          ecsLexerStateInternal_t( const achar* pSourceCode, CParserLexerListener* pLexerListener )
             : parserLexerState_t( pSourceCode, pLexerListener )
             , lexerScope( ECS_LEXER_SCOPE_DEFAULT )
             , bracketScopeLevel( 0 )
         {}
 
-        /**
-         * @brief Set lexer scope
-         * @param lexerScope    A new lexer scope
-         */
         FORCEINLINE void SetScope( ecsLexerScope_t lexerScope )
         {
             if (  ecsLexerStateInternal_t::lexerScope != ECS_LEXER_SCOPE_DEFAULT || scopeLevel > 0 )
@@ -70,9 +54,6 @@
             ecsLexerStateInternal_t::lexerScope = lexerScope;
         }
 
-        /**
-         * @brief Reset the lexer scope
-         */
         FORCEINLINE void ResetScope()
         {
             if ( scopeLevel > 0 )
@@ -82,20 +63,15 @@
             lexerScope = ECS_LEXER_SCOPE_DEFAULT;
         }
 
-        /**
-         * @brief Is current scope a scope
-         * @param lexerScope    Scope to check
-         * @return Return TRUE if the current scope is the lexerScope, otherwise FALSE
-         */
         FORCEINLINE bool IsScopeA( ecsLexerScope_t lexerScope ) const
         {
             return ecsLexerStateInternal_t::lexerScope == lexerScope;
         }
 
-        uint32                      bracketScopeLevel;  /**< Bracket scope level */
+        uint32                      bracketScopeLevel;
 
     private:
-        ecsLexerScope_t             lexerScope;         /**< Lexer scope */
+        ecsLexerScope_t             lexerScope;
     };
 %}
 
@@ -227,12 +203,6 @@
 .|\n                                            EMIT_ERROR( "Unknown token" );
 %%
 
-/**
- * @ingroup ecscompiler
- * @brief Entry function to tokenize ECS source code
- * @param pSourceCode      Source code
- * @param pLexerListener   Lexer listener
- */
 void EcsCode_Tokenize( const achar* pSourceCode, CParserLexerListener* pLexerListener )
 {
     yyscan_t                    scanner;

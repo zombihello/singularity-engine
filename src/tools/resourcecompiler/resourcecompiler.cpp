@@ -31,6 +31,7 @@ static const achar* s_pResourceTypeNames[] =
 };
 static_assert( RESOURCE_NUM_TYPES == ARRAYSIZE( s_pResourceTypeNames ), "Array size 's_pResourceTypeNames' must be equal to RESOURCE_NUM_TYPES" );
 
+
 /*
 ==================
 ConvScriptFileExtensionToResourceType
@@ -68,87 +69,50 @@ static const achar* ConvResourceTypeToString( resourceType_t resourceType )
 }
 
 
-/**
- * @ingroup resourcecompiler
- * @brief Resource compiler application
- */
+//-----------------------------------------------------------------------------
+// Resource compiler application
+//-----------------------------------------------------------------------------
 class CResourceCompilerApp : public CDefaultAppSystemGroup<CAppSystemGroup>
 {
 public:
-	/**
-	 * @brief Constructor
-	 */
-	CResourceCompilerApp();
-
-	/**
-	 * @brief An installed application creation function, you should tell the group
-	 * the DLLs and the singleton interfaces you want to instantiate.
-	 *
-	 * @return Return FALSE if there's any problems and the app will abort
-	 */
+	// IAppSystemGroup interface
+	// An installed application creation function, you should tell the group
+	// the DLLs and the singleton interfaces you want to instantiate
+	// Return FALSE if there's any problems and the app will abort
 	virtual bool Create() override;
 
-	/**
-	 * @brief Allow the application to do some work after AppSystems are connected
-	 *
-	 * Allow the application to do some work after AppSystems are connected but
-	 * they aren't all Initialized
-	 *
-	 * @return Return FALSE if there's any problems and the app will abort
-	 */
+	// Allow the application to do some work after AppSystems are connected but
+	// they aren't all Initialized
+	// Return FALSE if there's any problems and the app will abort
 	virtual bool PreInit() override;
 
-	/**
-	 * @brief Main loop implemented by the application
-	 * @return Return exit code. If all ok returns zero
-	 */
+	// Main loop implemented by the application
+	// Return exit code. If all ok returns zero
 	virtual int32 Main() override;
 
-	/**
-	 * @brief Allow the application to do some work after all AppSystems are shut down
-	 */
+	// Allow the application to do some work after all AppSystems are shut down
 	virtual void PostShutdown() override;
 
+	CResourceCompilerApp();
+
 private:
-	/**
-	 * @brief Resource file
-	 */
 	struct resourceFile_t
 	{
-		/**
-		 * @brief Destructor
-		 */
 		~resourceFile_t() 
 		{}
 
-		std::string		sourcePath;			/**< Path to a source file (*.stex for textures, *.smat for materials and etc) */
-		resourceType_t	type;				/**< Resource type */
+		std::string		sourcePath;
+		resourceType_t	type;
 	};
 
-	/**
-	 * @brief Print usage help
-	 */
 	void PrintUsageHelp();
-
-	/**
-	 * @brief Load a file list
-	 * @param pPath		Path to a file list
-	 * @return Return TRUE if the file successfully loaded, otherwise FALSE
-	 */
 	bool LoadFileList( const achar* pPath );
-
-	/**
-	 * @brief Add a file to compile
-	 * @param pPath		Path to a file
-	 * @param pWorkDir	Using the current working directory as the base, or pWorkDir if it isn't empty
-	 * @return Return TRUE if the file successfully added to compile, otherwise FALSE
-	 */
 	bool AddFileToCompile( const achar* pPath, const achar* pWorkDir = "" );
 
-	ITextureTool*				pTextureTool;	/**< Texture tool */
-	IMaterialTool*				pMaterialTool;	/**< Material tool */
-	IModelTool*					pModelTool;		/**< Model tool */
-	std::list<resourceFile_t>	files;			/**< File list to compile */
+	ITextureTool*				pTextureTool;
+	IMaterialTool*				pMaterialTool;
+	IModelTool*					pModelTool;
+	std::list<resourceFile_t>	files;
 };
 
 

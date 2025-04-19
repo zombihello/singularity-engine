@@ -13,6 +13,7 @@ static_assert( sizeof( s_STEXMagic ) == s_STEXMagicSize, "Size of s_STEXMagic mu
 // Singularity texture version
 static const uint32		s_STEXVersion					= 1;
 
+
 /*
 ==================
 CSTEXCompiledTextureDoc::CSTEXCompiledTextureDoc

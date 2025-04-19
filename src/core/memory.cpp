@@ -26,7 +26,7 @@ MemAlloc
 */
 IMemAlloc* MemAlloc()
 {
-	static IMemAlloc*	s_pMemAlloc = nullptr;
+	static IMemAlloc*	s_pMemAlloc = NULL;
 	
 	// If the global memory allocator not created yet then do it now!
 	if ( !s_pMemAlloc )

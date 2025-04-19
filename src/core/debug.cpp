@@ -21,10 +21,6 @@ static void DefaultLogOutput( const achar* pMsg )
 #endif // ENABLE_LOGGING
 }
 
-/**
- * @ingroup core
- * @brief Log output function
- */
 static logOutputFn_t	s_LogOutputFn = &DefaultLogOutput;
 
 /*

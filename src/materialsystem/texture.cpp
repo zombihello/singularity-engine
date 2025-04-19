@@ -1,5 +1,6 @@
 #include "pch_materialsystem.h"
 #include "materialsystem/texture.h"
+
 /*
 ==================
 CTexture::CTexture

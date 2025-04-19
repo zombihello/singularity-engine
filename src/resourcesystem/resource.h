@@ -1,75 +1,32 @@
-/**
- * @file
- * @addtogroup resourcesystem resourcesystem
- */
-
 #ifndef RESOURCE_H
 #define RESOURCE_H
 
 #include "resourcesystem/iresource.h"
 
-/**
- * @ingroup resourcesystem
- * @brief Resource
- */
+//-----------------------------------------------------------------------------
+// Resource
+//-----------------------------------------------------------------------------
 class CResource : public TRefCounted<IResource>
 {
 public:
-	/**
-	 * @brief Constructor
-	 * @param pPath			Resource path
-	 * @param pData			Resource data
-	 * @param type			Resource type
-	 * @param bProcedural	Is procedural resource
-	 */
 	CResource( const achar* pPath, IRefCounted* pData, resourceType_t type, bool bProcedural = false );
 
-	/**
-	 * @brief Set resource data
-	 * @param pData		Resource data
-	 * @param type		Resource type
-	 */
-	FORCEINLINE void SetData( IRefCounted* pData, resourceType_t type )
-	{
-		CResource::type		= type;
-		CResource::pData	= pData;
-	}
-
-	/**
-	 * @brief Get resource type
-	 * @return Return resource type. If the resource is procedural return empty string
-	 */
+	// IResource interface
+	// If the data isn't valid return the default resource or NULL if it isn't exist in the system
+	virtual IRefCounted* GetData() const override;
 	virtual resourceType_t GetType() const override;
 
-	/**
-	 * @brief Get resource data
-	 * @return Return resource data. If the data isn't valid return the default material (or NULL if the default resource isn't exist)
-	 */
-	virtual IRefCounted* GetData() const override;
-
-	/**
-	 * @brief Is procedural the resource (load from a file)
-	 * @return Return TRUE if the procedural resource, otherwise FALSE
-	 */
-	FORCEINLINE bool IsProcedural() const
-	{
-		return bProcedural;
-	}
-
-	/**
-	 * @brief Get resource path
-	 * @return Return resource path
-	 */
-	FORCEINLINE const achar* GetPath() const
-	{
-		return path.c_str();
-	}
+	void SetData( IRefCounted* pData, resourceType_t type );
+	bool IsProcedural() const;
+	const achar* GetPath() const;
 
 private:
-	bool					bProcedural;	/**< Is procedural the resource */
-	resourceType_t			type;			/**< Resource type */
-	std::string				path;			/**< Resource path */
-	TRefPtr<IRefCounted>	pData;			/**< Resource data */
+	bool					bProcedural;
+	resourceType_t			type;
+	std::string				path;
+	TRefPtr<IRefCounted>	pData;
 };
+
+#include "resourcesystem/resource.inl"
 
 #endif // !RESOURCE_H

@@ -5,6 +5,9 @@
 #include "filesystem/ifilesystem.h"
 #include "stdlib/convar.h"
 
+//-----------------------------------------------------------------------------
+// Cheat cvar
+//-----------------------------------------------------------------------------
 /*
 ==================
 CheatsChanged
@@ -21,244 +24,105 @@ static void CheatsChanged( IConVar* pConVar )
 		Msg( "FCVAR_CHEAT cvars reverted to defaults" );
 	}
 }
-
-/**
- * @ingroup engine
- * @brief Cvar allow cheats in the game
- */
 CConVar		cheats( "cheats", "0", "Allow cheats in the game", FCVAR_NONE, CheatsChanged );
 
 
-/**
- * @ingroup engine
- * @brief Implementation of the ICvarQuery interface
- */
+//-----------------------------------------------------------------------------
+// CvarQuery implementation
+//-----------------------------------------------------------------------------
 class CCvarQuery : public CBaseAppSystem<ICvarQuery> 
 {
 public:
-	/**
-	 * @brief Constructor
-	 */
 	CCvarQuery();
 
-	/**
-	 * @brief Connect application system
-	 *
-	 * @param pFactory		Pointer to interface factory
-	 * @return Return TRUE if successes application system is connected, otherwise return FALSE
-	 */
+	// IAppSystem interface
+	// Here's where the app systems get to learn about each other
 	virtual bool Connect( createInterfaceFn_t pFactory ) override;
-
-	/**
-	 * @brief Disconnect application system
-	 */
 	virtual void Disconnect() override;
 
-	/**
-	 * @brief Query interface
-	 *
-	 * Here's where systems can access other interfaces implemented by this object
-	 *
-	 * @param pInterfaceName	Interface name
-	 * @return Return pointer to interface, if doesn't implement the requested interface return NULL
-	 */
+	// Here's where systems can access other interfaces implemented by this object
+	// Returns NULL if it doesn't implement the requested interface
 	virtual void* QueryInterface( const achar* pInterfaceName ) override;
 
-	/**
-	 * @brief Can these two IConVars be aliased
-	 *
-	 * @param pChildVar		Child variable
-	 * @param pParentVar	Parent variable
-	 * @return Return TRUE if these two IConVars can be aliased, otherwise returns FALSE
-	 */
+	// ICvarQuery interface
 	virtual bool AreConVarsLinkable( const IConVar* pChildVar, const IConVar* pParentVar ) override;
 
 private:
-	ICvar*		pCvar;		/**< Cvar query connected to this ICvar */
+	ICvar*		pCvar;
 };
 
-/**
- * @ingroup engine
- * @brief The console system
- */
+
+//-----------------------------------------------------------------------------
+// The console system
+//-----------------------------------------------------------------------------
 class CCvar : public CBaseAppSystem<ICvar>
 {
 public:
-	/**
-	 * @brief Constructor
-	 */
 	CCvar();
 
-	/**
-	 * @brief Connect application system
-	 *
-	 * @param pFactory		Pointer to interface factory
-	 * @return Return TRUE if successes application system is connected, otherwise return FALSE
-	 */
+	// IAppSystem interface
+	// Here's where the app systems get to learn about each other
 	virtual bool Connect( createInterfaceFn_t pFactory ) override;
-
-	/**
-	 * @brief Disconnect application system
-	 */
 	virtual void Disconnect() override;
 
-	/**
-	 * @brief Init application system
-	 * @return Return TRUE if application system is inited
-	 */
+	// Initialize and shutdown
 	virtual bool Init() override;
-
-	/**
-	 * @brief Shutdown application system
-	 */
 	virtual void Shutdown() override;
 
-	/**
-	 * @brief Allocate a unique DLL identifier
-	 * @return Return allocated a unique DLL identifier
-	 */
+	// ICvar interface
 	virtual cvarDLLIdentifier_t AllocateDLLIdentifier() override;
 
-	/**
-	 * @brief Register command
-	 * @param pCommand	Console command
-	 */
 	virtual void RegisterCommand( IConCmdBase* pCommand ) override;
-
-	/**
-	 * @brief Unregister command
-	 * @param pCommand	Console command
-	 */
 	virtual void UnregisterCommand( IConCmdBase* pCommand ) override;
-
-	/**
-	 * @brief Unregister commands
-	 * @param dllIdentifier		DLL identifier
-	 */
 	virtual void UnregisterCommands( cvarDLLIdentifier_t dllIdentifier ) override;
 
-	/**
-	 * @brief Execute command
-	 *
-	 * @param pCommand		Command
-	 * @return Return TRUE if command is successfully executed, otherwise returns FALSE
-	 */
 	virtual bool Exec( const achar* pCommand ) override;
 
-	/**
-	 * @brief Find command base by name
-	 *
-	 * @param pName		Command name
-	 * @return Return pointer to command base if found, otherwise returns NULL
-	 */
 	virtual IConCmdBase* FindCommandBase( const achar* pName ) const override;
-
-	/**
-	 * @brief Find command by name
-	 *
-	 * @param pName		Command name
-	 * @return Return pointer to command if found, otherwise returns NULL
-	 */
 	virtual IConCmd* FindCommand( const achar* pName ) const override;
-
-	/**
-	 * @brief Find variable by name
-	 *
-	 * @param pName		Command name
-	 * @return Return pointer to variable if found, otherwise returns NULL
-	 */
 	virtual IConVar* FindVar( const achar* pName ) const override;
 
-	/**
-	 * @brief Reset cvars which contain a specific flags
-	 * Sets cvars containing the flags to their default value
-	 * 
-	 * @param flags		Cvar flags
-	 */
+	// Sets cvars containing the flags to their default value
 	virtual void ResetFlaggedVars( uint32 flags ) override;
 
-	/**
-	 * @brief Get the first IConCmdBase to allow iteration over all IConCmd and IConVars
-	 * @return Return the first IConCmdBase to allow iteration. If in the system isn't any commands returns NULL
-	 */
+	// Get the first IConCmdBase to allow iteration over all IConCmd and IConVars
 	virtual IConCmdBase* GetCommands() const override;
 
-	/**
-	 * @brief Set global change callback of IConVars
-	 * @note To be called when any IConVar changes
-	 *
-	 * @param pChangeCallbackFn		Change callback
-	 */
 	virtual void SetGlobalChangeCallback( conVarChangeCallbackFn_t pChangeCallbackFn ) override;
-
-	/**
-	 * @brief Call global change callback
-	 * @param pConVar	Changed cvar
-	 */
 	virtual void CallGlobalChangeCallback( IConVar* pConVar ) override;
 
-	/**
-	 * @brief Set console display function
-	 * @param pConsoleDisplayFunc	Console display function
-	 */
 	virtual void SetConsoleDisplayFunc( IConsoleDisplayFunc* pConsoleDisplayFunc ) override;
-
-	/**
-	 * @brief Print message into console
-	 *
-	 * @param color		Message color
-	 * @param pFormat	Message format
-	 * @param ...		Other message parameters
-	 */
 	virtual void ConsolePrintf( const CColor& color, const achar* pFormat, ... ) override;
-
-	/**
-	 * @brief Print message into console
-	 *
-	 * @param pFormat	Message format
-	 * @param ...		Other message parameters
-	 */
 	virtual void ConsolePrintf( const achar* pFormat, ... ) override;
 
-	/**
-	 * @brief Set ICvarQuery for the console system
-	 *
-	 * Method allowing the engine ICvarQuery interface to take over
-	 * A little hacky, owing to the fact the engine is loaded
-	 * well after ICvar, so we can't use the standard connect pattern
-	 *
-	 * @param pCvarQuery	Cvar query to set. If NULL ICvar set to default ICvarQuery
-	 */
+	// Method allowing the engine ICvarQuery interface to take over
+	// A little hacky, owing to the fact the engine is loaded
+	// well after ICvar, so we can't use the standard connect pattern
+	// NOTE: pCvarQuery If NULL ICvar set to default ICvarQuery
 	virtual void SetCVarQuery( ICvarQuery* pCvarQuery ) override;
 
 private:
 	enum
 	{
-		COMMAND_MAX_ARGC		= 64,	/**< Max count arguments in a command */
-		COMMAND_MAX_LENGTH		= 512	/**< Max length of a command */
+		COMMAND_MAX_ARGC		= 64,
+		COMMAND_MAX_LENGTH		= 512
 	};
 
-	/**
-	 * @brief Parse command
-	 * 
-	 * This method parse command and result place into variables:
-	 * commandArgc - Here will be count command arguments
-	 * pCommandArgv - Here will be command arguments
-	 * 
-	 * @param pCommand		Command to parse. After the function is executed, this pointer will point to the beginning of the next command after the separator, or NULL if there is nothing else left
-	 * @param separator		Symbol for splitting a command
-	 * @return Return TRUE if command was successfully parsed, otherwise returns FALSE
-	 */
+	// This method parse command and result place into variables:
+	// commandArgc - Here will be count command arguments
+	// pCommandArgv - Here will be command arguments
+	// NOTE: pCommand - After the function is executed, this pointer will point to the beginning 
+	// of the next command after the separator, or NULL if there is nothing else left
 	bool ParseCommand( const achar*& pCommand, const achar separator = '$' );
 
-	IConCmdBase*				pConCmdList;							/**< Console command list */
-	ICvarQuery*					pCvarQuery;								/**< Installed ICvarQuery */
-	cvarDLLIdentifier_t			nextDLLIdentifier;						/**< Next a unique DLL identifier */
-	conVarChangeCallbackFn_t	pGlobalChangeCallbackFn;				/**< Global change callback of IConVars */
-	IConsoleDisplayFunc*		pConsoleDisplayFunc;					/**< Console display function */
-	achar						commandArgvBuffer[COMMAND_MAX_LENGTH];	/**< Buffer for command arguments */
-	uint32						commandArgc;							/**< Count of command arguments */
-	const achar*				pCommandArgv[COMMAND_MAX_ARGC];			/**< Array of pointer to begin each command argument */
+	IConCmdBase*				pConCmdList;
+	ICvarQuery*					pCvarQuery;
+	cvarDLLIdentifier_t			nextDLLIdentifier;
+	conVarChangeCallbackFn_t	pGlobalChangeCallbackFn;
+	IConsoleDisplayFunc*		pConsoleDisplayFunc;
+	achar						commandArgvBuffer[COMMAND_MAX_LENGTH];
+	uint32						commandArgc;
+	const achar*				pCommandArgv[COMMAND_MAX_ARGC];
 };
 
 static CCvar		s_Cvar;
@@ -273,7 +137,7 @@ CCvarQuery::CCvarQuery
 ==================
 */
 CCvarQuery::CCvarQuery()
-	: pCvar( nullptr )
+	: pCvar( NULL )
 {}
 
 /*
@@ -302,7 +166,7 @@ void CCvarQuery::Disconnect()
 {
 	if ( pCvar )
 	{
-		pCvar->SetCVarQuery( nullptr );
+		pCvar->SetCVarQuery( NULL );
 	}
 }
 
@@ -318,7 +182,7 @@ void* CCvarQuery::QueryInterface( const achar* pInterfaceName )
 		return ( ICvarQuery* )this;
 	}
 
-	return nullptr;
+	return NULL;
 }
 
 /*
@@ -338,11 +202,11 @@ CCvar::CCvar
 ==================
 */
 CCvar::CCvar()
-	: pConCmdList( nullptr )
+	: pConCmdList( NULL )
 	, pCvarQuery( &s_CvarQuery )
 	, nextDLLIdentifier( 0 )
-	, pGlobalChangeCallbackFn( nullptr )
-	, pConsoleDisplayFunc( nullptr )
+	, pGlobalChangeCallbackFn( NULL )
+	, pConsoleDisplayFunc( NULL )
 	, commandArgc( 0 )
 {}
 
@@ -419,7 +283,7 @@ void CCvar::RegisterCommand( IConCmdBase* pCommand )
 	const achar*	pName = pCommand->GetName();
 	if ( !pName || !pName[0] )
 	{
-		pCommand->SetNext( nullptr );
+		pCommand->SetNext( NULL );
 		return;
 	}
 
@@ -492,7 +356,7 @@ void CCvar::RegisterCommand( IConCmdBase* pCommand )
 			}
 		}
 
-		pCommand->SetNext( nullptr );
+		pCommand->SetNext( NULL );
 		return;
 	}
 
@@ -520,7 +384,7 @@ void CCvar::UnregisterCommand( IConCmdBase* pCommand )
 	pCommand->SetRegistered( false );
 
 	// Remove command
-	for ( IConCmdBase* pCurCommand = pConCmdList, *pPrevCommand = nullptr; pCurCommand; pCurCommand = pCurCommand->GetNext() )
+	for ( IConCmdBase* pCurCommand = pConCmdList, *pPrevCommand = NULL; pCurCommand; pCurCommand = pCurCommand->GetNext() )
 	{
 		if ( pCurCommand != pCommand )
 		{
@@ -537,7 +401,7 @@ void CCvar::UnregisterCommand( IConCmdBase* pCommand )
 			pPrevCommand->SetNext( pCurCommand->GetNext() );
 		}
 
-		pCurCommand->SetNext( nullptr );
+		pCurCommand->SetNext( NULL );
 		break;
 	}
 }
@@ -550,8 +414,8 @@ CCvar::UnregisterCommands
 void CCvar::UnregisterCommands( cvarDLLIdentifier_t dllIdentifier )
 {
 	PROFILE_SCOPE();
-	IConCmdBase*	pNewList = nullptr;
-	IConCmdBase*	pCurCommand = pConCmdList, *pNextCommand = nullptr;
+	IConCmdBase*	pNewList = NULL;
+	IConCmdBase*	pCurCommand = pConCmdList, *pNextCommand = NULL;
 	while ( pCurCommand )
 	{
 		pNextCommand = pCurCommand->GetNext();
@@ -563,7 +427,7 @@ void CCvar::UnregisterCommands( cvarDLLIdentifier_t dllIdentifier )
 		else
 		{
 			pCurCommand->SetRegistered( false );
-			pCurCommand->SetNext( nullptr );
+			pCurCommand->SetNext( NULL );
 		}
 
 		pCurCommand = pNextCommand;
@@ -799,7 +663,7 @@ IConCmdBase* CCvar::FindCommandBase( const achar* pName ) const
 		}
 	}
 
-	return nullptr;
+	return NULL;
 }
 
 /*
@@ -813,7 +677,7 @@ IConCmd* CCvar::FindCommand( const achar* pName ) const
 	IConCmdBase*	pConCmd = FindCommandBase( pName );
 	if ( !pConCmd || !pConCmd->IsCommand() )
 	{
-		return nullptr;
+		return NULL;
 	}
 
 	return ( IConCmd* )pConCmd;
@@ -830,7 +694,7 @@ IConVar* CCvar::FindVar( const achar* pName ) const
 	IConCmdBase*	pConVar = FindCommandBase( pName );
 	if ( !pConVar || pConVar->IsCommand() )
 	{
-		return nullptr;
+		return NULL;
 	}
 
 	return ( IConVar* )pConVar;
@@ -961,7 +825,7 @@ CON_COMMAND( exec, "Execute a command file", FCVAR_NONE )
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 	if ( argc < 1 || !argv )
 	{
-		Msg( "exec <path> : Execute a command file" );
+		Msg( "Cvar: exec <path> : Execute a command file" );
 		return;
 	}
 
@@ -975,7 +839,7 @@ CON_COMMAND( exec, "Execute a command file", FCVAR_NONE )
 		file->Read( buffer.data(), file->GetSize() );
 
 		// Executing a file
-		Msg( "exec %s: Executing", argv[0] );
+		Msg( "Cvar: exec %s: Executing", argv[0] );
 		std::stringstream	sstream( buffer );
 		std::string			line;
 		while ( std::getline( sstream, line ) )
@@ -998,5 +862,5 @@ CON_COMMAND( exec, "Execute a command file", FCVAR_NONE )
 	}
 
 	// We failed to open file, it is bad
-	Warning( "exec %s: Failed to open file", argv[0] );
+	Warning( "Cvar: exec %s: Failed to open file", argv[0] );
 }

@@ -1,15 +1,12 @@
 #include "pch_stdlib.h"
 #include "stdlib/interface.h"
 
-/**
- * @ingroup stdlib
- * @brief Global list of registered interfaces
- */
-static interfaceReg_t*	s_pInterfaceRegs = nullptr;
+// Global list of registered interfaces
+static interfaceReg_t*	s_pInterfaceRegs = NULL;
 
 /*
 ==================
-SInterfaceReg::SInterfaceReg
+interfaceReg_t::interfaceReg_t
 ==================
 */
 interfaceReg_t::interfaceReg_t( instantiateInterfaceFn_t pFunc, const achar* pName )
@@ -35,7 +32,7 @@ void* CreateInterface( const achar* pName )
 			return pInterfaceReg->pCreateFn();
 		}
 	}
-	return nullptr;
+	return NULL;
 }
 
 /*

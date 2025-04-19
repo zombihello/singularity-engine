@@ -10,7 +10,7 @@ static CSearchPath		s_NullSearchPath( "", "" );
 CSearchPathIterator::CSearchPathIterator
 ==================
 */
-CSearchPathIterator::CSearchPathIterator( const achar* pFilePath, bool bForWrite, const achar* pPathID /* = nullptr */, uint32 lengthPathID /* = 0 */ )
+CSearchPathIterator::CSearchPathIterator( const achar* pFilePath, bool bForWrite, const achar* pPathID /* = NULL */, uint32 lengthPathID /* = 0 */ )
 	: currentIndex( INVALID_INDEX )
 {
 	PROFILE_SCOPE();
@@ -31,8 +31,8 @@ CSearchPathIterator::CSearchPathIterator( const achar* pFilePath, bool bForWrite
 			// We iterate from end to beginning to be able to overload paths
 			for ( int32 index = ( int32 )pFileSystem->searchPaths.size(); --index >= 0; )
 			{
-				CSearchPath* pSearchPath = &pFileSystem->searchPaths[index];
-				const std::string	searchPathID = pSearchPath->GetPathID();
+				CSearchPath*		pSearchPath		= &pFileSystem->searchPaths[index];
+				const std::string	searchPathID	= pSearchPath->GetPathID();
 				if ( searchPathID.size() == lengthPathID && !S_Strnicmp( searchPathID.c_str(), pPathID, lengthPathID ) )
 				{
 					searchPaths.push_back( pSearchPath );
@@ -43,9 +43,9 @@ CSearchPathIterator::CSearchPathIterator( const achar* pFilePath, bool bForWrite
 			if ( bForWrite && searchPaths.empty() )
 			{
 				Warning( "FileSystem: Requested non-existent write path '%s'!", pPathID );
-				CSearchPath* pFirstWriteSearchPath = nullptr;
-				const achar* pDefaultWritePathID = "DEFAULT_WRITE_PATH";
-				const uint32	lenghtDefaultWritePathID = 19;
+				CSearchPath*	pFirstWriteSearchPath		= NULL;
+				const achar*	pDefaultWritePathID			= "DEFAULT_WRITE_PATH";
+				const uint32	lenghtDefaultWritePathID	= 19;
 
 				// We iterate from end to beginning to be able to overload paths
 				for ( int32 index = ( int32 )pFileSystem->searchPaths.size(); --index >= 0; )

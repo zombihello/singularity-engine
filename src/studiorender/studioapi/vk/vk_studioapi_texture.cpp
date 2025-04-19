@@ -818,7 +818,7 @@ void CStudioAPITextureVk::UpdateSyncStateWithBarrier( CStudioAPICmdListVk* pCmdL
 	{
 		studioAPIImageMemoryBarrierVk_t								imageMemoryBarrier = {};
 		imageMemoryBarrier.vkImageMemoryBarrier.image				= vkImage;
-		imageMemoryBarrier.vkImageMemoryBarrier.subresourceRange	= subresourceRange.ToVkStructure( vkImageAspectFlags );
+		imageMemoryBarrier.vkImageMemoryBarrier.subresourceRange	= subresourceRange.AsVkStructure( vkImageAspectFlags );
 		if ( VK_UpdateSyncStateImageWithBarrier( vkDstImageLayout, vkDstAccessMask, vkDstStageMask, dstQueueFamilyIndex, syncState0, imageMemoryBarrier, usageFlags ) )
 		{
 			vkImageMemoryBarriers[numBarriers++]	= imageMemoryBarrier.vkImageMemoryBarrier;

@@ -1,8 +1,3 @@
-/**
- * @file
- * @addtogroup core core
- */
-
 #ifndef WIN_THREADING_INL
 #define WIN_THREADING_INL
 

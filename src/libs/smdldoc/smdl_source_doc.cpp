@@ -16,6 +16,7 @@ static const achar* s_pAxisUpNames[] =
 };
 static_assert( ARRAYSIZE( s_pAxisUpNames ) == AXIS_UP_NUM, "Array size 's_pAxisUpNames' must be equal to AXIS_UP_NUM" );
 
+
 /*
 ==================
 ConvTextToAxisUp
@@ -32,6 +33,7 @@ static axisUp_t ConvTextToAxisUp( const achar* pText )
 	}
 	return AXIS_UP_DEFAULT;
 }
+
 
 /*
 ==================

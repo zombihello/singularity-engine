@@ -136,51 +136,20 @@ FORCEINLINE studioAPIShaderDimensionType_t VK_TranslateShaderDimensionType( cons
 }
 
 
-/**
- * @ingroup shadercompiler_vk
- * @brief Vulkan shader compiler
- */
+//-----------------------------------------------------------------------------
+// Vulkan shader compiler
+//-----------------------------------------------------------------------------
 class CShaderCompilerBackendVk : public IShaderCompilerBackend
 {
 public:
-	/**
-	 * @brief Connect shader compile backend
-	 *
-	 * @param pFactory		Pointer to interface factory
-	 * @return Return TRUE if successes the backend is connected, otherwise return FALSE
-	 */
+	// IShaderCompilerBackend interface
 	virtual bool Connect( createInterfaceFn_t pFactory ) override;
-
-	/**
-	 * @brief Disconnect shader compile backend
-	 */
 	virtual void Disconnect() override;
 
-	/**
-	 * @brief Compile shader
-	 *
-	 * @param pSrcFileName		Path to source file of shader
-	 * @param pFunctionName		Main function in the shader
-	 * @param type				shader_t type (vertex, pixel, etc)
-	 * @param pEnvironment		Environment of shader
-	 * @param pOutput			Output data after compiling
-	 * @return Return TRUE if compilation is succeed, otherwise returns FALSE
-	 */
 	virtual bool CompileShader( const achar* pSrcFileName, const achar* pFunctionName, studioAPIShaderType_t type, IShaderCompilerEnvironment* pEnvironment, IShaderCompilerOutput* pOutput ) override;
-
-	/**
-	 * @brief Get shader platform name
-	 * @return Return shader platform name (dx11, vk, etc)
-	 */
 	virtual const achar* GetShaderPlatform() const override;
 
 private:
-	/**
-	 * @brief Grab reflect data
-	 * @param shadercShaderData		Shader data
-	 * @param pOutput				Output data
-	 * @return Return TRUE if the reflection data was successfully grabbed without errors, otherwise FALSE 
-	 */
 	bool GrabReflect( const shaderc::SpvCompilationResult& shadercShaderData, IShaderCompilerOutput* pOutput ) const;
 
 	shaderc::Compiler		shadercCompiler;		/**< Shaderc compiler */
@@ -189,29 +158,16 @@ private:
 EXPOSE_SINGLE_INTERFACE( CShaderCompilerBackendVk, IShaderCompilerBackend, SHADERCOMPILERBACKEND_INTERFACE_VERSION );
 
 
-/**
- * @ingroup shadercompiler_vk
- * @brief An implementation of the shaderc::CompileOptions::IncluderInterface interface to access a IShaderCompilerEnvironment
- */
+//-----------------------------------------------------------------------------
+// An implementation of the shaderc::CompileOptions::IncluderInterface interface to access a IShaderCompilerEnvironment
+//-----------------------------------------------------------------------------
 class CIncludeEnvironmentVk : public shaderc::CompileOptions::IncluderInterface
 {
 public:
-	/**
-	 * @brief Constructor
-	 * @param pEnvironment		Shader compile environment
-	 */
 	CIncludeEnvironmentVk( IShaderCompilerEnvironment* pEnvironment ) :
 		pEnvironment( pEnvironment )
 	{}
 
-	/**
-	 * @brief Resolve include
-	 * @param pRequestedSource		Specifies the name of the source being requested
-	 * @param includeType			Specifies the kind of inclusion request being made
-	 * @param pRequestingSource		Specifies the name of the source containing the #include request
-	 * @param includeDepth			include depth
-	 * @return Return pointer to allocated shaderc_include_result
-	 */
 	shaderc_include_result* GetInclude( const char* pRequestedSource, shaderc_include_type includeType, const char* pRequestingSource, size_t includeDepth )
 	{
 		// Initialize result information
@@ -267,10 +223,6 @@ public:
 		return pShadercIncludeResult;
 	}
 
-	/**
-	 * @brief Release resolved include
-	 * @param pIncludeResult	Include result to release
-	 */
 	void ReleaseInclude( shaderc_include_result* pIncludeResult )
 	{
 		if ( !pIncludeResult )
@@ -292,7 +244,7 @@ public:
 	}
 
 private:
-	IShaderCompilerEnvironment*		pEnvironment;		/**< Shader compile environment */
+	IShaderCompilerEnvironment*		pEnvironment;
 };
 
 
@@ -448,7 +400,7 @@ bool CShaderCompilerBackendVk::CompileShader( const achar* pSrcFileName, const a
 
 /*
 ==================
-CShaderCompilerBackendVk::GetShaderPlatform
+CShaderCompilerBackendVk::GrabReflect
 ==================
 */
 bool CShaderCompilerBackendVk::GrabReflect( const shaderc::SpvCompilationResult& shadercShaderData, IShaderCompilerOutput* pOutput ) const

@@ -1,8 +1,3 @@
-/**
- * @file
- * @addtogroup stdlib stdlib
- */
-
 #ifndef WIN_STRTOOLS_H
 #define WIN_STRTOOLS_H
 

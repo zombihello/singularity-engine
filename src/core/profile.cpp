@@ -2,6 +2,9 @@
 #include "core/profile.h"
 
 #if ENABLE_PROFILING
+//-----------------------------------------------------------------------------
+// Optick profiler
+//-----------------------------------------------------------------------------
 #include <optick.h>
 
 // Table for convert profileScopeGroup_t to Optick::Category
@@ -31,420 +34,305 @@ static const Optick::Category::Type		s_ProfileGroups[PROFILE_SCOPE_NUM_GROUPS] =
 };
 
 
-/**
- * @ingroup core
- * @brief Optick profiler
- */
 class COptickProfile : public IProfile
 {
 public:
-	/**
-	 * @brief Constructor
-	 */
 	COptickProfile()
 		: bIsRecord( false )
 	{}
 
-	/**
-	 * @brief Initialize the profiler
-	 */
-	virtual void Init() override
-	{
-		Optick::SetStateChangedCallback( COptickProfile::StateChangedCallback );
-	}
+	// IProfile interface
+	virtual void Init() override;
+	virtual void Shutdown() override;
 
-	/**
-	 * @brief Shutdown the profiler
-	 */
-	virtual void Shutdown() override
-	{
-		Optick::Shutdown();
-	}
+	virtual profileDescription_t CreateDescription( const achar* pFunctionName, const achar* pFileName, uint32 fileLine, const achar* pScopeName = NULL, profileScopeGroup_t scopeGroup = PROFILE_SCOPE_GROUP_NONE ) override;
+	virtual profileDescription_t CreateDescription( const achar* pFunctionName, const achar* pFileName, uint32 fileLine, profileScopeGroup_t scopeGroup ) override;
 
-	/**
-	 * @brief Create a profile description
-	 * @param pFunctionName		Function name
-	 * @param pFileName			File name
-	 * @param fileLine			File line
-	 * @param pScopeName		Scope name
-	 * @param scopeGroup		Scope group
-	 * @return Return created a new profile description
-	 */
-	virtual profileDescription_t CreateDescription( const achar* pFunctionName, const achar* pFileName, uint32 fileLine, const achar* pScopeName = NULL, profileScopeGroup_t scopeGroup = PROFILE_SCOPE_GROUP_NONE ) override
-	{
-		uint8								flags = pScopeName ? Optick::EventDescription::IS_CUSTOM_NAME : 0;
-		const Optick::Category::Type& scopeCategory = s_ProfileGroups[scopeGroup];
-		return Optick::EventDescription::Create( pFunctionName, pFileName, fileLine, Optick::Category::GetColor( scopeCategory ), Optick::Category::GetMask( scopeCategory ) );
-	}
+	virtual void StartThreadScope( const achar* pThreadName ) override;
+	virtual void StopThreadScope() override;
 
-	/**
-	 * @brief Create a profile description
-	 * @param pFunctionName		Function name
-	 * @param pFileName			File name
-	 * @param fileLine			File line
-	 * @param scopeGroup		Scope group
-	 * @return Return created a new profile description
-	 */
-	virtual profileDescription_t CreateDescription( const achar* pFunctionName, const achar* pFileName, uint32 fileLine, profileScopeGroup_t scopeGroup ) override
-	{
-		return CreateDescription( pFunctionName, pFileName, fileLine, NULL, scopeGroup );
-	}
+	virtual profileScopeData_t BeginScope( profileDescription_t pDescription ) override;
+	virtual void EndScope( profileScopeData_t pScopeData ) override;
 
-	/**
-	 * @brief Start profile a thread scope
-	 * @param pThreadName	Thread name
-	 */
-	virtual void StartThreadScope( const achar* pThreadName ) override
-	{
-		Optick::RegisterThread( pThreadName );
-	}
+	virtual uint32 NextFrame() override;
 
-	/**
-	 * @brief Stop profile the thread scope
-	 */
-	virtual void StopThreadScope() override
-	{
-		Optick::UnRegisterThread( false );
-	}
+	virtual void AttachTag( profileDescription_t pDescription, float value ) override;
+	virtual void AttachTag( profileDescription_t pDescription, int32 value ) override;
+	virtual void AttachTag( profileDescription_t pDescription, uint32 value ) override;
+	virtual void AttachTag( profileDescription_t pDescription, uint64 value ) override;
+	virtual void AttachTag( profileDescription_t pDescription, const vec3_t& value ) override;
+	virtual void AttachTag( profileDescription_t pDescription, const achar* pValue ) override;
+	virtual void AttachTag( profileDescription_t pDescription, const achar* pValue, uint16 length ) override;
+	virtual void AttachTag( profileDescription_t pDescription, float x, float y, float z ) override;
 
-	/**
-	 * @brief Begin profile a scope
-	 * @param pDescription		Profile description
-	 * @return Return the scope data
-	 */
-	virtual profileScopeData_t BeginScope( profileDescription_t pDescription ) override
-	{
-		Optick::EventDescription*		pEventDescription = ( Optick::EventDescription* )pDescription;
-		return Optick::Event::Start( *pEventDescription );
-	}
-
-	/**
-	 * @brief End profile the scope
-	 * @param pScopeData	Scope data
-	 */
-	virtual void EndScope( profileScopeData_t pScopeData ) override
-	{
-		Optick::EventData*		pEventData = ( Optick::EventData* )pScopeData;
-		Optick::Event::Stop( *pEventData );
-	}
-
-	/**
-	 * @brief Begin a next frame
-	 * @return Return a frame number
-	 */
-	virtual uint32 NextFrame() override
-	{
-		Optick::EndFrame();
-		Optick::Update();
-		return Optick::BeginFrame();
-	}
-
-	/**
-	 * @brief Attach a custom data-tag to the description
-	 * @param pDescription		Profile description
-	 * @param value				Value
-	 */
-	virtual void AttachTag( profileDescription_t pDescription, float value ) override
-	{
-		const Optick::EventDescription*		pEventDescription = ( Optick::EventDescription* )pDescription;
-		Optick::Tag::Attach( *pEventDescription, value );
-	}
-
-	/**
-	 * @brief Attach a custom data-tag to the description
-	 * @param pDescription		Profile description
-	 * @param value				Value
-	 */
-	virtual void AttachTag( profileDescription_t pDescription, int32 value ) override
-	{
-		const Optick::EventDescription*		pEventDescription = ( Optick::EventDescription* )pDescription;
-		Optick::Tag::Attach( *pEventDescription, value );
-	}
-
-	/**
-	 * @brief Attach a custom data-tag to the description
-	 * @param pDescription		Profile description
-	 * @param value				Value
-	 */
-	virtual void AttachTag( profileDescription_t pDescription, uint32 value ) override
-	{
-		const Optick::EventDescription*		pEventDescription = ( Optick::EventDescription* )pDescription;
-		Optick::Tag::Attach( *pEventDescription, value );
-	}
-
-	/**
-	 * @brief Attach a custom data-tag to the description
-	 * @param pDescription		Profile description
-	 * @param value				Value
-	 */
-	virtual void AttachTag( profileDescription_t pDescription, uint64 value ) override
-	{
-		const Optick::EventDescription*		pEventDescription = ( Optick::EventDescription* )pDescription;
-		Optick::Tag::Attach( *pEventDescription, value );
-	}
-
-	/**
-	 * @brief Attach a custom data-tag to the description
-	 * @param pDescription		Profile description
-	 * @param value				Value
-	 */
-	virtual void AttachTag( profileDescription_t pDescription, const vec3_t& value ) override
-	{
-		const Optick::EventDescription*		pEventDescription	= ( Optick::EventDescription* )pDescription;
-		float								rawValue[3]			= { value.x, value.y, value.z };
-		Optick::Tag::Attach( *pEventDescription, rawValue );
-	}
-
-	/**
-	 * @brief Attach a custom data-tag to the description
-	 * @param pDescription		Profile description
-	 * @param value				Value
-	 */
-	virtual void AttachTag( profileDescription_t pDescription, const achar* pValue ) override
-	{
-		const Optick::EventDescription*		pEventDescription = ( Optick::EventDescription* )pDescription;
-		Optick::Tag::Attach( *pEventDescription, pValue );
-	}
-
-	/**
-	 * @brief Attach a custom data-tag to the description
-	 * @param pDescription		Profile description
-	 * @param value				Value
-	 * @param length			Length
-	 */
-	virtual void AttachTag( profileDescription_t pDescription, const achar* pValue, uint16 length ) override
-	{
-		const Optick::EventDescription*		pEventDescription = ( Optick::EventDescription* )pDescription;
-		Optick::Tag::Attach( *pEventDescription, pValue, length );
-	}
-
-	/**
-	 * @brief Attach a custom data-tag to the description
-	 * @param pDescription		Profile description
-	 * @param x					X
-	 * @param y					Y
-	 * @param z					Z
-	 */
-	virtual void AttachTag( profileDescription_t pDescription, float x, float y, float z ) override
-	{
-		vec3_t		value( x, y, z );
-		AttachTag( pDescription, value );
-	}
-
-	/**
-	 * @brief Get the frame description
-	 * @return Return the frame description
-	 */
-	virtual profileDescription_t GetFrameDescription() override
-	{
-		return ( profileDescription_t )Optick::GetFrameDescription();
-	}
-
-	/**
-	 * @brief Does the profiler record the capture
-	 * @return Return TRUE if now the profiler record a capture, otherwise FALSE
-	 */
-	virtual bool IsRecord() const override
-	{
-		return bIsRecord;
-	}
+	virtual profileDescription_t GetFrameDescription() override;
+	virtual bool IsRecord() const override;
 
 private:
-	/**
-	 * @brief Optick state changed callback
-	 * @param optickState	New Optick state
-	 */
-	static bool StateChangedCallback( Optick::State::Type optickState )
-	{
-		COptickProfile*		pOptickProfile = ( COptickProfile* )Profile();
-		switch ( optickState )
-		{
-		case Optick::State::START_CAPTURE:
-			pOptickProfile->bIsRecord = true;
-			break;
+	static bool StateChangedCallback( Optick::State::Type optickState );
 
-		case Optick::State::DUMP_CAPTURE:
-
-
-		case Optick::State::CANCEL_CAPTURE:
-			pOptickProfile->bIsRecord = false;
-			break;
-		}
-		return true;
-	}
-
-	bool	bIsRecord;		/**< Does the profiler record the capture */
+	bool	bIsRecord;
 };
-#else
-/**
- * @ingroup core
- * @brief Null profiler
+
+
+/*
+ ==================
+ COptickProfile::Init
+ ==================
  */
+void COptickProfile::Init()
+{
+	Optick::SetStateChangedCallback( COptickProfile::StateChangedCallback );
+}
+
+/*
+ ==================
+ COptickProfile::Shutdown
+ ==================
+ */
+void COptickProfile::Shutdown()
+{
+	Optick::Shutdown();
+}
+
+/*
+ ==================
+ COptickProfile::CreateDescription
+ ==================
+ */
+profileDescription_t COptickProfile::CreateDescription( const achar* pFunctionName, const achar* pFileName, uint32 fileLine, const achar* pScopeName /*= NULL*/, profileScopeGroup_t scopeGroup /*= PROFILE_SCOPE_GROUP_NONE*/ )
+{
+	uint8								flags = pScopeName ? Optick::EventDescription::IS_CUSTOM_NAME : 0;
+	const Optick::Category::Type& scopeCategory = s_ProfileGroups[scopeGroup];
+	return Optick::EventDescription::Create( pFunctionName, pFileName, fileLine, Optick::Category::GetColor( scopeCategory ), Optick::Category::GetMask( scopeCategory ) );
+}
+
+/*
+ ==================
+ COptickProfile::CreateDescription
+ ==================
+ */
+profileDescription_t COptickProfile::CreateDescription( const achar* pFunctionName, const achar* pFileName, uint32 fileLine, profileScopeGroup_t scopeGroup )
+{
+	return CreateDescription( pFunctionName, pFileName, fileLine, NULL, scopeGroup );
+}
+
+/*
+ ==================
+ COptickProfile::StartThreadScope
+ ==================
+ */
+void COptickProfile::StartThreadScope( const achar* pThreadName )
+{
+	Optick::RegisterThread( pThreadName );
+}
+
+/*
+ ==================
+ COptickProfile::StopThreadScope
+ ==================
+ */
+void COptickProfile::StopThreadScope()
+{
+	Optick::UnRegisterThread( false );
+}
+
+/*
+ ==================
+ COptickProfile::BeginScope
+ ==================
+ */
+profileScopeData_t COptickProfile::BeginScope( profileDescription_t pDescription )
+{
+	Optick::EventDescription* pEventDescription = ( Optick::EventDescription* )pDescription;
+	return Optick::Event::Start( *pEventDescription );
+}
+
+/*
+ ==================
+ COptickProfile::EndScope
+ ==================
+ */
+void COptickProfile::EndScope( profileScopeData_t pScopeData )
+{
+	Optick::EventData* pEventData = ( Optick::EventData* )pScopeData;
+	Optick::Event::Stop( *pEventData );
+}
+
+/*
+ ==================
+ COptickProfile::NextFrame
+ ==================
+ */
+uint32 COptickProfile::NextFrame()
+{
+	Optick::EndFrame();
+	Optick::Update();
+	return Optick::BeginFrame();
+}
+
+/*
+ ==================
+ COptickProfile::AttachTag
+ ==================
+ */
+void COptickProfile::AttachTag( profileDescription_t pDescription, float value )
+{
+	const Optick::EventDescription* pEventDescription = ( Optick::EventDescription* )pDescription;
+	Optick::Tag::Attach( *pEventDescription, value );
+}
+
+/*
+ ==================
+ COptickProfile::AttachTag
+ ==================
+ */
+void COptickProfile::AttachTag( profileDescription_t pDescription, int32 value )
+{
+	const Optick::EventDescription* pEventDescription = ( Optick::EventDescription* )pDescription;
+	Optick::Tag::Attach( *pEventDescription, value );
+}
+
+/*
+ ==================
+ COptickProfile::AttachTag
+ ==================
+ */
+void COptickProfile::AttachTag( profileDescription_t pDescription, uint32 value )
+{
+	const Optick::EventDescription* pEventDescription = ( Optick::EventDescription* )pDescription;
+	Optick::Tag::Attach( *pEventDescription, value );
+}
+
+/*
+ ==================
+ COptickProfile::AttachTag
+ ==================
+ */
+void COptickProfile::AttachTag( profileDescription_t pDescription, uint64 value )
+{
+	const Optick::EventDescription* pEventDescription = ( Optick::EventDescription* )pDescription;
+	Optick::Tag::Attach( *pEventDescription, value );
+}
+
+/*
+ ==================
+ COptickProfile::AttachTag
+ ==================
+ */
+void COptickProfile::AttachTag( profileDescription_t pDescription, const vec3_t& value )
+{
+	const Optick::EventDescription* pEventDescription = ( Optick::EventDescription* )pDescription;
+	float								rawValue[3] = { value.x, value.y, value.z };
+	Optick::Tag::Attach( *pEventDescription, rawValue );
+}
+
+/*
+ ==================
+ COptickProfile::AttachTag
+ ==================
+ */
+void COptickProfile::AttachTag( profileDescription_t pDescription, const achar* pValue )
+{
+	const Optick::EventDescription* pEventDescription = ( Optick::EventDescription* )pDescription;
+	Optick::Tag::Attach( *pEventDescription, pValue );
+}
+
+/*
+ ==================
+ COptickProfile::AttachTag
+ ==================
+ */
+void COptickProfile::AttachTag( profileDescription_t pDescription, const achar* pValue, uint16 length )
+{
+	const Optick::EventDescription* pEventDescription = ( Optick::EventDescription* )pDescription;
+	Optick::Tag::Attach( *pEventDescription, pValue, length );
+}
+
+/*
+ ==================
+ COptickProfile::AttachTag
+ ==================
+ */
+void COptickProfile::AttachTag( profileDescription_t pDescription, float x, float y, float z )
+{
+	vec3_t		value( x, y, z );
+	AttachTag( pDescription, value );
+}
+
+/*
+ ==================
+ COptickProfile::GetFrameDescription
+ ==================
+ */
+profileDescription_t COptickProfile::GetFrameDescription()
+{
+	return ( profileDescription_t )Optick::GetFrameDescription();
+}
+
+/*
+ ==================
+ COptickProfile::IsRecord
+ ==================
+ */
+bool COptickProfile::IsRecord() const
+{
+	return bIsRecord;
+}
+
+/*
+ ==================
+ COptickProfile::StateChangedCallback
+ ==================
+ */
+bool COptickProfile::StateChangedCallback( Optick::State::Type optickState )
+{
+	COptickProfile* pOptickProfile = ( COptickProfile* )Profile();
+	switch ( optickState )
+	{
+	case Optick::State::START_CAPTURE:
+		pOptickProfile->bIsRecord = true;
+		break;
+
+	case Optick::State::DUMP_CAPTURE:
+
+
+	case Optick::State::CANCEL_CAPTURE:
+		pOptickProfile->bIsRecord = false;
+		break;
+	}
+	return true;
+}
+#else
 class CNullProfile : public IProfile
 {
 public:
-	/**
-	 * @brief Initialize the profiler
-	 */
-	virtual void Init() override 
-	{}
-
-	/**
-	 * @brief Shutdown the profiler
-	 */
-	virtual void Shutdown() override 
-	{}
-
-	/**
-	 * @brief Create a profile description
-	 * @param pFunctionName		Function name
-	 * @param pFileName			File name
-	 * @param fileLine			File line
-	 * @param pScopeName		Scope name
-	 * @param scopeGroup		Scope group
-	 * @return Return created a new profile description
-	 */
+	// IProfile interface
+	virtual void Init() override		{}
+	virtual void Shutdown() override	{}
 	virtual profileDescription_t CreateDescription( const achar* pFunctionName, const achar* pFileName, uint32 fileLine, const achar* pScopeName = NULL, profileScopeGroup_t scopeGroup = PROFILE_SCOPE_GROUP_NONE ) override
 	{
 		return NULL;
 	}
-
-	/**
-	 * @brief Create a profile description
-	 * @param pFunctionName		Function name
-	 * @param pFileName			File name
-	 * @param fileLine			File line
-	 * @param scopeGroup		Scope group
-	 * @return Return created a new profile description
-	 */
 	virtual profileDescription_t CreateDescription( const achar* pFunctionName, const achar* pFileName, uint32 fileLine, profileScopeGroup_t scopeGroup ) override
 	{
 		return NULL;
 	}
-
-	/**
-	 * @brief Start profile a thread scope
-	 * @param pThreadName	Thread name
-	 */
-	virtual void StartThreadScope( const achar* pThreadName ) override
-	{}
-
-	/**
-	 * @brief Stop profile the thread scope
-	 */
-	virtual void StopThreadScope() override
-	{}
-
-	/**
-	 * @brief Begin profile a scope
-	 * @param pDescription		Profile description
-	 * @return Return the scope data
-	 */
-	virtual profileScopeData_t BeginScope( profileDescription_t pDescription ) override
-	{
-		return NULL;
-	}
-
-	/**
-	 * @brief End profile the scope
-	 * @param pScopeData	Scope data
-	 */
-	virtual void EndScope( profileScopeData_t pScopeData ) override
-	{}
-
-	/**
-	 * @brief Begin a next frame
-	 * @return Return a frame number
-	 */
-	virtual uint32 NextFrame() override
-	{
-		return 0;
-	}
-
-	/**
-	 * @brief Attach a custom data-tag to the description
-	 * @param pDescription		Profile description
-	 * @param value				Value
-	 */
-	virtual void AttachTag( profileDescription_t pDescription, float value ) override
-	{}
-
-	/**
-	 * @brief Attach a custom data-tag to the description
-	 * @param pDescription		Profile description
-	 * @param value				Value
-	 */
-	virtual void AttachTag( profileDescription_t pDescription, int32 value ) override
-	{}
-
-	/**
-	 * @brief Attach a custom data-tag to the description
-	 * @param pDescription		Profile description
-	 * @param value				Value
-	 */
-	virtual void AttachTag( profileDescription_t pDescription, uint32 value ) override
-	{}
-
-	/**
-	 * @brief Attach a custom data-tag to the description
-	 * @param pDescription		Profile description
-	 * @param value				Value
-	 */
-	virtual void AttachTag( profileDescription_t pDescription, uint64 value ) override
-	{}
-
-	/**
-	 * @brief Attach a custom data-tag to the description
-	 * @param pDescription		Profile description
-	 * @param value				Value
-	 */
-	virtual void AttachTag( profileDescription_t pDescription, const vec3_t& value ) override
-	{}
-
-	/**
-	 * @brief Attach a custom data-tag to the description
-	 * @param pDescription		Profile description
-	 * @param value				Value
-	 */
-	virtual void AttachTag( profileDescription_t pDescription, const achar* pValue ) override
-	{}
-
-	/**
-	 * @brief Attach a custom data-tag to the description
-	 * @param pDescription		Profile description
-	 * @param value				Value
-	 * @param length			Length
-	 */
-	virtual void AttachTag( profileDescription_t pDescription, const achar* pValue, uint16 length ) override
-	{}
-
-	/**
-	 * @brief Attach a custom data-tag to the description
-	 * @param pDescription		Profile description
-	 * @param x					X
-	 * @param y					Y
-	 * @param z					Z
-	 */
-	virtual void AttachTag( profileDescription_t pDescription, float x, float y, float z ) override
-	{}
-
-	/**
-	 * @brief Get the frame description
-	 * @return Return the frame description
-	 */
-	virtual profileDescription_t GetFrameDescription() override
-	{
-		return NULL;
-	}
-
-	/**
-	 * @brief Does the profiler record the capture
-	 * @return Return TRUE if now the profiler record a capture, otherwise FALSE
-	 */
-	virtual bool IsRecord() const override
-	{
-		return false;
-	}
+	virtual void StartThreadScope( const achar* pThreadName ) override											{}
+	virtual void StopThreadScope() override																		{}
+	virtual profileScopeData_t BeginScope( profileDescription_t pDescription ) override							{ return NULL; }
+	virtual void EndScope( profileScopeData_t pScopeData ) override												{}
+	virtual uint32 NextFrame() override																			{ return 0; }
+	virtual void AttachTag( profileDescription_t pDescription, float value ) override							{}
+	virtual void AttachTag( profileDescription_t pDescription, int32 value ) override							{}
+	virtual void AttachTag( profileDescription_t pDescription, uint32 value ) override							{}
+	virtual void AttachTag( profileDescription_t pDescription, uint64 value ) override							{}
+	virtual void AttachTag( profileDescription_t pDescription, const vec3_t& value ) override					{}
+	virtual void AttachTag( profileDescription_t pDescription, const achar* pValue ) override					{}
+	virtual void AttachTag( profileDescription_t pDescription, const achar* pValue, uint16 length ) override	{}
+	virtual void AttachTag( profileDescription_t pDescription, float x, float y, float z ) override				{}
+	virtual profileDescription_t GetFrameDescription() override													{ return NULL; }
+	virtual bool IsRecord() const override																		{ return false; }
 };
 #endif // ENABLE_PROFILING
 

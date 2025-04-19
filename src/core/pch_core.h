@@ -1,17 +1,8 @@
-/**
- * @file
- * @addtogroup core core
- */
-
-// STL
 #include <cstdlib>
 #include <string>
 
-// StdLib
 #include "stdlib/strtools.h"
 #include "stdlib/template.h"
-
-// Core
 #include "core/build.h"
 #include "core/types.h"
 #include "core/core_private.h"

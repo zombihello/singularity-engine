@@ -61,6 +61,16 @@ bool CGameAppSystemGroup::Create()
 
 /*
 ==================
+CGameAppSystemGroup::PreInit
+==================
+*/
+bool CGameAppSystemGroup::PreInit()
+{
+	return true;
+}
+
+/*
+==================
 CGameAppSystemGroup::PostInit
 ==================
 */
@@ -114,6 +124,14 @@ void CGameAppSystemGroup::PreShutdown()
 
 /*
 ==================
+CGameAppSystemGroup::PostShutdown
+==================
+*/
+void CGameAppSystemGroup::PostShutdown()
+{}
+
+/*
+==================
 CGameAppSystemGroup::Destroy
 ==================
 */
@@ -140,7 +158,7 @@ bool CGameAppSystemGroup::GameDLL_Load()
 	gameDLLHandle = g_pFileSystem->LoadModule( "//GAMEBIN/game" DLL_EXT_STRING );
 	if ( !gameDLLHandle )
 	{
-		Warning( "GameDLL_Load: Failed to load '//GAMEBIN/game" DLL_EXT_STRING "'" );
+		Warning( "Engine: Failed to load '//GAMEBIN/game" DLL_EXT_STRING "'" );
 		GameDLL_Unload();
 		return false;
 	}
@@ -153,20 +171,20 @@ bool CGameAppSystemGroup::GameDLL_Load()
 		g_pGame = ( IGame* )pGameFactory( GAME_INTERFACE_VERSION );
 		if ( !g_pGame )
 		{
-			Warning( "GameDLL_Load: Could not get IGame interface from '//GAMEBIN/game" DLL_EXT_STRING "'" );
+			Warning( "Engine: Could not get IGame interface from '//GAMEBIN/game" DLL_EXT_STRING "'" );
 			GameDLL_Unload();
 			return false;
 		}
 	}
 	else
 	{
-		Warning( "GameDLL_Load: Could not find factory interface in '//GAMEBIN/game" DLL_EXT_STRING "'" );
+		Warning( "Engine: Could not find factory interface in '//GAMEBIN/game" DLL_EXT_STRING "'" );
 		GameDLL_Unload();
 		return false;
 	}
 
 	// We are done, all ok
-	Msg( "GameDLL_Load: game" DLL_EXT_STRING " loaded for %s", g_pGame->GetGameDescription() );
+	Msg( "Engine: game" DLL_EXT_STRING " loaded for %s", g_pGame->GetGameDescription() );
 	return true;
 }
 
@@ -179,7 +197,7 @@ void CGameAppSystemGroup::GameDLL_Unload()
 {
 	if ( gameDLLHandle )
 	{
-		Msg( "GameDLL_Unload: game" DLL_EXT_STRING " unloaded" );
+		Msg( "Engine: game" DLL_EXT_STRING " unloaded" );
 		g_pFileSystem->UnloadModule( gameDLLHandle );
 		CrashDump_SetAppInfo( crashDumpAppInfo_t{ NULL, NULL, NULL, NULL } );
 

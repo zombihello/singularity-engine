@@ -1,83 +1,64 @@
-/**
- * @file
- * @addtogroup appframework appframework
- */
-
 #ifndef WINDOWEVENT_H
 #define WINDOWEVENT_H
 
 #include "core/types.h"
 
-/**
- * @ingroup appframework
- * @brief Struct for storage event of window
- */
+//-----------------------------------------------------------------------------
+// Window events
+//-----------------------------------------------------------------------------
 struct windowEvent_t
 {
-	/**
-	 * @brief Enumeration of types event window
-	 */
 	enum type_t
 	{
-		EVENT_NONE,						/**< No event */
-		EVENT_WINDOW_CLOSE,				/**< Close window */
-		EVENT_WINDOW_RESIZE,			/**< Resize window */
-		EVENT_WINDOW_FOCUS_GAINED,		/**< Window is gained focus */
-		EVENT_WINDOW_FOCUS_LOST,		/**< Window is lost focus */
-		EVENT_WINDOW_MOVE,				/**< Window moved */
-		EVENT_WINDOW_MINIMIZED,			/**< Window has been minimized */
-		EVENT_WINDOW_MAXIMIZED,			/**< Window has been maximized */
-		EVENT_WINDOW_RESTORED,			/**< Window has been restored to normal size and position */
-		EVENT_WINDOW_DISPLAY_CHANGED	/**< Window has been moved to another display */
+		EVENT_NONE,
+		EVENT_WINDOW_CLOSE,
+		EVENT_WINDOW_RESIZE,
+		EVENT_WINDOW_FOCUS_GAINED,
+		EVENT_WINDOW_FOCUS_LOST,
+		EVENT_WINDOW_MOVE,
+		EVENT_WINDOW_MINIMIZED,
+		EVENT_WINDOW_MAXIMIZED,
+		EVENT_WINDOW_RESTORED,
+		EVENT_WINDOW_DISPLAY_CHANGED
 	};
 
-	/**
-	 * @brief Window display changed event
-	 */
+
 	struct windowDisplayChangedEvent_t
 	{	
-		uint32		displayId;	/**< Display ID */
+		uint32		displayId;
 	};
 
-	/**
-	 * @brief Window resize event
-	 */
+
 	struct windowResizeEvent_t
 	{
-		int32		width;		/**< New width window */
-		int32		height;		/**< New height window */
+		int32		width;
+		int32		height;
 	};
 
-	/**
-	 * @brief Window move event
-	 */
+
 	struct windowMoveEvent_t
 	{
-		int32		x;			/**< Current position by X */
-		int32		y;			/**< Current position by Y */
+		int32		x;
+		int32		y;
 	};
 
-	/**
-	 * @brief Events union
-	 */
+
 	union uevents_t
 	{
-		windowResizeEvent_t			windowResize;			/**< Window resize event */
-		windowMoveEvent_t			windowMove;				/**< Window move event */
-		windowDisplayChangedEvent_t	windowDisplayChanged;	/**< Window has been moved to another display */
+		windowResizeEvent_t			windowResize;
+		windowMoveEvent_t			windowMove;
+		windowDisplayChangedEvent_t	windowDisplayChanged;
 	};
 
-	/**
-	 * @brief Constructor
-	 */
+
 	windowEvent_t() 
 		: type( EVENT_NONE )
 		, windowId( 0 )
 	{}
 
-	type_t			type;		/**< Type event */
-	uint32			windowId;	/**< Id window */
-	uevents_t		events;		/**< Events */
+	type_t			type;
+	uint32			windowId;
+	uevents_t		events;
 };
 
 #endif // !WINDOWEVENT_H

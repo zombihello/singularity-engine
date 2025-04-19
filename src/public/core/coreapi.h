@@ -1,8 +1,3 @@
-/**
- * @file
- * @addtogroup core core
- */
-
 #ifndef COREAPI_H
 #define COREAPI_H
 

@@ -12,6 +12,7 @@ static_assert( sizeof( s_SMDLMagic ) == s_SMDLMagicSize, "Size of s_SMDLMagic mu
 // Singularity model version
 static const uint32		s_SMDLVersion					= 1;
 
+
 /*
 ==================
 CSMDLCompiledModelDoc::CSMDLCompiledModelDoc

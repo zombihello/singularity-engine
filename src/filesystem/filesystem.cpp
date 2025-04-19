@@ -25,7 +25,7 @@ CFileSystem::~CFileSystem
 */
 CFileSystem::~CFileSystem()
 {
-	g_pFileSystem = nullptr;
+	g_pFileSystem = NULL;
 }
 
 /*
@@ -117,8 +117,8 @@ TRefPtr<IStreamDataReader> CFileSystem::CreateFileReader( const achar* pPath, ui
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 
 	// Parse a path ID in pPath
-	const achar*    pFilePath = nullptr;
-	const achar*    pPathID = nullptr;
+	const achar*    pFilePath	= NULL;
+	const achar*    pPathID		= NULL;
 	uint32          lengthPathID = 0;
 	ParsePathID( pPath, pFilePath, pPathID, lengthPathID );
 
@@ -144,7 +144,7 @@ TRefPtr<IStreamDataReader> CFileSystem::CreateFileReader( const achar* pPath, ui
 	}
 
 	Warning( "FileSystem: Failed to open file '%s', flags 0x%X", pPath, flags );
-    return nullptr;
+    return NULL;
 }
 
 /*
@@ -157,8 +157,8 @@ TRefPtr<IStreamDataWriter> CFileSystem::CreateFileWriter( const achar* pPath, ui
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 
 	// Parse a path ID in pPath
-	const achar*    pFilePath = nullptr;
-	const achar*    pPathID = nullptr;
+	const achar*    pFilePath	= NULL;
+	const achar*    pPathID		= NULL;
 	uint32          lengthPathID = 0;
 	ParsePathID( pPath, pFilePath, pPathID, lengthPathID );
 
@@ -193,7 +193,7 @@ TRefPtr<IStreamDataWriter> CFileSystem::CreateFileWriter( const achar* pPath, ui
 	}
 
 	Warning( "FileSystem: Failed to create file '%s', flags 0x%X", pPath, flags );
-    return nullptr;
+    return NULL;
 }
 
 /*
@@ -206,8 +206,8 @@ TRefPtr<IPathArrayResult> CFileSystem::FindFiles( const achar* pPath, bool bFile
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 
 	// Parse a path ID in pPath
-	const achar*    pFilePath = nullptr;
-	const achar*    pPathID = nullptr;
+	const achar*    pFilePath	= NULL;
+	const achar*    pPathID		= NULL;
 	uint32          lengthPathID = 0;
 	ParsePathID( pPath, pFilePath, pPathID, lengthPathID );
 
@@ -241,8 +241,8 @@ dllHandle_t CFileSystem::LoadModule( const achar* pDLLName )
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 
 	// Parse a path ID in pPath
-	const achar*    pModulePath = nullptr;
-	const achar*    pPathID = nullptr;
+	const achar*    pModulePath = NULL;
+	const achar*    pPathID		= NULL;
 	uint32          lengthPathID = 0;
 	ParsePathID( pDLLName, pModulePath, pPathID, lengthPathID );
 
@@ -263,7 +263,7 @@ dllHandle_t CFileSystem::LoadModule( const achar* pDLLName )
 
 	// Otherwise if we here it's mean what nothing found
 	Warning( "FileSystem: Failed to load module '%s'", pDLLName );
-	return nullptr;
+	return NULL;
 }
 
 /*
@@ -290,8 +290,8 @@ bool CFileSystem::DeleteFile( const achar* pPath, bool bDeleteAllPathIDs /* = fa
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 
 	// Parse a path ID in pPath
-	const achar*    pFilePath = nullptr;
-	const achar*    pPathID = nullptr;
+	const achar*    pFilePath	= NULL;
+	const achar*    pPathID		= NULL;
 	uint32          lengthPathID = 0;
 	ParsePathID( pPath, pFilePath, pPathID, lengthPathID );
 
@@ -333,8 +333,8 @@ bool CFileSystem::MakeDirectory( const achar* pPath )
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 
 	// Parse a path ID in pPath
-	const achar*    pFilePath = nullptr;
-	const achar*    pPathID = nullptr;
+	const achar*    pFilePath	= NULL;
+	const achar*    pPathID		= NULL;
 	uint32          lengthPathID = 0;
 	ParsePathID( pPath, pFilePath, pPathID, lengthPathID );
 
@@ -367,8 +367,8 @@ bool CFileSystem::DeleteDirectory( const achar* pPath, bool bDeleteAllPathIDs /*
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 
 	// Parse a path ID in pPath
-	const achar*    pFilePath = nullptr;
-	const achar*    pPathID = nullptr;
+	const achar*    pFilePath	= NULL;
+	const achar*    pPathID		= NULL;
 	uint32          lengthPathID = 0;
 	ParsePathID( pPath, pFilePath, pPathID, lengthPathID );
 
@@ -410,14 +410,14 @@ copyMoveResult_t CFileSystem::CopyFile( const achar* pSrcPath, const achar* pDes
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 
 	// Parse a path ID in pSrcPath
-	const achar*    pSrcFilePath = nullptr;
-	const achar*    pSrcPathID = nullptr;
+	const achar*    pSrcFilePath	= NULL;
+	const achar*    pSrcPathID		= NULL;
 	uint32          lengthSrcPathID = 0;
 	ParsePathID( pSrcPath, pSrcFilePath, pSrcPathID, lengthSrcPathID );
 
 	// Parse a path ID in pDestPath
-	const achar*    pDestFilePath = nullptr;
-	const achar*    pDestPathID = nullptr;
+	const achar*    pDestFilePath	= NULL;
+	const achar*    pDestPathID		= NULL;
 	uint32          lengthDestPathID = 0;
 	ParsePathID( pDestPath, pDestFilePath, pDestPathID, lengthDestPathID );
 
@@ -476,8 +476,8 @@ copyMoveResult_t CFileSystem::CopyDirectory( const achar* pSrcPath, const achar*
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 
 	// Parse a path ID in pSrcPath
-	const achar*    pSrcFilePath = nullptr;
-	const achar*    pSrcPathID = nullptr;
+	const achar*    pSrcFilePath	= NULL;
+	const achar*    pSrcPathID		= NULL;
 	uint32          lengthSrcPathID = 0;
 	ParsePathID( pSrcPath, pSrcFilePath, pSrcPathID, lengthSrcPathID );
 
@@ -505,8 +505,8 @@ copyMoveResult_t CFileSystem::CopyDirectory( const achar* pSrcPath, const achar*
 	}
 
 	// Parse a path ID in pDestPath
-	const achar*    pDestFilePath = nullptr;
-	const achar*    pDestPathID = nullptr;
+	const achar*    pDestFilePath	= NULL;
+	const achar*    pDestPathID		= NULL;
 	uint32          lengthDestPathID = 0;
 	ParsePathID( pDestPath, pDestFilePath, pDestPathID, lengthDestPathID );
 
@@ -551,14 +551,14 @@ copyMoveResult_t CFileSystem::MoveFile( const achar* pSrcPath, const achar* pDes
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 
 	// Parse a path ID in pSrcPath
-	const achar*    pSrcFilePath = nullptr;
-	const achar*    pSrcPathID = nullptr;
+	const achar*    pSrcFilePath	= NULL;
+	const achar*    pSrcPathID		= NULL;
 	uint32          lengthSrcPathID = 0;
 	ParsePathID( pSrcPath, pSrcFilePath, pSrcPathID, lengthSrcPathID );
 
 	// Parse a path ID in pDestPath
-	const achar*    pDestFilePath = nullptr;
-	const achar*    pDestPathID = nullptr;
+	const achar*    pDestFilePath	= NULL;
+	const achar*    pDestPathID		= NULL;
 	uint32          lengthDestPathID = 0;
 	ParsePathID( pDestPath, pDestFilePath, pDestPathID, lengthDestPathID );
 
@@ -617,8 +617,8 @@ copyMoveResult_t CFileSystem::MoveDirectory( const achar* pSrcPath, const achar*
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 
 	// Parse a path ID in pSrcPath
-	const achar*    pSrcFilePath = nullptr;
-	const achar*    pSrcPathID = nullptr;
+	const achar*    pSrcFilePath	= NULL;
+	const achar*    pSrcPathID		= NULL;
 	uint32          lengthSrcPathID = 0;
 	ParsePathID( pSrcPath, pSrcFilePath, pSrcPathID, lengthSrcPathID );
 
@@ -646,8 +646,8 @@ copyMoveResult_t CFileSystem::MoveDirectory( const achar* pSrcPath, const achar*
 	}
 
 	// Parse a path ID in pDestPath
-	const achar*    pDestFilePath = nullptr;
-	const achar*    pDestPathID = nullptr;
+	const achar*    pDestFilePath	= NULL;
+	const achar*    pDestPathID		= NULL;
 	uint32          lengthDestPathID = 0;
 	ParsePathID( pDestPath, pDestFilePath, pDestPathID, lengthDestPathID );
 
@@ -692,8 +692,8 @@ bool CFileSystem::IsFileExists( const achar* pPath ) const
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 
 	// Parse a path ID in pPath
-	const achar*    pFilePath = nullptr;
-	const achar*    pPathID = nullptr;
+	const achar*    pFilePath	= NULL;
+	const achar*    pPathID		= NULL;
 	uint32          lengthPathID = 0;
 	ParsePathID( pPath, pFilePath, pPathID, lengthPathID );
 
@@ -725,8 +725,8 @@ bool CFileSystem::IsFileDirectory( const achar* pPath ) const
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 
 	// Parse a path ID in pPath
-	const achar*    pFilePath = nullptr;
-	const achar*    pPathID = nullptr;
+	const achar*    pFilePath	= NULL;
+	const achar*    pPathID		= NULL;
 	uint32          lengthPathID = 0;
 	ParsePathID( pPath, pFilePath, pPathID, lengthPathID );
 
@@ -1022,7 +1022,7 @@ void CFileSystem::ParsePathID( const achar* pPath, const achar*& pFilePath, cons
 {
 	// By default we think what in pPath no path ID
 	pFilePath		= pPath;
-	pPathID			= nullptr;
+	pPathID			= NULL;
 	lengthPathID	= 0;
 	
 	// Path must have at begin two forward slashes (//), otherwise no here path ID

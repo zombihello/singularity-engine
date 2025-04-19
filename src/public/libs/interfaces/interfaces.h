@@ -6,7 +6,9 @@
 #ifndef INTERFACES_H
 #define INTERFACES_H
 
+//-----------------------------------------------------------------------------
 // Forward declarations
+//-----------------------------------------------------------------------------
 class IFileSystem;
 class IWindowMgr;
 class IInputSystem;
@@ -18,64 +20,19 @@ class IShaderMgr;
 class IMaterialSystem;
 class IResourceSystem;
 
-/**
- * @ingroup interfaces
- * @brief File system
- */
-extern IFileSystem* g_pFileSystem;
 
-/**
- * @ingroup interfaces
- * @brief Window manager
- */
-extern IWindowMgr* g_pWindowMgr;
-
-/**
- * @ingroup interfaces
- * @brief Input system
- */
-extern IInputSystem* g_pInputSystem;
-
-/**
- * @ingroup interfaces
- * @brief Console system
- */
-extern ICvar* g_pCvar;
-
-/**
- * @ingroup interfaces
- * @brief Game
- */
-extern IGame* g_pGame;
-
-/**
- * @ingroup interfaces
- * @brief Studio render
- */
-extern IStudioRender* g_pStudioRender;
-
-/**
- * @ingroup interfaces
- * @brief Studio API
- */
-extern IStudioAPI* g_pStudioAPI;
-
-/**
- * @ingroup interfaces
- * @brief Shader manager
- */
-extern IShaderMgr* g_pShaderMgr;
-
-/**
- * @ingroup interfaces
- * @brief Material system
- */
+//-----------------------------------------------------------------------------
+// Global pointers to app systems
+//-----------------------------------------------------------------------------
+extern IFileSystem*		g_pFileSystem;
+extern IWindowMgr*		g_pWindowMgr;
+extern IInputSystem*	g_pInputSystem;
+extern ICvar*			g_pCvar;
+extern IGame*			g_pGame;
+extern IStudioRender*	g_pStudioRender;
+extern IStudioAPI*		g_pStudioAPI;
+extern IShaderMgr*		g_pShaderMgr;
 extern IMaterialSystem* g_pMaterialSystem;
-
-/**
- * @ingroup interfaces
- * @brief Resource system
- */
 extern IResourceSystem* g_pResourceSystem;
 
 #endif // !INTERFACES_H

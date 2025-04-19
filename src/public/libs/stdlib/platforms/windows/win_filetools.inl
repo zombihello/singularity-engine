@@ -1,8 +1,3 @@
-/**
- * @file
- * @addtogroup stdlib stdlib
- */
-
 #ifndef WIN_FILETOOLS_H
 #define WIN_FILETOOLS_H
 
