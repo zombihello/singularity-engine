@@ -104,11 +104,20 @@
 "component"                                     { EMIT_TOKEN( TOKEN_COMPONENT ); yyextra->SetScope( ECS_LEXER_SCOPE_COMPONENT ); }
 "defaults"                                      EMIT_TOKEN( TOKEN_DEFAULTS );
 "system"                                        { EMIT_TOKEN( TOKEN_SYSTEM ); yyextra->SetScope( ECS_LEXER_SCOPE_SYSTEM ); }
-"stage"                                         EMIT_TOKEN( TOKEN_METAINFO_STAGE );
-"read"                                          EMIT_TOKEN( TOKEN_METAINFO_READ );
-"write"                                         EMIT_TOKEN( TOKEN_METAINFO_WRITE );
-"include"                                       EMIT_TOKEN( TOKEN_METAINFO_INCLUDE );
-"exclude"                                       EMIT_TOKEN( TOKEN_METAINFO_EXCLUDE );
+"stage"                                         EMIT_TOKEN( TOKEN_SYSTEM_STAGE );
+"on_start"                                      EMIT_TOKEN( TOKEN_SYSTEM_STAGE_ONSTART );
+"on_load"                                       EMIT_TOKEN( TOKEN_SYSTEM_STAGE_ONLOAD );
+"post_load"                                     EMIT_TOKEN( TOKEN_SYSTEM_STAGE_POSTLOAD );
+"pre_update"                                    EMIT_TOKEN( TOKEN_SYSTEM_STAGE_PREUPDATE );
+"on_update"                                     EMIT_TOKEN( TOKEN_SYSTEM_STAGE_ONUPDATE );
+"on_validate"                                   EMIT_TOKEN( TOKEN_SYSTEM_STAGE_ONVALIDATE );
+"post_update"                                   EMIT_TOKEN( TOKEN_SYSTEM_STAGE_POSTUPDATE );
+"pre_store"                                     EMIT_TOKEN( TOKEN_SYSTEM_STAGE_PRESTORE );
+"on_store"                                      EMIT_TOKEN( TOKEN_SYSTEM_STAGE_ONSTORE );
+"read"                                          EMIT_TOKEN( TOKEN_SYSTEM_READ );
+"write"                                         EMIT_TOKEN( TOKEN_SYSTEM_WRITE );
+"include"                                       EMIT_TOKEN( TOKEN_SYSTEM_INCLUDE );
+"exclude"                                       EMIT_TOKEN( TOKEN_SYSTEM_EXCLUDE );
 
     /* Syntax */
 ":"                                             EMIT_TOKEN( ':' );
@@ -170,7 +179,6 @@
 
     /* Identifier */
 [a-zA-Z_]+[a-zA-Z_0-9]*							EMIT_TOKEN( TOKEN_IDENT );
-([a-zA-Z_][a-zA-Z_0-9]*|::|<|>|,|\*|&)+         EMIT_TOKEN( TOKEN_CPP_IDENT );
 
     /* Invalid Unicode chars */
 [^\x00-\x7F]*									EMIT_ERROR( "Invalid Unicode chars" );

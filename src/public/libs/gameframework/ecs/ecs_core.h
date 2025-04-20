@@ -8,11 +8,14 @@ struct ecsEntity_t
 	friend CEcsWorld;
 
 	ecsEntity_t();
+	ecsEntity_t( const flecs::entity& flecsEntity );
 	ecsEntity_t( const ecsEntity_t& other );
 	ecsEntity_t& operator=( const ecsEntity_t& other );
-
+	FORCEINLINE const achar* GetName() const
+	{
+		return flecsEntity.name().c_str();
+	}
 private:
-	ecsEntity_t( const flecs::entity& flecsEntity );
 
 	flecs::entity		flecsEntity;
 };
@@ -33,9 +36,7 @@ public:
 	bool IsValidEntity( const ecsEntity_t& ecsEntity ) const;
 
 	template<typename TEcsComponent>
-	void AddComponent( ecsEntity_t& ecsEntity, const TEcsComponent& ecsComponent );
-	template<typename TEcsComponent>
-	void AddComponent( ecsEntity_t& ecsEntity, TEcsComponent&& ecsComponent );
+	TEcsComponent* AddComponent( ecsEntity_t& ecsEntity );
 	template<typename TEcsComponent>
 	void RemoveComponent( ecsEntity_t& ecsEntity );
 	template<typename TEcsComponent>

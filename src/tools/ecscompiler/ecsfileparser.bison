@@ -100,7 +100,6 @@
 
 /* Data tokens */
 %token TOKEN_IDENT
-%token TOKEN_CPP_IDENT
 %token TOKEN_STRING
 
 /* Keywords */
@@ -110,11 +109,20 @@
 %token TOKEN_DEFAULTS
 %token TOKEN_SYSTEM
 %token TOKEN_CPP_CODE
-%token TOKEN_METAINFO_STAGE
-%token TOKEN_METAINFO_READ
-%token TOKEN_METAINFO_WRITE
-%token TOKEN_METAINFO_INCLUDE
-%token TOKEN_METAINFO_EXCLUDE
+%token TOKEN_SYSTEM_STAGE
+%token TOKEN_SYSTEM_STAGE_ONSTART
+%token TOKEN_SYSTEM_STAGE_ONLOAD
+%token TOKEN_SYSTEM_STAGE_POSTLOAD
+%token TOKEN_SYSTEM_STAGE_PREUPDATE
+%token TOKEN_SYSTEM_STAGE_ONUPDATE
+%token TOKEN_SYSTEM_STAGE_ONVALIDATE
+%token TOKEN_SYSTEM_STAGE_POSTUPDATE
+%token TOKEN_SYSTEM_STAGE_PRESTORE
+%token TOKEN_SYSTEM_STAGE_ONSTORE
+%token TOKEN_SYSTEM_READ
+%token TOKEN_SYSTEM_WRITE
+%token TOKEN_SYSTEM_INCLUDE
+%token TOKEN_SYSTEM_EXCLUDE
 
 %%
 
@@ -134,6 +142,7 @@ module_header
 module_body
     : module_body using                                                 { $<pContext>$ = $<pContext>2; }
     | module_body component                                             { $<pContext>$ = $<pContext>2; }
+    | module_body system                                                { $<pContext>$ = $<pContext>2; }
     | module_body semicolon                                             {}
     | /* empty */
     ;
@@ -155,7 +164,7 @@ component
     ;
 
 component_header
-    : TOKEN_COMPONENT TOKEN_IDENT                                       { g_pFileParser->StartComponent( $<pContext>2, $<token>2.data() ); $<pContext>$ = $<pContext>2; }
+    : metadata TOKEN_COMPONENT TOKEN_IDENT                              { g_pFileParser->StartComponent( $<pContext>3, $<token>3.data() ); $<pContext>$ = $<pContext>3; }
     ;
 
 component_body
@@ -166,8 +175,7 @@ component_body
     ;
 
 component_constructor
-    : TOKEN_DEFAULTS ';'                                                {}
-    | TOKEN_DEFAULTS '=' '>' component_constructor_fields ';'           {}
+    : TOKEN_DEFAULTS ':' component_constructor_fields ';'               {}
     ;
 
 component_constructor_fields
@@ -176,12 +184,73 @@ component_constructor_fields
     ;
 
 component_constructor_field
-    : TOKEN_IDENT '(' TOKEN_CPP_CODE ')'                                { g_pFileParser->SetDefaultFieldValue( $<pContext>1, $<pContext>3, $<token>1.data(), $<token>3.data() ); }
+    : TOKEN_IDENT '(' TOKEN_CPP_CODE ')'                                { g_pFileParser->SetComponentDefaultFieldValue( $<pContext>1, $<pContext>3, $<token>1.data(), $<token>3.data() ); }
     ;
 
 component_field
-    : TOKEN_CPP_IDENT TOKEN_IDENT ';'                                   { g_pFileParser->AddField( $<pContext>2, $<pContext>1, $<token>2.data(), $<token>1.data() ); }
-    | TOKEN_IDENT TOKEN_IDENT ';'                                       { g_pFileParser->AddField( $<pContext>2, $<pContext>1, $<token>2.data(), $<token>1.data() ); }
+    : metadata TOKEN_IDENT TOKEN_IDENT ';'                              { g_pFileParser->AddComponentField( $<pContext>3, $<pContext>2, $<token>3.data(), $<token>2.data() ); }
+    ;
+
+////////////////////////////////
+// System
+////////////////////////////////
+
+system
+    : system_header '{' system_body '}'                                 { g_pFileParser->EndDefinition( g_pFileContext->GetCurrentTokenLine(), $<pContext>1, $<pContext>4  ); $<pContext>$ = $<pContext>4; }
+    ;
+
+system_header
+    : metadata TOKEN_SYSTEM TOKEN_IDENT                                 { g_pFileParser->StartSystem( $<pContext>3, $<token>3.data() ); $<pContext>$ = $<pContext>3; }
+    ;
+
+system_body
+    : system_body system_stage semicolon                                {}
+    | system_body system_field semicolon                                {}
+    | system_body system_filter semicolon                               {}
+    | system_body semicolon                                             {}
+    | /* empty */
+    ;
+
+system_stage
+    : TOKEN_SYSTEM_STAGE ':' TOKEN_SYSTEM_STAGE_ONSTART                 { g_pFileParser->SetSystemStage( $<pContext>3, ECS_SYSTEM_STAGE_ONSTART ); }
+    | TOKEN_SYSTEM_STAGE ':' TOKEN_SYSTEM_STAGE_ONLOAD                  { g_pFileParser->SetSystemStage( $<pContext>3, ECS_SYSTEM_STAGE_ONLOAD ); }
+    | TOKEN_SYSTEM_STAGE ':' TOKEN_SYSTEM_STAGE_POSTLOAD                { g_pFileParser->SetSystemStage( $<pContext>3, ECS_SYSTEM_STAGE_POSTLOAD ); }
+    | TOKEN_SYSTEM_STAGE ':' TOKEN_SYSTEM_STAGE_PREUPDATE               { g_pFileParser->SetSystemStage( $<pContext>3, ECS_SYSTEM_STAGE_PREUPDATE ); }
+    | TOKEN_SYSTEM_STAGE ':' TOKEN_SYSTEM_STAGE_ONUPDATE                { g_pFileParser->SetSystemStage( $<pContext>3, ECS_SYSTEM_STAGE_ONUPDATE ); }
+    | TOKEN_SYSTEM_STAGE ':' TOKEN_SYSTEM_STAGE_ONVALIDATE              { g_pFileParser->SetSystemStage( $<pContext>3, ECS_SYSTEM_STAGE_ONVALIDATE ); }
+    | TOKEN_SYSTEM_STAGE ':' TOKEN_SYSTEM_STAGE_POSTUPDATE              { g_pFileParser->SetSystemStage( $<pContext>3, ECS_SYSTEM_STAGE_POSTUPDATE ); }
+    | TOKEN_SYSTEM_STAGE ':' TOKEN_SYSTEM_STAGE_PRESTORE                { g_pFileParser->SetSystemStage( $<pContext>3, ECS_SYSTEM_STAGE_PRESTORE ); }
+    | TOKEN_SYSTEM_STAGE ':' TOKEN_SYSTEM_STAGE_ONSTORE                 { g_pFileParser->SetSystemStage( $<pContext>3, ECS_SYSTEM_STAGE_ONSTORE ); }
+    ;
+
+system_field
+    : TOKEN_SYSTEM_READ ':' TOKEN_IDENT TOKEN_IDENT                     { g_pFileParser->AddSystemField( $<pContext>4, $<pContext>3, $<token>4.data(), $<token>3.data(), ECS_FIELD_ACCESS_TYPE_READ ); }
+    | TOKEN_SYSTEM_WRITE ':' TOKEN_IDENT TOKEN_IDENT                    { g_pFileParser->AddSystemField( $<pContext>4, $<pContext>3, $<token>4.data(), $<token>3.data(), ECS_FIELD_ACCESS_TYPE_WRITE ); }
+    ;
+
+system_filter
+    : TOKEN_SYSTEM_INCLUDE ':' TOKEN_IDENT                              { g_pFileParser->AddSystemFilter( $<pContext>3, $<token>3.data(), ECS_SYSTEM_FILTER_TYPE_INCLUDE ); }
+    | TOKEN_SYSTEM_EXCLUDE ':' TOKEN_IDENT                              { g_pFileParser->AddSystemFilter( $<pContext>3, $<token>3.data(), ECS_SYSTEM_FILTER_TYPE_EXCLUDE ); }
+    ;
+
+////////////////////////////////
+// Metadata
+////////////////////////////////
+
+metadata
+    : metadata '[' metadata_values ']'                                  {}
+    | /* empty */
+    ;
+
+metadata_values
+    : metadata_value ',' metadata_values                                {}
+    | metadata_value                                                    {}
+    ;
+
+metadata_value
+    : TOKEN_IDENT                                                       { g_pFileParser->AddMetadata( $<pContext>1, NULL, $<token>1.data(), NULL ); }
+    | TOKEN_IDENT '=' TOKEN_IDENT                                       { g_pFileParser->AddMetadata( $<pContext>1, $<pContext>3, $<token>1.data(), $<token>3.data() ); }
+    | TOKEN_IDENT '=' TOKEN_STRING                                      { g_pFileParser->AddMetadata( $<pContext>1, $<pContext>3, $<token>1.data(), $<token>3.data() ); }
     ;
 
 ////////////////////////////////

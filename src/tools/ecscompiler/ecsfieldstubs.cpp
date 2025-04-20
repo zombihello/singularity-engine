@@ -11,6 +11,29 @@ CEcsStubBase::CEcsStubBase( const parserFileContext_t& context, const achar* pNa
 {}
 
 
+
+/*
+==================
+CEcsStubMetadataValue::CEcsStubMetadataValue
+==================
+*/
+CEcsStubMetadataValue::CEcsStubMetadataValue( const parserFileContext_t& context, const parserFileContext_t* pValueContext, const achar* pName, const achar* pValue )
+	: CEcsStubBase( context, pName )
+	, pValueContext( pValueContext )
+	, value( pValue )
+{}
+
+
+/*
+==================
+CEcsStubMetadata::CEcsStubMetadata
+==================
+*/
+CEcsStubMetadata::CEcsStubMetadata( const parserFileContext_t& context )
+	: CEcsStubBase( context, "" )
+{}
+
+
 /*
 ==================
 CEcsStubDefaultFieldValue::CEcsStubDefaultFieldValue
@@ -28,10 +51,11 @@ CEcsStubDefaultFieldValue::CEcsStubDefaultFieldValue( const parserFileContext_t&
 CEcsStubField::CEcsStubField
 ==================
 */
-CEcsStubField::CEcsStubField( const parserFileContext_t& context, const parserFileContext_t& typeContext, const achar* pName, const achar* pType )
+CEcsStubField::CEcsStubField( const parserFileContext_t& context, const parserFileContext_t& typeContext, const achar* pName, const achar* pType, CEcsStubMetadata* pMetadata /* = NULL */ )
 	: CEcsStubBase( context, pName )
 	, typeContext( typeContext )
 	, type( pType )
+	, pMetadata( pMetadata )
 {}
 
 
@@ -40,8 +64,9 @@ CEcsStubField::CEcsStubField( const parserFileContext_t& context, const parserFi
 CEcsStubComponent::CEcsStubComponent
 ==================
 */
-CEcsStubComponent::CEcsStubComponent( const parserFileContext_t& context, const achar* pName )
+CEcsStubComponent::CEcsStubComponent( const parserFileContext_t& context, const achar* pName, CEcsStubMetadata* pMetadata /* = NULL */ )
 	: CEcsStubBase( context, pName )
+	, pMetadata( pMetadata )
 {
 	scope.startContext	= context;
 	scope.endContext	= context;
@@ -55,6 +80,28 @@ CEcsStubUsing::CEcsStubUsing
 */
 CEcsStubUsing::CEcsStubUsing( const parserFileContext_t& context, const achar* pName )
 	: CEcsStubBase( context, pName )
+{}
+
+
+/*
+==================
+CEcsStubSystemFilter::CEcsStubSystemFilter
+==================
+*/
+CEcsStubSystemFilter::CEcsStubSystemFilter( const parserFileContext_t& context, const achar* pName )
+	: CEcsStubBase( context, pName )
+{}
+
+
+/*
+==================
+CEcsStubSystem::CEcsStubSystem
+==================
+*/
+CEcsStubSystem::CEcsStubSystem( const parserFileContext_t& context, const achar* pName, CEcsStubMetadata* pMetadata /* = NULL */ )
+	: CEcsStubBase( context, pName )
+	, stage( ECS_SYSTEM_STAGE_ONUPDATE )
+	, pMetadata( pMetadata )
 {}
 
 

@@ -83,24 +83,17 @@ CEcsWorld::AddComponent
 ==================
 */
 template<typename TEcsComponent>
-FORCEINLINE void CEcsWorld::AddComponent( ecsEntity_t& ecsEntity, const TEcsComponent& ecsComponent )
+FORCEINLINE TEcsComponent* CEcsWorld::AddComponent( ecsEntity_t& ecsEntity )
 {
 	AssertMsg( IsValidEntity( ecsEntity ), "Entity must be valid" );
 	AssertMsg( !HasComponent<TEcsComponent>( ecsEntity ), "Entity already has component" );
-	ecsEntity.flecsEntity.set<TEcsComponent>( ecsComponent );
-}
+	if ( flecs::is_empty<TEcsComponent>::value )
+	{
+		ecsEntity.flecsEntity.add<TEcsComponent>();
+		return NULL;
+	}
 
-/*
-==================
-CEcsWorld::AddComponent
-==================
-*/
-template<typename TEcsComponent>
-FORCEINLINE void CEcsWorld::AddComponent( ecsEntity_t& ecsEntity, TEcsComponent&& ecsComponent )
-{
-	AssertMsg( IsValidEntity( ecsEntity ), "Entity must be valid" );
-	AssertMsg( !HasComponent<TEcsComponent>( ecsEntity ), "Entity already has component" );
-	ecsEntity.flecsEntity.set<TEcsComponent>( std::move( ecsComponent ) );
+	return &ecsEntity.flecsEntity.ensure<TEcsComponent>();
 }
 
 /*
