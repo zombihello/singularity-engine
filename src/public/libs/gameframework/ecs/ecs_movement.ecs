@@ -22,9 +22,12 @@ component Freezed
 
 system Movement
 {
-	stage: 		on_update;
-	read: 		Transform	transform;
-	write: 		Velocity	velocity;
+	stage: 			on_update;
+	read:
+		Transform	transform,
+		Velocity	velocity;
+		
 	include: 	Moveable;
 	exclude: 	Freezed;
 }
+// flecs::is_empty<TEcsComponent>::value

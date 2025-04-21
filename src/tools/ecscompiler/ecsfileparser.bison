@@ -205,8 +205,8 @@ system_header
 
 system_body
     : system_body system_stage semicolon                                {}
-    | system_body system_field semicolon                                {}
-    | system_body system_filter semicolon                               {}
+    | system_body system_fields semicolon                               {}
+    | system_body system_filters semicolon                              {}
     | system_body semicolon                                             {}
     | /* empty */
     ;
@@ -223,14 +223,50 @@ system_stage
     | TOKEN_SYSTEM_STAGE ':' TOKEN_SYSTEM_STAGE_ONSTORE                 { g_pFileParser->SetSystemStage( $<pContext>3, ECS_SYSTEM_STAGE_ONSTORE ); }
     ;
 
-system_field
-    : TOKEN_SYSTEM_READ ':' TOKEN_IDENT TOKEN_IDENT                     { g_pFileParser->AddSystemField( $<pContext>4, $<pContext>3, $<token>4.data(), $<token>3.data(), ECS_FIELD_ACCESS_TYPE_READ ); }
-    | TOKEN_SYSTEM_WRITE ':' TOKEN_IDENT TOKEN_IDENT                    { g_pFileParser->AddSystemField( $<pContext>4, $<pContext>3, $<token>4.data(), $<token>3.data(), ECS_FIELD_ACCESS_TYPE_WRITE ); }
+system_fields
+    : TOKEN_SYSTEM_READ ':' system_fields_read                          {}
+    | TOKEN_SYSTEM_WRITE ':' system_fields_write                        {}
     ;
 
-system_filter
-    : TOKEN_SYSTEM_INCLUDE ':' TOKEN_IDENT                              { g_pFileParser->AddSystemFilter( $<pContext>3, $<token>3.data(), ECS_SYSTEM_FILTER_TYPE_INCLUDE ); }
-    | TOKEN_SYSTEM_EXCLUDE ':' TOKEN_IDENT                              { g_pFileParser->AddSystemFilter( $<pContext>3, $<token>3.data(), ECS_SYSTEM_FILTER_TYPE_EXCLUDE ); }
+system_fields_read
+    : system_field_read ',' system_fields_read                          {}
+    | system_field_read                                                 {}
+    ;
+
+system_field_read
+    : TOKEN_IDENT TOKEN_IDENT                                           { g_pFileParser->AddSystemField( $<pContext>2, $<pContext>1, $<token>2.data(), $<token>1.data(), ECS_FIELD_ACCESS_TYPE_READ ); }
+    ;
+
+system_fields_write
+    : system_field_write ',' system_fields_write                        {}
+    | system_field_write                                                {}
+    ;
+
+system_field_write
+    : TOKEN_IDENT TOKEN_IDENT                                           { g_pFileParser->AddSystemField( $<pContext>2, $<pContext>1, $<token>2.data(), $<token>1.data(), ECS_FIELD_ACCESS_TYPE_WRITE ); }
+    ;
+
+system_filters
+    : TOKEN_SYSTEM_INCLUDE ':' system_filters_include                   {}
+    | TOKEN_SYSTEM_EXCLUDE ':' system_filters_exclude                   {}
+    ;
+
+system_filters_include
+    : system_filter_include ',' system_filters_include                  {}
+    | system_filter_include                                             {}
+    ;
+
+system_filter_include
+    : TOKEN_IDENT                                                       { g_pFileParser->AddSystemFilter( $<pContext>1, $<token>1.data(), ECS_SYSTEM_FILTER_TYPE_INCLUDE ); }
+    ;
+
+system_filters_exclude
+    : system_filter_exclude ',' system_filters_exclude                  {}
+    | system_filter_exclude                                             {}
+    ;
+
+system_filter_exclude
+    : TOKEN_IDENT                                                       { g_pFileParser->AddSystemFilter( $<pContext>1, $<token>1.data(), ECS_SYSTEM_FILTER_TYPE_EXCLUDE ); }
     ;
 
 ////////////////////////////////

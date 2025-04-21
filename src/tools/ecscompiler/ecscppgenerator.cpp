@@ -168,7 +168,7 @@ void CEcsCppGenerator::GenerateSystems( const std::vector<TRefPtr<CEcsStubSystem
 			buffer += S_Sprintf( "class CEcs%sSystem\n"
 								 "{\n"
 								 "public:\n"
-								 "\tstatic void OnUpdate( ecsEntity_t& entity%s );\n", 
+								 "\tstatic void OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity%s );\n", 
 								 pEcsStubSystem->GetName(), 
 								 !updateParams.empty() ? S_Sprintf( ", %s", updateParams.c_str() ).c_str() : "" );
 			buffer += S_Sprintf( "};\n" );
@@ -311,7 +311,7 @@ void CEcsCppGenerator::GenerateRegistrar( CEcsStubModule* pEcsStubModule )
 								 "%s"
 								 "\t\t\t.each( []( flecs::entity entity%s )\n"
 								 "\t\t\t{\n"
-								 "\t\t\t\tCEcs%sSystem::OnUpdate( ecsEntity_t( entity )%s );\n"
+								 "\t\t\t\tCEcs%sSystem::OnUpdate( entity.world(), entity%s );\n"
 								 "\t\t\t} );\n", 
 								 templateParams.c_str(), 
 								 s_pEcsSystemStageNames[pEcsStubSystem->GetStage()], 
