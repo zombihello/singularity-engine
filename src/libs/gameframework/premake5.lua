@@ -19,7 +19,7 @@ project "gameframework"
     -- Enable PCH file
     pchheader       "pch_gameframework.h"
     pchsource       "pch_gameframework.cpp"
-    includedirs     { "./", intermediateDir .. "/generated/" }
+    includedirs     { "./", ecsGeneratedDir }
 
     vpaths      {
         ["src/*"]       = { "**.h", "**.inl", "**.cpp", "**.ecs" },

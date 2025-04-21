@@ -24,7 +24,7 @@ project "materialsystem"
     -- Enable PCH file
     pchheader       "pch_materialsystem.h"
     pchsource       "pch_materialsystem.cpp"
-    includedirs     { "./", intermediateDir .. "/generated/" }
+    includedirs     { "./", shadersGeneratedDir }
 
     vpaths      {
         ["src/*"]       = { "**.h", "**.inl", "**.cpp", "shaderlist.makefile", "**.hlsl" },

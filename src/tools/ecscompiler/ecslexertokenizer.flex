@@ -118,14 +118,19 @@
 "write"                                         EMIT_TOKEN( TOKEN_SYSTEM_WRITE );
 "include"                                       EMIT_TOKEN( TOKEN_SYSTEM_INCLUDE );
 "exclude"                                       EMIT_TOKEN( TOKEN_SYSTEM_EXCLUDE );
+"const"                                         EMIT_TOKEN( TOKEN_CPP_CONST );
+"::"                                            EMIT_TOKEN( TOKEN_CPP_NAMESPACE );
 
     /* Syntax */
 ":"                                             EMIT_TOKEN( ':' );
 ","                                             EMIT_TOKEN( ',' );
 ";"                                             EMIT_TOKEN( ';' );
 "="                                             EMIT_TOKEN( '=' );
+"<"                                             EMIT_TOKEN( '<' );
 ">"                                             EMIT_TOKEN( '>' );
 "_"                                             EMIT_TOKEN( '_' );
+"*"                                             EMIT_TOKEN( '*' );
+"&"                                             EMIT_TOKEN( '&' );
 "{"                                             { EMIT_TOKEN( '{' ); ++yyextra->scopeLevel; }
 "}"                                             { 
                                                     EMIT_TOKEN( '}' ); 

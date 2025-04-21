@@ -25,7 +25,7 @@ project "sandbox"
     -- Enable PCH file
     pchheader       "pch_sandbox.h"
     pchsource       "pch_sandbox.cpp"
-    includedirs     { "./", intermediateDir .. "/generated/" }
+    includedirs     { "./", ecsGeneratedDir }
 
     vpaths      {
         ["src/*"]           = { "**.h", "**.inl", "**.cpp", "**.ecs" },

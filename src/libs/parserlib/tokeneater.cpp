@@ -1,4 +1,5 @@
 #include "pch_parserlib.h"
+#include "stdlib/filetools.h"
 #include "parserlib/tokeneater.h"
 
 /*
@@ -10,6 +11,11 @@ CParserTokenEater::CParserTokenEater( CParserTokenStream& tokens, const achar* p
 	: tokens( tokens )
 	, path( pPath )
 {
+	if ( !S_IsAbsolutePath( pPath ) )
+	{
+		S_MakeAbsolutePath( pPath, path );
+	}
+	S_RemoveDotPathSeparators( path );
 	tokens.GetTokens().reserve( 1000 );
 }
 

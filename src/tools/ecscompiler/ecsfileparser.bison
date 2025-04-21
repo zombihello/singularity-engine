@@ -20,10 +20,12 @@
         yystypeFile_t( const yystypeFile_t& other )
             : pContext( other.pContext )
             , token( other.token )
+            , string( other.string )
         {}
          yystypeFile_t( yystypeFile_t&& other )
             : pContext( std::move( other.pContext ) )
             , token( std::move( other.token ) )
+            , string( std::move( other.string ) )
         {}
         ~yystypeFile_t()
         {}
@@ -34,6 +36,7 @@
 	    	{
 	    		pContext    = other.pContext;
 	    		token       = other.token;
+                string      = other.string;
 	    	}
 	    	return *this;
 	    }
@@ -44,12 +47,14 @@
 	    	{
 	    		pContext    = std::move( other.pContext );
 	    		token       = std::move( other.token );
+                string      = std::move( other.string );
 	    	}
 	    	return *this;
 	    }
 
         parserFileContext_t*    pContext;
         std::string_view        token;
+        std::string             string;
     };
 
     typedef TGrammarInterface<CEcsFileParser, yystypeFile_t>        ecsGrammarInterface_t;
@@ -109,6 +114,8 @@
 %token TOKEN_DEFAULTS
 %token TOKEN_SYSTEM
 %token TOKEN_CPP_CODE
+%token TOKEN_CPP_NAMESPACE
+%token TOKEN_CPP_CONST
 %token TOKEN_SYSTEM_STAGE
 %token TOKEN_SYSTEM_STAGE_ONSTART
 %token TOKEN_SYSTEM_STAGE_ONLOAD
@@ -184,11 +191,33 @@ component_constructor_fields
     ;
 
 component_constructor_field
-    : TOKEN_IDENT '(' TOKEN_CPP_CODE ')'                                { g_pFileParser->SetComponentDefaultFieldValue( $<pContext>1, $<pContext>3, $<token>1.data(), $<token>3.data() ); }
+    : TOKEN_IDENT '(' TOKEN_CPP_CODE ')'                                                { g_pFileParser->SetComponentDefaultFieldValue( $<pContext>1, $<pContext>3, $<token>1.data(), $<token>3.data() ); }
     ;
 
 component_field
-    : metadata TOKEN_IDENT TOKEN_IDENT ';'                              { g_pFileParser->AddComponentField( $<pContext>3, $<pContext>2, $<token>3.data(), $<token>2.data() ); }
+    : metadata component_field_type TOKEN_IDENT ';'                                     { g_pFileParser->AddComponentField( $<pContext>3, $<pContext>2, $<token>3.data(), $<string>2.c_str() ); }
+    ;
+
+component_field_type
+    : component_field_typename                                                          { $<string>$ = $<string>1; }
+    | TOKEN_CPP_CONST component_field_type                                              { $<string>$ = S_Sprintf( "const %s", $<string>2.c_str() ); }
+    ;
+
+component_field_typename
+    : component_field_typename TOKEN_CPP_NAMESPACE TOKEN_IDENT                          { $<string>$ = S_Sprintf( "%s::%s", $<string>1.c_str(), $<token>3.data() ); }
+    | component_field_typename '<' component_field_type_template_args '>'               { $<string>$ = S_Sprintf( "%s<%s>", $<string>1.c_str(), $<string>3.c_str() ); }
+    | component_field_typename '*'                                                      { $<string>$ = S_Sprintf( "%s*", $<string>1.c_str() ); }
+    | component_field_typename '&'                                                      { $<string>$ = S_Sprintf( "%s&", $<string>1.c_str() ); }
+    | TOKEN_IDENT                                                                       { $<string>$ = $<token>1.data(); }
+    ;
+
+component_field_type_template_args
+    : component_field_type_template_args ',' component_field_type_template_arg          { $<string>$ = S_Sprintf( "%s, %s", $<string>1.c_str(), $<string>3.c_str() ); }
+    | component_field_type_template_arg                                                 { $<string>$ = $<string>1; }
+    ;
+
+component_field_type_template_arg
+    : component_field_type                                                              { $<string>$ = $<string>1; }
     ;
 
 ////////////////////////////////

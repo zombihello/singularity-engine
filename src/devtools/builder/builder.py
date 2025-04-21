@@ -19,7 +19,7 @@ PREMAKE5_ACTION             = premake5.GetActionToGenerateProjectFiles()
 TOOL_PROJECTS               = ["core", "engine", "filesystem", "material_tool", "model_tool", "resourcecompiler", "texture_tool", "shadercompiler", "shadercompiler_vk", "ecscompiler"]
 ENGINE_PROJECTS             = ["core", "engine", "filesystem", "inputsystem", "launcher", "materialsystem", "resourcesystem", "studioapi_vk", "studiorender", "stdshaders"]
 ENGINE_SHADERLISTS          = ["src/materialsystem/shaderlist.makefile", "src/materialsystem/stdshaders/shaderlist.makefile"]
-ENGINE_CPP_SHADERLISTS      = [("src/materialsystem/shaderlist.makefile", "materialsystem/"), ("src/materialsystem/stdshaders/shaderlist.makefile", "materialsystem/stdshaders/")]
+ENGINE_CPP_SHADERLISTS      = [("src/materialsystem/shaderlist.makefile", "shadercompiler/materialsystem/"), ("src/materialsystem/stdshaders/shaderlist.makefile", "materialsystem/stdshaders/")]
 ENGINE_ECS_DIRS             = [("src/public/libs/gameframework/", "gameframework/")]
 ENGINE_RESOURCELISTS        = ["content/core/resourcelist.txt"]
 SDK_SHADERCOMPILER_EXE      = f"shadercompiler{utils.GetExecutableExtension()}"
@@ -89,7 +89,7 @@ def _GenerateShaderCppClasses( context ):
         print( "" )
         print( f"> Generate C++ Classes: {makefile}" )
         print( "" )
-        subprocess.run( [shaderCompilerExe, f"-makefile {makefile} -gencpp -outcpp {repoRoot}/src/{intermediateDir}/generated/{outputDir}/ -skipcompilation"], check=True )
+        subprocess.run( [shaderCompilerExe, f"-makefile {makefile} -gencpp -outcpp {repoRoot}/src/{intermediateDir}/generated/shadercompiler/{outputDir}/ -skipcompilation"], check=True )
 
 # Compile ECS
 def _CompileEcs( context ):
@@ -102,7 +102,7 @@ def _CompileEcs( context ):
         print( "" )
         print( f"> Compile ECS: {ecsDir}" )
         print( "" )
-        subprocess.run( [ecsCompilerExe, f"-dir {ecsDir} -output {repoRoot}/src/{intermediateDir}/generated/{outputDir}/"], check=True )
+        subprocess.run( [ecsCompilerExe, f"-dir {ecsDir} -output {repoRoot}/src/{intermediateDir}/generated/ecs/{outputDir}/"], check=True )
 
 # Copy third party files
 def _CopyThirdPartyFiles( context ):

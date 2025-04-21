@@ -23,7 +23,7 @@ project "stdshaders"
     -- Enable PCH file
     pchheader       "pch_stdshaders.h"
     pchsource       "pch_stdshaders.cpp"
-    includedirs     { "./", intermediateDir .. "/generated/" }
+    includedirs     { "./", shadersGeneratedDir }
 
     vpaths      {
         ["src/*"]       = { "**.h", "**.inl", "**.cpp", "shaderlist.makefile", "**.hlsl" },

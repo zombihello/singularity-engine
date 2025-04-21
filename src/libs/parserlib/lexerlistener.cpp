@@ -1,4 +1,5 @@
 #include "pch_parserlib.h"
+#include "stdlib/filetools.h"
 #include "parserlib/lexerstate.h"
 #include "parserlib/lexerlistener.h"
 
@@ -10,7 +11,13 @@ CParserLexerListener::CParserLexerListener
 CParserLexerListener::CParserLexerListener( CParserTokenEater& parserListener, const achar* pPath )
 	: parserListener( parserListener )
 	, path( pPath )
-{}
+{
+	if ( !S_IsAbsolutePath( pPath ) )
+	{
+		S_MakeAbsolutePath( pPath, path );
+	}
+	S_RemoveDotPathSeparators( path );
+}
 
 /*
 ==================

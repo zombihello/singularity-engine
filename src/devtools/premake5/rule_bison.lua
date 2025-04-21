@@ -1,5 +1,5 @@
 -- Output directory for Bison
-bisonOutputDir       = intermediateDir .. "/generated/%{prj.name}/"
+bisonOutputDir       = intermediateDir .. "/generated/bison/%{prj.name}/"
 
 rule "bison"
     display         "Bison scripts compiler"

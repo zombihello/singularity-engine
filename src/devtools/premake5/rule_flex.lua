@@ -1,5 +1,5 @@
 -- Output directory for Flex
-flexOutputDir       = intermediateDir .. "/generated/%{prj.name}/"
+flexOutputDir       = intermediateDir .. "/generated/flex/%{prj.name}/"
 
 rule "flex"
     display         "Flex scripts compiler"

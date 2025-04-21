@@ -46,6 +46,12 @@ newoption {
 -- Path to intermediate directory for compiling the engine and the game
 intermediateDir				= root .. "/" .. _OPTIONS["intermediate-dir"] .. "/" .. ( _ACTION or "<INVALID_ACTION>" ) .. "/"
 
+-- Directory with generated ECS files
+ecsGeneratedDir             = intermediateDir .. "generated/ecs/"
+
+-- Directory with generated C++ shaders
+shadersGeneratedDir         = intermediateDir .. "generated/shadercompiler/"
+
 -- Path to intermediate directory for third parties
 intermediateThirdPartyDir	= intermediateDir .. "thirdparty/"
 

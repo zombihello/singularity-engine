@@ -175,7 +175,7 @@ bool CEcsCompilerApp::ParseEcsFiles( const std::string& dir, const std::string r
 		}
 	}
 
-	return !bResult;
+	return bResult;
 }
 
 /*
@@ -219,6 +219,18 @@ bool CEcsCompilerApp::GenerateCppHeaders( const achar* pRootDir, const achar* pO
 	const std::vector<TRefPtr<CEcsStubModule>>&		ecsStubModules = stubs.GetModules();
 	CEcsCppGenerator								ecsCppGenerator;
 
+	// Convert the root and the output directory into absolute path
+	std::string		rootDir = pRootDir;
+	std::string		outputDir = pOutputDir;
+	if ( !S_IsAbsolutePath( pRootDir ) )
+	{
+		S_MakeAbsolutePath( pRootDir, rootDir );
+	}
+	if ( !S_IsAbsolutePath( pOutputDir ) )
+	{
+		S_MakeAbsolutePath( pOutputDir, outputDir );
+	}
+
 	for ( uint32 ecsStubModuleIdx = 0, numEcsStubModules = ( uint32 )ecsStubModules.size(); ecsStubModuleIdx < numEcsStubModules; ++ecsStubModuleIdx )
 	{
 		// Generate C++ header for this module
@@ -231,7 +243,7 @@ bool CEcsCompilerApp::GenerateCppHeaders( const achar* pRootDir, const achar* pO
 		std::string		subDir;
 		if ( pRootDir )
 		{
-			S_GetFilePath( pEcsStubModule->GetContext().file.AsChar() + S_Strlen( pRootDir ), subDir, false );
+			S_GetFilePath( pEcsStubModule->GetContext().file.AsChar() + rootDir.size(), subDir, false);
 			S_AppendPathSeparator( subDir );
 		}
 
@@ -240,7 +252,7 @@ bool CEcsCompilerApp::GenerateCppHeaders( const achar* pRootDir, const achar* pO
 		{
 			std::string		moduleNameLower = pEcsStubModule->GetName();
 			S_Strlwr( moduleNameLower.data() );
-			filePath		= S_Sprintf( "%s/%secs_%s.h", pOutputDir, subDir.c_str(), moduleNameLower.c_str() );
+			filePath		= S_Sprintf( "%s/%secs_%s.h", outputDir.c_str(), subDir.c_str(), moduleNameLower.c_str() );
 		}
 
 		// Save buffer into the file
