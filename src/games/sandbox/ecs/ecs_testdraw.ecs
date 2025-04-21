@@ -1,0 +1,18 @@
+module TestDraw;
+
+component Quad
+{
+	TRefPtr<IStudioAPIBuffer>	pVertexBuffer;
+	TRefPtr<IStudioAPIBuffer>	pIndexBuffer;
+	TResourcePtr<IMaterial>		pMaterial;
+}
+
+component Drawable
+{}
+
+system QuadDraw
+{
+	stage: 		on_store;
+	read: 		Quad quad;
+	include: 	Drawable;
+}

@@ -72,7 +72,7 @@ public:
 	operator ptrint() const;
 	operator uptrint() const;
 	TResourceClass* operator->() const;
-	TResourceClass* operator*();
+	TResourceClass* operator*() const;
 
 private:
 	TRefPtr<IResource>		pPtr;

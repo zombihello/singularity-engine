@@ -122,7 +122,7 @@ TResourcePtr::operator*
 ==================
 */
 template<class TResourceClass>
-FORCEINLINE TResourceClass* TResourcePtr<TResourceClass>::operator*()
+FORCEINLINE TResourceClass* TResourcePtr<TResourceClass>::operator*() const
 {
 	Assert( pPtr );
 	return ( TResourceClass* )pPtr->GetData();

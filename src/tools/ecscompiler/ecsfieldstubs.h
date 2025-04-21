@@ -168,6 +168,8 @@ public:
 	FORCEINLINE void AddField( ecsFieldAccessType_t accessType, CEcsStubField* pField )										{ fields[accessType].emplace_back( pField ); }
 	FORCEINLINE void AddFilter( ecsSystemFilterType_t filterType, CEcsStubSystemFilter* pFilter )							{ filters[filterType].emplace_back( pFilter ); }
 
+	FORCEINLINE bool HasFields( ecsFieldAccessType_t accessType ) const														{ return !fields[accessType].empty(); }
+	FORCEINLINE bool HasFilters( ecsSystemFilterType_t filterType ) const													{ return !filters[filterType].empty(); }
 	FORCEINLINE ecsScopeStub_t& GetScope()																					{ return scope; }
 	FORCEINLINE ecsSystemStage_t GetStage() const																			{ return stage; }
 	FORCEINLINE const parserFileContext_t& GetStageContext() const															{ return stageContext; }

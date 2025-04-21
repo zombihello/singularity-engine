@@ -7,6 +7,8 @@
 #include "materialsystem/imaterialvar.h"
 #include "resourcesystem/iresourcesystem.h"
 #include "gameframework/igame.h"
+#include "gameframework/ecs/ecs.h"
+#include "sandbox/ecs/ecs_testdraw.gen.h"
 
 //-----------------------------------------------------------------------------
 // Singularity Sandbox game
@@ -26,6 +28,7 @@ private:
 	TRefPtr<IStudioAPIBuffer>	pQuadVertexBuffer;
 	TRefPtr<IStudioAPIBuffer>	pQuadIndexBuffer;
 	TResourcePtr<IMaterial>		pQuadMaterial;
+	CEcsWorld					ecsWorld;
 };
 
 EXPOSE_SINGLE_INTERFACE( CSandboxGame, IGame, GAME_INTERFACE_VERSION );
@@ -68,6 +71,8 @@ bool CSandboxGame::Init( createInterfaceFn_t pFactory )
 	// Load a quad material
 	pQuadMaterial = g_pResourceSystem->FindOrLoadResource( "materials/nelson", RESOURCE_TYPE_MATERIAL );
 
+	ecsWorld.RegisterModule<ecsTestDrawModule_t>();
+
 	class CInitQuadHelper
 	{
 	public:
@@ -94,6 +99,14 @@ bool CSandboxGame::Init( createInterfaceFn_t pFactory )
 										} );
 
 	Studio_FlushRenderCommands();
+	
+	ecsQuadComponent_t				quadComponent;
+	quadComponent.pVertexBuffer		= pQuadVertexBuffer;
+	quadComponent.pIndexBuffer		= pQuadIndexBuffer;
+	quadComponent.pMaterial			= pQuadMaterial;
+	ecsEntity_t						quadEntity = ecsWorld.CreateEntity( "quad" );
+	ecsWorld.SetComponent( quadEntity, std::move( quadComponent ) );
+	ecsWorld.AddComponent<ecsDrawableComponent_t>( quadEntity );
 	return true;
 }
 
@@ -105,6 +118,7 @@ CSandboxGame::Shutdown
 void CSandboxGame::Shutdown()
 {
 	CGame::Shutdown();
+	ecsWorld.Reset();
 	g_pStudioAPI		= NULL;
 	g_pStudioRender		= NULL;
 	g_pMaterialSystem	= NULL;
@@ -117,7 +131,7 @@ CSandboxGame::FrameUpdate
 */
 void CSandboxGame::FrameUpdate()
 {
-	g_pStudioRender->DrawQuad( *pQuadMaterial, pQuadVertexBuffer, pQuadIndexBuffer );
+	ecsWorld.Update( 0.f );
 }
 
 /*
@@ -128,4 +142,15 @@ CSandboxGame::GetGameDescription
 const achar* CSandboxGame::GetGameDescription() const
 {
 	return "Singularity Sandbox";
+}
+
+
+/*
+==================
+CSandboxGame::GetGameDescription
+==================
+*/
+void CEcsQuadDrawSystem::OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity, const ecsQuadComponent_t& quad )
+{
+	g_pStudioRender->DrawQuad( *quad.pMaterial, quad.pVertexBuffer, quad.pIndexBuffer );
 }

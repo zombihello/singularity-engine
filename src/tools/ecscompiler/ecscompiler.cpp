@@ -252,7 +252,7 @@ bool CEcsCompilerApp::GenerateCppHeaders( const achar* pRootDir, const achar* pO
 		{
 			std::string		moduleNameLower = pEcsStubModule->GetName();
 			S_Strlwr( moduleNameLower.data() );
-			filePath		= S_Sprintf( "%s/%secs_%s.h", outputDir.c_str(), subDir.c_str(), moduleNameLower.c_str() );
+			filePath		= S_Sprintf( "%s/%secs_%s.gen.h", outputDir.c_str(), subDir.c_str(), moduleNameLower.c_str() );
 		}
 
 		// Save buffer into the file

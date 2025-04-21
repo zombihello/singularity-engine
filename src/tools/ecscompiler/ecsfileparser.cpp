@@ -108,6 +108,17 @@ void CEcsFileParser::EndDefinition( int32 line, const parserFileContext_t* pScop
 	}
 	else if ( pCurrentSystem )
 	{
+		// A system must have at least one read or write component
+		bool	bHasAnyFields = false;
+		for ( uint32 accessType = 0; accessType < ECS_FIELD_NUM_ACCESS_TYPES; ++accessType )
+		{
+			bHasAnyFields |= pCurrentSystem->HasFields( ( ecsFieldAccessType_t )accessType );
+		}
+		if ( !bHasAnyFields )
+		{
+			EmitError( pScopeStart, "A system must have at least one read or write component" );
+		}
+
 		pScope				= &pCurrentSystem->GetScope();
 		pCurrentSystem		= NULL;
 	}
