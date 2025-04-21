@@ -60,7 +60,7 @@
 	- [ ] ECS compiler: Include sub-ecs files by 'using'
 	- [ ] ECS compiler: Validate component types in systems
 	- [ ] ECS compiler: Validate systems to they have at least one read or write component
-	- [ ] ECS compiler: Compile all ECS files in directory
+	- [X] ECS compiler: Compile all ECS files in directory
 	- [ ] Add possible to fly on scene
 - [ ] Migrate from STL to EASTL
 - [ ] Enable SIMD in GLM (#define GLM_FORCE_SSE2 and #define GLM_FORCE_ALIGNED)

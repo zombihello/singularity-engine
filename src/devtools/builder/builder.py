@@ -20,7 +20,7 @@ TOOL_PROJECTS               = ["core", "engine", "filesystem", "material_tool", 
 ENGINE_PROJECTS             = ["core", "engine", "filesystem", "inputsystem", "launcher", "materialsystem", "resourcesystem", "studioapi_vk", "studiorender", "stdshaders"]
 ENGINE_SHADERLISTS          = ["src/materialsystem/shaderlist.makefile", "src/materialsystem/stdshaders/shaderlist.makefile"]
 ENGINE_CPP_SHADERLISTS      = [("src/materialsystem/shaderlist.makefile", "materialsystem/"), ("src/materialsystem/stdshaders/shaderlist.makefile", "materialsystem/stdshaders/")]
-ENGINE_CPP_ECS              = [("src/public/libs/gameframework/ecs/ecs_movement.ecs", "gameframework/ecs/")]
+ENGINE_ECS_DIRS             = [("src/public/libs/gameframework/", "gameframework/")]
 ENGINE_RESOURCELISTS        = ["content/core/resourcelist.txt"]
 SDK_SHADERCOMPILER_EXE      = f"shadercompiler{utils.GetExecutableExtension()}"
 SDK_RESOURCECOMPILER_EXE    = f"resourcecompiler{utils.GetExecutableExtension()}"
@@ -93,16 +93,16 @@ def _GenerateShaderCppClasses( context ):
 
 # Compile ECS
 def _CompileEcs( context ):
-    ecsFiles                    = context.get( "ecsFiles" )
+    ecsDirs                     = context.get( "ecs_dirs" )
     repoRoot                    = context.get( "repo_root" )
     useDeployIntermediantDir    = context.get( "use_deploy_intermediant_dir" )
     ecsCompilerExe              = f"{context.get( "sdk_bin_dir" )}/{SDK_ECSCOMPILER_EXE}"
     intermediateDir             = f"{INTERMEDIATE_DEPLOY_DIR}/{PREMAKE5_ACTION}/" if useDeployIntermediantDir else f"{INTERMEDIATE_ROOT_DIR}/{PREMAKE5_ACTION}/"
-    for ecsFile, outputDir in ecsFiles:
+    for ecsDir, outputDir in ecsDirs:
         print( "" )
-        print( f"> Compile ECS: {ecsFile}" )
+        print( f"> Compile ECS: {ecsDir}" )
         print( "" )
-        subprocess.run( [ecsCompilerExe, f"-file {ecsFile} -output {repoRoot}/src/{intermediateDir}/generated/{outputDir}/"], check=True )
+        subprocess.run( [ecsCompilerExe, f"-dir {ecsDir} -output {repoRoot}/src/{intermediateDir}/generated/{outputDir}/"], check=True )
 
 # Copy third party files
 def _CopyThirdPartyFiles( context ):
@@ -222,12 +222,12 @@ class Builder:
         self.AddStep_Custom( step.Step( name, _GenerateShaderCppClasses, makefiles=_makefiles, repo_root=self.repoRoot, sdk_bin_dir=self.sdkBinDir, use_deploy_intermediant_dir=useDeployIntermediantDir ) )
 
     # Add compile a ECS file
-    def AddStep_CompileEcs( self, name, ecsFiles, useDeployIntermediantDir=True ):
-        _ecsFiles = []
-        for ecsFile, outputDir in ecsFiles:
-            _ecsFiles.append(  ( f"{self.repoRoot}/{ecsFile}", outputDir ) )
+    def AddStep_CompileEcs( self, name, ecsDirs, useDeployIntermediantDir=True ):
+        _ecsDirs = []
+        for ecsDir, outputDir in ecsDirs:
+            _ecsDirs.append(  ( f"{self.repoRoot}/{ecsDir}", outputDir ) )
         
-        self.AddStep_Custom( step.Step( name, _CompileEcs, ecsFiles=_ecsFiles, repo_root=self.repoRoot, sdk_bin_dir=self.sdkBinDir, use_deploy_intermediant_dir=useDeployIntermediantDir ) )
+        self.AddStep_Custom( step.Step( name, _CompileEcs, ecs_dirs=_ecsDirs, repo_root=self.repoRoot, sdk_bin_dir=self.sdkBinDir, use_deploy_intermediant_dir=useDeployIntermediantDir ) )
 
     # Execute the builder
     def Execute( self ):

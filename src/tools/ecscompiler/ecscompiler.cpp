@@ -34,8 +34,9 @@ public:
 
 private:
 	void PrintUsageHelp();
+	bool ParseEcsFiles( const std::string& dir, const std::string rootDir, CEcsSystemStub& stubs );
 	bool ParseEcsFile( const achar* pPath, CEcsSystemStub& stubs );
-	bool GenerateCppHeaders( const achar* pOutputDir, const CEcsSystemStub& stubs );
+	bool GenerateCppHeaders( const achar* pRootDir, const achar* pOutputDir, const CEcsSystemStub& stubs );
 };
 
 
@@ -85,32 +86,53 @@ int32 CEcsCompilerApp::Main()
 	// Is need to print help of usage
 	bool			bPrintHelpUsage = CommandLine()->HasParam( "h" ) || CommandLine()->HasParam( "help" ) || CommandLine()->HasParam( "?" );
 
-	// Get a path to source ECS file
+	// Get a path to source ECS file or directory
 	const achar*	pEcsFile = CommandLine()->GetFirstValue( "file" );
+	const achar*	pEcsDir = CommandLine()->GetFirstValue( "dir" );
 	bool			bInvalidEcsFilePath = !pEcsFile || pEcsFile[0] == '\0';
+	bool			bInvalidEcsDir		= !pEcsDir || pEcsDir[0] == '\0';
 
 	// Get an output directory for C++ file
 	const achar*	pCppFileDir = CommandLine()->GetFirstValue( "output" );
 	bool			bInvalidCppFileDir = !pCppFileDir || pCppFileDir[0] == '\0';
 
 	// Print help of usage if it need or some parameters aren't set 
-	if ( bPrintHelpUsage || bInvalidEcsFilePath || bInvalidCppFileDir )
+	if ( bPrintHelpUsage || ( bInvalidEcsFilePath && bInvalidEcsDir ) || bInvalidCppFileDir )
 	{
 		PrintUsageHelp();
 		return 0;
 	}
 
-	// Parse the ECS file
-	CEcsSystemStub		ecsSystemStub;
-	if ( !ParseEcsFile( pEcsFile, ecsSystemStub ) )
+	// Make sure that set only one flag
+	if ( !( bInvalidEcsFilePath ^ bInvalidEcsDir ) )
 	{
+		Error( "EcsCompiler: Must be set only 'file' or 'dir'" );
 		return 1;
 	}
 
-	// Generate C++ headers
-	if ( !GenerateCppHeaders( pCppFileDir, ecsSystemStub ) )
+	// Parse the ECS file if set 'file'
+	CEcsSystemStub		ecsSystemStub;
+	if ( bInvalidEcsDir )
 	{
-		return 2;
+		Assert( !bInvalidEcsFilePath );
+		if ( !ParseEcsFile( pEcsFile, ecsSystemStub ) )
+		{
+			return 2;
+		}
+	}
+	// Otherwise parse whole directory
+	else
+	{
+		if ( !ParseEcsFiles( pEcsDir, pEcsDir, ecsSystemStub ) )
+		{
+			return 2;
+		}
+	}
+
+	// Generate C++ headers
+	if ( !GenerateCppHeaders( !bInvalidEcsDir ? pEcsDir : NULL, pCppFileDir, ecsSystemStub ) )
+	{
+		return 3;
 	}
 
 	return 0;
@@ -124,6 +146,36 @@ CEcsCompilerApp::PostShutdown
 void CEcsCompilerApp::PostShutdown()
 {
 	DisconnectStdLib();
+}
+
+/*
+==================
+CEcsCompilerApp::ParseEcsFiles
+==================
+*/
+bool CEcsCompilerApp::ParseEcsFiles( const std::string& dir, const std::string rootDir, CEcsSystemStub& stubs )
+{
+	bool						bResult		= true;
+	TRefPtr<IPathArrayResult>	pFiles		= g_pFileSystem->FindFiles( dir.c_str(), true, true );
+	for ( uint32 fileIdx = 0, numFiles = pFiles->GetNum(); fileIdx < numFiles; ++fileIdx )
+	{
+		// If the file is a directory look in
+		const achar*		pPath = pFiles->GetPath( fileIdx );
+		if ( g_pFileSystem->IsFileDirectory( pPath ) )
+		{
+			bResult &= ParseEcsFiles( S_Sprintf( "%s/", pPath ), rootDir, stubs);
+			continue;
+		}
+
+		// If the file has 'ecs' extension its our ECS file and parse it
+		const achar*	pFileExtension = S_GetFileExtension( pPath );
+		if ( pFileExtension && !S_Stricmp( pFileExtension, "ecs" ) )
+		{
+			bResult &= ParseEcsFile( pPath, stubs );
+		}
+	}
+
+	return !bResult;
 }
 
 /*
@@ -161,7 +213,7 @@ bool CEcsCompilerApp::ParseEcsFile( const achar* pPath, CEcsSystemStub& stubs )
 CEcsCompilerApp::GenerateCppHeader
 ==================
 */
-bool CEcsCompilerApp::GenerateCppHeaders( const achar* pOutputDir, const CEcsSystemStub& stubs )
+bool CEcsCompilerApp::GenerateCppHeaders( const achar* pRootDir, const achar* pOutputDir, const CEcsSystemStub& stubs )
 {
 	bool											bResult = true;
 	const std::vector<TRefPtr<CEcsStubModule>>&		ecsStubModules = stubs.GetModules();
@@ -175,12 +227,20 @@ bool CEcsCompilerApp::GenerateCppHeaders( const achar* pOutputDir, const CEcsSys
 		ecsCppGenerator.Generate( pEcsStubModule );
 		const std::string&		buffer = ecsCppGenerator.GetBuffer();
 
+		// Make sub directories if we use 'dir' command
+		std::string		subDir;
+		if ( pRootDir )
+		{
+			S_GetFilePath( pEcsStubModule->GetContext().file.AsChar() + S_Strlen( pRootDir ), subDir, false );
+			S_AppendPathSeparator( subDir );
+		}
+
 		// Generate file path from the module name
 		std::string				filePath;
 		{
 			std::string		moduleNameLower = pEcsStubModule->GetName();
 			S_Strlwr( moduleNameLower.data() );
-			filePath		= S_Sprintf( "%s/ecs_%s.h", pOutputDir, moduleNameLower.c_str() );
+			filePath		= S_Sprintf( "%s/%secs_%s.h", pOutputDir, subDir.c_str(), moduleNameLower.c_str() );
 		}
 
 		// Save buffer into the file
@@ -209,11 +269,14 @@ void CEcsCompilerApp::PrintUsageHelp()
 {
 	Msg( "" );
 	Msg( "ECS compiler for Singularity Engine (" __DATE__ " " __TIME__ ")" );
-	Msg( "Usage ecscompiler -file <path> -output <path_dir>" );
+	Msg( "Usage: ecscompiler -file <path> -output <path_dir>" );
+	Msg( "Usage: ecscompiler -dir <path> -output <path_dir>" );
 	Msg( "Ex: ecscompiler -file ../src/public/libs/gameframework/ecs/ecs_movement.ecs -output ../src/public/libs/gameframework/ecs/" );
+	Msg( "Ex: ecscompiler -dir ../src/ -output ../src/intermediate/generated/" );
 	Msg( "" );
 	Msg( "Launch arguments:" );
-	Msg( "file\tSource ECS file to compile. For syntax ecample see 'src/public/libs/gameframework/ecs/*.ecs'" );
+	Msg( "file\tSource ECS file to compile. For syntax example see 'src/public/libs/gameframework/ecs/*.ecs'" );
+	Msg( "dir\tRecursively compile all ECS file in the directory" );
 	Msg( "output\tSpecify an output directory for a C++ file" );
 	Msg( "" );
 }
