@@ -141,7 +141,7 @@ void CEcsCppGenerator::GenerateSystems( const std::vector<TRefPtr<CEcsStubSystem
 			for ( uint32 fieldAccessType = 0; fieldAccessType < ECS_FIELD_NUM_ACCESS_TYPES; ++fieldAccessType )
 			{
 				const std::vector<TRefPtr<CEcsStubField>>&		fields = pEcsStubSystem->GetFields( ( ecsFieldAccessType_t )fieldAccessType );
-				if ( fieldAccessType != 0 && !fields.empty() )
+				if ( fieldAccessType != 0 && !fields.empty() && !updateParams.empty() )
 				{
 					updateParams += ", ";
 				}
@@ -225,7 +225,7 @@ void CEcsCppGenerator::GenerateRegistrar( CEcsStubModule* pEcsStubModule )
 			for ( uint32 fieldAccessType = 0; fieldAccessType < ECS_FIELD_NUM_ACCESS_TYPES; ++fieldAccessType )
 			{
 				const std::vector<TRefPtr<CEcsStubField>>&		fields = pEcsStubSystem->GetFields( ( ecsFieldAccessType_t )fieldAccessType );
-				if ( fieldAccessType != 0 && !fields.empty() )
+				if ( fieldAccessType != 0 && !fields.empty() && !updateParams.empty() )
 				{
 					templateParams		+= ", ";
 					updateParams		+= ", ";
