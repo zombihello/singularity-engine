@@ -12,7 +12,11 @@
 enum ecsFieldAccessType_t
 {
 	ECS_FIELD_ACCESS_TYPE_READ,
+	ECS_FIELD_ACCESS_TYPE_READ_OPTIONAL,
+	ECS_FIELD_ACCESS_TYPE_READ_RESOURCE,
 	ECS_FIELD_ACCESS_TYPE_WRITE,
+	ECS_FIELD_ACCESS_TYPE_WRITE_OPTIONAL,
+	ECS_FIELD_ACCESS_TYPE_WRITE_RESOURCE,
 	ECS_FIELD_NUM_ACCESS_TYPES
 };
 
@@ -120,10 +124,10 @@ private:
 };
 
 
-class CEcsStubComponent : public CEcsStubBase
+class CEcsStubDataType : public CEcsStubBase
 {
 public:
-	CEcsStubComponent( const parserFileContext_t& context, const achar* pName, CEcsStubMetadata* pMetadata = NULL );
+	CEcsStubDataType( const parserFileContext_t& context, const achar* pName, CEcsStubMetadata* pMetadata = NULL );
 
 	FORCEINLINE void AddDefaultFieldValue( CEcsStubDefaultFieldValue* pDefaultFieldValue )				{ defaultFieldValues.emplace_back( pDefaultFieldValue ); }
 	FORCEINLINE void AddField( CEcsStubField* pField )													{ fields.emplace_back( pField ); }
@@ -193,17 +197,20 @@ public:
 	CEcsStubModule( const parserFileContext_t& context, const achar* pName );
 
 	FORCEINLINE void AddUsing( CEcsStubUsing* pUsing )									{ usings.emplace_back( pUsing ); }
-	FORCEINLINE void AddComponent( CEcsStubComponent* pComponent )						{ components.emplace_back( pComponent ); }
+	FORCEINLINE void AddComponent( CEcsStubDataType* pComponent )						{ components.emplace_back( pComponent ); }
 	FORCEINLINE void AddSystem( CEcsStubSystem* pSystem )								{ systems.emplace_back( pSystem ); }
+	FORCEINLINE void AddResource( CEcsStubDataType* pResource )							{ resources.emplace_back( pResource ); }
 	FORCEINLINE const std::vector<TRefPtr<CEcsStubUsing>>& GetUsings() const			{ return usings; }
-	FORCEINLINE const std::vector<TRefPtr<CEcsStubComponent>>& GetComponents() const	{ return components; }
+	FORCEINLINE const std::vector<TRefPtr<CEcsStubDataType>>& GetComponents() const		{ return components; }
 	FORCEINLINE const std::vector<TRefPtr<CEcsStubSystem>>& GetSystems() const			{ return systems; }
+	FORCEINLINE const std::vector<TRefPtr<CEcsStubDataType>>& GetResources() const		{ return resources; }
 	FORCEINLINE ecsScopeStub_t& GetScope()												{ return scope; }
 
 private:
 	ecsScopeStub_t								scope;
 	std::vector<TRefPtr<CEcsStubUsing>>			usings;
-	std::vector<TRefPtr<CEcsStubComponent>>		components;
+	std::vector<TRefPtr<CEcsStubDataType>>		components;
+	std::vector<TRefPtr<CEcsStubDataType>>		resources;
 	std::vector<TRefPtr<CEcsStubSystem>>		systems;
 };
 

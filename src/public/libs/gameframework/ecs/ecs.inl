@@ -110,11 +110,11 @@ FORCEINLINE bool CEcsWorld::IsValidEntity( const ecsEntity_t& ecsEntity ) const
 CEcsWorld::AddResource
 ==================
 */
-template<typename TEcsComponent>
+template<typename TEcsResource>
 FORCEINLINE void CEcsWorld::AddResource()
 {
-	AssertMsg( !HasResource<TEcsComponent>(), "The world already has resource" );
-	flecsWorld.add<TEcsComponent>();
+	AssertMsg( !HasResource<TEcsResource>(), "The world already has resource" );
+	flecsWorld.add<TEcsResource>();
 }
 
 /*
@@ -122,11 +122,11 @@ FORCEINLINE void CEcsWorld::AddResource()
 CEcsWorld::SetResource
 ==================
 */
-template<typename TEcsComponent>
-FORCEINLINE void CEcsWorld::SetResource( const TEcsComponent& ecsComponent )
+template<typename TEcsResource>
+FORCEINLINE void CEcsWorld::SetResource( const TEcsResource& ecsResource )
 {
-	AssertMsg( !flecs::is_empty<TEcsComponent>::value, "To set a resource the one must have at least one field" );
-	flecsWorld.set<TEcsComponent>( ecsComponent );
+	AssertMsg( !flecs::is_empty<TEcsResource>::value, "To set a resource the one must have at least one field" );
+	flecsWorld.set<TEcsResource>( ecsResource );
 }
 
 /*
@@ -134,11 +134,11 @@ FORCEINLINE void CEcsWorld::SetResource( const TEcsComponent& ecsComponent )
 CEcsWorld::SetResource
 ==================
 */
-template<typename TEcsComponent>
-FORCEINLINE void CEcsWorld::SetResource( TEcsComponent&& ecsComponent )
+template<typename TEcsResource>
+FORCEINLINE void CEcsWorld::SetResource( TEcsResource&& ecsResource )
 {
-	AssertMsg( !flecs::is_empty<TEcsComponent>::value, "To set a resource the one must have at least one field" );
-	flecsWorld.set<TEcsComponent>( std::forward<TEcsComponent>( ecsComponent ) );
+	AssertMsg( !flecs::is_empty<TEcsResource>::value, "To set a resource the one must have at least one field" );
+	flecsWorld.set<TEcsResource>( std::forward<TEcsResource>( ecsResource ) );
 }
 
 /*
@@ -146,11 +146,11 @@ FORCEINLINE void CEcsWorld::SetResource( TEcsComponent&& ecsComponent )
 CEcsWorld::RemoveResource
 ==================
 */
-template<typename TEcsComponent>
+template<typename TEcsResource>
 FORCEINLINE void CEcsWorld::RemoveResource()
 {
-	AssertMsg( HasResource<TEcsComponent>(), "The world doesn't have component" );
-	flecsWorld.remove<TEcsComponent>();
+	AssertMsg( HasResource<TEcsResource>(), "The world doesn't have component" );
+	flecsWorld.remove<TEcsResource>();
 }
 
 /*
@@ -158,12 +158,12 @@ FORCEINLINE void CEcsWorld::RemoveResource()
 CEcsWorld::GetResource
 ==================
 */
-template<typename TEcsComponent>
-FORCEINLINE const TEcsComponent* CEcsWorld::GetResource() const
+template<typename TEcsResource>
+FORCEINLINE const TEcsResource* CEcsWorld::GetResource() const
 {
-	AssertMsg( HasResource<TEcsComponent>(), "The world doesn't have resource" );
-	AssertMsg( !flecs::is_empty<TEcsComponent>::value, "To get pointer to a resource, the one must have at least one field" );
-	return flecsWorld.get<TEcsComponent>();
+	AssertMsg( HasResource<TEcsResource>(), "The world doesn't have resource" );
+	AssertMsg( !flecs::is_empty<TEcsResource>::value, "To get pointer to a resource, the one must have at least one field" );
+	return flecsWorld.get<TEcsResource>();
 }
 
 /*
@@ -171,12 +171,12 @@ FORCEINLINE const TEcsComponent* CEcsWorld::GetResource() const
 CEcsWorld::GetResource
 ==================
 */
-template<typename TEcsComponent>
-FORCEINLINE TEcsComponent* CEcsWorld::GetResource()
+template<typename TEcsResource>
+FORCEINLINE TEcsResource* CEcsWorld::GetResource()
 {
-	AssertMsg( HasResource<TEcsComponent>(), "The world doesn't have resource" );
-	AssertMsg( !flecs::is_empty<TEcsComponent>::value, "To get pointer to a resource, the one must have at least one field" );
-	return flecsWorld.get_mut<TEcsComponent>();
+	AssertMsg( HasResource<TEcsResource>(), "The world doesn't have resource" );
+	AssertMsg( !flecs::is_empty<TEcsResource>::value, "To get pointer to a resource, the one must have at least one field" );
+	return flecsWorld.get_mut<TEcsResource>();
 }
 
 /*
@@ -184,10 +184,10 @@ FORCEINLINE TEcsComponent* CEcsWorld::GetResource()
 CEcsWorld::HasResource
 ==================
 */
-template<typename TEcsComponent>
+template<typename TEcsResource>
 FORCEINLINE bool CEcsWorld::HasResource() const
 {
-	return flecsWorld.has<TEcsComponent>();
+	return flecsWorld.has<TEcsResource>();
 }
 
 /*

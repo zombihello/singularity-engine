@@ -130,7 +130,7 @@ int32 CEcsCompilerApp::Main()
 	}
 
 	// Generate C++ headers
-	if ( !GenerateCppHeaders( !bInvalidEcsDir ? pEcsDir : NULL, pCppFileDir, ecsSystemStub ) )
+	if ( !GenerateCppHeaders( !bInvalidEcsDir ? pEcsDir : "", pCppFileDir, ecsSystemStub) )
 	{
 		return 3;
 	}
@@ -241,7 +241,7 @@ bool CEcsCompilerApp::GenerateCppHeaders( const achar* pRootDir, const achar* pO
 
 		// Make sub directories if we use 'dir' command
 		std::string		subDir;
-		if ( pRootDir )
+		if ( !rootDir.empty() )
 		{
 			S_GetFilePath( pEcsStubModule->GetContext().file.AsChar() + rootDir.size(), subDir, false);
 			S_AppendPathSeparator( subDir );

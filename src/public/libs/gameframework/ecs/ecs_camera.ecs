@@ -1,4 +1,5 @@
 module Camera;
+using "gameframework/ecs/ecs_common.gen.h";
 using "gameframework/ecs/ecs_movement.gen.h";
 
 component Camera
@@ -29,8 +30,9 @@ system CameraMovement
 
 system CameraSendToRender
 {
-	stage: 		on_store;
-	read:		Transform	transform,
-				Camera		camera;
-	include:	CameraActive;
+	stage: 				on_store;
+	read:				Transform		transform,
+						Camera			camera;
+	read_resource:		StudioScene		studioScene;
+	include:			CameraActive;
 }

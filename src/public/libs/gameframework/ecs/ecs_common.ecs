@@ -1,7 +1,7 @@
 module Common;
 using "studiorender/istudio_scene.h";
 
-component StudioScene
+resource StudioScene
 {
 	TRefPtr<IStudioScene>	pStudioScene;
 }

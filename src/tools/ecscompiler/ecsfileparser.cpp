@@ -39,6 +39,7 @@ bool CEcsFileParser::ParseFile( const achar* pPath, const achar* pCode )
 		CParserTokenEater		tokenEater( tokens, pPath );
 		CParserLexerListener	lexerListener( tokenEater, pPath );
 		EcsCode_Tokenize( pCode, &lexerListener );
+		bHasError				= lexerListener.HasError();
 	}
 
 	// Parser the code
@@ -106,6 +107,11 @@ void CEcsFileParser::EndDefinition( int32 line, const parserFileContext_t* pScop
 		pScope				= &pCurrentComponent->GetScope();
 		pCurrentComponent	= NULL;
 	}
+	else if ( pCurrentResource )
+	{
+		pScope				= &pCurrentResource->GetScope();
+		pCurrentResource	= NULL;
+	}
 	else if ( pCurrentSystem )
 	{
 		// A system must have at least one read or write component
@@ -154,7 +160,7 @@ void CEcsFileParser::StartComponent( const parserFileContext_t* pContext, const 
 	// Create a component we can only in a module
 	if ( pCurrentModule )
 	{
-		pCurrentComponent = new CEcsStubComponent( *pContext, pName, pCurrentMetadata );
+		pCurrentComponent = new CEcsStubDataType( *pContext, pName, pCurrentMetadata );
 		pCurrentModule->AddComponent( pCurrentComponent );
 	}
 	else
@@ -166,10 +172,41 @@ void CEcsFileParser::StartComponent( const parserFileContext_t* pContext, const 
 
 /*
 ==================
-CEcsFileParser::AddComponentField
+CEcsFileParser::StartResource
 ==================
 */
-void CEcsFileParser::AddComponentField( const parserFileContext_t* pContext, const parserFileContext_t* pTypeContext, const achar* pName, const achar* pType )
+void CEcsFileParser::StartResource( const parserFileContext_t* pContext, const achar* pName )
+{
+	AssertMsg( pContext, "Invalid context for a resource" );
+	AssertMsg( S_Strlen( pName ) > 0, "Resource name isn't valid" );
+
+	// Update the metadata scope
+	if ( pCurrentMetadata )
+	{
+		ecsScopeStub_t&		scope = pCurrentMetadata->GetScope();
+		scope.startContext	= pCurrentMetadata->GetContext();
+		scope.endContext	= *pContext;
+	}
+
+	// Create a resource we can only in a module
+	if ( pCurrentModule )
+	{
+		pCurrentResource = new CEcsStubDataType( *pContext, pName, pCurrentMetadata );
+		pCurrentModule->AddResource( pCurrentResource );
+	}
+	else
+	{
+		EmitError( pContext, "A resource must be in a module" );
+	}
+	pCurrentMetadata = NULL;
+}
+
+/*
+==================
+CEcsFileParser::AddField
+==================
+*/
+void CEcsFileParser::AddField( const parserFileContext_t* pContext, const parserFileContext_t* pTypeContext, const achar* pName, const achar* pType )
 {
 	AssertMsg( pContext, "Invalid context for a field" );
 	AssertMsg( pTypeContext, "Invalid context for a field type" );
@@ -189,20 +226,25 @@ void CEcsFileParser::AddComponentField( const parserFileContext_t* pContext, con
 	{
 		pCurrentComponent->AddField( new CEcsStubField( *pContext, *pTypeContext, pName, pType, pCurrentMetadata ) );
 	}
+	// Add the field into the current resource
+	else if ( pCurrentResource )
+	{
+		pCurrentResource->AddField( new CEcsStubField( *pContext, *pTypeContext, pName, pType, pCurrentMetadata ) );
+	}
 	// Otherwise it is error
 	else
 	{
-		EmitError( pContext, "Fields can be only in components" );
+		EmitError( pContext, "Fields can be only in components or resources" );
 	}
 	pCurrentMetadata = NULL;
 }
 
 /*
 ==================
-CEcsFileParser::SetComponentDefaultFieldValue
+CEcsFileParser::SetDefaultFieldValue
 ==================
 */
-void CEcsFileParser::SetComponentDefaultFieldValue( const parserFileContext_t* pContext, const parserFileContext_t* pValueContext, const achar* pName, const achar* pValue )
+void CEcsFileParser::SetDefaultFieldValue( const parserFileContext_t* pContext, const parserFileContext_t* pValueContext, const achar* pName, const achar* pValue )
 {
 	AssertMsg( pContext, "Invalid context for a field" );
 	AssertMsg( pValueContext, "Invalid context for a field value" );
@@ -213,10 +255,15 @@ void CEcsFileParser::SetComponentDefaultFieldValue( const parserFileContext_t* p
 	{
 		pCurrentComponent->AddDefaultFieldValue( new CEcsStubDefaultFieldValue( *pContext, *pValueContext, pName, pValue ) );
 	}
+	// Add the default field value into the current resource
+	else if ( pCurrentResource )
+	{
+		pCurrentResource->AddDefaultFieldValue( new CEcsStubDefaultFieldValue( *pContext, *pValueContext, pName, pValue ) );
+	}
 	// Otherwise it is error
 	else
 	{
-		EmitError( pContext, "Default field values can be only in components" );
+		EmitError( pContext, "Default field values can be only in components or resources" );
 	}
 }
 

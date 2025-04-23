@@ -1,0 +1,45 @@
+module Test;
+using "path/to/header.h";
+using "path/to/another/header.h";
+
+component TestComponent
+{
+	CTransform		transform;
+}
+
+resource TestResource
+{
+	TRefPtr<IStudioScene>	pStudioScene;
+}
+
+component ComponentWithDefaults
+{
+	defaults:
+		bVar( false ),
+		var( 146.f );
+
+	bool	bVar;
+	float	var;
+}
+
+component ComponentTag
+{}
+
+/*query TestQuery
+{
+	read: 			TestComponent 	test;
+	read_resource: 	TestResource	testResource;
+}*/
+
+system TestSystem
+{
+	stage: 				on_store;
+	read:				TestComponent				comp1,
+						ComponentWithDefaults		comp2;
+	read_optional:		ComponentWithDefaults		readOptional;
+	write_optional:		ComponentWithDefaults		writeOptional;
+	//query:			TestQuery					testQuery;
+	read_resource:		TestResource				readResource;
+	write_resource:		TestResource				writeResource;
+	include:			ComponentTag;
+}

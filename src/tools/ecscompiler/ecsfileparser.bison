@@ -111,6 +111,7 @@
 %token TOKEN_MODULE
 %token TOKEN_USING
 %token TOKEN_COMPONENT
+%token TOKEN_RESOURCE
 %token TOKEN_DEFAULTS
 %token TOKEN_SYSTEM
 %token TOKEN_CPP_CODE
@@ -127,7 +128,11 @@
 %token TOKEN_SYSTEM_STAGE_PRESTORE
 %token TOKEN_SYSTEM_STAGE_ONSTORE
 %token TOKEN_SYSTEM_READ
+%token TOKEN_SYSTEM_READ_OPTIONAL
+%token TOKEN_SYSTEM_READ_RESOURCE
 %token TOKEN_SYSTEM_WRITE
+%token TOKEN_SYSTEM_WRITE_OPTIONAL
+%token TOKEN_SYSTEM_WRITE_RESOURCE
 %token TOKEN_SYSTEM_INCLUDE
 %token TOKEN_SYSTEM_EXCLUDE
 
@@ -148,7 +153,7 @@ module_header
 
 module_body
     : module_body using                                                 { $<pContext>$ = $<pContext>2; }
-    | module_body component                                             { $<pContext>$ = $<pContext>2; }
+    | module_body datatype                                              { $<pContext>$ = $<pContext>2; }
     | module_body system                                                { $<pContext>$ = $<pContext>2; }
     | module_body semicolon                                             {}
     | /* empty */
@@ -163,61 +168,62 @@ using
     ;
 
 ////////////////////////////////
-// Component
+// Data type (component and resource)
 ////////////////////////////////
 
-component
-    : component_header '{' component_body '}'                           { g_pFileParser->EndDefinition( g_pFileContext->GetCurrentTokenLine(), $<pContext>1, $<pContext>4  ); $<pContext>$ = $<pContext>4; }
+datatype
+    : datatype_header '{' datatype_body '}'                             { g_pFileParser->EndDefinition( g_pFileContext->GetCurrentTokenLine(), $<pContext>1, $<pContext>4  ); $<pContext>$ = $<pContext>4; }
     ;
 
-component_header
+datatype_header
     : metadata TOKEN_COMPONENT TOKEN_IDENT                              { g_pFileParser->StartComponent( $<pContext>3, $<token>3.data() ); $<pContext>$ = $<pContext>3; }
+    | metadata TOKEN_RESOURCE TOKEN_IDENT                               { g_pFileParser->StartResource( $<pContext>3, $<token>3.data() ); $<pContext>$ = $<pContext>3; }
     ;
 
-component_body
-    : component_body component_constructor                              {}
-    | component_body component_field                                    {}
-    | component_body semicolon                                          {}
+datatype_body
+    : datatype_body datatype_constructor                                {}
+    | datatype_body datatype_field                                      {}
+    | datatype_body semicolon                                           {}
     | /* empty */
     ;
 
-component_constructor
-    : TOKEN_DEFAULTS ':' component_constructor_fields ';'               {}
+datatype_constructor
+    : TOKEN_DEFAULTS ':' datatype_constructor_fields ';'                {}
     ;
 
-component_constructor_fields
-    : component_constructor_field ',' component_constructor_fields      {}
-    | component_constructor_field                                       {}
+datatype_constructor_fields
+    : datatype_constructor_field ',' datatype_constructor_fields        {}
+    | datatype_constructor_field                                        {}
     ;
 
-component_constructor_field
-    : TOKEN_IDENT '(' TOKEN_CPP_CODE ')'                                                { g_pFileParser->SetComponentDefaultFieldValue( $<pContext>1, $<pContext>3, $<token>1.data(), $<token>3.data() ); }
+datatype_constructor_field
+    : TOKEN_IDENT '(' TOKEN_CPP_CODE ')'                                                { g_pFileParser->SetDefaultFieldValue( $<pContext>1, $<pContext>3, $<token>1.data(), $<token>3.data() ); }
     ;
 
-component_field
-    : metadata component_field_type TOKEN_IDENT ';'                                     { g_pFileParser->AddComponentField( $<pContext>3, $<pContext>2, $<token>3.data(), $<string>2.c_str() ); }
+datatype_field
+    : metadata datatype_field_type TOKEN_IDENT ';'                                      { g_pFileParser->AddField( $<pContext>3, $<pContext>2, $<token>3.data(), $<string>2.c_str() ); }
     ;
 
-component_field_type
-    : component_field_typename                                                          { $<string>$ = $<string>1; }
-    | TOKEN_CPP_CONST component_field_type                                              { $<string>$ = S_Sprintf( "const %s", $<string>2.c_str() ); }
+datatype_field_type
+    : datatype_field_typename                                                           { $<string>$ = $<string>1; }
+    | TOKEN_CPP_CONST datatype_field_type                                               { $<string>$ = S_Sprintf( "const %s", $<string>2.c_str() ); }
     ;
 
-component_field_typename
-    : component_field_typename TOKEN_CPP_NAMESPACE TOKEN_IDENT                          { $<string>$ = S_Sprintf( "%s::%s", $<string>1.c_str(), $<token>3.data() ); }
-    | component_field_typename '<' component_field_type_template_args '>'               { $<string>$ = S_Sprintf( "%s<%s>", $<string>1.c_str(), $<string>3.c_str() ); }
-    | component_field_typename '*'                                                      { $<string>$ = S_Sprintf( "%s*", $<string>1.c_str() ); }
-    | component_field_typename '&'                                                      { $<string>$ = S_Sprintf( "%s&", $<string>1.c_str() ); }
+datatype_field_typename
+    : datatype_field_typename TOKEN_CPP_NAMESPACE TOKEN_IDENT                           { $<string>$ = S_Sprintf( "%s::%s", $<string>1.c_str(), $<token>3.data() ); }
+    | datatype_field_typename '<' datatype_field_type_template_args '>'                 { $<string>$ = S_Sprintf( "%s<%s>", $<string>1.c_str(), $<string>3.c_str() ); }
+    | datatype_field_typename '*'                                                       { $<string>$ = S_Sprintf( "%s*", $<string>1.c_str() ); }
+    | datatype_field_typename '&'                                                       { $<string>$ = S_Sprintf( "%s&", $<string>1.c_str() ); }
     | TOKEN_IDENT                                                                       { $<string>$ = $<token>1.data(); }
     ;
 
-component_field_type_template_args
-    : component_field_type_template_args ',' component_field_type_template_arg          { $<string>$ = S_Sprintf( "%s, %s", $<string>1.c_str(), $<string>3.c_str() ); }
-    | component_field_type_template_arg                                                 { $<string>$ = $<string>1; }
+datatype_field_type_template_args
+    : datatype_field_type_template_args ',' datatype_field_type_template_arg            { $<string>$ = S_Sprintf( "%s, %s", $<string>1.c_str(), $<string>3.c_str() ); }
+    | datatype_field_type_template_arg                                                  { $<string>$ = $<string>1; }
     ;
 
-component_field_type_template_arg
-    : component_field_type                                                              { $<string>$ = $<string>1; }
+datatype_field_type_template_arg
+    : datatype_field_type                                                               { $<string>$ = $<string>1; }
     ;
 
 ////////////////////////////////
@@ -254,7 +260,11 @@ system_stage
 
 system_fields
     : TOKEN_SYSTEM_READ ':' system_fields_read                          {}
+    | TOKEN_SYSTEM_READ_OPTIONAL ':' system_fields_read_optional        {}
+    | TOKEN_SYSTEM_READ_RESOURCE ':' system_fields_read_resource        {}
     | TOKEN_SYSTEM_WRITE ':' system_fields_write                        {}
+    | TOKEN_SYSTEM_WRITE_OPTIONAL ':' system_fields_write_optional      {}
+    | TOKEN_SYSTEM_WRITE_RESOURCE ':' system_fields_write_resource      {}
     ;
 
 system_fields_read
@@ -266,6 +276,24 @@ system_field_read
     : TOKEN_IDENT TOKEN_IDENT                                           { g_pFileParser->AddSystemField( $<pContext>2, $<pContext>1, $<token>2.data(), $<token>1.data(), ECS_FIELD_ACCESS_TYPE_READ ); }
     ;
 
+system_fields_read_optional
+    : system_field_read_optional ',' system_fields_read_optional        {}
+    | system_field_read_optional                                        {}
+    ;
+
+system_field_read_optional
+    : TOKEN_IDENT TOKEN_IDENT                                           { g_pFileParser->AddSystemField( $<pContext>2, $<pContext>1, $<token>2.data(), $<token>1.data(), ECS_FIELD_ACCESS_TYPE_READ_OPTIONAL ); }
+    ;
+
+system_fields_read_resource
+    : system_field_read_resource ',' system_fields_read_resource        {}
+    | system_field_read_resource                                        {}
+    ;
+
+system_field_read_resource
+    : TOKEN_IDENT TOKEN_IDENT                                           { g_pFileParser->AddSystemField( $<pContext>2, $<pContext>1, $<token>2.data(), $<token>1.data(), ECS_FIELD_ACCESS_TYPE_READ_RESOURCE ); }
+    ;
+
 system_fields_write
     : system_field_write ',' system_fields_write                        {}
     | system_field_write                                                {}
@@ -273,6 +301,24 @@ system_fields_write
 
 system_field_write
     : TOKEN_IDENT TOKEN_IDENT                                           { g_pFileParser->AddSystemField( $<pContext>2, $<pContext>1, $<token>2.data(), $<token>1.data(), ECS_FIELD_ACCESS_TYPE_WRITE ); }
+    ;
+
+system_fields_write_optional
+    : system_field_write_optional ',' system_fields_write_optional      {}
+    | system_field_write_optional                                       {}
+    ;
+
+system_field_write_optional
+    : TOKEN_IDENT TOKEN_IDENT                                           { g_pFileParser->AddSystemField( $<pContext>2, $<pContext>1, $<token>2.data(), $<token>1.data(), ECS_FIELD_ACCESS_TYPE_WRITE_OPTIONAL ); }
+    ;
+
+system_fields_write_resource
+    : system_field_write_resource ',' system_fields_write_resource      {}
+    | system_field_write_resource                                       {}
+    ;
+
+system_field_write_resource
+    : TOKEN_IDENT TOKEN_IDENT                                           { g_pFileParser->AddSystemField( $<pContext>2, $<pContext>1, $<token>2.data(), $<token>1.data(), ECS_FIELD_ACCESS_TYPE_WRITE_RESOURCE ); }
     ;
 
 system_filters

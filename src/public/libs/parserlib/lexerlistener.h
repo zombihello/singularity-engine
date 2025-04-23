@@ -31,8 +31,13 @@ public:
 
 	// A section of script that has failed to match any token rules
 	virtual void Error( const parserLexerState_t& lexerState, const achar* pMessage );
+	FORCEINLINE bool HasError() const		
+	{
+		return bHasError; 
+	}
 
 protected:
+	bool					bHasError;
 	CParserTokenEater&		parserListener;
 	std::string				path;
 };

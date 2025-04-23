@@ -23,10 +23,11 @@ public:
 	void StartModule( const parserFileContext_t* pContext, const achar* pName );
 	void AddUsing( const parserFileContext_t* pContext, const achar* pName );
 
-	// Component functions
+	// Component and resource functions
 	void StartComponent( const parserFileContext_t* pContext, const achar* pName );
-	void AddComponentField( const parserFileContext_t* pContext, const parserFileContext_t* pTypeContext, const achar* pName, const achar* pType );
-	void SetComponentDefaultFieldValue( const parserFileContext_t* pContext, const parserFileContext_t* pValueContext, const achar* pName, const achar* pValue );
+	void StartResource( const parserFileContext_t* pContext, const achar* pName );
+	void AddField( const parserFileContext_t* pContext, const parserFileContext_t* pTypeContext, const achar* pName, const achar* pType );
+	void SetDefaultFieldValue( const parserFileContext_t* pContext, const parserFileContext_t* pValueContext, const achar* pName, const achar* pValue );
 	
 	// System functions
 	void StartSystem( const parserFileContext_t* pContext, const achar* pName );
@@ -38,7 +39,8 @@ private:
 	bool							bHasError;
 	CEcsSystemStub&					stubs;
 	CEcsStubModule*					pCurrentModule;
-	CEcsStubComponent*				pCurrentComponent;
+	CEcsStubDataType*				pCurrentComponent;
+	CEcsStubDataType*				pCurrentResource;
 	CEcsStubSystem*					pCurrentSystem;
 	TRefPtr<CEcsStubMetadata>		pCurrentMetadata;
 };

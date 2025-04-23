@@ -9,7 +9,8 @@ CParserLexerListener::CParserLexerListener
 ==================
 */
 CParserLexerListener::CParserLexerListener( CParserTokenEater& parserListener, const achar* pPath )
-	: parserListener( parserListener )
+	: bHasError( false )
+	, parserListener( parserListener )
 	, path( pPath )
 {
 	if ( !S_IsAbsolutePath( pPath ) )
@@ -90,4 +91,5 @@ void CParserLexerListener::Error( const parserLexerState_t& lexerState, const ac
 
 	parserFileContext_t		context( path, line, charLineStart, charStartPosition, charEndPosition );
 	::Error( "%s: %s", context.ToString().c_str(), pMessage );
+	bHasError = true;
 }

@@ -55,19 +55,19 @@ public:
 	void UnRegisterModule();
 
 	// Functions to work with resources (global game resources)
-	template<typename TEcsComponent>
+	template<typename TEcsResource>
 	void AddResource();
-	template<typename TEcsComponent>
-	void SetResource( const TEcsComponent& ecsComponent );
-	template<typename TEcsComponent>
-	void SetResource( TEcsComponent&& ecsComponent );
-	template<typename TEcsComponent>
+	template<typename TEcsResource>
+	void SetResource( const TEcsResource& ecsResource );
+	template<typename TEcsResource>
+	void SetResource( TEcsResource&& ecsResource );
+	template<typename TEcsResource>
 	void RemoveResource();
-	template<typename TEcsComponent>
-	const TEcsComponent* GetResource() const;
-	template<typename TEcsComponent>
-	TEcsComponent* GetResource();
-	template<typename TEcsComponent>
+	template<typename TEcsResource>
+	const TEcsResource* GetResource() const;
+	template<typename TEcsResource>
+	TEcsResource* GetResource();
+	template<typename TEcsResource>
 	bool HasResource() const;
 
 	// Functions to work with entities

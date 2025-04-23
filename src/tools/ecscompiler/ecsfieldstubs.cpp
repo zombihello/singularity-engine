@@ -61,10 +61,10 @@ CEcsStubField::CEcsStubField( const parserFileContext_t& context, const parserFi
 
 /*
 ==================
-CEcsStubComponent::CEcsStubComponent
+CEcsStubDataType::CEcsStubDataType
 ==================
 */
-CEcsStubComponent::CEcsStubComponent( const parserFileContext_t& context, const achar* pName, CEcsStubMetadata* pMetadata /* = NULL */ )
+CEcsStubDataType::CEcsStubDataType( const parserFileContext_t& context, const achar* pName, CEcsStubMetadata* pMetadata /* = NULL */ )
 	: CEcsStubBase( context, pName )
 	, pMetadata( pMetadata )
 {

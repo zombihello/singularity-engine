@@ -17,7 +17,7 @@ void CEcsSystemCameraMovement::OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity,
 CEcsSystemCameraSendToRender::OnUpdate
 ==================
 */
-void CEcsSystemCameraSendToRender::OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity, const ecsComponentTransform_t& transform, const ecsComponentCamera_t& camera )
+void CEcsSystemCameraSendToRender::OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity, const ecsComponentTransform_t& transform, const ecsComponentCamera_t& camera, const ecsResourceStudioScene_t& studioScene )
 {
 	studioSceneCameraView_t				studioSceneCameraView = {};
 	studioSceneCameraView.location		= transform.transform.GetLocation();
@@ -26,4 +26,5 @@ void CEcsSystemCameraSendToRender::OnUpdate( CEcsWorld ecsWorld, ecsEntity_t ent
 	studioSceneCameraView.nearClipPlane = camera.nearClipPlane;
 	studioSceneCameraView.farClipPlane	= camera.farClipPlane;
 	studioSceneCameraView.aspectRatio	= camera.aspectRatio;
+	studioScene.pStudioScene->SetView( studioSceneCameraView );
 }

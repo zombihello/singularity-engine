@@ -33,6 +33,7 @@
     {
         ECS_LEXER_SCOPE_DEFAULT,
         ECS_LEXER_SCOPE_COMPONENT,
+        ECS_LEXER_SCOPE_RESOURCE,
         ECS_LEXER_SCOPE_SYSTEM
     };
 
@@ -47,7 +48,7 @@
 
         FORCEINLINE void SetScope( ecsLexerScope_t lexerScope )
         {
-            if (  ecsLexerStateInternal_t::lexerScope != ECS_LEXER_SCOPE_DEFAULT || scopeLevel > 0 )
+            if ( ecsLexerStateInternal_t::lexerScope != ECS_LEXER_SCOPE_DEFAULT || scopeLevel > 0 )
             {
                 EmitError( "Invalid changing scope, components, systems and etc - must be outside of any scopes" );
             }
@@ -102,6 +103,7 @@
 "module"                                        EMIT_TOKEN( TOKEN_MODULE );
 "using"                                         EMIT_TOKEN( TOKEN_USING );
 "component"                                     { EMIT_TOKEN( TOKEN_COMPONENT ); yyextra->SetScope( ECS_LEXER_SCOPE_COMPONENT ); }
+"resource"                                      { EMIT_TOKEN( TOKEN_RESOURCE ); yyextra->SetScope( ECS_LEXER_SCOPE_RESOURCE ); }
 "defaults"                                      EMIT_TOKEN( TOKEN_DEFAULTS );
 "system"                                        { EMIT_TOKEN( TOKEN_SYSTEM ); yyextra->SetScope( ECS_LEXER_SCOPE_SYSTEM ); }
 "stage"                                         EMIT_TOKEN( TOKEN_SYSTEM_STAGE );
@@ -115,7 +117,11 @@
 "pre_store"                                     EMIT_TOKEN( TOKEN_SYSTEM_STAGE_PRESTORE );
 "on_store"                                      EMIT_TOKEN( TOKEN_SYSTEM_STAGE_ONSTORE );
 "read"                                          EMIT_TOKEN( TOKEN_SYSTEM_READ );
+"read_optional"                                 EMIT_TOKEN( TOKEN_SYSTEM_READ_OPTIONAL );
+"read_resource"                                 EMIT_TOKEN( TOKEN_SYSTEM_READ_RESOURCE );
 "write"                                         EMIT_TOKEN( TOKEN_SYSTEM_WRITE );
+"write_optional"                                EMIT_TOKEN( TOKEN_SYSTEM_WRITE_OPTIONAL );
+"write_resource"                                EMIT_TOKEN( TOKEN_SYSTEM_WRITE_RESOURCE );
 "include"                                       EMIT_TOKEN( TOKEN_SYSTEM_INCLUDE );
 "exclude"                                       EMIT_TOKEN( TOKEN_SYSTEM_EXCLUDE );
 "const"                                         EMIT_TOKEN( TOKEN_CPP_CONST );
