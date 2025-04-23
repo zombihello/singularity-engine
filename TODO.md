@@ -61,6 +61,7 @@
 	- [ ] ECS compiler: Validate component types in systems
 	- [X] ECS compiler: Validate systems to they have at least one read or write component
 	- [X] ECS compiler: Compile all ECS files in directory
+	- [ ] ECS compiler: Add support optional parameters, queries and resources
 	- [ ] Add possible to fly on scene
 - [ ] Migrate from STL to EASTL
 - [ ] Enable SIMD in GLM (#define GLM_FORCE_SSE2 and #define GLM_FORCE_ALIGNED)

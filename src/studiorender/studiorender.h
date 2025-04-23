@@ -42,6 +42,7 @@ public:
 
 	virtual IStudioViewport* CreateViewport() const override;
 	virtual IStudioRenderPipelineSet* CreateRenderPipelineSet() const override;
+	virtual IStudioScene* CreateScene() const override;
 
 	// Returns a command buffer of the render thread. If return NULL it's mean what StudioRender don't use render thread
 	virtual IStudioCmdBuffer* GetCommandBuffer() const override;

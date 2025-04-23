@@ -12,6 +12,7 @@ class IStudioViewport;
 class IStudioRenderPipelineSet;
 class IMaterial;
 class IStudioAPIBuffer;
+class IStudioScene;
 
 
 //-----------------------------------------------------------------------------
@@ -29,6 +30,7 @@ public:
 
 	virtual IStudioViewport* CreateViewport() const = 0;
 	virtual IStudioRenderPipelineSet* CreateRenderPipelineSet() const = 0;
+	virtual IStudioScene* CreateScene() const = 0;
 
 	// Returns a command buffer of the render thread. If return NULL it's mean what StudioRender don't use render thread
 	virtual IStudioCmdBuffer* GetCommandBuffer() const = 0;

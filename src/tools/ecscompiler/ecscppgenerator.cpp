@@ -89,12 +89,12 @@ void CEcsCppGenerator::GenerateComponents( const std::vector<TRefPtr<CEcsStubCom
 			const std::vector<TRefPtr<CEcsStubDefaultFieldValue>>&	ecsStubDefaultFieldValues	= pEcsStubComponent->GetDefaultFieldValues();
 			const std::vector<TRefPtr<CEcsStubField>>&				ecsStubFields				= pEcsStubComponent->GetFields();		
 			bool													bComponentEmpty				= ecsStubDefaultFieldValues.empty() && ecsStubFields.empty();
-			buffer += S_Sprintf( "struct ecs%sComponent_t\n{", pEcsStubComponent->GetName() );
+			buffer += S_Sprintf( "struct ecsComponent%s_t\n{", pEcsStubComponent->GetName() );
 			
 			// Write constructor
 			if ( !ecsStubDefaultFieldValues.empty() )
 			{
-				buffer += S_Sprintf( "\n\tecs%sComponent_t()\n", pEcsStubComponent->GetName() );
+				buffer += S_Sprintf( "\n\tecsComponent%s_t()\n", pEcsStubComponent->GetName() );
 				for ( uint32 defaultFieldValueIdx = 0, numDefaultFieldValues = ( uint32 )ecsStubDefaultFieldValues.size(); defaultFieldValueIdx < numDefaultFieldValues; ++defaultFieldValueIdx )
 				{
 					CEcsStubDefaultFieldValue*		pEcsStubDefaultFieldValue = ecsStubDefaultFieldValues[defaultFieldValueIdx];
@@ -151,8 +151,8 @@ void CEcsCppGenerator::GenerateSystems( const std::vector<TRefPtr<CEcsStubSystem
 					CEcsStubField*		pField = fields[fieldIdx];
 					switch ( fieldAccessType )
 					{
-					case ECS_FIELD_ACCESS_TYPE_READ:	updateParams += S_Sprintf( "const ecs%sComponent_t& %s", pField->GetType(), pField->GetName() );	break;
-					case ECS_FIELD_ACCESS_TYPE_WRITE:	updateParams += S_Sprintf( "ecs%sComponent_t& %s", pField->GetType(), pField->GetName() );			break;
+					case ECS_FIELD_ACCESS_TYPE_READ:	updateParams += S_Sprintf( "const ecsComponent%s_t& %s", pField->GetType(), pField->GetName() );	break;
+					case ECS_FIELD_ACCESS_TYPE_WRITE:	updateParams += S_Sprintf( "ecsComponent%s_t& %s", pField->GetType(), pField->GetName() );			break;
 					default:
 						AssertMsg( false, "Unknown field access 0x%X", fieldAccessType );
 						break;
@@ -165,7 +165,7 @@ void CEcsCppGenerator::GenerateSystems( const std::vector<TRefPtr<CEcsStubSystem
 				}
 			}
 
-			buffer += S_Sprintf( "class CEcs%sSystem\n"
+			buffer += S_Sprintf( "class CEcsSystem%s\n"
 								 "{\n"
 								 "public:\n"
 								 "\tstatic void OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity%s );\n", 
@@ -192,9 +192,9 @@ void CEcsCppGenerator::GenerateRegistrar( CEcsStubModule* pEcsStubModule )
 	const std::vector<TRefPtr<CEcsStubSystem>>&			ecsStubSystems		= pEcsStubModule->GetSystems();
 	
 	buffer += "\n// Registrar of the module\n";
-	buffer += S_Sprintf( "struct ecs%sModule_t\n"
+	buffer += S_Sprintf( "struct ecsModule%s_t\n"
 						  "{\n"
-						  "\tecs%sModule_t( flecs::world& flecsWorld )\n"
+						  "\tecsModule%s_t( flecs::world& flecsWorld )\n"
 						  "\t{\n", pEcsStubModule->GetName(), pEcsStubModule->GetName() );
 
 	// Register components
@@ -204,7 +204,7 @@ void CEcsCppGenerator::GenerateRegistrar( CEcsStubModule* pEcsStubModule )
 		for ( uint32 componentIdx = 0, numComponents = ( uint32 )ecsStubComponents.size(); componentIdx < numComponents; ++componentIdx )
 		{
 			CEcsStubComponent*		pEcsStubComponent = ecsStubComponents[componentIdx];
-			buffer += S_Sprintf( "\t\tflecsWorld.component<ecs%sComponent_t>();\n", pEcsStubComponent->GetName() );
+			buffer += S_Sprintf( "\t\tflecsWorld.component<ecsComponent%s_t>();\n", pEcsStubComponent->GetName() );
 		}
 	}
 
@@ -239,15 +239,15 @@ void CEcsCppGenerator::GenerateRegistrar( CEcsStubModule* pEcsStubModule )
 					switch ( fieldAccessType )
 					{
 					case ECS_FIELD_ACCESS_TYPE_READ:		
-						updateParams		+= S_Sprintf( "const ecs%sComponent_t& %s", pField->GetType(), pField->GetName() );
-						templateParams		+= S_Sprintf( "const ecs%sComponent_t", pField->GetType() );
-						readWriteFuncs		+= S_Sprintf( "\t\t\t.read<ecs%sComponent_t>()", pField->GetType() );
+						updateParams		+= S_Sprintf( "const ecsComponent%s_t& %s", pField->GetType(), pField->GetName() );
+						templateParams		+= S_Sprintf( "const ecsComponent%s_t", pField->GetType() );
+						readWriteFuncs		+= S_Sprintf( "\t\t\t.read<ecsComponent%s_t>()", pField->GetType() );
 						break;
 					
 					case ECS_FIELD_ACCESS_TYPE_WRITE:	
-						updateParams		+= S_Sprintf( "ecs%sComponent_t& %s", pField->GetType(), pField->GetName() );
-						templateParams		+= S_Sprintf( "ecs%sComponent_t", pField->GetType() );
-						readWriteFuncs		+= S_Sprintf( "\t\t\t.write<ecs%sComponent_t>()", pField->GetType() );
+						updateParams		+= S_Sprintf( "ecsComponent%s_t& %s", pField->GetType(), pField->GetName() );
+						templateParams		+= S_Sprintf( "ecsComponent%s_t", pField->GetType() );
+						readWriteFuncs		+= S_Sprintf( "\t\t\t.write<ecsComponent%s_t>()", pField->GetType() );
 						break;
 					
 					default:
@@ -285,8 +285,8 @@ void CEcsCppGenerator::GenerateRegistrar( CEcsStubModule* pEcsStubModule )
 					CEcsStubSystemFilter*	pEcsSystemFilter = filters[filterIdx];
 					switch ( systemFilterType )
 					{
-					case ECS_SYSTEM_FILTER_TYPE_INCLUDE:		filterFuncs += S_Sprintf( "\t\t\t.with<ecs%sComponent_t>()", pEcsSystemFilter->GetName() );		break;
-					case ECS_SYSTEM_FILTER_TYPE_EXCLUDE:		filterFuncs += S_Sprintf( "\t\t\t.without<ecs%sComponent_t>()", pEcsSystemFilter->GetName() );	break;
+					case ECS_SYSTEM_FILTER_TYPE_INCLUDE:		filterFuncs += S_Sprintf( "\t\t\t.with<ecsComponent%s_t>()", pEcsSystemFilter->GetName() );		break;
+					case ECS_SYSTEM_FILTER_TYPE_EXCLUDE:		filterFuncs += S_Sprintf( "\t\t\t.without<ecsComponent%s_t>()", pEcsSystemFilter->GetName() );	break;
 					default:
 						AssertMsg( false, "Unknown system filter 0x%X", systemFilterType );
 						break;
@@ -311,7 +311,7 @@ void CEcsCppGenerator::GenerateRegistrar( CEcsStubModule* pEcsStubModule )
 								 "%s"
 								 "\t\t\t.each( []( flecs::entity entity%s )\n"
 								 "\t\t\t{\n"
-								 "\t\t\t\tCEcs%sSystem::OnUpdate( entity.world(), entity%s );\n"
+								 "\t\t\t\tCEcsSystem%s::OnUpdate( entity.world(), entity%s );\n"
 								 "\t\t\t} );\n", 
 								 templateParams.c_str(), 
 								 s_pEcsSystemStageNames[pEcsStubSystem->GetStage()], 

@@ -6,6 +6,7 @@
 #include "studiorender/studio_viewport.h"
 #include "studiorender/studio_renderpipelineset.h"
 #include "studiorender/studio_vertexdeclarations.h"
+#include "studiorender/studio_scene.h"
 #include "studiorender/studiorender.h"
 
 CStudioRender		g_StudioRender;
@@ -216,6 +217,16 @@ CStudioRender::CreateRenderPipelineSet
 IStudioRenderPipelineSet* CStudioRender::CreateRenderPipelineSet() const
 {
 	return new CStudioRenderPipelineSet();
+}
+
+/*
+==================
+CStudioRender::CreateScene
+==================
+*/
+IStudioScene* CStudioRender::CreateScene() const
+{
+	return new CStudioScene();
 }
 
 /*

@@ -715,4 +715,71 @@ FORCEINLINE matrix_t S_MatrixInverse( const matrix_t& matrix )
 	S_MatrixInverse( matrix, result );
 	return result;
 }
+
+/*
+==================
+S_MatrixPerspective
+==================
+*/
+FORCEINLINE matrix_t S_MatrixPerspective( float fieldOfView, float aspectRatio, float nearClipPlane, float farClipPlane )
+{
+	matrix_t		result;
+	S_MatrixPerspective( fieldOfView, aspectRatio, nearClipPlane, farClipPlane, result );
+	return result;
+}
+
+/*
+==================
+S_MatrixPerspective
+==================
+*/
+FORCEINLINE void S_MatrixPerspective( float fieldOfView, float aspectRatio, float nearClipPlane, float farClipPlane, matrix_t& matrix )
+{
+	matrix = glm::perspective( S_DegreesToRadians( fieldOfView ), aspectRatio, nearClipPlane, farClipPlane );
+}
+
+/*
+==================
+S_MatrixOrtho
+==================
+*/
+FORCEINLINE matrix_t S_MatrixOrtho( float left, float right, float bottom, float top, float nearClipPlane, float farClipPlane )
+{
+	matrix_t		result;
+	S_MatrixOrtho( left, right, bottom, top, nearClipPlane, farClipPlane, result );
+	return result;
+}
+
+/*
+==================
+S_MatrixOrtho
+==================
+*/
+FORCEINLINE void S_MatrixOrtho( float left, float right, float bottom, float top, float nearClipPlane, float farClipPlane, matrix_t& matrix )
+{
+	matrix = glm::ortho( left, right, bottom, top, nearClipPlane, farClipPlane );
+}
+
+/*
+==================
+S_MatrixLookAt
+==================
+*/
+FORCEINLINE matrix_t S_MatrixLookAt( const vec3_t& location, const vec3_t& direction, const vec3_t& axisUp )
+{
+	matrix_t		result;
+	S_MatrixLookAt( location, direction, axisUp, result );
+	return result;
+}
+
+/*
+==================
+S_MatrixLookAt
+==================
+*/
+FORCEINLINE void S_MatrixLookAt( const vec3_t& location, const vec3_t& direction, const vec3_t& axisUp, matrix_t& matrix )
+{
+	matrix = glm::lookAt( location, direction, axisUp );
+}
+
 #endif // !MATH_INL

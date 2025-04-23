@@ -136,6 +136,12 @@ void S_MatrixScale( const vec3_t& scale, const matrix_t& initMatrix, matrix_t& m
 matrix_t S_MatrixScale( const vec3_t& scale, const matrix_t& initMatrix = matrix_t( 1.f ) );
 void S_MatrixInverse( const matrix_t& srcMatrix, matrix_t& destMatrix );
 matrix_t S_MatrixInverse( const matrix_t& matrix );
+matrix_t S_MatrixPerspective( float fieldOfView, float aspectRatio, float nearClipPlane, float farClipPlane );
+void S_MatrixPerspective( float fieldOfView, float aspectRatio, float nearClipPlane, float farClipPlane, matrix_t& matrix );
+matrix_t S_MatrixOrtho( float left, float right, float bottom, float top, float nearClipPlane, float farClipPlane );
+void S_MatrixOrtho( float left, float right, float bottom, float top, float nearClipPlane, float farClipPlane, matrix_t& matrix );
+matrix_t S_MatrixLookAt( const vec3_t& location, const vec3_t& direction, const vec3_t& axisUp );
+void S_MatrixLookAt( const vec3_t& location, const vec3_t& direction, const vec3_t& axisUp, matrix_t& matrix );
 
 #include "stdlib/math/math.inl"
 

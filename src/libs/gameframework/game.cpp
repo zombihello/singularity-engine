@@ -1,4 +1,5 @@
 #include "pch_gameframework.h"
+#include "studiorender/istudiorender.h"
 #include "gameframework/igame.h"
 
 //-----------------------------------------------------------------------------
@@ -13,6 +14,13 @@ bool CGame::Init( createInterfaceFn_t pFactory )
 {
 	// Connect StdLib
 	if ( !ConnectStdLib( pFactory ) )
+	{
+		return false;
+	}
+
+	// Get the studiorender
+	g_pStudioRender = ( IStudioRender* )pFactory( STUDIORENDER_INTERFACE_VERSION );
+	if ( !g_pStudioRender )
 	{
 		return false;
 	}

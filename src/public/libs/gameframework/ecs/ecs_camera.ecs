@@ -1,0 +1,36 @@
+module Camera;
+using "gameframework/ecs/ecs_movement.gen.h";
+
+component Camera
+{
+	defaults:
+		bAutoViewData( false ),
+		fieldOfView( 90.f ),
+		nearClipPlane( 0.01f ),
+		farClipPlane( 524288.0 * 0.5 ),
+		aspectRatio( 1.777778f );
+
+	bool	bAutoViewData;
+	float	fieldOfView;
+	float	nearClipPlane;
+	float	farClipPlane;
+	float	aspectRatio;
+}
+
+component CameraActive
+{}
+
+system CameraMovement
+{
+	stage:		on_start;
+	write:		Transform	transform;
+	include:	Camera, CameraActive;
+}
+
+system CameraSendToRender
+{
+	stage: 		on_store;
+	read:		Transform	transform,
+				Camera		camera;
+	include:	CameraActive;
+}
