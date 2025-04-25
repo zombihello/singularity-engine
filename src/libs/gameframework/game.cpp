@@ -1,5 +1,7 @@
 #include "pch_gameframework.h"
+#include "appframework/iwindowmgr.h"
 #include "studiorender/istudiorender.h"
+#include "resourcesystem/iresourcesystem.h"
 #include "gameframework/igame.h"
 
 //-----------------------------------------------------------------------------
@@ -18,9 +20,23 @@ bool CGame::Init( createInterfaceFn_t pFactory )
 		return false;
 	}
 
-	// Get the studiorender
+	// Get the window manager
+	g_pWindowMgr = ( IWindowMgr* )pFactory( WINDOWMGR_INTERFACE_VERSION );
+	if ( !g_pWindowMgr )
+	{
+		return false;
+	}
+
+	// Get StudioRender
 	g_pStudioRender = ( IStudioRender* )pFactory( STUDIORENDER_INTERFACE_VERSION );
 	if ( !g_pStudioRender )
+	{
+		return false;
+	}
+
+	// Get the resource system
+	g_pResourceSystem = ( IResourceSystem* )pFactory( RESOURCESYSTEM_INTERFACE_VERSION );
+	if ( !g_pResourceSystem )
 	{
 		return false;
 	}
@@ -37,6 +53,9 @@ CGame::Shutdown
 */
 void CGame::Shutdown()
 {
+	// Unregister all render objects
+	g_pStudioRender->UnregisterAllObjects();
+
 	// Unregister cvars and disconnect StdLib
 	ConVar_Unregister();
 	DisconnectStdLib();

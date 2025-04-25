@@ -15,6 +15,16 @@ class CStudioViewport;
 
 
 //-----------------------------------------------------------------------------
+// Studio scene view
+//-----------------------------------------------------------------------------
+struct studioSceneView_t
+{
+	matrix_t	viewMatrix;
+	matrix_t	projectionMatrix;
+};
+
+
+//-----------------------------------------------------------------------------
 // Studio render
 //-----------------------------------------------------------------------------
 class CStudioRender : public CBaseAppSystem<IStudioRender>
@@ -36,13 +46,17 @@ public:
 	// IStudioRender interface
 	// Sets which API we should be using. Has to be done before connect
 	virtual void SetStudioAPI( const achar* pStudioAPIDLL ) override;
+	virtual void SetCameraView( const studioCameraView_t& cameraView ) override;
 
-	// NOTE: FOR TEST ONLY!
-	virtual void DrawQuad( IMaterial* pMaterial, IStudioAPIBuffer* pVertexBuffer, IStudioAPIBuffer* pIndexBuffer ) override;
+	// Register and unregister render objects for rendering
+	virtual void RegisterObject( IStudioRenderObject* pRenderObject ) override;
+	virtual void UnregisterObject( IStudioRenderObject* pRenderObject ) override;
+	virtual void UnregisterAllObjects() override;
 
 	virtual IStudioViewport* CreateViewport() const override;
 	virtual IStudioRenderPipelineSet* CreateRenderPipelineSet() const override;
-	virtual IStudioScene* CreateScene() const override;
+	// NOTE: FOR TEST ONLY!
+	virtual IStudioRenderObject* CreateQuadRenderObject( IMaterial* pMaterial, IStudioAPIBuffer* pVertexBuffer, IStudioAPIBuffer* pIndexBuffer ) const override;
 
 	// Returns a command buffer of the render thread. If return NULL it's mean what StudioRender don't use render thread
 	virtual IStudioCmdBuffer* GetCommandBuffer() const override;
@@ -59,11 +73,13 @@ private:
 	createInterfaceFn_t CreateStudioAPI( const achar* pStudioAPIDLL );
 	void DestroyStudioAPI();
 
-	std::string					studioAPIDLLName;
-	dllHandle_t					studioAPIHandle;
-	createInterfaceFn_t			pStudioAPIFactory;
-	createInterfaceFn_t			pAppSystemFactory;
-	CStudioRenderPassPresent	presentRenderPass;
+	std::string									studioAPIDLLName;
+	dllHandle_t									studioAPIHandle;
+	createInterfaceFn_t							pStudioAPIFactory;
+	createInterfaceFn_t							pAppSystemFactory;
+	CStudioRenderPassPresent					presentRenderPass;
+	studioSceneView_t							sceneView;
+	std::vector<TRefPtr<IStudioRenderObject>>	renderObjects;
 };
 extern CStudioRender			g_StudioRender;
 

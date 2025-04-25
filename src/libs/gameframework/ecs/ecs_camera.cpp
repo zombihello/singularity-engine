@@ -1,30 +1,41 @@
 #include "pch_gameframework.h"
-#include "studiorender/studio_scene.h"
+#include "appframework/iwindowmgr.h"
 #include "studiorender/istudiorender.h"
 #include "gameframework/ecs/ecs.h"
 #include "gameframework/ecs/ecs_camera.gen.h"
 
 /*
 ==================
-CEcsSystemCameraMovement::OnUpdate
+CEcsSystemCameraInit::OnUpdate
 ==================
 */
-void CEcsSystemCameraMovement::OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity, ecsComponentTransform_t& transform )
-{}
+void CEcsSystemCameraInit::OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity, const ecsResourceWindowMgr_t& windowMgr, ecsComponentCamera_t& camera )
+{
+	if ( camera.bAutoViewData )
+	{
+		// TODO BS yehor.pohuliaka - Implement handle resize the window
+		uint32		windowWidth;
+		uint32		windowHeight;
+		windowMgr.pWindowMgr->GetSize( windowWidth, windowHeight );
+		camera.aspectRatio = ( float )windowWidth / windowHeight;
+	}
+
+	ecsWorld.AddComponent<ecsComponentCameraInited_t>( entity );
+}
 
 /*
 ==================
-CEcsSystemCameraSendToRender::OnUpdate
+CEcsSystemUpdateCameraView::OnUpdate
 ==================
 */
-void CEcsSystemCameraSendToRender::OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity, const ecsComponentTransform_t& transform, const ecsComponentCamera_t& camera, const ecsResourceStudioScene_t& studioScene )
+void CEcsSystemUpdateCameraView::OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity, const ecsComponentTransform_t& transform, const ecsComponentCamera_t& camera, const ecsResourceStudioRender_t& studioRender )
 {
-	studioSceneCameraView_t				studioSceneCameraView = {};
-	studioSceneCameraView.location		= transform.transform.GetLocation();
-	studioSceneCameraView.rotation		= transform.transform.GetRotation();
-	studioSceneCameraView.fieldOfView	= camera.fieldOfView;
-	studioSceneCameraView.nearClipPlane = camera.nearClipPlane;
-	studioSceneCameraView.farClipPlane	= camera.farClipPlane;
-	studioSceneCameraView.aspectRatio	= camera.aspectRatio;
-	studioScene.pStudioScene->SetView( studioSceneCameraView );
+	studioCameraView_t				studioCameraView = {};
+	studioCameraView.location		= transform.transform.GetLocation();
+	studioCameraView.rotation		= transform.transform.GetRotation();
+	studioCameraView.fieldOfView	= camera.fieldOfView;
+	studioCameraView.nearClipPlane	= camera.nearClipPlane;
+	studioCameraView.farClipPlane	= camera.farClipPlane;
+	studioCameraView.aspectRatio	= camera.aspectRatio;
+	studioRender.pStudioRender->SetCameraView( studioCameraView );
 }

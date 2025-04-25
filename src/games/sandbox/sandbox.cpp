@@ -8,7 +8,10 @@
 #include "resourcesystem/iresourcesystem.h"
 #include "gameframework/igame.h"
 #include "gameframework/ecs/ecs.h"
+#include "gameframework/ecs/ecs_common.gen.h"
 #include "sandbox/ecs/ecs_testdraw.gen.h"
+#include "gameframework/ecs/ecs_movement.gen.h"
+#include "gameframework/ecs/ecs_camera.gen.h"
 
 //-----------------------------------------------------------------------------
 // Singularity Sandbox game
@@ -54,25 +57,8 @@ bool CSandboxGame::Init( createInterfaceFn_t pFactory )
 		return false;
 	}
 
-	// Get StudioRender
-	g_pStudioRender = ( IStudioRender* )pFactory( STUDIORENDER_INTERFACE_VERSION );
-	if ( !g_pStudioRender )
-	{
-		return false;
-	}
-
-	// Get the resource system
-	g_pResourceSystem = ( IResourceSystem* )pFactory( RESOURCESYSTEM_INTERFACE_VERSION );
-	if ( !g_pResourceSystem )
-	{
-		return false;
-	}
-	
 	// Load a quad material
 	pQuadMaterial = g_pResourceSystem->FindOrLoadResource( "materials/nelson", RESOURCE_TYPE_MATERIAL );
-
-	ecsWorld.RegisterModule<ecsTestDrawModule_t>();
-
 	class CInitQuadHelper
 	{
 	public:
@@ -97,16 +83,36 @@ bool CSandboxGame::Init( createInterfaceFn_t pFactory )
 										{
 											CInitQuadHelper::R_InitQuad( pGame );
 										} );
-
 	Studio_FlushRenderCommands();
 	
-	ecsQuadComponent_t				quadComponent;
+
+
+	// Initialize the ECS world
+	ecsWorld.RegisterModule<ecsModuleCommon_t>();
+	ecsWorld.RegisterModule<ecsModuleRender_t>();
+	ecsWorld.RegisterModule<ecsModuleMovement_t>();
+	ecsWorld.RegisterModule<ecsModuleCamera_t>();
+	ecsWorld.RegisterModule<ecsModuleTestDraw_t>();
+
+	ecsWorld.SetResource( ecsResourceWindowMgr_t{ g_pWindowMgr } );
+	ecsWorld.SetResource( ecsResourceStudioRender_t{ g_pStudioRender } );
+
+	// Create a entity with quad component
+	ecsComponentQuad_t				quadComponent;
 	quadComponent.pVertexBuffer		= pQuadVertexBuffer;
 	quadComponent.pIndexBuffer		= pQuadIndexBuffer;
 	quadComponent.pMaterial			= pQuadMaterial;
 	ecsEntity_t						quadEntity = ecsWorld.CreateEntity( "quad" );
 	ecsWorld.SetComponent( quadEntity, std::move( quadComponent ) );
-	ecsWorld.AddComponent<ecsDrawableComponent_t>( quadEntity );
+	ecsWorld.AddComponent<ecsComponentTransform_t>( quadEntity );
+	
+	// Create a player entity
+	ecsEntity_t						playerEntity = ecsWorld.CreateEntity( "player" );
+	ecsComponentCamera_t			cameraComponent = {};
+	cameraComponent.bAutoViewData	= true;
+	ecsWorld.AddComponent<ecsComponentTransform_t>( playerEntity );
+	ecsWorld.SetComponent<ecsComponentCamera_t>( playerEntity, std::move( cameraComponent ) );
+	ecsWorld.AddComponent<ecsComponentCameraActive_t>( playerEntity );
 	return true;
 }
 
@@ -147,10 +153,13 @@ const achar* CSandboxGame::GetGameDescription() const
 
 /*
 ==================
-CSandboxGame::GetGameDescription
+CEcsSystemQuadDraw::OnUpdate
 ==================
 */
-void CEcsQuadDrawSystem::OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity, const ecsQuadComponent_t& quad )
+void CEcsSystemQuadInit::OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity, const ecsComponentQuad_t& quad, const ecsResourceStudioRender_t& studioRender )
 {
-	g_pStudioRender->DrawQuad( *quad.pMaterial, quad.pVertexBuffer, quad.pIndexBuffer );
+	ecsComponentStudioRenderObject_t					studioRenderObjectComponent;
+	studioRenderObjectComponent.pStudioRenderObject		= studioRender.pStudioRender->CreateQuadRenderObject( *quad.pMaterial, quad.pVertexBuffer, quad.pIndexBuffer );
+	studioRender.pStudioRender->RegisterObject( studioRenderObjectComponent.pStudioRenderObject );
+	ecsWorld.SetComponent( entity, std::move( studioRenderObjectComponent ) );
 }

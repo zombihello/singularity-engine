@@ -6,7 +6,7 @@
 #include "studiorender/studio_viewport.h"
 #include "studiorender/studio_renderpipelineset.h"
 #include "studiorender/studio_vertexdeclarations.h"
-#include "studiorender/studio_scene.h"
+#include "studiorender/studio_renderobject_quad.h"
 #include "studiorender/studiorender.h"
 
 CStudioRender		g_StudioRender;
@@ -185,18 +185,55 @@ void CStudioRender::SetStudioAPI( const achar* pStudioAPIDLL )
 
 /*
 ==================
-CStudioRender::DrawQuad
+CStudioRender::SetCameraView
 ==================
 */
-void CStudioRender::DrawQuad( IMaterial* pMaterial, IStudioAPIBuffer* pVertexBuffer, IStudioAPIBuffer* pIndexBuffer )
+void CStudioRender::SetCameraView( const studioCameraView_t& cameraView )
 {
-	UNIQUE_RENDER_COMMAND_THREEPARAMETER( CStudioRenderCmd_DrawQuad,
-										  TRefPtr<IMaterial>, pMaterial, pMaterial,
-										  TRefPtr<IStudioAPIBuffer>, pVertexBuffer, pVertexBuffer,
-										  TRefPtr<IStudioAPIBuffer>, pIndexBuffer, pIndexBuffer,
-										  {
-												g_StudioRender.presentRenderPass.R_SubmitQuad( pMaterial, pVertexBuffer, pIndexBuffer );
-										} );
+	// Calculate a view matrix
+	vec3_t		targetDirection = cameraView.rotation * g_vectorForward;
+	vec3_t		axisUp			= cameraView.rotation * g_vectorUp;
+	S_MatrixLookAt( cameraView.location, cameraView.location + targetDirection, axisUp, sceneView.viewMatrix );
+
+	// Calculate a perspective matrix
+	S_MatrixPerspective( cameraView.fieldOfView, cameraView.aspectRatio, cameraView.nearClipPlane, cameraView.farClipPlane, sceneView.projectionMatrix );
+}
+
+/*
+==================
+CStudioRender::RegisterObject
+==================
+*/
+void CStudioRender::RegisterObject( IStudioRenderObject* pRenderObject )
+{
+	renderObjects.emplace_back( pRenderObject );
+}
+
+/*
+==================
+CStudioRender::UnregisterObject
+==================
+*/
+void CStudioRender::UnregisterObject( IStudioRenderObject* pRenderObject )
+{
+	for ( uint32 renderObjectIdx = 0, numRenderObjects = ( uint32 )renderObjects.size(); renderObjectIdx < numRenderObjects; ++renderObjectIdx )
+	{
+		if ( renderObjects[renderObjectIdx] == pRenderObject )
+		{
+			renderObjects.erase( renderObjects.begin() + renderObjectIdx );
+			return;
+		}
+	}
+}
+
+/*
+==================
+CStudioRender::UnregisterAllObjects
+==================
+*/
+void CStudioRender::UnregisterAllObjects()
+{
+	renderObjects.clear();
 }
 
 /*
@@ -221,12 +258,12 @@ IStudioRenderPipelineSet* CStudioRender::CreateRenderPipelineSet() const
 
 /*
 ==================
-CStudioRender::CreateScene
+CStudioRender::CreateQuadRenderObject
 ==================
 */
-IStudioScene* CStudioRender::CreateScene() const
+IStudioRenderObject* CStudioRender::CreateQuadRenderObject( IMaterial* pMaterial, IStudioAPIBuffer* pVertexBuffer, IStudioAPIBuffer* pIndexBuffer ) const
 {
-	return new CStudioScene();
+	return new CStudioRenderObjectQuad( pVertexBuffer, pIndexBuffer, pMaterial );
 }
 
 /*
@@ -249,6 +286,7 @@ void CStudioRender::EndFrame()
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 	Assert( Sys_IsInMainThread() );
+	// TODO BS yehor.pohuliaka - Implement here synchronization the renderObjects between the main thread and the render thread
 }
 
 /*
@@ -261,7 +299,8 @@ void CStudioRender::R_DrawFrame( CStudioViewport* pViewport )
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 	Assert( Studio_IsInRenderThread() );
-	presentRenderPass.R_DrawPass( pViewport );
+	Assert( !renderObjects.empty() );
+	presentRenderPass.R_DrawPass( pViewport, ( CStudioRenderObjectQuad* )renderObjects[0].GetPtr() );
 }
 
 /*

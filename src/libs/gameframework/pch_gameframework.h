@@ -1,8 +1,3 @@
-/**
- * @file
- * @addtogroup gameframework gameframework
- */
-
 #include <cstdlib>
 #include <string>
 #include <vector>

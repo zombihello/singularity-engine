@@ -2,6 +2,7 @@
 #define STUDIO_RENDERPASS_PRESENT_H
 
 #include "materialsystem/imaterial.h"
+#include "studiorender/studio_renderobject_quad.h"
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -21,22 +22,10 @@ public:
 	void Init();
 	void Shutdown();
 
-	// NOTE: FOR TEST ONLY
-	FORCEINLINE void R_SubmitQuad( IMaterial* pMaterial, IStudioAPIBuffer* pVertexBuffer, IStudioAPIBuffer* pIndexBuffer )
-	{
-		pQuadVertexBuffer	= pVertexBuffer;
-		pQuadIndexBuffer	= pIndexBuffer;
-		pQuadMaterial		= pMaterial;
-	}
-
-	void R_DrawPass( CStudioViewport* pViewport );
+	void R_DrawPass( CStudioViewport* pViewport, CStudioRenderObjectQuad* pQuad );
 	static TRefPtr<IStudioAPIRenderPipeline> R_CreateStudioAPIRenderPipeline( CStudioViewport* pViewport, IStudioAPIBoundShaderState* pStudioAPIBoundShaderState );
 
 private:
-	// --- FOR TEST ONLY! ---
-	TRefPtr<IStudioAPIBuffer>	pQuadVertexBuffer;
-	TRefPtr<IStudioAPIBuffer>	pQuadIndexBuffer;
-	TRefPtr<IMaterial>			pQuadMaterial;
 };
 
 #endif // !STUDIO_RENDERPASS_PRESENT_H

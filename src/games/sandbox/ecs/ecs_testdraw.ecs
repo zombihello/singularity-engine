@@ -1,4 +1,5 @@
 module TestDraw;
+using "gameframework/ecs/ecs_render.gen.h";
 
 component Quad
 {
@@ -7,12 +8,10 @@ component Quad
 	TResourcePtr<IMaterial>		pMaterial;
 }
 
-component Drawable
-{}
-
-system QuadDraw
+system QuadInit
 {
-	stage: 		on_store;
-	read: 		Quad quad;
-	include: 	Drawable;
+	stage: 				on_update;
+	read: 				Quad quad;
+	read_resource:		StudioRender	studioRender;
+	exclude: 			StudioRenderObject;
 }

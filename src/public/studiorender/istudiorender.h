@@ -12,7 +12,21 @@ class IStudioViewport;
 class IStudioRenderPipelineSet;
 class IMaterial;
 class IStudioAPIBuffer;
-class IStudioScene;
+class IStudioRenderObject;
+
+
+//-----------------------------------------------------------------------------
+// Studio camera view
+//-----------------------------------------------------------------------------
+struct studioCameraView_t
+{
+	vec3_t	location;
+	quat_t	rotation;
+	float	fieldOfView;
+	float	nearClipPlane;
+	float	farClipPlane;
+	float	aspectRatio;
+};
 
 
 //-----------------------------------------------------------------------------
@@ -24,13 +38,17 @@ class IStudioRender : public IAppSystem
 public:
 	// Sets which API we should be using. Has to be done before connect
 	virtual void SetStudioAPI( const achar* pStudioAPIDLL ) = 0;
+	virtual void SetCameraView( const studioCameraView_t& cameraView ) = 0;
 
-	// NOTE: FOR TEST ONLY!
-	virtual void DrawQuad( IMaterial* pMaterial, IStudioAPIBuffer* pVertexBuffer, IStudioAPIBuffer* pIndexBuffer ) = 0;
+	// Register and unregister render objects for rendering
+	virtual void RegisterObject( IStudioRenderObject* pRenderObject ) = 0;
+	virtual void UnregisterObject( IStudioRenderObject* pRenderObject ) = 0;
+	virtual void UnregisterAllObjects() = 0;
 
 	virtual IStudioViewport* CreateViewport() const = 0;
 	virtual IStudioRenderPipelineSet* CreateRenderPipelineSet() const = 0;
-	virtual IStudioScene* CreateScene() const = 0;
+	// NOTE: FOR TEST ONLY!
+	virtual IStudioRenderObject* CreateQuadRenderObject( IMaterial* pMaterial, IStudioAPIBuffer* pVertexBuffer, IStudioAPIBuffer* pIndexBuffer ) const = 0;
 
 	// Returns a command buffer of the render thread. If return NULL it's mean what StudioRender don't use render thread
 	virtual IStudioCmdBuffer* GetCommandBuffer() const = 0;

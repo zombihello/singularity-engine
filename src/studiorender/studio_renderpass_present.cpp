@@ -19,21 +19,19 @@ CStudioRenderPassPresent::Shutdown
 ==================
 */
 void CStudioRenderPassPresent::Shutdown()
-{
-	pQuadMaterial		= NULL;
-	pQuadIndexBuffer	= NULL;
-	pQuadVertexBuffer	= NULL;
-}
+{}
 
 /*
 ==================
 CStudioRenderPassPresent::R_DrawPass
 ==================
 */
-void CStudioRenderPassPresent::R_DrawPass( CStudioViewport* pViewport )
+void CStudioRenderPassPresent::R_DrawPass( CStudioViewport* pViewport, CStudioRenderObjectQuad* pQuad )
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
-	Assert( pQuadMaterial && pQuadVertexBuffer && pQuadIndexBuffer );
+	IStudioAPIBuffer*				pQuadVertexBuffer		= pQuad->GetStudioAPIVertexBuffer();
+	IStudioAPIBuffer*				pQuadIndexBuffer		= pQuad->GetStudioAPIIndexBuffer();
+	IMaterial*						pQuadMaterial			= pQuad->GetMaterial();
 	ivec2_t							viewportSize			= pViewport->GetSize();
 	IStudioAPISwapChain*			pStudioAPISwapChain		= pViewport->GetStudioAPISwapChain();
 	TRefPtr<IStudioAPICmdContext>	pGraphicsCmdContext		= g_pStudioAPI->GetImmediateCmdContext( STUDIOAPI_QUEUE_TYPE_GRAPHICS );

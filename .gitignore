@@ -15,6 +15,9 @@
 **/__pycache__/**
 compile_commands.json
 
+# Auto generated files
+*.gen.h
+
 # Game folder and compiled content
 *.stex_c
 *.smat_c
@@ -24,3 +27,6 @@ compile_commands.json
 /game/**/shaders
 /game/licenses
 /game/logs
+
+# Backup files
+*.bak

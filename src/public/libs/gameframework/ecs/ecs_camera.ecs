@@ -1,5 +1,6 @@
 module Camera;
 using "gameframework/ecs/ecs_common.gen.h";
+using "gameframework/ecs/ecs_render.gen.h";
 using "gameframework/ecs/ecs_movement.gen.h";
 
 component Camera
@@ -18,21 +19,25 @@ component Camera
 	float	aspectRatio;
 }
 
+component CameraInited
+{}
+
 component CameraActive
 {}
 
-system CameraMovement
+system CameraInit
 {
-	stage:		on_start;
-	write:		Transform	transform;
-	include:	Camera, CameraActive;
+	stage:				on_update;
+	write:				Camera		camera;
+	read_resource:		WindowMgr	windowMgr;
+	exclude:			CameraInited;
 }
 
-system CameraSendToRender
+system UpdateCameraView
 {
 	stage: 				on_store;
 	read:				Transform		transform,
 						Camera			camera;
-	read_resource:		StudioScene		studioScene;
-	include:			CameraActive;
+	read_resource:		StudioRender	studioRender;
+	include:			CameraInited, CameraActive;
 }

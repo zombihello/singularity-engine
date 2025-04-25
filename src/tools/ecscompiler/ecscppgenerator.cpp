@@ -346,7 +346,7 @@ void CEcsCppGenerator::GenerateRegistrar( CEcsStubModule* pEcsStubModule )
 			for ( uint32 systemFilterType = 0; systemFilterType < ECS_SYSTEM_NUM_FILTER_TYPES; ++systemFilterType )
 			{
 				const std::vector<TRefPtr<CEcsStubSystemFilter>>&		filters = pEcsStubSystem->GetFilters( ( ecsSystemFilterType_t )systemFilterType );
-				if ( systemFilterType != 0 && !filters.empty() )
+				if ( systemFilterType != 0 && !filters.empty() && !filterFuncs.empty() )
 				{
 					filterFuncs += "\n";
 				}
