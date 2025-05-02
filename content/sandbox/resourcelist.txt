@@ -4,6 +4,8 @@
 		"materials/nelson.smat",
 		"materials/veh_btr_br.stex",
 		"materials/veh_btr_br.smat",
-		"models/veh_btr_br.smdl"
+		"models/veh_btr_br.smdl",
+		"entities/test_quad.sent",
+		"entities/player.sent"
 	]
 }

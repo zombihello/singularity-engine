@@ -6,36 +6,13 @@
 #include "materialsystem/ishader.h"
 #include "materialsystem/materialsystem.h"
 
-//-----------------------------------------------------------------------------
-// Calculate a hash for a string to use it in std::unordered_map
-//-----------------------------------------------------------------------------
-struct insensitiveStringHash_t
-{
-	FORCEINLINE std::size_t operator()( const achar* pString ) const
-	{
-		return FastHashFromString( pString );
-	}
-};
-
-
-//-----------------------------------------------------------------------------
-// Comparator for std::unordered_map to insensitive compre strings
-//-----------------------------------------------------------------------------
-struct insensitiveCompareString_t
-{
-	FORCEINLINE bool operator()( const achar* pLeft, const achar* pRight ) const
-	{
-		return !S_Stricmp( pLeft, pRight );
-	}
-};
-
 
 //-----------------------------------------------------------------------------
 // Information about a shader library
 //-----------------------------------------------------------------------------
 struct shaderLibInfo_t
 {
-	typedef std::unordered_map<const achar*, IShader*, insensitiveStringHash_t, insensitiveCompareString_t>		shadersDict_t;
+	typedef std::unordered_map<const achar*, IShader*, stlInsensitiveStringHash_t, stlInsensitiveCompareString_t>		shadersDict_t;
 
 	std::string									fileName;
 	dllHandle_t									moduleHandle;

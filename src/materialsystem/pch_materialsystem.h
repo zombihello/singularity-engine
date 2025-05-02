@@ -4,6 +4,7 @@
 
 #include "interfaces/interfaces.h"
 #include "stdlib/convar.h"
+#include "stdlib/stl.h"
 #include "core/core.h"
 #include "core/debug.h"
 #include "core/profile.h"

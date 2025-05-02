@@ -136,6 +136,8 @@ model_tool                  = "tools/model_tool/"
 gameframework               = "libs/gameframework"
 ecscompiler                 = "tools/ecscompiler/"
 parserlib                   = "libs/parserlib/"
+sentdoc                     = "libs/sentdoc/"
+entitydesc_tool             = "tools/entitydesc_tool/"
 
 --------------- THIRD PARTIES ---------
 include( root .. "/thirdparty/thirdparty.lua" )
@@ -266,10 +268,10 @@ workspace( workspaceName )
             include( smdldoc )
             include( gameframework )
             include( parserlib )
+            include( sentdoc )
             group "/Engine/Libraries/ThirdParty"
                 ThirdParty.SetupProjects()
     group "/Tools"
-        include( ecscompiler )
         group "/Tools/Shader Compiler"
             include( shadercompiler )
 			include( shadercompiler_vk )
@@ -278,6 +280,9 @@ workspace( workspaceName )
             include( texture_tool )
 			include( material_tool )
             include( model_tool )
+            include( entitydesc_tool )
+        group "/Tools/ECS Compiler"
+            include( ecscompiler )
 	group "/Games"
 		include( "games/" .. game .. "/" )
         include( "games/" .. game .. "_launcher/" )

@@ -1,5 +1,5 @@
-#ifndef ECS_INL
-#define ECS_INL
+#ifndef ECS_CORE_INL
+#define ECS_CORE_INL
 
 /*
 ==================

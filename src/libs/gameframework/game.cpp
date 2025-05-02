@@ -2,7 +2,11 @@
 #include "appframework/iwindowmgr.h"
 #include "studiorender/istudiorender.h"
 #include "resourcesystem/iresourcesystem.h"
-#include "gameframework/igame.h"
+#include "gameframework/ecs/ecs_core.h"
+#include "gameframework/ecs/ecs_common.gen.h"
+#include "gameframework/ecs/ecs_movement.gen.h"
+#include "gameframework/ecs/ecs_camera.gen.h"
+#include "gameframework/game.h"
 
 //-----------------------------------------------------------------------------
 // Base game implementation
@@ -43,6 +47,18 @@ bool CGame::Init( createInterfaceFn_t pFactory )
 
 	// Register cvars in the system
 	ConVar_Register( FCVAR_GAMEDLL );
+
+	// Register GameFramework modules
+	ecsWorld.RegisterModule<ecsModuleCommon_t>();
+	ecsWorld.RegisterModule<ecsModuleRender_t>();
+	ecsWorld.RegisterModule<ecsModuleMovement_t>();
+	ecsWorld.RegisterModule<ecsModuleCamera_t>();
+
+	ecsWorld.SetResource( ecsResourceWindowMgr_t{ g_pWindowMgr } );
+	ecsWorld.SetResource( ecsResourceStudioRender_t{ g_pStudioRender } );
+
+	// Initialize all resource factories
+	ecsEntityDescFactory.Init();
 	return true;
 }
 
@@ -56,6 +72,12 @@ void CGame::Shutdown()
 	// Unregister all render objects
 	g_pStudioRender->UnregisterAllObjects();
 
+	// Reset the ECS world
+	ecsWorld.Reset();
+
+	// Shutdown all resource factories
+	ecsEntityDescFactory.Shutdown();
+
 	// Unregister cvars and disconnect StdLib
 	ConVar_Unregister();
 	DisconnectStdLib();
@@ -67,7 +89,9 @@ CGame::FrameUpdate
 ==================
 */
 void CGame::FrameUpdate()
-{}
+{
+	ecsWorld.Update( 0.f );
+}
 
 
 //-----------------------------------------------------------------------------

@@ -37,6 +37,7 @@ public:
 	// NOTE: For use StdLib must be connected by ConnectStdLib
 	bool LoadFromFile( const achar* pPath );
 	bool SaveFile( const achar* pPath );
+	void Clear();
 
 	void SetData( const std::vector<smdlVertex_t>& vertices, const std::vector<uint32>& indices, const std::vector<smdlSurface_t>& surfaces, const std::vector<std::string>& materials );
 	void SetData( std::vector<smdlVertex_t>& vertices, std::vector<uint32>& indices, std::vector<smdlSurface_t>& surfaces, std::vector<std::string>& materials );

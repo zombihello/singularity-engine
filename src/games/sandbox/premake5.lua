@@ -41,7 +41,8 @@ project "sandbox"
         "core",
         "stdlib",
 		"interfaces",
-        "gameframework"
+        "gameframework",
+        "sentdoc"
     }
 
 	----------- LINK THIRD PARTIES -----------------

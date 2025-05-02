@@ -173,4 +173,15 @@ FORCEINLINE bool ResourceSystem_IsValidClassForType<ITexture>( resourceType_t ty
 	return type == RESOURCE_TYPE_TEXTURE;
 }
 
+/*
+==================
+ResourceSystem_IsValidClassForType
+==================
+*/
+template<>
+FORCEINLINE bool ResourceSystem_IsValidClassForType<IEntityDesc>( resourceType_t type )
+{
+	return type == RESOURCE_TYPE_ENTITY_DESC;
+}
+
 #endif // !IRESOURCE_INL

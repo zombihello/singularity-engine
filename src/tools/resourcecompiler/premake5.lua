@@ -29,7 +29,8 @@ project "resourcecompiler"
         "interfaces",
 		"smatdoc",
 		"stexdoc",
-        "smdldoc"
+        "smdldoc",
+        "sentdoc"
     }
 
     dependson   {
@@ -37,7 +38,8 @@ project "resourcecompiler"
 		"engine",
 		"texture_tool",
 		"material_tool",
-        "model_tool"
+        "model_tool",
+        "entitydesc_tool"
     }
 
     ----------- LINK THIRD PARTIES -----------------

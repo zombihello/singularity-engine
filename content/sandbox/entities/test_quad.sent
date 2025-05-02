@@ -1,0 +1,7 @@
+{
+	"output-dir": "//BASE_PATH/sandbox/entities/",
+	"components": [
+		{ "type": "transform" 	},
+		{ "type": "quad" 		}
+	]
+}

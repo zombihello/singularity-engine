@@ -109,6 +109,7 @@ bool CSMDLCompiledModelDoc::LoadFromFile( const achar* pPath )
 		Error( "SMDLDoc: Invalid version format in '%s'. Expected %i, received %i", pPath, s_SMDLVersion, version );
 		return false;
 	}
+	Clear();
 
 	// Read materials
 	uint32		numMaterials = 0;

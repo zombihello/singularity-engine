@@ -67,9 +67,6 @@ bool CSMATSourceMaterialDoc::LoadFromFile( const achar* pPath )
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 	Assert( g_pFileSystem );
 
-	// Clear the material
-	Clear();
-
 	// Try to open a file
 	TRefPtr<IStreamDataReader>	pFile = g_pFileSystem->CreateFileReader( pPath );
 	if ( !pFile )
@@ -107,7 +104,6 @@ bool CSMATSourceMaterialDoc::LoadFromBuffer( const achar* pBuffer )
 {
 	// Clear the material
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-	Clear();
 
 	// Load JSON from buffer
 	CJsonDoc		jsonMaterial;
@@ -530,7 +526,7 @@ bool CSMATSourceMaterialDoc::SaveFile( const achar* pPath )
 	TRefPtr<IStreamDataWriter>	pFile = g_pFileSystem->CreateFileWriter( pPath );
 	if ( !pFile )
 	{
-		Error( "SMATDoc: Failed to open file '%s' for save a SMT material", pPath );
+		Error( "SMATDoc: Failed to open file '%s' for save a SMAT material", pPath );
 		return false;
 	}
 

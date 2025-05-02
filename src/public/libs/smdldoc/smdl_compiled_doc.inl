@@ -3,6 +3,19 @@
 
 /*
 ==================
+CSMDLCompiledModelDoc::Clear
+==================
+*/
+FORCEINLINE void CSMDLCompiledModelDoc::Clear()
+{
+	vertices.clear();
+	indices.clear();
+	surfaces.clear();
+	materials.clear();
+}
+
+/*
+==================
 CSMDLCompiledModelDoc::SetData
 ==================
 */

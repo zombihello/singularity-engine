@@ -6,12 +6,15 @@
 #include "materialsystem/imaterial.h"
 #include "materialsystem/imaterialvar.h"
 #include "resourcesystem/iresourcesystem.h"
-#include "gameframework/igame.h"
-#include "gameframework/ecs/ecs.h"
+#include "gameframework/game.h"
+#include "gameframework/ientity.h"
+#include "gameframework/ientitydesc.h"
+#include "gameframework/ecs/ecs_core.h"
 #include "gameframework/ecs/ecs_common.gen.h"
 #include "sandbox/ecs/ecs_testdraw.gen.h"
 #include "gameframework/ecs/ecs_movement.gen.h"
 #include "gameframework/ecs/ecs_camera.gen.h"
+#include "gameframework/ecs/ecs_component_factory.h"
 
 //-----------------------------------------------------------------------------
 // Singularity Sandbox game
@@ -23,19 +26,79 @@ public:
 	virtual bool Init( createInterfaceFn_t pFactory ) override;
 	virtual void Shutdown() override;
 
-	virtual void FrameUpdate() override;
-
 	virtual const achar* GetGameDescription() const override;
 
 private:
-	TRefPtr<IStudioAPIBuffer>	pQuadVertexBuffer;
-	TRefPtr<IStudioAPIBuffer>	pQuadIndexBuffer;
-	TResourcePtr<IMaterial>		pQuadMaterial;
-	CEcsWorld					ecsWorld;
+	TRefPtr<IEntity>		pQuadEntity;
+	TRefPtr<IEntity>		pPlayerEntity;
 };
 
-EXPOSE_SINGLE_INTERFACE( CSandboxGame, IGame, GAME_INTERFACE_VERSION );
+EXPOSE_INTERFACE_FN( Game, IGame, GAME_INTERFACE_VERSION );
 EXPOSE_SINGLE_INTERFACE( CGameAppSystems, IGameAppSystems, GAME_APPSYSTEMS_INTERFACE_VERSION );
+
+static TRefPtr<IStudioAPIBuffer>	pQuadVertexBuffer;
+static TRefPtr<IStudioAPIBuffer>	pQuadIndexBuffer;
+static TResourcePtr<IMaterial>		pQuadMaterial;
+
+
+/*
+==================
+Game
+==================
+*/
+CGame* Game()
+{
+	static CSandboxGame		s_SandboxGame;
+	return &s_SandboxGame;
+}
+
+
+/*
+==================
+LoadDataFromSENTComponent
+==================
+*/
+void LoadDataFromSENTComponent( const CSENTEntityDescComponent& sentComponent, ecsComponentQuad_t& component )
+{
+	component.pVertexBuffer = pQuadVertexBuffer;
+	component.pIndexBuffer	= pQuadIndexBuffer;
+	component.pMaterial		= pQuadMaterial;
+}
+
+/*
+==================
+LoadDataFromSENTComponent
+==================
+*/
+void LoadDataFromSENTComponent( const CSENTEntityDescComponent& sentComponent, ecsComponentCamera_t& component )
+{
+	const std::vector<CSENTEntityDescVar>&		sentVars = sentComponent.GetVars();
+	for ( uint32 varIdx = 0, numVars = sentComponent.GetNumVars(); varIdx < numVars; ++varIdx )
+	{
+		const CSENTEntityDescVar&		sentVar = sentVars[varIdx];
+		const achar*					pVarName = sentVar.GetName();
+		if ( !S_Stricmp( pVarName, "bAutoViewData" ) )
+		{
+			component.bAutoViewData = sentVar.GetBoolValue();
+		}
+		else if ( !S_Stricmp( pVarName, "fieldOfView" ) )
+		{
+			component.fieldOfView = sentVar.GetFloatValue();
+		}
+		else if ( !S_Stricmp( pVarName, "nearClipPlane" ) )
+		{
+			component.nearClipPlane = sentVar.GetFloatValue();
+		}
+		else if ( !S_Stricmp( pVarName, "farClipPlane" ) )
+		{
+			component.farClipPlane = sentVar.GetFloatValue();
+		}
+		else if ( !S_Stricmp( pVarName, "aspectRatio" ) )
+		{
+			component.aspectRatio = sentVar.GetFloatValue();
+		}
+	}
+}
 
 
 /*
@@ -73,8 +136,8 @@ bool CSandboxGame::Init( createInterfaceFn_t pFactory )
 			};
 			uint16		quadIndices[] = { 0, 1, 2, 2, 3, 0 };
 
-			pGame->pQuadVertexBuffer = g_pStudioAPI->CreateBuffer( ( byte* )&quadVerteces[0], ARRAYSIZE( quadVerteces ) * sizeof( studioSimpleElementVertex_t ), sizeof( studioSimpleElementVertex_t ), STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_VERTEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
-			pGame->pQuadIndexBuffer = g_pStudioAPI->CreateBuffer( ( byte* )&quadIndices[0], ARRAYSIZE( quadIndices ) * sizeof( uint16 ), sizeof( uint16 ), STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_INDEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
+			pQuadVertexBuffer = g_pStudioAPI->CreateBuffer( ( byte* )&quadVerteces[0], ARRAYSIZE( quadVerteces ) * sizeof( studioSimpleElementVertex_t ), sizeof( studioSimpleElementVertex_t ), STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_VERTEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
+			pQuadIndexBuffer = g_pStudioAPI->CreateBuffer( ( byte* )&quadIndices[0], ARRAYSIZE( quadIndices ) * sizeof( uint16 ), sizeof( uint16 ), STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_INDEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
 		}
 	};
 
@@ -88,31 +151,17 @@ bool CSandboxGame::Init( createInterfaceFn_t pFactory )
 
 
 	// Initialize the ECS world
-	ecsWorld.RegisterModule<ecsModuleCommon_t>();
-	ecsWorld.RegisterModule<ecsModuleRender_t>();
-	ecsWorld.RegisterModule<ecsModuleMovement_t>();
-	ecsWorld.RegisterModule<ecsModuleCamera_t>();
 	ecsWorld.RegisterModule<ecsModuleTestDraw_t>();
 
-	ecsWorld.SetResource( ecsResourceWindowMgr_t{ g_pWindowMgr } );
-	ecsWorld.SetResource( ecsResourceStudioRender_t{ g_pStudioRender } );
+	ecsComponentTypes.RegisterType( "transform",	[]( const CSENTEntityDescComponent& sentComponent ) ->IEcsComponentFactory* { return new TEcsComponentFactory<ecsComponentTransform_t, NULL>( sentComponent ); } );
+	ecsComponentTypes.RegisterType( "quad",			[]( const CSENTEntityDescComponent& sentComponent ) ->IEcsComponentFactory* { return new TEcsComponentFactory<ecsComponentQuad_t, LoadDataFromSENTComponent>( sentComponent ); } );
+	ecsComponentTypes.RegisterType( "camera",		[]( const CSENTEntityDescComponent& sentComponent ) ->IEcsComponentFactory* { return new TEcsComponentFactory<ecsComponentCamera_t, LoadDataFromSENTComponent>( sentComponent ); } );
 
-	// Create a entity with quad component
-	ecsComponentQuad_t				quadComponent;
-	quadComponent.pVertexBuffer		= pQuadVertexBuffer;
-	quadComponent.pIndexBuffer		= pQuadIndexBuffer;
-	quadComponent.pMaterial			= pQuadMaterial;
-	ecsEntity_t						quadEntity = ecsWorld.CreateEntity( "quad" );
-	ecsWorld.SetComponent( quadEntity, std::move( quadComponent ) );
-	ecsWorld.AddComponent<ecsComponentTransform_t>( quadEntity );
-	
-	// Create a player entity
-	ecsEntity_t						playerEntity = ecsWorld.CreateEntity( "player" );
-	ecsComponentCamera_t			cameraComponent = {};
-	cameraComponent.bAutoViewData	= true;
-	ecsWorld.AddComponent<ecsComponentTransform_t>( playerEntity );
-	ecsWorld.SetComponent<ecsComponentCamera_t>( playerEntity, std::move( cameraComponent ) );
-	ecsWorld.AddComponent<ecsComponentCameraActive_t>( playerEntity );
+	TResourcePtr<IEntityDesc>		pQuadEntityDesc = g_pResourceSystem->FindOrLoadResource( "entities/test_quad", RESOURCE_TYPE_ENTITY_DESC );
+	pQuadEntity = pQuadEntityDesc->Create( "quad" );
+
+	TResourcePtr<IEntityDesc>		pPlayerEntityDesc = g_pResourceSystem->FindOrLoadResource( "entities/player", RESOURCE_TYPE_ENTITY_DESC );
+	pPlayerEntity = pQuadEntityDesc->Create( "player" );
 	return true;
 }
 
@@ -124,20 +173,11 @@ CSandboxGame::Shutdown
 void CSandboxGame::Shutdown()
 {
 	CGame::Shutdown();
-	ecsWorld.Reset();
+	pQuadEntity			= NULL;
+	pPlayerEntity		= NULL;
 	g_pStudioAPI		= NULL;
 	g_pStudioRender		= NULL;
 	g_pMaterialSystem	= NULL;
-}
-
-/*
-==================
-CSandboxGame::FrameUpdate
-==================
-*/
-void CSandboxGame::FrameUpdate()
-{
-	ecsWorld.Update( 0.f );
 }
 
 /*

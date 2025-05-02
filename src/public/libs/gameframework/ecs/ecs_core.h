@@ -1,5 +1,5 @@
-#ifndef ECS_H
-#define ECS_H
+#ifndef ECS_CORE_H
+#define ECS_CORE_H
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -99,6 +99,6 @@ private:
 	flecs::world	flecsWorld;
 };
 
-#include "gameframework/ecs/ecs.inl"
+#include "gameframework/ecs/ecs_core.inl"
 
-#endif // !ECS_H
+#endif // !ECS_CORE_H

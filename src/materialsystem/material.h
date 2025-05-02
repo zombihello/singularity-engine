@@ -19,10 +19,6 @@ class CMaterialVar;
 class CMaterial : public TRefCounted<IMaterial>
 {
 public:
-	CMaterial();
-	CMaterial( const CSMATCompiledMaterialDoc& smatCompiledDoc );
-	~CMaterial();
-
 	// IMaterial interface
 	virtual void R_Barrier( IStudioAPICmdList* pStudioAPICmdList ) override;
 	virtual void R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, studioRenderPassType_t renderPassType ) override;
@@ -33,6 +29,10 @@ public:
 	virtual IMaterialVar** GetVars() const override;
 	virtual const achar* GetShaderName() const override;
 	virtual IShader* GetShader() const override;
+
+	CMaterial();
+	CMaterial( const CSMATCompiledMaterialDoc& smatCompiledDoc );
+	~CMaterial();
 
 	void Clear();
 	FORCEINLINE void MarkDirtyBuffers()

@@ -16,7 +16,7 @@ import thirdparty
 INTERMEDIATE_ROOT_DIR       = "intermediate/"
 INTERMEDIATE_DEPLOY_DIR     = f"{INTERMEDIATE_ROOT_DIR}/deploy/"
 PREMAKE5_ACTION             = premake5.GetActionToGenerateProjectFiles()
-TOOL_PROJECTS               = ["core", "engine", "filesystem", "material_tool", "model_tool", "resourcecompiler", "texture_tool", "shadercompiler", "shadercompiler_vk", "ecscompiler"]
+TOOL_PROJECTS               = ["core", "engine", "filesystem", "material_tool", "model_tool", "resourcecompiler", "texture_tool", "shadercompiler", "shadercompiler_vk", "ecscompiler", "entitydesc_tool"]
 ENGINE_PROJECTS             = ["core", "engine", "filesystem", "inputsystem", "launcher", "materialsystem", "resourcesystem", "studioapi_vk", "studiorender", "stdshaders"]
 ENGINE_SHADERLISTS          = ["src/materialsystem/shaderlist.makefile", "src/materialsystem/stdshaders/shaderlist.makefile"]
 ENGINE_CPP_SHADERLISTS      = [("src/materialsystem/shaderlist.makefile", "materialsystem/"), ("src/materialsystem/stdshaders/shaderlist.makefile", "materialsystem/stdshaders/")]
@@ -199,7 +199,7 @@ class Builder:
         self.AddStep_Custom( step.Step( "[Build] Copy Third Party Files", _CopyThirdPartyFiles,
                                        third_party=self.sdkThirdParty,
                                        build_dir=f"{self.repoRoot}/game/",
-                                       is_copy_tools=False ) )
+                                       is_copy_tools=True ) )
 
     # Copy third party files
     def AddStep_CopyThirdPartyFiles( self, name, isCopyTools=False, gameDir=None ):

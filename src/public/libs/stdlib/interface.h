@@ -43,7 +43,7 @@ createInterfaceFn_t Sys_GetFactoryThis();
 // Helper macros to expose interfaces
 //-----------------------------------------------------------------------------
 #define EXPOSE_INTERFACE_FN( FunctionName, InterfaceName, VersionName ) \
-	static interfaceReg_t		__s_Create##InterfaceName##_reg( FunctionName, VersionName );
+	static interfaceReg_t		__s_Create##InterfaceName##_reg( ( instantiateInterfaceFn_t )FunctionName, VersionName );
 
 #define EXPOSE_INTERFACE( ClassName, InterfaceName, VersionName ) \
 	static void*				__Create##ClassName##_interface() { return ( InterfaceName* )new ClassName; } \

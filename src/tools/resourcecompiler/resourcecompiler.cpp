@@ -5,12 +5,14 @@
 #include "stexdoc/stex_source_doc.h"
 #include "smatdoc/smat_source_doc.h"
 #include "smdldoc/smdl_source_doc.h"
+#include "sentdoc/sent_source_doc.h"
 #include "filesystem/ifilesystem.h"
 #include "engine/icvar.h"
 #include "resourcesystem/iresource.h"
 #include "tools/resource_tools/itexture_tool.h"
 #include "tools/resource_tools/imaterial_tool.h"
 #include "tools/resource_tools/imodel_tool.h"
+#include "tools/resource_tools/ientitydesc_tool.h"
 #include "appframework/iappsystemgroup.h"
 
 // Table of resource types by script file extension
@@ -18,16 +20,18 @@ static const achar* s_pScriptFileExtensions[] =
 {
 	"smat",		// RESOURCE_TYPE_MATERIAL
 	"stex",		// RESOURCE_TYPE_TEXTURE
-	"smdl"		// RESOURCE_TYPE_MODEL
+	"smdl",		// RESOURCE_TYPE_MODEL
+	"sent"		// RESOURCE_TYPE_ENTITY_DESC
 };
 static_assert( RESOURCE_NUM_TYPES == ARRAYSIZE( s_pScriptFileExtensions ), "Array size 's_pScriptFileExtensions' must be equal to RESOURCE_NUM_TYPES" );
 
 // Table for convert resourceType_t to text
 static const achar* s_pResourceTypeNames[] =
 {
-	"material",		// RESOURCE_TYPE_MATERIAL
-	"texture",		// RESOURCE_TYPE_TEXTURE
-	"model"			// RESOURCE_TYPE_MODEL
+	"material",				// RESOURCE_TYPE_MATERIAL
+	"texture",				// RESOURCE_TYPE_TEXTURE
+	"model",				// RESOURCE_TYPE_MODEL
+	"entity descriptor"		// RESOURCE_TYPE_ENTITY_DESC
 };
 static_assert( RESOURCE_NUM_TYPES == ARRAYSIZE( s_pResourceTypeNames ), "Array size 's_pResourceTypeNames' must be equal to RESOURCE_NUM_TYPES" );
 
@@ -112,6 +116,7 @@ private:
 	ITextureTool*				pTextureTool;
 	IMaterialTool*				pMaterialTool;
 	IModelTool*					pModelTool;
+	IEntityDescTool*			pEntityDescTool;
 	std::list<resourceFile_t>	files;
 };
 
@@ -137,12 +142,13 @@ bool CResourceCompilerApp::Create()
 	// Load application systems
 	appSystemInfo_t		appSystemInfos[] =
 	{
-		{ "engine"			DLL_EXT_STRING,			CVAR_QUERY_INTERFACE_VERSION		},	// This one must be first
-		{ "filesystem"		DLL_EXT_STRING,			FILESYSTEM_INTERFACE_VERSION		},
-		{ "engine"			DLL_EXT_STRING,			CVAR_INTERFACE_VERSION				},
-		{ "texture_tool"	DLL_EXT_STRING,			TEXTURE_TOOL_INTERFACE_VERSION		},
-		{ "material_tool"	DLL_EXT_STRING,			MATERIAL_TOOL_INTERFACE_VERSION		},
-		{ "model_tool"		DLL_EXT_STRING,			MODEL_TOOL_INTERFACE_VERSION		},
+		{ "engine"				DLL_EXT_STRING,			CVAR_QUERY_INTERFACE_VERSION		},	// This one must be first
+		{ "filesystem"			DLL_EXT_STRING,			FILESYSTEM_INTERFACE_VERSION		},
+		{ "engine"				DLL_EXT_STRING,			CVAR_INTERFACE_VERSION				},
+		{ "texture_tool"		DLL_EXT_STRING,			TEXTURE_TOOL_INTERFACE_VERSION		},
+		{ "material_tool"		DLL_EXT_STRING,			MATERIAL_TOOL_INTERFACE_VERSION		},
+		{ "model_tool"			DLL_EXT_STRING,			MODEL_TOOL_INTERFACE_VERSION		},
+		{ "entitydesc_tool"		DLL_EXT_STRING,			ENTITYDESC_TOOL_INTERFACE_VERSION	},
 		{ "", "" }																			// Required to terminate the list
 	};
 
@@ -152,10 +158,11 @@ bool CResourceCompilerApp::Create()
 		return false;
 	}
 
-	// Get a texture, material and model tool
+	// Get a texture, material, model and entity tool
 	pTextureTool	= ( ITextureTool* )FindSystem( TEXTURE_TOOL_INTERFACE_VERSION );
 	pMaterialTool	= ( IMaterialTool* )FindSystem( MATERIAL_TOOL_INTERFACE_VERSION );
 	pModelTool		= ( IModelTool* )FindSystem( MODEL_TOOL_INTERFACE_VERSION );
+	pEntityDescTool	= ( IEntityDescTool* )FindSystem( ENTITYDESC_TOOL_INTERFACE_VERSION );
 
 	// Initialize a default pixel format
 	for ( uint32 index = 0; index < STUDIOAPI_PIXEL_NUM_FORMATS; ++index )
@@ -476,6 +483,135 @@ int32 CResourceCompilerApp::Main()
 			break;
 		}
 
+			// Compile an entity descriptor
+		case RESOURCE_TYPE_ENTITY_DESC:
+		{
+			CSENTSourceEntityDescDoc		sentSourceFile;
+			if ( !sentSourceFile.LoadFromFile( resourceFile.sourcePath.c_str() ) )
+			{
+				Error( "ResourceCompiler: Failed to load SENT file '%s'", resourceFile.sourcePath.c_str() );
+				bResult = false;
+				continue;
+			}
+
+			// Get entity descriptor components
+			std::vector<resourceToolEntityDescVar_t>			resourceToolEntityDescVars;
+			std::vector<resourceToolEntityDescComponent_t>		resourceToolEntityDescComponents;
+			resourceToolEntityDescComponents.resize( sentSourceFile.GetNumComponents() );
+			{
+				bool											bEntityDescComponentsAreVaild		= true;
+				uint32											resourceToolEntityDescVarsOffset	= 0;
+				const std::vector<CSENTEntityDescComponent>&	sentEntityDescComponents			= sentSourceFile.GetComponents();
+				for ( uint32 componentIdx = 0, numComponents = sentSourceFile.GetNumComponents(); componentIdx < numComponents; ++componentIdx )
+				{
+					const CSENTEntityDescComponent&			sentEntityDescComponent			= sentEntityDescComponents[componentIdx];
+					const std::vector<CSENTEntityDescVar>&	sentEntityDescVars				= sentEntityDescComponent.GetVars();
+					resourceToolEntityDescComponent_t&		resourceToolEntityDescComponent = resourceToolEntityDescComponents[componentIdx];
+					resourceToolEntityDescComponent.pType	= sentEntityDescComponent.GetType();
+					
+					// Get entity descriptor vars
+					if ( !sentEntityDescVars.empty() )
+					{
+						resourceToolEntityDescComponent.numVars = sentEntityDescComponent.GetNumVars();
+						resourceToolEntityDescVars.resize( resourceToolEntityDescVarsOffset + resourceToolEntityDescComponent.numVars );
+						resourceToolEntityDescComponent.pVars	= resourceToolEntityDescVars.data() + resourceToolEntityDescVarsOffset;
+						
+						for ( uint32 varIdx = 0, numVars = sentEntityDescComponent.GetNumVars(); varIdx < numVars; ++varIdx )
+						{
+							const CSENTEntityDescVar&			sentEntityDescVar			= sentEntityDescVars[varIdx];
+							resourceToolEntityDescVar_t&		resourceToolEntityDescVar	= resourceToolEntityDescVars[resourceToolEntityDescVarsOffset + varIdx];
+							resourceToolEntityDescVar.pName		= sentEntityDescVar.GetName();
+							switch ( sentEntityDescVar.GetType() )
+							{
+							case SENT_ENTITY_DESC_VAR_TYPE_BOOL:
+								resourceToolEntityDescVar.boolValue		= sentEntityDescVar.GetBoolValue();
+								resourceToolEntityDescVar.type			= RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_BOOL;
+								break;
+
+							case SENT_ENTITY_DESC_VAR_TYPE_INT:
+								resourceToolEntityDescVar.intValue		= sentEntityDescVar.GetIntValue();
+								resourceToolEntityDescVar.type			= RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_INT;
+								break;
+
+							case SENT_ENTITY_DESC_VAR_TYPE_FLOAT:
+								resourceToolEntityDescVar.floatValue	= sentEntityDescVar.GetFloatValue();
+								resourceToolEntityDescVar.type			= RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_FLOAT;
+								break;
+
+							case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_2D:
+								sentEntityDescVar.GetVecValue( &resourceToolEntityDescVar.vector2DValue.x, 2 );
+								resourceToolEntityDescVar.type			= RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_VECTOR_2D;
+								break;
+
+							case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_3D:
+								sentEntityDescVar.GetVecValue( &resourceToolEntityDescVar.vector3DValue.x, 3 );
+								resourceToolEntityDescVar.type			= RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_VECTOR_3D;
+								break;
+
+							case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_4D:
+								sentEntityDescVar.GetVecValue( &resourceToolEntityDescVar.vector4DValue.x, 4 );
+								resourceToolEntityDescVar.type			= RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_VECTOR_4D;
+								break;
+
+							case SENT_ENTITY_DESC_VAR_TYPE_MATRIX:
+								resourceToolEntityDescVar.matrixValue = sentEntityDescVar.GetMatrixValue();
+								resourceToolEntityDescVar.type			= RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_MATRIX;
+								break;
+
+							case SENT_ENTITY_DESC_VAR_TYPE_STRING:
+								resourceToolEntityDescVar.pStringValue = sentEntityDescVar.GetStringValue();
+								resourceToolEntityDescVar.type			= RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_STRING;
+								break;
+
+							default:
+								Error( "ResourceCompiler: Unknown entity descriptor type 0x%X in variable '%s' of '%s'", sentEntityDescVar.GetType(), resourceToolEntityDescVar.pName, resourceFile.sourcePath.c_str() );
+								bEntityDescComponentsAreVaild = false;
+								break;
+							}
+						}
+						resourceToolEntityDescVarsOffset += resourceToolEntityDescComponent.numVars;
+					}
+				}
+
+				if ( !bEntityDescComponentsAreVaild )
+				{
+					bResourceCompiled = false;
+					break;
+				}
+			}
+
+			// Get path to directory with the source file
+			std::string		sourceFileDir;
+			{
+				std::string		tmpBuffer;
+				S_GetFilePath( resourceFile.sourcePath, tmpBuffer, false );
+				S_MakeAbsolutePath( tmpBuffer, sourceFileDir, "", false );
+			}
+
+			// Get a destination file
+			std::string		destPath;
+			{
+				std::string		outputDir = sentSourceFile.GetOutputDir();
+				if ( !S_IsAbsolutePath( outputDir ) )
+				{
+					S_MakeAbsolutePath( sentSourceFile.GetOutputDir(), outputDir, sourceFileDir );
+				}
+
+				std::string		baseFileName;
+				S_GetFileBaseName( resourceFile.sourcePath, baseFileName );
+
+				S_AppendPathSeparator( outputDir );
+				destPath = S_Sprintf( "%s%s", outputDir.c_str(), baseFileName.c_str() );
+			}
+
+			resourceToolCompileEntityDescParams_t		compileParams = {};
+			compileParams.pDestPath						= destPath.c_str();
+			compileParams.pComponents					= resourceToolEntityDescComponents.data();
+			compileParams.numComponents					= ( uint32 )resourceToolEntityDescComponents.size();
+			bResourceCompiled							= pEntityDescTool->CompileEntityDesc( compileParams );
+			break;
+		}
+
 		default:
 			Error( "ResourceCompiler: Failed to compile '%s', unsupported resource type '%s'", resourceFile.sourcePath.c_str(), ConvResourceTypeToString( resourceFile.type ) );
 			bResult = false;
@@ -508,7 +644,7 @@ void CResourceCompilerApp::PrintUsageHelp()
 	Msg( "Usage resourcecompiler -file <path>" );
 	Msg( "Usage resourcecompiler -filelist <path>" );
 	Msg( "" );
-	Msg( "The compiler supports next resource types: texture (*.stex), material (*.smat) and model (*.smdl)" );
+	Msg( "The compiler supports next resource types: texture (*.stex), material (*.smat), model (*.smdl) and entity (*.sent)" );
 	Msg( "For syntax example see 'content/core/meterials/default_tex.stex', 'content/core/meterials/default_mat.smat'" );
 	Msg( "" );
 	Msg( "Launch arguments:" );

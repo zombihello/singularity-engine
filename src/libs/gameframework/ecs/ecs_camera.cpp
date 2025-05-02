@@ -1,7 +1,7 @@
 #include "pch_gameframework.h"
 #include "appframework/iwindowmgr.h"
 #include "studiorender/istudiorender.h"
-#include "gameframework/ecs/ecs.h"
+#include "gameframework/ecs/ecs_core.h"
 #include "gameframework/ecs/ecs_camera.gen.h"
 
 /*

@@ -8,6 +8,7 @@
 //-----------------------------------------------------------------------------
 class IMaterial;
 class ITexture;
+class IEntityDesc;
 
 
 //-----------------------------------------------------------------------------
@@ -18,6 +19,7 @@ enum resourceType_t
 	RESOURCE_TYPE_MATERIAL,
 	RESOURCE_TYPE_TEXTURE,
 	RESOURCE_TYPE_MODEL,
+	RESOURCE_TYPE_ENTITY_DESC,
 	RESOURCE_NUM_TYPES
 };
 
