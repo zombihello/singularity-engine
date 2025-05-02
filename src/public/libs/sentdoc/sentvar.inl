@@ -27,14 +27,14 @@ FORCEINLINE void CSENTEntityDescVar::SetBoolValue( bool bValue )
 CSENTEntityDescVar::GetBoolValue
 ==================
 */
-FORCEINLINE bool CSENTEntityDescVar::GetBoolValue() const
+FORCEINLINE bool CSENTEntityDescVar::GetBoolValue( bool defaultValue /* = false */ ) const
 {
 	switch ( type )
 	{
 	case SENT_ENTITY_DESC_VAR_TYPE_BOOL:	return boolValue;
 	case SENT_ENTITY_DESC_VAR_TYPE_INT:		return intValue > 0;
 	case SENT_ENTITY_DESC_VAR_TYPE_FLOAT:	return floatValue > 0.f;
-	default:								return false;
+	default:								return defaultValue;
 	}
 }
 
@@ -54,14 +54,14 @@ FORCEINLINE void CSENTEntityDescVar::SetIntValue( int32 value )
 CSENTEntityDescVar::GetIntValue
 ==================
 */
-FORCEINLINE int32 CSENTEntityDescVar::GetIntValue() const
+FORCEINLINE int32 CSENTEntityDescVar::GetIntValue( int32 defaultValue /* = 0 */ ) const
 {
 	switch ( type )
 	{
 	case SENT_ENTITY_DESC_VAR_TYPE_BOOL:	return ( int32 )boolValue;
 	case SENT_ENTITY_DESC_VAR_TYPE_INT:		return intValue;
 	case SENT_ENTITY_DESC_VAR_TYPE_FLOAT:	return ( int32 )floatValue;
-	default:								return 0;
+	default:								return defaultValue;
 	}
 }
 
@@ -81,41 +81,23 @@ FORCEINLINE void CSENTEntityDescVar::SetFloatValue( float value )
 CSENTEntityDescVar::GetFloatValue
 ==================
 */
-FORCEINLINE float CSENTEntityDescVar::GetFloatValue() const
+FORCEINLINE float CSENTEntityDescVar::GetFloatValue( float defaultValue /* = 0.f */ ) const
 {
 	switch ( type )
 	{
 	case SENT_ENTITY_DESC_VAR_TYPE_BOOL:	return ( float )boolValue;
 	case SENT_ENTITY_DESC_VAR_TYPE_INT:		return ( float )intValue;
 	case SENT_ENTITY_DESC_VAR_TYPE_FLOAT:	return floatValue;
-	default:								return 0.f;
+	default:								return defaultValue;
 	}
 }
 
 /*
 ==================
-CSENTEntityDescVar::SetVecValue
+CSENTEntityDescVar::SetVec2Value
 ==================
 */
-FORCEINLINE void CSENTEntityDescVar::SetVecValue( const float* pValue, uint32 numComps )
-{
-	switch ( numComps )
-	{
-	case 2: SetVecValue( *( vec2_t* ) pValue ); break;
-	case 3: SetVecValue( *( vec3_t* ) pValue ); break;
-	case 4: SetVecValue( *( vec4_t* ) pValue ); break;
-	default:
-		AssertMsg( false, "A material variable can take only in range from 2 to 4" );
-		break;
-	}
-}
-
-/*
-==================
-CSENTEntityDescVar::SetVecValue
-==================
-*/
-FORCEINLINE void CSENTEntityDescVar::SetVecValue( const vec2_t& value )
+FORCEINLINE void CSENTEntityDescVar::SetVec2Value( const vec2_t& value )
 {
 	vector2DValue	= value;
 	type			= SENT_ENTITY_DESC_VAR_TYPE_VECTOR_2D;
@@ -123,10 +105,10 @@ FORCEINLINE void CSENTEntityDescVar::SetVecValue( const vec2_t& value )
 
 /*
 ==================
-CSENTEntityDescVar::SetVecValue
+CSENTEntityDescVar::SetVec3Value
 ==================
 */
-FORCEINLINE void CSENTEntityDescVar::SetVecValue( const vec3_t& value )
+FORCEINLINE void CSENTEntityDescVar::SetVec3Value( const vec3_t& value )
 {
 	vector3DValue	= value;
 	type			= SENT_ENTITY_DESC_VAR_TYPE_VECTOR_3D;
@@ -137,7 +119,7 @@ FORCEINLINE void CSENTEntityDescVar::SetVecValue( const vec3_t& value )
 CSENTEntityDescVar::SetVecValue
 ==================
 */
-FORCEINLINE void CSENTEntityDescVar::SetVecValue( const vec4_t& value )
+FORCEINLINE void CSENTEntityDescVar::SetVec4Value( const vec4_t& value )
 {
 	vector4DValue	= value;
 	type			= SENT_ENTITY_DESC_VAR_TYPE_VECTOR_4D;
@@ -145,32 +127,49 @@ FORCEINLINE void CSENTEntityDescVar::SetVecValue( const vec4_t& value )
 
 /*
 ==================
-CSENTEntityDescVar::GetVecValue
+CSENTEntityDescVar::GetVec2Value
 ==================
 */
-FORCEINLINE void CSENTEntityDescVar::GetVecValue( float* pValue, uint32 numComps ) const
+FORCEINLINE vec2_t CSENTEntityDescVar::GetVec2Value( const vec2_t& defaultValue /* = vec2_t( 0.f, 0.f ) */ ) const
 {
-	Assert( numComps >= 2 && numComps <= 4 );
 	switch ( type )
 	{
-	case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_2D:
-		Assert( numComps >= 2 );
-		Mem_Memcpy( pValue, &vector2DValue, numComps * sizeof( float ) );
-		break;
+	case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_2D:		return vector2DValue;
+	case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_3D:		return vector3DValue;
+	case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_4D:		return vector4DValue;
+	default:										return defaultValue;
+	}
+}
 
-	case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_3D:
-		Assert( numComps >= 3 );
-		Mem_Memcpy( pValue, &vector3DValue, numComps * sizeof( float ) );
-		break;
+/*
+==================
+CSENTEntityDescVar::GetVec3Value
+==================
+*/
+FORCEINLINE vec3_t CSENTEntityDescVar::GetVec3Value( const vec3_t& defaultValue /* = vec3_t( 0.f, 0.f, 0.f ) */ ) const
+{
+	switch ( type )
+	{
+	case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_2D:		return vec3_t( vector2DValue.x, vector2DValue.y, defaultValue.z );
+	case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_3D:		return vector3DValue;
+	case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_4D:		return vector4DValue;
+	default:										return defaultValue;
+	}
+}
 
-	case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_4D:
-		Assert( numComps >= 4 );
-		Mem_Memcpy( pValue, &vector4DValue, numComps * sizeof( float ) );
-		break;
-
-	default:
-		Mem_Memset( pValue, 0, numComps * sizeof( float ) );
-		break;
+/*
+==================
+CSENTEntityDescVar::GetVec4Value
+==================
+*/
+FORCEINLINE vec4_t CSENTEntityDescVar::GetVec4Value( const vec4_t& defaultValue /* = vec4_t( 0.f, 0.f, 0.f, 0.f ) */ ) const
+{
+	switch ( type )
+	{
+	case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_2D:		return vec4_t( vector2DValue.x, vector2DValue.y, defaultValue.z, defaultValue.w );
+	case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_3D:		return vec4_t( vector3DValue.x, vector3DValue.y, vector3DValue.z, defaultValue.w );
+	case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_4D:		return vector4DValue;
+	default:										return defaultValue;
 	}
 }
 
@@ -190,9 +189,9 @@ FORCEINLINE void CSENTEntityDescVar::SetMatrixValue( const matrix_t& value )
 CSENTEntityDescVar::GetMatrixValue
 ==================
 */
-FORCEINLINE matrix_t CSENTEntityDescVar::GetMatrixValue() const
+FORCEINLINE matrix_t CSENTEntityDescVar::GetMatrixValue( const matrix_t& defaultValue /* = g_matrixIdentity */ ) const
 {
-	return type == SENT_ENTITY_DESC_VAR_TYPE_MATRIX ? matrixValue : g_matrixIdentity;
+	return type == SENT_ENTITY_DESC_VAR_TYPE_MATRIX ? matrixValue : defaultValue;
 }
 
 /*
@@ -212,9 +211,9 @@ FORCEINLINE void CSENTEntityDescVar::SetStringValue( const achar* pValue )
 CSENTEntityDescVar::GetStringValue
 ==================
 */
-FORCEINLINE const achar* CSENTEntityDescVar::GetStringValue() const
+FORCEINLINE const achar* CSENTEntityDescVar::GetStringValue( const achar* pDefaultValue /* = "" */ ) const
 {
-	return type == SENT_ENTITY_DESC_VAR_TYPE_STRING ? pStringValue : "";
+	return type == SENT_ENTITY_DESC_VAR_TYPE_STRING ? pStringValue : pDefaultValue;
 }
 
 /*

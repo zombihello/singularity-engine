@@ -37,6 +37,7 @@ CEcsEntityDesc::Init
 */
 void CEcsEntityDesc::Init( const CSENTCompiledEntityDescDoc& sentCompiledDoc )
 {
+	PROFILE_SCOPE()
 	CEcsComponentTypes&								ecsComponentTypes	= Game()->GetEcsComponentTypes();
 	const std::vector<CSENTEntityDescComponent>&	sentComponents		= sentCompiledDoc.GetComponents();
 	for ( uint32 componentIdx = 0, numComponents = sentCompiledDoc.GetNumComponents(); componentIdx < numComponents; ++componentIdx )
@@ -56,6 +57,7 @@ CEcsEntityDesc::RecreateEcsArchetypeEntity
 */
 void CEcsEntityDesc::RecreateEcsArchetypeEntity() const
 {
+	PROFILE_SCOPE()
 	CEcsWorld&		ecsWorld = Game()->GetEcsWorld();
 	if ( !ecsWorld.IsValidEntity( ecsArchetypeEntity ) )
 	{
@@ -70,6 +72,7 @@ CEcsEntityDesc::CreateEcsEntity
 */
 ecsEntity_t CEcsEntityDesc::CreateEcsEntity( const achar* pName ) const
 {
+	PROFILE_SCOPE()
 	CEcsWorld&		ecsWorld	= Game()->GetEcsWorld();
 	ecsEntity_t		ecsEntity	= ecsWorld.CreateEntity( pName );
 	for ( uint32 componentIdx = 0, numComponents = ( uint32 ) ecsComponentFactories.size(); componentIdx < numComponents; ++componentIdx )
@@ -88,6 +91,7 @@ CEcsEntityDesc::Clear
 */
 void CEcsEntityDesc::Clear()
 {
+	PROFILE_SCOPE()
 	CEcsWorld&	ecsWorld = Game()->GetEcsWorld();
 	if ( ecsWorld.IsValidEntity( ecsArchetypeEntity ) )
 	{
@@ -104,6 +108,7 @@ CEcsEntityDesc::Create
 */
 IEntity* CEcsEntityDesc::Create( const achar* pName /* = "" */ ) const
 {
+	PROFILE_SCOPE()
 	CEcsWorld&		ecsWorld = Game()->GetEcsWorld();
 	RecreateEcsArchetypeEntity();
 	return new CEcsEntity( ecsWorld.CloneEntity( ecsArchetypeEntity, pName ) );

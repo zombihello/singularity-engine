@@ -88,24 +88,21 @@ bool CSENTCompiledEntityDescDoc::SaveFile( const achar* pPath )
 
 			case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_2D:
 			{
-				vec2_t	value = { 0.f, 0.f };
-				var.GetVecValue( &value.x, 2 );
+				vec2_t	value = var.GetVec2Value();
 				pFile->Write( &value, sizeof( vec2_t ) );
 				break;
 			}
 
 			case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_3D:
 			{
-				vec3_t	value = { 0.f, 0.f, 0.f };
-				var.GetVecValue( &value.x, 3 );
+				vec3_t	value = var.GetVec3Value();
 				pFile->Write( &value, sizeof( vec3_t ) );
 				break;
 			}
 
 			case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_4D:
 			{
-				vec4_t	value = { 0.f, 0.f, 0.f, 0.f };
-				var.GetVecValue( &value.x, 4 );
+				vec4_t	value = var.GetVec4Value();
 				pFile->Write( &value, sizeof( vec4_t ) );
 				break;
 			}
@@ -237,7 +234,7 @@ bool CSENTCompiledEntityDescDoc::LoadFromFile( const achar* pPath )
 			{
 				vec2_t	value;
 				pFile->Read( &value, sizeof( vec2_t ) );
-				var.SetVecValue( value );
+				var.SetVec2Value( value );
 				break;
 			}
 
@@ -245,7 +242,7 @@ bool CSENTCompiledEntityDescDoc::LoadFromFile( const achar* pPath )
 			{
 				vec3_t	value;
 				pFile->Read( &value, sizeof( vec3_t ) );
-				var.SetVecValue( value );
+				var.SetVec3Value( value );
 				break;
 			}
 
@@ -253,7 +250,7 @@ bool CSENTCompiledEntityDescDoc::LoadFromFile( const achar* pPath )
 			{
 				vec4_t	value;
 				pFile->Read( &value, sizeof( vec4_t ) );
-				var.SetVecValue( value );
+				var.SetVec4Value( value );
 				break;
 			}
 

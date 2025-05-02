@@ -15,6 +15,7 @@
 #include "gameframework/ecs/ecs_movement.gen.h"
 #include "gameframework/ecs/ecs_camera.gen.h"
 #include "gameframework/ecs/ecs_component_factory.h"
+#include "gameframework/ecs/ecs_component_serialize.h"
 
 //-----------------------------------------------------------------------------
 // Singularity Sandbox game
@@ -72,31 +73,34 @@ LoadDataFromSENTComponent
 */
 void LoadDataFromSENTComponent( const CSENTEntityDescComponent& sentComponent, ecsComponentCamera_t& component )
 {
-	const std::vector<CSENTEntityDescVar>&		sentVars = sentComponent.GetVars();
-	for ( uint32 varIdx = 0, numVars = sentComponent.GetNumVars(); varIdx < numVars; ++varIdx )
+	CSENTEntityDescVar*		pSENTVar_bAutoViewData = sentComponent.GetVar( "bAutoViewData" );
+	if ( pSENTVar_bAutoViewData )
 	{
-		const CSENTEntityDescVar&		sentVar = sentVars[varIdx];
-		const achar*					pVarName = sentVar.GetName();
-		if ( !S_Stricmp( pVarName, "bAutoViewData" ) )
-		{
-			component.bAutoViewData = sentVar.GetBoolValue();
-		}
-		else if ( !S_Stricmp( pVarName, "fieldOfView" ) )
-		{
-			component.fieldOfView = sentVar.GetFloatValue();
-		}
-		else if ( !S_Stricmp( pVarName, "nearClipPlane" ) )
-		{
-			component.nearClipPlane = sentVar.GetFloatValue();
-		}
-		else if ( !S_Stricmp( pVarName, "farClipPlane" ) )
-		{
-			component.farClipPlane = sentVar.GetFloatValue();
-		}
-		else if ( !S_Stricmp( pVarName, "aspectRatio" ) )
-		{
-			component.aspectRatio = sentVar.GetFloatValue();
-		}
+		EcsReadData<bool>( component.bAutoViewData, *pSENTVar_bAutoViewData );
+	}
+
+	CSENTEntityDescVar*		pSENTVar_fieldOfView = sentComponent.GetVar( "fieldOfView" );
+	if ( pSENTVar_fieldOfView )
+	{
+		EcsReadData<float>( component.fieldOfView, *pSENTVar_fieldOfView );
+	}
+
+	CSENTEntityDescVar*		pSENTVar_nearClipPlane = sentComponent.GetVar( "nearClipPlane" );
+	if ( pSENTVar_nearClipPlane )
+	{
+		EcsReadData<float>( component.nearClipPlane, *pSENTVar_nearClipPlane );
+	}
+
+	CSENTEntityDescVar*		pSENTVar_farClipPlane = sentComponent.GetVar( "farClipPlane" );
+	if ( pSENTVar_farClipPlane )
+	{
+		EcsReadData<float>( component.farClipPlane, *pSENTVar_farClipPlane );
+	}
+
+	CSENTEntityDescVar* pSENTVar_aspectRatio = sentComponent.GetVar( "aspectRatio" );
+	if ( pSENTVar_aspectRatio )
+	{
+		EcsReadData<float>( component.aspectRatio, *pSENTVar_aspectRatio );
 	}
 }
 

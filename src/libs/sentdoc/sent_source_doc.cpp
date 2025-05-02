@@ -117,24 +117,21 @@ bool CSENTSourceEntityDescDoc::SaveFile( const achar* pPath )
 
 					case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_2D:
 					{
-						vec2_t		value = { 0.f, 0.f };
-						var.GetVecValue( &value.x, 2 );
+						vec2_t		value = var.GetVec2Value();
 						buffer += S_Sprintf( "{ \"x\": %f, \"y\": %f }\n", value.x, value.y );
 						break;
 					}
 
 					case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_3D:
 					{
-						vec3_t		value = { 0.f, 0.f, 0.f };
-						var.GetVecValue( &value.x, 3 );
+						vec3_t		value = var.GetVec3Value();
 						buffer += S_Sprintf( "{ \"x\": %f, \"y\": %f, \"z\": %f }\n", value.x, value.y, value.z );
 						break;
 					}
 
 					case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_4D:
 					{
-						vec4_t		value = { 0.f, 0.f, 0.f, 0.f };
-						var.GetVecValue( &value.x, 4 );
+						vec4_t		value = var.GetVec4Value();
 						buffer += S_Sprintf( "{ \"x\": %f, \"y\": %f, \"z\": %f, \"w\": %f }\n", value.x, value.y, value.z, value.w );
 						break;
 					}
@@ -591,7 +588,7 @@ bool CSENTSourceEntityDescDoc::GrabValueAsVar( const CJsonValue& jsonValue, CSEN
 			break;
 		}
 
-		var.SetVecValue( value );
+		var.SetVec2Value( value );
 		break;
 	}
 
@@ -605,7 +602,7 @@ bool CSENTSourceEntityDescDoc::GrabValueAsVar( const CJsonValue& jsonValue, CSEN
 			break;
 		}
 
-		var.SetVecValue( value );
+		var.SetVec3Value( value );
 		break;
 	}
 
@@ -619,7 +616,7 @@ bool CSENTSourceEntityDescDoc::GrabValueAsVar( const CJsonValue& jsonValue, CSEN
 			break;
 		}
 
-		var.SetVecValue( value );
+		var.SetVec4Value( value );
 		break;
 	}
 

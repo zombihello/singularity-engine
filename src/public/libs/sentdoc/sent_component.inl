@@ -8,8 +8,14 @@ CSENTEntityDescComponent::Copy
 */
 FORCEINLINE void CSENTEntityDescComponent::Copy( const CSENTEntityDescComponent& other )
 {
+	varsDict.clear();
 	type = other.type;
 	vars = other.vars;
+	for ( uint32 varIdx = 0, numVars = ( uint32 )vars.size(); varIdx < numVars; ++varIdx )
+	{
+		const CSENTEntityDescVar&	sentVar = vars[varIdx];
+		varsDict[sentVar.GetName()]	= varIdx;
+	}
 }
 
 /*
@@ -29,7 +35,9 @@ CSENTEntityDescComponent::AddVar
 */
 FORCEINLINE void CSENTEntityDescComponent::AddVar( const CSENTEntityDescVar& var )
 {
-	vars.emplace_back( var );
+	uint32						varIdx	= ( uint32 )vars.size();
+	const CSENTEntityDescVar&	newVar	= vars.emplace_back( var );
+	varsDict[newVar.GetName()]	= varIdx;
 }
 
 /*
@@ -40,6 +48,7 @@ CSENTEntityDescComponent::RemoveVar
 FORCEINLINE void CSENTEntityDescComponent::RemoveVar( uint32 index )
 {
 	Assert( index < vars.size() );
+	varsDict.erase( vars[index].GetName() );
 	vars.erase( vars.begin() + index );
 }
 
@@ -52,6 +61,7 @@ FORCEINLINE void CSENTEntityDescComponent::Clear()
 {
 	type = "";
 	vars.clear();
+	varsDict.clear();
 }
 
 /*
@@ -82,6 +92,32 @@ CSENTEntityDescComponent::GetVars
 FORCEINLINE const std::vector<CSENTEntityDescVar>& CSENTEntityDescComponent::GetVars() const
 {
 	return vars;
+}
+
+/*
+==================
+CSENTEntityDescComponent::GetVar
+==================
+*/
+FORCEINLINE const CSENTEntityDescVar& CSENTEntityDescComponent::GetVar( uint32 index ) const
+{
+	Assert( index < vars.size() );
+	return vars[index];
+}
+
+/*
+==================
+CSENTEntityDescComponent::GetVar
+==================
+*/
+FORCEINLINE CSENTEntityDescVar* CSENTEntityDescComponent::GetVar( const achar* pName ) const
+{
+	auto	itFind = varsDict.find( pName );
+	if ( itFind == varsDict.end() )
+	{
+		return NULL;
+	}
+	return ( CSENTEntityDescVar* )&vars[itFind->second];
 }
 
 /*

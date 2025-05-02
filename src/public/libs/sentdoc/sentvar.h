@@ -19,6 +19,7 @@ enum sentEntityDescVarType_t
 	SENT_ENTITY_DESC_VAR_TYPE_VECTOR_4D,
 	SENT_ENTITY_DESC_VAR_TYPE_MATRIX,
 	SENT_ENTITY_DESC_VAR_TYPE_STRING
+	// TODO BS yehor.pohuliaka - Add support of arrays and dictionaries
 };
 
 
@@ -36,22 +37,23 @@ public:
 	void SetBoolValue( bool bValue );
 	void SetIntValue( int32 value );
 	void SetFloatValue( float value );
-	void SetVecValue( const float* pValue, uint32 numComps );
-	void SetVecValue( const vec2_t& value );
-	void SetVecValue( const vec3_t& value );
-	void SetVecValue( const vec4_t& value );
+	void SetVec2Value( const vec2_t& value );
+	void SetVec3Value( const vec3_t& value );
+	void SetVec4Value( const vec4_t& value );
 	void SetMatrixValue( const matrix_t& value );
 	void SetStringValue( const achar* pValue );
 
 	bool IsDefined() const;
 	const achar* GetName() const;
 	sentEntityDescVarType_t GetType() const;
-	bool GetBoolValue() const;
-	int32 GetIntValue() const;
-	float GetFloatValue() const;
-	void GetVecValue( float* pValue, uint32 numComps ) const;
-	matrix_t GetMatrixValue() const;
-	const achar* GetStringValue() const;
+	bool GetBoolValue( bool defaultValue = false ) const;
+	int32 GetIntValue( int32 defaultValue = 0 ) const;
+	float GetFloatValue( float defaultValue = 0.f ) const;
+	vec2_t GetVec2Value( const vec2_t& defaultValue = vec2_t( 0.f, 0.f ) ) const;
+	vec3_t GetVec3Value( const vec3_t& defaultValue = g_vectorZero ) const;
+	vec4_t GetVec4Value( const vec4_t& defaultValue = vec4_t( 0.f, 0.f, 0.f, 0.f ) ) const;
+	matrix_t GetMatrixValue( const matrix_t& defaultValue = g_matrixIdentity ) const;
+	const achar* GetStringValue( const achar* pDefaultValue = "" ) const;
 
 	CSENTEntityDescVar& operator=( const CSENTEntityDescVar& right );
 

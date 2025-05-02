@@ -2,7 +2,9 @@
 #define SENT_COMPONENT_H
 
 #include <vector>
+#include <unordered_map>
 
+#include "stdlib/stl.h"
 #include "sentdoc/sentvar.h"
 
 //-----------------------------------------------------------------------------
@@ -25,12 +27,17 @@ public:
 	const achar* GetType() const;
 	uint32 GetNumVars() const;
 	const std::vector<CSENTEntityDescVar>& GetVars() const;
+	const CSENTEntityDescVar& GetVar( uint32 index ) const;
+	CSENTEntityDescVar* GetVar( const achar* pName ) const;
 
 	CSENTEntityDescComponent& operator=( const CSENTEntityDescComponent& right );
 
 private:
+	typedef std::unordered_map<const achar*, uint32, stlInsensitiveStringHash_t, stlInsensitiveCompareString_t>		varsDict_t;
+
 	std::string							type;
 	std::vector<CSENTEntityDescVar>		vars;
+	varsDict_t							varsDict;
 };
 
 #include "sentdoc/sent_component.inl"

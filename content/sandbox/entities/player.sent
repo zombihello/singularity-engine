@@ -15,11 +15,3 @@
 		}
 	]
 }
-
-// Usage:
-// IEntityDesc*		pEntityDesc = g_pResourceSystem->FindOrLoadResource( "entities/test_quad", RESOURCE_TYPE_ENTITY_DESC );
-// IEntity*			pEntity = pEntityDesc->Create( "my_test_quad" );
-//
-// class IEntitiesUpdater { virtual void Update( float deltaTime ) = 0; }
-// g_pSceneSystem->AddEntity( pEntity );
-// g_pSceneSystem->SetEntitiesUpdated( &g_EcsEntitiesUpdater );
