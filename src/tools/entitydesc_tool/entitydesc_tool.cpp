@@ -67,9 +67,9 @@ bool CEntityDescTool::CompileEntityDesc( const resourceToolCompileEntityDescPara
 			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_BOOL:		sentEntityDescVar.SetBoolValue( resourceToolEntityDescVar.boolValue );			break;
 			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_INT:		sentEntityDescVar.SetIntValue( resourceToolEntityDescVar.intValue );			break;
 			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_FLOAT:		sentEntityDescVar.SetFloatValue( resourceToolEntityDescVar.floatValue );		break;
-			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_VECTOR_2D:	sentEntityDescVar.SetVecValue( resourceToolEntityDescVar.vector2DValue );		break;
-			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_VECTOR_3D:	sentEntityDescVar.SetVecValue( resourceToolEntityDescVar.vector3DValue );		break;
-			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_VECTOR_4D:	sentEntityDescVar.SetVecValue( resourceToolEntityDescVar.vector4DValue );		break;
+			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_VECTOR_2D:	sentEntityDescVar.SetVec2Value( resourceToolEntityDescVar.vector2DValue );		break;
+			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_VECTOR_3D:	sentEntityDescVar.SetVec3Value( resourceToolEntityDescVar.vector3DValue );		break;
+			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_VECTOR_4D:	sentEntityDescVar.SetVec4Value( resourceToolEntityDescVar.vector4DValue );		break;
 			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_MATRIX:		sentEntityDescVar.SetMatrixValue( resourceToolEntityDescVar.matrixValue );		break;
 			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_STRING:		sentEntityDescVar.SetStringValue( resourceToolEntityDescVar.pStringValue );		break;
 			default:

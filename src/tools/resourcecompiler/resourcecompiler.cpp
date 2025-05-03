@@ -539,17 +539,17 @@ int32 CResourceCompilerApp::Main()
 								break;
 
 							case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_2D:
-								sentEntityDescVar.GetVecValue( &resourceToolEntityDescVar.vector2DValue.x, 2 );
+								resourceToolEntityDescVar.vector2DValue = sentEntityDescVar.GetVec2Value();
 								resourceToolEntityDescVar.type			= RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_VECTOR_2D;
 								break;
 
 							case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_3D:
-								sentEntityDescVar.GetVecValue( &resourceToolEntityDescVar.vector3DValue.x, 3 );
+								resourceToolEntityDescVar.vector3DValue = sentEntityDescVar.GetVec3Value( );
 								resourceToolEntityDescVar.type			= RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_VECTOR_3D;
 								break;
 
 							case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_4D:
-								sentEntityDescVar.GetVecValue( &resourceToolEntityDescVar.vector4DValue.x, 4 );
+								resourceToolEntityDescVar.vector4DValue = sentEntityDescVar.GetVec4Value();
 								resourceToolEntityDescVar.type			= RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_VECTOR_4D;
 								break;
 
