@@ -158,27 +158,28 @@ TRefPtr<IResource> CResourceSystem::FindOrLoadResource( const achar* pPath, reso
 		return it->second;
 	}
 
-	// Do nothing if we won't load a new resource
+	// Make sure that we have a factory for the resource type
 	IResourceFactory*	pResourceFactory = pResourceFactories[type];
-	if ( loadFlags & RESOURCE_LOAD_FLAG_ONLY_FIND )
-	{
-		// In the case we return a default resource
-		Error( "ResourceSystem: Failed to find resource '%s' (type: 0x%X)", pPath, type );
-		return pResourceFactory->GetDefaultResource();
-	}
-
-	// Otherwise we load a resource	
 	if ( !pResourceFactory )
 	{
 		Warning( "ResourceSystem: Failed to load resource '%s'. Resource factory for type 0x%X isn't registered", pPath, type );
 		return NULL;
 	}
 
+	// Do nothing if we won't load a new resource
+	TRefPtr<IResource>		pDefaultResource = !( loadFlags & RESOURCE_LOAD_FLAG_WITHOUT_DEFAULT ) ? pResourceFactory->GetDefaultResource() : NULL;
+	if ( loadFlags & RESOURCE_LOAD_FLAG_ONLY_FIND )
+	{
+		// In the case we return a default resource or NULL
+		Error( "ResourceSystem: Failed to find resource '%s' (type: 0x%X)", pPath, type );
+		return pDefaultResource;
+	}
+
 	TRefPtr<IRefCounted>	pData = pResourceFactory->LoadResource( pPath, loadFlags );
 	if ( !pData )
 	{
 		Error( "ResourceSystem: Failed to load resource '%s' (type: 0x%X)", pPath, type );
-		return pResourceFactory->GetDefaultResource();
+		return pDefaultResource;
 	}
 	
 	TRefPtr<CResource>		pResource = new CResource( pPath, pData, type );

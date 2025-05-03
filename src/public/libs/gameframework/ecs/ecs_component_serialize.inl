@@ -108,11 +108,13 @@ EcsReadData
 template<>
 FORCEINLINE void EcsReadData<TResourcePtr<ITexture>>( TResourcePtr<ITexture>& data, const CSENTEntityDescVar& sentVar, const TResourcePtr<ITexture>& pDefaultValue )
 {
+	data = NULL;
 	if ( sentVar.IsA( SENT_ENTITY_DESC_VAR_TYPE_STRING ) )
 	{
-		data = g_pResourceSystem->FindOrLoadResource( sentVar.GetStringValue(), RESOURCE_TYPE_TEXTURE );
+		data = g_pResourceSystem->FindOrLoadResource( sentVar.GetStringValue(), RESOURCE_TYPE_TEXTURE, RESOURCE_LOAD_FLAG_WITHOUT_DEFAULT );
 	}
-	else
+
+	if ( !data )
 	{
 		data = pDefaultValue;
 	}
@@ -126,11 +128,13 @@ EcsReadData
 template<>
 FORCEINLINE void EcsReadData<TResourcePtr<IMaterial>>( TResourcePtr<IMaterial>& data, const CSENTEntityDescVar& sentVar, const TResourcePtr<IMaterial>& pDefaultValue )
 {
+	data = NULL;
 	if ( sentVar.IsA( SENT_ENTITY_DESC_VAR_TYPE_STRING ) )
 	{
-		data = g_pResourceSystem->FindOrLoadResource( sentVar.GetStringValue(), RESOURCE_TYPE_MATERIAL );
+		data = g_pResourceSystem->FindOrLoadResource( sentVar.GetStringValue(), RESOURCE_TYPE_MATERIAL, RESOURCE_LOAD_FLAG_WITHOUT_DEFAULT );
 	}
-	else
+
+	if ( !data )
 	{
 		data = pDefaultValue;
 	}
@@ -146,9 +150,10 @@ FORCEINLINE void EcsReadData<TResourcePtr<IEntityDesc>>( TResourcePtr<IEntityDes
 {
 	if ( sentVar.IsA( SENT_ENTITY_DESC_VAR_TYPE_STRING ) )
 	{
-		data = g_pResourceSystem->FindOrLoadResource( sentVar.GetStringValue(), RESOURCE_TYPE_ENTITY_DESC );
+		data = g_pResourceSystem->FindOrLoadResource( sentVar.GetStringValue(), RESOURCE_TYPE_ENTITY_DESC, RESOURCE_LOAD_FLAG_WITHOUT_DEFAULT );
 	}
-	else
+
+	if ( !data )
 	{
 		data = pDefaultValue;
 	}

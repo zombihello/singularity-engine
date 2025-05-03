@@ -14,8 +14,9 @@ class IResource;
 //-----------------------------------------------------------------------------
 enum resourceLoadFlag_t
 {
-	RESOURCE_LOAD_FLAG_NONE			= 0,
-	RESOURCE_LOAD_FLAG_ONLY_FIND	= 1 << 0	// Only try to find already exists a resource
+	RESOURCE_LOAD_FLAG_NONE				= 0,
+	RESOURCE_LOAD_FLAG_ONLY_FIND		= 1 << 0,	// Only try to find already exists a resource
+	RESOURCE_LOAD_FLAG_WITHOUT_DEFAULT	= 1 << 1	// Don't return the default resource if a resource isn't found
 };
 
 
