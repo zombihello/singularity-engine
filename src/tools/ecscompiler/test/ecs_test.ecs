@@ -4,7 +4,7 @@ using "path/to/another/header.h";
 
 component TestComponent
 {
-	CTransform		transform;
+	[serialize] CTransform	transform;
 }
 
 resource TestResource
@@ -12,13 +12,14 @@ resource TestResource
 	TRefPtr<IStudioScene>	pStudioScene;
 }
 
+[name="component_with_defaults"]
 component ComponentWithDefaults
 {
 	defaults:
 		bVar( false ),
 		var( 146.f );
 
-	bool	bVar;
+	[serialize][name="b_var"] bool	bVar;
 	float	var;
 }
 

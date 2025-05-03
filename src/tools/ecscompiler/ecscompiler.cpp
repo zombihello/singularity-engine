@@ -36,7 +36,7 @@ private:
 	void PrintUsageHelp();
 	bool ParseEcsFiles( const std::string& dir, const std::string rootDir, CEcsSystemStub& stubs );
 	bool ParseEcsFile( const achar* pPath, CEcsSystemStub& stubs );
-	bool GenerateCppHeaders( const achar* pRootDir, const achar* pOutputDir, const CEcsSystemStub& stubs );
+	bool GenerateCppFiles( const achar* pRootDir, const achar* pOutputDir, const CEcsSystemStub& stubs, ecsCppFileType_t cppFileType );
 };
 
 
@@ -130,7 +130,13 @@ int32 CEcsCompilerApp::Main()
 	}
 
 	// Generate C++ headers
-	if ( !GenerateCppHeaders( !bInvalidEcsDir ? pEcsDir : "", pCppFileDir, ecsSystemStub) )
+	if ( !GenerateCppFiles( !bInvalidEcsDir ? pEcsDir : "", pCppFileDir, ecsSystemStub, ECS_CPP_FILE_TYPE_HEADER ) )
+	{
+		return 3;
+	}
+
+	// Generate C++ sources
+	if ( !GenerateCppFiles( !bInvalidEcsDir ? pEcsDir : "", pCppFileDir, ecsSystemStub, ECS_CPP_FILE_TYPE_SOURCE ) )
 	{
 		return 3;
 	}
@@ -210,14 +216,34 @@ bool CEcsCompilerApp::ParseEcsFile( const achar* pPath, CEcsSystemStub& stubs )
 
 /*
 ==================
-CEcsCompilerApp::GenerateCppHeader
+CEcsCompilerApp::GenerateCppFiles
 ==================
 */
-bool CEcsCompilerApp::GenerateCppHeaders( const achar* pRootDir, const achar* pOutputDir, const CEcsSystemStub& stubs )
+bool CEcsCompilerApp::GenerateCppFiles( const achar* pRootDir, const achar* pOutputDir, const CEcsSystemStub& stubs, ecsCppFileType_t cppFileType )
 {
 	bool											bResult = true;
 	const std::vector<TRefPtr<CEcsStubModule>>&		ecsStubModules = stubs.GetModules();
 	CEcsCppGenerator								ecsCppGenerator;
+
+	// Get file extension and type name
+	const achar*	pCppFileExtension;
+	const achar*	pCppFileTypeName;
+	switch ( cppFileType )
+	{
+	case ECS_CPP_FILE_TYPE_HEADER:
+		pCppFileExtension	= "h";
+		pCppFileTypeName	= "header";
+		break;
+
+	case ECS_CPP_FILE_TYPE_SOURCE:
+		pCppFileExtension	= "cpp";
+		pCppFileTypeName	= "source";
+		break;
+
+	default:
+		AssertMsg( false, "Unknown C++ file type 0x%X", cppFileType );
+		break;
+	}
 
 	// Convert the root and the output directory into absolute path
 	std::string		rootDir = pRootDir;
@@ -236,7 +262,7 @@ bool CEcsCompilerApp::GenerateCppHeaders( const achar* pRootDir, const achar* pO
 		// Generate C++ header for this module
 		CEcsStubModule*			pEcsStubModule = ecsStubModules[ecsStubModuleIdx];
 		ecsCppGenerator.Reset();
-		ecsCppGenerator.Generate( pEcsStubModule );
+		ecsCppGenerator.Generate( pEcsStubModule, cppFileType );
 		const std::string&		buffer = ecsCppGenerator.GetBuffer();
 
 		// Make sub directories if we use 'dir' command
@@ -252,7 +278,7 @@ bool CEcsCompilerApp::GenerateCppHeaders( const achar* pRootDir, const achar* pO
 		{
 			std::string		moduleNameLower = pEcsStubModule->GetName();
 			S_Strlwr( moduleNameLower.data() );
-			filePath		= S_Sprintf( "%s/%secs_%s.gen.h", outputDir.c_str(), subDir.c_str(), moduleNameLower.c_str() );
+			filePath		= S_Sprintf( "%s/%secs_%s.gen.%s", outputDir.c_str(), subDir.c_str(), moduleNameLower.c_str(), pCppFileExtension );
 		}
 
 		// Save buffer into the file
@@ -260,11 +286,11 @@ bool CEcsCompilerApp::GenerateCppHeaders( const achar* pRootDir, const achar* pO
 		if ( pFileWriter )
 		{
 			pFileWriter->Write( ( void* )buffer.data(), buffer.size() * sizeof( achar ) );
-			Msg( "EcsCompiler: C++ header for '%s' saved to '%s'", pEcsStubModule->GetName(), filePath.c_str() );
+			Msg( "EcsCompiler: C++ %s for '%s' saved to '%s'", pCppFileTypeName, pEcsStubModule->GetName(), filePath.c_str() );
 		}
 		else
 		{
-			Error( "EcsCompiler: Failed to save C++ header for '%s' to '%s'", pEcsStubModule->GetName(), filePath.c_str() );
+			Error( "EcsCompiler: Failed to save C++ %s for '%s' to '%s'", pCppFileTypeName, pEcsStubModule->GetName(), filePath.c_str() );
 			bResult = false;
 		}
 	}

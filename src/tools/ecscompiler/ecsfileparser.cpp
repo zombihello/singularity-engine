@@ -20,6 +20,7 @@ CEcsFileParser::CEcsFileParser( CEcsSystemStub& stubs )
 	, stubs( stubs )
 	, pCurrentModule( NULL )
 	, pCurrentComponent( NULL )
+	, pCurrentResource( NULL )
 	, pCurrentSystem( NULL )
 {}
 
@@ -39,7 +40,7 @@ bool CEcsFileParser::ParseFile( const achar* pPath, const achar* pCode )
 		CParserTokenEater		tokenEater( tokens, pPath );
 		CParserLexerListener	lexerListener( tokenEater, pPath );
 		EcsCode_Tokenize( pCode, &lexerListener );
-		bHasError				= lexerListener.HasError();
+		bHasError = lexerListener.HasError();
 	}
 
 	// Parser the code
@@ -283,15 +284,31 @@ void CEcsFileParser::EmitError( const parserFileContext_t* pContext, const achar
 CEcsFileParser::AddMetadata
 ==================
 */
-void CEcsFileParser::AddMetadata( const parserFileContext_t* pContext, const parserFileContext_t* pValueContext, const achar* pName, const achar* pValue )
+void CEcsFileParser::AddMetadata( const parserFileContext_t* pContext, ecsMetadataType_t type )
 {
 	AssertMsg( pContext, "Invalid context for a metadata" );
-	AssertMsg( S_Strlen( pName ) > 0, "Metadata name isn't valid" );
+	AssertMsg( type != ECS_METADATA_NUM_TYPES, "Invalid metadata type" );
 	if ( !pCurrentMetadata )
 	{
 		pCurrentMetadata = new CEcsStubMetadata( *pContext );
 	}
-	pCurrentMetadata->AddValue( new CEcsStubMetadataValue( *pContext, pValueContext, pName, pValue ? pValue : "" ) );
+	pCurrentMetadata->AddValue( new CEcsStubMetadataValue( *pContext, type ) );
+}
+
+/*
+==================
+CEcsFileParser::AddMetadata
+==================
+*/
+void CEcsFileParser::AddMetadata( const parserFileContext_t* pContext, const parserFileContext_t* pValueContext, ecsMetadataType_t type, const achar* pValue )
+{
+	AssertMsg( pContext, "Invalid context for a metadata" );
+	AssertMsg( type != ECS_METADATA_NUM_TYPES, "Invalid metadata type" );
+	if ( !pCurrentMetadata )
+	{
+		pCurrentMetadata = new CEcsStubMetadata( *pContext );
+	}
+	pCurrentMetadata->AddValue( new CEcsStubMetadataValue( *pContext, pValueContext, type, pValue ) );
 }
 
 /*

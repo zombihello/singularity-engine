@@ -1,10 +1,10 @@
 {
 	"output-dir": "//BASE_PATH/sandbox/entities/",
 	"components": [
-		{ "type": "transform" 		},
-		{ "type": "camera_active" 	},
+		{ "type": "Transform" 		},
+		{ "type": "CameraActive" 	},
 		{ 
-			"type": "camera",
+			"type": "Camera",
 			"properties": [
 				{ 
 					"name": "bAutoViewData",

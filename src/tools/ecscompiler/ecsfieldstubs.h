@@ -2,6 +2,7 @@
 #define ECSFIELDSTUBS_H
 
 #include <vector>
+#include <unordered_map>
 
 #include "stdlib/refcount.h"
 #include "parserlib/filecontext.h"
@@ -9,6 +10,14 @@
 //-----------------------------------------------------------------------------
 // ECS stubs
 //-----------------------------------------------------------------------------
+enum ecsMetadataType_t
+{
+	ECS_METADATA_TYPE_SERIALIZE,
+	ECS_METADATA_TYPE_NAME,
+	ECS_METADATA_NUM_TYPES
+};
+
+
 enum ecsFieldAccessType_t
 {
 	ECS_FIELD_ACCESS_TYPE_READ,
@@ -67,15 +76,18 @@ protected:
 class CEcsStubMetadataValue : public CEcsStubBase
 {
 public:
-	CEcsStubMetadataValue( const parserFileContext_t& context, const parserFileContext_t* pValueContext, const achar* pName, const achar* pValue );
+	CEcsStubMetadataValue( const parserFileContext_t& context, ecsMetadataType_t type );
+	CEcsStubMetadataValue( const parserFileContext_t& context, const parserFileContext_t* pValueContext, ecsMetadataType_t type, const achar* pValue );
 
 	FORCEINLINE bool HasValue() const									{ return pValueContext; }
 	FORCEINLINE const parserFileContext_t* GetValueContext() const		{ return pValueContext; }
 	FORCEINLINE const achar* GetValue() const							{ return value.c_str(); }
+	FORCEINLINE ecsMetadataType_t GetType() const						{ return type; }
 
 private:
 	const parserFileContext_t*	pValueContext;
 	std::string					value;
+	ecsMetadataType_t			type;
 };
 
 
@@ -84,13 +96,23 @@ class CEcsStubMetadata : public CEcsStubBase
 public:
 	CEcsStubMetadata( const parserFileContext_t& context );
 
-	FORCEINLINE void AddValue( CEcsStubMetadataValue* pValue )							{ metadataValues.emplace_back( pValue ); }
-	FORCEINLINE const std::vector<TRefPtr<CEcsStubMetadataValue>>& GetValue() const		{ return metadataValues; }
-	FORCEINLINE ecsScopeStub_t& GetScope()												{ return scope; }
+	FORCEINLINE void AddValue( CEcsStubMetadataValue* pValue )														{ valuesDict[pValue->GetType()] = pValue; }
+	FORCEINLINE const std::unordered_map<ecsMetadataType_t, TRefPtr<CEcsStubMetadataValue>>& GetValues() const		{ return valuesDict; }
+	FORCEINLINE ecsScopeStub_t& GetScope()																			{ return scope; }
+	FORCEINLINE bool HasValue( ecsMetadataType_t type ) const														{ return valuesDict.find( type ) != valuesDict.end(); }
+	FORCEINLINE CEcsStubMetadataValue* GetValue( ecsMetadataType_t type ) const
+	{
+		auto itFind = valuesDict.find( type );
+		if ( itFind == valuesDict.end() )
+		{
+			return NULL;
+		}
+		return itFind->second;
+	}
 
 private:
-	ecsScopeStub_t									scope;
-	std::vector<TRefPtr<CEcsStubMetadataValue>>		metadataValues;
+	ecsScopeStub_t															scope;
+	std::unordered_map<ecsMetadataType_t, TRefPtr<CEcsStubMetadataValue>>	valuesDict;
 };
 
 
@@ -129,8 +151,22 @@ class CEcsStubDataType : public CEcsStubBase
 public:
 	CEcsStubDataType( const parserFileContext_t& context, const achar* pName, CEcsStubMetadata* pMetadata = NULL );
 
-	FORCEINLINE void AddDefaultFieldValue( CEcsStubDefaultFieldValue* pDefaultFieldValue )				{ defaultFieldValues.emplace_back( pDefaultFieldValue ); }
 	FORCEINLINE void AddField( CEcsStubField* pField )													{ fields.emplace_back( pField ); }
+	FORCEINLINE void AddDefaultFieldValue( CEcsStubDefaultFieldValue* pDefaultFieldValue )				
+	{ 
+		uint32	defaultFieldValueIdx = ( uint32 )defaultFieldValues.size();
+		defaultFieldValues.emplace_back( pDefaultFieldValue );
+		defaultFieldValuesDict[pDefaultFieldValue->GetName()] = defaultFieldValueIdx;
+	}
+	FORCEINLINE CEcsStubDefaultFieldValue* FindDefaultFieldValue( const achar* pFieldName ) const
+	{
+		auto itFind = defaultFieldValuesDict.find( pFieldName );
+		if ( itFind == defaultFieldValuesDict.end() )
+		{
+			return NULL;
+		}
+		return defaultFieldValues[itFind->second];
+	}
 
 	FORCEINLINE const std::vector<TRefPtr<CEcsStubDefaultFieldValue>>& GetDefaultFieldValues() const	{ return defaultFieldValues; }
 	FORCEINLINE const std::vector<TRefPtr<CEcsStubField>>& GetFields() const							{ return fields; }
@@ -142,6 +178,7 @@ private:
 	TRefPtr<CEcsStubMetadata>							pMetadata;
 	std::vector<TRefPtr<CEcsStubDefaultFieldValue>>		defaultFieldValues;
 	std::vector<TRefPtr<CEcsStubField>>					fields;
+	std::unordered_map<std::string, uint32>				defaultFieldValuesDict;
 };
 
 

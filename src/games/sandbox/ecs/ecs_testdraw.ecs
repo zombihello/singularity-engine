@@ -1,11 +1,18 @@
 module TestDraw;
+using "games/sandbox/quad.h";
 using "gameframework/ecs/ecs_render.gen.h";
 
 component Quad
 {
-	TRefPtr<IStudioAPIBuffer>	pVertexBuffer;
-	TRefPtr<IStudioAPIBuffer>	pIndexBuffer;
-	TResourcePtr<IMaterial>		pMaterial;
+	defaults:
+		pVertexBuffer( Quad().GetStudioAPIVertexBuffer() ),
+		pIndexBuffer( Quad().GetStudioAPIIndexBuffer() ),
+		pMaterial( Quad().GetMaterial() );
+		
+	TRefPtr<IStudioAPIBuffer>		pVertexBuffer;
+	TRefPtr<IStudioAPIBuffer>		pIndexBuffer;
+	[serialize][name="Material"] 
+	TResourcePtr<IMaterial>			pMaterial;
 }
 
 system QuadInit

@@ -12,11 +12,11 @@ component Camera
 		farClipPlane( 524288.0 * 0.5 ),
 		aspectRatio( 1.777778f );
 
-	bool	bAutoViewData;
-	float	fieldOfView;
-	float	nearClipPlane;
-	float	farClipPlane;
-	float	aspectRatio;
+	[serialize] bool	bAutoViewData;
+	[serialize] float	fieldOfView;
+	[serialize] float	nearClipPlane;
+	[serialize] float	farClipPlane;
+	[serialize] float	aspectRatio;
 }
 
 component CameraInited

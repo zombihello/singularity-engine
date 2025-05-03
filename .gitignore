@@ -11,6 +11,7 @@
 *.gch
 *.pch
 /.cache
+/.vscode
 /build
 **/__pycache__/**
 compile_commands.json

@@ -228,6 +228,16 @@ FORCEINLINE bool CSENTEntityDescVar::IsDefined() const
 
 /*
 ==================
+CSENTEntityDescVar::IsA
+==================
+*/
+FORCEINLINE bool CSENTEntityDescVar::IsA( sentEntityDescVarType_t type ) const
+{
+	return CSENTEntityDescVar::type == type;
+}
+
+/*
+==================
 CSENTEntityDescVar::SetUndefined
 ==================
 */

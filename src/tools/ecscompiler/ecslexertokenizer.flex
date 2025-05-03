@@ -16,6 +16,8 @@
 
     /* C++ Section */
 %{
+    #include <stack>
+
     #include "ecsfileparser_bison.cpp.h"
     #include "core/debug.h"
     #include "parserlib/lexerstate.h"
@@ -34,7 +36,8 @@
         ECS_LEXER_SCOPE_DEFAULT,
         ECS_LEXER_SCOPE_COMPONENT,
         ECS_LEXER_SCOPE_RESOURCE,
-        ECS_LEXER_SCOPE_SYSTEM
+        ECS_LEXER_SCOPE_SYSTEM,
+        ECS_LEXER_SCOPE_METADATA
     };
 
 
@@ -70,6 +73,7 @@
         }
 
         uint32                      bracketScopeLevel;
+        std::stack<uint32>          flexStateStack;
 
     private:
         ecsLexerScope_t             lexerScope;
@@ -92,6 +96,7 @@
 %x MultiLineComment
 %x StringLiteral
 %x CppText
+%x Metadata
 
 %%
     /* Rules */
@@ -125,9 +130,9 @@
 "include"                                       EMIT_TOKEN( TOKEN_SYSTEM_INCLUDE );
 "exclude"                                       EMIT_TOKEN( TOKEN_SYSTEM_EXCLUDE );
 "const"                                         EMIT_TOKEN( TOKEN_CPP_CONST );
-"::"                                            EMIT_TOKEN( TOKEN_CPP_NAMESPACE );
 
     /* Syntax */
+"::"                                            EMIT_TOKEN( TOKEN_CPP_NAMESPACE );
 ":"                                             EMIT_TOKEN( ':' );
 ","                                             EMIT_TOKEN( ',' );
 ";"                                             EMIT_TOKEN( ';' );
@@ -146,10 +151,62 @@
                                                         yyextra->ResetScope();
                                                     }
                                                 }
-"["                                             EMIT_TOKEN( '[' );
-"]"                                             EMIT_TOKEN( ']' );
+
+    /* Metadata */
+"["                                             { 
+                                                    EMIT_TOKEN( '[' ); 
+                                                    yyextra->flexStateStack.push( INITIAL );
+                                                    BEGIN( Metadata ); 
+                                                }
+<Metadata>
+{
+        /* UTF-8 Byte Order Mark */
+    \xef\xbb\xbf								yyextra->currentContext.charOffset = 0;
+
+        /* Keywords */
+    "serialize"                                 EMIT_TOKEN( TOKEN_METADATA_SERIALIZE );
+    "name"                                      EMIT_TOKEN( TOKEN_METADATA_NAME );
+    
+        /* Syntax */
+    "="                                         EMIT_TOKEN( '=' );
+    ","                                         EMIT_TOKEN( ',' );
+    "]"                                         { 
+                                                    EMIT_TOKEN( ']' ); 
+                                                    BEGIN( yyextra->flexStateStack.top() );
+                                                    yyextra->flexStateStack.pop(); 
+                                                }
+
+        /* Invalid Unicode chars */
+    [^\x00-\x7F]*								EMIT_ERROR( "Invalid Unicode chars" );
+
+        /* Whitespace */
+    [ \t\r]
+
+        /* String */
+    \"                                          { 
+                                                    yyextra->StoreSequenceStart(); 
+                                                    yyextra->flexStateStack.push( Metadata );
+                                                    BEGIN( StringLiteral ); 
+                                                }
+
+        /* Comments */
+    "//"[^\r\n]*								{ yyextra->StoreSequenceStart(); EMIT_COMMENT(); }
+    "/*"										{ 
+                                                   yyextra->StoreSequenceStart();
+                                                   yyextra->flexStateStack.push( Metadata );
+                                                   BEGIN( MultiLineComment ); 
+                                                }                                         
+
+        /* Next line */
+    <*>\n                                       yyextra->NextLine();
+
+        /* Default Rule */
+    .|\n                                        EMIT_ERROR( "Unknown token in a metadata section" );
+}
+
+    /* C++ code or initial a variable */
 "("                                             {
-                                                    // Emit only '(' if we in a default scope
+                                                    // Emit only '(' if we in the default scope
                                                     if ( yyextra->IsScopeA( ECS_LEXER_SCOPE_DEFAULT ) )
                                                     {
                                                         EMIT_TOKEN( '(' );
@@ -160,6 +217,7 @@
                                                         if ( yyextra->bracketScopeLevel == 0 )
                                                         {
                                                             EMIT_TOKEN( '(' );
+                                                            yyextra->flexStateStack.push( INITIAL );
                                                             BEGIN( CppText );
                                                             yyextra->StoreSequenceStart();
                                                             ++yyextra->bracketScopeLevel;
@@ -182,7 +240,8 @@
                                                     { 
                                                         EMIT_SEQUENCE( TOKEN_CPP_CODE );
                                                         EMIT_TOKEN( ')' );
-                                                        BEGIN( INITIAL ); 
+                                                        BEGIN( yyextra->flexStateStack.top() ); 
+                                                        yyextra->flexStateStack.pop();
                                                     }
                                                 }
 }
@@ -198,21 +257,37 @@
 [ \t\r]
 
     /* String */
-\"                                              { yyextra->StoreSequenceStart(); BEGIN( StringLiteral ); }
+\"                                              { 
+                                                    yyextra->StoreSequenceStart(); 
+                                                    yyextra->flexStateStack.push( INITIAL );
+                                                    BEGIN( StringLiteral ); 
+                                                }
 <StringLiteral>
 {
     [^"]*
-	\"											{ EMIT_SEQUENCE( TOKEN_STRING ), BEGIN( INITIAL ); }
+	\"											{ 
+                                                    EMIT_SEQUENCE( TOKEN_STRING );
+                                                    BEGIN( yyextra->flexStateStack.top() ); 
+                                                    yyextra->flexStateStack.pop();
+                                                }
 }
 
     /* Comments */
 "//"[^\r\n]*									{ yyextra->StoreSequenceStart(); EMIT_COMMENT(); }
-"/*"											{ yyextra->StoreSequenceStart(); BEGIN( MultiLineComment ); }
+"/*"											{ 
+                                                    yyextra->StoreSequenceStart();
+                                                    yyextra->flexStateStack.push( INITIAL );
+                                                    BEGIN( MultiLineComment ); 
+                                                }
 <MultiLineComment>
 {
 	[^*\n]+
 	"*"
-	"*/"										{ EMIT_COMMENT(); BEGIN( INITIAL ); }
+	"*/"										{ 
+                                                    EMIT_COMMENT(); 
+                                                    BEGIN( yyextra->flexStateStack.top() ); 
+                                                    yyextra->flexStateStack.pop();
+                                                }
 }
 
     /* Next line */

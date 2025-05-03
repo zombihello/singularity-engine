@@ -73,6 +73,7 @@ public:
 	operator bool() const;
 	operator ptrint() const;
 	operator uptrint() const;
+	operator IResource*() const;
 	TResourceClass* operator->() const;
 	TResourceClass* operator*() const;
 

@@ -11,11 +11,9 @@
 #include "gameframework/ientitydesc.h"
 #include "gameframework/ecs/ecs_core.h"
 #include "gameframework/ecs/ecs_common.gen.h"
-#include "sandbox/ecs/ecs_testdraw.gen.h"
 #include "gameframework/ecs/ecs_movement.gen.h"
 #include "gameframework/ecs/ecs_camera.gen.h"
-#include "gameframework/ecs/ecs_component_factory.h"
-#include "gameframework/ecs/ecs_component_serialize.h"
+#include "games/sandbox/ecs/ecs_testdraw.gen.h"
 
 //-----------------------------------------------------------------------------
 // Singularity Sandbox game
@@ -37,10 +35,6 @@ private:
 EXPOSE_INTERFACE_FN( Game, IGame, GAME_INTERFACE_VERSION );
 EXPOSE_SINGLE_INTERFACE( CGameAppSystems, IGameAppSystems, GAME_APPSYSTEMS_INTERFACE_VERSION );
 
-static TRefPtr<IStudioAPIBuffer>	pQuadVertexBuffer;
-static TRefPtr<IStudioAPIBuffer>	pQuadIndexBuffer;
-static TResourcePtr<IMaterial>		pQuadMaterial;
-
 
 /*
 ==================
@@ -51,57 +45,6 @@ CGame* Game()
 {
 	static CSandboxGame		s_SandboxGame;
 	return &s_SandboxGame;
-}
-
-
-/*
-==================
-LoadDataFromSENTComponent
-==================
-*/
-void LoadDataFromSENTComponent( const CSENTEntityDescComponent& sentComponent, ecsComponentQuad_t& component )
-{
-	component.pVertexBuffer = pQuadVertexBuffer;
-	component.pIndexBuffer	= pQuadIndexBuffer;
-	component.pMaterial		= pQuadMaterial;
-}
-
-/*
-==================
-LoadDataFromSENTComponent
-==================
-*/
-void LoadDataFromSENTComponent( const CSENTEntityDescComponent& sentComponent, ecsComponentCamera_t& component )
-{
-	CSENTEntityDescVar*		pSENTVar_bAutoViewData = sentComponent.GetVar( "bAutoViewData" );
-	if ( pSENTVar_bAutoViewData )
-	{
-		EcsReadData<bool>( component.bAutoViewData, *pSENTVar_bAutoViewData );
-	}
-
-	CSENTEntityDescVar*		pSENTVar_fieldOfView = sentComponent.GetVar( "fieldOfView" );
-	if ( pSENTVar_fieldOfView )
-	{
-		EcsReadData<float>( component.fieldOfView, *pSENTVar_fieldOfView );
-	}
-
-	CSENTEntityDescVar*		pSENTVar_nearClipPlane = sentComponent.GetVar( "nearClipPlane" );
-	if ( pSENTVar_nearClipPlane )
-	{
-		EcsReadData<float>( component.nearClipPlane, *pSENTVar_nearClipPlane );
-	}
-
-	CSENTEntityDescVar*		pSENTVar_farClipPlane = sentComponent.GetVar( "farClipPlane" );
-	if ( pSENTVar_farClipPlane )
-	{
-		EcsReadData<float>( component.farClipPlane, *pSENTVar_farClipPlane );
-	}
-
-	CSENTEntityDescVar* pSENTVar_aspectRatio = sentComponent.GetVar( "aspectRatio" );
-	if ( pSENTVar_aspectRatio )
-	{
-		EcsReadData<float>( component.aspectRatio, *pSENTVar_aspectRatio );
-	}
 }
 
 
@@ -125,7 +68,6 @@ bool CSandboxGame::Init( createInterfaceFn_t pFactory )
 	}
 
 	// Load a quad material
-	pQuadMaterial = g_pResourceSystem->FindOrLoadResource( "materials/nelson", RESOURCE_TYPE_MATERIAL );
 	class CInitQuadHelper
 	{
 	public:
@@ -140,8 +82,10 @@ bool CSandboxGame::Init( createInterfaceFn_t pFactory )
 			};
 			uint16		quadIndices[] = { 0, 1, 2, 2, 3, 0 };
 
-			pQuadVertexBuffer = g_pStudioAPI->CreateBuffer( ( byte* )&quadVerteces[0], ARRAYSIZE( quadVerteces ) * sizeof( studioSimpleElementVertex_t ), sizeof( studioSimpleElementVertex_t ), STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_VERTEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
-			pQuadIndexBuffer = g_pStudioAPI->CreateBuffer( ( byte* )&quadIndices[0], ARRAYSIZE( quadIndices ) * sizeof( uint16 ), sizeof( uint16 ), STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_INDEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
+			TResourcePtr<IMaterial>		pMaterial				= g_pResourceSystem->FindOrLoadResource( "materials/nelson", RESOURCE_TYPE_MATERIAL );
+			TRefPtr<IStudioAPIBuffer>	pStudioAPIVertexBuffer	= g_pStudioAPI->CreateBuffer( ( byte* )&quadVerteces[0], ARRAYSIZE( quadVerteces ) * sizeof( studioSimpleElementVertex_t ), sizeof( studioSimpleElementVertex_t ), STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_VERTEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
+			TRefPtr<IStudioAPIBuffer>	pStudioAPIIndexBuffer	= g_pStudioAPI->CreateBuffer( ( byte* )&quadIndices[0], ARRAYSIZE( quadIndices ) * sizeof( uint16 ), sizeof( uint16 ), STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_INDEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
+			Quad().Init(pStudioAPIVertexBuffer, pStudioAPIIndexBuffer, pMaterial);
 		}
 	};
 
@@ -151,15 +95,9 @@ bool CSandboxGame::Init( createInterfaceFn_t pFactory )
 											CInitQuadHelper::R_InitQuad( pGame );
 										} );
 	Studio_FlushRenderCommands();
-	
-
 
 	// Initialize the ECS world
 	ecsWorld.RegisterModule<ecsModuleTestDraw_t>();
-
-	ecsComponentTypes.RegisterType( "transform",	[]( const CSENTEntityDescComponent& sentComponent ) ->IEcsComponentFactory* { return new TEcsComponentFactory<ecsComponentTransform_t, NULL>( sentComponent ); } );
-	ecsComponentTypes.RegisterType( "quad",			[]( const CSENTEntityDescComponent& sentComponent ) ->IEcsComponentFactory* { return new TEcsComponentFactory<ecsComponentQuad_t, LoadDataFromSENTComponent>( sentComponent ); } );
-	ecsComponentTypes.RegisterType( "camera",		[]( const CSENTEntityDescComponent& sentComponent ) ->IEcsComponentFactory* { return new TEcsComponentFactory<ecsComponentCamera_t, LoadDataFromSENTComponent>( sentComponent ); } );
 
 	TResourcePtr<IEntityDesc>		pQuadEntityDesc = g_pResourceSystem->FindOrLoadResource( "entities/test_quad", RESOURCE_TYPE_ENTITY_DESC );
 	pQuadEntity = pQuadEntityDesc->Create( "quad" );
@@ -176,12 +114,12 @@ CSandboxGame::Shutdown
 */
 void CSandboxGame::Shutdown()
 {
-	CGame::Shutdown();
+	Quad().Shutdown();
 	pQuadEntity			= NULL;
 	pPlayerEntity		= NULL;
 	g_pStudioAPI		= NULL;
-	g_pStudioRender		= NULL;
 	g_pMaterialSystem	= NULL;
+	CGame::Shutdown();
 }
 
 /*

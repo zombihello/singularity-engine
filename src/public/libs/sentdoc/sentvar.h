@@ -18,7 +18,9 @@ enum sentEntityDescVarType_t
 	SENT_ENTITY_DESC_VAR_TYPE_VECTOR_3D,
 	SENT_ENTITY_DESC_VAR_TYPE_VECTOR_4D,
 	SENT_ENTITY_DESC_VAR_TYPE_MATRIX,
-	SENT_ENTITY_DESC_VAR_TYPE_STRING
+	SENT_ENTITY_DESC_VAR_TYPE_STRING,
+	SENT_ENTITY_DESC_VAR_NUM_TYPES
+
 	// TODO BS yehor.pohuliaka - Add support of arrays and dictionaries
 };
 
@@ -44,6 +46,7 @@ public:
 	void SetStringValue( const achar* pValue );
 
 	bool IsDefined() const;
+	bool IsA( sentEntityDescVarType_t type ) const;
 	const achar* GetName() const;
 	sentEntityDescVarType_t GetType() const;
 	bool GetBoolValue( bool defaultValue = false ) const;

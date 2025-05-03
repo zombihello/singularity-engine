@@ -2,6 +2,12 @@
 #define ECS_COMPONENT_SERIALIZE_H
 
 #include "sentdoc/sentvar.h"
+#include "interfaces/interfaces.h"
+#include "materialsystem/imaterial.h"
+#include "materialsystem/itexture.h"
+#include "gameframework/ientitydesc.h"
+#include "resourcesystem/iresource.h"
+#include "resourcesystem/iresourcesystem.h"
 
 //-----------------------------------------------------------------------------
 // Read a data from a SENT variable

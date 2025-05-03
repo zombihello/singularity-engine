@@ -63,7 +63,7 @@
 	- [X] ECS compiler: Compile all ECS files in directory
 	- [X] ECS compiler: Add support optional parameters and resources
 	- [ ] ECS compiler: Add support queries
-	- [ ] ECS compiler: Add generate code for load component variables from SENT file
+	- [X] ECS compiler: Add generate code for load component variables from SENT file
 	- [ ] Add possible to fly on scene
 - [ ] Migrate from STL to EASTL
 - [ ] Enable SIMD in GLM (#define GLM_FORCE_SSE2 and #define GLM_FORCE_ALIGNED)

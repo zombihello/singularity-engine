@@ -106,6 +106,17 @@ FORCEINLINE TResourcePtr<TResourceClass>::operator uptrint() const
 
 /*
 ==================
+TResourcePtr::operator IResource*
+==================
+*/
+template<class TResourceClass>
+FORCEINLINE TResourcePtr<TResourceClass>::operator IResource*() const
+{
+	return ( IResource* )pPtr;
+}
+
+/*
+==================
 TResourcePtr::operator->
 ==================
 */

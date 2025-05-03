@@ -11,3 +11,4 @@
 #include "stdlib/filetools.h"
 #include "core/debug.h"
 #include "core/profile.h"
+#include "gameframework/game.h"

@@ -72,15 +72,17 @@ void CGame::Shutdown()
 	// Unregister all render objects
 	g_pStudioRender->UnregisterAllObjects();
 
-	// Reset the ECS world
-	ecsWorld.Reset();
-
 	// Shutdown all resource factories
 	ecsEntityDescFactory.Shutdown();
+
+	// Reset the ECS world
+	ecsWorld.Reset();
 
 	// Unregister cvars and disconnect StdLib
 	ConVar_Unregister();
 	DisconnectStdLib();
+
+	g_pStudioRender = NULL;
 }
 
 /*

@@ -303,14 +303,4 @@ FORCEINLINE void CEcsWorld::Update( float deltaTime )
 	flecsWorld.progress( deltaTime );
 }
 
-/*
-==================
-CEcsWorld::Reset
-==================
-*/
-FORCEINLINE void CEcsWorld::Reset()
-{
-	flecsWorld.reset();
-}
-
 #endif // !ECS_INL

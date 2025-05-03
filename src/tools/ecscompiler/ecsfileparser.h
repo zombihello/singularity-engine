@@ -17,7 +17,8 @@ public:
 	// Generate parser functions
 	void EndDefinition( int32 line, const parserFileContext_t* pScopeStart, const parserFileContext_t* pScopeEnd );
 	void EmitError( const parserFileContext_t* pContext, const achar* pMessage );
-	void AddMetadata( const parserFileContext_t* pContext, const parserFileContext_t* pValueContext, const achar* pName, const achar* pValue );
+	void AddMetadata( const parserFileContext_t* pContext, ecsMetadataType_t type );
+	void AddMetadata( const parserFileContext_t* pContext, const parserFileContext_t* pValueContext, ecsMetadataType_t type, const achar* pValue );
 
 	// Module functions
 	void StartModule( const parserFileContext_t* pContext, const achar* pName );

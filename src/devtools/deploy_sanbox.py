@@ -57,7 +57,7 @@ if __name__ == "__main__":
     _builder.AddStep_GenerateBuildProjectFiles( gameName="sandbox" )
     _builder.AddStep_GenerateShaderCppClasses( "Generate Shader C++ Classes (Engine)", builder.ENGINE_CPP_SHADERLISTS )
     _builder.AddStep_CompileEcs( "Compile ECS (Engine)", builder.ENGINE_ECS_DIRS )
-    _builder.AddStep_CompileEcs( "Compile ECS (sandbox)", [("src/games/sandbox/", "sandbox/")] )
+    _builder.AddStep_CompileEcs( "Compile ECS (sandbox)", [("src/games/sandbox/", "games/sandbox/")] )
     if args.with_sdk:
         _builder.AddStep_CompileProjects( "Build Singularity SDK", builder.TOOL_PROJECTS )
     _builder.AddStep_CompileProjects( "Build Engine", builder.ENGINE_PROJECTS )

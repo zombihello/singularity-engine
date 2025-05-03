@@ -135,6 +135,8 @@
 %token TOKEN_SYSTEM_WRITE_RESOURCE
 %token TOKEN_SYSTEM_INCLUDE
 %token TOKEN_SYSTEM_EXCLUDE
+%token TOKEN_METADATA_SERIALIZE
+%token TOKEN_METADATA_NAME
 
 %%
 
@@ -359,9 +361,8 @@ metadata_values
     ;
 
 metadata_value
-    : TOKEN_IDENT                                                       { g_pFileParser->AddMetadata( $<pContext>1, NULL, $<token>1.data(), NULL ); }
-    | TOKEN_IDENT '=' TOKEN_IDENT                                       { g_pFileParser->AddMetadata( $<pContext>1, $<pContext>3, $<token>1.data(), $<token>3.data() ); }
-    | TOKEN_IDENT '=' TOKEN_STRING                                      { g_pFileParser->AddMetadata( $<pContext>1, $<pContext>3, $<token>1.data(), $<token>3.data() ); }
+    : TOKEN_METADATA_SERIALIZE                                          { g_pFileParser->AddMetadata( $<pContext>1, ECS_METADATA_TYPE_SERIALIZE ); }
+    | TOKEN_METADATA_NAME '=' TOKEN_STRING                              { g_pFileParser->AddMetadata( $<pContext>1, $<pContext>3, ECS_METADATA_TYPE_NAME, $<token>3.data() ); }
     ;
 
 ////////////////////////////////

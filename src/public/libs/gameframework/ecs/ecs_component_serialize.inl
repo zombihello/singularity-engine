@@ -9,7 +9,7 @@ EcsReadData
 template<typename TType>
 FORCEINLINE void EcsReadData( TType& data, const CSENTEntityDescVar& sentVar, const TType& defaultValue /*= TType()*/ )
 {
-	AssertMsg( false, "Unknown type to read from a SENT variable" );
+	static_assert( false, "Unknown type to read from a SENT variable" );
 }
 
 /*
@@ -98,6 +98,60 @@ template<>
 FORCEINLINE void EcsReadData<std::string>( std::string& data, const CSENTEntityDescVar& sentVar, const std::string& defaultValue /*= ""*/ )
 {
 	data = sentVar.GetStringValue( defaultValue.c_str() );
+}
+
+/*
+==================
+EcsReadData
+==================
+*/
+template<>
+FORCEINLINE void EcsReadData<TResourcePtr<ITexture>>( TResourcePtr<ITexture>& data, const CSENTEntityDescVar& sentVar, const TResourcePtr<ITexture>& pDefaultValue )
+{
+	if ( sentVar.IsA( SENT_ENTITY_DESC_VAR_TYPE_STRING ) )
+	{
+		data = g_pResourceSystem->FindOrLoadResource( sentVar.GetStringValue(), RESOURCE_TYPE_TEXTURE );
+	}
+	else
+	{
+		data = pDefaultValue;
+	}
+}
+
+/*
+==================
+EcsReadData
+==================
+*/
+template<>
+FORCEINLINE void EcsReadData<TResourcePtr<IMaterial>>( TResourcePtr<IMaterial>& data, const CSENTEntityDescVar& sentVar, const TResourcePtr<IMaterial>& pDefaultValue )
+{
+	if ( sentVar.IsA( SENT_ENTITY_DESC_VAR_TYPE_STRING ) )
+	{
+		data = g_pResourceSystem->FindOrLoadResource( sentVar.GetStringValue(), RESOURCE_TYPE_MATERIAL );
+	}
+	else
+	{
+		data = pDefaultValue;
+	}
+}
+
+/*
+==================
+EcsReadData
+==================
+*/
+template<>
+FORCEINLINE void EcsReadData<TResourcePtr<IEntityDesc>>( TResourcePtr<IEntityDesc>& data, const CSENTEntityDescVar& sentVar, const TResourcePtr<IEntityDesc>& pDefaultValue )
+{
+	if ( sentVar.IsA( SENT_ENTITY_DESC_VAR_TYPE_STRING ) )
+	{
+		data = g_pResourceSystem->FindOrLoadResource( sentVar.GetStringValue(), RESOURCE_TYPE_ENTITY_DESC );
+	}
+	else
+	{
+		data = pDefaultValue;
+	}
 }
 
 #endif // !ECS_COMPONENT_SERIALIZE_INL

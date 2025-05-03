@@ -1,5 +1,14 @@
 #include "tools/ecscompiler/ecsfieldstubs.h"
 
+// Table for convert from ecsMetadataType_t to text
+static const achar* s_pEcsMetadataTypeNames[] =
+{
+	"serialize",	// ECS_METADATA_TYPE_SERIALIZE
+	"name"			// ECS_METADATA_TYPE_NAME
+};
+static_assert( ARRAYSIZE( s_pEcsMetadataTypeNames ) == ECS_METADATA_NUM_TYPES, "Array size 's_pEcsMetadataTypeNames' must be equal to ECS_METADATA_NUM_TYPES" );
+
+
 /*
 ==================
 CEcsStubBase::CEcsStubBase
@@ -11,16 +20,27 @@ CEcsStubBase::CEcsStubBase( const parserFileContext_t& context, const achar* pNa
 {}
 
 
+/*
+==================
+CEcsStubMetadataValue::CEcsStubMetadataValue
+==================
+*/
+CEcsStubMetadataValue::CEcsStubMetadataValue( const parserFileContext_t& context, ecsMetadataType_t type )
+	: CEcsStubBase( context, s_pEcsMetadataTypeNames[type])
+	, pValueContext( NULL )
+	, type( type )
+{}
 
 /*
 ==================
 CEcsStubMetadataValue::CEcsStubMetadataValue
 ==================
 */
-CEcsStubMetadataValue::CEcsStubMetadataValue( const parserFileContext_t& context, const parserFileContext_t* pValueContext, const achar* pName, const achar* pValue )
-	: CEcsStubBase( context, pName )
+CEcsStubMetadataValue::CEcsStubMetadataValue( const parserFileContext_t& context, const parserFileContext_t* pValueContext, ecsMetadataType_t type, const achar* pValue )
+	: CEcsStubBase( context, s_pEcsMetadataTypeNames[type] )
 	, pValueContext( pValueContext )
 	, value( pValue )
+	, type( type )
 {}
 
 
@@ -43,7 +63,11 @@ CEcsStubDefaultFieldValue::CEcsStubDefaultFieldValue( const parserFileContext_t&
 	: CEcsStubBase( context, pName )
 	, valueContext( valueContext )
 	, value( pValue )
-{}
+{
+	// Remove whitespace at begin and at the end
+	value.erase( 0, value.find_first_not_of( " \t\n\r\f\v" ) );
+	value.erase( value.find_last_not_of( " \t\n\r\f\v" ) + 1 );
+}
 
 
 /*

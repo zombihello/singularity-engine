@@ -1,7 +1,16 @@
 {
 	"output-dir": "//BASE_PATH/sandbox/entities/",
 	"components": [
-		{ "type": "transform" 	},
-		{ "type": "quad" 		}
+		{ "type": "Transform" 	},
+		{ 
+			"type": "Quad",
+			"properties": [
+				{
+					"name": "Material",
+					"type": "string",
+					"value": "materials/nelson"
+				}
+			]
+		}
 	]
 }

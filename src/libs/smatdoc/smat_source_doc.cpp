@@ -20,6 +20,7 @@ static const achar* s_pVarTypeNames[] =
 	"texture",			// SMAT_MATERIAL_VAR_TYPE_TEXTURE
 	"material"			// SMAT_MATERIAL_VAR_TYPE_MATERIAL
 };
+static_assert( ARRAYSIZE( s_pVarTypeNames ) == SMAT_MATERIAL_VAR_NUM_TYPES, "Array size 's_pVarTypeNames' must be equal to SMAT_MATERIAL_VAR_NUM_TYPES" );
 
 
 //-----------------------------------------------------------------------------

@@ -6,10 +6,17 @@
 //-----------------------------------------------------------------------------
 // ECS C++ generator
 //-----------------------------------------------------------------------------
+enum ecsCppFileType_t
+{
+	ECS_CPP_FILE_TYPE_HEADER,
+	ECS_CPP_FILE_TYPE_SOURCE
+};
+
+
 class CEcsCppGenerator
 {
 public:
-	void Generate( CEcsStubModule* pEcsStubModule );
+	void Generate( CEcsStubModule* pEcsStubModule, ecsCppFileType_t cppFileType );
 
 	FORCEINLINE void Reset()							{ buffer.clear(); }
 	FORCEINLINE const std::string& GetBuffer() const	{ return buffer; }
@@ -21,10 +28,14 @@ private:
 		ECS_STRUCT_TYPE_RESOURCE
 	};
 
+	void GenerateHeader( CEcsStubModule* pEcsStubModule );
+	void GenerateSource( CEcsStubModule* pEcsStubModule );
 	void GenerateUsings( const std::vector<TRefPtr<CEcsStubUsing>>& ecsStubUsings );
 	void GenerateStructs( const std::vector<TRefPtr<CEcsStubDataType>>& ecsStubDataTypes, ecsStructType_t structsType );
 	void GenerateSystems( const std::vector<TRefPtr<CEcsStubSystem>>& ecsStubSystems );
 	void GenerateRegistrar( CEcsStubModule* pEcsStubModule );
+	void GenerateImplementationEcsReadDataFuncs( CEcsStubModule* pEcsStubModule );
+	void GenerateImplementationEcsFactories( CEcsStubModule* pEcsStubModule );
 	FORCEINLINE std::string GetStringWithUpperFirstChar( const achar* pString ) const
 	{
 		std::string		result = pString;

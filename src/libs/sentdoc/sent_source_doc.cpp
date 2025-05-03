@@ -18,6 +18,7 @@ static const achar* s_pVarTypeNames[] =
 	"matrix",			// SENT_ENTITY_DESC_VAR_TYPE_MATRIX
 	"string"			// SENT_ENTITY_DESC_VAR_TYPE_STRING
 };
+static_assert( ARRAYSIZE( s_pVarTypeNames ) == SENT_ENTITY_DESC_VAR_NUM_TYPES, "Array size 's_pVarTypeNames' must be equal to SENT_ENTITY_DESC_VAR_NUM_TYPES" );
 
 
 //-----------------------------------------------------------------------------

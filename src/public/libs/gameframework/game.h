@@ -5,6 +5,7 @@
 #include "gameframework/igame.h"
 #include "gameframework/ecs/ecs_core.h"
 #include "gameframework/ecs/ecs_component_factory.h"
+#include "gameframework/ecs/ecs_component_serialize.h"
 #include "gameframework/ecs/ecs_entitydesc_factory.h"
 
 //-----------------------------------------------------------------------------
