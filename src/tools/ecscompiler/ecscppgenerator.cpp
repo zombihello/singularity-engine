@@ -1,18 +1,98 @@
+#include "core/profile.h"
 #include "tools/ecscompiler/ecscppgenerator.h"
 
 // Table for convert ecsSystemStage_t to text
-static const achar* s_pEcsSystemStageNames[] =
+static std::pair<const achar*, const achar*> s_pEcsSystemStageNames[] =
 {
-	"OnStart",			// ECS_SYSTEM_STAGE_ONSTART
-	"OnLoad",			// ECS_SYSTEM_STAGE_ONLOAD
-	"PostLoad",			// ECS_SYSTEM_STAGE_POSTLOAD
-	"PreUpdate",		// ECS_SYSTEM_STAGE_PREUPDATE
-	"OnUpdate",			// ECS_SYSTEM_STAGE_ONUPDATE
-	"OnValidate",		// ECS_SYSTEM_STAGE_ONVALIDATE
-	"PostUpdate",		// ECS_SYSTEM_STAGE_POSTUPDATE
-	"PreStore",			// ECS_SYSTEM_STAGE_PRESTORE
-	"OnStore"			// ECS_SYSTEM_STAGE_ONSTORE
+	{ "on_start",		"OnStart" },		// ECS_SYSTEM_STAGE_ONSTART
+	{ "on_load",		"OnLoad" },			// ECS_SYSTEM_STAGE_ONLOAD
+	{ "post_load",		"PostLoad" },		// ECS_SYSTEM_STAGE_POSTLOAD
+	{ "pre_update",		"PreUpdate" },		// ECS_SYSTEM_STAGE_PREUPDATE
+	{ "on_update",		"OnUpdate" },		// ECS_SYSTEM_STAGE_ONUPDATE
+	{ "on_validate",	"OnValidate" },		// ECS_SYSTEM_STAGE_ONVALIDATE
+	{ "post_update",	"PostUpdate" },		// ECS_SYSTEM_STAGE_POSTUPDATE
+	{ "pre_store",		"PreStore" },		// ECS_SYSTEM_STAGE_PRESTORE
+	{ "on_store",		"OnStore" }			// ECS_SYSTEM_STAGE_ONSTORE
 };
+static_assert( ARRAYSIZE( s_pEcsSystemStageNames ) == ECS_SYSTEM_NUM_STAGES, "Size of s_pEcsSystemStageNames must be equal to ECS_SYSTEM_NUM_STAGES" );
+
+// Table for convert profiler group to profileScopeGroup_t
+static std::pair<const achar*, const achar*> s_pProfilerScopeGroupNames[] =
+{
+	{ "none",		"PROFILE_SCOPE_GROUP_NONE" },			// PROFILE_SCOPE_GROUP_NONE
+	{ "ai",			"PROFILE_SCOPE_GROUP_AI" },				// PROFILE_SCOPE_GROUP_AI
+	{ "animation",	"PROFILE_SCOPE_GROUP_ANIMATION" },		// PROFILE_SCOPE_GROUP_ANIMATION
+	{ "audio",		"PROFILE_SCOPE_GROUP_AUDIO" },			// PROFILE_SCOPE_GROUP_AUDIO
+	{ "debug",		"PROFILE_SCOPE_GROUP_DEBUG" },			// PROFILE_SCOPE_GROUP_DEBUG
+	{ "camera",		"PROFILE_SCOPE_GROUP_CAMERA" },			// PROFILE_SCOPE_GROUP_CAMERA
+	{ "cloth",		"PROFILE_SCOPE_GROUP_CLOTH" },			// PROFILE_SCOPE_GROUP_CLOTH
+	{ "gamelogic",	"PROFILE_SCOPE_GROUP_GAMELOGIC" },		// PROFILE_SCOPE_GROUP_GAMELOGIC
+	{ "input",		"PROFILE_SCOPE_GROUP_INPUT" },			// PROFILE_SCOPE_GROUP_INPUT
+	{ "navigation", "PROFILE_SCOPE_GROUP_NAVIGATION" },		// PROFILE_SCOPE_GROUP_NAVIGATION
+	{ "network",	"PROFILE_SCOPE_GROUP_NETWORK" },		// PROFILE_SCOPE_GROUP_NETWORK
+	{ "physics",	"PROFILE_SCOPE_GROUP_PHYSICS" },		// PROFILE_SCOPE_GROUP_PHYSICS
+	{ "rendering",	"PROFILE_SCOPE_GROUP_PHYSICS" },		// PROFILE_SCOPE_GROUP_PHYSICS
+	{ "scene",		"PROFILE_SCOPE_GROUP_SCENE" },			// PROFILE_SCOPE_GROUP_SCENE
+	{ "script",		"PROFILE_SCOPE_GROUP_SCRIPT" },			// PROFILE_SCOPE_GROUP_SCRIPT
+	{ "streaming",	"PROFILE_SCOPE_GROUP_STREAMING" },		// PROFILE_SCOPE_GROUP_STREAMING
+	{ "ui",			"PROFILE_SCOPE_GROUP_UI" },				// PROFILE_SCOPE_GROUP_UI
+	{ "vfx",		"PROFILE_SCOPE_GROUP_VFX" },			// PROFILE_SCOPE_GROUP_VFX
+	{ "visibility", "PROFILE_SCOPE_GROUP_VISIBILITY" },		// PROFILE_SCOPE_GROUP_VISIBILITY
+	{ "wait",		"PROFILE_SCOPE_GROUP_WAIT" },			// PROFILE_SCOPE_GROUP_WAIT
+	{ "io",			"PROFILE_SCOPE_GROUP_IO" }				// PROFILE_SCOPE_GROUP_IO
+};
+static_assert( ARRAYSIZE( s_pProfilerScopeGroupNames ) == PROFILE_SCOPE_NUM_GROUPS, "Size of s_pProfilerScopeGroupNames must be equal to PROFILE_SCOPE_NUM_GROUPS" );
+
+
+/*
+==================
+ConvTextToSystemStage
+==================
+*/
+static bool ConvTextToSystemStage( const achar* pName, const achar*& pSystemStage )
+{
+	pSystemStage = NULL;
+	for ( uint32 systemStageIdx = 0; systemStageIdx < ECS_SYSTEM_NUM_STAGES; ++systemStageIdx )
+	{
+		if ( !S_Stricmp( pName, s_pEcsSystemStageNames[systemStageIdx].first ) )
+		{
+			pSystemStage = s_pEcsSystemStageNames[systemStageIdx].second;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/*
+==================
+ConvTextToProfilerScopeGroup
+==================
+*/
+static bool ConvTextToProfilerScopeGroup( const achar* pName, const achar*& pProfilerScopeGroup )
+{
+	pProfilerScopeGroup = NULL;
+	for ( uint32 groupIdx = 0; groupIdx < PROFILE_SCOPE_NUM_GROUPS; ++groupIdx )
+	{
+		if ( !S_Stricmp( pName, s_pProfilerScopeGroupNames[groupIdx].first ) )
+		{
+			pProfilerScopeGroup = s_pProfilerScopeGroupNames[groupIdx].second;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+/*
+==================
+CEcsCppGenerator::CEcsCppGenerator
+==================
+*/
+CEcsCppGenerator::CEcsCppGenerator()
+	: bHasError( false )
+{}
 
 /*
 ==================
@@ -422,20 +502,40 @@ void CEcsCppGenerator::GenerateRegistrar( CEcsStubModule* pEcsStubModule )
 			}
 
 			// Register the system
-			Assert( pEcsStubSystem->GetStage() < ARRAYSIZE( s_pEcsSystemStageNames ) );
+			CEcsStubMetadata*		pEcsStubSystemMetadata				= pEcsStubSystem->GetMetadata();
+			CEcsStubMetadataValue*	pEcsStubSystemMetadataProfilerGroup = pEcsStubSystemMetadata ? pEcsStubSystemMetadata->GetValue( ECS_METADATA_TYPE_PROFILER_GROUP ) : NULL;
+			const achar*			pProfilerScopeGroupName				= NULL;
+			if ( pEcsStubSystemMetadataProfilerGroup && S_Strlen( pEcsStubSystemMetadataProfilerGroup->GetValue() ) > 0 && 
+				 !ConvTextToProfilerScopeGroup( pEcsStubSystemMetadataProfilerGroup->GetValue(), pProfilerScopeGroupName ) )
+			{
+				Error( "%s: Unknown profiler group '%s'", pEcsStubSystemMetadataProfilerGroup->GetValueContext().ToString().c_str(), pEcsStubSystemMetadataProfilerGroup->GetValue() );
+				bHasError = true;
+			}
+
+			CEcsStubMetadataValue*	pEcsStubSystemMetadataStage		= pEcsStubSystemMetadata ? pEcsStubSystemMetadata->GetValue( ECS_METADATA_TYPE_STAGE ) : NULL;
+			const achar*			pSystemStageName				= s_pEcsSystemStageNames[ECS_SYSTEM_STAGE_ONUPDATE].second;
+			if ( pEcsStubSystemMetadataStage && S_Strlen( pEcsStubSystemMetadataStage->GetValue() ) > 0 &&
+				 !ConvTextToSystemStage( pEcsStubSystemMetadataStage->GetValue(), pSystemStageName ) )
+			{
+				Error( "%s: Unknown system stage '%s'", pEcsStubSystemMetadataStage->GetValueContext().ToString().c_str(), pEcsStubSystemMetadataStage->GetValue() );
+				bHasError = true;
+			}
+
 			buffer += S_Sprintf( "\t\tflecsWorld.system<%s>()\n"
 								 "\t\t\t.kind( flecs::%s )\n"
 								 "%s"
 								 "%s"
 								 "\t\t\t.each( []( flecs::entity entity%s )\n"
 								 "\t\t\t{\n"
+								 "%s"
 								 "\t\t\t\tCEcsSystem%s::OnUpdate( entity.world(), entity%s );\n"
 								 "\t\t\t} );\n", 
 								 templateParams.c_str(), 
-								 s_pEcsSystemStageNames[pEcsStubSystem->GetStage()], 
+								 pSystemStageName,
 								 readWriteFuncs.c_str(), 
 								 filterFuncs.c_str(),
 								 !updateParams.empty() ? S_Sprintf( ", %s", updateParams.c_str() ).c_str() : "",
+								 pProfilerScopeGroupName ? S_Sprintf( "\t\t\t\tPROFILE_SCOPE( %s );\n", pProfilerScopeGroupName ).c_str() : "",
 								 pEcsStubSystem->GetName(),
 								 !callUpdateParams.empty() ? S_Sprintf( ", %s", callUpdateParams.c_str() ).c_str() : "" );
 			if ( systemIdx + 1 < numSystems )
@@ -506,6 +606,7 @@ void CEcsCppGenerator::GenerateImplementationEcsReadDataFuncs( CEcsStubModule* p
 			buffer += "*/\n";
 			buffer += S_Sprintf( "static void EcsReadData( const CSENTEntityDescComponent& sentComponent, ecsComponent%s_t& component )\n"
 								 "{\n"
+								 "\tPROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );\n"
 								 "%s\n"
 								 "}\n", 
 								 pEcsStubComponent->GetName(), sentReadDataFields.c_str() );

@@ -32,7 +32,6 @@ public:
 	
 	// System functions
 	void StartSystem( const parserFileContext_t* pContext, const achar* pName );
-	void SetSystemStage( const parserFileContext_t* pContext, ecsSystemStage_t stage );
 	void AddSystemField( const parserFileContext_t* pContext, const parserFileContext_t* pTypeContext, const achar* pName, const achar* pType, ecsFieldAccessType_t accessType );
 	void AddSystemFilter( const parserFileContext_t* pContext, const achar* pName, ecsSystemFilterType_t filterType );
 

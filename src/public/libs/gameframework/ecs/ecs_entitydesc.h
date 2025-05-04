@@ -24,10 +24,9 @@ public:
 
 private:
 	void Init( const CSENTCompiledEntityDescDoc& sentCompiledDoc );
-	void RecreateEcsArchetypeEntity() const;
-	ecsEntity_t CreateEcsEntity( const achar* pName ) const;
+	ecsEntity_t CreateEcsPrefab( const achar* pName ) const;
 
-	mutable ecsEntity_t								ecsArchetypeEntity;
+	mutable ecsEntity_t								ecsPrefab;
 	std::vector<TRefPtr<IEcsComponentFactory>>		ecsComponentFactories;
 };
 

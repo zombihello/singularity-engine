@@ -103,7 +103,7 @@ bool CSandboxGame::Init( createInterfaceFn_t pFactory )
 	pQuadEntity = pQuadEntityDesc->Create( "quad" );
 
 	TResourcePtr<IEntityDesc>		pPlayerEntityDesc = g_pResourceSystem->FindOrLoadResource( "entities/player", RESOURCE_TYPE_ENTITY_DESC );
-	pPlayerEntity = pQuadEntityDesc->Create( "player" );
+	pPlayerEntity = pPlayerEntityDesc->Create( "player" );
 	return true;
 }
 

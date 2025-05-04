@@ -3,8 +3,10 @@
 // Table for convert from ecsMetadataType_t to text
 static const achar* s_pEcsMetadataTypeNames[] =
 {
-	"serialize",	// ECS_METADATA_TYPE_SERIALIZE
-	"name"			// ECS_METADATA_TYPE_NAME
+	"serialize",			// ECS_METADATA_TYPE_SERIALIZE
+	"name",					// ECS_METADATA_TYPE_NAME
+	"profiler_group",		// ECS_METADATA_TYPE_PROFILER_GROUP
+	"stage"					// ECS_METADATA_TYPE_STAGE
 };
 static_assert( ARRAYSIZE( s_pEcsMetadataTypeNames ) == ECS_METADATA_NUM_TYPES, "Array size 's_pEcsMetadataTypeNames' must be equal to ECS_METADATA_NUM_TYPES" );
 
@@ -27,7 +29,7 @@ CEcsStubMetadataValue::CEcsStubMetadataValue
 */
 CEcsStubMetadataValue::CEcsStubMetadataValue( const parserFileContext_t& context, ecsMetadataType_t type )
 	: CEcsStubBase( context, s_pEcsMetadataTypeNames[type])
-	, pValueContext( NULL )
+	, bHasValue( false )
 	, type( type )
 {}
 
@@ -36,9 +38,10 @@ CEcsStubMetadataValue::CEcsStubMetadataValue( const parserFileContext_t& context
 CEcsStubMetadataValue::CEcsStubMetadataValue
 ==================
 */
-CEcsStubMetadataValue::CEcsStubMetadataValue( const parserFileContext_t& context, const parserFileContext_t* pValueContext, ecsMetadataType_t type, const achar* pValue )
+CEcsStubMetadataValue::CEcsStubMetadataValue( const parserFileContext_t& context, const parserFileContext_t& valueContext, ecsMetadataType_t type, const achar* pValue )
 	: CEcsStubBase( context, s_pEcsMetadataTypeNames[type] )
-	, pValueContext( pValueContext )
+	, bHasValue( true )
+	, valueContext( valueContext )
 	, value( pValue )
 	, type( type )
 {}
@@ -124,7 +127,6 @@ CEcsStubSystem::CEcsStubSystem
 */
 CEcsStubSystem::CEcsStubSystem( const parserFileContext_t& context, const achar* pName, CEcsStubMetadata* pMetadata /* = NULL */ )
 	: CEcsStubBase( context, pName )
-	, stage( ECS_SYSTEM_STAGE_ONUPDATE )
 	, pMetadata( pMetadata )
 {}
 

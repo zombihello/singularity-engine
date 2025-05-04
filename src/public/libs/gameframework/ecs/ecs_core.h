@@ -70,13 +70,15 @@ public:
 	template<typename TEcsResource>
 	bool HasResource() const;
 
-	// Functions to work with entities
-	ecsEntity_t CreateEntity( const achar* pName );
+	// Functions to work with entities and archetypes
+	ecsEntity_t CreateEntity( const achar* pName, ecsEntity_t ecsPrefab );
+	ecsEntity_t CreatePrefab( const achar* pName );
 	void DestroyEntity( ecsEntity_t& ecsEntity );
 	ecsEntity_t CloneEntity( ecsEntity_t ecsEntity, const achar* pName = NULL );
 	void SetEntityName( ecsEntity_t ecsEntity, const achar* pName );
 	const achar* GetEntityName( const ecsEntity_t& ecsEntity ) const;
 	bool IsValidEntity( const ecsEntity_t& ecsEntity ) const;
+	bool IsPrefab( const ecsEntity_t& ecsEntity ) const;
 
 	// Functions to works with components
 	template<typename TEcsComponent>

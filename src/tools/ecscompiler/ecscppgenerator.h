@@ -16,9 +16,15 @@ enum ecsCppFileType_t
 class CEcsCppGenerator
 {
 public:
+	CEcsCppGenerator();
 	void Generate( CEcsStubModule* pEcsStubModule, ecsCppFileType_t cppFileType );
+	FORCEINLINE void Reset()							
+	{ 
+		buffer.clear(); 
+		bHasError = false; 
+	}
 
-	FORCEINLINE void Reset()							{ buffer.clear(); }
+	FORCEINLINE bool HasError() const					{ return bHasError; }
 	FORCEINLINE const std::string& GetBuffer() const	{ return buffer; }
 
 private:
@@ -46,6 +52,7 @@ private:
 		return result;
 	}
 
+	bool			bHasError;
 	std::string		buffer;
 };
 

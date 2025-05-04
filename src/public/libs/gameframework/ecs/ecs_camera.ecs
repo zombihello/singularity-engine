@@ -25,17 +25,17 @@ component CameraInited
 component CameraActive
 {}
 
+[stage="on_update", profiler_group="camera"]
 system CameraInit
 {
-	stage:				on_update;
 	write:				Camera		camera;
 	read_resource:		WindowMgr	windowMgr;
 	exclude:			CameraInited;
 }
 
+[stage="on_store", profiler_group="camera"]
 system UpdateCameraView
 {
-	stage: 				on_store;
 	read:				Transform		transform,
 						Camera			camera;
 	read_resource:		StudioRender	studioRender;

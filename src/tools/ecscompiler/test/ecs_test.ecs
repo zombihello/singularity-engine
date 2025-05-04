@@ -32,9 +32,9 @@ component ComponentTag
 	read_resource: 	TestResource	testResource;
 }*/
 
+[stage="on_store"][profiler_group="debug"]
 system TestSystem
 {
-	stage: 				on_store;
 	read:				TestComponent				comp1,
 						ComponentWithDefaults		comp2;
 	read_optional:		ComponentWithDefaults		readOptional;

@@ -308,7 +308,7 @@ void CEcsFileParser::AddMetadata( const parserFileContext_t* pContext, const par
 	{
 		pCurrentMetadata = new CEcsStubMetadata( *pContext );
 	}
-	pCurrentMetadata->AddValue( new CEcsStubMetadataValue( *pContext, pValueContext, type, pValue ) );
+	pCurrentMetadata->AddValue( new CEcsStubMetadataValue( *pContext, *pValueContext, type, pValue ) );
 }
 
 /*
@@ -340,27 +340,6 @@ void CEcsFileParser::StartSystem( const parserFileContext_t* pContext, const ach
 		EmitError( pContext, "A system must be in a module" );
 	}
 	pCurrentMetadata = NULL;
-}
-
-/*
-==================
-CEcsFileParser::SetSystemStage
-==================
-*/
-void CEcsFileParser::SetSystemStage( const parserFileContext_t* pContext, ecsSystemStage_t stage )
-{
-	AssertMsg( pContext, "Invalid context for a system field" );
-
-	// Set the stage into the current system
-	if ( pCurrentSystem )
-	{
-		pCurrentSystem->SetStage( *pContext, stage );
-	}
-	// Otherwise it is error
-	else
-	{
-		EmitError( pContext, "System stage can be only in systems" );
-	}
 }
 
 /*

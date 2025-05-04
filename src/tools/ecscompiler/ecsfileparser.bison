@@ -117,16 +117,6 @@
 %token TOKEN_CPP_CODE
 %token TOKEN_CPP_NAMESPACE
 %token TOKEN_CPP_CONST
-%token TOKEN_SYSTEM_STAGE
-%token TOKEN_SYSTEM_STAGE_ONSTART
-%token TOKEN_SYSTEM_STAGE_ONLOAD
-%token TOKEN_SYSTEM_STAGE_POSTLOAD
-%token TOKEN_SYSTEM_STAGE_PREUPDATE
-%token TOKEN_SYSTEM_STAGE_ONUPDATE
-%token TOKEN_SYSTEM_STAGE_ONVALIDATE
-%token TOKEN_SYSTEM_STAGE_POSTUPDATE
-%token TOKEN_SYSTEM_STAGE_PRESTORE
-%token TOKEN_SYSTEM_STAGE_ONSTORE
 %token TOKEN_SYSTEM_READ
 %token TOKEN_SYSTEM_READ_OPTIONAL
 %token TOKEN_SYSTEM_READ_RESOURCE
@@ -137,6 +127,8 @@
 %token TOKEN_SYSTEM_EXCLUDE
 %token TOKEN_METADATA_SERIALIZE
 %token TOKEN_METADATA_NAME
+%token TOKEN_METADATA_PROFILER_GROUP
+%token TOKEN_METADATA_STAGE
 
 %%
 
@@ -241,23 +233,10 @@ system_header
     ;
 
 system_body
-    : system_body system_stage semicolon                                {}
-    | system_body system_fields semicolon                               {}
+    : system_body system_fields semicolon                               {}
     | system_body system_filters semicolon                              {}
     | system_body semicolon                                             {}
     | /* empty */
-    ;
-
-system_stage
-    : TOKEN_SYSTEM_STAGE ':' TOKEN_SYSTEM_STAGE_ONSTART                 { g_pFileParser->SetSystemStage( $<pContext>3, ECS_SYSTEM_STAGE_ONSTART ); }
-    | TOKEN_SYSTEM_STAGE ':' TOKEN_SYSTEM_STAGE_ONLOAD                  { g_pFileParser->SetSystemStage( $<pContext>3, ECS_SYSTEM_STAGE_ONLOAD ); }
-    | TOKEN_SYSTEM_STAGE ':' TOKEN_SYSTEM_STAGE_POSTLOAD                { g_pFileParser->SetSystemStage( $<pContext>3, ECS_SYSTEM_STAGE_POSTLOAD ); }
-    | TOKEN_SYSTEM_STAGE ':' TOKEN_SYSTEM_STAGE_PREUPDATE               { g_pFileParser->SetSystemStage( $<pContext>3, ECS_SYSTEM_STAGE_PREUPDATE ); }
-    | TOKEN_SYSTEM_STAGE ':' TOKEN_SYSTEM_STAGE_ONUPDATE                { g_pFileParser->SetSystemStage( $<pContext>3, ECS_SYSTEM_STAGE_ONUPDATE ); }
-    | TOKEN_SYSTEM_STAGE ':' TOKEN_SYSTEM_STAGE_ONVALIDATE              { g_pFileParser->SetSystemStage( $<pContext>3, ECS_SYSTEM_STAGE_ONVALIDATE ); }
-    | TOKEN_SYSTEM_STAGE ':' TOKEN_SYSTEM_STAGE_POSTUPDATE              { g_pFileParser->SetSystemStage( $<pContext>3, ECS_SYSTEM_STAGE_POSTUPDATE ); }
-    | TOKEN_SYSTEM_STAGE ':' TOKEN_SYSTEM_STAGE_PRESTORE                { g_pFileParser->SetSystemStage( $<pContext>3, ECS_SYSTEM_STAGE_PRESTORE ); }
-    | TOKEN_SYSTEM_STAGE ':' TOKEN_SYSTEM_STAGE_ONSTORE                 { g_pFileParser->SetSystemStage( $<pContext>3, ECS_SYSTEM_STAGE_ONSTORE ); }
     ;
 
 system_fields
@@ -363,6 +342,8 @@ metadata_values
 metadata_value
     : TOKEN_METADATA_SERIALIZE                                          { g_pFileParser->AddMetadata( $<pContext>1, ECS_METADATA_TYPE_SERIALIZE ); }
     | TOKEN_METADATA_NAME '=' TOKEN_STRING                              { g_pFileParser->AddMetadata( $<pContext>1, $<pContext>3, ECS_METADATA_TYPE_NAME, $<token>3.data() ); }
+    | TOKEN_METADATA_PROFILER_GROUP '=' TOKEN_STRING                    { g_pFileParser->AddMetadata( $<pContext>1, $<pContext>3, ECS_METADATA_TYPE_PROFILER_GROUP, $<token>3.data() ); }
+    | TOKEN_METADATA_STAGE '=' TOKEN_STRING                             { g_pFileParser->AddMetadata( $<pContext>1, $<pContext>3, ECS_METADATA_TYPE_STAGE, $<token>3.data() ); }
     ;
 
 ////////////////////////////////

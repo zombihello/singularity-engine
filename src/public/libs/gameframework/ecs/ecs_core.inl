@@ -40,9 +40,20 @@ void CEcsWorld::UnRegisterModule()
 CEcsWorld::CreateEntity
 ==================
 */
-FORCEINLINE ecsEntity_t CEcsWorld::CreateEntity( const achar* pName )
+FORCEINLINE ecsEntity_t CEcsWorld::CreateEntity( const achar* pName, ecsEntity_t ecsPrefab )
 {
-	return ecsEntity_t( flecsWorld.entity( pName ) );
+	AssertMsg( IsValidEntity( ecsPrefab ) && IsPrefab( ecsPrefab ), "Prefab isn't valid" );
+	return ecsEntity_t( flecsWorld.entity( pName ).is_a( ecsPrefab.flecsEntity ) );
+}
+
+/*
+==================
+CEcsWorld::CreatePrefab
+==================
+*/
+FORCEINLINE ecsEntity_t CEcsWorld::CreatePrefab( const achar* pName )
+{
+	return ecsEntity_t( flecsWorld.prefab( pName ) );
 }
 
 /*
@@ -102,7 +113,18 @@ CEcsWorld::IsValidEntity
 */
 FORCEINLINE bool CEcsWorld::IsValidEntity( const ecsEntity_t& ecsEntity ) const
 {
-	return ecsEntity.flecsEntity != flecs::entity::null();
+	return flecsWorld.is_valid( ecsEntity.flecsEntity );
+}
+
+/*
+==================
+CEcsWorld::IsArchetypeEntity
+==================
+*/
+FORCEINLINE bool CEcsWorld::IsPrefab( const ecsEntity_t& ecsEntity ) const
+{
+	AssertMsg( IsValidEntity( ecsEntity ), "Entity must be valid" );
+	return ecsEntity.flecsEntity.has( flecs::Prefab );
 }
 
 /*

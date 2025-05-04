@@ -52,36 +52,21 @@ void CEcsEntityDesc::Init( const CSENTCompiledEntityDescDoc& sentCompiledDoc )
 
 /*
 ==================
-CEcsEntityDesc::RecreateEcsArchetypeEntity
+CEcsEntityDesc::CreateEcsPrefab
 ==================
 */
-void CEcsEntityDesc::RecreateEcsArchetypeEntity() const
+ecsEntity_t CEcsEntityDesc::CreateEcsPrefab( const achar* pName ) const
 {
 	PROFILE_SCOPE()
-	CEcsWorld&		ecsWorld = Game()->GetEcsWorld();
-	if ( !ecsWorld.IsValidEntity( ecsArchetypeEntity ) )
+	CEcsWorld&	ecsWorld = Game()->GetEcsWorld();
+	ecsEntity_t ecsPrefab = ecsWorld.CreatePrefab( pName );
+	for ( uint32 componentIdx = 0, numComponents = ( uint32 )ecsComponentFactories.size(); componentIdx < numComponents; ++componentIdx )
 	{
-		ecsArchetypeEntity = CreateEcsEntity( "" );
-	}
-}
-
-/*
-==================
-CEcsEntityDesc::CreateEcsEntity
-==================
-*/
-ecsEntity_t CEcsEntityDesc::CreateEcsEntity( const achar* pName ) const
-{
-	PROFILE_SCOPE()
-	CEcsWorld&		ecsWorld	= Game()->GetEcsWorld();
-	ecsEntity_t		ecsEntity	= ecsWorld.CreateEntity( pName );
-	for ( uint32 componentIdx = 0, numComponents = ( uint32 ) ecsComponentFactories.size(); componentIdx < numComponents; ++componentIdx )
-	{
-		IEcsComponentFactory* pEcsComponentFactory = ecsComponentFactories[componentIdx];
-		pEcsComponentFactory->Create( ecsWorld, ecsEntity );
+		IEcsComponentFactory*	pEcsComponentFactory = ecsComponentFactories[componentIdx];
+		pEcsComponentFactory->Create( ecsWorld, ecsPrefab );
 	}
 
-	return ecsEntity;
+	return ecsPrefab;
 }
 
 /*
@@ -93,11 +78,10 @@ void CEcsEntityDesc::Clear()
 {
 	PROFILE_SCOPE()
 	CEcsWorld&	ecsWorld = Game()->GetEcsWorld();
-	if ( ecsWorld.IsValidEntity( ecsArchetypeEntity ) )
+	if ( ecsWorld.IsValidEntity( ecsPrefab ) )
 	{
-		ecsWorld.DestroyEntity( ecsArchetypeEntity );
+		ecsWorld.DestroyEntity( ecsPrefab );
 	}
-
 	ecsComponentFactories.clear();
 }
 
@@ -110,6 +94,9 @@ IEntity* CEcsEntityDesc::Create( const achar* pName /* = "" */ ) const
 {
 	PROFILE_SCOPE()
 	CEcsWorld&		ecsWorld = Game()->GetEcsWorld();
-	RecreateEcsArchetypeEntity();
-	return new CEcsEntity( ecsWorld.CloneEntity( ecsArchetypeEntity, pName ) );
+	if ( !ecsWorld.IsValidEntity( ecsPrefab ) )
+	{
+		ecsPrefab = CreateEcsPrefab( "" );
+	}
+	return new CEcsEntity( ecsWorld.CreateEntity( pName, ecsPrefab ) );
 }

@@ -221,7 +221,6 @@ CEcsCompilerApp::GenerateCppFiles
 */
 bool CEcsCompilerApp::GenerateCppFiles( const achar* pRootDir, const achar* pOutputDir, const CEcsSystemStub& stubs, ecsCppFileType_t cppFileType )
 {
-	bool											bResult = true;
 	const std::vector<TRefPtr<CEcsStubModule>>&		ecsStubModules = stubs.GetModules();
 	CEcsCppGenerator								ecsCppGenerator;
 
@@ -263,13 +262,17 @@ bool CEcsCompilerApp::GenerateCppFiles( const achar* pRootDir, const achar* pOut
 		CEcsStubModule*			pEcsStubModule = ecsStubModules[ecsStubModuleIdx];
 		ecsCppGenerator.Reset();
 		ecsCppGenerator.Generate( pEcsStubModule, cppFileType );
+		if ( ecsCppGenerator.HasError() )
+		{
+			return false;
+		}
 		const std::string&		buffer = ecsCppGenerator.GetBuffer();
 
 		// Make sub directories if we use 'dir' command
 		std::string		subDir;
 		if ( !rootDir.empty() )
 		{
-			S_GetFilePath( pEcsStubModule->GetContext().file.AsChar() + rootDir.size(), subDir, false);
+			S_GetFilePath( pEcsStubModule->GetContext().file.AsChar() + rootDir.size(), subDir, false );
 			S_AppendPathSeparator( subDir );
 		}
 
@@ -291,11 +294,11 @@ bool CEcsCompilerApp::GenerateCppFiles( const achar* pRootDir, const achar* pOut
 		else
 		{
 			Error( "EcsCompiler: Failed to save C++ %s for '%s' to '%s'", pCppFileTypeName, pEcsStubModule->GetName(), filePath.c_str() );
-			bResult = false;
+			return false;
 		}
 	}
 
-	return bResult;
+	return true;
 }
 
 /*

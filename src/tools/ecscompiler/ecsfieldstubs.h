@@ -14,6 +14,8 @@ enum ecsMetadataType_t
 {
 	ECS_METADATA_TYPE_SERIALIZE,
 	ECS_METADATA_TYPE_NAME,
+	ECS_METADATA_TYPE_PROFILER_GROUP,
+	ECS_METADATA_TYPE_STAGE,
 	ECS_METADATA_NUM_TYPES
 };
 
@@ -30,6 +32,14 @@ enum ecsFieldAccessType_t
 };
 
 
+enum ecsSystemFilterType_t
+{
+	ECS_SYSTEM_FILTER_TYPE_INCLUDE,
+	ECS_SYSTEM_FILTER_TYPE_EXCLUDE,
+	ECS_SYSTEM_NUM_FILTER_TYPES
+};
+
+
 enum ecsSystemStage_t
 {
 	ECS_SYSTEM_STAGE_ONSTART,
@@ -40,15 +50,8 @@ enum ecsSystemStage_t
 	ECS_SYSTEM_STAGE_ONVALIDATE,
 	ECS_SYSTEM_STAGE_POSTUPDATE,
 	ECS_SYSTEM_STAGE_PRESTORE,
-	ECS_SYSTEM_STAGE_ONSTORE
-};
-
-
-enum ecsSystemFilterType_t
-{
-	ECS_SYSTEM_FILTER_TYPE_INCLUDE,
-	ECS_SYSTEM_FILTER_TYPE_EXCLUDE,
-	ECS_SYSTEM_NUM_FILTER_TYPES
+	ECS_SYSTEM_STAGE_ONSTORE,
+	ECS_SYSTEM_NUM_STAGES
 };
 
 
@@ -77,15 +80,16 @@ class CEcsStubMetadataValue : public CEcsStubBase
 {
 public:
 	CEcsStubMetadataValue( const parserFileContext_t& context, ecsMetadataType_t type );
-	CEcsStubMetadataValue( const parserFileContext_t& context, const parserFileContext_t* pValueContext, ecsMetadataType_t type, const achar* pValue );
+	CEcsStubMetadataValue( const parserFileContext_t& context, const parserFileContext_t& pValueContext, ecsMetadataType_t type, const achar* pValue );
 
-	FORCEINLINE bool HasValue() const									{ return pValueContext; }
-	FORCEINLINE const parserFileContext_t* GetValueContext() const		{ return pValueContext; }
+	FORCEINLINE bool HasValue() const									{ return bHasValue; }
+	FORCEINLINE const parserFileContext_t& GetValueContext() const		{ return valueContext; }
 	FORCEINLINE const achar* GetValue() const							{ return value.c_str(); }
 	FORCEINLINE ecsMetadataType_t GetType() const						{ return type; }
 
 private:
-	const parserFileContext_t*	pValueContext;
+	bool						bHasValue;
+	parserFileContext_t			valueContext;
 	std::string					value;
 	ecsMetadataType_t			type;
 };
@@ -201,27 +205,18 @@ class CEcsStubSystem : public CEcsStubBase
 public:
 	CEcsStubSystem( const parserFileContext_t& context, const achar* pName, CEcsStubMetadata* pMetadata = NULL );
 
-	FORCEINLINE void SetStage( const parserFileContext_t& stageContext, ecsSystemStage_t stage )							
-	{ 
-		CEcsStubSystem::stageContext	= stageContext; 
-		CEcsStubSystem::stage			= stage; 
-	}
 	FORCEINLINE void AddField( ecsFieldAccessType_t accessType, CEcsStubField* pField )										{ fields[accessType].emplace_back( pField ); }
 	FORCEINLINE void AddFilter( ecsSystemFilterType_t filterType, CEcsStubSystemFilter* pFilter )							{ filters[filterType].emplace_back( pFilter ); }
 
 	FORCEINLINE bool HasFields( ecsFieldAccessType_t accessType ) const														{ return !fields[accessType].empty(); }
 	FORCEINLINE bool HasFilters( ecsSystemFilterType_t filterType ) const													{ return !filters[filterType].empty(); }
 	FORCEINLINE ecsScopeStub_t& GetScope()																					{ return scope; }
-	FORCEINLINE ecsSystemStage_t GetStage() const																			{ return stage; }
-	FORCEINLINE const parserFileContext_t& GetStageContext() const															{ return stageContext; }
 	FORCEINLINE CEcsStubMetadata* GetMetadata() const																		{ return pMetadata; }
 	FORCEINLINE const std::vector<TRefPtr<CEcsStubField>>& GetFields( ecsFieldAccessType_t accessType ) const				{ return fields[accessType]; }
 	FORCEINLINE const std::vector<TRefPtr<CEcsStubSystemFilter>>& GetFilters( ecsSystemFilterType_t filterType ) const		{ return filters[filterType]; }
 
 private:
 	ecsScopeStub_t								scope;
-	ecsSystemStage_t							stage;
-	parserFileContext_t							stageContext;
 	TRefPtr<CEcsStubMetadata>					pMetadata;
 	std::vector<TRefPtr<CEcsStubField>>			fields[ECS_FIELD_NUM_ACCESS_TYPES];
 	std::vector<TRefPtr<CEcsStubSystemFilter>>	filters[ECS_SYSTEM_NUM_FILTER_TYPES];

@@ -111,16 +111,6 @@
 "resource"                                      { EMIT_TOKEN( TOKEN_RESOURCE ); yyextra->SetScope( ECS_LEXER_SCOPE_RESOURCE ); }
 "defaults"                                      EMIT_TOKEN( TOKEN_DEFAULTS );
 "system"                                        { EMIT_TOKEN( TOKEN_SYSTEM ); yyextra->SetScope( ECS_LEXER_SCOPE_SYSTEM ); }
-"stage"                                         EMIT_TOKEN( TOKEN_SYSTEM_STAGE );
-"on_start"                                      EMIT_TOKEN( TOKEN_SYSTEM_STAGE_ONSTART );
-"on_load"                                       EMIT_TOKEN( TOKEN_SYSTEM_STAGE_ONLOAD );
-"post_load"                                     EMIT_TOKEN( TOKEN_SYSTEM_STAGE_POSTLOAD );
-"pre_update"                                    EMIT_TOKEN( TOKEN_SYSTEM_STAGE_PREUPDATE );
-"on_update"                                     EMIT_TOKEN( TOKEN_SYSTEM_STAGE_ONUPDATE );
-"on_validate"                                   EMIT_TOKEN( TOKEN_SYSTEM_STAGE_ONVALIDATE );
-"post_update"                                   EMIT_TOKEN( TOKEN_SYSTEM_STAGE_POSTUPDATE );
-"pre_store"                                     EMIT_TOKEN( TOKEN_SYSTEM_STAGE_PRESTORE );
-"on_store"                                      EMIT_TOKEN( TOKEN_SYSTEM_STAGE_ONSTORE );
 "read"                                          EMIT_TOKEN( TOKEN_SYSTEM_READ );
 "read_optional"                                 EMIT_TOKEN( TOKEN_SYSTEM_READ_OPTIONAL );
 "read_resource"                                 EMIT_TOKEN( TOKEN_SYSTEM_READ_RESOURCE );
@@ -166,6 +156,8 @@
         /* Keywords */
     "serialize"                                 EMIT_TOKEN( TOKEN_METADATA_SERIALIZE );
     "name"                                      EMIT_TOKEN( TOKEN_METADATA_NAME );
+    "profiler_group"                            EMIT_TOKEN( TOKEN_METADATA_PROFILER_GROUP );
+    "stage"                                     EMIT_TOKEN( TOKEN_METADATA_STAGE );
     
         /* Syntax */
     "="                                         EMIT_TOKEN( '=' );

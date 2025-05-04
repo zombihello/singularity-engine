@@ -15,9 +15,9 @@ component Quad
 	TResourcePtr<IMaterial>			pMaterial;
 }
 
+[stage="on_update", profiler_group="scene"]
 system QuadInit
 {
-	stage: 				on_update;
 	read: 				Quad quad;
 	read_resource:		StudioRender	studioRender;
 	exclude: 			StudioRenderObject;
