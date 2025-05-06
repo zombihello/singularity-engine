@@ -9,8 +9,7 @@ pipeline {
 
     environment {
         GIT_URL = 'git@git.bs.ua:engine-team/singularity-engine.git'
-        BUILD_DIR = "artifacts/${JOB_NAME}"
-        ARCHIVE_DIR = "artifacts/${JOB_NAME}"
+        BUILD_DIR = "build"
         ZIP_DIR = "${env.BUILD_DIR}/**/*.*"
         ZIP_EXE = 'C:/Program Files/7-Zip/7z.exe'
     }
@@ -19,7 +18,7 @@ pipeline {
         stage( 'Generate Project Files' ) {
             steps {
                 script {
-                    def base_args = "${params.PLATFORM} ${params.CONFIGURATION} --output_path \"${env.JENKINS_AGENT_HOME}/${env.BUILD_DIR}\"" + ( params.WITH_SDK ? " --with-sdk" : "" )
+                    def base_args = "${params.PLATFORM} ${params.CONFIGURATION} --output_path \"${env.BUILD_DIR}\"" + ( params.WITH_SDK ? " --with-sdk" : "" )
                     dir( "src/devtools" ) {
                         bat "python jenkins/build_sandbox.py ${base_args} --generate-project-files"
                     }
@@ -30,7 +29,7 @@ pipeline {
         stage( 'Generate Shader C++ Classes' ) {
             steps {
                 script {
-                    def base_args = "${params.PLATFORM} ${params.CONFIGURATION} --output_path \"${env.JENKINS_AGENT_HOME}/${env.BUILD_DIR}\"" + ( params.WITH_SDK ? " --with-sdk" : "" )
+                    def base_args = "${params.PLATFORM} ${params.CONFIGURATION} --output_path \"${env.BUILD_DIR}\"" + ( params.WITH_SDK ? " --with-sdk" : "" )
                     dir( "src/devtools" ) {
                         bat "python jenkins/build_sandbox.py ${base_args} --generate-shadercpp-classes"
                     }
@@ -41,7 +40,7 @@ pipeline {
         stage( 'Compile ECS' ) {
             steps {
                 script {
-                    def base_args = "${params.PLATFORM} ${params.CONFIGURATION} --output_path \"${env.JENKINS_AGENT_HOME}/${env.BUILD_DIR}\"" + ( params.WITH_SDK ? " --with-sdk" : "" )
+                    def base_args = "${params.PLATFORM} ${params.CONFIGURATION} --output_path \"${env.BUILD_DIR}\"" + ( params.WITH_SDK ? " --with-sdk" : "" )
                     dir( "src/devtools" ) {
                         bat "python jenkins/build_sandbox.py ${base_args} --compile-ecs"
                     }
@@ -52,7 +51,7 @@ pipeline {
         stage( 'Compile C++' ) {
             steps {
                 script {
-                    def base_args = "${params.PLATFORM} ${params.CONFIGURATION} --output_path \"${env.JENKINS_AGENT_HOME}/${env.BUILD_DIR}\"" + ( params.WITH_SDK ? " --with-sdk" : "" )
+                    def base_args = "${params.PLATFORM} ${params.CONFIGURATION} --output_path \"${env.BUILD_DIR}\"" + ( params.WITH_SDK ? " --with-sdk" : "" )
                     dir( "src/devtools" ) {
                         bat "python jenkins/build_sandbox.py ${base_args} --compile-cpp"
                     }
@@ -63,7 +62,7 @@ pipeline {
         stage( 'Compile Content' ) {
             steps {
                 script {
-                    def base_args = "${params.PLATFORM} ${params.CONFIGURATION} --output_path \"${env.JENKINS_AGENT_HOME}/${env.BUILD_DIR}\"" + ( params.WITH_SDK ? " --with-sdk" : "" )
+                    def base_args = "${params.PLATFORM} ${params.CONFIGURATION} --output_path \"${env.BUILD_DIR}\"" + ( params.WITH_SDK ? " --with-sdk" : "" )
                     dir( "src/devtools" ) {
                         bat "python jenkins/build_sandbox.py ${base_args} --compile-content"
                     }
@@ -74,7 +73,7 @@ pipeline {
         stage( 'Copy Files And Cleanup' ) {
             steps {
                 script {
-                    def base_args = "${params.PLATFORM} ${params.CONFIGURATION} --output_path \"${env.JENKINS_AGENT_HOME}/${env.BUILD_DIR}\"" + ( params.WITH_SDK ? " --with-sdk" : "" )
+                    def base_args = "${params.PLATFORM} ${params.CONFIGURATION} --output_path \"${env.BUILD_DIR}\"" + ( params.WITH_SDK ? " --with-sdk" : "" )
                     dir( "src/devtools" ) {
                         bat "python jenkins/build_sandbox.py ${base_args} --copy-files-and-cleanup"
                     }
@@ -85,20 +84,11 @@ pipeline {
         stage( 'Archive Artifact' ) {
             steps {
                 script {
-                    dir( "${env.JENKINS_AGENT_HOME}" ) {
-                        def archiveFile = "${env.ARCHIVE_DIR}/${JOB_BASE_NAME}_${env.PLATFORM}_${env.CONFIGURATION}_${BUILD_NUMBER}.7z"
-                        bat "\"${env.ZIP_EXE}\" a \"${archiveFile}\" \"${env.JENKINS_AGENT_HOME}/${env.BUILD_DIR}/*\""
-                        archiveArtifacts artifacts: "${archiveFile}", followSymlinks: false, onlyIfSuccessful: true
-                    }  
+                    def archiveFile = "${JOB_BASE_NAME}_${env.PLATFORM}_${env.CONFIGURATION}_${BUILD_NUMBER}.7z"
+                    bat "\"${env.ZIP_EXE}\" a \"${archiveFile}\" \"${env.BUILD_DIR}/*\""
+                    archiveArtifacts artifacts: "${archiveFile}", followSymlinks: false, onlyIfSuccessful: true 
                 }
             }
-        }
-    }
-
-    post {
-        always {
-            echo "Cleaning build directory"
-            bat "rmdir /s /q \"${env.JENKINS_AGENT_HOME}/${env.BUILD_DIR}\""
         }
     }
 }
