@@ -9,8 +9,8 @@ pipeline {
 
     environment {
         GIT_URL = 'git@git.bs.ua:engine-team/singularity-engine.git'
-        BUILD_DIR = "${JENKINS_HOME}/artifacts/${JOB_BASE_NAME}_${BUILD_NUMBER}"
-        ARCHIVE_DIR = "${JENKINS_HOME}/artifacts"
+        BUILD_DIR = "artifacts/${JOB_BASE_NAME}_${BUILD_NUMBER}"
+        ARCHIVE_DIR = "artifacts"
         ZIP_DIR = "${env.BUILD_DIR}/**/*.*"
         ZIP_EXE = 'C:/Program Files/7-Zip/7z.exe'
     }
@@ -19,7 +19,7 @@ pipeline {
         stage( 'Generate Project Files' ) {
             steps {
                 script {
-                    def base_args = "${params.PLATFORM} ${params.CONFIGURATION} --output_path \"${env.WORKSPACE}/${env.BUILD_DIR}\"" + ( params.WITH_SDK ? " --with-sdk" : "" )
+                    def base_args = "${params.PLATFORM} ${params.CONFIGURATION} --output_path \"${env.JENKINS_HOME}/${env.BUILD_DIR}\"" + ( params.WITH_SDK ? " --with-sdk" : "" )
                     dir( "src/devtools" ) {
                         bat "python jenkins/build_sandbox.py ${base_args} --generate-project-files"
                     }
@@ -30,7 +30,7 @@ pipeline {
         stage( 'Generate Shader C++ Classes' ) {
             steps {
                 script {
-                    def base_args = "${params.PLATFORM} ${params.CONFIGURATION} --output_path \"${env.WORKSPACE}/${env.BUILD_DIR}\"" + ( params.WITH_SDK ? " --with-sdk" : "" )
+                    def base_args = "${params.PLATFORM} ${params.CONFIGURATION} --output_path \"${env.JENKINS_HOME}/${env.BUILD_DIR}\"" + ( params.WITH_SDK ? " --with-sdk" : "" )
                     dir( "src/devtools" ) {
                         bat "python jenkins/build_sandbox.py ${base_args} --generate-shadercpp-classes"
                     }
@@ -41,7 +41,7 @@ pipeline {
         stage( 'Compile ECS' ) {
             steps {
                 script {
-                    def base_args = "${params.PLATFORM} ${params.CONFIGURATION} --output_path \"${env.WORKSPACE}/${env.BUILD_DIR}\"" + ( params.WITH_SDK ? " --with-sdk" : "" )
+                    def base_args = "${params.PLATFORM} ${params.CONFIGURATION} --output_path \"${env.JENKINS_HOME}/${env.BUILD_DIR}\"" + ( params.WITH_SDK ? " --with-sdk" : "" )
                     dir( "src/devtools" ) {
                         bat "python jenkins/build_sandbox.py ${base_args} --compile-ecs"
                     }
@@ -52,7 +52,7 @@ pipeline {
         stage( 'Compile C++' ) {
             steps {
                 script {
-                    def base_args = "${params.PLATFORM} ${params.CONFIGURATION} --output_path \"${env.WORKSPACE}/${env.BUILD_DIR}\"" + ( params.WITH_SDK ? " --with-sdk" : "" )
+                    def base_args = "${params.PLATFORM} ${params.CONFIGURATION} --output_path \"${env.JENKINS_HOME}/${env.BUILD_DIR}\"" + ( params.WITH_SDK ? " --with-sdk" : "" )
                     dir( "src/devtools" ) {
                         bat "python jenkins/build_sandbox.py ${base_args} --compile-cpp"
                     }
@@ -63,7 +63,7 @@ pipeline {
         stage( 'Compile Content' ) {
             steps {
                 script {
-                    def base_args = "${params.PLATFORM} ${params.CONFIGURATION} --output_path \"${env.WORKSPACE}/${env.BUILD_DIR}\"" + ( params.WITH_SDK ? " --with-sdk" : "" )
+                    def base_args = "${params.PLATFORM} ${params.CONFIGURATION} --output_path \"${env.JENKINS_HOME}/${env.BUILD_DIR}\"" + ( params.WITH_SDK ? " --with-sdk" : "" )
                     dir( "src/devtools" ) {
                         bat "python jenkins/build_sandbox.py ${base_args} --compile-content"
                     }
@@ -74,7 +74,7 @@ pipeline {
         stage( 'Copy Files And Cleanup' ) {
             steps {
                 script {
-                    def base_args = "${params.PLATFORM} ${params.CONFIGURATION} --output_path \"${env.WORKSPACE}/${env.BUILD_DIR}\"" + ( params.WITH_SDK ? " --with-sdk" : "" )
+                    def base_args = "${params.PLATFORM} ${params.CONFIGURATION} --output_path \"${env.JENKINS_HOME}/${env.BUILD_DIR}\"" + ( params.WITH_SDK ? " --with-sdk" : "" )
                     dir( "src/devtools" ) {
                         bat "python jenkins/build_sandbox.py ${base_args} --copy-files-and-cleanup"
                     }
@@ -86,7 +86,7 @@ pipeline {
             steps {
                 script {
                     def archiveFile = "${env.ARCHIVE_DIR}/${JOB_BASE_NAME}_${env.PLATFORM}_${env.CONFIGURATION}_${BUILD_NUMBER}.7z"
-                    bat "\"${env.ZIP_EXE}\" a \"${env.WORKSPACE}/${archiveFile}\" \"${env.WORKSPACE}/${env.BUILD_DIR}/*\""
+                    bat "\"${env.ZIP_EXE}\" a \"${env.JENKINS_HOME}/${archiveFile}\" \"${env.JENKINS_HOME}/${env.BUILD_DIR}/*\""
                     archiveArtifacts artifacts: "${archiveFile}", followSymlinks: false, onlyIfSuccessful: true
                 }
             }
@@ -96,7 +96,7 @@ pipeline {
     post {
         always {
             echo "Cleaning build directory"
-            bat "rmdir /s /q \"${env.WORKSPACE}/${env.BUILD_DIR}\""
+            bat "rmdir /s /q \"${env.JENKINS_HOME}/${env.BUILD_DIR}\""
         }
     }
 }
