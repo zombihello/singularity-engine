@@ -10,7 +10,7 @@ pipeline {
     environment {
         GIT_URL = 'git@git.bs.ua:engine-team/singularity-engine.git'
         BUILD_DIR = "artifacts/${JOB_NAME}"
-        ARCHIVE_DIR = "artifacts/singularity-engine"
+        ARCHIVE_DIR = "artifacts/${JOB_NAME}"
         ZIP_DIR = "${env.BUILD_DIR}/**/*.*"
         ZIP_EXE = 'C:/Program Files/7-Zip/7z.exe'
     }
