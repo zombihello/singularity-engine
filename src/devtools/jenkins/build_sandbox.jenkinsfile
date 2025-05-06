@@ -9,8 +9,8 @@ pipeline {
 
     environment {
         GIT_URL = 'git@git.bs.ua:engine-team/singularity-engine.git'
-        BUILD_DIR = "artifacts/singularity-engine/${JOB_BASE_NAME}_${BUILD_NUMBER}"
-        ARCHIVE_DIR = "artifacts/singularity-engine/"
+        BUILD_DIR = "artifacts/${JOB_NAME}"
+        ARCHIVE_DIR = "artifacts/singularity-engine"
         ZIP_DIR = "${env.BUILD_DIR}/**/*.*"
         ZIP_EXE = 'C:/Program Files/7-Zip/7z.exe'
     }
@@ -85,9 +85,11 @@ pipeline {
         stage( 'Archive Artifact' ) {
             steps {
                 script {
-                    def archiveFile = "${env.JENKINS_AGENT_HOME}/${env.ARCHIVE_DIR}/${JOB_BASE_NAME}_${env.PLATFORM}_${env.CONFIGURATION}_${BUILD_NUMBER}.7z"
-                    bat "\"${env.ZIP_EXE}\" a \"${archiveFile}\" \"${env.JENKINS_AGENT_HOME}/${env.BUILD_DIR}/*\""
-                    archiveArtifacts artifacts: "${archiveFile}", followSymlinks: false, onlyIfSuccessful: true
+                    dir( "${env.JENKINS_AGENT_HOME}" ) {
+                        def archiveFile = "${env.ARCHIVE_DIR}/${JOB_BASE_NAME}_${env.PLATFORM}_${env.CONFIGURATION}_${BUILD_NUMBER}.7z"
+                        bat "\"${env.ZIP_EXE}\" a \"${archiveFile}\" \"${env.JENKINS_AGENT_HOME}/${env.BUILD_DIR}/*\""
+                        archiveArtifacts artifacts: "${archiveFile}", followSymlinks: false, onlyIfSuccessful: true
+                    }  
                 }
             }
         }
