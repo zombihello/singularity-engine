@@ -243,3 +243,4 @@ class Builder:
         except Exception as exception:
             print( f"Exception: {exception}" ) 
             traceback.print_exc()
+            sys.exit( 1 )

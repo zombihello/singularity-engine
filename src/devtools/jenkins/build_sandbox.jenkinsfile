@@ -1,0 +1,122 @@
+pipeline {
+    agent any
+
+    parameters {
+        choice( choices: ['master', 'dev'], name: 'GIT_BRANCH' )
+        choice( choices: ['Win64'], name: 'PLATFORM' )
+        choice( choices: ['Debug', 'Release', 'Retail'], name: 'CONFIGURATION' )
+        booleanParam( name: 'WITH_SDK', defaultValue: true )
+    }
+
+    environment {
+        GIT_URL = 'git@git.bs.ua:engine-team/singularity-engine.git'
+        REPO_DIR = 'repo'
+        BUILD_DIR = "artifacts/${JOB_BASE_NAME}_${BUILD_NUMBER}"
+        ARCHIVE_DIR = "artifacts"
+        ZIP_DIR = "${env.BUILD_DIR}/**/*.*"
+        ZIP_EXE = 'C:/Program Files/7-Zip/7z.exe'
+    }
+
+    stages {
+        stage( 'Prepare' ) {
+            steps {
+                script {
+                    catchError( buildResult: 'SUCCESS', stageResult: 'SUCCESS' ) {
+                        bat "rmdir /s /q \"${env.WORKSPACE}/${env.REPO_DIR}\""
+                        }
+                }
+            }
+        }
+
+        stage( 'Checkout' ) {
+            steps {
+                dir( env.REPO_DIR ) {
+                    git branch: params.GIT_BRANCH, credentialsId: 'gitlab-singularity-engine', url: env.GIT_URL
+                }
+            }
+        }
+
+        stage( 'Generate Project Files' ) {
+            steps {
+                script {
+                    def base_args = "${params.PLATFORM} ${params.CONFIGURATION} --output_path \"${env.WORKSPACE}/${env.BUILD_DIR}\"" + ( params.WITH_SDK ? " --with-sdk" : "" )
+                    dir( "${env.REPO_DIR}/src/devtools" ) {
+                        bat "python jenkins/build_sandbox.py ${base_args} --generate-project-files"
+                    }
+                }
+            }
+        }
+
+        stage( 'Generate Shader C++ Classes' ) {
+            steps {
+                script {
+                    def base_args = "${params.PLATFORM} ${params.CONFIGURATION} --output_path \"${env.WORKSPACE}/${env.BUILD_DIR}\"" + ( params.WITH_SDK ? " --with-sdk" : "" )
+                    dir( "${env.REPO_DIR}/src/devtools" ) {
+                        bat "python jenkins/build_sandbox.py ${base_args} --generate-shadercpp-classes"
+                    }
+                }
+            }
+        }
+
+        stage( 'Compile ECS' ) {
+            steps {
+                script {
+                    def base_args = "${params.PLATFORM} ${params.CONFIGURATION} --output_path \"${env.WORKSPACE}/${env.BUILD_DIR}\"" + ( params.WITH_SDK ? " --with-sdk" : "" )
+                    dir( "${env.REPO_DIR}/src/devtools" ) {
+                        bat "python jenkins/build_sandbox.py ${base_args} --compile-ecs"
+                    }
+                }
+            }
+        }
+
+        stage( 'Compile C++' ) {
+            steps {
+                script {
+                    def base_args = "${params.PLATFORM} ${params.CONFIGURATION} --output_path \"${env.WORKSPACE}/${env.BUILD_DIR}\"" + ( params.WITH_SDK ? " --with-sdk" : "" )
+                    dir( "${env.REPO_DIR}/src/devtools" ) {
+                        bat "python jenkins/build_sandbox.py ${base_args} --compile-cpp"
+                    }
+                }
+            }
+        }
+
+        stage( 'Compile Content' ) {
+            steps {
+                script {
+                    def base_args = "${params.PLATFORM} ${params.CONFIGURATION} --output_path \"${env.WORKSPACE}/${env.BUILD_DIR}\"" + ( params.WITH_SDK ? " --with-sdk" : "" )
+                    dir( "${env.REPO_DIR}/src/devtools" ) {
+                        bat "python jenkins/build_sandbox.py ${base_args} --compile-content"
+                    }
+                }
+            }
+        }
+
+        stage( 'Copy Files And Cleanup' ) {
+            steps {
+                script {
+                    def base_args = "${params.PLATFORM} ${params.CONFIGURATION} --output_path \"${env.WORKSPACE}/${env.BUILD_DIR}\"" + ( params.WITH_SDK ? " --with-sdk" : "" )
+                    dir( "${env.REPO_DIR}/src/devtools" ) {
+                        bat "python jenkins/build_sandbox.py ${base_args} --copy-files-and-cleanup"
+                    }
+                }
+            }
+        }
+
+        stage( 'Archive Artifact' ) {
+            steps {
+                script {
+                    def archiveFile = "${env.ARCHIVE_DIR}/${JOB_BASE_NAME}_${env.PLATFORM}_${env.CONFIGURATION}_${BUILD_NUMBER}.7z"
+                    bat "\"${env.ZIP_EXE}\" a \"${env.WORKSPACE}/${archiveFile}\" \"${env.WORKSPACE}/${env.BUILD_DIR}/*\""
+                    archiveArtifacts artifacts: "${archiveFile}", followSymlinks: false, onlyIfSuccessful: true
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Cleaning build directory"
+            bat "rmdir /s /q \"${env.WORKSPACE}/${env.BUILD_DIR}\""
+        }
+    }
+}
