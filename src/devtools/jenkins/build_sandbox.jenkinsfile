@@ -11,31 +11,13 @@ pipeline {
     environment {
         GIT_URL = 'git@git.bs.ua:engine-team/singularity-engine.git'
         REPO_DIR = 'repo'
-        BUILD_DIR = "artifacts/${JOB_BASE_NAME}_${BUILD_NUMBER}"
-        ARCHIVE_DIR = "artifacts"
+        BUILD_DIR = "${JENKINS_HOME}/artifacts/${JOB_BASE_NAME}_${BUILD_NUMBER}"
+        ARCHIVE_DIR = "${JENKINS_HOME}/artifacts"
         ZIP_DIR = "${env.BUILD_DIR}/**/*.*"
         ZIP_EXE = 'C:/Program Files/7-Zip/7z.exe'
     }
 
     stages {
-        stage( 'Prepare' ) {
-            steps {
-                script {
-                    catchError( buildResult: 'SUCCESS', stageResult: 'SUCCESS' ) {
-                        bat "rmdir /s /q \"${env.WORKSPACE}/${env.REPO_DIR}\""
-                        }
-                }
-            }
-        }
-
-        stage( 'Checkout' ) {
-            steps {
-                dir( env.REPO_DIR ) {
-                    git branch: params.GIT_BRANCH, credentialsId: 'gitlab-singularity-engine', url: env.GIT_URL
-                }
-            }
-        }
-
         stage( 'Generate Project Files' ) {
             steps {
                 script {
