@@ -85,8 +85,8 @@ pipeline {
         stage( 'Archive Artifact' ) {
             steps {
                 script {
-                    def archiveFile = "${env.ARCHIVE_DIR}/${JOB_BASE_NAME}_${env.PLATFORM}_${env.CONFIGURATION}_${BUILD_NUMBER}.7z"
-                    bat "\"${env.ZIP_EXE}\" a \"${env.JENKINS_AGENT_HOME}/${archiveFile}\" \"${env.JENKINS_AGENT_HOME}/${env.BUILD_DIR}/*\""
+                    def archiveFile = "${env.JENKINS_AGENT_HOME}/${env.ARCHIVE_DIR}/${JOB_BASE_NAME}_${env.PLATFORM}_${env.CONFIGURATION}_${BUILD_NUMBER}.7z"
+                    bat "\"${env.ZIP_EXE}\" a \"${archiveFile}\" \"${env.JENKINS_AGENT_HOME}/${env.BUILD_DIR}/*\""
                     archiveArtifacts artifacts: "${archiveFile}", followSymlinks: false, onlyIfSuccessful: true
                 }
             }
