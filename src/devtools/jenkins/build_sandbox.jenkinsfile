@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     parameters {
-        choice( choices: ['master', 'dev'], name: 'GIT_BRANCH' )
         choice( choices: ['Win64'], name: 'PLATFORM' )
         choice( choices: ['Debug', 'Release', 'Retail'], name: 'CONFIGURATION' )
         booleanParam( name: 'WITH_SDK', defaultValue: true )
