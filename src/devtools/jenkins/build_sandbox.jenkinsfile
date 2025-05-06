@@ -15,12 +15,6 @@ pipeline {
     }
 
     stages {
-        stage( 'Clean Workspace' ) {
-            steps {
-                cleanWs()
-            }
-        }
-
         stage( 'Generate Project Files' ) {
             steps {
                 script {
