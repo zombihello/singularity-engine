@@ -13,6 +13,7 @@ project "ecscompiler"
         "**.bison",
         "../../public/core/**.cpp"
     }
+	excludes { "test/**.*" }
 
     includedirs     {
         flexOutputDir,

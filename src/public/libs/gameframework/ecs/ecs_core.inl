@@ -3,6 +3,18 @@
 
 /*
 ==================
+EcsInitWorld
+==================
+*/
+FORCEINLINE void EcsInitWorld( CEcsWorld& ecsWorld )
+{
+	EcsInitWorld_GameframeworkOnly( ecsWorld );
+	EcsInitWorld_GameOnly( ecsWorld );
+}
+
+
+/*
+==================
 ecsEntity_t::operator=
 ==================
 */
@@ -104,6 +116,16 @@ FORCEINLINE const achar* CEcsWorld::GetEntityName( const ecsEntity_t& ecsEntity 
 {
 	AssertMsg( IsValidEntity( ecsEntity ), "Entity must be valid" );
 	return ecsEntity.flecsEntity.name().c_str();
+}
+
+/*
+==================
+CEcsWorld::FindEntity
+==================
+*/
+FORCEINLINE ecsEntity_t CEcsWorld::FindEntity( const achar* pName ) const
+{
+	return flecsWorld.lookup( pName );
 }
 
 /*
@@ -323,6 +345,17 @@ CEcsWorld::Update
 FORCEINLINE void CEcsWorld::Update( float deltaTime )
 {
 	flecsWorld.progress( deltaTime );
+}
+
+/*
+==================
+CEcsWorld::IsRegisteredType
+==================
+*/
+template<typename TEcsType>
+FORCEINLINE bool CEcsWorld::IsRegisteredType() const
+{
+	return flecs::_::type<TEcsType>::registered( flecsWorld.c_ptr() );
 }
 
 #endif // !ECS_INL

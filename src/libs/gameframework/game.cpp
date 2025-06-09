@@ -13,6 +13,15 @@
 //-----------------------------------------------------------------------------
 /*
 ==================
+CGame::CGame
+==================
+*/
+CGame::CGame()
+	: ecsWorld( false )
+{}
+
+/*
+==================
 CGame::Init
 ==================
 */
@@ -48,14 +57,10 @@ bool CGame::Init( createInterfaceFn_t pFactory )
 	// Register cvars in the system
 	ConVar_Register( FCVAR_GAMEDLL );
 
-	// Register GameFramework modules
-	ecsWorld.RegisterModule<ecsModuleCommon_t>();
-	ecsWorld.RegisterModule<ecsModuleRender_t>();
-	ecsWorld.RegisterModule<ecsModuleMovement_t>();
-	ecsWorld.RegisterModule<ecsModuleCamera_t>();
-
-	ecsWorld.SetResource( ecsResourceWindowMgr_t{ g_pWindowMgr } );
-	ecsWorld.SetResource( ecsResourceStudioRender_t{ g_pStudioRender } );
+	// Register GameFramework ECS modules and initialize the world
+	extern void EcsInitModules_Gameframework();
+	EcsInitModules_Gameframework();
+	EcsInitWorld_GameframeworkOnly( ecsWorld );
 
 	// Initialize all resource factories
 	ecsEntityDescFactory.Init();

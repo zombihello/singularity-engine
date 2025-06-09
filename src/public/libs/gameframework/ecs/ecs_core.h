@@ -2,9 +2,39 @@
 #define ECS_CORE_H
 
 //-----------------------------------------------------------------------------
+// ECS macroses
+//-----------------------------------------------------------------------------
+#define ECS_COMPONENT_BODY( EcsComponentName ) \
+	static const achar* GetComponentName() \
+	{ \
+		return EcsComponentName; \
+	}
+
+#define ECS_RESOURCE_BODY( EcsResourceName ) \
+	static const achar* GetResourceName() \
+	{ \
+		return EcsResourceName; \
+	}
+
+#define ECS_SYSTEM_BODY( EcsSystemName ) \
+	static const achar* GetSystemName() \
+	{ \
+		return EcsSystemName; \
+	}
+
+
+//-----------------------------------------------------------------------------
 // Forward declarations
 //-----------------------------------------------------------------------------
 class CEcsWorld;
+
+
+//-----------------------------------------------------------------------------
+// ECS initialize a world
+//-----------------------------------------------------------------------------
+void EcsInitWorld_GameframeworkOnly( CEcsWorld& ecsWorld );
+void EcsInitWorld_GameOnly( CEcsWorld& ecsWorld );			// NOTE: The function must be implemented on the game side
+void EcsInitWorld( CEcsWorld& ecsWorld );					// The function calls EcsInitWorld_GameframeworkOnly and EcsInitWorld_GameOnly
 
 
 //-----------------------------------------------------------------------------
@@ -37,16 +67,21 @@ private:
 class CEcsWorld
 {
 public:
-	CEcsWorld()
-	{}
+	CEcsWorld( bool bAutoInit = true )
+	{
+		if ( bAutoInit )
+		{
+			EcsInitWorld( *this );
+		}
+	}
 	CEcsWorld( const flecs::world& flecsWorld )
 		: flecsWorld( flecsWorld )
 	{}
 
 	void Update( float deltaTime );
-	// Deletes and recreates the world
-	// NOTE: After reset you have to re-register modules
-	void Reset();
+	void Reset( bool bAutoInit = true );		// Deletes and recreates the world
+	template<typename TEcsType>
+	bool IsRegisteredType() const;
 
 	// Register and unregister module functions
 	template<typename TEcsModule>
@@ -77,6 +112,7 @@ public:
 	ecsEntity_t CloneEntity( ecsEntity_t ecsEntity, const achar* pName = NULL );
 	void SetEntityName( ecsEntity_t ecsEntity, const achar* pName );
 	const achar* GetEntityName( const ecsEntity_t& ecsEntity ) const;
+	ecsEntity_t FindEntity( const achar* pName ) const;
 	bool IsValidEntity( const ecsEntity_t& ecsEntity ) const;
 	bool IsPrefab( const ecsEntity_t& ecsEntity ) const;
 

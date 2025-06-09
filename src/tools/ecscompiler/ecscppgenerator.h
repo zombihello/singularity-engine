@@ -40,8 +40,11 @@ private:
 	void GenerateStructs( const std::vector<TRefPtr<CEcsStubDataType>>& ecsStubDataTypes, ecsStructType_t structsType );
 	void GenerateSystems( const std::vector<TRefPtr<CEcsStubSystem>>& ecsStubSystems );
 	void GenerateRegistrar( CEcsStubModule* pEcsStubModule );
+	std::string GenerateRegistrarConstructor( CEcsStubModule* pEcsStubModule );
+	std::string GenerateRegistrarDestructor( CEcsStubModule* pEcsStubModule );
 	void GenerateImplementationEcsReadDataFuncs( CEcsStubModule* pEcsStubModule );
 	void GenerateImplementationEcsFactories( CEcsStubModule* pEcsStubModule );
+	void GenerateImplementationEcsReflection( CEcsStubModule* pEcsStubModule );
 	FORCEINLINE std::string GetStringWithUpperFirstChar( const achar* pString ) const
 	{
 		std::string		result = pString;

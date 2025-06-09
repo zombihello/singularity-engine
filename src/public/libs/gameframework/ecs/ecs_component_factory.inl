@@ -34,6 +34,12 @@ template<typename TEcsComponent, void( *pParserSENTComponentVarsFunc )( const CS
 void TEcsComponentFactory<TEcsComponent, pParserSENTComponentVarsFunc>::Create( CEcsWorld ecsWorld, ecsEntity_t ecsEntity )
 {
 	PROFILE_SCOPE()
+	if ( !ecsWorld.IsRegisteredType<TEcsComponent>() )
+	{
+		Warning( "Game: ECS component type '%s' isn't registered in the world", TEcsComponent::GetComponentName() );
+		return;
+	}
+
 	if ( !flecs::is_empty<TEcsComponent>::value )
 	{
 		ecsWorld.SetComponent( ecsEntity, ecsArchetypeComponent );

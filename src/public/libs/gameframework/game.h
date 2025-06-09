@@ -22,6 +22,8 @@ public:
 	// Process one game frame
 	virtual void FrameUpdate() override;
 
+	CGame();
+
 	CEcsWorld& GetEcsWorld();
 	CEcsComponentTypes& GetEcsComponentTypes();
 

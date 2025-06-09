@@ -9,7 +9,9 @@ CEcsEntityDesc::CEcsEntityDesc
 ==================
 */
 CEcsEntityDesc::CEcsEntityDesc()
-{}
+{
+	Sys_InitGuid( guid );
+}
 
 /*
 ==================
@@ -20,6 +22,7 @@ CEcsEntityDesc::CEcsEntityDesc( const CSENTCompiledEntityDescDoc& sentCompiledDo
 {
 	// Initialize the entity descriptor by SENT compiled document
 	Init( sentCompiledDoc );
+	Sys_InitGuid( guid );
 }
 
 /*
@@ -96,7 +99,17 @@ IEntity* CEcsEntityDesc::Create( const achar* pName /* = "" */ ) const
 	CEcsWorld&		ecsWorld = Game()->GetEcsWorld();
 	if ( !ecsWorld.IsValidEntity( ecsPrefab ) )
 	{
-		ecsPrefab = CreateEcsPrefab( "" );
+		std::string		ecsPrefabName = S_Sprintf( "ecs_prefab_%s", guid.AsString().c_str() );
+		ecsPrefab		= ecsWorld.FindEntity( ecsPrefabName.c_str() );
+		if ( !ecsWorld.IsValidEntity( ecsPrefab ) )
+		{
+			ecsPrefab = CreateEcsPrefab( ecsPrefabName.c_str() );
+		}
+		else
+		{
+			AssertMsg( ecsWorld.IsPrefab( ecsPrefab ), "The prefab was found but it isn't valid" );
+		}
 	}
+
 	return new CEcsEntity( ecsWorld.CreateEntity( pName, ecsPrefab ) );
 }

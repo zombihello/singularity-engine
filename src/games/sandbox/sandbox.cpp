@@ -97,7 +97,9 @@ bool CSandboxGame::Init( createInterfaceFn_t pFactory )
 	Studio_FlushRenderCommands();
 
 	// Initialize the ECS world
-	ecsWorld.RegisterModule<ecsModuleTestDraw_t>();
+	extern void EcsInitModules_Sandbox();
+	EcsInitModules_Sandbox();
+	EcsInitWorld_GameOnly( ecsWorld );
 
 	TResourcePtr<IEntityDesc>		pQuadEntityDesc = g_pResourceSystem->FindOrLoadResource( "entities/test_quad", RESOURCE_TYPE_ENTITY_DESC );
 	pQuadEntity = pQuadEntityDesc->Create( "quad" );

@@ -28,6 +28,7 @@ private:
 
 	mutable ecsEntity_t								ecsPrefab;
 	std::vector<TRefPtr<IEcsComponentFactory>>		ecsComponentFactories;
+	CGuid											guid;
 };
 
 #endif // !ECS_ENTITYDESC_H
