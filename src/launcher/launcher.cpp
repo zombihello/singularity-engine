@@ -237,6 +237,14 @@ extern "C" DLL_EXPORT uint32 LauncherMain( appInstanceHandle_t hInstance, const 
 		Sys_SetupConsoleIO();
 	}
 
+	// Disable ensures if it need
+#if ENABLE_ENSURE
+	if ( CommandLine()->HasParam( "noensure" ) )
+	{
+		Sys_SetEnsureAllow( false );
+	}
+#endif // ENABLE_ENSURE
+
 	// Run application
 	CSingularityEngineApp		application( pGameDir, hInstance );
 	return application.Run();

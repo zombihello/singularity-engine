@@ -13,6 +13,10 @@
 	#define ENABLE_ASSERT		!RETAIL
 #endif // !ENABLE_ASSERT
 
+#ifndef ENABLE_ENSURE
+	#define ENABLE_ENSURE		!RETAIL
+#endif // !ENABLE_ENSURE
+
 #ifndef ENABLE_LOGGING
 	#define ENABLE_LOGGING		!RETAIL
 #endif // !ENABLE_LOGGING

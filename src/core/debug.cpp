@@ -143,7 +143,7 @@ logOutputFn_t Sys_GetDefaultLogOutput()
 		// Get final message
 		va_list			params;
 		va_start( params, pFormat );
-		std::string		message = S_Sprintf( "Assertion failed: %s\nMessage: %s\n\nFile: %s\nLine: %i", pExpr, S_Strlen( pFormat ) > 0 ? S_Vsprintf( pFormat, params ).c_str() : "<None>", pFile, line);
+		std::string		message = S_Sprintf( "Expression: %s\nMessage: %s\n\nFile: %s\nLine: %i", pExpr, S_Strlen( pFormat ) > 0 ? S_Vsprintf( pFormat, params ).c_str() : "<None>", pFile, line);
 		va_end( params );
 
 		// Print message and show message box
@@ -163,3 +163,43 @@ logOutputFn_t Sys_GetDefaultLogOutput()
 		Sys_RequestExit( true );
 	}
 #endif // ENABLE_ASSERT
+
+#if ENABLE_ENSURE
+	static bool		s_bEnsureAllowed = true;
+
+	/*
+	==================
+	Sys_EnsureFunc
+	==================
+	*/
+	void Sys_EnsureFunc( const achar* pExpr, const achar* pFile, int32 line, bool bAlways, const achar* pFormat /*= ""*/, ... )
+	{
+		if ( bAlways || s_bEnsureAllowed )
+		{
+			// Get final message
+			va_list			params;
+			va_start( params, pFormat );
+			std::string		message = S_Sprintf( "Expression: %s\nMessage: %s\n\nFile: %s\nLine: %i", pExpr, S_Strlen( pFormat ) > 0 ? S_Vsprintf( pFormat, params ).c_str() : "<None>", pFile, line);
+			va_end( params );
+
+			// Print message and show message box
+			s_LogOutputFn( "\n------------ ENSURE FAILED --------------\n" );
+			s_LogOutputFn( message.c_str() );
+			s_LogOutputFn( "\n--------------------------------------------\n\n" );
+			if ( Sys_IsDebuggerPresent() )
+			{
+				Sys_DebugBreak();
+			}
+		}
+	}
+
+	/*
+	==================
+	Sys_SetEnsureAllow
+	==================
+	*/
+	void Sys_SetEnsureAllow( bool bAllowed )
+	{
+		s_bEnsureAllowed = bAllowed;
+	}
+#endif // ENABLE_ENSURE

@@ -36,7 +36,7 @@ void TEcsComponentFactory<TEcsComponent, pParserSENTComponentVarsFunc>::Create( 
 	PROFILE_SCOPE()
 	if ( !ecsWorld.IsRegisteredType<TEcsComponent>() )
 	{
-		Warning( "Game: ECS component type '%s' isn't registered in the world", TEcsComponent::GetComponentName() );
+		EnsureMsg( false, "ECS component type '%s' isn't registered in the world", TEcsComponent::GetComponentName() );
 		return;
 	}
 
