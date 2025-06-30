@@ -1,6 +1,6 @@
 #include "pch_core.h"
 #include "core/crashdump_private.h"
-#include "core/debug.h"
+#include "core/debug_private.h"
 
 /*
  ==================
@@ -21,7 +21,8 @@ static void DefaultLogOutput( const achar* pMsg )
 #endif // ENABLE_LOGGING
 }
 
-static logOutputFn_t	s_LogOutputFn = &DefaultLogOutput;
+static logOutputFn_t	s_LogOutputFn	= &DefaultLogOutput;
+logColor_t				g_LogColor		= LOG_COLOR_DEFAULT;
 
 /*
 ==================
@@ -53,6 +54,16 @@ logOutputFn_t Sys_GetDefaultLogOutput()
 	return &DefaultLogOutput;
 }
 
+/*
+==================
+Sys_ResetLogColor
+==================
+*/
+void Sys_ResetLogColor()
+{
+	Sys_SetLogColor( LOG_COLOR_DEFAULT );
+}
+
 #if ENABLE_LOGGING
 	/*
 	==================
@@ -74,7 +85,16 @@ logOutputFn_t Sys_GetDefaultLogOutput()
 	*/
 	void VMsg( const achar* pFormat, va_list params )
 	{
+		bool	bIsAllowedChangeColor = g_LogColor == LOG_COLOR_DEFAULT;
+		if ( bIsAllowedChangeColor )
+		{
+			Sys_SetLogColor( LOG_COLOR_WHITE );
+		}
 		s_LogOutputFn( S_Sprintf( "Msg: %s\n", S_Vsprintf( pFormat, params ).c_str() ).c_str() );
+		if ( bIsAllowedChangeColor )
+		{
+			Sys_SetLogColor( LOG_COLOR_DEFAULT );
+		}
 	}
 
 	/*
@@ -97,7 +117,16 @@ logOutputFn_t Sys_GetDefaultLogOutput()
 	*/
 	void VWarning( const achar* pFormat, va_list params )
 	{
+		bool	bIsAllowedChangeColor = g_LogColor == LOG_COLOR_DEFAULT;
+		if ( bIsAllowedChangeColor )
+		{
+			Sys_SetLogColor( LOG_COLOR_YELLOW );
+		}
 		s_LogOutputFn( S_Sprintf( "Warning: %s\n", S_Vsprintf( pFormat, params ).c_str() ).c_str() );
+		if ( bIsAllowedChangeColor )
+		{
+			Sys_SetLogColor( LOG_COLOR_DEFAULT );
+		}
 	}
 
 	/*
@@ -120,7 +149,16 @@ logOutputFn_t Sys_GetDefaultLogOutput()
 	*/
 	void VError( const achar* pFormat, va_list params )
 	{
+		bool	bIsAllowedChangeColor = g_LogColor == LOG_COLOR_DEFAULT;
+		if ( bIsAllowedChangeColor )
+		{
+			Sys_SetLogColor( LOG_COLOR_RED );
+		}
 		s_LogOutputFn( S_Sprintf( "Error: %s\n", S_Vsprintf( pFormat, params ).c_str() ).c_str() );
+		if ( bIsAllowedChangeColor )
+		{
+			Sys_SetLogColor( LOG_COLOR_DEFAULT );
+		}
 	}
 #endif // ENABLE_LOGGING
 
@@ -147,9 +185,19 @@ logOutputFn_t Sys_GetDefaultLogOutput()
 		va_end( params );
 
 		// Print message and show message box
+		bool	bIsAllowedChangeColor = g_LogColor == LOG_COLOR_DEFAULT;
+		if ( bIsAllowedChangeColor )
+		{
+			Sys_SetLogColor( LOG_COLOR_RED );
+		}
 		s_LogOutputFn( "\n------------ ASSERTION FAILED --------------\n" );
 		s_LogOutputFn( message.c_str() );
 		s_LogOutputFn( "\n--------------------------------------------\n\n" );
+		if ( bIsAllowedChangeColor )
+		{
+			Sys_SetLogColor( LOG_COLOR_DEFAULT );
+		}
+
 		if ( Sys_IsDebuggerPresent() )
 		{
 			Sys_DebugBreak();
@@ -183,9 +231,19 @@ logOutputFn_t Sys_GetDefaultLogOutput()
 			va_end( params );
 
 			// Print message and show message box
+			bool	bIsAllowedChangeColor = g_LogColor == LOG_COLOR_DEFAULT;
+			if ( bIsAllowedChangeColor )
+			{
+				Sys_SetLogColor( LOG_COLOR_RED );
+			}
 			s_LogOutputFn( "\n------------ ENSURE FAILED --------------\n" );
 			s_LogOutputFn( message.c_str() );
 			s_LogOutputFn( "\n--------------------------------------------\n\n" );
+			if ( bIsAllowedChangeColor )
+			{
+				Sys_SetLogColor( LOG_COLOR_DEFAULT );
+			}
+
 			if ( Sys_IsDebuggerPresent() )
 			{
 				Sys_DebugBreak();

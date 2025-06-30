@@ -9,5 +9,5 @@
 #include "core/platform_private.h"
 #include "core/threading_private.h"
 #include "core/memory_private.h"
-#include "core/debug.h"
+#include "core/debug_private.h"
 #include "core/profile.h"

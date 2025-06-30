@@ -12,10 +12,22 @@
 // Debug log
 //-----------------------------------------------------------------------------
 typedef void ( *logOutputFn_t )( const achar* pMsg );
+enum logColor_t
+{
+    LOG_COLOR_DEFAULT,
+    LOG_COLOR_WHITE,
+    LOG_COLOR_RED,
+    LOG_COLOR_YELLOW,
+    LOG_COLOR_GREEN,
+    LOG_NUM_COLORS
+};
+
 
 CORE_INTERFACE void Sys_SetLogOutputFunc( logOutputFn_t pFunc );
 CORE_INTERFACE logOutputFn_t Sys_GetLogOutputFunc();
 CORE_INTERFACE logOutputFn_t Sys_GetDefaultLogOutput();
+CORE_INTERFACE void Sys_SetLogColor( logColor_t logColor );
+CORE_INTERFACE void Sys_ResetLogColor();
 CORE_INTERFACE void Sys_SetupConsoleIO();
 CORE_INTERFACE bool Sys_IsInitedConsoleIO();
 
