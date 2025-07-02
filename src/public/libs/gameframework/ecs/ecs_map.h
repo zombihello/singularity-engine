@@ -4,6 +4,7 @@
 #include "smapdoc/smap_compiled_doc.h"
 #include "gameframework/ecs/ecs_core.h"
 #include "gameframework/ecs/ecs_component_factory.h"
+#include "gameframework/ecs/ecs_entity.h"
 #include "gameframework/imap.h"
 
 //-----------------------------------------------------------------------------
@@ -12,6 +13,11 @@
 DECLARE_MULTICAST_DELEGATE( COnMapReseted, IMap* /* pMap */ );
 DECLARE_MULTICAST_DELEGATE( COnMapUnloaded, IMap* /* pMap */ );
 
+//-----------------------------------------------------------------------------
+// Forward declarations
+//-----------------------------------------------------------------------------
+class CEcsEntityDesc;
+
 
 //-----------------------------------------------------------------------------
 // ECS map
@@ -19,8 +25,9 @@ DECLARE_MULTICAST_DELEGATE( COnMapUnloaded, IMap* /* pMap */ );
 class CEcsMap : public TRefCounted<IMap>
 {
 public:
+	friend CEcsEntityDesc;
 	CEcsMap();
-	CEcsMap( const CSMAPCompiledMapDoc& smapCompiledDoc );
+	CEcsMap(const CSMAPCompiledMapDoc& smapCompiledDoc);
 	~CEcsMap();
 
 	// IMap interface
@@ -36,9 +43,10 @@ public:
 private:
 	void Init( const CSMAPCompiledMapDoc& smapCompiledDoc );
 
-	CEcsWorld		ecsWorld;
-	COnMapReseted	onMapReseted;
-	COnMapUnloaded	onMapUnloaded;
+	CEcsWorld							ecsWorld;
+	COnMapReseted						onMapReseted;
+	COnMapUnloaded						onMapUnloaded;
+	std::vector<TRefPtr<CEcsEntity>>	ecsEntities;
 };
 
 #include "gameframework/ecs/ecs_map.inl"

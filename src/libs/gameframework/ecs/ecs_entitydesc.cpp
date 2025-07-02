@@ -189,6 +189,8 @@ IEntity* CEcsEntityDesc::Create( IMap* pMap, const achar* pName /* = "" */ ) con
 	}
 
 	// Create an ECS entity
-	const ecsPrefab_t&		ecsPrefab = ecsPrefabs[lastUsedEcsPrefabIdx];
-	return new CEcsEntity( ecsWorld.CreateEntity( pName, ecsPrefab.ecsEntity ), ecsPrefab.pEcsMap );
+	const ecsPrefab_t&		ecsPrefab	= ecsPrefabs[lastUsedEcsPrefabIdx];
+	TRefPtr<CEcsEntity>		pEcsEntity	= new CEcsEntity( ecsWorld.CreateEntity( pName, ecsPrefab.ecsEntity ), ecsPrefab.pEcsMap );
+	ecsPrefab.pEcsMap->ecsEntities.emplace_back( pEcsEntity );
+	return pEcsEntity;
 }

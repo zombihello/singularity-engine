@@ -73,6 +73,7 @@ void CEcsMap::Reset()
 
 	// TODO BS yehor.pohuliaka - Implement reload the map from the file system
 	ecsWorld.Reset();
+	ecsEntities.clear();
 }
 
 /*

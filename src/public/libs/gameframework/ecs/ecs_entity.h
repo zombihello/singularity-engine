@@ -3,11 +3,13 @@
 
 #include "gameframework/ecs/ecs_core.h"
 #include "gameframework/ientity.h"
+#include "gameframework/imap.h"
 
 //-----------------------------------------------------------------------------
 // Forward declarations
 //-----------------------------------------------------------------------------
 class CEcsMap;
+
 
 //-----------------------------------------------------------------------------
 // ECS entity
