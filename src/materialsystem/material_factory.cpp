@@ -86,3 +86,21 @@ TRefPtr<IResource> CMaterialFactory::GetDefaultResource() const
 {
 	return pDefaultMaterial;
 }
+
+/*
+==================
+CMaterialFactory::GetFormatType
+==================
+*/
+const achar* CMaterialFactory::GetFormatType() const
+{
+	return "SMAT";
+}
+
+/*
+==================
+CMaterialFactory::Validate
+==================
+*/
+void CMaterialFactory::Validate() const
+{}

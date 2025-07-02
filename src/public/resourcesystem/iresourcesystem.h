@@ -27,6 +27,9 @@ public:
 
 	// Return a default resource by its type. If the type isn't registered or not have a default resource return NULL
 	virtual TRefPtr<IResource> GetDefaultResource( resourceType_t type ) const = 0;
+
+	virtual bool HasResourceFactory( resourceType_t type ) const = 0;
+	virtual IResourceFactory* GetResourceFactory( resourceType_t type ) const = 0;
 };
 
 #endif // !IRESOURCESYSTEM_H

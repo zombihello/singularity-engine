@@ -1,4 +1,4 @@
-project "sandbox"
+project "map_tool"
     if not buildMonolithicEngine then
         kind "SharedLib"
     else
@@ -6,50 +6,38 @@ project "sandbox"
     end
     language    "C++"
     location( intermediateDir )
-	targetname	"game"
-	targetdir( buildDir .. "sandbox/" .. outputBinDirSuffix )
-	
+
     ----------- PROJECT SETTINGS --------
 
-    files       {
-		-- Sandbox game code
-		"**.inl", 
+    files       { 
+        "**.h", 
+        "**.inl", 
         "**.cpp",
-        "**.h",
-		"**.ecs",
-
-		-- Public interfaces and shared code
+        "../../public/tools/resource_tools/**.h",
         "../../public/core/**.cpp"
     }
 
     -- Enable PCH file
-    pchheader       "pch_sandbox.h"
-    pchsource       "pch_sandbox.cpp"
-    includedirs     { "./", ecsGeneratedDir }
+    pchheader       "pch_map_tool.h"
+    pchsource       "pch_map_tool.cpp"
+    includedirs     { "./" }
 
     vpaths      {
-        ["src/*"]           = { "**.h", "**.inl", "**.cpp", "**.ecs" },
-		["public/*"]        = { "../../public/**.h", "../../public/**.inl", "../../public/**.cpp" }
+        ["src/*"]       = { "**.h", "**.inl", "**.cpp" },
+        ["public/*"]    = { "../public/**.h", "../public/**.inl", "../public/**.cpp" }
     }
-
-    -- Build commands for specific files
-    filter { "files:**.ecs" }
-        buildaction "None" 
-    filter {}
 
     links       {
         "core",
         "stdlib",
 		"interfaces",
-        "gameframework",
-        "sentdoc",
-		"smapdoc"
+        "smapdoc"
     }
 
 	----------- LINK THIRD PARTIES -----------------
 
     ThirdParty.Link( ThirdParty.Libs.GLM )
-    ThirdParty.Link( ThirdParty.Libs.Flecs )
+    ThirdParty.Link( ThirdParty.Libs.RapidJSON )
 
     ---------- PLATFORM SPECIFIC SETTINGS ---------
 

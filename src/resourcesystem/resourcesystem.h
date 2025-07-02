@@ -37,6 +37,9 @@ public:
 	// Return a default resource by its type. If the type isn't registered or not have a default resource return NULL
 	virtual TRefPtr<IResource> GetDefaultResource( resourceType_t type ) const override;
 
+	virtual bool HasResourceFactory( resourceType_t type ) const override;
+	virtual IResourceFactory* GetResourceFactory( resourceType_t type ) const override;
+
 private:
 	IResourceFactory*										pResourceFactories[RESOURCE_NUM_TYPES];
 	std::unordered_map<std::string, TRefPtr<CResource>>		resourcesDicts[RESOURCE_NUM_TYPES];

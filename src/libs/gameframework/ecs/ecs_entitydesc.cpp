@@ -9,9 +9,8 @@ CEcsEntityDesc::CEcsEntityDesc
 ==================
 */
 CEcsEntityDesc::CEcsEntityDesc()
-{
-	Sys_InitGuid( guid );
-}
+	: lastUsedEcsPrefabIdx( INVALID_INDEX )
+{}
 
 /*
 ==================
@@ -22,7 +21,6 @@ CEcsEntityDesc::CEcsEntityDesc( const CSENTCompiledEntityDescDoc& sentCompiledDo
 {
 	// Initialize the entity descriptor by SENT compiled document
 	Init( sentCompiledDoc );
-	Sys_InitGuid( guid );
 }
 
 /*
@@ -31,7 +29,9 @@ CEcsEntityDesc::~CEcsEntityDesc
 ==================
 */
 CEcsEntityDesc::~CEcsEntityDesc()
-{}
+{
+	Clear();
+}
 
 /*
 ==================
@@ -40,7 +40,10 @@ CEcsEntityDesc::Init
 */
 void CEcsEntityDesc::Init( const CSENTCompiledEntityDescDoc& sentCompiledDoc )
 {
-	PROFILE_SCOPE()
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_SCENE )
+	Clear();
+
+	// Initialize new ECS component factories
 	CEcsComponentTypes&								ecsComponentTypes	= Game()->GetEcsComponentTypes();
 	const std::vector<CSENTEntityDescComponent>&	sentComponents		= sentCompiledDoc.GetComponents();
 	for ( uint32 componentIdx = 0, numComponents = sentCompiledDoc.GetNumComponents(); componentIdx < numComponents; ++componentIdx )
@@ -58,18 +61,71 @@ void CEcsEntityDesc::Init( const CSENTCompiledEntityDescDoc& sentCompiledDoc )
 CEcsEntityDesc::CreateEcsPrefab
 ==================
 */
-ecsEntity_t CEcsEntityDesc::CreateEcsPrefab( const achar* pName ) const
+uint32 CEcsEntityDesc::CreateEcsPrefab( CEcsMap* pEcsMap, const achar* pName, uint32 ecsPrefabIdx /* = INVALID_INDEX */ ) const
 {
-	PROFILE_SCOPE()
-	CEcsWorld&	ecsWorld = Game()->GetEcsWorld();
-	ecsEntity_t ecsPrefab = ecsWorld.CreatePrefab( pName );
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_SCENE );
+	Assert( pEcsMap );
+	Assert( ecsPrefabIdx == INVALID_INDEX || ecsPrefabIdx < ecsPrefabs.size() );
+
+	// Create a new ECS prefab
+	CEcsWorld&		ecsWorld	= pEcsMap->GetEcsWorld();
+	ecsEntity_t		ecsEntity	= ecsWorld.CreatePrefab( pName );
 	for ( uint32 componentIdx = 0, numComponents = ( uint32 )ecsComponentFactories.size(); componentIdx < numComponents; ++componentIdx )
 	{
 		IEcsComponentFactory*	pEcsComponentFactory = ecsComponentFactories[componentIdx];
-		pEcsComponentFactory->Create( ecsWorld, ecsPrefab );
+		pEcsComponentFactory->Create( ecsWorld, ecsEntity );
+	}
+	
+	// Register it in our array
+	if ( ecsPrefabIdx != INVALID_INDEX )
+	{
+		ecsPrefabs[ecsPrefabIdx].ecsEntity = ecsEntity;
+		return ecsPrefabIdx;
 	}
 
-	return ecsPrefab;
+	ecsPrefab_t							ecsPrefab = {};
+	ecsPrefab.pEcsMap					= pEcsMap;
+	ecsPrefab.ecsEntity					= ecsEntity;
+	ecsPrefab.pOnMapResetedDelegate		= pEcsMap->OnMapReseted()->AddFunc( &CEcsEntityDesc::OnMapResetedOrUnloaded, ( void* )this );
+	ecsPrefab.pOnMapUnloadedDelegate	= pEcsMap->OnMapUnloaded()->AddFunc( &CEcsEntityDesc::OnMapResetedOrUnloaded, ( void* )this );
+	ecsPrefabs.emplace_back( ecsPrefab );
+	return ( uint32 )ecsPrefabs.size() - 1;
+}
+
+/*
+==================
+CEcsEntityDesc::OnMapResetedOrUnloaded
+==================
+*/
+void CEcsEntityDesc::OnMapResetedOrUnloaded( void* pUserData, IMap* pMap )
+{
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_SCENE )
+	CEcsEntityDesc*		pEcsEntityDesc	= ( CEcsEntityDesc* )pUserData;
+	for ( uint32 ecsPrefabIdx = 0, numEcsPrefabs = ( uint32 )pEcsEntityDesc->ecsPrefabs.size(); ecsPrefabIdx < numEcsPrefabs; ++ecsPrefabIdx )
+	{
+		ecsPrefab_t&	ecsPrefab = pEcsEntityDesc->ecsPrefabs[ecsPrefabIdx];
+		if ( ecsPrefab.pEcsMap != pMap )
+		{
+			continue;
+		}
+
+		CEcsWorld&	ecsWorld = ( ( CEcsMap* )pMap )->GetEcsWorld();
+		if ( ecsWorld.IsValidEntity( ecsPrefab.ecsEntity ) )
+		{
+			ecsWorld.DestroyEntity( ecsPrefab.ecsEntity );
+		}
+
+		pEcsEntityDesc->ecsPrefabs.erase( pEcsEntityDesc->ecsPrefabs.begin() + ecsPrefabIdx );
+		if ( ecsPrefabIdx < pEcsEntityDesc->lastUsedEcsPrefabIdx )
+		{
+			--pEcsEntityDesc->lastUsedEcsPrefabIdx;
+		}
+		else if ( ecsPrefabIdx == pEcsEntityDesc->lastUsedEcsPrefabIdx )
+		{
+			pEcsEntityDesc->lastUsedEcsPrefabIdx = INVALID_INDEX;
+		}
+		return;
+	}
 }
 
 /*
@@ -79,13 +135,25 @@ CEcsEntityDesc::Clear
 */
 void CEcsEntityDesc::Clear()
 {
-	PROFILE_SCOPE()
-	CEcsWorld&	ecsWorld = Game()->GetEcsWorld();
-	if ( ecsWorld.IsValidEntity( ecsPrefab ) )
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_SCENE )
+	for ( uint32 ecsPrefabIdx = 0, numEcsPrefabs = ( uint32 )ecsPrefabs.size(); ecsPrefabIdx < numEcsPrefabs; ++ecsPrefabIdx )
 	{
-		ecsWorld.DestroyEntity( ecsPrefab );
+		ecsPrefab_t&	ecsPrefab	= ecsPrefabs[ecsPrefabIdx];
+		CEcsWorld&		ecsWorld	= ecsPrefab.pEcsMap->GetEcsWorld();
+		if ( ecsWorld.IsValidEntity( ecsPrefab.ecsEntity ) )
+		{
+			ecsWorld.DestroyEntity( ecsPrefab.ecsEntity );
+		}
+
+		ecsPrefab.pEcsMap->OnMapReseted()->RemoveFunc( ecsPrefab.pOnMapResetedDelegate );
+		ecsPrefab.pEcsMap->OnMapUnloaded()->RemoveFunc( ecsPrefab.pOnMapUnloadedDelegate );
 	}
+
+	// Clear ECS component factories, prefabs and update GUID
 	ecsComponentFactories.clear();
+	ecsPrefabs.clear();
+	lastUsedEcsPrefabIdx = INVALID_INDEX;
+	Sys_InitGuid( guid );
 }
 
 /*
@@ -93,23 +161,36 @@ void CEcsEntityDesc::Clear()
 CEcsEntityDesc::Create
 ==================
 */
-IEntity* CEcsEntityDesc::Create( const achar* pName /* = "" */ ) const
+IEntity* CEcsEntityDesc::Create( IMap* pMap, const achar* pName /* = "" */ ) const
 {
-	PROFILE_SCOPE()
-	CEcsWorld&		ecsWorld = Game()->GetEcsWorld();
-	if ( !ecsWorld.IsValidEntity( ecsPrefab ) )
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_SCENE )
+	Assert( pMap );
+	
+	CEcsWorld&		ecsWorld = ( ( CEcsMap* )pMap )->GetEcsWorld();
+	if ( lastUsedEcsPrefabIdx == INVALID_INDEX || ecsPrefabs[lastUsedEcsPrefabIdx].pEcsMap != pMap )
 	{
-		std::string		ecsPrefabName = S_Sprintf( "ecs_prefab_%s", guid.AsString().c_str() );
-		ecsPrefab		= ecsWorld.FindEntity( ecsPrefabName.c_str() );
-		if ( !ecsWorld.IsValidEntity( ecsPrefab ) )
+		// Try to find an already created prefab
+		uint32	foundEcsPrefabIdx = INVALID_INDEX;
+		for ( uint32 ecsPrefabIdx = 0, numEcsPrefabs = ( uint32 )ecsPrefabs.size(); ecsPrefabIdx < numEcsPrefabs; ++ecsPrefabIdx )
 		{
-			ecsPrefab = CreateEcsPrefab( ecsPrefabName.c_str() );
+			const ecsPrefab_t&	ecsPrefab = ecsPrefabs[ecsPrefabIdx];
+			if ( ecsPrefab.pEcsMap == pMap )
+			{
+				foundEcsPrefabIdx = ecsPrefabIdx;
+				break;
+			}
 		}
-		else
+
+		// Create a new ECS prefab if it wasn't found or isn't valid
+		if ( foundEcsPrefabIdx == INVALID_INDEX || !ecsWorld.IsValidEntity( ecsPrefabs[foundEcsPrefabIdx].ecsEntity ) )
 		{
-			AssertMsg( ecsWorld.IsPrefab( ecsPrefab ), "The prefab was found but it isn't valid" );
+			lastUsedEcsPrefabIdx = CreateEcsPrefab( ( CEcsMap* )pMap, S_Sprintf( "ecs_prefab_%s", guid.AsString().c_str() ).c_str(), foundEcsPrefabIdx );
 		}
 	}
 
-	return new CEcsEntity( ecsWorld.CreateEntity( pName, ecsPrefab ) );
+	// Create an ECS entity
+	const ecsPrefab_t&		ecsPrefab	= ecsPrefabs[lastUsedEcsPrefabIdx];
+	TRefPtr<CEcsEntity>		pEcsEntity	= new CEcsEntity( ecsWorld.CreateEntity( pName, ecsPrefab.ecsEntity ), ecsPrefab.pEcsMap );
+	ecsPrefab.pEcsMap->ecsEntities.emplace_back( pEcsEntity );
+	return pEcsEntity;
 }

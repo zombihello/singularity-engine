@@ -9,6 +9,7 @@
 #include "gameframework/game.h"
 #include "gameframework/ientity.h"
 #include "gameframework/ientitydesc.h"
+#include "gameframework/imap.h"
 #include "gameframework/ecs/ecs_core.h"
 #include "gameframework/ecs/ecs_common.gen.h"
 #include "gameframework/ecs/ecs_movement.gen.h"
@@ -99,13 +100,16 @@ bool CSandboxGame::Init( createInterfaceFn_t pFactory )
 	// Initialize the ECS world
 	extern void EcsInitModules_Sandbox();
 	EcsInitModules_Sandbox();
-	EcsInitWorld_GameOnly( ecsWorld );
 
-	TResourcePtr<IEntityDesc>		pQuadEntityDesc = g_pResourceSystem->FindOrLoadResource( "entities/test_quad", RESOURCE_TYPE_ENTITY_DESC );
-	pQuadEntity = pQuadEntityDesc->Create( "quad" );
+	// Load and set as active a map
+	TResourcePtr<IMap>		pMap = g_pResourceSystem->FindOrLoadResource( "maps/test", RESOURCE_TYPE_MAP, RESOURCE_LOAD_FLAG_WITHOUT_DEFAULT );
+	if ( !pMap )
+	{
+		Sys_Error( "Sandbox: Failed to load 'maps/test'" );
+		return false;
+	}
 
-	TResourcePtr<IEntityDesc>		pPlayerEntityDesc = g_pResourceSystem->FindOrLoadResource( "entities/player", RESOURCE_TYPE_ENTITY_DESC );
-	pPlayerEntity = pPlayerEntityDesc->Create( "player" );
+	SetActiveMap( pMap );
 	return true;
 }
 

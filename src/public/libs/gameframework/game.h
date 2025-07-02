@@ -7,6 +7,8 @@
 #include "gameframework/ecs/ecs_component_factory.h"
 #include "gameframework/ecs/ecs_component_serialize.h"
 #include "gameframework/ecs/ecs_entitydesc_factory.h"
+#include "gameframework/ecs/ecs_map.h"
+#include "gameframework/ecs/ecs_map_factory.h"
 
 //-----------------------------------------------------------------------------
 // Base class of the game
@@ -24,15 +26,17 @@ public:
 
 	CGame();
 
-	CEcsWorld& GetEcsWorld();
+	void SetActiveMap( const TResourcePtr<IMap>& pEcsMap );
+	IMap* GetActiveMap() const;
 	CEcsComponentTypes& GetEcsComponentTypes();
 
 protected:
-	CEcsWorld					ecsWorld;
 	CEcsComponentTypes			ecsComponentTypes;
 
 private:
+	TResourcePtr<IMap>			pActiveMap;
 	CEcsEntityDescFactory		ecsEntityDescFactory;
+	CEcsMapFactory				ecsMapFactory;
 };
 
 // NOTE: You must implement the function to return a singleton game class

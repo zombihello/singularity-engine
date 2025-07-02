@@ -1,19 +1,14 @@
-#ifndef ECS_ENTITYDESC_FACTORY_H
-#define ECS_ENTITYDESC_FACTORY_H
+#ifndef ECS_MAP_FACTORY_H
+#define ECS_MAP_FACTORY_H
 
 #include "resourcesystem/iresourcefactory.h"
 
-//-----------------------------------------------------------------------------
-// Forward declarations
-//-----------------------------------------------------------------------------
-class CEcsEntityDesc;
-
 
 //-----------------------------------------------------------------------------
-// ECS entity descriptor factory
+// ECS map factory
 // Path to the resource in the file system can be without file extension
 //-----------------------------------------------------------------------------
-class CEcsEntityDescFactory : public IResourceFactory
+class CEcsMapFactory : public IResourceFactory
 {
 public:
 	void Init();
@@ -31,7 +26,7 @@ public:
 	virtual void Validate() const override;
 
 private:
-	TRefPtr<IResource>		pDefaultEntityDesc;
+	TRefPtr<IResource>		pDefaultMap;
 };
 
-#endif // !ECS_ENTITYDESC_FACTORY_H
+#endif // !ECS_MAP_FACTORY_H

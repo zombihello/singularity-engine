@@ -283,7 +283,7 @@ bool CSENTSourceEntityDescDoc::GrabData( const CJsonDoc& jsonDoc )
 		}
 		else
 		{
-			Error( "SENTDoc: A source material '%s' must have 'output-dir' field" );
+			Error( "SENTDoc: A source material must have 'output-dir' field" );
 			bResult = false;
 		}
 	}

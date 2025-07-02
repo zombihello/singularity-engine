@@ -80,9 +80,12 @@ CResourceSystem::RegisterResourceFactory
 */
 void CResourceSystem::RegisterResourceFactory( resourceType_t type, IResourceFactory* pFactory )
 {
+	// Before to register the factory make sure that it is valid,
+	// because one can depends on specific format types
 	Assert( type < RESOURCE_NUM_TYPES && pFactory );
+	pFactory->Validate();
 	pResourceFactories[type] = pFactory;
-	Msg( "ResourceSystem: Resource factory for type 0x%X registered", type );
+	Msg( "ResourceSystem: Resource factory for type 0x%X registered (format: '%s')", type, pFactory->GetFormatType() );
 }
 
 /*
@@ -93,8 +96,7 @@ CResourceSystem::UnRegisterResourceFactory
 void CResourceSystem::UnRegisterResourceFactory( resourceType_t type )
 {
 	Assert( type < RESOURCE_NUM_TYPES );
-	IResourceFactory*	pResourceFactory = pResourceFactories[type];
-	if ( pResourceFactory )
+	if ( IResourceFactory* pResourceFactory = pResourceFactories[type] )
 	{
 		// Unload all resource of the type
 		std::unordered_map<std::string, TRefPtr<CResource>>&	resourcesDict = resourcesDicts[type];
@@ -105,8 +107,17 @@ void CResourceSystem::UnRegisterResourceFactory( resourceType_t type )
 		}
 		resourcesDict.clear();
 
+		Msg( "ResourceSystem: Resource factory for type 0x%X unregistered (format: '%s')", type, pResourceFactory->GetFormatType() );
 		pResourceFactories[type] = NULL;
-		Msg( "ResourceSystem: Resource factory for type 0x%X unregistered", type );
+	}
+
+	// Make sure that rest factories are valid, because one factory can depends on specific format types
+	for ( uint32 factoryIdx = 0; factoryIdx < RESOURCE_NUM_TYPES; ++factoryIdx )
+	{
+		if ( IResourceFactory* pResourceFactory = pResourceFactories[factoryIdx] )
+		{
+			pResourceFactory->Validate();
+		}
 	}
 }
 
@@ -227,9 +238,32 @@ void CResourceSystem::RemoveUnusedResources()
 CResourceSystem::GetDefaultResource
 ==================
 */
-TRefPtr<IResource> CResourceSystem::GetDefaultResource( resourceType_t resourceType ) const
+TRefPtr<IResource> CResourceSystem::GetDefaultResource( resourceType_t type ) const
 {
-	Assert( resourceType < RESOURCE_NUM_TYPES );
-	IResourceFactory*		pResourceFactory = pResourceFactories[resourceType];
+	Assert( type < RESOURCE_NUM_TYPES );
+	IResourceFactory*		pResourceFactory = pResourceFactories[type];
 	return pResourceFactory ? pResourceFactory->GetDefaultResource() : NULL;
+}
+
+/*
+==================
+CResourceSystem::HasResourceFactory
+==================
+*/
+bool CResourceSystem::HasResourceFactory( resourceType_t type ) const
+{
+	Assert( type < RESOURCE_NUM_TYPES );
+	return !!pResourceFactories[type];
+}
+
+/*
+==================
+CResourceSystem::GetResourceFactory
+==================
+*/
+IResourceFactory* CResourceSystem::GetResourceFactory( resourceType_t type ) const
+{
+	Assert( type < RESOURCE_NUM_TYPES );
+	IResourceFactory*		pResourceFactory = pResourceFactories[type];
+	return pResourceFactory ? pResourceFactory : NULL;
 }

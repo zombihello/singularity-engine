@@ -44,7 +44,6 @@ struct resourceToolEntityDescComponent_t
 	const achar*							pType;
 	const resourceToolEntityDescVar_t*		pVars;
 	uint32									numVars;
-
 };
 
 

@@ -24,6 +24,7 @@ compile_commands.json
 *.smat_c
 *.smdl_c
 *.sent_c
+*.smap_c
 /game/bin/**
 /game/**/bin
 /game/**/shaders

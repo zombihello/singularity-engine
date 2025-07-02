@@ -126,3 +126,21 @@ TRefPtr<IResource> CTextureFactory::GetDefaultResource() const
 {
 	return pDefaultTexture;
 }
+
+/*
+==================
+CTextureFactory::GetFormatType
+==================
+*/
+const achar* CTextureFactory::GetFormatType() const
+{
+	return "STEX";
+}
+
+/*
+==================
+CTextureFactory::Validate
+==================
+*/
+void CTextureFactory::Validate() const
+{}

@@ -7,6 +7,7 @@
 // Forward declarations
 //-----------------------------------------------------------------------------
 class IEntity;
+class IMap;
 
 
 //-----------------------------------------------------------------------------
@@ -17,7 +18,7 @@ class IEntityDesc : public IRefCounted
 {
 public:
 	virtual ~IEntityDesc() {}
-	virtual IEntity* Create( const achar* pName = "" ) const = 0;
+	virtual IEntity* Create( IMap* pMap, const achar* pName = "" ) const = 0;
 };
 
 #endif // !IENTITYDESC_H
