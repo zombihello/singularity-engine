@@ -138,6 +138,8 @@ ecscompiler                 = "tools/ecscompiler/"
 parserlib                   = "libs/parserlib/"
 sentdoc                     = "libs/sentdoc/"
 entitydesc_tool             = "tools/entitydesc_tool/"
+smapdoc						= "libs/smapdoc/"
+map_tool					= "tools/map_tool/"
 
 --------------- THIRD PARTIES ---------
 include( root .. "/thirdparty/thirdparty.lua" )
@@ -269,6 +271,7 @@ workspace( workspaceName )
             include( gameframework )
             include( parserlib )
             include( sentdoc )
+			include( smapdoc )
             group "/Engine/Libraries/ThirdParty"
                 ThirdParty.SetupProjects()
     group "/Tools"
@@ -281,6 +284,7 @@ workspace( workspaceName )
 			include( material_tool )
             include( model_tool )
             include( entitydesc_tool )
+			include( map_tool )
         group "/Tools/ECS Compiler"
             include( ecscompiler )
 	group "/Games"

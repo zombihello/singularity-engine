@@ -3,12 +3,22 @@
 
 /*
 ==================
-CGame::GetEcsWorld
+CGame::SetActiveMap
 ==================
 */
-FORCEINLINE CEcsWorld& CGame::GetEcsWorld()
+FORCEINLINE void CGame::SetActiveMap( const TResourcePtr<IMap>& pEcsMap )
 {
-	return ecsWorld;
+	pActiveMap = pEcsMap;
+}
+
+/*
+==================
+CGame::GetActiveMap
+==================
+*/
+FORCEINLINE IMap* CGame::GetActiveMap() const
+{
+	return *pActiveMap;
 }
 
 /*

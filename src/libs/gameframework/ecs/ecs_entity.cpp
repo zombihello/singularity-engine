@@ -1,15 +1,21 @@
 #include "pch_gameframework.h"
 #include "gameframework/game.h"
 #include "gameframework/ecs/ecs_entity.h"
+#include "gameframework/ecs/ecs_map.h"
 
 /*
 ==================
 CEcsEntity::CEcsEntity
 ==================
 */
-CEcsEntity::CEcsEntity( ecsEntity_t ecsEntity )
+CEcsEntity::CEcsEntity( ecsEntity_t ecsEntity, CEcsMap* pEcsMap )
 	: ecsEntity( ecsEntity )
-{}
+	, pEcsMap( pEcsMap )
+	, pOnMapResetedDelegate( pEcsMap->OnMapReseted()->AddFunc( &CEcsEntity::OnMapResetedOrUnloaded, this ) )
+	, pOnMapUnloadedDelegate( pEcsMap->OnMapUnloaded()->AddFunc( &CEcsEntity::OnMapResetedOrUnloaded, this ) )
+{
+	Assert( pEcsMap );
+}
 
 /*
 ==================
@@ -18,9 +24,46 @@ CEcsEntity::~CEcsEntity
 */
 CEcsEntity::~CEcsEntity()
 {
-	CEcsWorld&		ecsWorld = Game()->GetEcsWorld();
-	if ( ecsWorld.IsValidEntity( ecsEntity ) )
+	DestroyEcsEntity();
+}
+
+/*
+==================
+CEcsEntity::OnMapResetedOrUnloaded
+==================
+*/
+void CEcsEntity::OnMapResetedOrUnloaded( void* pUserData, IMap* pMap )
+{
+	CEcsEntity*		pEcsEntity = ( CEcsEntity* )pUserData;
+	if ( pEcsEntity->pEcsMap == pMap )
 	{
-		ecsWorld.DestroyEntity( ecsEntity );
+		pEcsEntity->DestroyEcsEntity( false );
+	}
+}
+
+/*
+==================
+CEcsEntity::DestroyEcsEntity
+==================
+*/
+void CEcsEntity::DestroyEcsEntity( bool bRemoveEcsMapDelegates /* = true */ )
+{
+	if ( pEcsMap )
+	{
+		CEcsWorld&	ecsWorld = pEcsMap->GetEcsWorld();
+		if ( ecsWorld.IsValidEntity( ecsEntity ) )
+		{
+			ecsWorld.DestroyEntity( ecsEntity );
+		}
+
+		if ( bRemoveEcsMapDelegates )
+		{
+			pEcsMap->OnMapReseted()->RemoveFunc( pOnMapResetedDelegate );
+			pEcsMap->OnMapUnloaded()->RemoveFunc( pOnMapUnloadedDelegate );
+		}
+
+		pEcsMap = NULL;
+		pOnMapResetedDelegate = NULL;
+		pOnMapUnloadedDelegate = NULL;
 	}
 }

@@ -31,6 +31,11 @@ public:
 	virtual TRefPtr<IRefCounted> LoadResource( const achar* pPath, uint32 loadFlags = RESOURCE_LOAD_FLAG_NONE ) const = 0;
 	virtual void UnloadResource( IRefCounted* pResoruce ) const = 0;
 	virtual TRefPtr<IResource> GetDefaultResource() const = 0;
+	virtual const achar* GetFormatType() const = 0;
+	
+	// Ensures that the factory is valid, because one can depends on specific format type.
+	// If something wrong the function must crash the game
+	virtual void Validate() const = 0;
 };
 
 #endif // !IRESOURCEFACTORY_H

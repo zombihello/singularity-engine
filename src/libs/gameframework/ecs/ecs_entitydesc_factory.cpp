@@ -82,3 +82,27 @@ TRefPtr<IResource> CEcsEntityDescFactory::GetDefaultResource() const
 {
 	return pDefaultEntityDesc;
 }
+
+/*
+==================
+CEcsEntityDescFactory::GetFormatType
+==================
+*/
+const achar* CEcsEntityDescFactory::GetFormatType() const
+{
+	return "SENT_ECS";
+}
+
+/*
+==================
+CEcsEntityDescFactory::Validate
+==================
+*/
+void CEcsEntityDescFactory::Validate() const
+{
+	IResourceFactory*	pMapResourceFactory = g_pResourceSystem->GetResourceFactory( RESOURCE_TYPE_MAP );
+	if ( !pMapResourceFactory || S_Stricmp( pMapResourceFactory->GetFormatType(), "SMAP_ECS" ) )
+	{
+		Sys_Error( "SENT_ECS factory depends on SMAP_ECS factory" );
+	}
+}

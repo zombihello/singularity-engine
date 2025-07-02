@@ -17,7 +17,6 @@ CGame::CGame
 ==================
 */
 CGame::CGame()
-	: ecsWorld( false )
 {}
 
 /*
@@ -60,9 +59,9 @@ bool CGame::Init( createInterfaceFn_t pFactory )
 	// Register GameFramework ECS modules and initialize the world
 	extern void EcsInitModules_Gameframework();
 	EcsInitModules_Gameframework();
-	EcsInitWorld_GameframeworkOnly( ecsWorld );
 
 	// Initialize all resource factories
+	ecsMapFactory.Init();
 	ecsEntityDescFactory.Init();
 	return true;
 }
@@ -77,11 +76,16 @@ void CGame::Shutdown()
 	// Unregister all render objects
 	g_pStudioRender->UnregisterAllObjects();
 
-	// Reset the ECS world
-	ecsWorld.Reset();
+	// Reset the active map
+	if ( pActiveMap )
+	{
+		pActiveMap->Reset();
+		pActiveMap = NULL;
+	}
 
 	// Shutdown all resource factories
 	ecsEntityDescFactory.Shutdown();
+	ecsMapFactory.Shutdown();
 
 	// Unregister cvars and disconnect StdLib
 	ConVar_Unregister();
@@ -97,7 +101,10 @@ CGame::FrameUpdate
 */
 void CGame::FrameUpdate()
 {
-	ecsWorld.Update( 0.f );
+	if ( pActiveMap )
+	{
+		pActiveMap->Update( 0.f );
+	}
 }
 
 

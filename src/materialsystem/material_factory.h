@@ -24,6 +24,11 @@ public:
 	virtual TRefPtr<IRefCounted> LoadResource( const achar* pPath, uint32 loadFlags = RESOURCE_LOAD_FLAG_NONE ) const override;
 	virtual void UnloadResource( IRefCounted* pResoruce ) const override;
 	virtual TRefPtr<IResource> GetDefaultResource() const override;
+	virtual const achar* GetFormatType() const override;
+
+	// Ensures that the factory is valid, because one can depends on specific format type.
+	// If something wrong the function must crash the game
+	virtual void Validate() const override;
 
 private:
 	TRefPtr<IResource>		pDefaultMaterial;

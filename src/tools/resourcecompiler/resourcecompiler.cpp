@@ -6,6 +6,7 @@
 #include "smatdoc/smat_source_doc.h"
 #include "smdldoc/smdl_source_doc.h"
 #include "sentdoc/sent_source_doc.h"
+#include "smapdoc/smap_source_doc.h"
 #include "filesystem/ifilesystem.h"
 #include "engine/icvar.h"
 #include "resourcesystem/iresource.h"
@@ -13,6 +14,7 @@
 #include "tools/resource_tools/imaterial_tool.h"
 #include "tools/resource_tools/imodel_tool.h"
 #include "tools/resource_tools/ientitydesc_tool.h"
+#include "tools/resource_tools/imap_tool.h"
 #include "appframework/iappsystemgroup.h"
 
 // Table of resource types by script file extension
@@ -21,7 +23,8 @@ static const achar* s_pScriptFileExtensions[] =
 	"smat",		// RESOURCE_TYPE_MATERIAL
 	"stex",		// RESOURCE_TYPE_TEXTURE
 	"smdl",		// RESOURCE_TYPE_MODEL
-	"sent"		// RESOURCE_TYPE_ENTITY_DESC
+	"sent",		// RESOURCE_TYPE_ENTITY_DESC
+	"smap"		// RESOURCE_TYPE_MAP
 };
 static_assert( RESOURCE_NUM_TYPES == ARRAYSIZE( s_pScriptFileExtensions ), "Array size 's_pScriptFileExtensions' must be equal to RESOURCE_NUM_TYPES" );
 
@@ -31,7 +34,8 @@ static const achar* s_pResourceTypeNames[] =
 	"material",				// RESOURCE_TYPE_MATERIAL
 	"texture",				// RESOURCE_TYPE_TEXTURE
 	"model",				// RESOURCE_TYPE_MODEL
-	"entity descriptor"		// RESOURCE_TYPE_ENTITY_DESC
+	"entity descriptor",	// RESOURCE_TYPE_ENTITY_DESC
+	"map"					// RESOURCE_TYPE_MAP
 };
 static_assert( RESOURCE_NUM_TYPES == ARRAYSIZE( s_pResourceTypeNames ), "Array size 's_pResourceTypeNames' must be equal to RESOURCE_NUM_TYPES" );
 
@@ -117,6 +121,7 @@ private:
 	IMaterialTool*				pMaterialTool;
 	IModelTool*					pModelTool;
 	IEntityDescTool*			pEntityDescTool;
+	IMapTool*					pMapTool;
 	std::list<resourceFile_t>	files;
 };
 
@@ -130,6 +135,8 @@ CResourceCompilerApp::CResourceCompilerApp()
 	: pTextureTool( NULL )
 	, pMaterialTool( NULL )
 	, pModelTool( NULL )
+	, pEntityDescTool( NULL )
+	, pMapTool( NULL )
 {}
 
 /*
@@ -149,6 +156,7 @@ bool CResourceCompilerApp::Create()
 		{ "material_tool"		DLL_EXT_STRING,			MATERIAL_TOOL_INTERFACE_VERSION		},
 		{ "model_tool"			DLL_EXT_STRING,			MODEL_TOOL_INTERFACE_VERSION		},
 		{ "entitydesc_tool"		DLL_EXT_STRING,			ENTITYDESC_TOOL_INTERFACE_VERSION	},
+		{ "map_tool"			DLL_EXT_STRING,			MAP_TOOL_INTERFACE_VERSION			},
 		{ "", "" }																			// Required to terminate the list
 	};
 
@@ -163,6 +171,7 @@ bool CResourceCompilerApp::Create()
 	pMaterialTool	= ( IMaterialTool* )FindSystem( MATERIAL_TOOL_INTERFACE_VERSION );
 	pModelTool		= ( IModelTool* )FindSystem( MODEL_TOOL_INTERFACE_VERSION );
 	pEntityDescTool	= ( IEntityDescTool* )FindSystem( ENTITYDESC_TOOL_INTERFACE_VERSION );
+	pMapTool		= ( IMapTool* )FindSystem( MAP_TOOL_INTERFACE_VERSION );
 
 	// Initialize a default pixel format
 	for ( uint32 index = 0; index < STUDIOAPI_PIXEL_NUM_FORMATS; ++index )
@@ -612,6 +621,63 @@ int32 CResourceCompilerApp::Main()
 			break;
 		}
 
+			// Compile a map
+		case RESOURCE_TYPE_MAP:
+		{
+			CSMAPSourceMapDoc		smapSourceFile;
+			if ( !smapSourceFile.LoadFromFile( resourceFile.sourcePath.c_str() ) )
+			{
+				Error( "ResourceCompiler: Failed to load SMAP file '%s'", resourceFile.sourcePath.c_str() );
+				bResult = false;
+				continue;
+			}
+
+			// Get entities
+			std::vector<resourceToolMapEntity_t>		entities;
+			entities.resize( smapSourceFile.GetNumEntities() );
+			{
+				const std::vector<CSMAPEntity>&		smapEntities = smapSourceFile.GetEntities();
+				for ( uint32 entityIdx = 0, numEntities = (uint32)smapEntities.size(); entityIdx < numEntities; ++entityIdx )
+				{
+					const CSMAPEntity&						smapEntity = smapEntities[entityIdx];
+					resourceToolMapEntity_t&				resourceToolMapEntity = entities[entityIdx];
+					resourceToolMapEntity.pEntityDesc		= smapEntity.GetEntityDesc();
+					resourceToolMapEntity.pName				= smapEntity.GetName();
+				}
+			}
+
+			// Get path to directory with the source file
+			std::string		sourceFileDir;
+			{
+				std::string		tmpBuffer;
+				S_GetFilePath( resourceFile.sourcePath, tmpBuffer, false );
+				S_MakeAbsolutePath( tmpBuffer, sourceFileDir, "", false );
+			}
+
+			// Get a destination file
+			std::string		destPath;
+			{
+				std::string		outputDir = smapSourceFile.GetOutputDir();
+				if ( !S_IsAbsolutePath( outputDir ) )
+				{
+					S_MakeAbsolutePath( smapSourceFile.GetOutputDir(), outputDir, sourceFileDir );
+				}
+
+				std::string		baseFileName;
+				S_GetFileBaseName( resourceFile.sourcePath, baseFileName );
+
+				S_AppendPathSeparator( outputDir );
+				destPath = S_Sprintf( "%s%s", outputDir.c_str(), baseFileName.c_str() );
+			}
+
+			resourceToolCompileMapParams_t		compileParams = {};
+			compileParams.pDestPath				= destPath.c_str();
+			compileParams.pEntities				= entities.data();
+			compileParams.numEntities			= ( uint32 )entities.size();
+			bResourceCompiled					= pMapTool->CompileMap( compileParams );
+			break;
+		}
+
 		default:
 			Error( "ResourceCompiler: Failed to compile '%s', unsupported resource type '%s'", resourceFile.sourcePath.c_str(), ConvResourceTypeToString( resourceFile.type ) );
 			bResult = false;
@@ -644,7 +710,7 @@ void CResourceCompilerApp::PrintUsageHelp()
 	Msg( "Usage resourcecompiler -file <path>" );
 	Msg( "Usage resourcecompiler -filelist <path>" );
 	Msg( "" );
-	Msg( "The compiler supports next resource types: texture (*.stex), material (*.smat), model (*.smdl) and entity (*.sent)" );
+	Msg( "The compiler supports next resource types: texture (*.stex), material (*.smat), model (*.smdl), entity (*.sent) and map (*.smap)" );
 	Msg( "For syntax example see 'content/core/meterials/default_tex.stex', 'content/core/meterials/default_mat.smat'" );
 	Msg( "" );
 	Msg( "Launch arguments:" );
