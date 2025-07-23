@@ -65,119 +65,166 @@ void Sys_ResetLogColor()
 }
 
 #if ENABLE_LOGGING
-	/*
-	==================
-	Msg
-	==================
-	*/
-	void Msg( const achar* pFormat, ... )
-	{
-		va_list			params;
-		va_start( params, pFormat );
-		VMsg( pFormat, params );
-		va_end( params );
-	}
+/*
+==================
+Msg
+==================
+*/
+void Msg( const achar* pFormat, ... )
+{
+	va_list			params;
+	va_start( params, pFormat );
+	VMsg( pFormat, params );
+	va_end( params );
+}
 
-	/*
-	==================
-	VMsg
-	==================
-	*/
-	void VMsg( const achar* pFormat, va_list params )
+/*
+==================
+VMsg
+==================
+*/
+void VMsg( const achar* pFormat, va_list params )
+{
+	bool	bIsAllowedChangeColor = g_LogColor == LOG_COLOR_DEFAULT;
+	if ( bIsAllowedChangeColor )
 	{
-		bool	bIsAllowedChangeColor = g_LogColor == LOG_COLOR_DEFAULT;
-		if ( bIsAllowedChangeColor )
-		{
-			Sys_SetLogColor( LOG_COLOR_WHITE );
-		}
-		s_LogOutputFn( S_Sprintf( "Msg: %s\n", S_Vsprintf( pFormat, params ).c_str() ).c_str() );
-		if ( bIsAllowedChangeColor )
-		{
-			Sys_SetLogColor( LOG_COLOR_DEFAULT );
-		}
+		Sys_SetLogColor( LOG_COLOR_WHITE );
 	}
+	s_LogOutputFn( S_Sprintf( "Msg: %s\n", S_Vsprintf( pFormat, params ).c_str() ).c_str() );
+	if ( bIsAllowedChangeColor )
+	{
+		Sys_SetLogColor( LOG_COLOR_DEFAULT );
+	}
+}
 
-	/*
-	==================
-	Warning
-	==================
-	*/
-	void Warning( const achar* pFormat, ... )
-	{
-		va_list			params;
-		va_start( params, pFormat );
-		VWarning( pFormat, params );
-		va_end( params );
-	}
+/*
+==================
+Warning
+==================
+*/
+void Warning( const achar* pFormat, ... )
+{
+	va_list			params;
+	va_start( params, pFormat );
+	VWarning( pFormat, params );
+	va_end( params );
+}
 
-	/*
-	==================
-	VWarning
-	==================
-	*/
-	void VWarning( const achar* pFormat, va_list params )
+/*
+==================
+VWarning
+==================
+*/
+void VWarning( const achar* pFormat, va_list params )
+{
+	bool	bIsAllowedChangeColor = g_LogColor == LOG_COLOR_DEFAULT;
+	if ( bIsAllowedChangeColor )
 	{
-		bool	bIsAllowedChangeColor = g_LogColor == LOG_COLOR_DEFAULT;
-		if ( bIsAllowedChangeColor )
-		{
-			Sys_SetLogColor( LOG_COLOR_YELLOW );
-		}
-		s_LogOutputFn( S_Sprintf( "Warning: %s\n", S_Vsprintf( pFormat, params ).c_str() ).c_str() );
-		if ( bIsAllowedChangeColor )
-		{
-			Sys_SetLogColor( LOG_COLOR_DEFAULT );
-		}
+		Sys_SetLogColor( LOG_COLOR_YELLOW );
 	}
+	s_LogOutputFn( S_Sprintf( "Warning: %s\n", S_Vsprintf( pFormat, params ).c_str() ).c_str() );
+	if ( bIsAllowedChangeColor )
+	{
+		Sys_SetLogColor( LOG_COLOR_DEFAULT );
+	}
+}
 
-	/*
-	==================
-	Error
-	==================
-	*/
-	void Error( const achar* pFormat, ... )
-	{
-		va_list			params;
-		va_start( params, pFormat );
-		VError( pFormat, params );
-		va_end( params );
-	}
+/*
+==================
+Error
+==================
+*/
+void Error( const achar* pFormat, ... )
+{
+	va_list			params;
+	va_start( params, pFormat );
+	VError( pFormat, params );
+	va_end( params );
+}
 
-	/*
-	==================
-	VError
-	==================
-	*/
-	void VError( const achar* pFormat, va_list params )
+/*
+==================
+VError
+==================
+*/
+void VError( const achar* pFormat, va_list params )
+{
+	bool	bIsAllowedChangeColor = g_LogColor == LOG_COLOR_DEFAULT;
+	if ( bIsAllowedChangeColor )
 	{
-		bool	bIsAllowedChangeColor = g_LogColor == LOG_COLOR_DEFAULT;
-		if ( bIsAllowedChangeColor )
-		{
-			Sys_SetLogColor( LOG_COLOR_RED );
-		}
-		s_LogOutputFn( S_Sprintf( "Error: %s\n", S_Vsprintf( pFormat, params ).c_str() ).c_str() );
-		if ( bIsAllowedChangeColor )
-		{
-			Sys_SetLogColor( LOG_COLOR_DEFAULT );
-		}
+		Sys_SetLogColor( LOG_COLOR_RED );
 	}
+	s_LogOutputFn( S_Sprintf( "Error: %s\n", S_Vsprintf( pFormat, params ).c_str() ).c_str() );
+	if ( bIsAllowedChangeColor )
+	{
+		Sys_SetLogColor( LOG_COLOR_DEFAULT );
+	}
+}
 #endif // ENABLE_LOGGING
 
 #if ENABLE_ASSERT
-	/*
-	==================
-	Sys_FailAssertFunc
-	==================
-	*/
-	void Sys_FailAssertFunc( const achar* pExpr, const achar* pFile, int32 line, const achar* pFormat /*= "" */, ... )
+/*
+==================
+Sys_AssertFailed
+==================
+*/
+bool Sys_AssertFailed( const achar* pExpr, const achar* pFile, int32 line, const achar* pFormat /*= "" */, ... )
+{
+	// Don't show message if we already shutdown the game by a critical error
+	static bool		s_bAlreadyHasError = false;
+	if ( s_bAlreadyHasError )
 	{
-		// Don't show message if we already shutdown the game by a critical error
-		static bool		bAlreadyHasError = false;
-		if ( bAlreadyHasError )
-		{
-			return;
-		}
-		bAlreadyHasError = true;
+		return false;
+	}
+	s_bAlreadyHasError = true;
 
+	// Get final message
+	va_list			params;
+	va_start( params, pFormat );
+	std::string		message = S_Sprintf( "Expression: %s\nMessage: %s\n\nFile: %s\nLine: %i", pExpr, S_Strlen( pFormat ) > 0 ? S_Vsprintf( pFormat, params ).c_str() : "<None>", pFile, line);
+	va_end( params );
+
+	// Print message and show message box
+	bool	bIsAllowedChangeColor = g_LogColor == LOG_COLOR_DEFAULT;
+	if ( bIsAllowedChangeColor )
+	{
+		Sys_SetLogColor( LOG_COLOR_RED );
+	}
+	s_LogOutputFn( "\n------------ ASSERTION FAILED --------------\n" );
+	s_LogOutputFn( message.c_str() );
+	s_LogOutputFn( "\n--------------------------------------------\n\n" );
+	if ( bIsAllowedChangeColor )
+	{
+		Sys_SetLogColor( LOG_COLOR_DEFAULT );
+	}
+
+	if ( Sys_IsDebuggerPresent() )
+	{
+		Sys_DebugBreak();
+	}
+	Sys_ShowMessageBox( "Singularity Error", message.c_str(), MESSAGE_BOX_ERROR );
+
+	// Set crash dump message
+	CrashDump_SetMessage( message.c_str() );
+
+	// Shutdown application
+	Sys_RequestExit( true );
+	return true;
+}
+#endif // ENABLE_ASSERT
+
+#if ENABLE_ENSURE
+static bool		s_bEnsureAllowed = true;
+
+/*
+==================
+Sys_EnsureFailed
+==================
+*/
+bool Sys_EnsureFailed( const achar* pExpr, const achar* pFile, int32 line, bool bAlways, const achar* pFormat /*= ""*/, ... )
+{
+	if ( bAlways || s_bEnsureAllowed )
+	{
 		// Get final message
 		va_list			params;
 		va_start( params, pFormat );
@@ -190,7 +237,7 @@ void Sys_ResetLogColor()
 		{
 			Sys_SetLogColor( LOG_COLOR_RED );
 		}
-		s_LogOutputFn( "\n------------ ASSERTION FAILED --------------\n" );
+		s_LogOutputFn( "\n------------ ENSURE FAILED --------------\n" );
 		s_LogOutputFn( message.c_str() );
 		s_LogOutputFn( "\n--------------------------------------------\n\n" );
 		if ( bIsAllowedChangeColor )
@@ -202,62 +249,19 @@ void Sys_ResetLogColor()
 		{
 			Sys_DebugBreak();
 		}
-		Sys_ShowMessageBox( "Singularity Error", message.c_str(), MESSAGE_BOX_ERROR );
-
-		// Set crash dump message
-		CrashDump_SetMessage( message.c_str() );
-
-		// Shutdown application
-		Sys_RequestExit( true );
-	}
-#endif // ENABLE_ASSERT
-
-#if ENABLE_ENSURE
-	static bool		s_bEnsureAllowed = true;
-
-	/*
-	==================
-	Sys_EnsureFunc
-	==================
-	*/
-	void Sys_EnsureFunc( const achar* pExpr, const achar* pFile, int32 line, bool bAlways, const achar* pFormat /*= ""*/, ... )
-	{
-		if ( bAlways || s_bEnsureAllowed )
-		{
-			// Get final message
-			va_list			params;
-			va_start( params, pFormat );
-			std::string		message = S_Sprintf( "Expression: %s\nMessage: %s\n\nFile: %s\nLine: %i", pExpr, S_Strlen( pFormat ) > 0 ? S_Vsprintf( pFormat, params ).c_str() : "<None>", pFile, line);
-			va_end( params );
-
-			// Print message and show message box
-			bool	bIsAllowedChangeColor = g_LogColor == LOG_COLOR_DEFAULT;
-			if ( bIsAllowedChangeColor )
-			{
-				Sys_SetLogColor( LOG_COLOR_RED );
-			}
-			s_LogOutputFn( "\n------------ ENSURE FAILED --------------\n" );
-			s_LogOutputFn( message.c_str() );
-			s_LogOutputFn( "\n--------------------------------------------\n\n" );
-			if ( bIsAllowedChangeColor )
-			{
-				Sys_SetLogColor( LOG_COLOR_DEFAULT );
-			}
-
-			if ( Sys_IsDebuggerPresent() )
-			{
-				Sys_DebugBreak();
-			}
-		}
+		return true;
 	}
 
-	/*
-	==================
-	Sys_SetEnsureAllow
-	==================
-	*/
-	void Sys_SetEnsureAllow( bool bAllowed )
-	{
-		s_bEnsureAllowed = bAllowed;
-	}
+	return false;
+}
+
+/*
+==================
+Sys_SetEnsureAllow
+==================
+*/
+void Sys_SetEnsureAllow( bool bAllowed )
+{
+	s_bEnsureAllowed = bAllowed;
+}
 #endif // ENABLE_ENSURE
