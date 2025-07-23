@@ -15,12 +15,12 @@ Sys_Error
 void Sys_Error( const achar* pFormat, ... )
 {
 	// Don't show message if we already shutdown the game by a critical error
-	static bool		bAlreadyHasError = false;
-	if ( bAlreadyHasError )
+	static bool		s_bAlreadyHasError = false;
+	if ( s_bAlreadyHasError )
 	{
 		return;
 	}
-	bAlreadyHasError = true;
+	s_bAlreadyHasError = true;
 
 	// Get formated string
 	va_list			params;

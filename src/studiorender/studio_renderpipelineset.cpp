@@ -193,7 +193,7 @@ IStudioAPIRenderPipeline* CStudioRenderPipelineSet::CRenderPipelineContainer::Ge
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 
 	// Draw render pipelines
-	Assert( pDataStorage && renderPassType != STUDIO_RENDERPASS_NUM_TYPES )
+	Assert( pDataStorage && renderPassType != STUDIO_RENDERPASS_NUM_TYPES );
 	if ( renderPassType != STUDIO_RENDERPASS_TYPE_PRESENT )
 	{
 		dataStorageDrawRenderPasses_t*	pDataStorageDraw = ( dataStorageDrawRenderPasses_t* )pDataStorage;

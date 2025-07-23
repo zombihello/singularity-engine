@@ -52,122 +52,52 @@ CORE_INTERFACE bool Sys_IsInitedConsoleIO();
 // Asserts
 //-----------------------------------------------------------------------------
 #if ENABLE_ASSERT
-    CORE_INTERFACE void Sys_FailAssertFunc( const achar* pExpr, const achar* pFile, int32 line, const achar* pFormat = "", ... );
+    CORE_INTERFACE bool Sys_AssertFailed( const achar* pExpr, const achar* pFile, int32 line, const achar* pFormat = "", ... );
 
-    #define AssertCode( Code ) \
-        do \
-        { \
-            Code \
-        } \
-        while ( false );
-
-    #define AssertMsg( Expr, Msg, ... )	\
-    { \
-        if ( !( Expr ) ) \
-        { \
-            Sys_FailAssertFunc( #Expr, __FILE__, __LINE__, Msg, __VA_ARGS__ ); \
-        } \
-    }
-
-    #define AssertFunc( Expr, Func ) \
-    { \
-        if ( !( Expr ) ) \
-        { \
-            Func; \
-            Sys_FailAssertFunc( #Expr, __FILE__, __LINE__ ); \
-        } \
-    }
-
-    #define Assert( Expr ) \
-    { \
-        if ( !( Expr ) ) \
-        { \
-            Sys_FailAssertFunc( #Expr, __FILE__, __LINE__ ); \
-        } \
-    }
-
-    #define AssertNoEntry()                     Sys_FailAssertFunc( "Enclosing block should never be called", __FILE__, __LINE__ );
+    #define Assert( Expr )					    ( void )( !!( Expr ) || Sys_AssertFailed( #Expr, __FILE__, __LINE__ ) )
+    #define AssertMsg( Expr, Msg, ... )		    ( void )( !!( Expr ) || Sys_AssertFailed( #Expr, __FILE__, __LINE__, Msg, __VA_ARGS__ ) )
+    #define AssertNoEntry()					    Sys_AssertFailed( "Enclosing block should never be called", __FILE__, __LINE__ )
     #define AssertNoReentry() \
     { \
-        static bool s_beenHere##__LINE__ = false; \
-        AssertMsg( !s_beenHere##__LINE__, "Enclosing block was called more than once" ); \
-        s_beenHere##__LINE__ = true; \
+        static bool CONCAT( s_bBeenHere_, __LINE__ ) = false; \
+        AssertMsg( !CONCAT( s_bBeenHere_, __LINE__ ), "Enclosing block was called more than once" ); \
+        CONCAT( s_bBeenHere_, __LINE__ ) = true; \
     }
+    #define AssertUnimplemented()               AssertMsg( false, "Unimplemented function called" )
+    #define Verify( Expr )                      ( !!( Expr ) ? true : ( Sys_AssertFailed( #Expr, __FILE__, __LINE__ ), false ) )
+    #define VerifyMsg( Expr, Msg, ... )         ( !!( Expr ) ? true : ( Sys_AssertFailed( #Expr, __FILE__, __LINE__, Msg, __VA_ARGS__ ), false ) )
 #else
-    FORCEINLINE void Sys_FailAssertFunc( const achar* pExpr, const achar* pFile, int32 line, const achar* pFormat = "", ... ) {}
-    #define AssertCode( Code )		            {}
-    #define AssertMsg( Expr, Msg, ... )		    {}
-    #define AssertFunc( Expr, Func )	        {}
-    #define Assert( Expr )				        {}
-    #define AssertNoEntry()                     {}
-    #define AssertNoReentry()                   {}
+    FORCEINLINE bool Sys_AssertFailed( const achar* pExpr, const achar* pFile, int32 line, const achar* pFormat = "", ... ) { return false; }
+
+    #define Assert( Expr )
+    #define AssertMsg( Expr, Msg, ... )
+    #define AssertNoEntry()
+    #define AssertNoReentry()
+    #define AssertUnimplemented()
+    #define Verify( Expr )                      !!( Expr )
+    #define VerifyMsg( Expr, Msg, ... )         !!( Expr )
 #endif // ENABLE_ASSERT
+
 
 //-----------------------------------------------------------------------------
 // Ensures
 //-----------------------------------------------------------------------------
 #if ENABLE_ENSURE
-    CORE_INTERFACE void Sys_EnsureFunc( const achar* pExpr, const achar* pFile, int32 line, bool bAlways, const achar* pFormat = "", ... );
+    CORE_INTERFACE bool Sys_EnsureFailed( const achar* pExpr, const achar* pFile, int32 line, bool bAlways, const achar* pFormat = "", ... );
     CORE_INTERFACE void Sys_SetEnsureAllow( bool bAllowed );
 
-    #define Ensure( Expr ) \
-    { \
-        if ( !( Expr ) ) \
-        { \
-            static bool s_bExecuted##__LINE__ = false; \
-            if ( !s_bExecuted##__LINE__ ) \
-            { \
-                s_bExecuted##__LINE__ = true; \
-                Sys_EnsureFunc( #Expr, __FILE__, __LINE__, false ); \
-            } \
-        } \
-    }
-
-    #define EnsureMsg( Expr, Msg, ... ) \
-    { \
-        if ( !( Expr ) ) \
-        { \
-            static bool s_bExecuted##__LINE__ = false; \
-            if ( !s_bExecuted##__LINE__ ) \
-            { \
-                s_bExecuted##__LINE__ = true; \
-                Sys_EnsureFunc( #Expr, __FILE__, __LINE__, false, Msg, __VA_ARGS__ ); \
-            } \
-        } \
-    }
-
-    #define EnsureAlways( Expr ) \
-    { \
-        if ( !( Expr ) ) \
-        { \
-            static bool s_bExecuted##__LINE__ = false; \
-            if ( !s_bExecuted##__LINE__ ) \
-            { \
-                s_bExecuted##__LINE__ = true; \
-                Sys_EnsureFunc( #Expr, __FILE__, __LINE__, true ); \
-            } \
-        } \
-    }
-
-    #define EnsureAlwaysMsg( Expr, Msg, ... ) \
-    { \
-        if ( !( Expr ) ) \
-        { \
-            static bool s_bExecuted##__LINE__ = false; \
-            if ( !s_bExecuted##__LINE__ ) \
-            { \
-                s_bExecuted##__LINE__ = true; \
-                Sys_EnsureFunc( #Expr, __FILE__, __LINE__, true, Msg, __VA_ARGS__ ); \
-            } \
-        } \
-    }
+    #define Ensure( Expr )                        ( ( Expr ) ? true : ( Sys_EnsureFailed( #Expr, __FILE__, __LINE__, false ), false ) )
+    #define EnsureMsg( Expr, Msg, ... )           ( ( Expr ) ? true : ( Sys_EnsureFailed( #Expr, __FILE__, __LINE__, false, Msg, __VA_ARGS__ ), false ) )
+    #define EnsureAlways( Expr )                  ( ( Expr ) ? true : ( Sys_EnsureFailed( #Expr, __FILE__, __LINE__, true ), false ) )
+    #define EnsureAlwaysMsg( Expr, Msg, ... )     ( ( Expr ) ? true : ( Sys_EnsureFailed( #Expr, __FILE__, __LINE__, true, Msg, __VA_ARGS__ ), false ) )
 #else
-    FORCEINLINE void Sys_EnsureFunc( const achar* pExpr, const achar* pFile, int32 line, bool bAlways, const achar* pFormat = "", ... ) {}
+    FORCEINLINE bool Sys_EnsureFailed( const achar* pExpr, const achar* pFile, int32 line, bool bAlways, const achar* pFormat = "", ... ) { return false; }
     FORCEINLINE void Sys_SetEnsureAllow( bool bAllowed ) {}
-    #define Ensure( Expr )                      {}
-    #define EnsureMsg( Expr, Msg, ... )         {}
-    #define EnsureAlways( Expr )                {}
-    #define EnsureAlwaysMsg( Expr, Msg, ... )   {}
+
+    #define Ensure( Expr )                        !!( Expr )
+    #define EnsureMsg( Expr, Msg, ... )           !!( Expr )
+    #define EnsureAlways( Expr )                  !!( Expr )
+    #define EnsureAlwaysMsg( Expr, Msg, ... )     !!( Expr )
 #endif // ENABLE_ENSURE
 
 #endif // !DEBUG_H
