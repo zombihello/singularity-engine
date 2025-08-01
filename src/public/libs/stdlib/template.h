@@ -1,20 +1,5 @@
-#ifndef TEMPLATE_H
-#define TEMPLATE_H
-
+#pragma once
 #include "stdlib/stdlib.h"
-
-//-----------------------------------------------------------------------------
-// Template mecroses
-//-----------------------------------------------------------------------------
-#undef ARRAYSIZE
-#undef OFFSET_OF
-
-#define ARRAYSIZE( Array )											( sizeof( Array ) / sizeof( ( Array )[0] ) )
-#define OFFSET_OF( Struc, Member )									( ( ptrint )&( ( Struc* )0 )->Member )
-#define PACK_VERSION( Major, Minor, Patch )							( ( uint32 )Major << 24 | ( uint32 )Minor << 16 | Patch )
-#define UNPACK_VERSION( Version, Major, Minor, Patch )				{ Major = ( ( uint32 )Version >> 24 ) & 0xFF; Minor = ( ( uint32 )Version >> 16 ) & 0xFF; Patch = ( uint32 )Version & 0xFFFF; }
-#define BIT( Bit )													( 1 << Bit )
-
 
 //-----------------------------------------------------------------------------
 // Template functions
@@ -81,5 +66,3 @@ private:
 };
 
 #include "stdlib/template.inl"
-
-#endif // !TEMPLATE_H

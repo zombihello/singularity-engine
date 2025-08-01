@@ -1,6 +1,4 @@
-#ifndef ECS_MAP_H
-#define ECS_MAP_H
-
+#pragma once
 #include "smapdoc/smap_compiled_doc.h"
 #include "gameframework/ecs/ecs_core.h"
 #include "gameframework/ecs/ecs_component_factory.h"
@@ -50,5 +48,3 @@ private:
 };
 
 #include "gameframework/ecs/ecs_map.inl"
-
-#endif // !ECS_MAP_H

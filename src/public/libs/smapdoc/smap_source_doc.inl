@@ -1,5 +1,4 @@
-#ifndef SMAP_SOURCE_DOC_INL
-#define SMAP_SOURCE_DOC_INL
+#pragma once
 
 /*
 ==================
@@ -61,5 +60,3 @@ FORCEINLINE const std::vector<CSMAPEntity>& CSMAPSourceMapDoc::GetEntities() con
 {
 	return entities;
 }
-
-#endif // !SMAP_SOURCE_DOC_INL

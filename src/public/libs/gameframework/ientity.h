@@ -1,6 +1,4 @@
-#ifndef IENTITY_H
-#define IENTITY_H
-
+#pragma once
 #include "stdlib/refcount.h"
 
 //-----------------------------------------------------------------------------
@@ -11,5 +9,3 @@ class IEntity : public IRefCounted
 public:
 	virtual ~IEntity() {}
 };
-
-#endif // !IENTITY_H

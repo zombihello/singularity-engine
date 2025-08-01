@@ -1,6 +1,4 @@
-#ifndef SENTVAR_H
-#define SENTVAR_H
-
+#pragma once
 #include "core/core.h"
 #include "core/debug.h"
 #include "stdlib/math/math.h"
@@ -78,5 +76,3 @@ private:
 };
 
 #include "sentdoc/sentvar.inl"
-
-#endif // !SENTVAR_H

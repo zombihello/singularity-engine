@@ -1,5 +1,4 @@
-#ifndef SENTVAR_INL
-#define SENTVAR_INL
+#pragma once
 
 /*
 ==================
@@ -276,5 +275,3 @@ FORCEINLINE CSENTEntityDescVar& CSENTEntityDescVar::operator=( const CSENTEntity
 	Copy( right );
 	return *this;
 }
-
-#endif // !SENTVAR_INL

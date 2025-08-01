@@ -1,5 +1,4 @@
-#ifndef ECS_MAP_INL
-#define ECS_MAP_INL
+#pragma once
 
 /*
 ==================
@@ -22,5 +21,3 @@ FORCEINLINE CEcsWorld& CEcsMap::GetEcsWorld()
 {
 	return ecsWorld;
 }
-
-#endif // !ECS_MAP_INL

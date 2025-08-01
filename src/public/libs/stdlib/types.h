@@ -1,7 +1,5 @@
-#ifndef TYPES_H
-#define TYPES_H
-
-#include "core/build.h"
+#pragma once
+#include "stdlib/builddefines.h"
 
 //-----------------------------------------------------------------------------
 // Types
@@ -34,5 +32,3 @@ enum
 	INVALID_HASH	= ( hash_t )-1,
 	INVALID_INDEX	= ( uint32 )-1
 };
-
-#endif // !TYPES_H

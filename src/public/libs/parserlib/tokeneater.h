@@ -1,6 +1,4 @@
-#ifndef TOKENEATER_H
-#define TOKENEATER_H
-
+#pragma once
 #include "parserlib/tokenstream.h"
 #include "parserlib/stringbuffer.h"
 
@@ -20,5 +18,3 @@ protected:
 	std::string				path;
 	CParserTokenStream&		tokens;		// Here will be places all of parsed tokens
 };
-
-#endif // !TOKENEATER_H

@@ -1,11 +1,9 @@
-#ifndef VK_STUDIOAPI_QUEUE_H
-#define VK_STUDIOAPI_QUEUE_H
-
+#pragma once
 #include <list>
 
 #include "Volk/volk.h"
-#include "core/types.h"
-#include "core/platform.h"
+#include "stdlib/defines.h"
+#include "stdlib/types.h"
 #include "studiorender/studioapi/vk/vk_helpers.h"
 
 //-----------------------------------------------------------------------------
@@ -69,5 +67,3 @@ private:
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_queue.inl"
-
-#endif // !VK_STUDIOAPI_QUEUE_H

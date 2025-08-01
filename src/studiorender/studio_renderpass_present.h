@@ -1,6 +1,4 @@
-#ifndef STUDIO_RENDERPASS_PRESENT_H
-#define STUDIO_RENDERPASS_PRESENT_H
-
+#pragma once
 #include "materialsystem/imaterial.h"
 #include "studiorender/studio_renderobject_quad.h"
 
@@ -27,5 +25,3 @@ public:
 
 private:
 };
-
-#endif // !STUDIO_RENDERPASS_PRESENT_H

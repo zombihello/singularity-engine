@@ -1,6 +1,4 @@
-#ifndef WIN_PLATFORM_H
-#define WIN_PLATFORM_H
-
+#pragma once
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <direct.h>
@@ -42,6 +40,7 @@
 #endif // RETAIL
 
 #define DLL_EXT_STRING			        ".dll"
+#define EXE_EXT_STRING			        ".exe"
 #ifndef PLATFORM_SUBDIR
 	#if PLATFORM_64BIT
 		#define PLATFORM_SUBDIR		    "win64"
@@ -82,5 +81,3 @@ typedef HANDLE                          windowHandle_t;
 typedef HINSTANCE                       appInstanceHandle_t;
 typedef HANDLE                          threadHandle_t;
 typedef DWORD                           threadId_t;
-
-#endif // !WIN_PLATFORM_H

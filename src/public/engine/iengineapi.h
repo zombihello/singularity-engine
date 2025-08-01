@@ -1,6 +1,4 @@
-#ifndef IENGINEAPI_H
-#define IENGINEAPI_H
-
+#pragma once
 #include "appframework/iappsystem.h"
 
 //-----------------------------------------------------------------------------
@@ -28,5 +26,3 @@ public:
 	virtual void SetStartupInfo( const startupInfo_t& info ) = 0;
 	virtual int32 Run() = 0;
 };
-
-#endif // !IENGINEAPI_H

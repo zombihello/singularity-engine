@@ -1,5 +1,4 @@
-#ifndef MEMORY_INL
-#define MEMORY_INL
+#pragma once
 
 /*
 ==================
@@ -124,5 +123,3 @@ FORCEINLINE void CUseSystemMemAllocForNew::operator delete[]( void* pPtr )
 {
 	Mem_FreeSystem( pPtr );
 }
-
-#endif // !MEMORY_INL

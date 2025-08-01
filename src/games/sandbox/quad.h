@@ -1,6 +1,4 @@
-#ifndef QUAD_H
-#define QUAD_H
-
+#pragma once
 #include "studiorender/studioapi/istudioapi.h"
 #include "resourcesystem/iresource.h"
 #include "materialsystem/imaterial.h"
@@ -23,6 +21,5 @@ private:
 	TRefPtr<IStudioAPIBuffer>	pStudioAPIIndexBuffer;
 	TResourcePtr<IMaterial>		pMaterial;
 };
-CQuad& Quad();
 
-#endif // !QUAD_H
+CQuad& Quad();

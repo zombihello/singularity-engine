@@ -1,6 +1,4 @@
-#ifndef IMAP_H
-#define IMAP_H
-
+#pragma once
 #include "stdlib/refcount.h"
 #include "stdlib/delegate.h"
 
@@ -33,5 +31,3 @@ public:
 	virtual IOnMapReseted* OnMapReseted() const = 0;
 	virtual IOnMapUnloaded* OnMapUnloaded() const = 0;
 };
-
-#endif // !IMAP_H

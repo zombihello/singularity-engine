@@ -1,6 +1,4 @@
-#ifndef ECS_ENTITYDESC_FACTORY_H
-#define ECS_ENTITYDESC_FACTORY_H
-
+#pragma once
 #include "resourcesystem/iresourcefactory.h"
 
 //-----------------------------------------------------------------------------
@@ -33,5 +31,3 @@ public:
 private:
 	TRefPtr<IResource>		pDefaultEntityDesc;
 };
-
-#endif // !ECS_ENTITYDESC_FACTORY_H

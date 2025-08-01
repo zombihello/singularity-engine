@@ -1,11 +1,9 @@
-#ifndef VK_STUDIOAPI_CMDBUFFER_H
-#define VK_STUDIOAPI_CMDBUFFER_H
-
+#pragma once
 #include <vector>
 #include <unordered_set>
 #include <unordered_map>
 
-#include "core/platform.h"
+#include "stdlib/defines.h"
 #include "studiorender/studioapi/vk/vk_studioapi_fence.h"
 #include "studiorender/studioapi/vk/vk_studioapi_semaphore.h"
 #include "studiorender/studioapi/vk/vk_studioapi_descriptorpoolsmgr.h"
@@ -48,5 +46,3 @@ private:
 	CStudioAPICmdBufferPoolVk&				cmdBufferPool;	
 	CStudioAPIDescriptorPoolSetContainerVk* pCurrentDescriptorPoolSetContainer;
 };
-
-#endif // !VK_STUDIOAPI_CMDBUFFER_H

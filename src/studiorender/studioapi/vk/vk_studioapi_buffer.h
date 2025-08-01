@@ -1,6 +1,4 @@
-#ifndef VK_STUDIOAPI_BUFFER_H
-#define VK_STUDIOAPI_BUFFER_H
-
+#pragma once
 #include "studiorender/studioapi/istudioapi_buffer.h"
 #include "studiorender/studioapi/vk/vk_studioapi_device.h"
 #include "studiorender/studioapi/vk/vk_studioapi_syncmgr.h"
@@ -72,5 +70,3 @@ private:
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_buffer.inl"
-
-#endif // !VK_STUDIOAPI_BUFFER_H

@@ -1,5 +1,4 @@
-#ifndef AXIS_H
-#define AXIS_H
+#pragma once
 
 //-----------------------------------------------------------------------------
 // Axis types
@@ -27,5 +26,3 @@ enum axisUp_t
 	AXIS_UP_NUM,
 	AXIS_UP_DEFAULT	= AXIS_UP_PLUS_Y
 };
-
-#endif // !AXIS_H

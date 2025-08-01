@@ -1,5 +1,4 @@
-#ifndef FILECONTEXT_INL
-#define FILECONTEXT_INL
+#pragma once
 
 /*
 ==================
@@ -57,5 +56,3 @@ FORCEINLINE std::string parserFileContext_t::ToString() const
 		return "Unknown";
 	}
 }
-
-#endif // !FILECONTEXT_INL

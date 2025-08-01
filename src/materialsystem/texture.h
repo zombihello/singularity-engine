@@ -1,6 +1,4 @@
-#ifndef TEXTURE_H
-#define TEXTURE_H
-
+#pragma once
 #include "materialsystem/itexture.h"
 #include "studiorender/istudio_renderresource.h"
 
@@ -39,5 +37,3 @@ private:
 	std::vector<textureMipMap_t>	mipmaps;
 	std::vector<byte>				data;
 };
-
-#endif // !TEXTURE_H

@@ -1,6 +1,4 @@
-#ifndef ICONVAR_H
-#define ICONVAR_H
-
+#pragma once
 #include "engine/iconcmd.h"
 
 //-----------------------------------------------------------------------------
@@ -39,5 +37,3 @@ public:
 	virtual float GetMin() const = 0;
 	virtual float GetMax() const = 0;
 };
-
-#endif // !ICONVAR_H

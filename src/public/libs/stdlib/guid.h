@@ -1,6 +1,4 @@
-#ifndef GUID_H
-#define GUID_H
-
+#pragma once
 #include "stdlib/strtools.h"
 #include "stdlib/hashing/fasthash.h"
 
@@ -47,5 +45,3 @@ private:
 };
 
 #include "stdlib/guid.inl"
-
-#endif // !GUID_H

@@ -1,5 +1,4 @@
-#ifndef WIN_PLATFORM_PRIVATE_H
-#define WIN_PLATFORM_PRIVATE_H
+#pragma once
 
 // Windows support _aligned_malloc
 #undef PLATFORM_USE__ALIGNED_MALLOC
@@ -12,5 +11,3 @@
 // If we on 64 bit platform then it is supports mimalloc
 #undef PLATFORM_SUPPORTS_MIMALLOC
 #define PLATFORM_SUPPORTS_MIMALLOC                  PLATFORM_64BIT
-
-#endif // !WIN_PLATFORM_PRIVATE_H

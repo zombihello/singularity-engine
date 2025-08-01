@@ -1,5 +1,4 @@
-#ifndef TOKEN_INL
-#define TOKEN_INL
+#pragma once
 
 /*
 ==================
@@ -24,5 +23,3 @@ FORCEINLINE std::string parserToken_t::ToString() const
 {
 	return S_Sprintf( "Token %i \"%hs\", #%i at %hs", tokenID, !tokenString.empty() ? tokenString.data() : "<TEXT_EMPTY>", scopeLevel, context.ToString().c_str() );
 }
-
-#endif // !TOKEN_INL

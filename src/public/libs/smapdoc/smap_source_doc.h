@@ -1,6 +1,4 @@
-#ifndef SMAP_SOURCE_DOC_H
-#define SMAP_SOURCE_DOC_H
-
+#pragma once
 #include <vector>
 #include <string>
 
@@ -35,5 +33,3 @@ private:
 };
 
 #include "smapdoc/smap_source_doc.inl"
-
-#endif // !SMAP_SOURCE_DOC_H

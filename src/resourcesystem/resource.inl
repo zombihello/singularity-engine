@@ -1,5 +1,4 @@
-#ifndef RESOURCE_INL
-#define RESOURCE_INL
+#pragma once
 
 /*
 ==================
@@ -31,5 +30,3 @@ FORCEINLINE const achar* CResource::GetPath() const
 {
 	return path.c_str();
 }
-
-#endif // !RESOURCE_INL

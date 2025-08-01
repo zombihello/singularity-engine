@@ -1,6 +1,4 @@
-#ifndef ISTUDIOAPI_RENDERPIPELINE_H
-#define ISTUDIOAPI_RENDERPIPELINE_H
-
+#pragma once
 #include "stdlib/math/math.h"
 #include "studiorender/studioapi/istudioapi_resource.h"
 
@@ -205,5 +203,3 @@ class IStudioAPIRenderPipeline : public IStudioAPIResource
 public:
 	virtual ~IStudioAPIRenderPipeline() {}
 };
-
-#endif // !ISTUDIOAPI_RENDERPIPELINE_H

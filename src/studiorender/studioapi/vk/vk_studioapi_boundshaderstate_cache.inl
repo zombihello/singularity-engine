@@ -1,5 +1,4 @@
-#ifndef VK_STUDIOAPI_BOUNDSHADERSTATE_CACHE_INL
-#define VK_STUDIOAPI_BOUNDSHADERSTATE_CACHE_INL
+#pragma once
 
 /*
 ==================
@@ -87,5 +86,3 @@ FORCEINLINE void CStudioAPIBoundShaderStateCacheVk::RemoveAll()
 {
 	boundShaderStateDict.clear();
 }
-
-#endif // !VK_STUDIOAPI_BOUNDSHADERSTATE_CACHE_INL

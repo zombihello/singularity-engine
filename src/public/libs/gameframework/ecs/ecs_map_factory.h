@@ -1,6 +1,4 @@
-#ifndef ECS_MAP_FACTORY_H
-#define ECS_MAP_FACTORY_H
-
+#pragma once
 #include "resourcesystem/iresourcefactory.h"
 
 
@@ -28,5 +26,3 @@ public:
 private:
 	TRefPtr<IResource>		pDefaultMap;
 };
-
-#endif // !ECS_MAP_FACTORY_H

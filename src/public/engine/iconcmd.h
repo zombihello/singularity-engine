@@ -1,7 +1,5 @@
-#ifndef ICONCMD_H
-#define ICONCMD_H
-
-#include "core/types.h"
+#pragma once
+#include "stdlib/types.h"
 
 //-----------------------------------------------------------------------------
 // IConVars/IConCmds are marked as having a particular DLL identifier
@@ -54,5 +52,3 @@ class IConCmd : public IConCmdBase
 public:
 	virtual void Exec( uint32 argc, const achar** argv ) = 0;
 };
-
-#endif // !ICONCMD_H

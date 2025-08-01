@@ -1,5 +1,4 @@
-#ifndef VK_STUDIOAPI_PENDINGSTATE_INL
-#define VK_STUDIOAPI_PENDINGSTATE_INL
+#pragma once
 
 /*
 ==================
@@ -88,4 +87,3 @@ FORCEINLINE void CStudioAPIPendingRenderStateVk::indexBuffer_t::Clear()
 	pBuffer = NULL;
 	offset	= 0;
 }
-#endif // !VK_STUDIOAPI_PENDINGSTATE_INL

@@ -1,5 +1,4 @@
-#ifndef ISTUDIO_RENDERRESOURCE_INL
-#define ISTUDIO_RENDERRESOURCE_INL
+#pragma once
 
 /*
 ==================
@@ -258,5 +257,3 @@ void TStudioRenderResource<TBaseClass, bGlobal>::UpdateStudioAPI()
 	ReleaseStudioAPI();
 	InitStudioAPI();
 }
-
-#endif // !ISTUDIO_RENDERRESOURCE_INL

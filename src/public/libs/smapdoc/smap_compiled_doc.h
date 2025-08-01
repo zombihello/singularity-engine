@@ -1,6 +1,4 @@
-#ifndef SMAP_COMPILED_DOC_H
-#define SMAP_COMPILED_DOC_H
-
+#pragma once
 #include <vector>
 
 #include "core/core.h"
@@ -29,5 +27,3 @@ private:
 };
 
 #include "smapdoc/smap_compiled_doc.inl"
-
-#endif // !SMAP_COMPILED_DOC_H

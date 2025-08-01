@@ -1,6 +1,4 @@
-#ifndef ISTUDIOAPI_RESOURCE_H
-#define ISTUDIOAPI_RESOURCE_H
-
+#pragma once
 #include "stdlib/refcount.h"
 
 //-----------------------------------------------------------------------------
@@ -11,5 +9,3 @@ class IStudioAPIResource : public IRefCounted
 public:
 	virtual ~IStudioAPIResource() {}
 };
-
-#endif // !ISTUDIOAPI_RESOURCE_H

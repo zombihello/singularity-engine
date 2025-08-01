@@ -1,6 +1,4 @@
-#ifndef ISTUDIOAPI_SWAPCHAIN_H
-#define ISTUDIOAPI_SWAPCHAIN_H
-
+#pragma once
 #include "stdlib/math/math.h"
 #include "stdlib/delegate.h"
 #include "studiorender/studioapi/istudioapi_framebuffer.h"
@@ -49,5 +47,3 @@ public:
 	
 	virtual IOnReCreated* OnReCreated() const = 0;
 };
-
-#endif // !ISTUDIOAPI_SWAPCHAIN_H

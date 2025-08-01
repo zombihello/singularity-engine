@@ -1,6 +1,4 @@
-#ifndef STUDIORENDER_H
-#define STUDIORENDER_H
-
+#pragma once
 #include <stack>
 
 #include "materialsystem/imaterial.h"
@@ -82,5 +80,3 @@ private:
 	std::vector<TRefPtr<IStudioRenderObject>>	renderObjects;
 };
 extern CStudioRender			g_StudioRender;
-
-#endif // !STUDIORENDER_H

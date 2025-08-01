@@ -1,6 +1,4 @@
-#ifndef SMATVAR_H
-#define SMATVAR_H
-
+#pragma once
 #include <string>
 
 #include "core/core.h"
@@ -84,5 +82,3 @@ private:
 };
 
 #include "smatdoc/smatvar.inl"
-
-#endif // !SMATVAR_H

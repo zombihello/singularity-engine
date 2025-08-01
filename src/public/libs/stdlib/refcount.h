@@ -1,9 +1,7 @@
-#ifndef REFCOUNT_H
-#define REFCOUNT_H
-
+#pragma once
 #include "stdlib/hashing/fasthash.h"
-#include "core/types.h"
-#include "core/platform.h"
+#include "stdlib/defines.h"
+#include "stdlib/types.h"
 #include "core/threading.h"
 
 //-----------------------------------------------------------------------------
@@ -120,5 +118,3 @@ private:
 };
 
 #include "stdlib/refcount.inl"
-
-#endif // !REFCOUNT_H

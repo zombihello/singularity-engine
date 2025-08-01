@@ -1,5 +1,4 @@
-#ifndef IRESOURCE_INL
-#define IRESOURCE_INL
+#pragma once
 
 /*
 ==================
@@ -205,5 +204,3 @@ FORCEINLINE bool ResourceSystem_IsValidClassForType<IMap>( resourceType_t type )
 {
 	return type == RESOURCE_TYPE_MAP;
 }
-
-#endif // !IRESOURCE_INL

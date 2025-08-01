@@ -1,5 +1,4 @@
-#ifndef SHADER_BASE_INL
-#define SHADER_BASE_INL
+#pragma once
 
 /*
 ==================
@@ -15,5 +14,3 @@ FORCEINLINE uint64 CBaseShader::GetPipelineIndex( const uint64* pCacheIndices ) 
 	}
 	return pipelineIndex;
 }
-
-#endif // !SHADER_BASE_INL

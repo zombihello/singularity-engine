@@ -1,5 +1,4 @@
-#ifndef VK_STUDIOAPI_DATAUPLOADER_INL
-#define VK_STUDIOAPI_DATAUPLOADER_INL
+#pragma once
 
 /*
 ==================
@@ -74,5 +73,3 @@ FORCEINLINE void CStudioAPIDataUploaderVk::Flush()
 {
 	SubmitCmdBuffer( true );
 }
-
-#endif // !VK_STUDIOAPI_DATAUPLOADER_INL

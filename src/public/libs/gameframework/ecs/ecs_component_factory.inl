@@ -1,5 +1,4 @@
-#ifndef ECS_COMPONENT_FACTORY_INL
-#define ECS_COMPONENT_FACTORY_INL
+#pragma once
 
 /*
 ==================
@@ -109,5 +108,3 @@ FORCEINLINE IEcsComponentFactory* CEcsComponentTypes::CreateFactory( const CSENT
 
 	return itFind->second( sentComponent );
 }
-
-#endif // !ECS_COMPONENT_FACTORY_INL

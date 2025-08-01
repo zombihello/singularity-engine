@@ -1,6 +1,4 @@
-#ifndef IAPPSYSTEM_H
-#define IAPPSYSTEM_H
-
+#pragma once
 #include "stdlib/interface.h"
 
 //-----------------------------------------------------------------------------
@@ -46,5 +44,3 @@ public:
 	virtual bool Init()													{ return true; }
 	virtual void Shutdown()												{}
 };
-
-#endif // !IAPPSYSTEM_H

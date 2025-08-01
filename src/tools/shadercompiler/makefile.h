@@ -1,6 +1,4 @@
-#ifndef MAKEFILE_H
-#define MAKEFILE_H
-
+#pragma once
 #include "stdlib/jsondoc.h"
 #include "tools/shadercompiler/shadercompiler.h"
 
@@ -39,5 +37,3 @@ private:
 	std::vector<std::string>	shaderIncludeDirs;
 	std::vector<shader_t>		shaders;
 };
-
-#endif // !MAKEFILE_H

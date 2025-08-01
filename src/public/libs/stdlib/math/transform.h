@@ -1,6 +1,4 @@
-#ifndef TRANSFORM_H
-#define TRANSFORM_H
-
+#pragma once
 #include "stdlib/math/math.h"
 #include "core/debug.h"
 
@@ -82,5 +80,3 @@ protected:
 };
 
 #include "stdlib/math/transform.inl"
-
-#endif // TRANSFORM_H

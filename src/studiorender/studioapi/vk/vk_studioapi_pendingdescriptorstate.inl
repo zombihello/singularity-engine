@@ -1,5 +1,4 @@
-#ifndef VK_STUDIOAPI_PENDINGDESCRIPTORSTATE_INL
-#define VK_STUDIOAPI_PENDINGDESCRIPTORSTATE_INL
+#pragma once
 
 /*
 ==================
@@ -53,5 +52,3 @@ FORCEINLINE CStudioAPIRenderPipelineVk* CStudioAPIDescriptorStateRenderVk::GetRe
 {
 	return pRenderPipeline;
 }
-
-#endif // !VK_STUDIOAPI_PENDINGDESCRIPTORSTATE_INL

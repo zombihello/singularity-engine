@@ -1,5 +1,4 @@
-#ifndef VK_STUDIOAPI_FENCE_INL
-#define VK_STUDIOAPI_FENCE_INL
+#pragma once
 
 /*
 ==================
@@ -130,5 +129,3 @@ FORCEINLINE void CStudioAPIFenceVk::Destroy()
 		vkFence = VK_NULL_HANDLE;
 	}
 }
-
-#endif // !VK_STUDIOAPI_FENCE_INL

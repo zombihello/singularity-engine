@@ -1,6 +1,4 @@
-#ifndef IAPPSYSTEMGROUP_H
-#define IAPPSYSTEMGROUP_H
-
+#pragma once
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -182,5 +180,3 @@ public:
 	virtual void PostShutdown() {}
 	virtual void Destroy()		{}
 };
-
-#endif // !IAPPSYSTEMGROUP_H

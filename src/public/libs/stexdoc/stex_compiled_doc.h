@@ -1,6 +1,4 @@
-#ifndef STEX_COMPILED_DOC_H
-#define STEX_COMPILED_DOC_H
-
+#pragma once
 #include <vector>
 
 #include "core/core.h"
@@ -70,5 +68,3 @@ private:
 };
 
 #include "stexdoc/stex_compiled_doc.inl"
-
-#endif // !STEX_COMPILED_DOC_H

@@ -1,6 +1,4 @@
-#ifndef ECSFIELDSTUBS_H
-#define ECSFIELDSTUBS_H
-
+#pragma once
 #include <vector>
 #include <unordered_map>
 
@@ -256,5 +254,3 @@ public:
 private:
 	std::vector<TRefPtr<CEcsStubModule>>		modules;
 };
-
-#endif // !ECSFIELDSTUBS_H

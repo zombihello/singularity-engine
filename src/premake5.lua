@@ -67,6 +67,9 @@ outputBinDirSuffix			= "bin/%{string.lower(cfg.platform)}_%{string.lower(cfg.bui
 -- Licenses directory
 licensesDir                 = buildDir .. "/licenses/"
 
+-- Git branch
+gitBranch                   = Utils.GetGitBranch()
+
 -- Workspace name
 workspaceName               = _OPTIONS["workspace-name"]
 
@@ -80,6 +83,7 @@ buildConfigurations         = { "Debug", "Release", "Retail" }
 buildPlatforms              = { "Win64" }
 
 -- Print some information about configuration
+print( "Git branch: " .. gitBranch )
 print( "Intermediate directory: " .. intermediateDir )
 print( "Build directory: " .. buildDir )
 print( "Workspace name: " .. workspaceName )
@@ -174,7 +178,9 @@ workspace( workspaceName )
     }
 
     defines 		    {
-        "PLATFORM_SUBDIR=\"%{string.lower(cfg.platform)}_%{string.lower(cfg.buildcfg)}\""
+        "PLATFORM_SUBDIR=\"%{string.lower(cfg.platform)}_%{string.lower(cfg.buildcfg)}\"",
+        "GIT_BRANCH=\"" .. gitBranch .. "\"",
+        "TARGET_NAME=\"%{string.lower(prj.name)}\""
     }
 
     if buildMonolithicEngine then

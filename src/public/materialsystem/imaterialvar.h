@@ -1,7 +1,5 @@
-#ifndef IMATERIALVAR_H
-#define IMATERIALVAR_H
-
-#include "core/types.h"
+#pragma once
+#include "stdlib/types.h"
 #include "stdlib/math/math.h"
 
 //-----------------------------------------------------------------------------
@@ -61,5 +59,3 @@ public:
 	virtual ITexture* GetTextureValue() const = 0;
 	virtual IMaterial* GetMaterialValue() const = 0;
 };
-
-#endif // !IMATERIALVAR_H

@@ -1,6 +1,4 @@
-#ifndef IWINDOWMGR_H
-#define IWINDOWMGR_H
-
+#pragma once
 #include "stdlib/delegate.h"
 #include "appframework/iappsystem.h"
 #include "appframework/windowevent.h"
@@ -66,5 +64,3 @@ public:
 // Create a singleton window manager
 //-----------------------------------------------------------------------------
 IWindowMgr* CreateWindowMgr();
-
-#endif // !IWINDOWMGR_H

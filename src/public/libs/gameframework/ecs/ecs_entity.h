@@ -1,6 +1,4 @@
-#ifndef ECS_ENTITY_H
-#define ECS_ENTITY_H
-
+#pragma once
 #include "gameframework/ecs/ecs_core.h"
 #include "gameframework/ientity.h"
 #include "gameframework/imap.h"
@@ -29,5 +27,3 @@ private:
 	IOnMapReseted::funcDelegate_t*		pOnMapResetedDelegate;
 	IOnMapUnloaded::funcDelegate_t*		pOnMapUnloadedDelegate;
 };
-
-#endif // !ECS_ENTITYDESC_H

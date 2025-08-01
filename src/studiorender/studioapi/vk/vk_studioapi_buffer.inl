@@ -1,5 +1,4 @@
-#ifndef VK_STUDIOAPI_BUFFER_INL
-#define VK_STUDIOAPI_BUFFER_INL
+#pragma once
 
 /*
 ==================
@@ -71,5 +70,3 @@ FORCEINLINE uint32 CStudioAPIBufferVk::GetNumBuffersFromUsage( uint32 usageFlags
 {
 	return usageFlags & STUDIOAPI_BUFFER_USAGE_FLAG_DYNAMIC ? NUM_BUFFERS : 1;
 }
-
-#endif // !VK_STUDIOAPI_BUFFER_INL

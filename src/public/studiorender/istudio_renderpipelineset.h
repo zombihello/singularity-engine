@@ -1,6 +1,4 @@
-#ifndef ISTUDIO_RENDERPIPELINESET_H
-#define ISTUDIO_RENDERPIPELINESET_H
-
+#pragma once
 #include "studiorender/studioapi/istudioapi_shader.h"
 #include "studiorender/istudio_renderresource.h"
 #include "studiorender/studio_renderpasstypes.h"
@@ -33,5 +31,3 @@ public:
 	virtual IStudioAPIRenderPipeline* R_BakeRenderPipeline( const studioBakeRenderPipelineParams_t& bakeParams ) = 0;
 	virtual IStudioAPIRenderPipeline* GetStudioAPIRenderPipeline( studioRenderPassType_t renderPassType, uint64 pipelineIdx ) const = 0;
 };
-
-#endif // !ISTUDIO_RENDERPIPELINESET_H

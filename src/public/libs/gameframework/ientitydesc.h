@@ -1,6 +1,4 @@
-#ifndef IENTITYDESC_H
-#define IENTITYDESC_H
-
+#pragma once
 #include "stdlib/refcount.h"
 
 //-----------------------------------------------------------------------------
@@ -20,5 +18,3 @@ public:
 	virtual ~IEntityDesc() {}
 	virtual IEntity* Create( IMap* pMap, const achar* pName = "" ) const = 0;
 };
-
-#endif // !IENTITYDESC_H

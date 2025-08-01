@@ -1,5 +1,4 @@
-#ifndef TOKENSTREAM_INL
-#define TOKENSTREAM_INL
+#pragma once
 
 /*
 ==================
@@ -113,5 +112,3 @@ FORCEINLINE bool CParserTokenStream::IsEmpty() const
 {
 	return tokens.empty();
 }
-
-#endif // !TOKENSTREAM_INL

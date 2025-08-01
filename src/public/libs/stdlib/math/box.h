@@ -1,6 +1,4 @@
-#ifndef BOX_H
-#define BOX_H
-
+#pragma once
 #include "stdlib/math/math.h"
 
 //-----------------------------------------------------------------------------
@@ -34,5 +32,3 @@ private:
 };
 
 #include "stdlib/math/box.inl"
-
-#endif // !BOX_H

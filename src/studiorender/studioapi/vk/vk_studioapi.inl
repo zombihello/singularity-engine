@@ -1,5 +1,4 @@
-#ifndef VK_STUDIOAPI_INL
-#define VK_STUDIOAPI_INL
+#pragma once
 
 /*
 ==================
@@ -80,5 +79,3 @@ FORCEINLINE uint32 CStudioAPIVk::GetCurrentFrameInFlight() const
 {
 	return currentFrameInFlight;
 }
-
-#endif // !VK_STUDIOAPI_INL

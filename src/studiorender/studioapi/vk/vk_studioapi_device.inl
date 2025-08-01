@@ -1,5 +1,4 @@
-#ifndef VK_STUDIOAPI_DEVICE_INL
-#define VK_STUDIOAPI_DEVICE_INL
+#pragma once
 
 /*
 ==================
@@ -160,5 +159,3 @@ FORCEINLINE bool CStudioAPIDeviceVk::queueFamilyIndices_t::IsValid( uint32 queue
 	// We are done!
 	return !bInvalid;
 }
-
-#endif // !VK_STUDIOAPI_DEVICE_INL

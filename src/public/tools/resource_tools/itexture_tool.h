@@ -1,6 +1,4 @@
-#ifndef ITEXTURE_TOOL_H
-#define ITEXTURE_TOOL_H
-
+#pragma once
 #include "appframework/iappsystem.h"
 #include "studiorender/studioapi/istudioapi_texture.h"
 
@@ -30,5 +28,3 @@ public:
 	virtual bool CompileTexture( const resourceToolCompileTextureParams_t& compileParams ) const = 0;
 	virtual bool IsSupportPixelFormat( studioAPIPixelFormat_t pixelFormat ) const = 0;
 };
-
-#endif // !ITEXTURE_TOOL_H

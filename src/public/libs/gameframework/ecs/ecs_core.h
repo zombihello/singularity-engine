@@ -1,5 +1,4 @@
-#ifndef ECS_CORE_H
-#define ECS_CORE_H
+#pragma once
 
 //-----------------------------------------------------------------------------
 // ECS macroses
@@ -138,5 +137,3 @@ private:
 };
 
 #include "gameframework/ecs/ecs_core.inl"
-
-#endif // !ECS_CORE_H

@@ -1,6 +1,4 @@
-#ifndef VK_STUDIOAPI_SWAPCHAIN_H
-#define VK_STUDIOAPI_SWAPCHAIN_H
-
+#pragma once
 #include "stdlib/refcount.h"
 #include "studiorender/studioapi/istudioapi_swapchain.h"
 #include "studiorender/studioapi/vk/vk_studioapi.h"
@@ -111,5 +109,3 @@ private:
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_swapchain.inl"
-
-#endif // !VK_STUDIOAPI_SWAPCHAIN_H

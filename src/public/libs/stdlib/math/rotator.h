@@ -1,6 +1,4 @@
-#ifndef ROTATOR_H
-#define ROTATOR_H
-
+#pragma once
 #include "stdlib/math/math.h"
 
 //-----------------------------------------------------------------------------
@@ -121,5 +119,3 @@ private:
 };
 
 #include "stdlib/math/rotator.inl"
-
-#endif // !ROTATOR_H

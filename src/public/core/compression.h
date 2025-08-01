@@ -1,13 +1,6 @@
-/**
- * @file
- * @addtogroup core core
- */
-
-#ifndef COMPRESSION_H
-#define COMPRESSION_H
-
+#pragma once
 #include "core/coreapi.h"
-#include "core/types.h"
+#include "stdlib/types.h"
 
 //-----------------------------------------------------------------------------
 // Compression
@@ -26,5 +19,3 @@ CORE_INTERFACE bool Sys_CompressMemory( compressionType_t compressionType, void*
 // Thread-safe abstract decompression routine. Uncompresses memory from compressed buffer and writes it to uncompressed
 // buffer. UncompressedSize is expected to be the exact size of the data after decompression
 CORE_INTERFACE bool Sys_UncompressMemory( compressionType_t compressionType, void* pUncompressedBuffer, uint32 uncompressedSize, const void* pCompressedBuffer, uint32 compressedSize );
-
-#endif // !COMPRESSION_H

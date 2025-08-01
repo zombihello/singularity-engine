@@ -1,5 +1,4 @@
-#ifndef VK_STUDIOAPI_QUEUE_INL
-#define VK_STUDIOAPI_QUEUE_INL
+#pragma once
 
 /*
 ==================
@@ -53,4 +52,3 @@ FORCEINLINE const VkQueueFamilyProperties& CStudioAPIQueueVk::GetVkQueueFamilyPr
 {
 	return vkQueueFamilyProperties;
 }
-#endif // !VK_STUDIOAPI_QUEUE_INL

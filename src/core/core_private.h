@@ -1,6 +1,4 @@
-#ifndef CORE_PRIVATE_H
-#define CORE_PRIVATE_H
-
+#pragma once
 #include "core/core.h"
 
 //-----------------------------------------------------------------------------
@@ -18,5 +16,3 @@ extern bool							g_bConsoleIOInited;
 // Internal core functions
 //-----------------------------------------------------------------------------
 double Sys_GetSecondsPerCycle();
-
-#endif // !CORE_PRIVATE_H

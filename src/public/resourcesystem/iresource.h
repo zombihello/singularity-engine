@@ -1,6 +1,4 @@
-#ifndef IRESOURCE_H
-#define IRESOURCE_H
-
+#pragma once
 #include "stdlib/refcount.h"
 
 //-----------------------------------------------------------------------------
@@ -84,5 +82,3 @@ private:
 };
 
 #include "resourcesystem/iresource.inl"
-
-#endif // !IRESOURCE_H

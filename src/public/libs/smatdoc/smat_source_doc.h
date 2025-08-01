@@ -1,6 +1,4 @@
-#ifndef SMAT_SOURCE_DOC_H
-#define SMAT_SOURCE_DOC_H
-
+#pragma once
 #include <string>
 #include <vector>
 
@@ -47,5 +45,3 @@ private:
 };
 
 #include "smatdoc/smat_source_doc.inl"
-
-#endif // !SMAT_SOURCE_DOC_H

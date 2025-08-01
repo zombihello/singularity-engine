@@ -1,6 +1,4 @@
-#ifndef ISTUDIO_VIEWPORTCLIENT_H
-#define ISTUDIO_VIEWPORTCLIENT_H
-
+#pragma once
 #include "studiorender/studioapi/istudioapi_swapchain.h"
 
 //-----------------------------------------------------------------------------
@@ -36,5 +34,3 @@ public:
 	virtual void R_BeginDrawFrame( IStudioViewport* pStudioViewport ) override	{}
 	virtual void R_EndDrawFrame( IStudioViewport* pStudioViewport ) override	{}
 };
-
-#endif // !ISTUDIO_VIEWPORTCLIENT_H

@@ -1,6 +1,4 @@
-#ifndef VK_STUDIOAPI_RENDERBUFFER_H
-#define VK_STUDIOAPI_RENDERBUFFER_H
-
+#pragma once
 #include "studiorender/studioapi/istudioapi_framebuffer.h"
 #include "studiorender/studioapi/vk/vk_studioapi_device.h"
 
@@ -35,5 +33,3 @@ private:
 	uint8									numClearValues;
 	VkClearValue							vkClearValues[STUDIOAPI_MAX_SIMULTANEOUS_RENDER_TARGETS + 1];
 };
-
-#endif // !VK_STUDIOAPI_RENDERBUFFER_H

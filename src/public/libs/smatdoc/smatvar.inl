@@ -1,5 +1,4 @@
-#ifndef SMATVAR_INL
-#define SMATVAR_INL
+#pragma once
 
 /*
 ==================
@@ -311,5 +310,3 @@ FORCEINLINE CSMATMaterialVar& CSMATMaterialVar::operator=( const CSMATMaterialVa
 	Copy( right );
 	return *this;
 }
-
-#endif // !SMATVAR_INL

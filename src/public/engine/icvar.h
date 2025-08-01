@@ -1,6 +1,4 @@
-#ifndef ICVAR_H
-#define ICVAR_H
-
+#pragma once
 #include "appframework/iappsystem.h"
 #include "engine/iconcmd.h"
 #include "engine/iconvar.h"
@@ -66,5 +64,3 @@ public:
 	// NOTE: pCvarQuery If NULL ICvar set to default ICvarQuery
 	virtual void SetCVarQuery( ICvarQuery* pCvarQuery ) = 0;
 };
-
-#endif // !ICVAR_H

@@ -1,5 +1,4 @@
-#ifndef SHADERCACHE_INL
-#define SHADERCACHE_INL
+#pragma once
 
 /*
 ==================
@@ -51,5 +50,3 @@ FORCEINLINE const CShaderCacheDoc::shaderCache_t& CShaderCacheDoc::GetCache( uin
 	Assert( cacheId < ( uint64 )caches.size() );
 	return caches[cacheId];
 }
-
-#endif // !SHADERCACHE_INL

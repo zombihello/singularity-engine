@@ -1,5 +1,4 @@
-#ifndef SEARCHPATH_INL
-#define SEARCHPATH_INL
+#pragma once
 
 /*
 ==================
@@ -117,4 +116,3 @@ FORCEINLINE CSearchPath* CSearchPathIterator::GetSearchPath() const
 {
     return !searchPaths.empty() ? searchPaths[currentIndex] : NULL;
 }
-#endif // !SEARCHPATH_INL

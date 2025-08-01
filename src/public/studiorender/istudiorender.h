@@ -1,6 +1,4 @@
-#ifndef ISTUDIORENDER_H
-#define ISTUDIORENDER_H
-
+#pragma once
 #include "stdlib/refcount.h"
 #include "appframework/iappsystem.h"
 #include "studiorender/istudio_cmdbuffer.h"
@@ -54,5 +52,3 @@ public:
 	virtual IStudioCmdBuffer* GetCommandBuffer() const = 0;
 	virtual bool IsInRenderThread() const = 0;
 };
-
-#endif // !ISTUDIORENDER_H

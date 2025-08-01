@@ -1,6 +1,4 @@
-#ifndef BUILD_H
-#define BUILD_H
-
+#pragma once
 #ifndef PLATFORM_32BIT
 	#define PLATFORM_32BIT		0
 #endif // !PLATFORM_32BIT
@@ -24,5 +22,3 @@
 #ifndef ENABLE_PROFILING
 	#define ENABLE_PROFILING	!RETAIL
 #endif // !ENABLE_PROFILING
-
-#endif // !BUILD_H

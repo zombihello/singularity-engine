@@ -1,9 +1,7 @@
-#ifndef DELEGATE_H
-#define DELEGATE_H
-
+#pragma once
 #include <list>
 
-#include "core/platform.h"
+#include "stdlib/defines.h"
 #include "core/threading.h"
 #include "core/profile.h"
 
@@ -96,5 +94,3 @@ private:
 };
 
 #include "stdlib/delegate.inl"
-
-#endif // !DELEGATE_H

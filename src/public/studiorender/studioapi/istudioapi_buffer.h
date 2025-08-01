@@ -1,7 +1,5 @@
-#ifndef ISTUDIOAPI_BUFFER_H
-#define ISTUDIOAPI_BUFFER_H
- 
-#include "core/types.h"
+#pragma once 
+#include "stdlib/types.h"
 #include "studiorender/studioapi/istudioapi_resource.h"
 #include "studiorender/studioapi/istudioapi_cmdlist.h"
 
@@ -80,5 +78,3 @@ public:
 	// For use the buffer must have STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST flag 
 	virtual void UpdateData( IStudioAPICmdContext* pCmdContext, byte* pData, uint64 dataSize, uint64 offset = 0 ) = 0;
 };
-
-#endif // !ISTUDIOAPI_BUFFER_H

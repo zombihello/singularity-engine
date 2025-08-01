@@ -1,5 +1,4 @@
-#ifndef ENGINE_INL
-#define ENGINE_INL
+#pragma once
 
 /*
 ==================
@@ -40,5 +39,3 @@ FORCEINLINE const CGameInfoDoc& CEngine::GetGameInfo() const
 {
 	return gameinfo;
 }
-
-#endif // !ENGINE_INL

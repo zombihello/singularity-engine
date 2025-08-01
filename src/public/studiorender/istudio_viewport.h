@@ -1,6 +1,4 @@
-#ifndef ISTUDIO_VIEWPORT_H
-#define ISTUDIO_VIEWPORT_H
-
+#pragma once
 #include "stdlib/refcount.h"
 #include "stdlib/math/math.h"
 #include "studiorender/studioapi/istudioapi_swapchain.h"
@@ -34,5 +32,3 @@ public:
 	// The function returns a StudioAPI frame buffers for render into the viewport (valid only per a frame, because the viewport can use double/triple/etc buffering)
 	virtual IStudioAPIFrameBuffer* GetStudioAPIFrameBuffer() const = 0;
 };
-
-#endif // !ISTUDIO_VIEWPORT_H

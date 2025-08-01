@@ -1,5 +1,4 @@
-#ifndef WIN_STRTOOLS_H
-#define WIN_STRTOOLS_H
+#pragma once
 
 /*
 ==================
@@ -40,5 +39,3 @@ FORCEINLINE uint32 S_Strnicmp( const wchar* pString1, const wchar* pString2, uin
 {
 	return wcsnicmp( pString1, pString2, count );
 }
-
-#endif // !WIN_STRTOOLS_H

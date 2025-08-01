@@ -1,5 +1,4 @@
-#ifndef FILETOOLS_INL
-#define FILETOOLS_INL
+#pragma once
 
 /*
 ==================
@@ -144,5 +143,3 @@ FORCEINLINE bool CFilename::IsInDirectory( const std::string& dirPath ) const
     // Compare two string
     return !S_Strnicmp( absolutePath.c_str(), absoluteDirPath.c_str(), ( uint32 )absoluteDirPath.size() );
 }
-
-#endif // !FILETOOLS_INL

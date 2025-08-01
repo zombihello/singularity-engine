@@ -1,5 +1,4 @@
-#ifndef VK_STUDIOAPI_MEMORYMGR_INL
-#define VK_STUDIOAPI_MEMORYMGR_INL
+#pragma once
 
 /*
 ==================
@@ -63,5 +62,3 @@ FORCEINLINE void CStudioAPIMemoryMgrVk::UnmapMemory( VmaAllocation vmaAllocation
 {
 	vmaUnmapMemory( vmaAllocator, vmaAllocation );
 }
-
-#endif // !VK_STUDIOAPI_MEMORYMGR_INL

@@ -1,6 +1,4 @@
-#ifndef MATH_H
-#define MATH_H
-
+#pragma once
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm.hpp>
 #include <gtx/quaternion.hpp>
@@ -10,8 +8,8 @@
 
 #include "stdlib/template.h"
 #include "stdlib/math/axis.h"
-#include "core/types.h"
-#include "core/platform.h"
+#include "stdlib/defines.h"
+#include "stdlib/types.h"
 
 //-----------------------------------------------------------------------------
 // Math constants
@@ -144,5 +142,3 @@ matrix_t S_MatrixLookAt( const vec3_t& location, const vec3_t& direction, const 
 void S_MatrixLookAt( const vec3_t& location, const vec3_t& direction, const vec3_t& axisUp, matrix_t& matrix );
 
 #include "stdlib/math/math.inl"
-
-#endif // !MATH_H

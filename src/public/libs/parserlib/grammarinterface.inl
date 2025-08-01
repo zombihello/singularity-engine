@@ -1,5 +1,4 @@
-#ifndef GRAMMARINTERFACE_INL
-#define GRAMMARINTERFACE_INL
+#pragma once
 
 /*
 ==================
@@ -78,5 +77,3 @@ FORCEINLINE int32 TGrammarInterface<TFileParserClass, TGrammarContextType>::GetL
 	}
 	return pTokens->GetLastToken().context.line;
 }
-
-#endif // !GRAMMARINTERFACE_INL

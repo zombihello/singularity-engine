@@ -1,6 +1,4 @@
-#ifndef WIN_FILETOOLS_H
-#define WIN_FILETOOLS_H
-
+#pragma once
 #include "core/debug.h"
 
 /*
@@ -39,5 +37,3 @@ FORCEINLINE bool S_IsAbsolutePath( const achar* pPath )
 {
 	return ( pPath[0] && pPath[1] == ':' ) || pPath[0] == '/' || pPath[0] == '\\';
 }
-
-#endif // !WIN_FILETOOLS_H

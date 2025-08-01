@@ -1,6 +1,4 @@
-#ifndef APPSYSTEMGROUP_GAME_H
-#define APPSYSTEMGROUP_GAME_H
-
+#pragma once
 #include "appframework/iappsystemgroup.h"
 
 //-----------------------------------------------------------------------------
@@ -52,5 +50,3 @@ private:
 	dllHandle_t				gameDLLHandle;
 	createInterfaceFn_t		pGameFactory;
 };
-
-#endif // !APPSYSTEMGROUP_GAME_H

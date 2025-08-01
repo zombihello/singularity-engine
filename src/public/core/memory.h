@@ -1,10 +1,8 @@
-#ifndef MEMORY_H
-#define MEMORY_H
-
+#pragma once
 #include <cstdlib>
 
 #include "core/coreapi.h"
-#include "core/platform.h"
+#include "stdlib/defines.h"
 #include "core/imemalloc.h"
 
 //-----------------------------------------------------------------------------
@@ -51,5 +49,3 @@ public:
 
 // Override the global memory allocator
 #include "core/memoverride.h"
-
-#endif // !MEMORY_H

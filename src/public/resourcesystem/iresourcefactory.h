@@ -1,6 +1,4 @@
-#ifndef IRESOURCEFACTORY_H
-#define IRESOURCEFACTORY_H
-
+#pragma once
 #include "stdlib/refcount.h"
 
 //-----------------------------------------------------------------------------
@@ -37,5 +35,3 @@ public:
 	// If something wrong the function must crash the game
 	virtual void Validate() const = 0;
 };
-
-#endif // !IRESOURCEFACTORY_H

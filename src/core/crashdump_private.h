@@ -1,6 +1,4 @@
-#ifndef CRASHDUMP_PRIVATE_H
-#define CRASHDUMP_PRIVATE_H
-
+#pragma once
 #include "core/crashdump.h"
 
 //-----------------------------------------------------------------------------
@@ -14,5 +12,3 @@ void CrashDump_OnThreadRun();
 void CrashDump_OnThreadStop();
 
 void CrashDump_SetMessage( const achar* pMsg );
-
-#endif // !CRASHDUMP_PRIVATE_H

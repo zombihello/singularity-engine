@@ -1,8 +1,6 @@
-#ifndef MEMALLOC_MIMALLOC_H
-#define MEMALLOC_MIMALLOC_H
-
+#pragma once
 #include "core/memalloc_base.h"
-#include "core/platform_private.h"
+#include "core/defines.h"
 
 //-----------------------------------------------------------------------------
 // Mimalloc memory allocator
@@ -28,5 +26,3 @@ public:
 	virtual bool IsInternallyThreadSafe() const override;
 };
 #endif // PLATFORM_SUPPORTS_MIMALLOC
-
-#endif // !MEMALLOC_MIMALLOC_H

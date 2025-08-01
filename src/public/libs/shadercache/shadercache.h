@@ -1,10 +1,8 @@
-#ifndef SHADERCACHE_H
-#define SHADERCACHE_H
-
+#pragma once
 #include <vector>
 
-#include "core/types.h"
-#include "core/platform.h"
+#include "stdlib/defines.h"
+#include "stdlib/types.h"
 #include "stdlib/istreamdata.h"
 #include "studiorender/studioapi/istudioapi_shader.h"
 
@@ -56,5 +54,3 @@ private:
 };
 
 #include "shadercache/shadercache.inl"
-
-#endif // !SHADERCACHE_H

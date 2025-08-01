@@ -1,6 +1,4 @@
-#ifndef IRESOURCESYSTEM_H
-#define IRESOURCESYSTEM_H
-
+#pragma once
 #include "stdlib/refcount.h"
 #include "appframework/iappsystem.h"
 #include "resourcesystem/iresource.h"
@@ -31,5 +29,3 @@ public:
 	virtual bool HasResourceFactory( resourceType_t type ) const = 0;
 	virtual IResourceFactory* GetResourceFactory( resourceType_t type ) const = 0;
 };
-
-#endif // !IRESOURCESYSTEM_H

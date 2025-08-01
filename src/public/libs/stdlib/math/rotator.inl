@@ -1,5 +1,4 @@
-#ifndef ROTATOR_INL
-#define ROTATOR_INL
+#pragma once
 
 /*
 ==================
@@ -365,5 +364,3 @@ FORCEINLINE CRotator rotationConversionCache_t::GetCachedRotator() const
 {
 	return cachedRotator;
 }
-
-#endif // !ROTATOR_INL

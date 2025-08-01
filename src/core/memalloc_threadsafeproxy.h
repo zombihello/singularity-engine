@@ -1,6 +1,4 @@
-#ifndef MEMALLOC_THREADSAFEPROXY_H
-#define MEMALLOC_THREADSAFEPROXY_H
-
+#pragma once
 #include "core/memalloc_base.h"
 #include "core/threading.h"
 
@@ -29,5 +27,3 @@ private:
 	IMemAlloc*				pUsedMemAlloc;
 	mutable CThreadMutex	synchronizationObject;
 };
-
-#endif // !MEMALLOC_THREADSAFEPROXY_H

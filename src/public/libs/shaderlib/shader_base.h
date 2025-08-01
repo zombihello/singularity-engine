@@ -1,6 +1,4 @@
-#ifndef SHADER_BASE_H
-#define SHADER_BASE_H
-
+#pragma once
 #include "studiorender/studioapi/istudioapi.h"
 #include "studiorender/studioapi/istudioapi_barrier.h"
 #include "studiorender/istudio_renderpipelineset.h"
@@ -285,5 +283,3 @@ private:
 };
 
 #include "shaderlib/shader_base.inl"
-
-#endif // !SHADER_BASE_H

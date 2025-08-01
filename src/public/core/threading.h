@@ -1,12 +1,4 @@
-
-/**
- * @file
- * @addtogroup core core
- */
-
-#ifndef THREADING_H
-#define THREADING_H
-
+#pragma once
 #include "core/core.h"
 #include "core/debug.h"
 
@@ -180,5 +172,3 @@ private:
 #else
 	#error Unknown platform
 #endif // PLATFORM_WINDOWS
-
-#endif // !THREADING_H

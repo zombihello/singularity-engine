@@ -1,5 +1,4 @@
-#ifndef SMAT_COMPILED_DOC_INL
-#define SMAT_COMPILED_DOC_INL
+#pragma once
 
 /*
 ==================
@@ -72,5 +71,3 @@ FORCEINLINE const achar* CSMATCompiledMaterialDoc::GetShaderName() const
 {
 	return shaderName.c_str();
 }
-
-#endif // !SMAT_COMPILED_DOC_INL

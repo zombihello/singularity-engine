@@ -1,6 +1,4 @@
-#ifndef STUDIO_RENDEROBJECT_QUAD_H
-#define STUDIO_RENDEROBJECT_QUAD_H
-
+#pragma once
 #include "studiorender/istudio_renderobject.h"
 #include "studiorender/studioapi/istudioapi_buffer.h"
 #include "materialsystem/imaterial.h"
@@ -26,5 +24,3 @@ public:
 	TRefPtr<IStudioAPIBuffer>		pStudioAPIIndexBuffer;
 	TRefPtr<IMaterial>				pMaterial;
 };
-
-#endif // !STUDIO_RENDEROBJECT_QUAD_H

@@ -1,5 +1,4 @@
-#ifndef STL_INL
-#define STL_INL
+#pragma once
 
 /*
 ==================
@@ -21,5 +20,3 @@ FORCEINLINE bool stlInsensitiveCompareString_t::operator()( const achar* pLeft, 
 {
 	return !S_Stricmp( pLeft, pRight );
 }
-
-#endif // !STL_INL

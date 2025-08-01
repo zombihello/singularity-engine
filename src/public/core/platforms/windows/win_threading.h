@@ -1,5 +1,4 @@
-#ifndef WIN_THREADING_H
-#define WIN_THREADING_H
+#pragma once
 
 //-----------------------------------------------------------------------------
 // Windows version of a thread mutex
@@ -98,5 +97,3 @@ private:
 	threadId_t				id;
 	CWindowsThreadEvent*	pThreadInitSyncEvent;
 };
-
-#endif // !WIN_THREADING_H

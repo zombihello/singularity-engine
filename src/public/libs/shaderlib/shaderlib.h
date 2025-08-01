@@ -1,6 +1,4 @@
-#ifndef SHADERLIB_H
-#define SHADERLIB_H
-
+#pragma once
 #include <vector>
 
 #include "materialsystem/ishadermgr.h"
@@ -36,5 +34,3 @@ private:
 extern CShaderLib					g_ShaderLib;
 
 #include "shaderlib/shaderlib.inl"
-
-#endif // !SHADERLIB_H

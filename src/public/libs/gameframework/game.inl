@@ -1,5 +1,4 @@
-#ifndef GAME_INL
-#define GAME_INL
+#pragma once
 
 /*
 ==================
@@ -43,5 +42,3 @@ FORCEINLINE void CGameAppSystems::AddAppSystem( const achar* pModuleName, const 
 	appSystemInfo.pModuleName		= pModuleName;
 	appSystemInfo.pInterfaceName	= pInterfaceName;
 }
-
-#endif // !GAME_INL

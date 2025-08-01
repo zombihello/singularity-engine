@@ -1,6 +1,4 @@
-#ifndef MATERIAL_FACTORY_H
-#define MATERIAL_FACTORY_H
-
+#pragma once
 #include "resourcesystem/iresourcefactory.h"
 
 //-----------------------------------------------------------------------------
@@ -33,5 +31,3 @@ public:
 private:
 	TRefPtr<IResource>		pDefaultMaterial;
 };
-
-#endif // !MATERIAL_FACTORY_H

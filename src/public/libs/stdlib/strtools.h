@@ -1,10 +1,8 @@
-#ifndef STRTOOLS_H
-#define STRTOOLS_H
-
+#pragma once
 #include <string>
 
-#include "core/types.h"
-#include "core/platform.h"
+#include "stdlib/defines.h"
+#include "stdlib/types.h"
 
 //-----------------------------------------------------------------------------
 // String tools
@@ -150,5 +148,3 @@ typedef TStringConversion<achar, wchar, CWCHARToANSI_Convert>		wcharToAnsi_t;
 #else
 	#error Unknown platform
 #endif // PLATFORM_WINDOWS
-
-#endif // !STRTOOLS_H

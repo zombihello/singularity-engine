@@ -1,5 +1,4 @@
-#ifndef VK_HELPERS_INL
-#define VK_HELPERS_INL
+#pragma once
 
 /*
 ==================
@@ -423,5 +422,3 @@ FORCEINLINE const achar* VK_ConvVkColorSpaceToText( VkColorSpaceKHR vkColorSpace
 	default:											return "UNKNOWN";
 	}
 }
-
-#endif // !VK_HELPERS_INL

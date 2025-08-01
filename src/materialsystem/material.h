@@ -1,6 +1,4 @@
-#ifndef MATERIAL_H
-#define MATERIAL_H
-
+#pragma once
 #include "smatdoc/smat_compiled_doc.h"
 #include "studiorender/studioapi/istudioapi_buffer.h"
 #include "studiorender/istudio_rendercmd.h"
@@ -67,5 +65,3 @@ private:
 };
 
 #include "materialsystem/material.inl"
-
-#endif // !MATERIAL_H

@@ -1,8 +1,6 @@
-#ifndef BUILDNUM_H
-#define BUILDNUM_H
-
-#include "core/types.h"
-#include "core/platform.h"
+#pragma once
+#include "stdlib/defines.h"
+#include "stdlib/types.h"
 
 //-----------------------------------------------------------------------------
 // Build number counter
@@ -27,5 +25,3 @@ private:
 };
 
 #include "stdlib/buildnum.inl"
-
-#endif // !BUILDNUM_H

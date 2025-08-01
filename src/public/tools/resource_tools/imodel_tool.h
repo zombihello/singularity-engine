@@ -1,6 +1,4 @@
-#ifndef IMODEL_TOOL_H
-#define IMODEL_TOOL_H
-
+#pragma once
 #include "appframework/iappsystem.h"
 #include "stdlib/math/axis.h"
 
@@ -32,5 +30,3 @@ class IModelTool : public IAppSystem
 public:
 	virtual bool CompileModel( const resourceToolCompileModelParams_t& compileParams ) const = 0;
 };
-
-#endif // !IMODEL_TOOL_H

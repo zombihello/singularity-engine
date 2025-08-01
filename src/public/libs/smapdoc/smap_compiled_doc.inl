@@ -1,5 +1,4 @@
-#ifndef SMAP_COMPILED_DOC_INL
-#define SMAP_COMPILED_DOC_INL
+#pragma once
 
 /*
 ==================
@@ -51,5 +50,3 @@ FORCEINLINE const std::vector<CSMAPEntity>& CSMAPCompiledMapDoc::GetEntities() c
 {
 	return entities;
 }
-
-#endif // !SMAP_COMPILED_DOC_INL

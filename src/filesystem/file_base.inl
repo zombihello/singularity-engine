@@ -1,5 +1,4 @@
-#ifndef FILE_BASE_INL
-#define FILE_BASE_INL
+#pragma once
 
 /*
 ==================
@@ -66,5 +65,3 @@ FORCEINLINE bool CBaseStreamDataFileWriter::IsWriter() const
 {
 	return true;
 }
-
-#endif // !FILE_BASE_INL

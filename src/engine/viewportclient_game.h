@@ -1,6 +1,4 @@
-#ifndef VIEWPORTCLIENT_GAME_H
-#define VIEWPORTCLIENT_GAME_H
-
+#pragma once
 #include "studiorender/istudio_viewportclient.h"
 
 //-----------------------------------------------------------------------------
@@ -10,5 +8,3 @@ class CGameViewportClient : public TBaseStudioViewportClient<IStudioViewportClie
 {
 public:
 };
-
-#endif // !VIEWPORTCLIENT_GAME_H

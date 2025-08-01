@@ -1,6 +1,4 @@
-#ifndef FILESYSTEM_H
-#define FILESYSTEM_H
-
+#pragma once
 #include <string>
 #include <vector>
 
@@ -94,5 +92,3 @@ private:
 
     std::vector<CSearchPath>      searchPaths;
 };
-
-#endif // !FILESYSTEM_H

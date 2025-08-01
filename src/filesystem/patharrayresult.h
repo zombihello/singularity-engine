@@ -1,6 +1,4 @@
-#ifndef PATHARRAYRESULT_H
-#define PATHARRAYRESULT_H
-
+#pragma once
 #include <vector>
 #include <string>
 
@@ -22,5 +20,3 @@ public:
 private:
 	std::vector<std::string>	pathArray;
 };
-
-#endif // !PATHARRAYRESULT_H

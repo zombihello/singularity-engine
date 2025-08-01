@@ -1,6 +1,4 @@
-#ifndef ISTUDIOAPI_SHADER_H
-#define ISTUDIOAPI_SHADER_H
-
+#pragma once
 #include "studiorender/studioapi/istudioapi_resource.h"
 
 //-----------------------------------------------------------------------------
@@ -109,5 +107,3 @@ public:
 	virtual IStudioAPIShader* GetDomainShader() const = 0;
 	virtual IStudioAPIShader* GetGeometryShader() const = 0;
 };
-
-#endif // !ISTUDIOAPI_SHADER_H

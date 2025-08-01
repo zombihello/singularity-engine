@@ -1,6 +1,4 @@
-#ifndef VK_STUDIOAPI_H
-#define VK_STUDIOAPI_H
-
+#pragma once
 #include "studiorender/studioapi/istudioapi.h"
 #include "studiorender/studioapi/vk/vk_studioapi_delegates.h"
 #include "studiorender/studioapi/vk/vk_studioapi_device.h"
@@ -96,5 +94,3 @@ private:
 extern CStudioAPIVk		g_StudioAPIVk;
 
 #include "studiorender/studioapi/vk/vk_studioapi.inl"
-
-#endif // !VK_STUDIOAPI_H

@@ -1,5 +1,4 @@
-#ifndef VK_STUDIOAPI_SWAPCHAIN_INL
-#define VK_STUDIOAPI_SWAPCHAIN_INL
+#pragma once
 
 /*
 ==================
@@ -92,4 +91,3 @@ FORCEINLINE CStudioAPISemaphoreVk* CStudioAPISwapChainVk::GetRenderFinishedSemap
 {
 	return renderFinishedSemaphores[currentSemaphoreIndex];
 }
-#endif // !VK_STUDIOAPI_SWAPCHAIN_INL

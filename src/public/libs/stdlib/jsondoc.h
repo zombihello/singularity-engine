@@ -1,13 +1,11 @@
-#ifndef JSONDOC_H
-#define JSONDOC_H
-
+#pragma once
 #include <string>
 #include <unordered_map>
 #include <vector>
 #include <rapidjson/document.h>
 
-#include "core/types.h"
-#include "core/platform.h"
+#include "stdlib/defines.h"
+#include "stdlib/types.h"
 
 //-----------------------------------------------------------------------------
 // Forward delcarations
@@ -133,5 +131,3 @@ private:
 };
 
 #include "stdlib/jsondoc.inl"
-
-#endif // !JSONDOC_H

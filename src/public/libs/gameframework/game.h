@@ -1,6 +1,4 @@
-#ifndef GAME_H
-#define GAME_H
-
+#pragma once
 #include "appframework/iappsystemgroup.h"
 #include "gameframework/igame.h"
 #include "gameframework/ecs/ecs_core.h"
@@ -62,5 +60,3 @@ private:
 };
 
 #include "gameframework/game.inl"
-
-#endif // !GAME_H

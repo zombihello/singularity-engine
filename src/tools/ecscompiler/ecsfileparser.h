@@ -1,7 +1,5 @@
-#ifndef ECSFILEPARSER_H
-#define ECSFILEPARSER_H
-
-#include "core/types.h"
+#pragma once
+#include "stdlib/types.h"
 #include "parserlib/filecontext.h"
 #include "tools/ecscompiler/ecsfieldstubs.h"
 
@@ -44,5 +42,3 @@ private:
 	CEcsStubSystem*					pCurrentSystem;
 	TRefPtr<CEcsStubMetadata>		pCurrentMetadata;
 };
-
-#endif // !ECSFILEPARSER_H

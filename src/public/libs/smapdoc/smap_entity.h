@@ -1,6 +1,4 @@
-#ifndef SMAP_ENTITY_H
-#define SMAP_ENTITY_H
-
+#pragma once
 #include <string>
 #include "core/core.h"
 
@@ -29,5 +27,3 @@ private:
 };
 
 #include "smapdoc/smap_entity.inl"
-
-#endif // !SMAP_ENTITY_H

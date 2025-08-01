@@ -1,6 +1,4 @@
-#ifndef VK_STUDIOAPI_DEVICE_H
-#define VK_STUDIOAPI_DEVICE_H
-
+#pragma once
 #include "stdlib/delegate.h"
 #include "studiorender/studioapi/vk/vk_studioapi_queue.h"
 
@@ -71,5 +69,3 @@ private:
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_device.inl"
-
-#endif // !VK_STUDIOAPI_DEVICE_H

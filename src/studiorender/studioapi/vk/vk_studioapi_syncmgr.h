@@ -1,5 +1,4 @@
-#ifndef VK_STUDIOAPI_SYNCMGR_H
-#define VK_STUDIOAPI_SYNCMGR_H
+#pragma once
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -154,5 +153,3 @@ void VK_UpdateSyncStateImage( VkImageLayout vkDstImageLayout, VkAccessFlags vkDs
 bool VK_UpdateSyncStateImageWithBarrier( VkImageLayout vkDstImageLayout, VkAccessFlags vkDstAccessMask, VkPipelineStageFlags vkDstStageMask, uint32 dstQueueFamilyIndex, studioAPISyncStateImageVk_t& syncState, studioAPIImageMemoryBarrierVk_t& imageMemoryBarrier, uint32 textureUsageFlags );
 
 #include "studiorender/studioapi/vk/vk_studioapi_syncmgr.inl"
-
-#endif // !VK_STUDIOAPI_SYNCMGR_H

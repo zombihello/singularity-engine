@@ -1,6 +1,4 @@
-#ifndef ISTUDIOAPI_H
-#define ISTUDIOAPI_H
-
+#pragma once
 #include "stdlib/interface.h"
 #include "studiorender/studioapi/istudioapi_shader.h"
 #include "studiorender/studioapi/istudioapi_renderpipeline.h"
@@ -91,5 +89,3 @@ public:
 	virtual uint64 GetFrameNumber() const = 0;
 	virtual IStudioAPICmdContext* GetImmediateCmdContext( studioAPIQueueType_t queueType ) const = 0;
 };
-
-#endif // !ISTUDIOAPI_H

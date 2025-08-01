@@ -1,8 +1,6 @@
-#ifndef LEXERCONTEXT_H
-#define LEXERCONTEXT_H
-
-#include "core/platform.h"
-#include "core/types.h"
+#pragma once
+#include "stdlib/defines.h"
+#include "stdlib/types.h"
 
 //-----------------------------------------------------------------------------
 // Parser lexer context
@@ -25,5 +23,3 @@ struct parserLexerContext_t
 	uint32		byteOffset;	// The associated position in the raw input buffer
 	uint32		charOffset; // The associated position in the input buffer resolved as a UTF-8 string
 };
-
-#endif // !LEXERCONTEXT_H

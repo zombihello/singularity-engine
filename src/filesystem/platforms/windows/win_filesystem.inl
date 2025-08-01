@@ -1,5 +1,4 @@
-#ifndef WIN_FILESYSTEM_INL
-#define WIN_FILESYSTEM_INL
+#pragma once
 
 /*
 ==================
@@ -62,5 +61,3 @@ FORCEINLINE copyMoveResult_t Plat_MoveFile( const achar* pSrcPath, const achar* 
 	DWORD	moveFlags = ( bReplaceExisting ? MOVEFILE_REPLACE_EXISTING : 0x0 ) | MOVEFILE_WRITE_THROUGH;
 	return MoveFileExA( pSrcPath, pDestPath, moveFlags ) != 0 ? COPYMOVE_RESULT_OK : COPYMOVE_RESULT_MISC_FAIL;
 }
-
-#endif // !WIN_FILESYSTEM_INL

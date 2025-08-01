@@ -1,6 +1,4 @@
-#ifndef IENTITYDESC_TOOL
-#define IENTITYDESC_TOOL
-
+#pragma once
 #include "stdlib/math/math.h"
 #include "appframework/iappsystem.h"
 
@@ -61,5 +59,3 @@ class IEntityDescTool : public IAppSystem
 public:
 	virtual bool CompileEntityDesc( const resourceToolCompileEntityDescParams_t& compileParams ) const = 0;
 };
-
-#endif // !IENTITYDESC_TOOL

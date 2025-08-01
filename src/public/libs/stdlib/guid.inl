@@ -1,5 +1,4 @@
-#ifndef GUID_INL
-#define GUID_INL
+#pragma once
 
 /*
 ==================
@@ -142,5 +141,3 @@ FORCEINLINE hash_t CGuid::GetHash() const
 {
 	return FastHash( *this );
 }
-
-#endif // !GUID_INL

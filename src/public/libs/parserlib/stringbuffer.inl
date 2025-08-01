@@ -1,5 +1,4 @@
-#ifndef STRINGBUFFER_INL
-#define STRINGBUFFER_INL
+#pragma once
 
 /*
 ==================
@@ -170,5 +169,3 @@ FORCEINLINE bool TParserStringBuffer<TCharType, TCharContainerType>::operator!=(
 {
 	return !( operator!=( pString ) );
 }
-
-#endif // !STRINGBUFFER_INL

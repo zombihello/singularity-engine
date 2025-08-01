@@ -1,6 +1,4 @@
-#ifndef MEMALLOC_BASE_H
-#define MEMALLOC_BASE_H
-
+#pragma once
 #include "core/memory.h"
 
 //-----------------------------------------------------------------------------
@@ -17,5 +15,3 @@ public:
 	virtual bool IsInternallyThreadSafe() const;
 	virtual bool GetAllocationSize( void* pOriginal, size_t& numBytes ) override;
 };
-
-#endif // !MEMALLOC_BASE_H

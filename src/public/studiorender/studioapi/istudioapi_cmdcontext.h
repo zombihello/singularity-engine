@@ -1,6 +1,4 @@
-#ifndef ISTUDIOAPI_CMDCONTEXT_H
-#define ISTUDIOAPI_CMDCONTEXT_H
-
+#pragma once
 #include "studiorender/studioapi/istudioapi_resource.h"
 
 //-----------------------------------------------------------------------------
@@ -24,5 +22,3 @@ public:
 	virtual ~IStudioAPICmdContext() {}
 	virtual bool HasSupportQueueType( studioAPIQueueType_t queueType ) const = 0;
 };
-
-#endif // ISTUDIOAPI_CMDCONTEXT_H

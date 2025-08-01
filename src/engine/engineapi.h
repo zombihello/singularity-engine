@@ -1,11 +1,7 @@
-#ifndef ENGINEAPI_H
-#define ENGINEAPI_H
-
+#pragma once
 #include "stdlib/interface.h"
 
 //-----------------------------------------------------------------------------
 // This factory gets to many of the major app-single systems
 //-----------------------------------------------------------------------------
 extern createInterfaceFn_t		g_pAppSystemFactory;
-
-#endif // !ENGINEAPI_H

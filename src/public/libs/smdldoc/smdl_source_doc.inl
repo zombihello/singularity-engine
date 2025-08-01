@@ -1,5 +1,4 @@
-#ifndef SMDL_SOURCE_DOC_INL
-#define SMDL_SOURCE_DOC_INL
+#pragma once
 
 /*
 ==================
@@ -155,5 +154,3 @@ FORCEINLINE void CSMDLSourceModelDoc::Clear()
 	outputDir		= "";
 	renamedMaterialsDict.clear();
 }
-
-#endif // !SMDL_SOURCE_DOC_INL

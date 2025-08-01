@@ -1,5 +1,4 @@
-#ifndef CONVAR_INL
-#define CONVAR_INL
+#pragma once
 
 /*
 ==================
@@ -247,5 +246,3 @@ FORCEINLINE IConVar* CConVarRef::operator->() const
 	Assert( pConVar );
 	return pConVar;
 }
-
-#endif // !CONVAR_INL

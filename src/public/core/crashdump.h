@@ -1,6 +1,4 @@
-#ifndef CRASHDUMP_H
-#define CRASHDUMP_H
-
+#pragma once
 #include "core/core.h"
 
 //-----------------------------------------------------------------------------
@@ -17,5 +15,3 @@ struct crashDumpAppInfo_t
 
 CORE_INTERFACE void CrashDump_SetAppInfo( const crashDumpAppInfo_t& appInfo );
 CORE_INTERFACE void CrashDump_AddLogFile( const achar* pPath );
-
-#endif // !CRASHDUMP_H

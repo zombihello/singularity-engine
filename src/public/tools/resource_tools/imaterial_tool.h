@@ -1,6 +1,4 @@
-#ifndef IMATERIAL_TOOL_H
-#define IMATERIAL_TOOL_H
-
+#pragma once
 #include "stdlib/math/math.h"
 #include "appframework/iappsystem.h"
 
@@ -58,5 +56,3 @@ class IMaterialTool : public IAppSystem
 public:
 	virtual bool CompileMaterial( const resourceToolCompileMaterialParams_t& compileParams ) const = 0;
 };
-
-#endif // !IMATERIAL_TOOL_H

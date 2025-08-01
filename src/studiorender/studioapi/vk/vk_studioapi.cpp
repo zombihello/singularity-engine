@@ -1,5 +1,6 @@
 #include "pch_studioapi.h"
 #include "core/icommandline.h"
+#include "stdlib/buildnum.h"
 #include "engine/version.h"
 #include "studiorender/studioapi/vk/vk_studioapi_swapchain.h"
 #include "studiorender/studioapi/vk/vk_studioapi.h"

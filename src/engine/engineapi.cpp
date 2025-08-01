@@ -6,6 +6,7 @@
 #include "studiorender/istudiorender.h"
 #include "engine/engine.h"
 #include "engine/appsystemgroup_game.h"
+#include "stdlib/buildnum.h"
 #include "engine/version.h"
 #include "engine/iengineapi.h"
 #include "engine/engineapi.h"
@@ -61,7 +62,8 @@ bool CEngineAPI::Connect( createInterfaceFn_t pFactory )
 	}
 
 	// Print some info about engine version and build number
-	Msg( "Engine: Singularity Engine " ENGINE_VERSION_STRING " build %i (" __DATE__ " " __TIME__ ")", Engine_BuildNumber() );
+	TBuildNumber<ENGINE_GOLDDATE>	engineBuildNumber;
+	Msg( "Engine: Singularity Engine " ENGINE_VERSION_STRING " build %i (" __DATE__ " " __TIME__ ")", engineBuildNumber.GetBuildNumber() );
 
 	// Get the window manager
 	g_pWindowMgr = ( IWindowMgr* )pFactory( WINDOWMGR_INTERFACE_VERSION );

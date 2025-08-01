@@ -1,6 +1,4 @@
-#ifndef ECS_ENTITYDESC_H
-#define ECS_ENTITYDESC_H
-
+#pragma once
 #include "sentdoc/sent_compiled_doc.h"
 #include "gameframework/ecs/ecs_core.h"
 #include "gameframework/ecs/ecs_component_factory.h"
@@ -41,5 +39,3 @@ private:
 	CGuid											guid;
 	mutable uint32									lastUsedEcsPrefabIdx;
 };
-
-#endif // !ECS_ENTITYDESC_H

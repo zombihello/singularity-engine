@@ -1,9 +1,7 @@
-#ifndef ISTUDIO_RENDERCMD_H
-#define ISTUDIO_RENDERCMD_H
-
+#pragma once
 #include "interfaces/interfaces.h"
-#include "core/types.h"
-#include "core/platform.h"
+#include "stdlib/defines.h"
+#include "stdlib/types.h"
 #include "studiorender/istudio_cmdbuffer.h"
 #include "studiorender/istudiorender.h"
 
@@ -202,5 +200,3 @@ private:
 void Studio_FlushRenderCommands();
 
 #include "studiorender/istudio_rendercmd.inl"
-
-#endif // !ISTUDIO_RENDERCMD_H

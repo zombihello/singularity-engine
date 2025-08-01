@@ -1,6 +1,4 @@
-#ifndef CONVAR_H
-#define CONVAR_H
-
+#pragma once
 #include <string>
 
 #include "interfaces/interfaces.h"
@@ -247,5 +245,3 @@ void ConVar_Register( uint32 flags = FCVAR_NONE, ICvarAccessor* pAccessor = NULL
 void ConVar_Unregister();
 
 #include "stdlib/convar.inl"
-
-#endif // !CONVAR_H

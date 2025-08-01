@@ -1,6 +1,4 @@
-#ifndef RECT_H
-#define RECT_H
-
+#pragma once
 #include "stdlib/math/math.h"
 
 //-----------------------------------------------------------------------------
@@ -41,5 +39,3 @@ typedef rect_t<int32>		recti_t;
 typedef rect_t<float>		rectf_t;
 
 #include "stdlib/math/rect.inl"
-
-#endif // !COLOR_H

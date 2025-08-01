@@ -1,5 +1,4 @@
-#ifndef ISTUDIOAPI_BARRIER_INL
-#define ISTUDIOAPI_BARRIER_INL
+#pragma once
 
 /*
 ==================
@@ -64,5 +63,3 @@ FORCEINLINE studioAPIBarrier_t StudioAPI_MakeTextureBarrier( IStudioAPISwapChain
 	barrier.texture.bSwapChain		= true;
 	return barrier;
 }
-
-#endif // !ISTUDIOAPI_BARRIER_INL

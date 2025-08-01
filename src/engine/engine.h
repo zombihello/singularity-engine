@@ -1,7 +1,5 @@
-#ifndef ENGINE_H
-#define ENGINE_H
-
-#include "core/platform.h"
+#pragma once
+#include "stdlib/defines.h"
 #include "gameinfo/gameinfo.h"
 #include "studiorender/istudio_viewport.h"
 #include "engine/viewportclient_game.h"
@@ -48,5 +46,3 @@ private:
 extern CEngine		g_Engine;
 
 #include "engine/engine.inl"
-
-#endif // !ENGINE_H

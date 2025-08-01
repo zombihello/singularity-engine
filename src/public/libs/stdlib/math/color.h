@@ -1,6 +1,4 @@
-#ifndef COLOR_H
-#define COLOR_H
-
+#pragma once
 #include "stdlib/math/math.h"
 
 //-----------------------------------------------------------------------------
@@ -51,5 +49,3 @@ public:
 };
 
 #include "stdlib/math/color.inl"
-
-#endif // !COLOR_H

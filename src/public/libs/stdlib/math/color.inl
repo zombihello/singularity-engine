@@ -1,5 +1,4 @@
-#ifndef COLOR_INL
-#define COLOR_INL
+#pragma once
 
 /*
 ==================
@@ -96,5 +95,3 @@ FORCEINLINE bool CColor::operator!=( const CColor& other ) const
 {
 	return !( *this == other );
 }
-
-#endif // !COLOR_INL

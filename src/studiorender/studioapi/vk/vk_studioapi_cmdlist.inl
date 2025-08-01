@@ -1,5 +1,4 @@
-#ifndef VK_STUDIOAPI_CMDBLIST_INL
-#define VK_STUDIOAPI_CMDBLIST_INL
+#pragma once
 
 /*
 ==================
@@ -122,5 +121,3 @@ FORCEINLINE CStudioAPICmdBufferVk* CStudioAPICmdListVk::GetCmdBuffer() const
 {
 	return pCmdBuffer;
 }
-
-#endif // !VK_STUDIOAPI_CMDBLIST_INL

@@ -1,6 +1,4 @@
-#ifndef TEXTURE_FACTORY_H
-#define TEXTURE_FACTORY_H
-
+#pragma once
 #include "resourcesystem/iresourcefactory.h"
 
 //-----------------------------------------------------------------------------
@@ -33,5 +31,3 @@ public:
 private:
 	TRefPtr<IResource>		pDefaultTexture;
 };
-
-#endif // !TEXTURE_FACTORY_H

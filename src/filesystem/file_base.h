@@ -1,6 +1,4 @@
-#ifndef FILE_BASE_H
-#define FILE_BASE_H
-
+#pragma once
 #include <string>
 #include "stdlib/istreamdata.h"
 
@@ -56,5 +54,3 @@ public:
 };
 
 #include "filesystem/file_base.inl"
-
-#endif // !FILE_BASE_H

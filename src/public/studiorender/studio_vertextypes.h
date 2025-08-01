@@ -1,8 +1,6 @@
-#ifndef STUDIO_VERTEXTYPES_H
-#define STUDIO_VERTEXTYPES_H
-
-#include "core/types.h"
-#include "core/platform.h"
+#pragma once
+#include "stdlib/defines.h"
+#include "stdlib/types.h"
 #include "stdlib/math/math.h"
 #include "stdlib/math/color.h"
 
@@ -57,5 +55,3 @@ struct studioModelVertex_t
 	vec4_t		tangent;
 	vec4_t		binormal;
 };
-
-#endif // !STUDIO_VERTEXTYPES_H

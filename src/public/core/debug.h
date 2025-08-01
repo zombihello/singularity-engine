@@ -1,11 +1,4 @@
-/**
- * @file
- * @addtogroup core core
- */
-
-#ifndef DEBUG_H
-#define DEBUG_H
-
+#pragma once
 #include "core/core.h"
 
 //-----------------------------------------------------------------------------
@@ -99,5 +92,3 @@ CORE_INTERFACE bool Sys_IsInitedConsoleIO();
     #define EnsureAlways( Expr )                  !!( Expr )
     #define EnsureAlwaysMsg( Expr, Msg, ... )     !!( Expr )
 #endif // ENABLE_ENSURE
-
-#endif // !DEBUG_H

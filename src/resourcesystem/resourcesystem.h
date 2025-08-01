@@ -1,6 +1,4 @@
-#ifndef RESOURCESYSTEM_H
-#define RESOURCESYSTEM_H
-
+#pragma once
 #include <unordered_map>
 
 #include "resourcesystem/iresourcesystem.h"
@@ -45,5 +43,3 @@ private:
 	std::unordered_map<std::string, TRefPtr<CResource>>		resourcesDicts[RESOURCE_NUM_TYPES];
 };
 extern CResourceSystem		g_ResourceSystem;
-
-#endif // !RESOURCESYSTEM_H

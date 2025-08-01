@@ -1,7 +1,5 @@
-#ifndef IGAME_H
-#define IGAME_H
-
-#include "core/types.h"
+#pragma once
+#include "stdlib/types.h"
 
 //-----------------------------------------------------------------------------
 // Game interface
@@ -33,5 +31,3 @@ public:
 	virtual const achar* GetModuleName( uint32 index ) const = 0;
 	virtual const achar* GetInterfaceName( uint32 index ) const = 0;
 };
-
-#endif // !IGAME_H

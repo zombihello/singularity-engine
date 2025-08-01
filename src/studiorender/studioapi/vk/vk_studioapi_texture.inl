@@ -1,5 +1,4 @@
-#ifndef VK_STUDIOAPI_TEXTURE_INL
-#define VK_STUDIOAPI_TEXTURE_INL
+#pragma once
 
 /*
 ==================
@@ -293,5 +292,3 @@ FORCEINLINE uint32 CStudioAPITextureVk::GetSyncStateIndex( uint32 mip, uint32 la
 	Assert( mip + numMips * layer < ( uint32 )syncStates.size() );
 	return mip + numMips * layer;
 }
-
-#endif // !VK_STUDIOAPI_TEXTURE_INL

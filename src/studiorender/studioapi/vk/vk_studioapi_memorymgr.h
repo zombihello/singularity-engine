@@ -1,6 +1,4 @@
-#ifndef VK_STUDIOAPI_MEMORYMGR_H
-#define VK_STUDIOAPI_MEMORYMGR_H
-
+#pragma once
 #include <list>
 
 #include "vma/vk_mem_alloc.h"
@@ -90,5 +88,3 @@ private:
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_memorymgr.inl"
-
-#endif // !VK_STUDIOAPI_MEMORYMGR_H

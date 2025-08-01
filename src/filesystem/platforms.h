@@ -1,11 +1,9 @@
-#ifndef FILESYSTEM_PLATFORMS_H
-#define FILESYSTEM_PLATFORMS_H
-
+#pragma once
 #include <string>
 #include <vector>
 
-#include "core/types.h"
-#include "core/platform.h"
+#include "stdlib/defines.h"
+#include "stdlib/types.h"
 #include "filesystem/ifilesystem.h"
 
 //-----------------------------------------------------------------------------
@@ -26,5 +24,3 @@ copyMoveResult_t Plat_MoveFile( const achar* pSrcPath, const achar* pDestPath, b
 #if PLATFORM_WINDOWS
 	#include "filesystem/platforms/windows/win_filesystem.inl"
 #endif // PLATFORM_WINDOWS
-
-#endif // FILESYSTEM_PLATFORMS_H
