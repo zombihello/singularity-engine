@@ -1,7 +1,7 @@
 #include "pch_studioapi.h"
 #include "core/icommandline.h"
 #include "stdlib/buildnum.h"
-#include "engine/version.h"
+#include "core/version.h"
 #include "studiorender/studioapi/vk/vk_studioapi_swapchain.h"
 #include "studiorender/studioapi/vk/vk_studioapi.h"
 #include "studiorender/studioapi/vk/vk_studioapi_cmdcontext.h"
@@ -24,8 +24,7 @@ CStudioAPIVk::CStudioAPIVk
 ==================
 */
 CStudioAPIVk::CStudioAPIVk()
-	: bInited( false )
-	, frameNumber( 0 )
+	: frameNumber( 0 )
 	, currentFrameInFlight( 0 )
 	, pGraphicsCmdContext( NULL )
 	, pTransferCmdContext( NULL )
@@ -36,25 +35,39 @@ CStudioAPIVk::CStudioAPIVk()
 
 /*
 ==================
-CStudioAPIVk::Init
+CStudioAPIVk::Connect
 ==================
 */
-bool CStudioAPIVk::Init( createInterfaceFn_t pFactory )
+bool CStudioAPIVk::Connect( createInterfaceFn_t pFactory )
 {
-	// We cannot init the Studio API twice
-	if ( bInited )
-	{
-		Error( "StudioAPIVk: Cannot initialize the Studio API twice!" );
-		return false;
-	}
-
 	// Connect StdLib and register cvars
 	if ( !ConnectStdLib( pFactory ) )
 	{
 		return false;
 	}
 	ConVar_Register();
+	return true;
+}
 
+/*
+==================
+CStudioAPIVk::Disconnect
+==================
+*/
+void CStudioAPIVk::Disconnect()
+{
+	// Unregister cvars and disconnect StdLib
+	ConVar_Unregister();
+	DisconnectStdLib();
+}
+
+/*
+==================
+CStudioAPIVk::Init
+==================
+*/
+bool CStudioAPIVk::Init()
+{
 	// Initialize the StudioAPI device
 	device.Init( ENGINE_VERSION_MAJOR, ENGINE_VERSION_MINOR, ENGINE_VERSION_PATCH );
 
@@ -118,7 +131,6 @@ bool CStudioAPIVk::Init( createInterfaceFn_t pFactory )
 	descriptorPoolsMgr.Init();
 
 	// We are done!
-	bInited		= true;
 	frameNumber = 0;
 	Msg( "StudioAPIVk: Studio API initialized" );
 	return true;
@@ -191,12 +203,7 @@ void CStudioAPIVk::Shutdown()
 	// Clear StudioAPI info and reset the current frame number
 	Mem_Memzero( &info, sizeof( studioAPIInfo_t ) );
 	frameNumber = 0;
-
-	// Unregister cvars and disconnect StdLib
-	ConVar_Unregister();
-	DisconnectStdLib();
 	Msg( "StudioAPIVk: StudioAPI destroyed" );
-	bInited = false;
 }
 
 /*

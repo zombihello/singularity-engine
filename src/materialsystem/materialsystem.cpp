@@ -21,6 +21,7 @@ bool CMaterialSystem::Connect( createInterfaceFn_t pFactory )
 	{
 		return false;
 	}
+	ConVar_Register();
 
 	// Get the StudioAPI
 	g_pStudioAPI = ( IStudioAPI* )pFactory( STUDIOAPI_INTERFACE_VERSION );
@@ -66,6 +67,8 @@ void CMaterialSystem::Disconnect()
 	g_pShaderMgr		= NULL;
 	g_pStudioAPI		= NULL;
 	g_pAppSystemFactory = NULL;
+
+	ConVar_Unregister();
 	DisconnectStdLib();
 }
 
@@ -87,9 +90,6 @@ CMaterialSystem::Init
 */
 bool CMaterialSystem::Init()
 {
-	// Register cvars
-	ConVar_Register();
-
 	// Initialize the shader manager
 	g_pShaderMgr->Init();
 
@@ -112,7 +112,4 @@ void CMaterialSystem::Shutdown()
 
 	// Shutdown the shader manager
 	g_pShaderMgr->Shutdown();
-
-	// Unregister cvars
-	ConVar_Unregister();
 }

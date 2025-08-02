@@ -36,9 +36,10 @@ FORCEINLINE CEcsComponentTypes& CGame::GetEcsComponentTypes()
 CGameAppSystems::AddAppSystem
 ==================
 */
-FORCEINLINE void CGameAppSystems::AddAppSystem( const achar* pModuleName, const achar* pInterfaceName )
+FORCEINLINE void CGameAppSystems::AddAppSystem( const achar* pModuleName, const achar* pInterfaceName, gameAppSystemOrder_t order )
 {
-	appSystemInfo_t&				appSystemInfo = appSystems.emplace_back();
+	gameAppSystemInfo_t&			appSystemInfo = appSystems.emplace_back();
+	appSystemInfo.order				= order;
 	appSystemInfo.pModuleName		= pModuleName;
 	appSystemInfo.pInterfaceName	= pInterfaceName;
 }

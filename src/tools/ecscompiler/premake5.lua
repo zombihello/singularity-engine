@@ -37,7 +37,7 @@ project "ecscompiler"
 
     dependson   {
         "filesystem",
-		"engine"
+		"cvar"
     }
 
     ----------- LINK THIRD PARTIES -----------------

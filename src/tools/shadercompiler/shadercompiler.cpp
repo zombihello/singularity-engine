@@ -2,7 +2,7 @@
 #include "stdlib/jsondoc.h"
 #include "core/icommandline.h"
 #include "core/crashdump.h"
-#include "engine/icvar.h"
+#include "cvar/icvar.h"
 #include "appframework/iappsystemgroup.h"
 #include "shadercache/shadercache.h"
 #include "tools/shadercompiler/makefile.h"
@@ -142,9 +142,9 @@ bool CShaderCompileApp::Create()
 	// Load application systems
 	appSystemInfo_t		appSystemInfos[] =
 	{
-		{ "engine"		DLL_EXT_STRING,			CVAR_QUERY_INTERFACE_VERSION		},	// This one must be first
+		{ "cvar"		DLL_EXT_STRING,			CVAR_QUERY_INTERFACE_VERSION		},	// This one must be first
 		{ "filesystem"	DLL_EXT_STRING,			FILESYSTEM_INTERFACE_VERSION		},
-		{ "engine"		DLL_EXT_STRING,			CVAR_INTERFACE_VERSION				},
+		{ "cvar"		DLL_EXT_STRING,			CVAR_INTERFACE_VERSION				},
 		{ "", "" }																		// Required to terminate the list
 	};
 

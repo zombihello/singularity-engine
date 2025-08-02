@@ -1,7 +1,7 @@
 #pragma once
 #include "appframework/iappsystem.h"
-#include "engine/iconcmd.h"
-#include "engine/iconvar.h"
+#include "cvar/iconcmd.h"
+#include "cvar/iconvar.h"
 #include "stdlib/math/color.h"
 
 //-----------------------------------------------------------------------------

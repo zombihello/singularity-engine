@@ -1,6 +1,6 @@
 #include "pch_inputsystem.h"
 #include "stdlib/convar.h"
-#include "engine/icvar.h"
+#include "cvar/icvar.h"
 #include "inputsystem/inputsystem_private.h"
 #include "inputsystem/iinputsystem.h"
 
@@ -145,10 +145,6 @@ public:
 	virtual bool Connect( createInterfaceFn_t pFactory ) override;
 	virtual void Disconnect() override;
 
-	// Initialize and shutdown
-	virtual bool Init() override;
-	virtual void Shutdown() override;
-
 	// IInputSystem interface
 	virtual void AttachToWindow( IWindowMgr* pWindowMgr ) override;
 	virtual void DetachFromWindow() override;
@@ -238,7 +234,13 @@ CInputSystem::Connect
 */
 bool CInputSystem::Connect( createInterfaceFn_t pFactory )
 {
-	return ConnectStdLib( pFactory );
+	if ( !ConnectStdLib( pFactory ) )
+	{
+		return false;
+	}
+
+	ConVar_Register();
+	return true;
 }
 
 /*
@@ -249,28 +251,8 @@ CInputSystem::Disconnect
 void CInputSystem::Disconnect()
 {
 	DetachFromWindow();
-	DisconnectStdLib();
-}
-
-/*
-==================
-CInputSystem::Init
-==================
-*/
-bool CInputSystem::Init()
-{
-	ConVar_Register();
-	return true;
-}
-
-/*
-==================
-CInputSystem::Shutdown
-==================
-*/
-void CInputSystem::Shutdown()
-{
 	ConVar_Unregister();
+	DisconnectStdLib();
 }
 
 /*

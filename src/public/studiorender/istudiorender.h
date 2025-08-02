@@ -34,8 +34,6 @@ struct studioCameraView_t
 class IStudioRender : public IAppSystem
 {
 public:
-	// Sets which API we should be using. Has to be done before connect
-	virtual void SetStudioAPI( const achar* pStudioAPIDLL ) = 0;
 	virtual void SetCameraView( const studioCameraView_t& cameraView ) = 0;
 
 	// Register and unregister render objects for rendering

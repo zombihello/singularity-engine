@@ -3,7 +3,7 @@
 
 #include "interfaces/interfaces.h"
 #include "core/debug.h"
-#include "engine/icvar.h"
+#include "cvar/icvar.h"
 
 //-----------------------------------------------------------------------------
 // Macroses for implement a console command

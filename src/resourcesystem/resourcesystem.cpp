@@ -21,6 +21,7 @@ bool CResourceSystem::Connect( createInterfaceFn_t pFactory )
 	{
 		return false;
 	}
+	ConVar_Register();
 
 	g_pResourceSystem = this;
 	return true;
@@ -33,6 +34,7 @@ CResourceSystem::Disconnect
 */
 void CResourceSystem::Disconnect()
 {
+	ConVar_Unregister();
 	DisconnectStdLib();
 	g_pResourceSystem = NULL;
 }
@@ -44,9 +46,6 @@ CResourceSystem::Init
 */
 bool CResourceSystem::Init()
 {
-	// Register cvars
-	ConVar_Register();
-
 	// Reset all resource factories
 	Mem_Memzero( pResourceFactories, RESOURCE_NUM_TYPES * sizeof( IResourceFactory* ) );
 	return true;
@@ -68,9 +67,6 @@ void CResourceSystem::Shutdown()
 
 	// Reset all resource factories
 	Mem_Memzero( pResourceFactories, RESOURCE_NUM_TYPES * sizeof( IResourceFactory* ) );
-
-	// Unregister cvars
-	ConVar_Unregister();
 }
 
 /*

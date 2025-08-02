@@ -8,7 +8,7 @@
 #include "sentdoc/sent_source_doc.h"
 #include "smapdoc/smap_source_doc.h"
 #include "filesystem/ifilesystem.h"
-#include "engine/icvar.h"
+#include "cvar/icvar.h"
 #include "resourcesystem/iresource.h"
 #include "tools/resource_tools/itexture_tool.h"
 #include "tools/resource_tools/imaterial_tool.h"
@@ -149,9 +149,9 @@ bool CResourceCompilerApp::Create()
 	// Load application systems
 	appSystemInfo_t		appSystemInfos[] =
 	{
-		{ "engine"				DLL_EXT_STRING,			CVAR_QUERY_INTERFACE_VERSION		},	// This one must be first
+		{ "cvar"				DLL_EXT_STRING,			CVAR_QUERY_INTERFACE_VERSION		},	// This one must be first
 		{ "filesystem"			DLL_EXT_STRING,			FILESYSTEM_INTERFACE_VERSION		},
-		{ "engine"				DLL_EXT_STRING,			CVAR_INTERFACE_VERSION				},
+		{ "cvar"				DLL_EXT_STRING,			CVAR_INTERFACE_VERSION				},
 		{ "texture_tool"		DLL_EXT_STRING,			TEXTURE_TOOL_INTERFACE_VERSION		},
 		{ "material_tool"		DLL_EXT_STRING,			MATERIAL_TOOL_INTERFACE_VERSION		},
 		{ "model_tool"			DLL_EXT_STRING,			MODEL_TOOL_INTERFACE_VERSION		},

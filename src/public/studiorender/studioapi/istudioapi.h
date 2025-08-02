@@ -1,5 +1,5 @@
 #pragma once
-#include "stdlib/interface.h"
+#include "appframework/iappsystem.h"
 #include "studiorender/studioapi/istudioapi_shader.h"
 #include "studiorender/studioapi/istudioapi_renderpipeline.h"
 #include "studiorender/studioapi/istudioapi_framebuffer.h"
@@ -46,13 +46,9 @@ struct studioAPIInfo_t
 // Studio API interface
 //-----------------------------------------------------------------------------
 #define STUDIOAPI_INTERFACE_VERSION			"SStudioAPI001"
-class IStudioAPI
+class IStudioAPI : public IAppSystem
 {
 public:
-	// Initialize/shutdown Studio API
-	virtual bool Init( createInterfaceFn_t pFactory ) = 0;
-	virtual void Shutdown() = 0;
-
 	// Acquire/release thread ownership
 	virtual void AcquireThreadOwnership() = 0;
 	virtual void ReleaseThreadOwnership() = 0;

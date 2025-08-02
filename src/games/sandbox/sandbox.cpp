@@ -22,10 +22,16 @@
 class CSandboxGame : public CGame
 {
 public:
-	// IGame interface
-	virtual bool Init( createInterfaceFn_t pFactory ) override;
+	// IAppSystem interfaces
+	// Here's where the app systems get to learn about each other
+	virtual bool Connect( createInterfaceFn_t pFactory ) override;
+	virtual void Disconnect() override;
+
+	// Initialize and shutdown
+	virtual bool Init() override;
 	virtual void Shutdown() override;
 
+	// IGame interfaces
 	virtual const achar* GetGameDescription() const override;
 
 private:
@@ -51,12 +57,12 @@ CGame* Game()
 
 /*
 ==================
-CSandboxGame::Init
+CSandboxGame::Connect
 ==================
 */
-bool CSandboxGame::Init( createInterfaceFn_t pFactory )
+bool CSandboxGame::Connect( createInterfaceFn_t pFactory )
 {
-	if ( !CGame::Init( pFactory ) )
+	if ( !CGame::Connect( pFactory ) )
 	{
 		return false;
 	}
@@ -64,6 +70,32 @@ bool CSandboxGame::Init( createInterfaceFn_t pFactory )
 	// Get StudioAPI
 	g_pStudioAPI = ( IStudioAPI* )pFactory( STUDIOAPI_INTERFACE_VERSION );
 	if ( !g_pStudioAPI )
+	{
+		return false;
+	}
+
+	return true;
+}
+
+/*
+==================
+CSandboxGame::Disconnect
+==================
+*/
+void CSandboxGame::Disconnect()
+{
+	g_pStudioAPI = NULL;
+	CGame::Disconnect();
+}
+
+/*
+==================
+CSandboxGame::Init
+==================
+*/
+bool CSandboxGame::Init()
+{
+	if ( !CGame::Init() )
 	{
 		return false;
 	}
@@ -123,8 +155,6 @@ void CSandboxGame::Shutdown()
 	Quad().Shutdown();
 	pQuadEntity			= NULL;
 	pPlayerEntity		= NULL;
-	g_pStudioAPI		= NULL;
-	g_pMaterialSystem	= NULL;
 	CGame::Shutdown();
 }
 

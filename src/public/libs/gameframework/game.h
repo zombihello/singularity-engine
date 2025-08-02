@@ -11,14 +11,19 @@
 //-----------------------------------------------------------------------------
 // Base class of the game
 //-----------------------------------------------------------------------------
-class CGame : public IGame
+class CGame : public CBaseAppSystem<IGame>
 {
 public:
-	// IGame interfaces
-	// Methods initialize and shutdown the game
-	virtual bool Init( createInterfaceFn_t pFactory ) override;
+	// IAppSystem interfaces
+	// Here's where the app systems get to learn about each other
+	virtual bool Connect( createInterfaceFn_t pFactory ) override;
+	virtual void Disconnect() override;
+
+	// Initialize and shutdown
+	virtual bool Init() override;
 	virtual void Shutdown() override;
 
+	// IGame interfaces
 	// Process one game frame
 	virtual void FrameUpdate() override;
 
@@ -49,14 +54,13 @@ class CGameAppSystems : public IGameAppSystems
 public:
 	// IGameAppSystems interfaces
 	virtual uint32 GetNum() const override;
-	virtual const achar* GetModuleName( uint32 index ) const override;
-	virtual const achar* GetInterfaceName( uint32 index ) const override;
+	virtual gameAppSystemInfo_t GetInfo( uint32 index ) const override;
 
 protected:
-	void AddAppSystem( const achar* pModuleName, const achar* pInterfaceName );
+	void AddAppSystem( const achar* pModuleName, const achar* pInterfaceName, gameAppSystemOrder_t order );
 
 private:
-	std::vector<appSystemInfo_t>		appSystems;
+	std::vector<gameAppSystemInfo_t>	appSystems;
 };
 
 #include "gameframework/game.inl"

@@ -1,8 +1,5 @@
-#include "pch_engine.h"
-#include <sstream>
-
-#include "engine/icvar.h"
-#include "filesystem/ifilesystem.h"
+#include "pch_cvar.h"
+#include "cvar/icvar.h"
 #include "stdlib/convar.h"
 
 //-----------------------------------------------------------------------------
@@ -64,10 +61,6 @@ public:
 	// Here's where the app systems get to learn about each other
 	virtual bool Connect( createInterfaceFn_t pFactory ) override;
 	virtual void Disconnect() override;
-
-	// Initialize and shutdown
-	virtual bool Init() override;
-	virtual void Shutdown() override;
 
 	// ICvar interface
 	virtual cvarDLLIdentifier_t AllocateDLLIdentifier() override;
@@ -217,7 +210,13 @@ CCvar::Connect
 */
 bool CCvar::Connect( createInterfaceFn_t pFactory )
 {
-	return ConnectStdLib( pFactory );
+	if ( !ConnectStdLib( pFactory ) )
+	{
+		return false;
+	}
+
+	ConVar_Register();
+	return true;
 }
 
 /*
@@ -227,28 +226,8 @@ CCvar::Disconnect
 */
 void CCvar::Disconnect()
 {
-	DisconnectStdLib();
-}
-
-/*
-==================
-CCvar::Init
-==================
-*/
-bool CCvar::Init()
-{
-	ConVar_Register();
-	return true;
-}
-
-/*
-==================
-CCvar::Shutdown
-==================
-*/
-void CCvar::Shutdown()
-{
 	ConVar_Unregister();
+	DisconnectStdLib();
 }
 
 /*
@@ -812,55 +791,4 @@ CCvar::SetCVarQuery
 void CCvar::SetCVarQuery( ICvarQuery* pCvarQuery )
 {
 	CCvar::pCvarQuery = pCvarQuery ? pCvarQuery : &s_CvarQuery;
-}
-
-
-/*
-==================
-Exec command
-==================
-*/
-CON_COMMAND( exec, "Execute a command file", FCVAR_NONE )
-{
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-	if ( argc < 1 || !argv )
-	{
-		Msg( "Cvar: exec <path> : Execute a command file" );
-		return;
-	}
-
-	// Open a command file
-	TRefPtr<IStreamDataReader>	file = g_pFileSystem->CreateFileReader( argv[0] );
-	if ( file )
-	{
-		// Read whole file into buffer
-		std::string		buffer;
-		buffer.resize( file->GetSize() / sizeof( achar ) );
-		file->Read( buffer.data(), file->GetSize() );
-
-		// Executing a file
-		Msg( "Cvar: exec %s: Executing", argv[0] );
-		std::stringstream	sstream( buffer );
-		std::string			line;
-		while ( std::getline( sstream, line ) )
-		{
-			// We throw away \r
-			if ( !line.empty() && line.back() == '\r' )
-			{
-				line.pop_back();
-			}
-
-			// We ignore line if it starts with C++ comment (//)
-			if ( line.rfind( "//", 0 ) == std::string::npos )
-			{
-				g_pCvar->Exec( line.c_str() );
-			}
-		}
-
-		// We are done!
-		return;
-	}
-
-	// We failed to open file, it is bad
-	Warning( "Cvar: exec %s: Failed to open file", argv[0] );
 }

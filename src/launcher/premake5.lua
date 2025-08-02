@@ -28,13 +28,14 @@ project "launcher"
         "core",
         "stdlib",
         "appframework",
-        "interfaces"
+        "interfaces",
+		"gameinfo"
     }
 
     dependson   {
         "inputsystem",
         "filesystem",
-		"engine",
+		"cvar",
         "studiorender",
         "materialsystem",
 		"resourcesystem",
@@ -44,6 +45,7 @@ project "launcher"
     ----------- LINK THIRD PARTIES -----------------
 
     ThirdParty.Link( ThirdParty.Libs.GLM )
+	ThirdParty.Link( ThirdParty.Libs.RapidJSON )
 
 	---------- PLATFORM SPECIFIC SETTINGS ---------
 	

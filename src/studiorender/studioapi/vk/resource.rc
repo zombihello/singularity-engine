@@ -1,5 +1,5 @@
 #include "stdlib/defines.h"
-#include "engine/version.h"
+#include "core/version.h"
 
 1 VERSIONINFO
 FILEVERSION     ENGINE_VERSION_MAJOR, ENGINE_VERSION_MINOR, ENGINE_VERSION_PATCH
@@ -23,7 +23,7 @@ BEGIN
 			VALUE "FileDescription", 	"Singularity Vulkan StudioAPI"
 			VALUE "FileVersion",        ENGINE_VERSION_STRING
             VALUE "InternalName",       "studioapi_vk"
-            VALUE "LegalCopyright", 	"© 2020-2025 Broken Singularity"
+            VALUE "LegalCopyright", 	"ï¿½ 2020-2025 Broken Singularity"
             VALUE "OriginalFilename", 	"studioapi_vk.dll"
             VALUE "ProductName", 		"Singularity Vulkan StudioAPI"
 			VALUE "ProductVersion",     ENGINE_VERSION_STRING

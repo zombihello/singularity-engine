@@ -6,4 +6,4 @@
 // Engine launcher interface
 //-----------------------------------------------------------------------------
 #define LAUNCHER_MAIN_FUNCNAME			"LauncherMain"
-typedef uint32 ( *launcherMainFn_t )( appInstanceHandle_t hInstance, const achar* pGameDir, const achar* pCommandLine );
+typedef uint32 ( *launcherMainFn_t )( appInstanceHandle_t hInstance, const achar* pDefaultGameDir, const achar* pCommandLine );

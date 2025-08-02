@@ -1,7 +1,7 @@
 #include "pch_core.h"
 #include "stdlib/filetools.h"
 #include "stdlib/buildnum.h"
-#include "engine/version.h"
+#include "core/version.h"
 #include "core/crashdump_private.h"
 
 #include <BugTrap.h>

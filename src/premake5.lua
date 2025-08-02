@@ -118,7 +118,7 @@ appframework                = "libs/appframework/"
 inputsystem                 = "inputsystem/"
 filesystem                  = "filesystem/"
 interfaces                  = "libs/interfaces/"
-engine						= "engine/"
+cvar						= "cvar/"
 gameinfo					= "libs/gameinfo/"
 studiorender                = "studiorender/"
 studioapi_vk 				= "studiorender/studioapi/vk/"
@@ -256,7 +256,7 @@ workspace( workspaceName )
 		include( core )
         include( inputsystem )
         include( filesystem )
-		include( engine )
+		include( cvar )
         include( studiorender )
         include( materialsystem )
 		include( studioapi_vk )

@@ -1,4 +1,4 @@
-project "engine"
+project "cvar"
     if not buildMonolithicEngine then
         kind "SharedLib"
     else
@@ -13,14 +13,14 @@ project "engine"
         "**.h", 
         "**.inl", 
         "**.cpp",
-        "../public/engine/**.h",
-        "../public/engine/**.inl",
+        "../public/cvar/**.h",
+        "../public/cvar/**.inl",
         "../public/core/**.cpp"
     }
 
     -- Enable PCH file
-    pchheader       "pch_engine.h"
-    pchsource       "pch_engine.cpp"
+    pchheader       "pch_cvar.h"
+    pchsource       "pch_cvar.cpp"
     includedirs     { "./" }
 
     vpaths      {
@@ -31,9 +31,7 @@ project "engine"
     links       {
         "core",
         "stdlib",
-		"interfaces",
-		"gameinfo",
-        "appframework"
+		"interfaces"
     }
 
 	----------- LINK THIRD PARTIES -----------------

@@ -36,7 +36,7 @@ project "resourcecompiler"
 
     dependson   {
         "filesystem",
-		"engine",
+		"cvar",
 		"texture_tool",
 		"material_tool",
         "model_tool",

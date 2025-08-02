@@ -69,4 +69,10 @@
 - [ ] Enable SIMD in GLM (#define GLM_FORCE_SSE2 and #define GLM_FORCE_ALIGNED)
 - [ ] Fix crush in Retail configuration. Need rework pending free Vulkan resources in CStudioAPIMemoryMgrVk::Shutdown
 - [X] Clear code from unnecessary Doxygen comments 
-- [ ] Move loading game.dll to launcher.dll
+- [X] Move loading game.dll to launcher.dll
+- [ ] Implement read/write config files
+- [ ] IEntityDesc shouldn't create an entity, it must be created by IMap (i.g: IMap::CreateEntity(IEntityDesc*)) 
+- [ ] Need remove IResourceSystem::UnRegisterResourceFactory and IResourceFactory::Validate
+- [ ] Remove IMap interface and a resource factory for it. A map it is a game specific resource and it must be loaded by a game
+- [ ] Add multiple log output for the logging system (like FOutputDevice in Unreal Engine)
+- [ ] Tidy up the folder src/devtools/
