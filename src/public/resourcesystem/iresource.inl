@@ -193,14 +193,3 @@ FORCEINLINE bool ResourceSystem_IsValidClassForType<IEntityDesc>( resourceType_t
 {
 	return type == RESOURCE_TYPE_ENTITY_DESC;
 }
-
-/*
-==================
-ResourceSystem_IsValidClassForType
-==================
-*/
-template<>
-FORCEINLINE bool ResourceSystem_IsValidClassForType<IMap>( resourceType_t type )
-{
-	return type == RESOURCE_TYPE_MAP;
-}

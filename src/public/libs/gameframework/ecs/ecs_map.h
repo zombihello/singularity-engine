@@ -20,7 +20,7 @@ class CEcsEntityDesc;
 //-----------------------------------------------------------------------------
 // ECS map
 //-----------------------------------------------------------------------------
-class CEcsMap : public TRefCounted<IMap>
+class CEcsMap : public IMap
 {
 public:
 	friend CEcsEntityDesc;

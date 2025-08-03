@@ -20,11 +20,9 @@ DECLARE_MULTICAST_DELEGATE_INTERFACE( IOnMapUnloaded, IMap* /* pMap */ );
 //-----------------------------------------------------------------------------
 // Map interface
 //-----------------------------------------------------------------------------
-class IMap : public IRefCounted
+class IMap
 {
 public:
-	virtual ~IMap() {}
-
 	// Spawn and destroy an entity
 	virtual IEntity* SpawnEntity( IEntityDesc* pEntityDesc, const achar* pName = "" ) = 0;
 	virtual void DestroyEntity( IEntity* pEntity ) = 0;

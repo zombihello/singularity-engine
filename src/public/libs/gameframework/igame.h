@@ -2,12 +2,25 @@
 #include "appframework/iappsystem.h"
 
 //-----------------------------------------------------------------------------
+// Forward declarations
+//-----------------------------------------------------------------------------
+class IMap;
+
+
+//-----------------------------------------------------------------------------
 // Game interface
 //-----------------------------------------------------------------------------
 #define GAME_INTERFACE_VERSION		"SGame001"
 class IGame : public IAppSystem
 {
 public:
+	// Initialize/shutdown a map and get the active map
+	// NOTE: The path to the map in the file system can be without file extension
+	virtual bool MapInit( const achar* pPath ) = 0;
+	virtual void MapShutdown() = 0;
+	virtual bool HasActiveMap() const = 0;
+	virtual IMap* GetActiveMap() const = 0;
+
 	// Process one game frame
 	virtual void FrameUpdate() = 0;
 

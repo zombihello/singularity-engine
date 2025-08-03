@@ -6,7 +6,6 @@
 #include "gameframework/ecs/ecs_component_serialize.h"
 #include "gameframework/ecs/ecs_entitydesc_factory.h"
 #include "gameframework/ecs/ecs_map.h"
-#include "gameframework/ecs/ecs_map_factory.h"
 
 //-----------------------------------------------------------------------------
 // Base class of the game
@@ -24,22 +23,25 @@ public:
 	virtual void Shutdown() override;
 
 	// IGame interfaces
+	// NOTE: The path to the map in the file system can be without file extension
+	virtual bool MapInit( const achar* pPath ) override;
+	virtual void MapShutdown() override;
+	virtual bool HasActiveMap() const override;
+	virtual IMap* GetActiveMap() const override;
+
 	// Process one game frame
 	virtual void FrameUpdate() override;
 
 	CGame();
-
-	void SetActiveMap( const TResourcePtr<IMap>& pEcsMap );
-	IMap* GetActiveMap() const;
+	CEcsMap* GetActiveEcsMap() const;
 	CEcsComponentTypes& GetEcsComponentTypes();
 
 protected:
 	CEcsComponentTypes			ecsComponentTypes;
+	CEcsMap*					pActiveEcsMap;
 
 private:
-	TResourcePtr<IMap>			pActiveMap;
 	CEcsEntityDescFactory		ecsEntityDescFactory;
-	CEcsMapFactory				ecsMapFactory;
 };
 
 // NOTE: You must implement the function to return a singleton game class

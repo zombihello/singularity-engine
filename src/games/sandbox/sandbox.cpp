@@ -133,15 +133,12 @@ bool CSandboxGame::Init()
 	extern void EcsInitModules_Sandbox();
 	EcsInitModules_Sandbox();
 
-	// Load and set as active a map
-	TResourcePtr<IMap>		pMap = g_pResourceSystem->FindOrLoadResource( "maps/test", RESOURCE_TYPE_MAP, RESOURCE_LOAD_FLAG_WITHOUT_DEFAULT );
-	if ( !pMap )
+	// Load a map
+	if ( !MapInit( "maps/test" ) )
 	{
-		Sys_Error( "Sandbox: Failed to load 'maps/test'" );
+		Sys_Error( "Failed to load 'maps/test'" );
 		return false;
 	}
-
-	SetActiveMap( pMap );
 	return true;
 }
 

@@ -2,12 +2,12 @@
 
 /*
 ==================
-CGame::SetActiveMap
+CGame::HasActiveMap
 ==================
 */
-FORCEINLINE void CGame::SetActiveMap( const TResourcePtr<IMap>& pEcsMap )
+FORCEINLINE bool CGame::HasActiveMap() const
 {
-	pActiveMap = pEcsMap;
+	return !!pActiveEcsMap;
 }
 
 /*
@@ -17,7 +17,17 @@ CGame::GetActiveMap
 */
 FORCEINLINE IMap* CGame::GetActiveMap() const
 {
-	return *pActiveMap;
+	return pActiveEcsMap;
+}
+
+/*
+==================
+CGame::GetActiveEcsMap
+==================
+*/
+FORCEINLINE CEcsMap* CGame::GetActiveEcsMap() const
+{
+	return ( CEcsMap* )GetActiveMap();
 }
 
 /*

@@ -84,7 +84,6 @@ bool CGame::Init()
 	EcsInitModules_Gameframework();
 
 	// Initialize all game-specific resource factories
-	ecsMapFactory.Init();
 	ecsEntityDescFactory.Init();
 	return true;
 }
@@ -99,16 +98,51 @@ void CGame::Shutdown()
 	// Unregister all render objects
 	g_pStudioRender->UnregisterAllObjects();
 
-	// Reset the active map
-	if ( pActiveMap )
-	{
-		pActiveMap->Reset();
-		pActiveMap = NULL;
-	}
+	// Shutdown the active map
+	MapShutdown();
 
 	// Shutdown all resource factories
 	ecsEntityDescFactory.Shutdown();
-	ecsMapFactory.Shutdown();
+}
+
+/*
+==================
+CGame::MapInit
+==================
+*/
+bool CGame::MapInit( const achar* pPath )
+{
+	// Shutdown the old map
+	MapShutdown();
+
+	// Load a new map
+	CSMAPCompiledMapDoc		smapCompiledMapDoc;
+	std::string				mapPath = S_GetFileExtension( pPath ) ? pPath : S_Sprintf( "%s.smap_c", pPath );
+	if ( !smapCompiledMapDoc.LoadFromFile( mapPath.c_str() ) )
+	{
+		Warning( "Game: Failed to load map '%s'", mapPath.c_str() );
+		return false;
+	}
+
+	pActiveEcsMap = new CEcsMap( smapCompiledMapDoc );
+	Msg( "Game: Map '%s' loaded", mapPath.c_str() );
+	return true;
+}
+
+/*
+==================
+CGame::MapShutdown
+==================
+*/
+void CGame::MapShutdown()
+{
+	// Reset the active map
+	if ( pActiveEcsMap )
+	{
+		delete pActiveEcsMap;
+		pActiveEcsMap = NULL;
+		Msg( "Game: Active map unloaded" );
+	}
 }
 
 /*
@@ -118,9 +152,9 @@ CGame::FrameUpdate
 */
 void CGame::FrameUpdate()
 {
-	if ( pActiveMap )
+	if ( pActiveEcsMap )
 	{
-		pActiveMap->Update( 0.f );
+		pActiveEcsMap->Update( 0.f );
 	}
 }
 
