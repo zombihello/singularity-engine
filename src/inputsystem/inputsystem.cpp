@@ -1,5 +1,6 @@
 #include "pch_inputsystem.h"
 #include "stdlib/convar.h"
+#include "stdlib/istreamdata.h"
 #include "cvar/icvar.h"
 #include "inputsystem/inputsystem_private.h"
 #include "inputsystem/iinputsystem.h"
@@ -7,7 +8,7 @@
 //-----------------------------------------------------------------------------
 // Global values and cvars
 //-----------------------------------------------------------------------------
-CConVar		mouse_sensitivity( "mouse_sensitivity", "0.5", "Mouse sensitivity" );
+CConVar				mouse_sensitivity( "mouse_sensitivity", "0.5", "Mouse sensitivity", FCVAR_ARCHIVE );
 
 // Table of button names
 static const achar* s_pButtonNames[] =
@@ -185,15 +186,17 @@ public:
 private:
 	static void ProcessWindowEvent( void* pUserData, const windowEvent_t& windowEvent );
 	static void ProcessInputEvent( void* pUserData, const inputEvent_t& inputEvent );
+	static void WriteConCmdsToConfigFile( void* pUserData, IStreamDataWriter* pStreamData );
 
-	bool									bRelativeMouseMode;
-	IWindowMgr*								pWindowMgr;							// A window manager that was attached the input system
-	IOnProcessWindowEvent::funcDelegate_t*	pWindowEventDelegate;
-	IOnProcessInputEvent::funcDelegate_t*	pInputEventDelegate;
-	buttonEvent_t							buttonEvents[BUTTON_CODE_COUNT];
-	vec2_t									mouseLocation;
-	vec2_t									mouseOffset;
-	std::string								binds[BUTTON_CODE_COUNT];
+	bool											bRelativeMouseMode;
+	IWindowMgr*										pWindowMgr;							// A window manager that was attached the input system
+	IOnProcessWindowEvent::funcDelegate_t*			pWindowEventDelegate;
+	IOnProcessInputEvent::funcDelegate_t*			pInputEventDelegate;
+	IOnWriteConCmdsToConfigFile::funcDelegate_t*	pWriteConCmdsDelegate;
+	buttonEvent_t									buttonEvents[BUTTON_CODE_COUNT];
+	vec2_t											mouseLocation;
+	vec2_t											mouseOffset;
+	std::string										binds[BUTTON_CODE_COUNT];
 };
 
 // Input system singleton
@@ -211,6 +214,7 @@ CInputSystem::CInputSystem()
 	, pWindowMgr( NULL )
 	, pWindowEventDelegate( NULL )
 	, pInputEventDelegate( NULL )
+	, pWriteConCmdsDelegate( NULL )
 	, mouseLocation( g_vectorZero )
 	, mouseOffset( g_vectorZero )
 {
@@ -238,8 +242,9 @@ bool CInputSystem::Connect( createInterfaceFn_t pFactory )
 	{
 		return false;
 	}
-
 	ConVar_Register();
+
+	pWriteConCmdsDelegate = g_pCvar->OnWriteConCmdsToConfigFile()->AddFunc( &CInputSystem::WriteConCmdsToConfigFile, this );
 	return true;
 }
 
@@ -251,6 +256,12 @@ CInputSystem::Disconnect
 void CInputSystem::Disconnect()
 {
 	DetachFromWindow();
+	if ( pWriteConCmdsDelegate )
+	{
+		g_pCvar->OnWriteConCmdsToConfigFile()->RemoveFunc( pWriteConCmdsDelegate );
+		pWriteConCmdsDelegate = NULL;
+	}
+
 	ConVar_Unregister();
 	DisconnectStdLib();
 }
@@ -388,6 +399,34 @@ void CInputSystem::ProcessInputEvent( void* pUserData, const inputEvent_t& input
 	case inputEvent_t::EVENT_TEXT_INPUT:
 		break;
 	}
+}
+
+/*
+==================
+CInputSystem::WriteConCmdsToConfigFile
+==================
+*/
+void CInputSystem::WriteConCmdsToConfigFile( void* pUserData, IStreamDataWriter* pStreamData )
+{
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	Assert( pUserData );
+	CInputSystem*		pInputSystem = ( CInputSystem* )pUserData;
+
+	std::string			buffer;
+	buffer += "unbindall\n";
+	for ( uint32 index = 0; index < BUTTON_CODE_COUNT; ++index )
+	{
+		const achar*	pCommand = pInputSystem->GetBindingCommand( ( buttonCode_t )index );
+		if ( !pCommand || !pCommand[0] )
+		{
+			continue;
+		}
+
+		buffer += S_Sprintf( "bind \"%s\" \"%s\"\n", pInputSystem->GetButtonName( ( buttonCode_t )index ), pCommand );
+	}
+
+	// Write the buffer into the file
+	pStreamData->Write( buffer.data(), buffer.size() * sizeof( achar ) );
 }
 
 /*

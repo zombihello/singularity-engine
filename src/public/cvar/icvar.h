@@ -2,7 +2,20 @@
 #include "appframework/iappsystem.h"
 #include "cvar/iconcmd.h"
 #include "cvar/iconvar.h"
+#include "stdlib/delegate.h"
 #include "stdlib/math/color.h"
+
+//-----------------------------------------------------------------------------
+// Forward declarations
+//-----------------------------------------------------------------------------
+class IStreamDataWriter;
+
+
+//-----------------------------------------------------------------------------
+// Cvar delegate interfaces
+//-----------------------------------------------------------------------------
+DECLARE_MULTICAST_DELEGATE_INTERFACE( IOnWriteConCmdsToConfigFile, IStreamDataWriter* /* pStreamData */ );
+
 
 //-----------------------------------------------------------------------------
 // Applications can implement this to modify behavior in ICvar
@@ -12,6 +25,16 @@ class ICvarQuery : public IAppSystem
 {
 public:
 	virtual bool AreConVarsLinkable( const IConVar* pChildVar, const IConVar* pParentVar ) = 0;
+};
+
+
+//-----------------------------------------------------------------------------
+// IConVars overrider
+//-----------------------------------------------------------------------------
+class IConVarsOverrider
+{
+public:
+	virtual void OverrideFromCommandLine() = 0;
 };
 
 
@@ -44,6 +67,15 @@ public:
 	virtual IConCmdBase* FindCommandBase( const achar* pName ) const = 0;
 	virtual IConCmd* FindCommand( const achar* pName ) const = 0;
 	virtual IConVar* FindVar( const achar* pName ) const = 0;
+
+	// Read and write a configuration file
+	virtual void ReadConfigFile( const achar* pConfigDir, bool bWriteConfigIfNotExist = true ) = 0;
+	virtual void WriteConfigFile( const achar* pConfigDir, bool bWriteDefaultConfig = false ) = 0;
+	virtual IOnWriteConCmdsToConfigFile* OnWriteConCmdsToConfigFile() const = 0;
+
+	// Override IConVars from a command line
+	virtual void OverrideConVarsFromCommandLine() = 0;
+	virtual void SetConVarsOverrider( cvarDLLIdentifier_t dllIdentifier, IConVarsOverrider* pConVarsOverrider ) = 0;
 
 	// Sets cvars containing the flags to their default value
 	virtual void ResetFlaggedVars( uint32 flags ) = 0;

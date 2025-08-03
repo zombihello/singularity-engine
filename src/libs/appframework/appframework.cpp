@@ -40,8 +40,6 @@ bool CApplication::PreInit()
 	{
 		return false;
 	}
-
-	ConVar_Register();
 	return true;
 }
 
@@ -65,6 +63,5 @@ CApplication::PostShutdown
 */
 void CApplication::PostShutdown()
 {
-	ConVar_Unregister();
 	DisconnectStdLib();
 }

@@ -13,9 +13,8 @@ typedef uint32 cvarDLLIdentifier_t;
 enum cvarFlags_t
 {
 	FCVAR_NONE		= 0,
-	FCVAR_CHEAT		= 1 << 0,
-	FCVAR_GAMEDLL	= 1 << 1,
-	FCVAR_ARCHIVE	= 1 << 2
+	FCVAR_CHEAT		= BIT( 0 ),
+	FCVAR_ARCHIVE	= BIT( 1 )
 };
 
 

@@ -9,6 +9,7 @@
 #include "studiorender/studio_renderobject_quad.h"
 #include "studiorender/studiorender.h"
 
+CConVar				r_vsync( "r_vsync", "0", "Should use vertical synchronization (VSync)", FCVAR_ARCHIVE );
 CStudioRender		g_StudioRender;
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CStudioRender, IStudioRender, STUDIORENDER_INTERFACE_VERSION, g_StudioRender );
 

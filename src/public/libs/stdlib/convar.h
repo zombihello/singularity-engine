@@ -49,7 +49,7 @@ public:
 //-----------------------------------------------------------------------------
 class CCvarLocalRegister
 {
-	friend void ConVar_Register( uint32 flags, ICvarAccessor* pAccessor );
+	friend void ConVar_Register( uint32 flags, IConVarsOverrider* pConVarsOverrider, ICvarAccessor* pAccessor );
 	friend void ConVar_Unregister();
 
 protected:
@@ -240,8 +240,9 @@ private:
 // 
 // flags - Add these flags to IConVars and IConCmds
 // pAccessor - Accessor for register IConVars and IConCmds. If NULL use default accessor
+// pConVarsOverrider - Used by ICvar to override IConVars (i.g for a command line). If NULL isn't be used
 //-----------------------------------------------------------------------------
-void ConVar_Register( uint32 flags = FCVAR_NONE, ICvarAccessor* pAccessor = NULL );
+void ConVar_Register( uint32 flags = FCVAR_NONE, IConVarsOverrider* pConVarsOverrider = NULL, ICvarAccessor* pAccessor = NULL );
 void ConVar_Unregister();
 
 #include "stdlib/convar.inl"

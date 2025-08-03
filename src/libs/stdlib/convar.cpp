@@ -33,7 +33,7 @@ static CCvarDefaultAccessor		s_CvarDefaultAccessor;
 ConVar_Register
 ==================
 */
-void ConVar_Register( uint32 flags /*= FCVAR_NONE*/, ICvarAccessor* pAccessor /*= nullptr*/ )
+void ConVar_Register( uint32 flags /*= FCVAR_NONE*/, IConVarsOverrider* pConVarsOverrider /*= NULL*/, ICvarAccessor* pAccessor /*= NULL*/ )
 {
 	if ( !g_pCvar || CCvarLocalRegister::s_bCVarsRegistered )
 	{
@@ -53,6 +53,7 @@ void ConVar_Register( uint32 flags /*= FCVAR_NONE*/, ICvarAccessor* pAccessor /*
 		CCvarLocalRegister::s_pAccessor->RegisterCommand( pCurCommand );
 		pCurCommand = pNextCommand;
 	}
+	g_pCvar->SetConVarsOverrider( CCvarLocalRegister::s_dllIdentifier, pConVarsOverrider );
 }
 
 /*
@@ -69,6 +70,8 @@ void ConVar_Unregister()
 
 	Assert( CCvarLocalRegister::s_dllIdentifier >= 0 );
 	g_pCvar->UnregisterCommands( CCvarLocalRegister::s_dllIdentifier );
+	g_pCvar->SetConVarsOverrider( CCvarLocalRegister::s_dllIdentifier, NULL );
+
 	CCvarLocalRegister::s_dllIdentifier		= -1;
 	CCvarLocalRegister::s_bCVarsRegistered	= false;
 	CCvarLocalRegister::s_pAccessor			= NULL;

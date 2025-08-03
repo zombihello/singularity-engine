@@ -31,7 +31,7 @@ bool CGame::Connect( createInterfaceFn_t pFactory )
 	{
 		return false;
 	}
-	ConVar_Register( FCVAR_GAMEDLL );
+	ConVar_Register();
 
 	// Get the window manager
 	g_pWindowMgr = ( IWindowMgr* )pFactory( WINDOWMGR_INTERFACE_VERSION );

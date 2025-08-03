@@ -1,6 +1,17 @@
 #include "pch_cvar.h"
+#include "filesystem/ifilesystem.h"
 #include "cvar/icvar.h"
 #include "stdlib/convar.h"
+
+#define CVAR_CONFIG_NAME				"config"
+#define CVAR_DEFAULT_CONFIG_NAME		"config_default"
+
+
+//-----------------------------------------------------------------------------
+// Cvar delegates
+//-----------------------------------------------------------------------------
+DECLARE_MULTICAST_DELEGATE( COnWriteConCmdsToConfigFile, IStreamDataWriter* /* pStreamData */ );
+
 
 //-----------------------------------------------------------------------------
 // Cheat cvar
@@ -61,6 +72,7 @@ public:
 	// Here's where the app systems get to learn about each other
 	virtual bool Connect( createInterfaceFn_t pFactory ) override;
 	virtual void Disconnect() override;
+	virtual void Shutdown() override;
 
 	// ICvar interface
 	virtual cvarDLLIdentifier_t AllocateDLLIdentifier() override;
@@ -74,6 +86,15 @@ public:
 	virtual IConCmdBase* FindCommandBase( const achar* pName ) const override;
 	virtual IConCmd* FindCommand( const achar* pName ) const override;
 	virtual IConVar* FindVar( const achar* pName ) const override;
+
+	// Read and write a configuration file
+	virtual void ReadConfigFile( const achar* pConfigDir, bool bWriteConfigIfNotExist = true ) override;
+	virtual void WriteConfigFile( const achar* pConfigDir, bool bWriteDefaultConfig = false ) override;
+	virtual IOnWriteConCmdsToConfigFile* OnWriteConCmdsToConfigFile() const override;
+
+	// Override IConVars from a command line
+	virtual void OverrideConVarsFromCommandLine() override;
+	virtual void SetConVarsOverrider( cvarDLLIdentifier_t dllIdentifier, IConVarsOverrider* pConVarsOverrider ) override;
 
 	// Sets cvars containing the flags to their default value
 	virtual void ResetFlaggedVars( uint32 flags ) override;
@@ -108,14 +129,16 @@ private:
 	// of the next command after the separator, or NULL if there is nothing else left
 	bool ParseCommand( const achar*& pCommand, const achar separator = '$' );
 
-	IConCmdBase*				pConCmdList;
-	ICvarQuery*					pCvarQuery;
-	cvarDLLIdentifier_t			nextDLLIdentifier;
-	conVarChangeCallbackFn_t	pGlobalChangeCallbackFn;
-	IConsoleDisplayFunc*		pConsoleDisplayFunc;
-	achar						commandArgvBuffer[COMMAND_MAX_LENGTH];
-	uint32						commandArgc;
-	const achar*				pCommandArgv[COMMAND_MAX_ARGC];
+	IConCmdBase*													pConCmdList;
+	ICvarQuery*														pCvarQuery;
+	cvarDLLIdentifier_t												nextDLLIdentifier;
+	conVarChangeCallbackFn_t										pGlobalChangeCallbackFn;
+	IConsoleDisplayFunc*											pConsoleDisplayFunc;
+	achar															commandArgvBuffer[COMMAND_MAX_LENGTH];
+	uint32															commandArgc;
+	const achar*													pCommandArgv[COMMAND_MAX_ARGC];
+	std::unordered_map<cvarDLLIdentifier_t, IConVarsOverrider*>		conVarsOverriderDict;
+	COnWriteConCmdsToConfigFile										onWriteConCmdsToConfigFile;
 };
 
 static CCvar		s_Cvar;
@@ -228,6 +251,17 @@ void CCvar::Disconnect()
 {
 	ConVar_Unregister();
 	DisconnectStdLib();
+}
+
+/*
+==================
+CCvar::Shutdown
+==================
+*/
+void CCvar::Shutdown()
+{
+	nextDLLIdentifier = 0;
+	conVarsOverriderDict.clear();
 }
 
 /*
@@ -677,6 +711,112 @@ IConVar* CCvar::FindVar( const achar* pName ) const
 	}
 
 	return ( IConVar* )pConVar;
+}
+
+/*
+==================
+CCvar::ReadConfigFile
+==================
+*/
+void CCvar::ReadConfigFile( const achar* pConfigDir, bool bWriteConfigIfNotExist /* = true */ )
+{
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	std::string		configPath = S_Sprintf( "%s/" CVAR_CONFIG_NAME ".cfg", pConfigDir );
+	if ( g_pFileSystem->IsFileExists( configPath.c_str() ) )
+	{
+		g_pCvar->Exec( S_Sprintf( "exec %s", configPath.c_str() ).c_str() );
+		return;
+	}
+
+	// Otherwise try execute a default config if the one is exist
+	configPath = S_Sprintf( "%s/" CVAR_DEFAULT_CONFIG_NAME ".cfg", pConfigDir );
+	if ( g_pFileSystem->IsFileExists( configPath.c_str() ) )
+	{
+		g_pCvar->Exec( S_Sprintf( "exec %s", configPath.c_str() ).c_str() );
+	}
+
+	// Save a new config if it need
+	if ( bWriteConfigIfNotExist )
+	{
+		WriteConfigFile( pConfigDir );
+	}
+}
+
+/*
+==================
+CCvar::WriteConfigFile
+==================
+*/
+void CCvar::WriteConfigFile( const achar* pConfigDir, bool bWriteDefaultConfig /* = false */ )
+{
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+
+	// Open file to write
+	std::string					configPath = S_Sprintf( !bWriteDefaultConfig ? "%s/" CVAR_CONFIG_NAME ".cfg" : "%s/" CVAR_DEFAULT_CONFIG_NAME ".cfg", pConfigDir );
+	TRefPtr<IStreamDataWriter>	pFile = g_pFileSystem->CreateFileWriter( configPath.c_str() );
+	if ( !pFile )
+	{
+		Warning( "Cvar: Failed to create file configuration '%s'", configPath.c_str() );
+		return;
+	}
+
+	// Broadcast an event that causes other subsystems to write concmds to the file (i.g: 'bind q quit', 'exec subconfig.cfg')
+	onWriteConCmdsToConfigFile.Broadcast( pFile );
+
+	// Write cvars
+	std::string		buffer;
+	for ( IConCmdBase* pVar = g_pCvar->GetCommands(); pVar; pVar = pVar->GetNext() )
+	{
+		// Skip commands and cvars that not have FCVAR_ARCHIVE
+		if ( pVar->IsCommand() || !pVar->IsFlagSet( FCVAR_ARCHIVE ) )
+		{
+			continue;;
+		}
+
+		buffer += S_Sprintf( "%s \"%s\"\n", pVar->GetName(), ( ( IConVar* )pVar )->GetString() );
+	}
+
+	// Write the buffer into the file
+	pFile->Write( buffer.data(), buffer.size() * sizeof( achar ) );
+}
+
+/*
+==================
+CCvar::OnWriteConfiguration
+==================
+*/
+IOnWriteConCmdsToConfigFile* CCvar::OnWriteConCmdsToConfigFile() const
+{
+	return ( IOnWriteConCmdsToConfigFile* )&onWriteConCmdsToConfigFile;
+}
+
+/*
+==================
+CCvar::OverrideConVarsFromCommandLine
+==================
+*/
+void CCvar::OverrideConVarsFromCommandLine()
+{
+	for ( auto it = conVarsOverriderDict.begin(), itEnd = conVarsOverriderDict.end(); it != itEnd; ++it )
+	{
+		it->second->OverrideFromCommandLine();
+	}
+}
+
+/*
+==================
+CCvar::SetConVarsOverrider
+==================
+*/
+void CCvar::SetConVarsOverrider( cvarDLLIdentifier_t dllIdentifier, IConVarsOverrider* pConVarsOverrider )
+{
+	if ( !pConVarsOverrider )
+	{
+		conVarsOverriderDict.erase( dllIdentifier );
+		return;
+	}
+
+	conVarsOverriderDict[dllIdentifier] = pConVarsOverrider;
 }
 
 /*

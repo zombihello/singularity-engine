@@ -70,7 +70,7 @@
 - [ ] Fix crush in Retail configuration. Need rework pending free Vulkan resources in CStudioAPIMemoryMgrVk::Shutdown
 - [X] Clear code from unnecessary Doxygen comments 
 - [X] Move loading game.dll to launcher.dll
-- [ ] Implement read/write config files
+- [X] Rework read/write config files
 - [ ] IEntityDesc shouldn't create an entity, it must be created by IMap (i.g: IMap::CreateEntity(IEntityDesc*)) 
 - [ ] Need remove IResourceSystem::UnRegisterResourceFactory and IResourceFactory::Validate
 - [ ] Remove IMap interface and a resource factory for it. A map it is a game specific resource and it must be loaded by a game

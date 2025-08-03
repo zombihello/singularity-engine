@@ -17,6 +17,11 @@
 #include "gameframework/igame.h"
 #include "gameinfo/gameinfo.h"
 
+CConVar		window_width( "window_width", "1280", "Window width", FCVAR_ARCHIVE );
+CConVar		window_height( "window_height", "720", "Window height", FCVAR_ARCHIVE );
+CConVar		fullscreen( "fullscreen", "0", "Is need open the window in fullscreen mode", FCVAR_ARCHIVE );
+
+
 #if ENABLE_LOGGING
 #include <filesystem>
 static FILE*		s_pLogFile = NULL;		// Launcher's log file
@@ -77,6 +82,17 @@ void Launcher_InitLogOutput()
 	Sys_SetLogOutputFunc( Launcher_LogOutput );
 #endif // ENABLE_LOGGING
 }
+
+
+//-----------------------------------------------------------------------------
+// IConVars overrider
+//-----------------------------------------------------------------------------
+class CConVarsOverrider : public IConVarsOverrider
+{
+public:
+	virtual void OverrideFromCommandLine() override;
+};
+static CConVarsOverrider	s_conVarsOverrider;
 
 
 //-----------------------------------------------------------------------------
@@ -146,6 +162,62 @@ private:
 	TRefPtr<IStudioViewport>				pStudioViewport;
 	IOnProcessWindowEvent::funcDelegate_t*	pProcessWindowEventDelegate;
 };
+
+
+/*
+==================
+CConVarsOverrider::OverrideFromCommandLine
+==================
+*/
+void CConVarsOverrider::OverrideFromCommandLine()
+{
+	ICommandLine*	pCommandLine = CommandLine();
+
+	// Check for windowed mode command line override
+	if ( pCommandLine->HasParam( "windowed" ) || pCommandLine->HasParam( "window" ) )
+	{
+		fullscreen.SetInt( 0 );
+	}
+	// Check for fullscreen override
+	else if ( pCommandLine->HasParam( "full" ) || pCommandLine->HasParam( "fullscreen" ) )
+	{
+		fullscreen.SetInt( 1 );
+	}
+
+	// Get width
+	const achar*	pWidthParam = NULL;
+	if ( pCommandLine->HasParam( "width" ) )
+	{
+		pWidthParam = "width";
+	}
+	else if ( pCommandLine->HasParam( "w" ) )
+	{
+		pWidthParam = "w";
+	}
+
+	// Override width
+	if ( pWidthParam )
+	{
+		window_width.SetString( pCommandLine->GetFirstValue( pWidthParam ) );
+	}
+
+	// Get height
+	const achar*	pHeightParam = NULL;
+	if ( pCommandLine->HasParam( "height" ) )
+	{
+		pHeightParam = "height";
+	}
+	else if ( pCommandLine->HasParam( "h" ) )
+	{
+		pHeightParam = "h";
+	}
+
+	// Override height
+	if ( pHeightParam )
+	{
+		window_height.SetString( pCommandLine->GetFirstValue( pHeightParam ) );
+	}
+}
 
 
 /*
@@ -360,6 +432,9 @@ CSingularityAppSystemGroup::PreInit
 */
 bool CSingularityAppSystemGroup::PreInit()
 {
+	// Register cvars
+	ConVar_Register( FCVAR_NONE, &s_conVarsOverrider );
+
 	// Setup application information for the crash dump
 	crashDumpAppInfo_t				crashDumpAppInfo = {};
 	crashDumpAppInfo.pAppName		= gameInfo.GetGame().c_str();
@@ -368,12 +443,12 @@ bool CSingularityAppSystemGroup::PreInit()
 	crashDumpAppInfo.pSupportURL	= gameInfo.GetSupportURL().c_str();
 	CrashDump_SetAppInfo( crashDumpAppInfo );
 
-	// TODO BS yehor.pohuliaka - Added next thinks: 
-	// - ReadConfiguration( "//GAME/cfg/config.cfg" )
-	// - OverrideConfigurationFromCommandLine()
+	// Read file configuration and override it from the command line
+	g_pCvar->ReadConfigFile( "//GAME/cfg" );
+	g_pCvar->OverrideConVarsFromCommandLine();
 
 	// Create a hidden window for we can init render context and other things links with the one
-	if ( !g_pWindowMgr->Create( gameInfo.GetGame().c_str(), 1280, 720, WINDOW_STYLE_DEFAULT | WINDOW_STYLE_HIDDEN ) )
+	if ( !g_pWindowMgr->Create( gameInfo.GetGame().c_str(), window_width.GetInt(), window_height.GetInt(), WINDOW_STYLE_DEFAULT | WINDOW_STYLE_HIDDEN ) )
 	{
 		Sys_Error( "Failed to create a window" );
 		return false;
@@ -404,9 +479,11 @@ bool CSingularityAppSystemGroup::PostInit()
 
 	uint32		windowWidth = 0;
 	uint32		windowHeight = 0;
+	CConVarRef	r_vsyncRef( "r_vsync" );
 	g_pWindowMgr->GetSize( windowWidth, windowHeight );
+	g_pWindowMgr->SetFullscreen( fullscreen.GetBool() );
 	pStudioViewport->SetViewportClient( &gameViewportClient );
-	pStudioViewport->Init( g_pWindowMgr->GetHandle(), windowWidth, windowHeight );
+	pStudioViewport->Init( g_pWindowMgr->GetHandle(), windowWidth, windowHeight, r_vsyncRef.IsValid() ? r_vsyncRef->GetBool() : false );
 	g_pWindowMgr->ShowWindow();
 	return true;
 }
@@ -473,6 +550,9 @@ void CSingularityAppSystemGroup::PreShutdown()
 
 	// Close the window
 	g_pWindowMgr->Close();
+
+	// Unregister cvars
+	ConVar_Unregister();
 }
 
 /*
