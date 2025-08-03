@@ -100,10 +100,9 @@ private:
 	VkSurfaceFormatKHR								vkSurfaceFormat;
 	ivec2_t											size;
 	uint32											currentImageIndex;
-	uint32											currentSemaphoreIndex;
 	COnStudioAPIVkShutdown::funcDelegate_t*			pStudioAPIVkShutdownDelegate;
 	COnReCreated									onReCreated;
-	std::vector<CStudioAPISemaphoreVk*>				imageAvailableSemaphores;
+	CStudioAPISemaphoreVk*							pImageAvailableSemaphores[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];
 	std::vector<CStudioAPISemaphoreVk*>				renderFinishedSemaphores;
 	std::vector<CStudioAPISwapChainImageVk*>		swapChainImages;
 };
