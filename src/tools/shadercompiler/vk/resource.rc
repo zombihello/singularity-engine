@@ -23,7 +23,7 @@ BEGIN
 			VALUE "FileDescription", 	"Singularity Vulkan Shader Compiler"
 			VALUE "FileVersion",        ENGINE_VERSION_STRING
             VALUE "InternalName",       "shadercompiler_vk"
-            VALUE "LegalCopyright", 	"ï¿½ 2020-2025 Broken Singularity"
+            VALUE "LegalCopyright", 	"© 2020-2025 Broken Singularity"
             VALUE "OriginalFilename", 	"shadercompiler_vk.dll"
             VALUE "ProductName", 		"Singularity Vulkan Shader Compiler"
 			VALUE "ProductVersion",     ENGINE_VERSION_STRING

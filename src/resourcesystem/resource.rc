@@ -23,7 +23,7 @@ BEGIN
 			VALUE "FileDescription", 	"Singularity Resource System"
 			VALUE "FileVersion",        ENGINE_VERSION_STRING
             VALUE "InternalName",       "resourcesystem"
-            VALUE "LegalCopyright", 	"ï¿½ 2020-2025 Broken Singularity"
+            VALUE "LegalCopyright", 	"© 2020-2025 Broken Singularity"
             VALUE "OriginalFilename", 	"resourcesystem.dll"
             VALUE "ProductName", 		"Singularity Resource System"
 			VALUE "ProductVersion",     ENGINE_VERSION_STRING

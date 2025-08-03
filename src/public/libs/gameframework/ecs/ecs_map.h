@@ -29,6 +29,10 @@ public:
 	~CEcsMap();
 
 	// IMap interface
+	// Spawn and destroy an entity
+	virtual IEntity* SpawnEntity( IEntityDesc* pEntityDesc, const achar* pName = "" ) override;
+	virtual void DestroyEntity( IEntity* pEntity ) override;
+
 	// Resets the map to initial state to before any updates on the map
 	virtual void Reset() override;
 	virtual void Update( float deltaTime ) override;

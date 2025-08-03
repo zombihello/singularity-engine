@@ -23,7 +23,7 @@ BEGIN
 			VALUE "FileDescription", 	"Singularity Launcher"
 			VALUE "FileVersion",        ENGINE_VERSION_STRING
             VALUE "InternalName",       "launcher"
-            VALUE "LegalCopyright", 	"ï¿½ 2020-2025 Broken Singularity"
+            VALUE "LegalCopyright", 	"© 2020-2025 Broken Singularity"
             VALUE "OriginalFilename", 	"launcher.dll"
             VALUE "ProductName", 		"Singularity Launcher"
 			VALUE "ProductVersion",     ENGINE_VERSION_STRING

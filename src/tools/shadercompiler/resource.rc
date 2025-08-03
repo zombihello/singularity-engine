@@ -23,7 +23,7 @@ BEGIN
 			VALUE "FileDescription", 	"Singularity Shader Compiler"
 			VALUE "FileVersion",        ENGINE_VERSION_STRING
             VALUE "InternalName",       "shadercompiler"
-            VALUE "LegalCopyright", 	"ï¿½ 2020-2025 Broken Singularity"
+            VALUE "LegalCopyright", 	"© 2020-2025 Broken Singularity"
             VALUE "OriginalFilename", 	"shadercompiler.exe"
             VALUE "ProductName", 		"Singularity Shader Compiler"
 			VALUE "ProductVersion",     ENGINE_VERSION_STRING

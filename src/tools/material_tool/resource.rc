@@ -23,7 +23,7 @@ BEGIN
 			VALUE "FileDescription", 	"Singularity Material Tool"
 			VALUE "FileVersion",        ENGINE_VERSION_STRING
             VALUE "InternalName",       "material_tool"
-            VALUE "LegalCopyright", 	"ï¿½ 2020-2025 Broken Singularity"
+            VALUE "LegalCopyright", 	"© 2020-2025 Broken Singularity"
             VALUE "OriginalFilename", 	"material_tool.dll"
             VALUE "ProductName", 		"Singularity Material Tool"
 			VALUE "ProductVersion",     ENGINE_VERSION_STRING

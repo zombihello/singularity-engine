@@ -23,7 +23,7 @@ BEGIN
 			VALUE "FileDescription", 	"Singularity Map Tool"
 			VALUE "FileVersion",        ENGINE_VERSION_STRING
             VALUE "InternalName",       "map_tool"
-            VALUE "LegalCopyright", 	"ï¿½ 2020-2025 Broken Singularity"
+            VALUE "LegalCopyright", 	"© 2020-2025 Broken Singularity"
             VALUE "OriginalFilename", 	"map_tool.dll"
             VALUE "ProductName", 		"Singularity Map Tool"
 			VALUE "ProductVersion",     ENGINE_VERSION_STRING

@@ -15,6 +15,10 @@ class CEcsMap;
 class CEcsEntity : public TRefCounted<IEntity>
 {
 public:
+	// IEntity interface
+	virtual void Destroy() override;
+	virtual bool IsValid() const override;
+
 	CEcsEntity( ecsEntity_t ecsEntity, CEcsMap* pEcsMap );
 	~CEcsEntity();
 

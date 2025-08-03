@@ -6,19 +6,23 @@
 #include "gameframework/ientitydesc.h"
 
 //-----------------------------------------------------------------------------
+// Forward declarations
+//-----------------------------------------------------------------------------
+class CEcsMap;
+
+
+//-----------------------------------------------------------------------------
 // ECS entity descriptor
 // By this you can create an ECS entity
 //-----------------------------------------------------------------------------
 class CEcsEntityDesc : public TRefCounted<IEntityDesc>
 {
 public:
-	// IEntityDesc interface
-	virtual IEntity* Create( IMap* pMap, const achar* pName = "" ) const override;
-
 	CEcsEntityDesc();
 	CEcsEntityDesc( const CSENTCompiledEntityDescDoc& sentCompiledDoc );
 	~CEcsEntityDesc();
 
+	ecsEntity_t GetEcsPrefab( CEcsMap* pEcsMap );
 	void Clear();
 
 private:

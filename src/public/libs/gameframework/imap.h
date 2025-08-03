@@ -6,6 +6,7 @@
 // Forward declarations
 //-----------------------------------------------------------------------------
 class IEntity;
+class IEntityDesc;
 class IMap;
 
 
@@ -23,6 +24,10 @@ class IMap : public IRefCounted
 {
 public:
 	virtual ~IMap() {}
+
+	// Spawn and destroy an entity
+	virtual IEntity* SpawnEntity( IEntityDesc* pEntityDesc, const achar* pName = "" ) = 0;
+	virtual void DestroyEntity( IEntity* pEntity ) = 0;
 
 	// Resets the map to initial state to before any updates on the map
 	virtual void Reset() = 0;

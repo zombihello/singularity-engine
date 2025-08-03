@@ -12,6 +12,7 @@ void CEcsMapFactory::Init()
 {
 	// Register the factory in the resource system
 	Assert( g_pResourceSystem );
+	flags |= GetDefaultFlags();
 	g_pResourceSystem->RegisterResourceFactory( RESOURCE_TYPE_MAP, this );
 
 	// Initialize the default map
@@ -30,6 +31,7 @@ CEcsMapFactory::Shutdown
 void CEcsMapFactory::Shutdown()
 {
 	// Unregister the factory from the resource system
+	flags |= RESOURCE_FACTORY_FLAG_NOT_USED;
 	g_pResourceSystem->UnRegisterResourceFactory( RESOURCE_TYPE_MAP );
 
 	// Remove the default map
@@ -90,13 +92,5 @@ CEcsMapFactory::GetFormatType
 */
 const achar* CEcsMapFactory::GetFormatType() const
 {
-	return "SMAP_ECS";
+	return "SMAP";
 }
-
-/*
-==================
-CEcsMapFactory::Validate
-==================
-*/
-void CEcsMapFactory::Validate() const
-{}

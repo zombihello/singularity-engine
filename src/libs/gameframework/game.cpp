@@ -83,7 +83,7 @@ bool CGame::Init()
 	extern void EcsInitModules_Gameframework();
 	EcsInitModules_Gameframework();
 
-	// Initialize all resource factories
+	// Initialize all game-specific resource factories
 	ecsMapFactory.Init();
 	ecsEntityDescFactory.Init();
 	return true;

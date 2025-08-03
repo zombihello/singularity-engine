@@ -161,20 +161,20 @@ void CEcsEntityDesc::Clear()
 CEcsEntityDesc::Create
 ==================
 */
-IEntity* CEcsEntityDesc::Create( IMap* pMap, const achar* pName /* = "" */ ) const
+ecsEntity_t CEcsEntityDesc::GetEcsPrefab( CEcsMap* pEcsMap )
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_SCENE )
-	Assert( pMap );
+	Assert( pEcsMap );
 	
-	CEcsWorld&		ecsWorld = ( ( CEcsMap* )pMap )->GetEcsWorld();
-	if ( lastUsedEcsPrefabIdx == INVALID_INDEX || ecsPrefabs[lastUsedEcsPrefabIdx].pEcsMap != pMap )
+	CEcsWorld&		ecsWorld = pEcsMap->GetEcsWorld();
+	if ( lastUsedEcsPrefabIdx == INVALID_INDEX || ecsPrefabs[lastUsedEcsPrefabIdx].pEcsMap != pEcsMap )
 	{
 		// Try to find an already created prefab
 		uint32	foundEcsPrefabIdx = INVALID_INDEX;
 		for ( uint32 ecsPrefabIdx = 0, numEcsPrefabs = ( uint32 )ecsPrefabs.size(); ecsPrefabIdx < numEcsPrefabs; ++ecsPrefabIdx )
 		{
 			const ecsPrefab_t&	ecsPrefab = ecsPrefabs[ecsPrefabIdx];
-			if ( ecsPrefab.pEcsMap == pMap )
+			if ( ecsPrefab.pEcsMap == pEcsMap )
 			{
 				foundEcsPrefabIdx = ecsPrefabIdx;
 				break;
@@ -184,13 +184,9 @@ IEntity* CEcsEntityDesc::Create( IMap* pMap, const achar* pName /* = "" */ ) con
 		// Create a new ECS prefab if it wasn't found or isn't valid
 		if ( foundEcsPrefabIdx == INVALID_INDEX || !ecsWorld.IsValidEntity( ecsPrefabs[foundEcsPrefabIdx].ecsEntity ) )
 		{
-			lastUsedEcsPrefabIdx = CreateEcsPrefab( ( CEcsMap* )pMap, S_Sprintf( "ecs_prefab_%s", guid.AsString().c_str() ).c_str(), foundEcsPrefabIdx );
+			lastUsedEcsPrefabIdx = CreateEcsPrefab( pEcsMap, S_Sprintf( "ecs_prefab_%s", guid.AsString().c_str() ).c_str(), foundEcsPrefabIdx );
 		}
 	}
 
-	// Create an ECS entity
-	const ecsPrefab_t&		ecsPrefab	= ecsPrefabs[lastUsedEcsPrefabIdx];
-	TRefPtr<CEcsEntity>		pEcsEntity	= new CEcsEntity( ecsWorld.CreateEntity( pName, ecsPrefab.ecsEntity ), ecsPrefab.pEcsMap );
-	ecsPrefab.pEcsMap->ecsEntities.emplace_back( pEcsEntity );
-	return pEcsEntity;
+	return ecsPrefabs[lastUsedEcsPrefabIdx].ecsEntity;
 }

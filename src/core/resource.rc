@@ -23,7 +23,7 @@ BEGIN
 			VALUE "FileDescription", 	"Singularity Core"
 			VALUE "FileVersion",        ENGINE_VERSION_STRING
             VALUE "InternalName",       "core"
-            VALUE "LegalCopyright", 	"ï¿½ 2020-2025 Broken Singularity"
+            VALUE "LegalCopyright", 	"© 2020-2025 Broken Singularity"
             VALUE "OriginalFilename", 	"core.dll"
             VALUE "ProductName", 		"Singularity Core"
 			VALUE "ProductVersion",     ENGINE_VERSION_STRING

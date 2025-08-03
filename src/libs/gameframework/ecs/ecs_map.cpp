@@ -2,6 +2,7 @@
 #include "resourcesystem/iresourcesystem.h"
 #include "gameframework/ientitydesc.h"
 #include "gameframework/game.h"
+#include "gameframework/ecs/ecs_entitydesc.h"
 #include "gameframework/ecs/ecs_map.h"
 
 /*
@@ -57,7 +58,50 @@ void CEcsMap::Init( const CSMAPCompiledMapDoc& smapCompiledDoc )
 			continue;
 		}
 
-		pEntityDesc->Create( this, smapEntity.GetName() );
+		SpawnEntity( *pEntityDesc, smapEntity.GetName() );
+	}
+}
+
+/*
+==================
+CEcsMap::SpawnEntity
+==================
+*/
+IEntity* CEcsMap::SpawnEntity( IEntityDesc* pEntityDesc, const achar* pName /* = "" */ )
+{
+	TRefPtr<CEcsEntity>		pNewEcsEntity;
+	if ( pEntityDesc )
+	{
+		CEcsEntityDesc*		pEcsEntityDesc = ( CEcsEntityDesc* )pEntityDesc;
+		pNewEcsEntity		= new CEcsEntity( ecsWorld.CreateEntity( pName, pEcsEntityDesc->GetEcsPrefab( this ) ), this );
+		ecsEntities.emplace_back( pNewEcsEntity );
+	}
+	else
+	{
+		Warning( "Game: Failed to spawn entity '%s', its descriptor isn't valid", pName );
+	}
+
+	return pNewEcsEntity;
+}
+
+/*
+==================
+CEcsMap::DestroyEntity
+==================
+*/
+void CEcsMap::DestroyEntity( IEntity* pEntity )
+{
+	if ( pEntity )
+	{
+		CEcsEntity*		pEcsEntity = ( CEcsEntity* )pEntity;
+		for ( uint32 index = 0, count = ( uint32 )ecsEntities.size(); index < count; ++index )
+		{
+			if ( ecsEntities[index] == pEcsEntity )
+			{
+				pEcsEntity->Destroy();
+				ecsEntities.erase( ecsEntities.begin() + index );
+			}
+		}
 	}
 }
 

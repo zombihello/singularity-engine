@@ -14,6 +14,7 @@ void CTextureFactory::Init()
 {
 	// Register the factory in the resource system
 	Assert( g_pResourceSystem );
+	flags = GetDefaultFlags();
 	g_pResourceSystem->RegisterResourceFactory( RESOURCE_TYPE_TEXTURE, this );
 
 	// Initialize a default texture
@@ -48,6 +49,7 @@ CTextureFactory::Shutdown
 void CTextureFactory::Shutdown()
 {
 	// Unregister the factory from the resource system
+	flags |= RESOURCE_FACTORY_FLAG_NOT_USED;
 	g_pResourceSystem->UnRegisterResourceFactory( RESOURCE_TYPE_TEXTURE );
 
 	// Remove the default texture
@@ -136,11 +138,3 @@ const achar* CTextureFactory::GetFormatType() const
 {
 	return "STEX";
 }
-
-/*
-==================
-CTextureFactory::Validate
-==================
-*/
-void CTextureFactory::Validate() const
-{}

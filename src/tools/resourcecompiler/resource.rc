@@ -23,7 +23,7 @@ BEGIN
 			VALUE "FileDescription", 	"Singularity Resource Compiler"
 			VALUE "FileVersion",        ENGINE_VERSION_STRING
             VALUE "InternalName",       "resourcecompiler"
-            VALUE "LegalCopyright", 	"ï¿½ 2020-2025 Broken Singularity"
+            VALUE "LegalCopyright", 	"© 2020-2025 Broken Singularity"
             VALUE "OriginalFilename", 	"resourcecompiler.exe"
             VALUE "ProductName", 		"Singularity Resource Compiler"
 			VALUE "ProductVersion",     ENGINE_VERSION_STRING

@@ -23,7 +23,7 @@ BEGIN
 			VALUE "FileDescription", 	"Singularity ECS Compiler"
 			VALUE "FileVersion",        ENGINE_VERSION_STRING
             VALUE "InternalName",       "ecscompiler"
-            VALUE "LegalCopyright", 	"ï¿½ 2020-2025 Broken Singularity"
+            VALUE "LegalCopyright", 	"© 2020-2025 Broken Singularity"
             VALUE "OriginalFilename", 	"ecscompiler.exe"
             VALUE "ProductName", 		"Singularity ECS Compiler"
 			VALUE "ProductVersion",     ENGINE_VERSION_STRING
