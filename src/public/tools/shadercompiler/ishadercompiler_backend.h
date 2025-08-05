@@ -1,7 +1,5 @@
-#ifndef ISHADERCOMPILER_BACKEND_H
-#define ISHADERCOMPILER_BACKEND_H
-
-#include "core/types.h"
+#pragma once
+#include "stdlib/types.h"
 #include "stdlib/interface.h"
 #include "studiorender/studioapi/istudioapi_shader.h"
 
@@ -54,5 +52,3 @@ public:
 	virtual bool CompileShader( const achar* pSrcFileName, const achar* pFunctionName, studioAPIShaderType_t type, IShaderCompilerEnvironment* pEnvironment, IShaderCompilerOutput* pOutput ) = 0;
 	virtual const achar* GetShaderPlatform() const = 0;
 };
-
-#endif // !ISHADERCOMPILER_BACKEND_H

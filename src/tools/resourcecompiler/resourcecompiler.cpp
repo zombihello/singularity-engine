@@ -8,57 +8,68 @@
 #include "sentdoc/sent_source_doc.h"
 #include "smapdoc/smap_source_doc.h"
 #include "filesystem/ifilesystem.h"
-#include "engine/icvar.h"
-#include "resourcesystem/iresource.h"
+#include "cvar/icvar.h"
 #include "tools/resource_tools/itexture_tool.h"
 #include "tools/resource_tools/imaterial_tool.h"
 #include "tools/resource_tools/imodel_tool.h"
 #include "tools/resource_tools/ientitydesc_tool.h"
 #include "tools/resource_tools/imap_tool.h"
-#include "appframework/iappsystemgroup.h"
+#include "appframework/appframework.h"
 
-// Table of resource types by script file extension
+// Resource source types
+enum resourceSourceType_t
+{
+	RESOURCE_SOURCE_TYPE_MATERIAL,
+	RESOURCE_SOURCE_TYPE_TEXTURE,
+	RESOURCE_SOURCE_TYPE_MODEL,
+	RESOURCE_SOURCE_TYPE_ENTITY_DESC,
+	RESOURCE_SOURCE_TYPE_MAP,
+	RESOURCE_SOURCE_NUM_TYPES
+};
+
+
+// Table of source resource types by script file extension
 static const achar* s_pScriptFileExtensions[] =
 {
-	"smat",		// RESOURCE_TYPE_MATERIAL
-	"stex",		// RESOURCE_TYPE_TEXTURE
-	"smdl",		// RESOURCE_TYPE_MODEL
-	"sent",		// RESOURCE_TYPE_ENTITY_DESC
-	"smap"		// RESOURCE_TYPE_MAP
+	"smat",					// RESOURCE_SOURCE_TYPE_MATERIAL
+	"stex",					// RESOURCE_SOURCE_TYPE_TEXTURE
+	"smdl",					// RESOURCE_SOURCE_TYPE_MODEL
+	"sent",					// RESOURCE_SOURCE_TYPE_ENTITY_DESC
+	"smap"					// RESOURCE_SOURCE_TYPE_MAP
 };
-static_assert( RESOURCE_NUM_TYPES == ARRAYSIZE( s_pScriptFileExtensions ), "Array size 's_pScriptFileExtensions' must be equal to RESOURCE_NUM_TYPES" );
+static_assert( RESOURCE_SOURCE_NUM_TYPES == ARRAYSIZE( s_pScriptFileExtensions ), "Array size 's_pScriptFileExtensions' must be equal to RESOURCE_SOURCE_NUM_TYPES" );
 
-// Table for convert resourceType_t to text
-static const achar* s_pResourceTypeNames[] =
+// Table for convert resourceSourceType_t to text
+static const achar* s_pResourceSourceTypeNames[] =
 {
-	"material",				// RESOURCE_TYPE_MATERIAL
-	"texture",				// RESOURCE_TYPE_TEXTURE
-	"model",				// RESOURCE_TYPE_MODEL
-	"entity descriptor",	// RESOURCE_TYPE_ENTITY_DESC
-	"map"					// RESOURCE_TYPE_MAP
+	"material",				// RESOURCE_SOURCE_TYPE_MATERIAL
+	"texture",				// RESOURCE_SOURCE_TYPE_TEXTURE
+	"model",				// RESOURCE_SOURCE_TYPE_MODEL
+	"entity descriptor",	// RESOURCE_SOURCE_TYPE_ENTITY_DESC
+	"map"					// RESOURCE_SOURCE_TYPE_MAP
 };
-static_assert( RESOURCE_NUM_TYPES == ARRAYSIZE( s_pResourceTypeNames ), "Array size 's_pResourceTypeNames' must be equal to RESOURCE_NUM_TYPES" );
+static_assert( RESOURCE_SOURCE_NUM_TYPES == ARRAYSIZE( s_pResourceSourceTypeNames ), "Array size 's_pResourceSourceTypeNames' must be equal to RESOURCE_SOURCE_NUM_TYPES" );
 
 
 /*
 ==================
-ConvScriptFileExtensionToResourceType
+ConvScriptFileExtensionToResourceSourceType
 ==================
 */
-static bool ConvScriptFileExtensionToResourceType( const achar* pFileExtension, resourceType_t& resourceType )
+static bool ConvScriptFileExtensionToResourceSourceType( const achar* pFileExtension, resourceSourceType_t& resourceSourceType )
 {
 	for ( uint32 index = 0; index < ARRAYSIZE( s_pScriptFileExtensions ); ++index )
 	{
 		if ( s_pScriptFileExtensions[index] && !S_Stricmp( pFileExtension, s_pScriptFileExtensions[index] ) )
 		{
 			// We found! Return current type
-			resourceType = ( resourceType_t )index;
+			resourceSourceType = ( resourceSourceType_t )index;
 			return true;
 		}
 	}
 
 	// We not found, return invalid type
-	resourceType = RESOURCE_NUM_TYPES;
+	resourceSourceType = RESOURCE_SOURCE_NUM_TYPES;
 	return false;
 }
 
@@ -67,20 +78,20 @@ static bool ConvScriptFileExtensionToResourceType( const achar* pFileExtension, 
 ConvResourceTypeToString
 ==================
 */
-static const achar* ConvResourceTypeToString( resourceType_t resourceType )
+static const achar* ConvResourceSourceTypeToString( resourceSourceType_t resourceSourceType )
 {
-	if ( resourceType >= RESOURCE_NUM_TYPES )
+	if ( resourceSourceType >= RESOURCE_SOURCE_NUM_TYPES )
 	{
 		return "unknown";
 	}
-	return s_pResourceTypeNames[resourceType];
+	return s_pResourceSourceTypeNames[resourceSourceType];
 }
 
 
 //-----------------------------------------------------------------------------
-// Resource compiler application
+// Resource compiler app system group
 //-----------------------------------------------------------------------------
-class CResourceCompilerApp : public CDefaultAppSystemGroup<CAppSystemGroup>
+class CResourceCompilerAppSystemGroup : public CDefaultAppSystemGroup<CAppSystemGroup>
 {
 public:
 	// IAppSystemGroup interface
@@ -89,19 +100,11 @@ public:
 	// Return FALSE if there's any problems and the app will abort
 	virtual bool Create() override;
 
-	// Allow the application to do some work after AppSystems are connected but
-	// they aren't all Initialized
-	// Return FALSE if there's any problems and the app will abort
-	virtual bool PreInit() override;
-
 	// Main loop implemented by the application
 	// Return exit code. If all ok returns zero
 	virtual int32 Main() override;
 
-	// Allow the application to do some work after all AppSystems are shut down
-	virtual void PostShutdown() override;
-
-	CResourceCompilerApp();
+	CResourceCompilerAppSystemGroup();
 
 private:
 	struct resourceFile_t
@@ -109,8 +112,8 @@ private:
 		~resourceFile_t() 
 		{}
 
-		std::string		sourcePath;
-		resourceType_t	type;
+		std::string				sourcePath;
+		resourceSourceType_t	type;
 	};
 
 	void PrintUsageHelp();
@@ -128,10 +131,10 @@ private:
 
 /*
 ==================
-CResourceCompilerApp::CResourceCompilerApp
+CResourceCompilerAppSystemGroup::CResourceCompilerAppSystemGroup
 ==================
 */
-CResourceCompilerApp::CResourceCompilerApp()
+CResourceCompilerAppSystemGroup::CResourceCompilerAppSystemGroup()
 	: pTextureTool( NULL )
 	, pMaterialTool( NULL )
 	, pModelTool( NULL )
@@ -141,17 +144,14 @@ CResourceCompilerApp::CResourceCompilerApp()
 
 /*
 ==================
-CResourceCompilerApp::Create
+CResourceCompilerAppSystemGroup::Create
 ==================
 */
-bool CResourceCompilerApp::Create()
+bool CResourceCompilerAppSystemGroup::Create()
 {
 	// Load application systems
 	appSystemInfo_t		appSystemInfos[] =
 	{
-		{ "engine"				DLL_EXT_STRING,			CVAR_QUERY_INTERFACE_VERSION		},	// This one must be first
-		{ "filesystem"			DLL_EXT_STRING,			FILESYSTEM_INTERFACE_VERSION		},
-		{ "engine"				DLL_EXT_STRING,			CVAR_INTERFACE_VERSION				},
 		{ "texture_tool"		DLL_EXT_STRING,			TEXTURE_TOOL_INTERFACE_VERSION		},
 		{ "material_tool"		DLL_EXT_STRING,			MATERIAL_TOOL_INTERFACE_VERSION		},
 		{ "model_tool"			DLL_EXT_STRING,			MODEL_TOOL_INTERFACE_VERSION		},
@@ -192,20 +192,10 @@ bool CResourceCompilerApp::Create()
 
 /*
 ==================
-CResourceCompilerApp::PreInit
+CResourceCompilerAppSystemGroup::Main
 ==================
 */
-bool CResourceCompilerApp::PreInit()
-{
-	return ConnectStdLib( GetFactory() );
-}
-
-/*
-==================
-CResourceCompilerApp::Main
-==================
-*/
-int32 CResourceCompilerApp::Main()
+int32 CResourceCompilerAppSystemGroup::Main()
 {
 	// Is need to print help of usage
 	bool	bPrintHelpUsage = CommandLine()->HasParam( "h" ) || CommandLine()->HasParam( "help" ) || CommandLine()->HasParam( "?" );
@@ -245,7 +235,7 @@ int32 CResourceCompilerApp::Main()
 		switch ( resourceFile.type )
 		{
 			// Compile a texture
-		case RESOURCE_TYPE_TEXTURE:
+		case RESOURCE_SOURCE_TYPE_TEXTURE:
 		{
 			CSTEXSourceTextureDoc		stexSourceFile;
 			if ( !stexSourceFile.LoadFromFile( resourceFile.sourcePath.c_str() ) )
@@ -311,7 +301,7 @@ int32 CResourceCompilerApp::Main()
 		}
 
 			// Compile a material
-		case RESOURCE_TYPE_MATERIAL:
+		case RESOURCE_SOURCE_TYPE_MATERIAL:
 		{
 			CSMATSourceMaterialDoc		smatSourceFile;
 			if ( !smatSourceFile.LoadFromFile( resourceFile.sourcePath.c_str() ) )
@@ -432,7 +422,7 @@ int32 CResourceCompilerApp::Main()
 		}
 
 			// Compile a model
-		case RESOURCE_TYPE_MODEL:
+		case RESOURCE_SOURCE_TYPE_MODEL:
 		{
 			CSMDLSourceModelDoc		smdlSourceFile;
 			if ( !smdlSourceFile.LoadFromFile( resourceFile.sourcePath.c_str() ) )
@@ -493,7 +483,7 @@ int32 CResourceCompilerApp::Main()
 		}
 
 			// Compile an entity descriptor
-		case RESOURCE_TYPE_ENTITY_DESC:
+		case RESOURCE_SOURCE_TYPE_ENTITY_DESC:
 		{
 			CSENTSourceEntityDescDoc		sentSourceFile;
 			if ( !sentSourceFile.LoadFromFile( resourceFile.sourcePath.c_str() ) )
@@ -622,7 +612,7 @@ int32 CResourceCompilerApp::Main()
 		}
 
 			// Compile a map
-		case RESOURCE_TYPE_MAP:
+		case RESOURCE_SOURCE_TYPE_MAP:
 		{
 			CSMAPSourceMapDoc		smapSourceFile;
 			if ( !smapSourceFile.LoadFromFile( resourceFile.sourcePath.c_str() ) )
@@ -679,7 +669,7 @@ int32 CResourceCompilerApp::Main()
 		}
 
 		default:
-			Error( "ResourceCompiler: Failed to compile '%s', unsupported resource type '%s'", resourceFile.sourcePath.c_str(), ConvResourceTypeToString( resourceFile.type ) );
+			Error( "ResourceCompiler: Failed to compile '%s', unsupported resource type '%s'", resourceFile.sourcePath.c_str(), ConvResourceSourceTypeToString( resourceFile.type ) );
 			bResult = false;
 			continue;
 		}
@@ -700,10 +690,10 @@ int32 CResourceCompilerApp::Main()
 
 /*
 ==================
-CResourceCompilerApp::PrintUsageHelp
+CResourceCompilerAppSystemGroup::PrintUsageHelp
 ==================
 */
-void CResourceCompilerApp::PrintUsageHelp()
+void CResourceCompilerAppSystemGroup::PrintUsageHelp()
 {
 	Msg( "" );
 	Msg( "Resource compiler for Singularity Engine (" __DATE__ " " __TIME__ ")" );
@@ -721,10 +711,10 @@ void CResourceCompilerApp::PrintUsageHelp()
 
 /*
 ==================
-CResourceCompilerApp::LoadFileList
+CResourceCompilerAppSystemGroup::LoadFileList
 ==================
 */
-bool CResourceCompilerApp::LoadFileList( const achar* pPath )
+bool CResourceCompilerAppSystemGroup::LoadFileList( const achar* pPath )
 {
 	Msg( "ResourceCompiler: Load file list '%s'", pPath );
 
@@ -779,18 +769,18 @@ bool CResourceCompilerApp::LoadFileList( const achar* pPath )
 
 /*
 ==================
-CResourceCompilerApp::AddFileToCompile
+CResourceCompilerAppSystemGroup::AddFileToCompile
 ==================
 */
-bool CResourceCompilerApp::AddFileToCompile( const achar* pPath, const achar* pWorkDir /* = "" */ )
+bool CResourceCompilerAppSystemGroup::AddFileToCompile( const achar* pPath, const achar* pWorkDir /* = "" */ )
 {
 	// Convert of the file path to absolute
-	std::string		absoluteFilePath;
-	resourceType_t	resourceType;
+	std::string				absoluteFilePath;
+	resourceSourceType_t	resourceSourceType;
 	S_MakeAbsolutePath( pPath, absoluteFilePath, pWorkDir );
 
 	// Get resource type by the file extension
-	if ( !ConvScriptFileExtensionToResourceType( S_GetFileExtension( absoluteFilePath.c_str() ), resourceType ) )
+	if ( !ConvScriptFileExtensionToResourceSourceType( S_GetFileExtension( absoluteFilePath.c_str() ), resourceSourceType ) )
 	{
 		Warning( "ResourceCompiler: Unknown resource type for file '%s'", absoluteFilePath.c_str() );
 		return false;
@@ -799,21 +789,11 @@ bool CResourceCompilerApp::AddFileToCompile( const achar* pPath, const achar* pW
 	// Add into a list the file
 	resourceFile_t			resourceFile	= {};
 	resourceFile.sourcePath = absoluteFilePath;
-	resourceFile.type		= resourceType;
+	resourceFile.type		= resourceSourceType;
 
-	Msg( "ResourceCompiler: File '%s' added to compile as '%s'", absoluteFilePath.c_str(), ConvResourceTypeToString( resourceType ) );
+	Msg( "ResourceCompiler: File '%s' added to compile as '%s'", absoluteFilePath.c_str(), ConvResourceSourceTypeToString( resourceSourceType ) );
 	files.emplace_back( resourceFile );
 	return true;
-}
-
-/*
-==================
-CResourceCompilerApp::PostShutdown
-==================
-*/
-void CResourceCompilerApp::PostShutdown()
-{
-	DisconnectStdLib();
 }
 
 
@@ -824,8 +804,16 @@ main
 */
 int main( int argc, char** argv )
 {
+	// Enable developer messages if we in debug configuration
+#if DEBUG
+	Logger()->SetGroupActivate( LOG_GROUP_DEVELOPER, true );
+#endif // DEBUG
+
 	// Initialize the main thread
 	Sys_InitMainThread();
+
+	// Initialize OS console
+	LogConsoleOS()->Show( true );
 
 	// Setup application information for the crash dump
 	CrashDump_SetAppInfo( crashDumpAppInfo_t{ "Resource Compiler", __DATE__ " " __TIME__, NULL, NULL } );
@@ -849,6 +837,7 @@ int main( int argc, char** argv )
 	}
 
 	// Run the application
-	CResourceCompilerApp		resourceCompilerApp;
-	return resourceCompilerApp.Run();
+	CResourceCompilerAppSystemGroup		resourceCompilerSystems;
+	CApplication						application( &resourceCompilerSystems, "resourcecompiler" );
+	return application.Run();
 }

@@ -1,6 +1,4 @@
-#ifndef TOKEN_H
-#define TOKEN_H
-
+#pragma once
 #include "parserlib/filecontext.h"
 
 //-----------------------------------------------------------------------------
@@ -51,5 +49,3 @@ struct parserToken_t
 };
 
 #include "parserlib/token.inl"
-
-#endif // !TOKEN_H

@@ -1,7 +1,5 @@
-#ifndef ISTREAMDATA_H
-#define ISTREAMDATA_H
-
-#include "core/types.h"
+#pragma once
+#include "stdlib/types.h"
 #include "stdlib/refcount.h"
 
 //-----------------------------------------------------------------------------
@@ -41,5 +39,3 @@ class IStreamDataWriter : public IStreamData
 public:
 	virtual void Write( void* pBuffer, uint64 size ) = 0;
 };
-
-#endif // !ISTREAMDATA_H

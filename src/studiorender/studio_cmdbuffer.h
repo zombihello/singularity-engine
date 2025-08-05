@@ -1,6 +1,4 @@
-#ifndef STUDIO_CMDBUFFER_H
-#define STUDIO_CMDBUFFER_H
-
+#pragma once
 #include "core/threading.h"
 #include "studiorender/istudio_cmdbuffer.h"
 
@@ -45,5 +43,3 @@ private:
 	uint32				alignment;
 	CThreadEvent		dataWrittenEvent;		// The event used to signal the reader thread when the ring buffer has data to read
 };
-
-#endif // !STUDIO_CMDBUFFER_H

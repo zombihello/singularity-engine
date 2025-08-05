@@ -1,11 +1,15 @@
-#ifndef ECS_ENTITYDESC_H
-#define ECS_ENTITYDESC_H
-
+#pragma once
 #include "sentdoc/sent_compiled_doc.h"
 #include "gameframework/ecs/ecs_core.h"
 #include "gameframework/ecs/ecs_component_factory.h"
 #include "gameframework/ecs/ecs_map.h"
 #include "gameframework/ientitydesc.h"
+
+//-----------------------------------------------------------------------------
+// Forward declarations
+//-----------------------------------------------------------------------------
+class CEcsMap;
+
 
 //-----------------------------------------------------------------------------
 // ECS entity descriptor
@@ -14,13 +18,11 @@
 class CEcsEntityDesc : public TRefCounted<IEntityDesc>
 {
 public:
-	// IEntityDesc interface
-	virtual IEntity* Create( IMap* pMap, const achar* pName = "" ) const override;
-
 	CEcsEntityDesc();
 	CEcsEntityDesc( const CSENTCompiledEntityDescDoc& sentCompiledDoc );
 	~CEcsEntityDesc();
 
+	ecsEntity_t GetEcsPrefab( CEcsMap* pEcsMap );
 	void Clear();
 
 private:
@@ -41,5 +43,3 @@ private:
 	CGuid											guid;
 	mutable uint32									lastUsedEcsPrefabIdx;
 };
-
-#endif // !ECS_ENTITYDESC_H

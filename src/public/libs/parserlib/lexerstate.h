@@ -1,6 +1,4 @@
-#ifndef LEXERSTATE_H
-#define LEXERSTATE_H
-
+#pragma once
 #include "parserlib/lexercontext.h"
 #include "parserlib/lexerlistener.h"
 #include "parserlib/utils.h"
@@ -51,5 +49,3 @@ private:
 };
 
 #include "parserlib/lexerstate.inl"
-
-#endif // !LEXERSTATE_H

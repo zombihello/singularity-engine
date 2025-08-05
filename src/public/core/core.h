@@ -1,36 +1,22 @@
-#ifndef CORE_H
-#define CORE_H
-
-#include "core/build.h"
+#pragma once
 #include "core/coreapi.h"
-#include "core/types.h"
-#include "core/platform.h"
+#include "stdlib/types.h"
 #include "core/memory.h"
 #include "stdlib/template.h"
 #include "stdlib/strtools.h"
 #include "stdlib/guid.h"
 
 //-----------------------------------------------------------------------------
-// Some core macroses
+// Core functions
 //-----------------------------------------------------------------------------
 enum messageBox_t
 {
-    MESSAGE_BOX_INFO,
-    MESSAGE_BOX_WARNING,
-    MESSAGE_BOX_ERROR
+	MESSAGE_BOX_INFO,
+	MESSAGE_BOX_WARNING,
+	MESSAGE_BOX_ERROR
 };
 
 
-#define DEPRECATED( Version, Message )		[ [ deprecated( Message " Please update your code to the new API before upgrading to the next release, otherwise your project will no longer compile." ) ] ]
-#define NOOP					            ( void )0
-#define UNUSED_VAR( Var )                   ( void )( Var )
-#define CONCAT_IMPL( X, Y )                 X##Y
-#define CONCAT( X, Y )                      CONCAT_IMPL( X, Y )
-
-
-//-----------------------------------------------------------------------------
-// Core functions
-//-----------------------------------------------------------------------------
 // Functions to work with a process
 CORE_INTERFACE void* Sys_CreateProc( const achar* pPathToProcess, const achar* pParams, bool bLaunchDetached, bool bLaunchHidden, int32 priorityModifier, uint64* pProcessId = nullptr );
 CORE_INTERFACE bool Sys_GetProcReturnCode( void* pProcHandle, int32* pReturnCode );
@@ -55,5 +41,3 @@ CORE_INTERFACE const achar* Sys_GetUserName();
 CORE_INTERFACE const achar* Sys_GetExecutablePath();
 CORE_INTERFACE double Sys_Seconds();
 CORE_INTERFACE void Sys_InitGuid( CGuid& guid );
-
-#endif // !CORE_H

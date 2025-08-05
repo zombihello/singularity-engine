@@ -1,7 +1,5 @@
-#ifndef VK_STUDIOAPI_BOUNDSHADERSTATE_CACHE_H
-#define VK_STUDIOAPI_BOUNDSHADERSTATE_CACHE_H
-
-#include "core/types.h"
+#pragma once
+#include "stdlib/types.h"
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -54,5 +52,3 @@ private:
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_boundshaderstate_cache.inl"
-
-#endif // !VK_STUDIOAPI_BOUNDSHADERSTATE_CACHE_H

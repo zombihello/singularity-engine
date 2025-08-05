@@ -1,11 +1,9 @@
-#ifndef ISTUDIO_RENDERRESOURCE_H
-#define ISTUDIO_RENDERRESOURCE_H
-
+#pragma once
 #include <unordered_set>
 
 #include "interfaces/interfaces.h"
-#include "core/types.h"
-#include "core/platform.h"
+#include "stdlib/defines.h"
+#include "stdlib/types.h"
 #include "core/threading.h"
 #include "studiorender/istudio_rendercmd.h"
 #include "studiorender/istudiorender.h"
@@ -111,5 +109,3 @@ private:
 };
 
 #include "studiorender/istudio_renderresource.inl"
-
-#endif // !ISTUDIO_RENDERRESOURCE_H

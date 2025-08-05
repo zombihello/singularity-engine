@@ -85,7 +85,7 @@
     #include <stdint.h>
     #include <string>
 
-    #include "core/platform.h"
+    #include "stdlib/defines.h"
 
     #if PLATFORM_WINDOWS
         #include <io.h>         // For fix error with unknown 'isatty'

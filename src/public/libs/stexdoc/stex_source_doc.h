@@ -1,6 +1,4 @@
-#ifndef STEX_SOURCE_DOC_H
-#define STEX_SOURCE_DOC_H
-
+#pragma once
 #include "studiorender/studioapi/istudioapi_texture.h"
 #include "stexdoc/stex_types.h"
 
@@ -64,5 +62,3 @@ private:
 };
 
 #include "stexdoc/stex_source_doc.inl"
-
-#endif // !STEX_SOURCE_DOC_H

@@ -1,5 +1,4 @@
-#ifndef FASTHASH_INL
-#define FASTHASH_INL
+#pragma once
 
 /*
 ==================
@@ -83,5 +82,3 @@ FORCEINLINE hash_t FastHashFromString( const std::string& string, hash_t hash /*
 {
 	return FastHashFromString( string.data(), ( uint64 )string.size() * sizeof( achar ), hash );
 }
-
-#endif // !FASTHASH_INL

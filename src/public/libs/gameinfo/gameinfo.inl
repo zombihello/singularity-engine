@@ -1,5 +1,4 @@
-#ifndef GAMEINFO_INL
-#define GAMEINFO_INL
+#pragma once
 
 /*
 ==================
@@ -60,5 +59,3 @@ FORCEINLINE bool CGameInfoDoc::IsLoaded() const
 {
 	return bLoaded;
 }
-
-#endif // GAMEINFO_INL

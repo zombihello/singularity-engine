@@ -1,5 +1,4 @@
-#ifndef BUTTONCODE_H
-#define BUTTONCODE_H
+#pragma once
 
 //-----------------------------------------------------------------------------
 // Button codes
@@ -150,5 +149,3 @@ enum buttonCode_t
 	BUTTON_CODE_LAST	= MOUSE_LAST,
 	BUTTON_CODE_COUNT	= BUTTON_CODE_LAST - KEY_FIRST + 1
 };
-
-#endif // !BUTTONCODE_H

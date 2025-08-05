@@ -41,6 +41,11 @@ newoption {
     description     = "Place the workspace file in the root"
 }
 
+newoption {
+    trigger         = "automation-tool",
+    description     = "Is this generation for Automation Tool"
+}
+
 --------- GLOBAL VARIABLES -----------------
 
 -- Path to intermediate directory for compiling the engine and the game
@@ -67,6 +72,9 @@ outputBinDirSuffix			= "bin/%{string.lower(cfg.platform)}_%{string.lower(cfg.bui
 -- Licenses directory
 licensesDir                 = buildDir .. "/licenses/"
 
+-- Git branch
+gitBranch                   = Utils.GetGitBranch()
+
 -- Workspace name
 workspaceName               = _OPTIONS["workspace-name"]
 
@@ -80,6 +88,7 @@ buildConfigurations         = { "Debug", "Release", "Retail" }
 buildPlatforms              = { "Win64" }
 
 -- Print some information about configuration
+print( "Git branch: " .. gitBranch )
 print( "Intermediate directory: " .. intermediateDir )
 print( "Build directory: " .. buildDir )
 print( "Workspace name: " .. workspaceName )
@@ -100,7 +109,16 @@ if _OPTIONS["workspace-on-root"] then
 else
     workspaceLocation = intermediateDir
 end 
+
+-- Is this generation for Automation Tool
+if _OPTIONS["automation-tool"] then
+    isAutomationTool = true
+else
+    isAutomationTool = false
+end
+
 print( "Workspace file path: " .. workspaceLocation )
+print( "Automation Tool: " .. tostring( isAutomationTool ) )
 print( "" )
 
 include( "devtools/premake5/rule_flex.lua" )
@@ -114,7 +132,7 @@ appframework                = "libs/appframework/"
 inputsystem                 = "inputsystem/"
 filesystem                  = "filesystem/"
 interfaces                  = "libs/interfaces/"
-engine						= "engine/"
+cvar						= "cvar/"
 gameinfo					= "libs/gameinfo/"
 studiorender                = "studiorender/"
 studioapi_vk 				= "studiorender/studioapi/vk/"
@@ -174,7 +192,9 @@ workspace( workspaceName )
     }
 
     defines 		    {
-        "PLATFORM_SUBDIR=\"%{string.lower(cfg.platform)}_%{string.lower(cfg.buildcfg)}\""
+        "PLATFORM_SUBDIR=\"%{string.lower(cfg.platform)}_%{string.lower(cfg.buildcfg)}\"",
+        "GIT_BRANCH=\"" .. gitBranch .. "\"",
+        "TARGET_NAME=\"%{string.lower(prj.name)}\""
     }
 
     if buildMonolithicEngine then
@@ -250,7 +270,7 @@ workspace( workspaceName )
 		include( core )
         include( inputsystem )
         include( filesystem )
-		include( engine )
+		include( cvar )
         include( studiorender )
         include( materialsystem )
 		include( studioapi_vk )
@@ -261,17 +281,18 @@ workspace( workspaceName )
             include( stdlib )
             include( appframework )
             include( interfaces )
-			include( gameinfo )
             include( shaderlib )
-			include( shadercache )
-			include( smatdoc )
-            include( stexdoc )
 			include( pixelformatinfos )
-            include( smdldoc )
             include( gameframework )
             include( parserlib )
-            include( sentdoc )
-			include( smapdoc )
+			group "/Engine/Libraries/Data Formats"
+				include( gameinfo )
+				include( shadercache )
+				include( smatdoc )
+				include( stexdoc )
+				include( smdldoc )
+				include( sentdoc )
+				include( smapdoc )
             group "/Engine/Libraries/ThirdParty"
                 ThirdParty.SetupProjects()
     group "/Tools"

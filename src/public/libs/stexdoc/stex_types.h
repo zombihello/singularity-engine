@@ -1,5 +1,4 @@
-#ifndef STEX_TYPES_H
-#define STEX_TYPES_H
+#pragma once
 
 //-----------------------------------------------------------------------------
 // STEX cube face index
@@ -14,5 +13,3 @@ enum stexCubeFaceIndex_t
 	STEX_CUBE_FACE_BACK,			// Negative Z
 	STEX_CUBE_FACE_COUNT			// Cube face count
 };
-
-#endif // !STEX_TYPES_H

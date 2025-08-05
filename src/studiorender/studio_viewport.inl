@@ -1,5 +1,4 @@
-#ifndef STUDIO_VIEWPORT_INL
-#define STUDIO_VIEWPORT_INL
+#pragma once
 
 /*
 ==================
@@ -72,5 +71,3 @@ FORCEINLINE void CStudioViewport::ReleaseIndex( uint32 viewportIndex )
 	s_FreeViewportIndices.emplace_back( viewportIndex );
 	onReleaseViewportIndex.Broadcast( this );
 }
-
-#endif // !STUDIO_VIEWPORT_INL

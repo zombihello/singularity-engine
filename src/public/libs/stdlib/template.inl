@@ -1,5 +1,4 @@
-#ifndef TEMPLATE_INL
-#define TEMPLATE_INL
+#pragma once
 
 /*
 ==================
@@ -69,5 +68,3 @@ FORCEINLINE const TType& TGuardValue<TType>::operator*() const
 {
 	return oldValue;
 }
-
-#endif // !TEMPLATE_INL

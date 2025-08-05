@@ -1,5 +1,4 @@
-#ifndef MATERIAL_INL
-#define MATERIAL_INL
+#pragma once
 
 /*
 ==================
@@ -42,5 +41,3 @@ FORCEINLINE void CMaterial::DestroyBuffers()
 											} );
 	}
 }
-
-#endif // !MATERIAL_INL

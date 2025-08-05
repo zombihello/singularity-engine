@@ -1,13 +1,6 @@
-/**
- * @file
- * @addtogroup core core
- */
-
-#ifndef IMEMALLOC_H
-#define IMEMALLOC_H
-
+#pragma once
 #include "core/coreapi.h"
-#include "core/types.h"
+#include "stdlib/types.h"
 
 //-----------------------------------------------------------------------------
 // The memory allocator's interface
@@ -35,5 +28,3 @@ public:
 };
 
 CORE_INTERFACE IMemAlloc* MemAlloc();
-
-#endif // !IMEMALLOC_H

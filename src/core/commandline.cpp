@@ -34,9 +34,9 @@ private:
 CommandLine
 ==================
 */
-static CCommandLine		s_CommandLine;
 ICommandLine* CommandLine()
 {
+	static CCommandLine		s_CommandLine;
 	return &s_CommandLine;
 }
 
@@ -144,7 +144,7 @@ void CCommandLine::Init( const achar* pCommandLine )
 {
 	Shutdown();
 	Parse( pCommandLine );
-	Msg( "Core: inited with arguments '%s'", pCommandLine );
+	Msg( "Core: Command line: '%s'", pCommandLine );
 }
 
 /*

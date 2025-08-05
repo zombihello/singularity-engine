@@ -1,5 +1,4 @@
-#ifndef VK_STUDIOAPI_DESCRIPTORSETSLAYOUT_INL
-#define VK_STUDIOAPI_DESCRIPTORSETSLAYOUT_INL
+#pragma once
 
 /*
 ==================
@@ -96,5 +95,3 @@ FORCEINLINE COnStudioAPIDescriptorSetsLayoutDeletedVk& CStudioAPIDescriptorSetsL
 {
 	return onDescriptorSetsLayoutDeleted;
 }
-
-#endif // !VK_STUDIOAPI_DESCRIPTORSETSLAYOUT_INL

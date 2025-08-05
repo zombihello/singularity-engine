@@ -1,5 +1,4 @@
-#ifndef STEX_SOURCE_DOC_INL
-#define STEX_SOURCE_DOC_INL
+#pragma once
 
 /*
 ==================
@@ -317,5 +316,3 @@ FORCEINLINE bool CSTEXSourceTextureDoc::IsValidNumSourcePaths( studioAPITextureT
 
 	return bResult;
 }
-
-#endif // !STEX_SOURCE_DOC_INL

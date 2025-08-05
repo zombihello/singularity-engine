@@ -1,9 +1,7 @@
-#ifndef VK_HELPERS_H
-#define VK_HELPERS_H
-
+#pragma once
 #include "Volk/volk.h"
-#include "core/platform.h"
-#include "core/types.h"
+#include "stdlib/defines.h"
+#include "stdlib/types.h"
 
 //-----------------------------------------------------------------------------
 // Vulkan macrosses and constants
@@ -111,5 +109,3 @@ const achar* VK_ConvVkFormatToText( VkFormat vkFormat );
 const achar* VK_ConvVkColorSpaceToText( VkColorSpaceKHR vkColorSpace );
 
 #include "studiorender/studioapi/vk/vk_helpers.inl"
-
-#endif // !VK_HELPERS_H

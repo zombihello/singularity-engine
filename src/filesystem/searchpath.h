@@ -1,17 +1,10 @@
-/**
- * @file
- * @addtogroup filesystem filesystem
- */
-
-#ifndef SEARCHPATH_H
-#define SEARCHPATH_H
-
+#pragma once
 #include <string>
 #include <vector>
 #include <algorithm>
 
-#include "core/types.h"
-#include "core/platform.h"
+#include "stdlib/defines.h"
+#include "stdlib/types.h"
 #include "stdlib/filetools.h"
 
 //-----------------------------------------------------------------------------
@@ -85,5 +78,3 @@ public:
 };
 
 #include "filesystem/searchpath.inl"
-
-#endif // !SEARCHPATH_H

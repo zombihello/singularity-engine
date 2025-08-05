@@ -1,5 +1,4 @@
-#ifndef VK_STUDIOAPI_SEMAPHORE_INL
-#define VK_STUDIOAPI_SEMAPHORE_INL
+#pragma once
 
 /*
 ==================
@@ -101,4 +100,3 @@ FORCEINLINE const std::string& CStudioAPINamedSemaphoreVk::GetName() const
 {
 	return name;
 }
-#endif // !VK_STUDIOAPI_SEMAPHORE_INL

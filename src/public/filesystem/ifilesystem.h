@@ -1,7 +1,5 @@
-#ifndef IFILESYSTEM_H
-#define IFILESYSTEM_H
-
-#include "core/types.h"
+#pragma once
+#include "stdlib/types.h"
 #include "appframework/iappsystem.h"
 #include "stdlib/refcount.h"
 #include "stdlib/istreamdata.h"
@@ -106,5 +104,3 @@ public:
     virtual TRefPtr<IPathArrayResult> GetSearchPath( const achar* pPathID ) const = 0;
     virtual uint32 GetNumSearchPaths() const = 0;
 };
-
-#endif // !IFILESYSTEM_H

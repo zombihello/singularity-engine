@@ -1,6 +1,4 @@
-#ifndef ITEXTURE_H
-#define ITEXTURE_H
-
+#pragma once
 #include "stdlib/refcount.h"
 #include "studiorender/studioapi/istudioapi_texture.h"
 
@@ -30,5 +28,3 @@ public:
 	virtual IStudioAPITexture* GetStudioAPITexture() const = 0;
 	virtual IStudioAPISampler* GetStudioAPISampler() const = 0;
 };
-
-#endif // !ITEXTURE_H

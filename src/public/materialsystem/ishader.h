@@ -1,7 +1,5 @@
-#ifndef ISHADER_H
-#define ISHADER_H
-
-#include "core/types.h"
+#pragma once
+#include "stdlib/types.h"
 #include "studiorender/studioapi/istudioapi_shader.h"
 #include "studiorender/studio_renderpasstypes.h"
 
@@ -92,5 +90,3 @@ public:
 	virtual const achar* GetHelp() const = 0;
 	virtual const achar* GetFallbackShader() const = 0;
 };
-
-#endif // !ISHADER_H

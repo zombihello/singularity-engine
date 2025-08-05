@@ -1,5 +1,4 @@
-#ifndef BUILDNUM_INL
-#define BUILDNUM_INL
+#pragma once
 
 /*
 ==================
@@ -50,5 +49,3 @@ void TBuildNumber<dateOfBeginning>::ComputeBuildNumber()
 
 	buildNumber -= dateOfBeginning;
 }
-
-#endif // !BUILDNUM_INL

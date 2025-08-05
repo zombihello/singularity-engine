@@ -1,10 +1,8 @@
-#ifndef SHADERCOMPILE_H
-#define SHADERCOMPILE_H
-
+#pragma once
 #include <string>
 #include <vector>
 
-#include "core/types.h"
+#include "stdlib/types.h"
 #include "core/memory.h"
 
 //-----------------------------------------------------------------------------
@@ -52,5 +50,3 @@ struct shader_t
 //-----------------------------------------------------------------------------
 bool ConvStringToShaderType( const achar* pShaderTypeName, studioAPIShaderType_t& shaderType );
 void ConvShaderTypeToString( studioAPIShaderType_t shaderType, const achar*& pShaderTypeName );
-
-#endif // !SHADERCOMPILE_H

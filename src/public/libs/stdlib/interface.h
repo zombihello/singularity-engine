@@ -1,13 +1,6 @@
-/**
- * @file
- * @addtogroup stdlib stdlib
- */
-
-#ifndef INTERFACE_H
-#define INTERFACE_H
-
-#include "core/types.h"
-#include "core/platform.h"
+#pragma once
+#include "stdlib/defines.h"
+#include "stdlib/types.h"
 
 //-----------------------------------------------------------------------------
 // Interface system
@@ -56,5 +49,3 @@ createInterfaceFn_t Sys_GetFactoryThis();
 #define EXPOSE_SINGLE_INTERFACE( ClassName, InterfaceName, VersionName ) \
 	static ClassName			__s_##ClassName##_singleton; \
 	EXPOSE_SINGLE_INTERFACE_GLOBALVAR( ClassName, InterfaceName, VersionName, __s_##ClassName##_singleton )
-
-#endif // !INTERFACE_H

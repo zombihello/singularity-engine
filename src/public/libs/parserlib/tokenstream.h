@@ -1,6 +1,4 @@
-#ifndef TOKENSTREAM_H
-#define TOKENSTREAM_H
-
+#pragma once
 #include <vector>
 #include "parserlib/token.h"
 
@@ -41,5 +39,3 @@ private:
 };
 
 #include "parserlib/tokenstream.inl"
-
-#endif // !TOKENSTREAM_H

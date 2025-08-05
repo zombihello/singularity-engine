@@ -1,5 +1,4 @@
-#ifndef REFCOUNT_INL
-#define REFCOUNT_INL
+#pragma once
 
 /*
 ==================
@@ -310,5 +309,3 @@ FORCEINLINE TPtrType* TRefPtr<TPtrType>::GetPtr() const
 {
 	return pPtr;
 }
-
-#endif // !REFCOUNT_INL

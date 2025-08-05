@@ -1,6 +1,4 @@
-#ifndef ECS_ENTITY_H
-#define ECS_ENTITY_H
-
+#pragma once
 #include "gameframework/ecs/ecs_core.h"
 #include "gameframework/ientity.h"
 #include "gameframework/imap.h"
@@ -17,6 +15,10 @@ class CEcsMap;
 class CEcsEntity : public TRefCounted<IEntity>
 {
 public:
+	// IEntity interface
+	virtual void Destroy() override;
+	virtual bool IsValid() const override;
+
 	CEcsEntity( ecsEntity_t ecsEntity, CEcsMap* pEcsMap );
 	~CEcsEntity();
 
@@ -29,5 +31,3 @@ private:
 	IOnMapReseted::funcDelegate_t*		pOnMapResetedDelegate;
 	IOnMapUnloaded::funcDelegate_t*		pOnMapUnloadedDelegate;
 };
-
-#endif // !ECS_ENTITYDESC_H

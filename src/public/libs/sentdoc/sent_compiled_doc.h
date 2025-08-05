@@ -1,6 +1,4 @@
-#ifndef SENT_COMPILED_DOC_H
-#define SENT_COMPILED_DOC_H
-
+#pragma once
 #include <string>
 #include <vector>
 
@@ -30,5 +28,3 @@ private:
 };
 
 #include "sentdoc/sent_compiled_doc.inl"
-
-#endif // !SENT_COMPILED_DOC_H

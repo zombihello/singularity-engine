@@ -6,8 +6,8 @@
 #ifndef WIN_VK_PLATFORM_H
 #define WIN_VK_PLATFORM_H
 
-#include "core/platform.h"
-#include "core/types.h"
+#include "stdlib/defines.h"
+#include "stdlib/types.h"
 #include "stdlib/template.h"
 #include "Volk/volk.h"
 

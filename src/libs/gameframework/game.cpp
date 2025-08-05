@@ -21,16 +21,17 @@ CGame::CGame()
 
 /*
 ==================
-CGame::Init
+CGame::Connect
 ==================
 */
-bool CGame::Init( createInterfaceFn_t pFactory )
+bool CGame::Connect( createInterfaceFn_t pFactory )
 {
-	// Connect StdLib
+	// Connect StdLib and register cvars
 	if ( !ConnectStdLib( pFactory ) )
 	{
 		return false;
 	}
+	ConVar_Register();
 
 	// Get the window manager
 	g_pWindowMgr = ( IWindowMgr* )pFactory( WINDOWMGR_INTERFACE_VERSION );
@@ -53,15 +54,36 @@ bool CGame::Init( createInterfaceFn_t pFactory )
 		return false;
 	}
 
-	// Register cvars in the system
-	ConVar_Register( FCVAR_GAMEDLL );
+	return true;
+}
 
+/*
+==================
+CGame::Disconnect
+==================
+*/
+void CGame::Disconnect()
+{
+	ConVar_Unregister();
+	DisconnectStdLib();
+
+	g_pWindowMgr		= NULL;
+	g_pStudioRender		= NULL;
+	g_pResourceSystem	= NULL;
+}
+
+/*
+==================
+CGame::Init
+==================
+*/
+bool CGame::Init()
+{
 	// Register GameFramework ECS modules and initialize the world
 	extern void EcsInitModules_Gameframework();
 	EcsInitModules_Gameframework();
 
-	// Initialize all resource factories
-	ecsMapFactory.Init();
+	// Initialize all game-specific resource factories
 	ecsEntityDescFactory.Init();
 	return true;
 }
@@ -76,22 +98,51 @@ void CGame::Shutdown()
 	// Unregister all render objects
 	g_pStudioRender->UnregisterAllObjects();
 
-	// Reset the active map
-	if ( pActiveMap )
-	{
-		pActiveMap->Reset();
-		pActiveMap = NULL;
-	}
+	// Shutdown the active map
+	MapShutdown();
 
 	// Shutdown all resource factories
 	ecsEntityDescFactory.Shutdown();
-	ecsMapFactory.Shutdown();
+}
 
-	// Unregister cvars and disconnect StdLib
-	ConVar_Unregister();
-	DisconnectStdLib();
+/*
+==================
+CGame::MapInit
+==================
+*/
+bool CGame::MapInit( const achar* pPath )
+{
+	// Shutdown the old map
+	MapShutdown();
 
-	g_pStudioRender = NULL;
+	// Load a new map
+	CSMAPCompiledMapDoc		smapCompiledMapDoc;
+	std::string				mapPath = S_GetFileExtension( pPath ) ? pPath : S_Sprintf( "%s.smap_c", pPath );
+	if ( !smapCompiledMapDoc.LoadFromFile( mapPath.c_str() ) )
+	{
+		Warning( "Game: Failed to load map '%s'", mapPath.c_str() );
+		return false;
+	}
+
+	pActiveEcsMap = new CEcsMap( smapCompiledMapDoc );
+	Msg( "Game: Map '%s' loaded", mapPath.c_str() );
+	return true;
+}
+
+/*
+==================
+CGame::MapShutdown
+==================
+*/
+void CGame::MapShutdown()
+{
+	// Reset the active map
+	if ( pActiveEcsMap )
+	{
+		delete pActiveEcsMap;
+		pActiveEcsMap = NULL;
+		Msg( "Game: Active map unloaded" );
+	}
 }
 
 /*
@@ -101,9 +152,9 @@ CGame::FrameUpdate
 */
 void CGame::FrameUpdate()
 {
-	if ( pActiveMap )
+	if ( pActiveEcsMap )
 	{
-		pActiveMap->Update( 0.f );
+		pActiveEcsMap->Update( 0.f );
 	}
 }
 
@@ -126,17 +177,7 @@ uint32 CGameAppSystems::GetNum() const
 CGameAppSystems::GetModuleName
 ==================
 */
-const achar* CGameAppSystems::GetModuleName( uint32 index ) const
+gameAppSystemInfo_t CGameAppSystems::GetInfo( uint32 index ) const
 {
-	return appSystems[index].pModuleName;
-}
-
-/*
-==================
-CGameAppSystems::GetInterfaceName
-==================
-*/
-const achar* CGameAppSystems::GetInterfaceName( uint32 index ) const
-{
-	return appSystems[index].pInterfaceName;
+	return appSystems[index];
 }

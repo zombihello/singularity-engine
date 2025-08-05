@@ -1,5 +1,4 @@
-#ifndef STREAMDATA_MEMORY_INL
-#define STREAMDATA_MEMORY_INL
+#pragma once
 
 /*
 ==================
@@ -87,5 +86,3 @@ streamDataType_t CBaseStreamDataMemory<TBaseClass>::GetType() const
 {
 	return STREAMDATA_TYPE_MEMORY;
 }
-
-#endif // !STREAMDATA_MEMORY_INL

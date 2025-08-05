@@ -1,6 +1,4 @@
-#ifndef ISTUDIORENDER_H
-#define ISTUDIORENDER_H
-
+#pragma once
 #include "stdlib/refcount.h"
 #include "appframework/iappsystem.h"
 #include "studiorender/istudio_cmdbuffer.h"
@@ -36,8 +34,6 @@ struct studioCameraView_t
 class IStudioRender : public IAppSystem
 {
 public:
-	// Sets which API we should be using. Has to be done before connect
-	virtual void SetStudioAPI( const achar* pStudioAPIDLL ) = 0;
 	virtual void SetCameraView( const studioCameraView_t& cameraView ) = 0;
 
 	// Register and unregister render objects for rendering
@@ -54,5 +50,3 @@ public:
 	virtual IStudioCmdBuffer* GetCommandBuffer() const = 0;
 	virtual bool IsInRenderThread() const = 0;
 };
-
-#endif // !ISTUDIORENDER_H

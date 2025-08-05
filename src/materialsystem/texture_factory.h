@@ -1,6 +1,4 @@
-#ifndef TEXTURE_FACTORY_H
-#define TEXTURE_FACTORY_H
-
+#pragma once
 #include "resourcesystem/iresourcefactory.h"
 
 //-----------------------------------------------------------------------------
@@ -13,7 +11,7 @@ class CTexture;
 // Texture factory
 // Path to the resource in the file system can be without file extension
 //-----------------------------------------------------------------------------
-class CTextureFactory : public IResourceFactory
+class CTextureFactory : public CBaseResourceFactory<IResourceFactory>
 {
 public:
 	void Init();
@@ -26,12 +24,6 @@ public:
 	virtual TRefPtr<IResource> GetDefaultResource() const override;
 	virtual const achar* GetFormatType() const override;
 
-	// Ensures that the factory is valid, because one can depends on specific format type.
-	// If something wrong the function must crash the game
-	virtual void Validate() const override;
-
 private:
 	TRefPtr<IResource>		pDefaultTexture;
 };
-
-#endif // !TEXTURE_FACTORY_H

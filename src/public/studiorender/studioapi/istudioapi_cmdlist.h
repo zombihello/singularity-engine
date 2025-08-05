@@ -1,6 +1,4 @@
-#ifndef ISTUDIOAPI_CMDLIST_H
-#define ISTUDIOAPI_CMDLIST_H
-
+#pragma once
 #include "studiorender/studioapi/istudioapi.h"
 #include "studiorender/studioapi/istudioapi_cmdcontext.h"
 #include "studiorender/studioapi/istudioapi_texture.h"
@@ -96,5 +94,3 @@ public:
 	virtual uint32 GetNumCmdLists() const = 0;
 	virtual IStudioAPICmdList** GetCmdLists() const = 0;
 };
-
-#endif // !ISTUDIOAPI_CMDLIST_H

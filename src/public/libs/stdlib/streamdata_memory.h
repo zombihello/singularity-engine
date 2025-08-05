@@ -1,10 +1,8 @@
-#ifndef STREAMDATA_MEMORY_H
-#define STREAMDATA_MEMORY_H
-
+#pragma once
 #include <string>
 #include <vector>
 
-#include "core/types.h"
+#include "stdlib/types.h"
 #include "stdlib/istreamdata.h"
 
 //-----------------------------------------------------------------------------
@@ -76,5 +74,3 @@ private:
 };
 
 #include "stdlib/streamdata_memory.inl"
-
-#endif // !STREAMDATA_MEMORY_H

@@ -1,6 +1,4 @@
-#ifndef SHADERCOMPILER_ENVIRONMENT_H
-#define SHADERCOMPILER_ENVIRONMENT_H
-
+#pragma once
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -32,5 +30,3 @@ private:
 	std::unordered_map<std::string, std::string>	defines;
 	uint32											compileFlags;
 };
-
-#endif // !SHADERCOMPILER_ENVIRONMENT_H

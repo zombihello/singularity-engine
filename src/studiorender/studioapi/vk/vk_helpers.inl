@@ -1,5 +1,4 @@
-#ifndef VK_HELPERS_INL
-#define VK_HELPERS_INL
+#pragma once
 
 /*
 ==================
@@ -130,6 +129,7 @@ FORCEINLINE const achar* VK_ConvVkPresentModeToText( VkPresentModeKHR vkPresentM
 	case VK_PRESENT_MODE_FIFO_RELAXED_KHR:					return "VK_PRESENT_MODE_FIFO_RELAXED_KHR";
 	case VK_PRESENT_MODE_SHARED_DEMAND_REFRESH_KHR:			return "VK_PRESENT_MODE_SHARED_DEMAND_REFRESH_KHR";
 	case VK_PRESENT_MODE_SHARED_CONTINUOUS_REFRESH_KHR:		return "VK_PRESENT_MODE_SHARED_CONTINUOUS_REFRESH_KHR";
+	case VK_PRESENT_MODE_FIFO_LATEST_READY_KHR:				return "VK_PRESENT_MODE_FIFO_LATEST_READY_KHR";
 	default:												return "UNKNOWN";
 	}
 }
@@ -423,5 +423,3 @@ FORCEINLINE const achar* VK_ConvVkColorSpaceToText( VkColorSpaceKHR vkColorSpace
 	default:											return "UNKNOWN";
 	}
 }
-
-#endif // !VK_HELPERS_INL

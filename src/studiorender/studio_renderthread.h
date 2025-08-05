@@ -1,6 +1,4 @@
-#ifndef STUDIO_RENDERTHREAD_H
-#define STUDIO_RENDERTHREAD_H
-
+#pragma once
 #include "studiorender/studio_cmdbuffer.h"
 
 //-----------------------------------------------------------------------------
@@ -16,5 +14,3 @@ FORCEINLINE bool Studio_IsInRenderThread()
 
 void Studio_StartRenderThread();
 void Studio_StopRenderThread();
-
-#endif // !STUDIO_RENDERTHREAD_H

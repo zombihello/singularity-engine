@@ -1,7 +1,6 @@
-#ifndef STUDIO_RENDERPIPELINESET_H
-#define STUDIO_RENDERPIPELINESET_H
-
+#pragma once
 #include <vector>
+
 #include "studiorender/istudio_renderpipelineset.h"
 #include "studiorender/studio_viewport.h"
 
@@ -68,5 +67,3 @@ private:
 
 	CRenderPipelineContainer	renderPipelineContainers[STUDIO_RENDERPASS_NUM_TYPES];
 };
-
-#endif // !STUDIO_RENDERPIPELINESET_H

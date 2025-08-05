@@ -1,5 +1,4 @@
-#ifndef ECS_CORE_INL
-#define ECS_CORE_INL
+#pragma once
 
 /*
 ==================
@@ -357,5 +356,3 @@ FORCEINLINE bool CEcsWorld::IsRegisteredType() const
 {
 	return flecs::_::type<TEcsType>::registered( flecsWorld.c_ptr() );
 }
-
-#endif // !ECS_INL

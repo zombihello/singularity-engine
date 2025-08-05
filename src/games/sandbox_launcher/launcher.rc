@@ -1,27 +1,34 @@
-IDI_ICON1               ICON        "launcher.ico"
+#include "stdlib/defines.h"
+#include "games/sandbox/version.h"
+
+IDI_ICON1	ICON	"launcher.ico"
 
 1 VERSIONINFO
- FILEFLAGSMASK 0x3fL
-#ifdef _DEBUG
- FILEFLAGS 0x1L
+FILEVERSION     GAME_VERSION_MAJOR, GAME_VERSION_MINOR, GAME_VERSION_PATCH
+PRODUCTVERSION  GAME_VERSION_MAJOR, GAME_VERSION_MINOR, GAME_VERSION_PATCH
+FILEFLAGSMASK   0x3fL
+#ifdef DEBUG
+    FILEFLAGS   0x1L
 #else
- FILEFLAGS 0x0L
-#endif
- FILEOS 0x40004L
- FILETYPE 0x1L
- FILESUBTYPE 0x0L
+    FILEFLAGS   0x0L
+#endif // DEBUG
+FILEOS          0x40004L
+FILETYPE        0x1L
+FILESUBTYPE     0x0L
  
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "CompanyName", 		"Broken Singularity"
-            VALUE "InternalName", 		""
-            VALUE "LegalCopyright", 	"Copyright 2024-2025 Broken Singularity"
-            VALUE "OriginalFilename", 	""
+            VALUE "CompanyName",        "Broken Singularity"
+			VALUE "FileDescription", 	"Singularity Sandbox Launcher"
+			VALUE "FileVersion",        GAME_VERSION_STRING
+            VALUE "InternalName",       "sandbox_launcher"
+            VALUE "LegalCopyright", 	"© 2020-2025 Broken Singularity"
+            VALUE "OriginalFilename", 	"sandbox.exe"
             VALUE "ProductName", 		"Singularity Sandbox"
-			VALUE "ProductVersion", 	"0.1.0"
+			VALUE "ProductVersion",     GAME_VERSION_STRING
         END
     END
     BLOCK "VarFileInfo"

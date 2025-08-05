@@ -1,6 +1,4 @@
-#ifndef MATERIALSYSTEM_H
-#define MATERIALSYSTEM_H
-
+#pragma once
 #include "materialsystem/imaterialsystem.h"
 #include "materialsystem/texture_factory.h"
 #include "materialsystem/material_factory.h"
@@ -31,5 +29,3 @@ private:
 	CTextureFactory			textureFactory;
 	CMaterialFactory		materialFactory;
 };
-
-#endif // !MATERIALSYSTEM_H

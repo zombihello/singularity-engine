@@ -1,5 +1,4 @@
-#ifndef BOX_INL
-#define BOX_INL
+#pragma once
 
 /*
 ==================
@@ -60,5 +59,3 @@ FORCEINLINE bool CBox::IsValid() const
 {
 	return bIsValid;
 }
-
-#endif // !BOX_INL

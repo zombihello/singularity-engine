@@ -1,6 +1,4 @@
-#ifndef VK_STUDIOAPI_SHADER_H
-#define VK_STUDIOAPI_SHADER_H
-
+#pragma once
 #include "studiorender/studioapi/istudioapi_shader.h"
 #include "studiorender/studioapi/vk/vk_studioapi_device.h"
 #include "studiorender/studioapi/vk/vk_studioapi_boundshaderstate_cache.h"
@@ -163,5 +161,3 @@ private:
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_shader.inl"
-
-#endif // !VK_STUDIOAPI_SHADER_H

@@ -1,6 +1,4 @@
-#ifndef THREADING_PRIVATE_H
-#define THREADING_PRIVATE_H
-
+#pragma once
 #include "core/threading.h"
 
 //-----------------------------------------------------------------------------
@@ -8,5 +6,3 @@
 //-----------------------------------------------------------------------------
 void Sys_SetThreadPriority( threadHandle_t threadHandle, threadPriority_t threadPriority );
 void Sys_SetThreadName( threadHandle_t threadHandle, const achar* pThreadName );
-
-#endif // !THREADING_PRIVATE_H

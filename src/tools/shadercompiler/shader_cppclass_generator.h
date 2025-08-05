@@ -1,6 +1,4 @@
-#ifndef SHADER_CPPCLASS_GENERATOR_H
-#define SHADER_CPPCLASS_GENERATOR_H
-
+#pragma once
 #include "tools/shadercompiler/shadercompiler.h"
 
 //-----------------------------------------------------------------------------
@@ -21,5 +19,3 @@ private:
 
 	std::string		buffer;
 };
-
-#endif // !SHADER_CPPCLASS_GENERATOR_H

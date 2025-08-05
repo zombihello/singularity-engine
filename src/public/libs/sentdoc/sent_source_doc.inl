@@ -1,5 +1,4 @@
-#ifndef SENT_SOURCE_DOC_INL
-#define SENT_SOURCE_DOC_INL
+#pragma once
 
 /*
 ==================
@@ -72,5 +71,3 @@ FORCEINLINE const std::vector<CSENTEntityDescComponent>& CSENTSourceEntityDescDo
 {
 	return components;
 }
-
-#endif // !SENT_SOURCE_DOC_INL

@@ -1,6 +1,4 @@
-#ifndef FILECONTEXT_H
-#define FILECONTEXT_H
-
+#pragma once
 #include "parserlib/stringbuffer.h"
 
 //-----------------------------------------------------------------------------
@@ -55,5 +53,3 @@ struct parserFileContext_t
 };
 
 #include "parserlib/filecontext.inl"
-
-#endif // !FILECONTEXT_H

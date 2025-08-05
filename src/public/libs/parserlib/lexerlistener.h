@@ -1,6 +1,4 @@
-#ifndef LEXERLISTENER_H
-#define LEXERLISTENER_H
-
+#pragma once
 #include "parserlib/tokeneater.h"
 
 //-----------------------------------------------------------------------------
@@ -41,5 +39,3 @@ protected:
 	CParserTokenEater&		parserListener;
 	std::string				path;
 };
-
-#endif // !LEXERLISTENER_H

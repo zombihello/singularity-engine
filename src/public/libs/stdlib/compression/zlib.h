@@ -1,10 +1,8 @@
-#ifndef ZLIB_H
-#define ZLIB_H
-
+#pragma once
 #include <vector>
 
-#include "core/platform.h"
-#include "core/types.h"
+#include "stdlib/defines.h"
+#include "stdlib/types.h"
 #include "stdlib/istreamdata.h"
 
 //-----------------------------------------------------------------------------
@@ -16,5 +14,3 @@ public:
 	static void Compress( IStreamDataWriter* pStreamWriter, byte* pSrcBuffer, uint64 srcSize );
 	static void Uncompress( IStreamDataReader* pStreamReader, byte* pDestBuffer, uint64 destSize );
 };
-
-#endif // !ZLIB_H

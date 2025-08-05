@@ -1,7 +1,5 @@
-#ifndef PIXELFORMATINFOS_H
-#define PIXELFORMATINFOS_H
-
-#include "core/types.h"
+#pragma once
+#include "stdlib/types.h"
 #include "studiorender/studioapi/istudioapi_texture.h"
 
 //-----------------------------------------------------------------------------
@@ -17,5 +15,3 @@ struct pixelFormatInfo_t
 	uint32						numComponents;
 };
 extern pixelFormatInfo_t		g_PixelFormatInfos[STUDIOAPI_PIXEL_NUM_FORMATS];
-
-#endif // !PIXELFORMATINFOS_H

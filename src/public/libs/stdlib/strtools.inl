@@ -1,5 +1,4 @@
-#ifndef STRTOOLS_INL
-#define STRTOOLS_INL
+#pragma once
 
 /*
 ==================
@@ -490,5 +489,3 @@ FORCEINLINE uint32 TStringConversion<TConverTo, TConvertFrom, TBaseConverter, de
 {
 	return pConvertedString ? TBaseConverter::GetLength( pConvertedString ) : 0;
 }
-
-#endif // !STRTOOLS_INL

@@ -1,5 +1,4 @@
-#ifndef VK_STUDIOAPI_SYNCMGR_INL
-#define VK_STUDIOAPI_SYNCMGR_INL
+#pragma once
 
 /*
 ==================
@@ -106,5 +105,3 @@ FORCEINLINE void CStudioAPISyncMgrVk::AddFrameInFlightFence( CStudioAPIFenceVk* 
 {
 	frameInFlightFences[indexFrameInFlight].emplace_back( pFence );
 }
-
-#endif // !VK_STUDIOAPI_SYNCMGR_INL

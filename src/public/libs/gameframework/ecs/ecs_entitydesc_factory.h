@@ -1,6 +1,4 @@
-#ifndef ECS_ENTITYDESC_FACTORY_H
-#define ECS_ENTITYDESC_FACTORY_H
-
+#pragma once
 #include "resourcesystem/iresourcefactory.h"
 
 //-----------------------------------------------------------------------------
@@ -13,7 +11,7 @@ class CEcsEntityDesc;
 // ECS entity descriptor factory
 // Path to the resource in the file system can be without file extension
 //-----------------------------------------------------------------------------
-class CEcsEntityDescFactory : public IResourceFactory
+class CEcsEntityDescFactory : public CBaseResourceFactory<IResourceFactory, RESOURCE_FACTORY_FLAG_STATIC>
 {
 public:
 	void Init();
@@ -26,12 +24,6 @@ public:
 	virtual TRefPtr<IResource> GetDefaultResource() const override;
 	virtual const achar* GetFormatType() const override;
 
-	// Ensures that the factory is valid, because one can depends on specific format type.
-	// If something wrong the function must crash the game
-	virtual void Validate() const override;
-
 private:
 	TRefPtr<IResource>		pDefaultEntityDesc;
 };
-
-#endif // !ECS_ENTITYDESC_FACTORY_H

@@ -1,6 +1,4 @@
-#ifndef ISTUDIOAPI_BARRIER_H
-#define ISTUDIOAPI_BARRIER_H
-
+#pragma once
 #include "studiorender/studioapi/istudioapi_cmdcontext.h"
 #include "studiorender/studioapi/istudioapi_texture.h"
 #include "studiorender/studioapi/istudioapi_buffer.h"
@@ -85,5 +83,3 @@ studioAPIBarrier_t StudioAPI_MakeTextureBarrier( IStudioAPITexture* pTexture, st
 studioAPIBarrier_t StudioAPI_MakeTextureBarrier( IStudioAPISwapChainImage* pImage, studioAPITextureLayout_t layout, studioAPIQueueType_t ownerQueueType );
 
 #include "studiorender/studioapi/istudioapi_barrier.inl"
-
-#endif // !ISTUDIOAPI_BARRIER_H

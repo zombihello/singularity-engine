@@ -1,5 +1,4 @@
-#ifndef JSONDOC_INL
-#define JSONDOC_INL
+#pragma once
 
 /*
 ==================
@@ -351,5 +350,3 @@ FORCEINLINE CJsonValue CJsonDoc::GetValue( const achar* pName ) const
 	}
 	return itValues->second;
 }
-
-#endif // !JSONDOC_INL

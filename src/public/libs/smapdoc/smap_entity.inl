@@ -1,5 +1,4 @@
-#ifndef SMAP_ENTITY_INL
-#define SMAP_ENTITY_INL
+#pragma once
 
 /*
 ==================
@@ -73,5 +72,3 @@ FORCEINLINE CSMAPEntity& CSMAPEntity::operator=( const CSMAPEntity& right )
 	Copy( right );
 	return *this;
 }
-
-#endif // !SMAP_ENTITY_INL

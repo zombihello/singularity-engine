@@ -1,5 +1,4 @@
-#ifndef TRANSFORM_INL
-#define TRANSFORM_INL
+#pragma once
 
 /*
 ==================
@@ -299,5 +298,3 @@ FORCEINLINE CTransform CTransform::operator-( const CTransform& other ) const
 {
 	return CTransform( S_QuaternionInverse( other.rotation ) * rotation, translation - other.translation, scale - other.scale );
 }
-
-#endif // !TRANSFORM_INL

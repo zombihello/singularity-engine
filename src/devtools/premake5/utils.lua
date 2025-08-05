@@ -45,3 +45,15 @@ function Utils.ToJSON( value, indentLevel )
         return "null"
     end
 end
+
+-- Get current Git branch
+function Utils.GetGitBranch()
+    local   pipe = io.popen( "git rev-parse --abbrev-ref HEAD" )
+    if not pipe then 
+        return "unknown" 
+    end
+
+	local   branch = pipe:read( "*l" )
+	pipe:close()
+	return branch or "unknown"
+end

@@ -1,6 +1,4 @@
-#ifndef SENT_COMPONENT_H
-#define SENT_COMPONENT_H
-
+#pragma once
 #include <vector>
 #include <unordered_map>
 
@@ -41,5 +39,3 @@ private:
 };
 
 #include "sentdoc/sent_component.inl"
-
-#endif // !SENT_COMPONENT_H

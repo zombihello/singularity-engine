@@ -1,5 +1,4 @@
-#ifndef DELEGATE_INL
-#define DELEGATE_INL
+#pragma once
 
 /*
 ==================
@@ -105,5 +104,3 @@ void TDelegate<TParamTypes...>::Execute( TParamTypes... params )
 	CScopeLock		scopeLock( mutex );
 	( *funcDelegate.pFunc )( funcDelegate.pUserData, params... );
 }
-
-#endif // !DELEGATE_INL

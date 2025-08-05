@@ -1,6 +1,4 @@
-#ifndef RESOURCE_H
-#define RESOURCE_H
-
+#pragma once
 #include "resourcesystem/iresource.h"
 
 //-----------------------------------------------------------------------------
@@ -28,5 +26,3 @@ private:
 };
 
 #include "resourcesystem/resource.inl"
-
-#endif // !RESOURCE_H

@@ -1,16 +1,9 @@
-/**
- * @file
- * @addtogroup gameinfo gameinfo
- */
-
-#ifndef GAMEINFO_H
-#define GAMEINFO_H
-
+#pragma once
 #include <string>
 #include <vector>
 
-#include "core/types.h"
-#include "core/platform.h"
+#include "stdlib/defines.h"
+#include "stdlib/types.h"
 #include "stdlib/jsondoc.h"
 
 //-----------------------------------------------------------------------------
@@ -54,5 +47,3 @@ private:
 };
 
 #include "gameinfo/gameinfo.inl"
-
-#endif // !GAMEINFO_H

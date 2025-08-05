@@ -3,34 +3,21 @@
 #include "stdlib/filetools.h"
 #include "interfaces/interfaces.h"
 #include "filesystem/ifilesystem.h"
-#include "engine/icvar.h"
-#include "appframework/iappsystemgroup.h"
+#include "cvar/icvar.h"
+#include "appframework/appframework.h"
 #include "tools/ecscompiler/ecsfileparser.h"
 #include "tools/ecscompiler/ecscppgenerator.h"
 
 //-----------------------------------------------------------------------------
-// ECS compiler application
+// ECS compiler app system group
 //-----------------------------------------------------------------------------
-class CEcsCompilerApp : public CDefaultAppSystemGroup<CAppSystemGroup>
+class CEcsCompilerAppSystemGroup : public CDefaultAppSystemGroup<CAppSystemGroup>
 {
 public:
 	// IAppSystemGroup interface
-	// An installed application creation function, you should tell the group
-	// the DLLs and the singleton interfaces you want to instantiate
-	// Return FALSE if there's any problems and the app will abort
-	virtual bool Create() override;
-
-	// Allow the application to do some work after AppSystems are connected but
-	// they aren't all Initialized
-	// Return FALSE if there's any problems and the app will abort
-	virtual bool PreInit() override;
-
 	// Main loop implemented by the application
 	// Return exit code. If all ok returns zero
 	virtual int32 Main() override;
-
-	// Allow the application to do some work after all AppSystems are shut down
-	virtual void PostShutdown() override;
 
 private:
 	void PrintUsageHelp();
@@ -39,49 +26,12 @@ private:
 	bool GenerateCppFiles( const achar* pRootDir, const achar* pOutputDir, const CEcsSystemStub& stubs, ecsCppFileType_t cppFileType );
 };
 
-
 /*
 ==================
-CEcsCompilerApp::Create
+CEcsCompilerAppSystemGroup::Main
 ==================
 */
-bool CEcsCompilerApp::Create()
-{
-	// Load application systems
-	appSystemInfo_t		appSystemInfos[] =
-	{
-		{ "engine"			DLL_EXT_STRING,			CVAR_QUERY_INTERFACE_VERSION		},	// This one must be first
-		{ "filesystem"		DLL_EXT_STRING,			FILESYSTEM_INTERFACE_VERSION		},
-		{ "engine"			DLL_EXT_STRING,			CVAR_INTERFACE_VERSION				},
-		{ "", "" }																			// Required to terminate the list
-	};
-
-	// Add all systems from array
-	if ( !AddSystems( appSystemInfos ) )
-	{
-		return false;
-	}
-
-	// We are done
-	return true;
-}
-
-/*
-==================
-CEcsCompilerApp::PreInit
-==================
-*/
-bool CEcsCompilerApp::PreInit()
-{
-	return ConnectStdLib( GetFactory() );
-}
-
-/*
-==================
-CEcsCompilerApp::Main
-==================
-*/
-int32 CEcsCompilerApp::Main()
+int32 CEcsCompilerAppSystemGroup::Main()
 {
 	// Is need to print help of usage
 	bool			bPrintHelpUsage = CommandLine()->HasParam( "h" ) || CommandLine()->HasParam( "help" ) || CommandLine()->HasParam( "?" );
@@ -146,20 +96,10 @@ int32 CEcsCompilerApp::Main()
 
 /*
 ==================
-CEcsCompilerApp::PostShutdown
+CEcsCompilerAppSystemGroup::ParseEcsFiles
 ==================
 */
-void CEcsCompilerApp::PostShutdown()
-{
-	DisconnectStdLib();
-}
-
-/*
-==================
-CEcsCompilerApp::ParseEcsFiles
-==================
-*/
-bool CEcsCompilerApp::ParseEcsFiles( const std::string& dir, const std::string rootDir, CEcsSystemStub& stubs )
+bool CEcsCompilerAppSystemGroup::ParseEcsFiles( const std::string& dir, const std::string rootDir, CEcsSystemStub& stubs )
 {
 	bool						bResult		= true;
 	TRefPtr<IPathArrayResult>	pFiles		= g_pFileSystem->FindFiles( dir.c_str(), true, true );
@@ -186,10 +126,10 @@ bool CEcsCompilerApp::ParseEcsFiles( const std::string& dir, const std::string r
 
 /*
 ==================
-CEcsCompilerApp::ParseEcsFile
+CEcsCompilerAppSystemGroup::ParseEcsFile
 ==================
 */
-bool CEcsCompilerApp::ParseEcsFile( const achar* pPath, CEcsSystemStub& stubs )
+bool CEcsCompilerAppSystemGroup::ParseEcsFile( const achar* pPath, CEcsSystemStub& stubs )
 {
 	// Read whole the file
 	TRefPtr<IStreamDataReader>	pFileReader = g_pFileSystem->CreateFileReader( pPath );
@@ -216,10 +156,10 @@ bool CEcsCompilerApp::ParseEcsFile( const achar* pPath, CEcsSystemStub& stubs )
 
 /*
 ==================
-CEcsCompilerApp::GenerateCppFiles
+CEcsCompilerAppSystemGroup::GenerateCppFiles
 ==================
 */
-bool CEcsCompilerApp::GenerateCppFiles( const achar* pRootDir, const achar* pOutputDir, const CEcsSystemStub& stubs, ecsCppFileType_t cppFileType )
+bool CEcsCompilerAppSystemGroup::GenerateCppFiles( const achar* pRootDir, const achar* pOutputDir, const CEcsSystemStub& stubs, ecsCppFileType_t cppFileType )
 {
 	const std::vector<TRefPtr<CEcsStubModule>>&		ecsStubModules = stubs.GetModules();
 	CEcsCppGenerator								ecsCppGenerator;
@@ -303,10 +243,10 @@ bool CEcsCompilerApp::GenerateCppFiles( const achar* pRootDir, const achar* pOut
 
 /*
 ==================
-CEcsCompilerApp::PrintUsageHelp
+CEcsCompilerAppSystemGroup::PrintUsageHelp
 ==================
 */
-void CEcsCompilerApp::PrintUsageHelp()
+void CEcsCompilerAppSystemGroup::PrintUsageHelp()
 {
 	Msg( "" );
 	Msg( "ECS compiler for Singularity Engine (" __DATE__ " " __TIME__ ")" );
@@ -330,8 +270,16 @@ main
 */
 int main( int argc, char** argv )
 {
+	// Enable developer messages if we in debug configuration
+#if DEBUG
+	Logger()->SetGroupActivate( LOG_GROUP_DEVELOPER, true );
+#endif // DEBUG
+
 	// Initialize the main thread
 	Sys_InitMainThread();
+
+	// Initialize OS console
+	LogConsoleOS()->Show( true );
 
 	// Setup application information for the crash dump
 	CrashDump_SetAppInfo( crashDumpAppInfo_t{ "ECS Compiler", __DATE__ " " __TIME__, NULL, NULL } );
@@ -355,6 +303,7 @@ int main( int argc, char** argv )
 	}
 
 	// Run the application
-	CEcsCompilerApp		ecsCompilerApp;
-	return ecsCompilerApp.Run();
+	CEcsCompilerAppSystemGroup		ecsCompilerSystems;
+	CApplication					application( &ecsCompilerSystems, "ecscompiler" );
+	return application.Run();
 }

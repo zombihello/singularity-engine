@@ -1,8 +1,6 @@
-#ifndef FASTHASH_H
-#define FASTHASH_H
-
-#include "core/types.h"
-#include "core/platform.h"
+#pragma once
+#include "stdlib/defines.h"
+#include "stdlib/types.h"
 #include "stdlib/strtools.h"
 
 //-----------------------------------------------------------------------------
@@ -19,5 +17,3 @@ hash_t FastHashFromString( const achar* pString, hash_t hash = 0 );
 hash_t FastHashFromString( const std::string& string, hash_t hash = 0 );
 
 #include "stdlib/hashing/fasthash.inl"
-
-#endif // !FASTHASH_H

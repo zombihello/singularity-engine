@@ -1,6 +1,4 @@
-#ifndef IMATERIAL_H
-#define IMATERIAL_H
-
+#pragma once
 #include "stdlib/refcount.h"
 #include "studiorender/studio_renderpasstypes.h"
 
@@ -31,5 +29,3 @@ public:
 	virtual const achar* GetShaderName() const = 0;
 	virtual IShader* GetShader() const = 0;
 };
-
-#endif // !IMATERIAL_H

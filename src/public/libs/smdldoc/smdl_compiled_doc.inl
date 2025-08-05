@@ -1,5 +1,4 @@
-#ifndef SMDL_COMPILED_DOC_INL
-#define SMDL_COMPILED_DOC_INL
+#pragma once
 
 /*
 ==================
@@ -79,5 +78,3 @@ FORCEINLINE const std::vector<std::string>& CSMDLCompiledModelDoc::GetMaterials(
 {
 	return materials;
 }
-
-#endif // !SMDL_COMPILED_DOC_INL

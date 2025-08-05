@@ -1,6 +1,4 @@
-#ifndef ECSCPPGENERATOR_H
-#define ECSCPPGENERATOR_H
-
+#pragma once
 #include "tools/ecscompiler/ecsfieldstubs.h"
 
 //-----------------------------------------------------------------------------
@@ -58,5 +56,3 @@ private:
 	bool			bHasError;
 	std::string		buffer;
 };
-
-#endif // !ECSCPPGENERATOR_H

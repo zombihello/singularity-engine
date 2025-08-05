@@ -1,5 +1,4 @@
-#ifndef VK_STUDIOAPI_SHADER_INL
-#define VK_STUDIOAPI_SHADER_INL
+#pragma once
 
 /*
 ==================
@@ -82,4 +81,3 @@ FORCEINLINE const CStudioAPIDescriptorSetsLayoutVk& CStudioAPIBoundShaderStateVk
 {
 	return descriptorSetsLayout;
 }
-#endif // !VK_STUDIOAPI_SHADER_INL

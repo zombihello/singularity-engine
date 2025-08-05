@@ -1,7 +1,5 @@
-#ifndef INPUTEVENT_H
-#define INPUTEVENT_H
-
-#include "core/types.h"
+#pragma once
+#include "stdlib/types.h"
 #include "inputsystem/buttoncode.h"
 
 //-----------------------------------------------------------------------------
@@ -81,5 +79,3 @@ struct inputEvent_t
 	type_t			type;
 	uevents_t		events;
 };
-
-#endif // !INPUTEVENT_H

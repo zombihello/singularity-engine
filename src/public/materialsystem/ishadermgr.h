@@ -1,6 +1,4 @@
-#ifndef ISHADERMGR_H
-#define ISHADERMGR_H
-
+#pragma once
 #include "studiorender/studioapi/istudioapi_shader.h"
 
 //-----------------------------------------------------------------------------
@@ -49,5 +47,3 @@ public:
 	virtual IShader* GetShader( uint32 index ) const = 0;
 	virtual uint32 GetIndex() const = 0;
 };
-
-#endif // !ISHADERMGR_H

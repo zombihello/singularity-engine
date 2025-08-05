@@ -1,5 +1,4 @@
-#ifndef MEMOVERRIDE_H
-#define MEMOVERRIDE_H
+#pragma once
 
 //-----------------------------------------------------------------------------
 // Override the global memory allocator
@@ -15,5 +14,3 @@
 
 #undef free
 #define free( Ptr )					Mem_Free( Ptr )
-
-#endif // !MEMOVERRIDE_H

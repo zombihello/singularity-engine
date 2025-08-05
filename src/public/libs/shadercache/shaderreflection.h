@@ -1,11 +1,9 @@
-#ifndef SHADERREFLECTION_H
-#define SHADERREFLECTION_H
-
+#pragma once
 #include <string>
 #include <vector>
 #include <unordered_map>
 
-#include "core/types.h"
+#include "stdlib/types.h"
 #include "stdlib/istreamdata.h"
 #include "studiorender/studioapi/istudioapi_shader.h"
 
@@ -140,5 +138,3 @@ private:
 };
 
 #include "shadercache/shaderreflection.inl"
-
-#endif // !SHADERREFLECTION_H

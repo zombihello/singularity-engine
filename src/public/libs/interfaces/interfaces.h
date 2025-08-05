@@ -1,10 +1,4 @@
-/**
- * @file
- * @addtogroup interfaces interfaces
- */
-
-#ifndef INTERFACES_H
-#define INTERFACES_H
+#pragma once
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -34,5 +28,3 @@ extern IStudioAPI*		g_pStudioAPI;
 extern IShaderMgr*		g_pShaderMgr;
 extern IMaterialSystem* g_pMaterialSystem;
 extern IResourceSystem* g_pResourceSystem;
-
-#endif // !INTERFACES_H

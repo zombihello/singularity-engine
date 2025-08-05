@@ -2,8 +2,8 @@
 #include "stdlib/jsondoc.h"
 #include "core/icommandline.h"
 #include "core/crashdump.h"
-#include "engine/icvar.h"
-#include "appframework/iappsystemgroup.h"
+#include "cvar/icvar.h"
+#include "appframework/appframework.h"
 #include "shadercache/shadercache.h"
 #include "tools/shadercompiler/makefile.h"
 #include "tools/shadercompiler/shader_cppclass_generator.h"
@@ -82,22 +82,12 @@ void ConvShaderTypeToString( studioAPIShaderType_t shaderType, const achar*& pSh
 
 
 //-----------------------------------------------------------------------------
-// Shader compile application
+// Shader compile app system group
 //-----------------------------------------------------------------------------
-class CShaderCompileApp : public CDefaultAppSystemGroup<CAppSystemGroup>
+class CShaderCompileAppSystemGroup : public CDefaultAppSystemGroup<CAppSystemGroup>
 {
 public:
 	// IAppSystemGroup interface
-	// An installed application creation function, you should tell the group
-	// the DLLs and the singleton interfaces you want to instantiate
-	// Return FALSE if there's any problems and the app will abort
-	virtual bool Create() override;
-
-	// Allow the application to do some work after AppSystems are connected but
-	// they aren't all Initialized
-	// Return FALSE if there's any problems and the app will abort
-	virtual bool PreInit() override;
-
 	// Main loop implemented by the application
 	// Return exit code. If all ok returns zero
 	virtual int32 Main() override;
@@ -105,7 +95,7 @@ public:
 	// Allow the application to do some work after all AppSystems are shut down
 	virtual void PostShutdown() override;
 
-	CShaderCompileApp();
+	CShaderCompileAppSystemGroup();
 
 private:
 	bool GenerateShaderCppClass();
@@ -123,10 +113,10 @@ private:
 
 /*
 ==================
-CShaderCompileApp::CShaderCompileApp
+CShaderCompileAppSystemGroup::CShaderCompileAppSystemGroup
 ==================
 */
-CShaderCompileApp::CShaderCompileApp()
+CShaderCompileAppSystemGroup::CShaderCompileAppSystemGroup()
 	: bDebugConfiguration( false )
 	, backendHandle( NULL )
 	, pShaderCompileBackend( NULL )
@@ -134,46 +124,10 @@ CShaderCompileApp::CShaderCompileApp()
 
 /*
 ==================
-CShaderCompileApp::Create
+CShaderCompileAppSystemGroup::Main
 ==================
 */
-bool CShaderCompileApp::Create()
-{
-	// Load application systems
-	appSystemInfo_t		appSystemInfos[] =
-	{
-		{ "engine"		DLL_EXT_STRING,			CVAR_QUERY_INTERFACE_VERSION		},	// This one must be first
-		{ "filesystem"	DLL_EXT_STRING,			FILESYSTEM_INTERFACE_VERSION		},
-		{ "engine"		DLL_EXT_STRING,			CVAR_INTERFACE_VERSION				},
-		{ "", "" }																		// Required to terminate the list
-	};
-
-	// Add all systems from array
-	if ( !AddSystems( appSystemInfos ) )
-	{
-		return false;
-	}
-
-	// We are done
-	return true;
-}
-
-/*
-==================
-CShaderCompileApp::PreInit
-==================
-*/
-bool CShaderCompileApp::PreInit()
-{
-	return ConnectStdLib( GetFactory() );
-}
-
-/*
-==================
-CShaderCompileApp::Main
-==================
-*/
-int32 CShaderCompileApp::Main()
+int32 CShaderCompileAppSystemGroup::Main()
 {
 	// Is need to print help of usage
 	bool			bPrintHelpUsage = CommandLine()->HasParam( "h" ) || CommandLine()->HasParam( "help" ) || CommandLine()->HasParam( "?" );
@@ -243,10 +197,10 @@ int32 CShaderCompileApp::Main()
 
 /*
 ==================
-CShaderCompileApp::GenerateShaderCppClass
+CShaderCompileAppSystemGroup::GenerateShaderCppClass
 ==================
 */
-bool CShaderCompileApp::GenerateShaderCppClass()
+bool CShaderCompileAppSystemGroup::GenerateShaderCppClass()
 {
 	bool							bResult = true;
 	CShaderCppClassGenerator		shaderCppClassGenerator;
@@ -296,10 +250,10 @@ bool CShaderCompileApp::GenerateShaderCppClass()
 
 /*
 ==================
-CShaderCompileApp::CompileShaders
+CShaderCompileAppSystemGroup::CompileShaders
 ==================
 */
-bool CShaderCompileApp::CompileShaders()
+bool CShaderCompileAppSystemGroup::CompileShaders()
 {
 	// Iterate over shaders and each the one compile for all flag combination
 	bool							bResult = true;
@@ -334,10 +288,10 @@ bool CShaderCompileApp::CompileShaders()
 
 /*
 ==================
-CShaderCompileApp::CompileShader
+CShaderCompileAppSystemGroup::CompileShader
 ==================
 */
-bool CShaderCompileApp::CompileShader( const shader_t& shader, CShaderCacheDoc& shaderCacheDoc )
+bool CShaderCompileAppSystemGroup::CompileShader( const shader_t& shader, CShaderCacheDoc& shaderCacheDoc )
 {
 	std::vector<int32>				flagVarSlots( shader.flags.size() );
 
@@ -460,10 +414,10 @@ bool CShaderCompileApp::CompileShader( const shader_t& shader, CShaderCacheDoc& 
 
 /*
 ==================
-CShaderCompileApp::LoadBackend
+CShaderCompileAppSystemGroup::LoadBackend
 ==================
 */
-bool CShaderCompileApp::LoadBackend()
+bool CShaderCompileAppSystemGroup::LoadBackend()
 {
 	// Unload old backend
 	UnloadBackend();
@@ -506,17 +460,17 @@ bool CShaderCompileApp::LoadBackend()
 
 	// We are done
 	Msg( "ShaderCompiler: Backend '%s' loaded", backendPath.c_str() );
-	CShaderCompileApp::backendHandle			= backendHandle;
-	CShaderCompileApp::pShaderCompileBackend	= pShaderCompileBackend;
+	CShaderCompileAppSystemGroup::backendHandle			= backendHandle;
+	CShaderCompileAppSystemGroup::pShaderCompileBackend	= pShaderCompileBackend;
 	return true;
 }
 
 /*
 ==================
-CShaderCompileApp::UnloadBackend
+CShaderCompileAppSystemGroup::UnloadBackend
 ==================
 */
-void CShaderCompileApp::UnloadBackend()
+void CShaderCompileAppSystemGroup::UnloadBackend()
 {
 	if ( backendHandle || pShaderCompileBackend )
 	{
@@ -540,10 +494,10 @@ void CShaderCompileApp::UnloadBackend()
 
 /*
 ==================
-CShaderCompileApp::PostShutdown
+CShaderCompileAppSystemGroup::PostShutdown
 ==================
 */
-void CShaderCompileApp::PostShutdown()
+void CShaderCompileAppSystemGroup::PostShutdown()
 {
 	UnloadBackend();
 	DisconnectStdLib();
@@ -573,8 +527,16 @@ main
 */
 int main( int argc, char** argv )
 {
+	// Enable developer messages if we in debug configuration
+#if DEBUG
+	Logger()->SetGroupActivate( LOG_GROUP_DEVELOPER, true );
+#endif // DEBUG
+
 	// Initialize the main thread
 	Sys_InitMainThread();
+
+	// Initialize OS console
+	LogConsoleOS()->Show( true );
 
 	// Setup application information for the crash dump
 	CrashDump_SetAppInfo( crashDumpAppInfo_t{ "Shader Compile", __DATE__ " " __TIME__, NULL, NULL } );
@@ -598,6 +560,7 @@ int main( int argc, char** argv )
 	}
 
 	// Run application
-	CShaderCompileApp		shaderCompileApp;
-	return shaderCompileApp.Run();
+	CShaderCompileAppSystemGroup	shaderCompileSystems;
+	CApplication					application( &shaderCompileSystems, "shadercompiler" );
+	return application.Run();
 }

@@ -1,7 +1,7 @@
 #include "pch_stdlib.h"
 #include "interfaces/interfaces.h"
 #include "filesystem/ifilesystem.h"
-#include "engine/icvar.h"
+#include "cvar/icvar.h"
 #include "stdlib/stdlib.h"
 
 // Is StdLib already connected

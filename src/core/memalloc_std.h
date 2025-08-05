@@ -1,6 +1,4 @@
-#ifndef MEMALLOC_STD_H
-#define MEMALLOC_STD_H
-
+#pragma once
 #include "core/memalloc_base.h"
 
 //-----------------------------------------------------------------------------
@@ -23,5 +21,3 @@ public:
 	// CMemAllocBase interface
 	virtual bool IsInternallyThreadSafe() const override;
 };
-
-#endif // !MEMALLOC_STD_H

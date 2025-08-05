@@ -1,6 +1,4 @@
-#ifndef IMATERIALSYSTEM_H
-#define IMATERIALSYSTEM_H
-
+#pragma once
 #include "stdlib/refcount.h"
 #include "appframework/iappsystem.h"
 
@@ -18,5 +16,3 @@ class IMaterialSystem : public IAppSystem
 {
 public:
 };
-
-#endif // !IMATERIALSYSTEM_H

@@ -1,6 +1,4 @@
-#ifndef ISTUDIO_RENDEROBJECT_H
-#define ISTUDIO_RENDEROBJECT_H
-
+#pragma once
 #include "stdlib/refcount.h"
 
 //-----------------------------------------------------------------------------
@@ -10,5 +8,3 @@ class IStudioRenderObject : public IRefCounted
 {
 public:
 };
-
-#endif // !ISTUDIO_RENDEROBJECT_H

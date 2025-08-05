@@ -1,5 +1,4 @@
-#ifndef STEX_COMPILED_DOC_INL
-#define STEX_COMPILED_DOC_INL
+#pragma once
 
 /*
 ==================
@@ -253,5 +252,3 @@ FORCEINLINE void CSTEXCompiledTextureDoc::Clear()
 	mipmaps.clear();
 	data.clear();
 }
-
-#endif // !STEX_COMPILED_DOC_INL

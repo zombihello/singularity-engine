@@ -1,18 +1,25 @@
-#ifndef IGAME_H
-#define IGAME_H
+#pragma once
+#include "appframework/iappsystem.h"
 
-#include "core/types.h"
+//-----------------------------------------------------------------------------
+// Forward declarations
+//-----------------------------------------------------------------------------
+class IMap;
+
 
 //-----------------------------------------------------------------------------
 // Game interface
 //-----------------------------------------------------------------------------
 #define GAME_INTERFACE_VERSION		"SGame001"
-class IGame
+class IGame : public IAppSystem
 {
 public:
-	// Methods initialize and shutdown the game
-	virtual bool Init( createInterfaceFn_t pFactory ) = 0;
-	virtual void Shutdown() = 0;
+	// Initialize/shutdown a map and get the active map
+	// NOTE: The path to the map in the file system can be without file extension
+	virtual bool MapInit( const achar* pPath ) = 0;
+	virtual void MapShutdown() = 0;
+	virtual bool HasActiveMap() const = 0;
+	virtual IMap* GetActiveMap() const = 0;
 
 	// Process one game frame
 	virtual void FrameUpdate() = 0;
@@ -25,13 +32,25 @@ public:
 //-----------------------------------------------------------------------------
 // Interface exposed from the game module back to the engine for specifying IAppSystems
 //-----------------------------------------------------------------------------
+enum gameAppSystemOrder_t
+{
+	GAME_APPSYSTEM_ORDER_BEFORE_GAME,
+	GAME_APPSYSTEM_ORDER_AFTER_GAME
+};
+
+
+struct gameAppSystemInfo_t
+{
+	gameAppSystemOrder_t	order;			// Determines the order in which systems are initialized
+	const achar*			pModuleName;
+	const achar*			pInterfaceName;
+};
+
+
 #define GAME_APPSYSTEMS_INTERFACE_VERSION		"SGameAppSystems001"
 class IGameAppSystems
 {
 public:
 	virtual uint32 GetNum() const = 0;
-	virtual const achar* GetModuleName( uint32 index ) const = 0;
-	virtual const achar* GetInterfaceName( uint32 index ) const = 0;
+	virtual gameAppSystemInfo_t GetInfo( uint32 index ) const = 0;
 };
-
-#endif // !IGAME_H

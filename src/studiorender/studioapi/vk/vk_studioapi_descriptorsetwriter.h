@@ -1,6 +1,4 @@
-#ifndef VK_STUDIOAPI_DESCRIPTORSETWRITER_H
-#define VK_STUDIOAPI_DESCRIPTORSETWRITER_H
-
+#pragma once
 #include "Volk/volk.h"
 
 #include "studiorender/studioapi/vk/vk_studioapi_descriptorsetslayout.h"
@@ -69,5 +67,3 @@ private:
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_descriptorsetwriter.inl"
-
-#endif // !VK_STUDIOAPI_DESCRIPTORSETWRITER_H

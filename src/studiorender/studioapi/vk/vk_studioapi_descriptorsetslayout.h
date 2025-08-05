@@ -1,6 +1,4 @@
-#ifndef VK_STUDIOAPI_DESCRIPTORSETSLAYOUT_H
-#define VK_STUDIOAPI_DESCRIPTORSETSLAYOUT_H
-
+#pragma once
 #include <vector>
 #include <unordered_map>
 
@@ -72,5 +70,3 @@ private:
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_descriptorsetslayout.inl"
-
-#endif // !VK_STUDIOAPI_DESCRIPTORSETSLAYOUT_H

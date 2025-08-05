@@ -1,5 +1,4 @@
-#ifndef LEXERSTATE_INL
-#define LEXERSTATE_INL
+#pragma once
 
 /*
 ==================
@@ -89,5 +88,3 @@ FORCEINLINE void parserLexerState_t::EmitError( const achar* pMessage )
 {
 	pLexerListener->Error( *this, pMessage );
 }
-
-#endif // !LEXERSTATE_INL

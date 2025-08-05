@@ -1,6 +1,4 @@
-#ifndef IAPPSYSTEMGROUP_H
-#define IAPPSYSTEMGROUP_H
-
+#pragma once
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -24,8 +22,8 @@ enum
 //-----------------------------------------------------------------------------
 struct appSystemInfo_t
 {
-	const achar*	pModuleName;		/**< module_t name */
-	const achar*	pInterfaceName;		/**< Interface name */
+	const achar*	pModuleName;
+	const achar*	pInterfaceName;
 };
 
 
@@ -102,8 +100,11 @@ public:
 	int32 Run();
 
 	// Post initialize and pre-shutdown
-	virtual bool PostInit() override	{ return true; }
-	virtual void PreShutdown() override {}
+	virtual bool PostInit() override;
+	virtual void PreShutdown() override;
+
+	// Used by CApplication to set up necessary pointer if we can't do it in the constructor
+	void Setup( CAppSystemGroup* pParentAppSystem );
 
 	// Returns the stage at which the app system group ran into an error
 	appSystemGroupStage_t GetCurrentStage() const;
@@ -175,12 +176,12 @@ template<class CBaseClass>
 class CDefaultAppSystemGroup : public CBaseClass
 {
 public:
-	virtual bool Create()		{ return true; }
-	virtual bool PreInit()		{ return true; }
-	virtual bool PostInit()		{ return true; }
-	virtual void PreShutdown()	{}
-	virtual void PostShutdown() {}
-	virtual void Destroy()		{}
+	virtual bool Create();
+	virtual bool PreInit();
+	virtual bool PostInit();
+	virtual void PreShutdown();
+	virtual void PostShutdown();
+	virtual void Destroy();
 };
 
-#endif // !IAPPSYSTEMGROUP_H
+#include "appframework/iappsystemgroup.inl"

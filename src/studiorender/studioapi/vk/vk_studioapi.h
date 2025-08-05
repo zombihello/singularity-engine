@@ -1,6 +1,4 @@
-#ifndef VK_STUDIOAPI_H
-#define VK_STUDIOAPI_H
-
+#pragma once
 #include "studiorender/studioapi/istudioapi.h"
 #include "studiorender/studioapi/vk/vk_studioapi_delegates.h"
 #include "studiorender/studioapi/vk/vk_studioapi_device.h"
@@ -22,14 +20,19 @@ class CStudioAPIDescriptorPoolsMgrVk;
 //-----------------------------------------------------------------------------
 // Vulkan Studio API
 //-----------------------------------------------------------------------------
-class CStudioAPIVk : public IStudioAPI
+class CStudioAPIVk : public CBaseAppSystem<IStudioAPI>
 {
 public:
-	// IStudioAPI interface
-	// Initialize/shutdown Studio API
-	virtual bool Init( createInterfaceFn_t pFactory ) override;
+	// IAppSystem interfaces
+	// Here's where the app systems get to learn about each other
+	virtual bool Connect( createInterfaceFn_t pFactory ) override;
+	virtual void Disconnect() override;
+
+	// Initialize and shutdown
+	virtual bool Init() override;
 	virtual void Shutdown() override;
 
+	// IStudioAPI interface
 	// Acquire/release thread ownership
 	virtual void AcquireThreadOwnership() override;
 	virtual void ReleaseThreadOwnership() override;
@@ -78,7 +81,6 @@ public:
 	uint32 GetCurrentFrameInFlight() const;
 
 private:
-	bool										bInited;
 	uint64										frameNumber;
 	uint32										currentFrameInFlight;
 	CStudioAPIDeviceVk							device;
@@ -96,5 +98,3 @@ private:
 extern CStudioAPIVk		g_StudioAPIVk;
 
 #include "studiorender/studioapi/vk/vk_studioapi.inl"
-
-#endif // !VK_STUDIOAPI_H

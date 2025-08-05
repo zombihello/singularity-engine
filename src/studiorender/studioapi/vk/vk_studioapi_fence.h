@@ -1,6 +1,4 @@
-#ifndef VK_STUDIOAPI_FENCE_H
-#define VK_STUDIOAPI_FENCE_H
-
+#pragma once
 #include "studiorender/studioapi/vk/vk_studioapi.h"
 
 //-----------------------------------------------------------------------------
@@ -54,5 +52,3 @@ private:
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_fence.inl"
-
-#endif // !VK_STUDIOAPI_FENCE_H

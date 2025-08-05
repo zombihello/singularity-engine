@@ -1,6 +1,4 @@
-#ifndef VK_STUDIOAPI_RENDERPIPELINE_H
-#define VK_STUDIOAPI_RENDERPIPELINE_H
-
+#pragma once
 #include "studiorender/studioapi/istudioapi_renderpipeline.h"
 #include "studiorender/studioapi/vk/vk_studioapi_delegates.h"
 #include "studiorender/studioapi/vk/vk_studioapi_device.h"
@@ -27,5 +25,3 @@ private:
 	TRefPtr<CStudioAPIBoundShaderStateVk>			pBoundShaderState;
 	mutable COnStudioAPIRenderPipelineDeletedVk		onRenderPipelineDeleted;
 };
-
-#endif // !VK_STUDIOAPI_RENDERPIPELINE_H

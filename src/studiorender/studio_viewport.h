@@ -1,6 +1,4 @@
-#ifndef STUDIO_VIEWPORT_H
-#define STUDIO_VIEWPORT_H
-
+#pragma once
 #include "stdlib/delegate.h"
 #include "studiorender/istudio_viewport.h"
 #include "studiorender/studio_renderthread.h"
@@ -77,5 +75,3 @@ private:
 };
 
 #include "studiorender/studio_viewport.inl"
-
-#endif // !STUDIO_VIEWPORT_H

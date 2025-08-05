@@ -1,6 +1,4 @@
-#ifndef ISTUDIOAPI_TEXTURE_H
-#define ISTUDIOAPI_TEXTURE_H
-
+#pragma once
 #include "studiorender/studioapi/istudioapi_resource.h"
 #include "studiorender/studioapi/istudioapi_renderpipeline.h"
 
@@ -193,5 +191,3 @@ public:
 	virtual uint32 GetUsageFlags() const = 0;
 	virtual uint8 GetMemoryFlags() const = 0;
 };
-
-#endif // !ISTUDIOAPI_TEXTURE_H

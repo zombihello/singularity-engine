@@ -1,5 +1,4 @@
-#ifndef UTILS_INL
-#define UTILS_INL
+#pragma once
 
 /*
 ==================
@@ -42,5 +41,3 @@ FORCEINLINE uint32 Parserlib_GetNumChars( const achar* pString, uint32 size )
 
 	return length;
 }
-
-#endif // !UTILS_INL

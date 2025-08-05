@@ -1,8 +1,6 @@
-#ifndef STL_H
-#define STL_H
-
-#include "core/types.h"
-#include "core/platform.h"
+#pragma once
+#include "stdlib/defines.h"
+#include "stdlib/types.h"
 #include "stdlib/strtools.h"
 #include "stdlib/hashing/fasthash.h"
 
@@ -24,5 +22,3 @@ struct stlInsensitiveCompareString_t
 };
 
 #include "stdlib/stl.inl"
-
-#endif // !STL_H

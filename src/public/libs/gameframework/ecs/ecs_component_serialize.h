@@ -1,6 +1,4 @@
-#ifndef ECS_COMPONENT_SERIALIZE_H
-#define ECS_COMPONENT_SERIALIZE_H
-
+#pragma once
 #include "sentdoc/sentvar.h"
 #include "interfaces/interfaces.h"
 #include "materialsystem/imaterial.h"
@@ -18,5 +16,3 @@ void EcsReadData( TType& data, const CSENTEntityDescVar& sentVar, const TType& d
 // Here you can add your override function to read a data from a SENT variable
 
 #include "gameframework/ecs/ecs_component_serialize.inl"
-
-#endif // !ECS_COMPONENT_SERIALIZE_H

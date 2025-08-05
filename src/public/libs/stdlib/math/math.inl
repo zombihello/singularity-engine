@@ -1,5 +1,4 @@
-#ifndef MATH_INL
-#define MATH_INL
+#pragma once
 
 /*
 ==================
@@ -781,5 +780,3 @@ FORCEINLINE void S_MatrixLookAt( const vec3_t& location, const vec3_t& direction
 {
 	matrix = glm::lookAt( location, direction, axisUp );
 }
-
-#endif // !MATH_INL

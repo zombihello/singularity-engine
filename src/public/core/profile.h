@@ -1,6 +1,4 @@
-#ifndef PROFILE_H
-#define PROFILE_H
-
+#pragma once
 #include "core/core.h"
 #include "stdlib/math/math.h"
 
@@ -117,6 +115,7 @@ public:
 	virtual bool IsRecord() const = 0;
 };
 
+// NOTE: If the module was build with disabled profiling the function return a null implementation
 CORE_INTERFACE IProfile* Profile();
 
 //-----------------------------------------------------------------------------
@@ -156,5 +155,3 @@ public:
 private:
 	profileScopeData_t		pScopeData;
 };
-
-#endif // !PROFILE_H

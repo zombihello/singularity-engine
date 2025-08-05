@@ -14,6 +14,7 @@ void CMaterialFactory::Init()
 {
 	// Register the factory in the resource system
 	Assert( g_pResourceSystem );
+	flags = GetDefaultFlags();
 	g_pResourceSystem->RegisterResourceFactory( RESOURCE_TYPE_MATERIAL, this );
 
 	// Initialize a default material
@@ -34,6 +35,7 @@ CMaterialFactory::Shutdown
 void CMaterialFactory::Shutdown()
 {
 	// Unregister the factory from the resource system
+	flags |= RESOURCE_FACTORY_FLAG_NOT_USED;
 	g_pResourceSystem->UnRegisterResourceFactory( RESOURCE_TYPE_MATERIAL );
 
 	// Remove the default material
@@ -96,11 +98,3 @@ const achar* CMaterialFactory::GetFormatType() const
 {
 	return "SMAT";
 }
-
-/*
-==================
-CMaterialFactory::Validate
-==================
-*/
-void CMaterialFactory::Validate() const
-{}

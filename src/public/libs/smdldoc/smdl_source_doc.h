@@ -1,6 +1,4 @@
-#ifndef SMDL_SOURCE_DOC_H
-#define SMDL_SOURCE_DOC_H
-
+#pragma once
 #include "core/core.h"
 
 //-----------------------------------------------------------------------------
@@ -44,5 +42,3 @@ private:
 };
 
 #include "smdldoc/smdl_source_doc.inl"
-
-#endif // !SMDL_SOURCE_DOC_H

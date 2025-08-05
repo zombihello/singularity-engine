@@ -1,5 +1,4 @@
-#ifndef SENT_COMPONENT_INL
-#define SENT_COMPONENT_INL
+#pragma once
 
 /*
 ==================
@@ -130,5 +129,3 @@ FORCEINLINE CSENTEntityDescComponent& CSENTEntityDescComponent::operator=( const
 	Copy( right );
 	return *this;
 }
-
-#endif // !SENT_COMPONENT_INL

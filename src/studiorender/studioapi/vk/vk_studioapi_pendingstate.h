@@ -1,6 +1,4 @@
-#ifndef VK_STUDIOAPI_PENDINGSTATE_H
-#define VK_STUDIOAPI_PENDINGSTATE_H
-
+#pragma once
 #include <unordered_map>
 
 #include "studiorender/studioapi/vk/vk_studioapi_delegates.h"
@@ -102,5 +100,3 @@ private:
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_pendingstate.inl"
-
-#endif // !VK_STUDIOAPI_PENDINGSTATE_H

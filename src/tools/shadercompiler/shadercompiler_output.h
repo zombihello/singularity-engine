@@ -1,6 +1,4 @@
-#ifndef SHADERCOMPILER_OUTPUT_H
-#define SHADERCOMPILER_OUTPUT_H
-
+#pragma once
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -30,5 +28,3 @@ private:
 	std::string				errorMsg;
 	std::vector<byte>		reflectionData;
 };
-
-#endif // !SHADERCOMPILER_OUTPUT_H

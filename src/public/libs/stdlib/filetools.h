@@ -1,10 +1,8 @@
-#ifndef FILETOOLS_H
-#define FILETOOLS_H
-
+#pragma once
 #include <string>
 
-#include "core/platform.h"
-#include "core/types.h"
+#include "stdlib/defines.h"
+#include "stdlib/types.h"
 
 //-----------------------------------------------------------------------------
 // File tools
@@ -65,5 +63,3 @@ private:
 #else
     #error Unknown platform
 #endif // PLATFORM_WINDOWS
-
-#endif // !FILETOOLS_H

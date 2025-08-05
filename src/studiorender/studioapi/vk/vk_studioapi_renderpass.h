@@ -1,6 +1,4 @@
-#ifndef VK_STUDIOAPI_RENDERPASS_H
-#define VK_STUDIOAPI_RENDERPASS_H
-
+#pragma once
 #include "studiorender/studioapi/istudioapi_renderpass.h"
 #include "studiorender/studioapi/vk/vk_studioapi_device.h"
 
@@ -24,5 +22,3 @@ private:
 	VkRenderPass								vkRenderPass;
 	COnStudioAPIVkShutdown::funcDelegate_t*		pStudioAPIVkShutdownDelegate;
 };
-
-#endif // !VK_STUDIOAPI_RENDERPASS_H

@@ -1,6 +1,4 @@
-#ifndef GRAMMARINTERFACE_H
-#define GRAMMARINTERFACE_H
-
+#pragma once
 #include "parserlib/tokenstream.h"
 
 //-----------------------------------------------------------------------------
@@ -30,5 +28,3 @@ private:
 };
 
 #include "parserlib/grammarinterface.inl"
-
-#endif // !GRAMMARINTERFACE_H

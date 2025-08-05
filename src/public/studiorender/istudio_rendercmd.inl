@@ -1,5 +1,4 @@
-#ifndef ISTUDIO_RENDERCMD_INL
-#define ISTUDIO_RENDERCMD_INL
+#pragma once
 
 /*
 ==================
@@ -53,5 +52,3 @@ FORCEINLINE void Studio_FlushRenderCommands()
 		g_pStudioRender->GetCommandBuffer()->Flush();
 	}
 }
-
-#endif // !ISTUDIO_RENDERCMD_INL

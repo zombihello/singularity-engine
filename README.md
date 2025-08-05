@@ -1,5 +1,3 @@
-![SingularityEngine](docs/engineLogo.png?raw=true)
-
 ## Description
 Singularity Engine is a 3D game engine inspired by Source Engine and Quake Engine 
 

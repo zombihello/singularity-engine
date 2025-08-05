@@ -21,6 +21,7 @@ bool CResourceSystem::Connect( createInterfaceFn_t pFactory )
 	{
 		return false;
 	}
+	ConVar_Register();
 
 	g_pResourceSystem = this;
 	return true;
@@ -33,6 +34,7 @@ CResourceSystem::Disconnect
 */
 void CResourceSystem::Disconnect()
 {
+	ConVar_Unregister();
 	DisconnectStdLib();
 	g_pResourceSystem = NULL;
 }
@@ -44,9 +46,6 @@ CResourceSystem::Init
 */
 bool CResourceSystem::Init()
 {
-	// Register cvars
-	ConVar_Register();
-
 	// Reset all resource factories
 	Mem_Memzero( pResourceFactories, RESOURCE_NUM_TYPES * sizeof( IResourceFactory* ) );
 	return true;
@@ -68,9 +67,6 @@ void CResourceSystem::Shutdown()
 
 	// Reset all resource factories
 	Mem_Memzero( pResourceFactories, RESOURCE_NUM_TYPES * sizeof( IResourceFactory* ) );
-
-	// Unregister cvars
-	ConVar_Unregister();
 }
 
 /*
@@ -78,14 +74,22 @@ void CResourceSystem::Shutdown()
 CResourceSystem::RegisterResourceFactory
 ==================
 */
-void CResourceSystem::RegisterResourceFactory( resourceType_t type, IResourceFactory* pFactory )
+bool CResourceSystem::RegisterResourceFactory( resourceType_t type, IResourceFactory* pFactory )
 {
-	// Before to register the factory make sure that it is valid,
-	// because one can depends on specific format types
+	// If a factory is already registered for this type, 
+	// then in this case we can redefine it only in cases where it 
+	// does not have RESOURCE_FACTORY_FLAG_STATIC or has RESOURCE_FACTORY_FLAG_NOT_USED
 	Assert( type < RESOURCE_NUM_TYPES && pFactory );
-	pFactory->Validate();
+	IResourceFactory*	pOldFactory = pResourceFactories[type];
+	if ( pOldFactory && pOldFactory->GetFlags() & RESOURCE_FACTORY_FLAG_STATIC && !( pOldFactory->GetFlags() & RESOURCE_FACTORY_FLAG_NOT_USED ) )
+	{
+		Warning( "ResourceSystem: Resource factory for type 0x%X already registered and can be override (old format: '%s', new format: '%s')", type, pOldFactory->GetFormatType(), pFactory->GetFormatType() );
+		return false;
+	}
+
 	pResourceFactories[type] = pFactory;
 	Msg( "ResourceSystem: Resource factory for type 0x%X registered (format: '%s')", type, pFactory->GetFormatType() );
+	return true;
 }
 
 /*
@@ -93,11 +97,18 @@ void CResourceSystem::RegisterResourceFactory( resourceType_t type, IResourceFac
 CResourceSystem::UnRegisterResourceFactory
 ==================
 */
-void CResourceSystem::UnRegisterResourceFactory( resourceType_t type )
+bool CResourceSystem::UnRegisterResourceFactory( resourceType_t type )
 {
 	Assert( type < RESOURCE_NUM_TYPES );
 	if ( IResourceFactory* pResourceFactory = pResourceFactories[type] )
 	{
+		// We can't unregister a static resource factory that in use now
+		if ( pResourceFactory->GetFlags() & RESOURCE_FACTORY_FLAG_STATIC && !( pResourceFactory->GetFlags() & RESOURCE_FACTORY_FLAG_NOT_USED ) )
+		{
+			Warning( "ResourceSystem: Resource factory for type 0x%X can be unregistered (format: '%s')", type, pResourceFactory->GetFormatType() );
+			return false;
+		}
+
 		// Unload all resource of the type
 		std::unordered_map<std::string, TRefPtr<CResource>>&	resourcesDict = resourcesDicts[type];
 		for ( auto it = resourcesDict.begin(); it != resourcesDict.end(); ++it )
@@ -111,14 +122,7 @@ void CResourceSystem::UnRegisterResourceFactory( resourceType_t type )
 		pResourceFactories[type] = NULL;
 	}
 
-	// Make sure that rest factories are valid, because one factory can depends on specific format types
-	for ( uint32 factoryIdx = 0; factoryIdx < RESOURCE_NUM_TYPES; ++factoryIdx )
-	{
-		if ( IResourceFactory* pResourceFactory = pResourceFactories[factoryIdx] )
-		{
-			pResourceFactory->Validate();
-		}
-	}
+	return true;
 }
 
 /*

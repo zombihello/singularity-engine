@@ -1,6 +1,4 @@
-#ifndef ISTUDIOAPI_FRAMEBUFFER_H
-#define ISTUDIOAPI_FRAMEBUFFER_H
-
+#pragma once
 #include "stdlib/math/math.h"
 #include "stdlib/math/color.h"
 #include "studiorender/studioapi/istudioapi_renderpass.h"
@@ -59,5 +57,3 @@ public:
 	virtual ~IStudioAPIFrameBuffer() {}
 	virtual ivec2_t GetSize() const = 0;
 };
-
-#endif // !ISTUDIOAPI_FRAMEBUFFER_H

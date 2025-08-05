@@ -1,5 +1,4 @@
-#ifndef ECS_COMPONENT_SERIALIZE_INL
-#define ECS_COMPONENT_SERIALIZE_INL
+#pragma once
 
 /*
 ==================
@@ -158,5 +157,3 @@ FORCEINLINE void EcsReadData<TResourcePtr<IEntityDesc>>( TResourcePtr<IEntityDes
 		data = pDefaultValue;
 	}
 }
-
-#endif // !ECS_COMPONENT_SERIALIZE_INL

@@ -1,9 +1,7 @@
-#ifndef VK_STUDIOAPI_CMDCONTEXT_H
-#define VK_STUDIOAPI_CMDCONTEXT_H
-
+#pragma once
 #include "Volk/volk.h"
-#include "core/platform.h"
-#include "core/types.h"
+#include "stdlib/defines.h"
+#include "stdlib/types.h"
 #include "studiorender/studioapi/vk/vk_studioapi_renderpass.h"
 #include "studiorender/studioapi/vk/vk_studioapi_renderpipeline.h"
 #include "studiorender/studioapi/vk/vk_studioapi_framebuffer.h"
@@ -92,5 +90,3 @@ private:
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_cmdcontext.inl"
-
-#endif // !VK_STUDIOAPI_CMDCONTEXT_H

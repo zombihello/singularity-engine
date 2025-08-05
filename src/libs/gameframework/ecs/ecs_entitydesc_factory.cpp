@@ -12,6 +12,7 @@ void CEcsEntityDescFactory::Init()
 {
 	// Register the factory in the resource system
 	Assert( g_pResourceSystem );
+	flags |= GetDefaultFlags();
 	g_pResourceSystem->RegisterResourceFactory( RESOURCE_TYPE_ENTITY_DESC, this );
 
 	// Initialize the default entity descriptor
@@ -30,6 +31,7 @@ CEcsEntityDescFactory::Shutdown
 void CEcsEntityDescFactory::Shutdown()
 {
 	// Unregister the factory from the resource system
+	flags |= RESOURCE_FACTORY_FLAG_NOT_USED;
 	g_pResourceSystem->UnRegisterResourceFactory( RESOURCE_TYPE_ENTITY_DESC );
 
 	// Remove the default entity descriptor
@@ -90,19 +92,5 @@ CEcsEntityDescFactory::GetFormatType
 */
 const achar* CEcsEntityDescFactory::GetFormatType() const
 {
-	return "SENT_ECS";
-}
-
-/*
-==================
-CEcsEntityDescFactory::Validate
-==================
-*/
-void CEcsEntityDescFactory::Validate() const
-{
-	IResourceFactory*	pMapResourceFactory = g_pResourceSystem->GetResourceFactory( RESOURCE_TYPE_MAP );
-	if ( !pMapResourceFactory || S_Stricmp( pMapResourceFactory->GetFormatType(), "SMAP_ECS" ) )
-	{
-		Sys_Error( "SENT_ECS factory depends on SMAP_ECS factory" );
-	}
+	return "SENT";
 }

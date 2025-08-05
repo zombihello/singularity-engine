@@ -1,6 +1,4 @@
-#ifndef SENT_SOURCE_DOC_H
-#define SENT_SOURCE_DOC_H
-
+#pragma once
 #include <string>
 #include <vector>
 
@@ -41,9 +39,7 @@ private:
 	bool GrabValueAsVar( const CJsonValue& jsonValue, CSENTEntityDescVar& var ) const;
 
 	std::string								outputDir;
-	std::vector<CSENTEntityDescComponent>		components;
+	std::vector<CSENTEntityDescComponent>	components;
 };
 
 #include "sentdoc/sent_source_doc.inl"
-
-#endif // !SENT_SOURCE_DOC_H

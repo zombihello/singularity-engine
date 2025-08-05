@@ -1,8 +1,6 @@
-#ifndef COREAPI_H
-#define COREAPI_H
-
-#include "core/build.h"
-#include "core/platform.h"
+#pragma once
+#include "stdlib/builddefines.h"
+#include "stdlib/defines.h"
 
 #if !defined( BUILD_STATIC_LIB ) && !defined( BUILD_MONOLITHIC_ENGINE )
 	#ifdef CORE_DLL_EXPORT
@@ -19,5 +17,3 @@
 	#define CORE_CLASS
 	#define CORE_GLOBAL				extern
 #endif // !BUILD_STATIC_LIB || BUILD_MONOLITHIC_ENGINE
-
-#endif // !COREAPI_H

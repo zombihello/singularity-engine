@@ -1,5 +1,4 @@
-#ifndef VK_STUDIOAPI_DESCRIPTORPOOLSMGR_INL
-#define VK_STUDIOAPI_DESCRIPTORPOOLSMGR_INL
+#pragma once
 
 /*
 ==================
@@ -72,5 +71,3 @@ FORCEINLINE uint64 CStudioAPIDescriptorPoolSetContainerVk::GetLastFrameUsed() co
 {
 	return lastFrameUsed;
 }
-
-#endif // !VK_STUDIOAPI_DESCRIPTORPOOLSMGR_INL

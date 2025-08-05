@@ -1,6 +1,4 @@
-#ifndef VK_STUDIOAPI_CMDBUFFERPOOL_H
-#define VK_STUDIOAPI_CMDBUFFERPOOL_H
-
+#pragma once
 #include "studiorender/studioapi/vk/vk_studioapi_queue.h"
 
 //-----------------------------------------------------------------------------
@@ -35,5 +33,3 @@ private:
 	std::list<CStudioAPICmdBufferVk*>	cmdBuffers;
 	std::list<CStudioAPICmdBufferVk*>	freeCmdBuffers;
 };
-
-#endif // !VK_STUDIOAPI_CMDBUFFERPOOL_H

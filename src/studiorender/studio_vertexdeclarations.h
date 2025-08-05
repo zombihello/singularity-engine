@@ -1,6 +1,4 @@
-#ifndef STUDIO_VERTEXDECLARATIONS_H
-#define STUDIO_VERTEXDECLARATIONS_H
-
+#pragma once
 #include "studiorender/studioapi/istudioapi_shader.h"
 #include "studiorender/istudio_renderresource.h"
 #include "studiorender/studio_vertextypes.h"
@@ -37,5 +35,3 @@ private:
 	TRefPtr<IStudioAPIVertexDeclaration>		pStudioAPIVertexDeclarations[STUDIO_VERTEX_NUM_TYPES];
 };
 extern CStudioVertexDeclarations		g_StudioVertexDeclarations;
-
-#endif // !STUDIO_VERTEXDECLARATIONS_H

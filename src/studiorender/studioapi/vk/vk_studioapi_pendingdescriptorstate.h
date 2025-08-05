@@ -1,6 +1,4 @@
-#ifndef VK_STUDIOAPI_PENDINGDESCRIPTORSTATE_H
-#define VK_STUDIOAPI_PENDINGDESCRIPTORSTATE_H
-
+#pragma once
 #include <vector>
 
 #include "studiorender/studioapi/vk/vk_studioapi_renderpipeline.h"
@@ -72,5 +70,3 @@ private:
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_pendingdescriptorstate.inl"
-
-#endif // !VK_STUDIOAPI_PENDINGDESCRIPTORSTATE_H

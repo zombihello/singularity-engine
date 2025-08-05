@@ -9,20 +9,10 @@
 #include "studiorender/studio_renderobject_quad.h"
 #include "studiorender/studiorender.h"
 
+CConVar				r_vsync( "r_vsync", "0", "Should use vertical synchronization (VSync)", FCVAR_ARCHIVE );
 CStudioRender		g_StudioRender;
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CStudioRender, IStudioRender, STUDIORENDER_INTERFACE_VERSION, g_StudioRender );
 
-
-/*
-==================
-CStudioRender::CStudioRender
-==================
-*/
-CStudioRender::CStudioRender()
-	: studioAPIHandle( INVALID_DLL_HANDLE )
-	, pStudioAPIFactory( nullptr )
-	, pAppSystemFactory( nullptr )
-{}
 
 /*
 ==================
@@ -36,16 +26,10 @@ bool CStudioRender::Connect( createInterfaceFn_t pFactory )
 	{
 		return false;
 	}
-
-	// Before connect studiorender must be Studio API loaded by CStudioRender::SetStudioAPI
-	if ( !pStudioAPIFactory )
-	{
-		Warning( "StudioRender: The studiorender requires Studio API to run!" );
-		return false;
-	}
+	ConVar_Register();
 
 	// Get Studio API
-	g_pStudioAPI = ( IStudioAPI* )pStudioAPIFactory( STUDIOAPI_INTERFACE_VERSION );
+	g_pStudioAPI = ( IStudioAPI* )pFactory( STUDIOAPI_INTERFACE_VERSION );
 	if ( !g_pStudioAPI )
 	{
 		return false;
@@ -58,8 +42,7 @@ bool CStudioRender::Connect( createInterfaceFn_t pFactory )
 		return false;
 	}
 
-	pAppSystemFactory	= pFactory;
-	g_pStudioRender		= this;
+	g_pStudioRender	= this;
 	return true;
 }
 
@@ -71,35 +54,12 @@ CStudioRender::Disconnect
 void CStudioRender::Disconnect()
 {
 	// Disconnect StdLib
+	ConVar_Unregister();
 	DisconnectStdLib();
+
 	g_pStudioAPI		= NULL;
-	pAppSystemFactory	= NULL;
 	g_pStudioRender		= NULL;
 	g_pShaderMgr		= NULL;
-}
-
-/*
-==================
-CStudioRender::QueryInterface
-==================
-*/
-void* CStudioRender::QueryInterface( const achar* pInterfaceName )
-{
-	// Returns various interfaces supported by the Studio API dll
-	void*	pInterface = NULL;
-	if ( pStudioAPIFactory )
-	{
-		pInterface = pStudioAPIFactory( pInterfaceName );
-	}
-
-	// Otherwise if not found look in our factory
-	if ( !pInterface )
-	{
-		createInterfaceFn_t		pFactory = Sys_GetFactoryThis();
-		pInterface = pFactory( pInterfaceName );
-	}
-
-	return pInterface;
 }
 
 /*
@@ -109,17 +69,6 @@ CStudioRender::Init
 */
 bool CStudioRender::Init()
 {
-	// Register cvars
-	ConVar_Register();
-	
-	// Initialize Studio API
-	if ( !g_pStudioAPI->Init( pAppSystemFactory ) )
-	{
-		Warning( "StudioRender: Failed to init Studio API '%s'", studioAPIDLLName.c_str() );
-		DestroyStudioAPI();
-		return false;
-	}
-
 	// Initialize all global resources
 	CStudioGlobalRenderResources::InitResources();
 
@@ -148,39 +97,6 @@ void CStudioRender::Shutdown()
 
 	// Release all global resources
 	CStudioGlobalRenderResources::ReleaseResources();
-
-	// Destroy Studio API and unregister cvars
-	DestroyStudioAPI();
-	ConVar_Unregister();
-}
-
-/*
-==================
-CStudioRender::SetStudioAPI
-==================
-*/
-void CStudioRender::SetStudioAPI( const achar* pStudioAPIDLL )
-{
-	// We cannot set the studio API twice
-	if ( pStudioAPIFactory )
-	{
-		Error( "StudioRender: Cannot set the Studio API twice!" );
-		return;
-	}
-
-	// Set default StudioAPI module if pStudioAPIDLL isn't valid
-	if ( !pStudioAPIDLL )
-	{
-		pStudioAPIDLL = "studioapi_vk" DLL_EXT_STRING;
-	}
-
-	// Load Studio API module
-	studioAPIDLLName	= pStudioAPIDLL;
-	pStudioAPIFactory	= CreateStudioAPI( pStudioAPIDLL );
-	if ( !pStudioAPIFactory )
-	{
-		DestroyStudioAPI();
-	}
 }
 
 /*
@@ -321,67 +237,4 @@ CStudioRender::IsInRenderThreads
 bool CStudioRender::IsInRenderThread() const
 {
 	return Studio_IsInRenderThread();
-}
-
-/*
-==================
-CStudioRender::StudioAPI_Load
-==================
-*/
-createInterfaceFn_t CStudioRender::CreateStudioAPI( const achar* pStudioAPIDLL )
-{
-	// Do nothing if pStudioAPIDLL isn't valid
-	if ( !pStudioAPIDLL )
-	{
-		return NULL;
-	}
-
-	// Clean up the old Studio API
-	DestroyStudioAPI();
-
-	// Load the new Studio API
-	studioAPIHandle = Sys_DLL_LoadModule( pStudioAPIDLL );
-	if ( !studioAPIHandle )
-	{
-		Warning( "StudioRender: Failed to load Studio API '%s'", pStudioAPIDLL );
-		return NULL;
-	}
-
-	// Get our class factory methods
-	createInterfaceFn_t		pFactory = Sys_GetFactory( studioAPIHandle );
-	if ( !pFactory )
-	{
-		Warning( "StudioRender: Failed to get interface factory from '%s'", pStudioAPIDLL );
-		DestroyStudioAPI();
-		return NULL;
-	}
-
-	// We are done!
-	Msg( "StudioRender: Studio API '%s' loaded", pStudioAPIDLL );
-	return pFactory;
-}
-
-/*
-==================
-CStudioRender::DestroyStudioAPI
-==================
-*/
-void CStudioRender::DestroyStudioAPI()
-{
-	if ( studioAPIHandle )
-	{
-		// Shutdown Studio API if pointer is valid
-		if ( g_pStudioAPI )
-		{
-			g_pStudioAPI->Shutdown();
-		}
-
-		Msg( "StudioRender: Studio API '%s' unloaded", studioAPIDLLName.c_str() );
-		Sys_DLL_UnloadModule( studioAPIHandle );
-
-		studioAPIDLLName.clear();
-		studioAPIHandle		= NULL;
-		pStudioAPIFactory	= NULL;
-		g_pStudioAPI		= NULL;
-	}
 }

@@ -1,7 +1,5 @@
-#ifndef WINDOWEVENT_H
-#define WINDOWEVENT_H
-
-#include "core/types.h"
+#pragma once
+#include "stdlib/types.h"
 
 //-----------------------------------------------------------------------------
 // Window events
@@ -60,5 +58,3 @@ struct windowEvent_t
 	uint32			windowId;
 	uevents_t		events;
 };
-
-#endif // !WINDOWEVENT_H

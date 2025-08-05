@@ -1,5 +1,4 @@
-#ifndef WIN_MEMORY_INL
-#define WIN_MEMORY_INL
+#pragma once
 
 //-----------------------------------------------------------------------------
 // Macroses to allocate memory at stack
@@ -57,5 +56,3 @@ FORCEINLINE void* Mem_Memcpy( void* pDest, const void* pSrc, size_t numBytes )
 {
 	return memcpy( pDest, pSrc, numBytes );
 }
-
-#endif // !WIN_MEMORY_INL

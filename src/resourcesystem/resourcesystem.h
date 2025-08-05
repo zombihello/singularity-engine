@@ -1,6 +1,4 @@
-#ifndef RESOURCESYSTEM_H
-#define RESOURCESYSTEM_H
-
+#pragma once
 #include <unordered_map>
 
 #include "resourcesystem/iresourcesystem.h"
@@ -22,14 +20,14 @@ public:
 	virtual void Shutdown() override;
 
 	// IResourceSystem interface
-	// Functions register/unregister a resource factory and reset a default resource for the resource type
-	virtual void RegisterResourceFactory( resourceType_t type, IResourceFactory* pFactory ) override;
-	virtual void UnRegisterResourceFactory( resourceType_t type ) override;
-
-	virtual TRefPtr<IResource> CreateProceduralResource( const achar* pName, resourceType_t type ) override;
+	// Functions register/unregister a resource factory
+	// NOTE: You can't override a resource factory if the one has RESOURCE_FACTORY_FLAG_STATIC (except for the case if the factory has RESOURCE_FACTORY_FLAG_NOT_USED)
+	virtual bool RegisterResourceFactory( resourceType_t type, IResourceFactory* pFactory ) override;
+	virtual bool UnRegisterResourceFactory( resourceType_t type ) override;
 
 	// NOTE: The path to the resource in the file system can be without file extension, or its name if it is a procedural resource
 	virtual TRefPtr<IResource> FindOrLoadResource( const achar* pPath, resourceType_t type, uint32 loadFlags = RESOURCE_LOAD_FLAG_NONE ) override;
+	virtual TRefPtr<IResource> CreateProceduralResource( const achar* pName, resourceType_t type ) override;
 
 	// This function delete any resource that has a refcount <= 1 (one reference in the resource system)
 	virtual void RemoveUnusedResources() override;
@@ -45,5 +43,3 @@ private:
 	std::unordered_map<std::string, TRefPtr<CResource>>		resourcesDicts[RESOURCE_NUM_TYPES];
 };
 extern CResourceSystem		g_ResourceSystem;
-
-#endif // !RESOURCESYSTEM_H

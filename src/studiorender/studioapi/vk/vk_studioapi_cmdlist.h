@@ -1,6 +1,4 @@
-#ifndef VK_STUDIOAPI_CMDBLIST_H
-#define VK_STUDIOAPI_CMDBLIST_H
-
+#pragma once
 #include "studiorender/studioapi/istudioapi_cmdlist.h"
 
 //-----------------------------------------------------------------------------
@@ -165,5 +163,3 @@ private:
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_cmdlist.inl"
-
-#endif // !VK_STUDIOAPI_CMDBLIST_H

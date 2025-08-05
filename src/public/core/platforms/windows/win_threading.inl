@@ -1,5 +1,4 @@
-#ifndef WIN_THREADING_INL
-#define WIN_THREADING_INL
+#pragma once
 
 /*
 ==================
@@ -130,5 +129,3 @@ FORCEINLINE void Sys_Sleep( float seconds )
 {
 	Sleep( ( DWORD )( seconds * 1000.0 ) );
 }
-
-#endif // !WIN_THREADING_INL

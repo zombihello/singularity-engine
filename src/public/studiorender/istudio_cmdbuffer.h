@@ -1,8 +1,6 @@
-#ifndef ISTUDIO_CMDBUFFER_H
-#define ISTUDIO_CMDBUFFER_H
-
-#include "core/types.h"
-#include "core/platform.h"
+#pragma once
+#include "stdlib/defines.h"
+#include "stdlib/types.h"
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -30,5 +28,3 @@ public:
 	virtual void CommitAllocation( studioCmdAlloc_t& allocContext ) = 0;
 	virtual void Flush() = 0;
 };
-
-#endif // !ISTUDIO_CMDBUFFER_H

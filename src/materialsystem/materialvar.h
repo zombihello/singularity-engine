@@ -1,6 +1,4 @@
-#ifndef MATERIALVAR_H
-#define MATERIALVAR_H
-
+#pragma once
 #include "materialsystem/imaterialvar.h"
 
 //-----------------------------------------------------------------------------
@@ -63,5 +61,3 @@ private:
 		TRefPtr<CMaterial>		pMaterialValue;
 	};
 };
-
-#endif // !MATERIALVAR_H

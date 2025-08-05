@@ -1,6 +1,4 @@
-#ifndef IMAP_TOOL
-#define IMAP_TOOL
-
+#pragma once
 #include "stdlib/math/math.h"
 #include "appframework/iappsystem.h"
 
@@ -28,5 +26,3 @@ class IMapTool : public IAppSystem
 public:
 	virtual bool CompileMap( const resourceToolCompileMapParams_t& compileParams ) const = 0;
 };
-
-#endif // !IMAP_TOOL

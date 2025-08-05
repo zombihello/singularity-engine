@@ -1,6 +1,4 @@
-#ifndef VK_STUDIOAPI_DESCRIPTORPOOLSMGR_H
-#define VK_STUDIOAPI_DESCRIPTORPOOLSMGR_H
-
+#pragma once
 #include <vector>
 #include <list>
 
@@ -96,5 +94,3 @@ private:
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_descriptorpoolsmgr.inl"
-
-#endif // !VK_STUDIOAPI_DESCRIPTORPOOLSMGR_H

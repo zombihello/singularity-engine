@@ -100,9 +100,9 @@ CStudioAPISwapChainVk::CStudioAPISwapChainVk( const achar* pDebugName /* = "" */
 	, vkSwapChain( VK_NULL_HANDLE )
 	, size( 0, 0 )
 	, currentImageIndex( 0 )
-	, currentSemaphoreIndex( 0 )
 	, pStudioAPIVkShutdownDelegate( NULL )
 {
+	Mem_Memzero( pImageAvailableSemaphores, STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT * sizeof( CStudioAPISemaphoreVk* ) );
 	Mem_Memzero( &vkSurfaceFormat, sizeof( VkSurfaceFormatKHR ) );
 }
 
@@ -358,24 +358,31 @@ bool CStudioAPISwapChainVk::Create( windowHandle_t windowHandle, uint32 width, u
 	}
 
 	CStudioAPISwapChainVk::windowHandle = windowHandle;
-	currentImageIndex					= 0;
-	currentSemaphoreIndex				= 0;
+	currentImageIndex = 0;
 	Msg( "StudioAPIVk: Swap chain is created for window handle (0x%X), count images: %u", windowHandle, numImages );
 
 	// Re-create semaphores
-	imageAvailableSemaphores.resize( numImages );
 	renderFinishedSemaphores.resize( numImages );
 
-	for ( uint32 semaphoreIdx = 0; semaphoreIdx < numImages; ++semaphoreIdx )
+	// To correct reusing swapchain semaphores we create semaphores the next way:
+	// * Image available semaphore per frame in flight
+	// * Render finished semaphore per swapchain image
+	// 
+	// For more information:
+	// https://docs.vulkan.org/guide/latest/swapchain_semaphore_reuse.html
+	for ( uint32 imageAvailableSemaphoreIdx = 0; imageAvailableSemaphoreIdx < STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT; ++imageAvailableSemaphoreIdx )
 	{
-		CStudioAPISemaphoreVk*&		pImageAvailableSemaphore = imageAvailableSemaphores[semaphoreIdx];
+		CStudioAPISemaphoreVk*&		pImageAvailableSemaphore = pImageAvailableSemaphores[imageAvailableSemaphoreIdx];
 		if ( pImageAvailableSemaphore )
 		{
 			g_StudioAPIVk.GetSyncMgr().ReleaseSemaphore( pImageAvailableSemaphore );
 		}
 		pImageAvailableSemaphore = g_StudioAPIVk.GetSyncMgr().CreateSemaphore();
+	}
 
-		CStudioAPISemaphoreVk*&		pRenderFinishedSemaphores = renderFinishedSemaphores[semaphoreIdx];
+	for ( uint32 renderFinishedSemaphoreIdx = 0; renderFinishedSemaphoreIdx < numImages; ++renderFinishedSemaphoreIdx )
+	{
+		CStudioAPISemaphoreVk*&		pRenderFinishedSemaphores = renderFinishedSemaphores[renderFinishedSemaphoreIdx];
 		if ( pRenderFinishedSemaphores )
 		{
 			g_StudioAPIVk.GetSyncMgr().ReleaseSemaphore( pRenderFinishedSemaphores );
@@ -426,11 +433,11 @@ void CStudioAPISwapChainVk::Destroy()
 	swapChainImages.clear();
 
 	// Release all semaphores and fences
-	for ( uint32 index = 0, count = ( uint32 )imageAvailableSemaphores.size(); index < count; ++index )
+	for ( uint32 index = 0; index < STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT; ++index )
 	{
-		g_StudioAPIVk.GetSyncMgr().ReleaseSemaphore( imageAvailableSemaphores[index] );
+		g_StudioAPIVk.GetSyncMgr().ReleaseSemaphore( pImageAvailableSemaphores[index] );
 	}
-	imageAvailableSemaphores.clear();
+	Mem_Memzero( pImageAvailableSemaphores, STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT * sizeof( CStudioAPISemaphoreVk* ) );
 
 	for ( uint32 index = 0, count = ( uint32 )renderFinishedSemaphores.size(); index < count; ++index )
 	{
@@ -442,7 +449,6 @@ void CStudioAPISwapChainVk::Destroy()
 	Mem_Memzero( &vkSurfaceFormat, sizeof( VkSurfaceFormatKHR ) );
 	size					= ivec2_t( 0, 0 );
 	currentImageIndex		= 0;
-	currentSemaphoreIndex	= 0;
 	windowHandle			= INVALID_WINDOW_HANDLE;
 	bUseVSync				= false;
 
@@ -489,11 +495,9 @@ bool CStudioAPISwapChainVk::AcquireNextImage()
 
 	// Get the index of the next swap chain image we should render to
 	// We'll wait with an "infinite" timeout, the function will block until an image is ready
-	// The imageAvailableSemaphores[currentSemaphoreIndex] will get signaled when the image is ready (upon function return)
-	uint32			imageIndex			= 0;
-	const uint32	prevSemaphoreIndex	= currentSemaphoreIndex;
-	const uint32	maxImageIndex		= GetNumImages() - 1;
-	currentSemaphoreIndex				= ( currentSemaphoreIndex + 1 ) % GetNumImages();
+	// The imageAvailableSemaphores[g_StudioAPIVk.GetCurrentFrameInFlight()] will get signaled when the image is ready (upon function return)
+	uint32			imageIndex		= 0;
+	const uint32	maxImageIndex	= GetNumImages() - 1;
 
 	// Get the current image available semaphore
 	CStudioAPISemaphoreVk*		pImageAvailableSemaphore = GetImageAvailableSemaphore();
@@ -522,7 +526,6 @@ bool CStudioAPISwapChainVk::AcquireNextImage()
 	// Revert semaphore index if the image is out of date
 	if ( vkResult == VK_ERROR_OUT_OF_DATE_KHR )
 	{
-		currentSemaphoreIndex = prevSemaphoreIndex;
 		return false;
 	}
 	// Other result except VK_SUBOPTIMAL_KHR is critical

@@ -1,6 +1,4 @@
-#ifndef VK_STUDIOAPI_DATAUPLOADER_H
-#define VK_STUDIOAPI_DATAUPLOADER_H
-
+#pragma once
 #include "studiorender/studioapi/vk/vk_studioapi_delegates.h"
 #include "studiorender/studioapi/vk/vk_studioapi_device.h"
 #include "studiorender/studioapi/vk/vk_studioapi_cmdlist.h"
@@ -87,5 +85,3 @@ private:
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_datauploader.inl"
-
-#endif // !VK_STUDIOAPI_DATAUPLOADER_H

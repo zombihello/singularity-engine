@@ -1,8 +1,6 @@
-#ifndef ICOMMANDLINE_H
-#define ICOMMANDLINE_H
-
+#pragma once
 #include "core/coreapi.h"
-#include "core/types.h"
+#include "stdlib/types.h"
 
 //-----------------------------------------------------------------------------
 // Command line interface
@@ -35,5 +33,3 @@ public:
 };
 
 CORE_INTERFACE ICommandLine* CommandLine();
-
-#endif // !ICOMMANDLINE_H

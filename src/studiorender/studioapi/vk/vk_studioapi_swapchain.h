@@ -1,6 +1,4 @@
-#ifndef VK_STUDIOAPI_SWAPCHAIN_H
-#define VK_STUDIOAPI_SWAPCHAIN_H
-
+#pragma once
 #include "stdlib/refcount.h"
 #include "studiorender/studioapi/istudioapi_swapchain.h"
 #include "studiorender/studioapi/vk/vk_studioapi.h"
@@ -102,14 +100,11 @@ private:
 	VkSurfaceFormatKHR								vkSurfaceFormat;
 	ivec2_t											size;
 	uint32											currentImageIndex;
-	uint32											currentSemaphoreIndex;
 	COnStudioAPIVkShutdown::funcDelegate_t*			pStudioAPIVkShutdownDelegate;
 	COnReCreated									onReCreated;
-	std::vector<CStudioAPISemaphoreVk*>				imageAvailableSemaphores;
+	CStudioAPISemaphoreVk*							pImageAvailableSemaphores[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];
 	std::vector<CStudioAPISemaphoreVk*>				renderFinishedSemaphores;
 	std::vector<CStudioAPISwapChainImageVk*>		swapChainImages;
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_swapchain.inl"
-
-#endif // !VK_STUDIOAPI_SWAPCHAIN_H

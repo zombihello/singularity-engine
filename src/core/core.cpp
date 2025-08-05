@@ -5,7 +5,6 @@
 
 bool		g_bRequestingExit	= false;
 double		g_SecondsPerCycle	= Sys_GetSecondsPerCycle();
-bool		g_bConsoleIOInited	= false;
 
 /*
 ==================
@@ -72,14 +71,4 @@ Sys_IsRequestingExit
 bool Sys_IsRequestingExit()
 {
 	return g_bRequestingExit;
-}
-
-/*
-==================
-Sys_IsInitedConsoleIO
-==================
-*/
-bool Sys_IsInitedConsoleIO()
-{
-	return g_bConsoleIOInited;
 }

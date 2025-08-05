@@ -1,5 +1,4 @@
-#ifndef VK_STUDIOAPI_DESCRIPTORSETWRITER_INL
-#define VK_STUDIOAPI_DESCRIPTORSETWRITER_INL
+#pragma once
 
 /*
 ==================
@@ -173,5 +172,3 @@ FORCEINLINE bool CStudioAPIDescriptorSetWriterVk::WriteDescriptorImageInfo( uint
 	textureSamplerPair.pStudioAPISampler = pSampler;
 	return bChanged;
 }
-
-#endif // !VK_STUDIOAPI_DESCRIPTORSETWRITER_INL

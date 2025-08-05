@@ -1,6 +1,4 @@
-#ifndef ISTUDIOAPI_RENDERPASS_H
-#define ISTUDIOAPI_RENDERPASS_H
-
+#pragma once
 #include "studiorender/studioapi/istudioapi_texture.h"
 
 //-----------------------------------------------------------------------------
@@ -105,5 +103,3 @@ class IStudioAPIRenderPass : public IStudioAPIResource
 public:
 	virtual ~IStudioAPIRenderPass() {}
 };
-
-#endif // !ISTUDIOAPI_RENDERPASS_H

@@ -1,5 +1,4 @@
-#ifndef INPUTSYSTEM_PRIVATE_H
-#define INPUTSYSTEM_PRIVATE_H
+#pragma once
 
 //-----------------------------------------------------------------------------
 // Internal functions
@@ -9,5 +8,3 @@
 // Only relative motion events will be delivered, the mouse position
 // will not change.
 void Sys_SetRelativeMouseMode( bool bEnabled );
-
-#endif // !INPUTSYSTEM_PRIVATE_H

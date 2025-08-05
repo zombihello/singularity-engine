@@ -1,8 +1,3 @@
-/**
- * @file
- * @addtogroup stdlib stdlib
- */
-
 #include <string>
 
 #include "stdlib/template.h"

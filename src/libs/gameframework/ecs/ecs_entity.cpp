@@ -29,6 +29,26 @@ CEcsEntity::~CEcsEntity()
 
 /*
 ==================
+CEcsEntity::Destroy
+==================
+*/
+void CEcsEntity::Destroy()
+{
+	DestroyEcsEntity();
+}
+
+/*
+==================
+CEcsEntity::IsValid
+==================
+*/
+bool CEcsEntity::IsValid() const
+{
+	return !!pEcsMap;
+}
+
+/*
+==================
 CEcsEntity::OnMapResetedOrUnloaded
 ==================
 */

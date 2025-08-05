@@ -33,7 +33,7 @@ project "shadercompiler"
 
     dependson   {
         "filesystem",
-		"engine",
+		"cvar",
 		"shadercompiler_vk"
     }
 

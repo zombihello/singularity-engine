@@ -1,6 +1,4 @@
-#ifndef ECS_COMPONENT_FACTORY_H
-#define ECS_COMPONENT_FACTORY_H
-
+#pragma once
 #include <string>
 #include <unordered_map>
 
@@ -56,5 +54,3 @@ private:
 };
 
 #include "gameframework/ecs/ecs_component_factory.inl"
-
-#endif // !ECS_COMPONENT_FACTORY_H

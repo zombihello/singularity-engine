@@ -1,5 +1,4 @@
-#ifndef RECT_INL
-#define RECT_INL
+#pragma once
 
 /*
 ==================
@@ -30,5 +29,3 @@ FORCEINLINE const rect_t<TType>& rect_t<TType>::operator=( const rect_t<TType>& 
 	height	= other.height;
 	return *this;
 }
-
-#endif // !RECT_INL

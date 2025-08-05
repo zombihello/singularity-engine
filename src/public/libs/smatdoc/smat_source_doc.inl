@@ -1,5 +1,4 @@
-#ifndef SMAT_SOURCE_DOC_INL
-#define SMAT_SOURCE_DOC_INL
+#pragma once
 
 /*
 ==================
@@ -93,5 +92,3 @@ FORCEINLINE const achar* CSMATSourceMaterialDoc::GetOutputDir() const
 {
 	return outputDir.c_str();
 }
-
-#endif // !SMAT_SOURCE_DOC_INL

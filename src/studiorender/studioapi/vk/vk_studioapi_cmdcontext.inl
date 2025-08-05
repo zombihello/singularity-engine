@@ -1,5 +1,4 @@
-#ifndef VK_STUDIOAPI_CMDCONTEXT_INL
-#define VK_STUDIOAPI_CMDCONTEXT_INL
+#pragma once
 
 /*
 ==================
@@ -60,5 +59,3 @@ FORCEINLINE CStudioAPICmdListBatchMgrVk& CStudioAPICmdContextVk::GetCmdListBatch
 {
 	return cmdListBatchMgr;
 }
-
-#endif // !VK_STUDIOAPI_CMDCONTEXT_INL

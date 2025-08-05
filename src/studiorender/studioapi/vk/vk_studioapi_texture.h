@@ -1,6 +1,4 @@
-#ifndef VK_STUDIOAPI_TEXTURE_H
-#define VK_STUDIOAPI_TEXTURE_H
-
+#pragma once
 #include "pixelformatinfos/pixelformatinfos.h"
 #include "studiorender/studioapi/istudioapi_texture.h"
 
@@ -146,5 +144,3 @@ private:
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_texture.inl"
-
-#endif // !VK_STUDIOAPI_TEXTURE_H

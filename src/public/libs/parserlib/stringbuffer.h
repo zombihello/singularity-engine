@@ -1,6 +1,4 @@
-#ifndef STRINGBUFFER_H
-#define STRINGBUFFER_H
-
+#pragma once
 #include "core/core.h"
 #include "stdlib/refcount.h"
 
@@ -90,5 +88,3 @@ typedef TParserStringBuffer<achar, std::string>					parserStringBufferANSI_t;
 typedef TParserStringBuffer<wchar, std::wstring>				parserStringBufferWCHAR_t;
 
 #include "parserlib/stringbuffer.inl"
-
-#endif // !STRINGBUFFER_H

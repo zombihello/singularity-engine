@@ -1,9 +1,7 @@
-#ifndef FILE_STD_H
-#define FILE_STD_H
-
+#pragma once
 #include <stdio.h>
 
-#include "core/platform.h"
+#include "stdlib/defines.h"
 #include "filesystem/file_base.h"
 
 //-----------------------------------------------------------------------------
@@ -64,5 +62,3 @@ public:
 private:
 	FILE*	pFile;
 };
-
-#endif // !FILE_STD_H

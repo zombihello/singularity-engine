@@ -1,8 +1,6 @@
-#ifndef MEMALLOC_MIMALLOC_H
-#define MEMALLOC_MIMALLOC_H
-
+#pragma once
 #include "core/memalloc_base.h"
-#include "core/platform_private.h"
+#include "core/defines.h"
 
 //-----------------------------------------------------------------------------
 // Mimalloc memory allocator
@@ -12,8 +10,6 @@
 class CMemAllocMimalloc : public CMemAllocBase
 {
 public:
-	CMemAllocMimalloc();
-
 	// IMemAlloc interface
 	virtual void* Malloc( size_t numBytes, uint32 alignment = DEFAULT_ALIGNMENT ) override;
 	virtual void* TryMalloc( size_t numBytes, uint32 alignment = DEFAULT_ALIGNMENT ) override;
@@ -24,9 +20,7 @@ public:
 
 	virtual bool GetAllocationSize( void* pOriginal, size_t& numBytes ) override;
 
-	// CMemAllocBase interafce
+	// CMemAllocBase interface
 	virtual bool IsInternallyThreadSafe() const override;
 };
 #endif // PLATFORM_SUPPORTS_MIMALLOC
-
-#endif // !MEMALLOC_MIMALLOC_H

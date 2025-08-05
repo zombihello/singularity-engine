@@ -1,6 +1,4 @@
-#ifndef IINPUTSYSTEM_H
-#define IINPUTSYSTEM_H
-
+#pragma once
 #include "stdlib/math/math.h"
 #include "appframework/iappsystem.h"
 #include "appframework/iwindowmgr.h"
@@ -60,5 +58,3 @@ public:
 	virtual buttonCode_t GetButtonCodeByName( const achar* pButtonName ) const = 0;
 	virtual const achar* GetButtonName( buttonCode_t buttonCode ) const = 0;
 };
-
-#endif // !IINPUTSYSTEM_H

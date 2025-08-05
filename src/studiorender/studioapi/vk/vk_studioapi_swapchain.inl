@@ -1,5 +1,4 @@
-#ifndef VK_STUDIOAPI_SWAPCHAIN_INL
-#define VK_STUDIOAPI_SWAPCHAIN_INL
+#pragma once
 
 /*
 ==================
@@ -80,7 +79,7 @@ CStudioAPISwapChainVk::GetImageAvailableSemaphore
 */
 FORCEINLINE CStudioAPISemaphoreVk* CStudioAPISwapChainVk::GetImageAvailableSemaphore() const
 {
-	return imageAvailableSemaphores[currentSemaphoreIndex];
+	return pImageAvailableSemaphores[g_StudioAPIVk.GetCurrentFrameInFlight()];
 }
 
 /*
@@ -90,6 +89,5 @@ CStudioAPISwapChainVk::GetRenderFinishedSemaphore
 */
 FORCEINLINE CStudioAPISemaphoreVk* CStudioAPISwapChainVk::GetRenderFinishedSemaphore() const
 {
-	return renderFinishedSemaphores[currentSemaphoreIndex];
+	return renderFinishedSemaphores[currentImageIndex];
 }
-#endif // !VK_STUDIOAPI_SWAPCHAIN_INL

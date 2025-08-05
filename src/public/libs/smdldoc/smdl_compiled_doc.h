@@ -1,6 +1,4 @@
-#ifndef SMDL_COMPILED_DOC_H
-#define SMDL_COMPILED_DOC_H
-
+#pragma once
 #include <vector>
 
 #include "core/core.h"
@@ -55,5 +53,3 @@ private:
 };
 
 #include "smdldoc/smdl_compiled_doc.inl"
-
-#endif // !SMDL_COMPILED_DOC_H

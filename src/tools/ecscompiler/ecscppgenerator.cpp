@@ -124,16 +124,7 @@ CEcsCppGenerator::GenerateHeader
 */
 void CEcsCppGenerator::GenerateHeader( CEcsStubModule* pEcsStubModule )
 {
-	// Get include guard define name
-	std::string		includeGuardDefineName;
-	{
-		std::string		moduleNameUpr = pEcsStubModule->GetName();
-		S_Strupr( moduleNameUpr.data() );
-		includeGuardDefineName = S_Sprintf( "__ECS_%s_H__", moduleNameUpr.c_str() );
-	}
-
-	buffer += S_Sprintf( "#ifndef %s\n", includeGuardDefineName.c_str() );
-	buffer += S_Sprintf( "#define %s\n", includeGuardDefineName.c_str() );
+	buffer += "#pragma once\n";
 
 	// Write usings
 	GenerateUsings( pEcsStubModule->GetUsings() );
@@ -147,9 +138,6 @@ void CEcsCppGenerator::GenerateHeader( CEcsStubModule* pEcsStubModule )
 
 	// Write registrar of the module
 	GenerateRegistrar( pEcsStubModule );
-
-	// Write all data into the file
-	buffer += S_Sprintf( "\n#endif // !%s", includeGuardDefineName.c_str() );
 }
 
 /*

@@ -1,6 +1,4 @@
-#ifndef ECS_MAP_H
-#define ECS_MAP_H
-
+#pragma once
 #include "smapdoc/smap_compiled_doc.h"
 #include "gameframework/ecs/ecs_core.h"
 #include "gameframework/ecs/ecs_component_factory.h"
@@ -22,7 +20,7 @@ class CEcsEntityDesc;
 //-----------------------------------------------------------------------------
 // ECS map
 //-----------------------------------------------------------------------------
-class CEcsMap : public TRefCounted<IMap>
+class CEcsMap : public IMap
 {
 public:
 	friend CEcsEntityDesc;
@@ -31,6 +29,10 @@ public:
 	~CEcsMap();
 
 	// IMap interface
+	// Spawn and destroy an entity
+	virtual IEntity* SpawnEntity( IEntityDesc* pEntityDesc, const achar* pName = "" ) override;
+	virtual void DestroyEntity( IEntity* pEntity ) override;
+
 	// Resets the map to initial state to before any updates on the map
 	virtual void Reset() override;
 	virtual void Update( float deltaTime ) override;
@@ -50,5 +52,3 @@ private:
 };
 
 #include "gameframework/ecs/ecs_map.inl"
-
-#endif // !ECS_MAP_H

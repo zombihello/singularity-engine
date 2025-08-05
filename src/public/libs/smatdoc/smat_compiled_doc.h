@@ -1,6 +1,4 @@
-#ifndef SMAT_COMPILED_DOC_H
-#define SMAT_COMPILED_DOC_H
-
+#pragma once
 #include <string>
 #include <vector>
 
@@ -33,5 +31,3 @@ private:
 };
 
 #include "smatdoc/smat_compiled_doc.inl"
-
-#endif // !SMAT_COMPILED_DOC_H

@@ -1,5 +1,4 @@
-#ifndef SHADERREFLECTION_INL
-#define SHADERREFLECTION_INL
+#pragma once
 
 /*
 ==================
@@ -83,5 +82,3 @@ FORCEINLINE const std::vector<shaderReflectionPushConstantRange_t>& CShaderRefle
 {
 	return pushConstantRanges;
 }
-
-#endif // !SHADERREFLECTION_INL
