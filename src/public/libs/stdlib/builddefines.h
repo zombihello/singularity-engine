@@ -16,7 +16,7 @@
 #endif // !ENABLE_ENSURE
 
 #ifndef ENABLE_LOGGING
-	#define ENABLE_LOGGING		!RETAIL
+	#define ENABLE_LOGGING		1
 #endif // !ENABLE_LOGGING
 
 #ifndef ENABLE_PROFILING

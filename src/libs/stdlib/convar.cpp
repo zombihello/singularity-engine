@@ -127,9 +127,10 @@ CConVar::CConVar( const achar* pName, const achar* pDefaultValue, const achar* p
 	, floatValue( 0.f )
 	, pDefaultValue( pDefaultValue )
 	, pParent( this )
-	, pChangeCallbackFn( pChangeCallbackFn )
+	, pChangeCallbackFn( NULL )
 {
 	SetString( pDefaultValue );
+	CConVar::pChangeCallbackFn = pChangeCallbackFn;
 }
 
 /*
@@ -147,9 +148,10 @@ CConVar::CConVar( const achar* pName, const achar* pDefaultValue, bool bHasMin, 
 	, floatValue( 0.f )
 	, pDefaultValue( pDefaultValue )
 	, pParent( this )
-	, pChangeCallbackFn( pChangeCallbackFn )
+	, pChangeCallbackFn( NULL )
 {
 	SetString( pDefaultValue );
+	CConVar::pChangeCallbackFn = pChangeCallbackFn;
 }
 
 /*

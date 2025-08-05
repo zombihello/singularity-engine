@@ -115,6 +115,7 @@ public:
 	virtual bool IsRecord() const = 0;
 };
 
+// NOTE: If the module was build with disabled profiling the function return a null implementation
 CORE_INTERFACE IProfile* Profile();
 
 //-----------------------------------------------------------------------------

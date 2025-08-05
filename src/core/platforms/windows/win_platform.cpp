@@ -1,20 +1,6 @@
 #include "pch_core.h"
 #include <combaseapi.h>
 
-#include "core/core_private.h"
-#include "core/debug_private.h"
-
-static const uint16 s_LogColorsWin32[] =
-{
-	0x7,		// LOG_COLOR_DEFAULT
-	0x7,		// LOG_COLOR_WHITE
-	0xC,		// LOG_COLOR_RED
-	0xE,		// LOG_COLOR_YELLOW
-	0x2			// LOG_COLOR_GREEN
-};
-static_assert( LOG_NUM_COLORS == ARRAYSIZE( s_LogColorsWin32 ), "Array size 's_LogColorsWin32' must be equal to LOG_NUM_COLORS" );
-
-
 /*
 ==================
 Sys_CreateProc
@@ -274,23 +260,6 @@ double Sys_GetSecondsPerCycle()
 
 /*
 ==================
-Sys_SetupConsoleIO
-==================
-*/
-void Sys_SetupConsoleIO()
-{
-	if ( !g_bConsoleIOInited )
-	{
-		AllocConsole();
-		freopen( "conin$", "r", stdin );
-		freopen( "conout$", "w", stdout );
-		freopen( "conout$", "w", stderr );
-		g_bConsoleIOInited = true;
-	}
-}
-
-/*
-==================
 Sys_InitGuid
 ==================
 */
@@ -298,19 +267,4 @@ void Sys_InitGuid( CGuid& guid )
 {
 	HRESULT		result = CoCreateGuid( ( GUID* )&guid );
 	Assert( result == S_OK );
-}
-
-/*
-==================
-Sys_SetLogColor
-==================
-*/
-void Sys_SetLogColor( logColor_t logColor )
-{
-	Assert( logColor < LOG_NUM_COLORS );
-	g_LogColor = logColor;
-	if ( HANDLE consoleHandle = GetStdHandle( STD_OUTPUT_HANDLE ) )
-	{
-		SetConsoleTextAttribute( consoleHandle, s_LogColorsWin32[ (uint32)logColor ] );
-	}
 }

@@ -22,68 +22,6 @@ CConVar		window_height( "window_height", "720", "Window height", FCVAR_ARCHIVE )
 CConVar		fullscreen( "fullscreen", "0", "Is need open the window in fullscreen mode", FCVAR_ARCHIVE );
 
 
-#if ENABLE_LOGGING
-#include <filesystem>
-static FILE*		s_pLogFile = NULL;		// Launcher's log file
-
-/*
-==================
-Launcher_LogOutput
-==================
-*/
-static void Launcher_LogOutput( const achar* pMsg )
-{
-	// Print message to OS console
-	if ( Sys_IsInitedConsoleIO() )
-	{
-		printf( pMsg );
-	}
-
-	// Print message to the log file
-	if ( s_pLogFile )
-	{
-		fprintf( s_pLogFile, pMsg );
-		fflush( s_pLogFile );
-	}
-
-	// Print message to debug output
-	if ( Sys_IsDebuggerPresent() )
-	{
-		Sys_DebugMessage( pMsg );
-	}
-
-	// Print message to the engine's console
-	if ( g_pCvar )
-	{
-		g_pCvar->ConsolePrintf( pMsg );
-	}
-}
-#endif // ENABLE_LOGGING
-
-/*
-==================
-Launcher_InitLogOutput
-==================
-*/
-void Launcher_InitLogOutput()
-{
-#if ENABLE_LOGGING
-	// Create directory for logs
-	std::filesystem::create_directory( "../../logs" );
-	
-	// Open a log file and add it to the crash dump system
-	s_pLogFile = fopen( "../../logs/launcher.log", "w" );
-	if ( s_pLogFile )
-	{
-		CrashDump_AddLogFile( "../../logs/launcher.log" );
-	}
-
-	// Set our log output function
-	Sys_SetLogOutputFunc( Launcher_LogOutput );
-#endif // ENABLE_LOGGING
-}
-
-
 //-----------------------------------------------------------------------------
 // IConVars overrider
 //-----------------------------------------------------------------------------
@@ -435,6 +373,20 @@ bool CSingularityAppSystemGroup::PreInit()
 	// Register cvars
 	ConVar_Register( FCVAR_NONE, &s_conVarsOverrider );
 
+	// Set true in cheats and developer cvars if we in debug configuration
+#if DEBUG
+	CConVarRef	cheatsRef( "cheats" );
+	CConVarRef	developerRef( "developer" );
+	if ( cheatsRef.IsValid() )
+	{
+		cheatsRef->SetBool( true );
+	}
+	if ( developerRef.IsValid() )
+	{
+		developerRef->SetBool( true );
+	}
+#endif // DEBUG
+
 	// Setup application information for the crash dump
 	crashDumpAppInfo_t				crashDumpAppInfo = {};
 	crashDumpAppInfo.pAppName		= gameInfo.GetGame().c_str();
@@ -565,7 +517,7 @@ void CSingularityAppSystemGroup::PostShutdown()
 	// Remove only paths "GAME" and "GAMEBIN" if gameinfo.txt not loaded
 	if ( !gameInfo.IsLoaded() )
 	{
-		Warning( "Launcher: gameinfo.txt not laoded, will be remove only search paths \"GAME\" and \"GAMEBIN\"" );
+		Warning( "Launcher: gameinfo.txt not loaded, will be remove only search paths \"GAME\" and \"GAMEBIN\"" );
 		g_pFileSystem->RemoveSearchPath( "GAME" );
 		g_pFileSystem->RemoveSearchPath( "GAMEBIN" );
 		return;
@@ -658,17 +610,21 @@ LauncherMain
 */
 extern "C" DLL_EXPORT uint32 LauncherMain( appInstanceHandle_t hInstance, const achar* pDefaultGameDir, const achar* pCommandLine )
 {
+	// Enable developer messages if we in debug configuration
+#if DEBUG
+	Logger()->SetGroupActivate( LOG_GROUP_DEVELOPER, true );
+#endif // DEBUG
+
 	// Initialize the main thread
 	Sys_InitMainThread();
 
-	// Init of launcher's log output and command line
-	Launcher_InitLogOutput();
+	// Initialize the command line
 	CommandLine()->Init( pCommandLine );
 
 	// Initialize OS console if it need
 	if ( CommandLine()->HasParam( "console" ) )
 	{
-		Sys_SetupConsoleIO();
+		LogConsoleOS()->Show( true );
 	}
 
 	// Disable ensures if it need
@@ -679,8 +635,8 @@ extern "C" DLL_EXPORT uint32 LauncherMain( appInstanceHandle_t hInstance, const 
 	}
 #endif // ENABLE_ENSURE
 
-	// Run application
+	// Run the application
 	CSingularityAppSystemGroup	singularitySystems( pDefaultGameDir, hInstance );
-	CApplication				application( &singularitySystems );
+	CApplication				application( &singularitySystems, "launcher" );
 	return application.Run();
 }

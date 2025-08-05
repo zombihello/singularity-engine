@@ -6,32 +6,6 @@
 
 /*
 ==================
-MimallocOutput
-==================
-*/
-static void MimallocOutput( const achar* pMsg, void* pArg )
-{
-	logOutputFn_t		pLogOutputFn = Sys_GetLogOutputFunc();
-	if ( !pLogOutputFn )
-	{
-		pLogOutputFn = Sys_GetDefaultLogOutput();
-	}
-	pLogOutputFn( pMsg );
-}
-
-/*
-==================
-CMemAllocMimalloc::CMemAllocMimalloc
-==================
-*/
-CMemAllocMimalloc::CMemAllocMimalloc()
-{
-	mi_option_enable( mi_option_show_errors );
-	mi_register_output( MimallocOutput, NULL );
-}
-
-/*
-==================
 CMemAllocMimalloc::Malloc
 ==================
 */

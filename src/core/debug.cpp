@@ -1,70 +1,169 @@
 #include "pch_core.h"
 #include "core/crashdump_private.h"
-#include "core/debug_private.h"
+
+#if ENABLE_LOGGING
+class CLogger : public ILogger
+{
+public:
+	// ILogger interface
+	virtual void AddOutput( ILogOutput* pLogOutput ) override;
+	virtual void RemoveOutput( ILogOutput* pLogOutput ) override;
+	virtual void RemoveAllOutputs() override;
+
+	virtual void SetGroupActivate( logGroup_t group, bool bActivate ) override;
+	virtual bool IsGroupActive( logGroup_t group ) const override;
+
+	virtual void Printf( logGroup_t group, logLevel_t level, const achar* pFormat, ... ) override;
+	virtual void VPrintf( logGroup_t group, logLevel_t level, const achar* pFormat, va_list params ) override;
+	virtual void SetTextColor( logTextColor_t textColor ) override;
+	virtual logTextColor_t GetTextColor() const override;
+
+	CLogger();
+
+private:
+	std::vector<ILogOutput*>	outputs;
+	bool						bActiveGroups[LOG_NUM_GROUPS];
+	logTextColor_t				textColor;
+};
+
+static const achar*				s_pLogLevelNames[] =
+{
+	"Msg",		// LOG_LEVEL_MESSAGE
+	"Warning",	// LOG_LEVEL_WARNING
+	"Error"		// LOG_LEVEL_ERROR
+};
+static_assert( ARRAYSIZE( s_pLogLevelNames ) == LOG_NUM_LEVELS, "Invalid array size of s_pLogLevelNames, must be equal to LOG_NUM_LEVELS" );
+
 
 /*
- ==================
- DefaultLogOutput
- ==================
- */
-static void DefaultLogOutput( const achar* pMsg )
+==================
+CLogger::CLogger
+==================
+*/
+CLogger::CLogger()
+	: textColor( LOG_TEXT_COLOR_DEFAULT )
 {
-#if ENABLE_LOGGING
-	// Print message to OS console
-	printf( pMsg );
+	bActiveGroups[LOG_GROUP_GENERAL]	= true;
+	bActiveGroups[LOG_GROUP_DEVELOPER]	= false;
+	Sys_SetupDefaultLogOutputs( this );
+}
 
-	// Print message to debug output
-	if ( Sys_IsDebuggerPresent() )
+/*
+==================
+CLogger::AddOutput
+==================
+*/
+void CLogger::AddOutput( ILogOutput* pLogOutput )
+{
+	outputs.emplace_back( pLogOutput );
+	pLogOutput->SetTextColor( textColor );
+}
+
+/*
+==================
+CLogger::RemoveOutput
+==================
+*/
+void CLogger::RemoveOutput( ILogOutput* pLogOutput )
+{
+	for ( uint32 index = 0, count = ( uint32 )outputs.size(); index < count; ++index )
 	{
-		Sys_DebugMessage( pMsg );
+		if ( outputs[index] == pLogOutput )
+		{
+			outputs.erase( outputs.begin() + index );
+			return;
+		}
 	}
-#endif // ENABLE_LOGGING
-}
-
-static logOutputFn_t	s_LogOutputFn	= &DefaultLogOutput;
-logColor_t				g_LogColor		= LOG_COLOR_DEFAULT;
-
-/*
-==================
-Sys_SetLogOutputFunc
-==================
-*/
-void Sys_SetLogOutputFunc( logOutputFn_t pFunc )
-{
-	s_LogOutputFn = pFunc ? pFunc : Sys_GetDefaultLogOutput();
 }
 
 /*
 ==================
-Sys_GetLogOutputFunc
+CLogger::RemoveAllOutputs
 ==================
 */
-logOutputFn_t Sys_GetLogOutputFunc()
+void CLogger::RemoveAllOutputs()
 {
-	return s_LogOutputFn;
+	outputs.clear();
 }
 
 /*
 ==================
-Sys_GetDefaultLogOutput
+CLogger::SetGroupActivate
 ==================
 */
-logOutputFn_t Sys_GetDefaultLogOutput()
+void CLogger::SetGroupActivate( logGroup_t group, bool bActivate )
 {
-	return &DefaultLogOutput;
+	Assert( group < LOG_NUM_GROUPS );
+	bActiveGroups[group] = bActivate;
 }
 
 /*
 ==================
-Sys_ResetLogColor
+CLogger::IsGroupActive
 ==================
 */
-void Sys_ResetLogColor()
+bool CLogger::IsGroupActive( logGroup_t group ) const
 {
-	Sys_SetLogColor( LOG_COLOR_DEFAULT );
+	Assert( group < LOG_NUM_GROUPS );
+	return bActiveGroups[group];
 }
 
-#if ENABLE_LOGGING
+/*
+==================
+CLogger::Printf
+==================
+*/
+void CLogger::Printf( logGroup_t group, logLevel_t level, const achar* pFormat, ... )
+{
+	va_list		params;
+	va_start( params, pFormat );
+	VPrintf( group, level, pFormat, params );
+	va_end( params );
+}
+
+/*
+==================
+CLogger::VPrintf
+==================
+*/
+void CLogger::VPrintf( logGroup_t group, logLevel_t level, const achar* pFormat, va_list params )
+{
+	if ( IsGroupActive( group ) )
+	{
+		Assert( level < LOG_NUM_LEVELS );
+		std::string		message = S_Sprintf( "%s: %s\n", s_pLogLevelNames[level], S_Vsprintf( pFormat, params ).c_str() );
+		for ( uint32 index = 0, count = ( uint32 )outputs.size(); index < count; ++index )
+		{
+			outputs[index]->Print( level, message.c_str() );
+		}
+	}
+}
+
+/*
+==================
+CLogger::SetTextColor
+==================
+*/
+void CLogger::SetTextColor( logTextColor_t textColor )
+{
+	CLogger::textColor = textColor;
+	for ( uint32 index = 0, count = ( uint32 )outputs.size(); index < count; ++index )
+	{
+		outputs[index]->SetTextColor( textColor );
+	}
+}
+
+/*
+==================
+CLogger::GetTextColor
+==================
+*/
+logTextColor_t CLogger::GetTextColor() const
+{
+	return textColor;
+}
+
+
 /*
 ==================
 Msg
@@ -74,27 +173,8 @@ void Msg( const achar* pFormat, ... )
 {
 	va_list			params;
 	va_start( params, pFormat );
-	VMsg( pFormat, params );
+	Logger()->VPrintf(LOG_GROUP_GENERAL, LOG_LEVEL_MESSAGE, pFormat, params);
 	va_end( params );
-}
-
-/*
-==================
-VMsg
-==================
-*/
-void VMsg( const achar* pFormat, va_list params )
-{
-	bool	bIsAllowedChangeColor = g_LogColor == LOG_COLOR_DEFAULT;
-	if ( bIsAllowedChangeColor )
-	{
-		Sys_SetLogColor( LOG_COLOR_WHITE );
-	}
-	s_LogOutputFn( S_Sprintf( "Msg: %s\n", S_Vsprintf( pFormat, params ).c_str() ).c_str() );
-	if ( bIsAllowedChangeColor )
-	{
-		Sys_SetLogColor( LOG_COLOR_DEFAULT );
-	}
 }
 
 /*
@@ -106,27 +186,8 @@ void Warning( const achar* pFormat, ... )
 {
 	va_list			params;
 	va_start( params, pFormat );
-	VWarning( pFormat, params );
+	Logger()->VPrintf( LOG_GROUP_GENERAL, LOG_LEVEL_WARNING, pFormat, params );
 	va_end( params );
-}
-
-/*
-==================
-VWarning
-==================
-*/
-void VWarning( const achar* pFormat, va_list params )
-{
-	bool	bIsAllowedChangeColor = g_LogColor == LOG_COLOR_DEFAULT;
-	if ( bIsAllowedChangeColor )
-	{
-		Sys_SetLogColor( LOG_COLOR_YELLOW );
-	}
-	s_LogOutputFn( S_Sprintf( "Warning: %s\n", S_Vsprintf( pFormat, params ).c_str() ).c_str() );
-	if ( bIsAllowedChangeColor )
-	{
-		Sys_SetLogColor( LOG_COLOR_DEFAULT );
-	}
 }
 
 /*
@@ -138,29 +199,83 @@ void Error( const achar* pFormat, ... )
 {
 	va_list			params;
 	va_start( params, pFormat );
-	VError( pFormat, params );
+	Logger()->VPrintf( LOG_GROUP_GENERAL, LOG_LEVEL_ERROR, pFormat, params );
 	va_end( params );
 }
 
 /*
 ==================
-VError
+DevMsg
 ==================
 */
-void VError( const achar* pFormat, va_list params )
+void DevMsg( const achar* pFormat, ... )
 {
-	bool	bIsAllowedChangeColor = g_LogColor == LOG_COLOR_DEFAULT;
-	if ( bIsAllowedChangeColor )
-	{
-		Sys_SetLogColor( LOG_COLOR_RED );
-	}
-	s_LogOutputFn( S_Sprintf( "Error: %s\n", S_Vsprintf( pFormat, params ).c_str() ).c_str() );
-	if ( bIsAllowedChangeColor )
-	{
-		Sys_SetLogColor( LOG_COLOR_DEFAULT );
-	}
+	va_list			params;
+	va_start( params, pFormat );
+	Logger()->VPrintf( LOG_GROUP_DEVELOPER, LOG_LEVEL_MESSAGE, pFormat, params );
+	va_end( params );
 }
+
+/*
+==================
+DevWarning
+==================
+*/
+void DevWarning( const achar* pFormat, ... )
+{
+	va_list			params;
+	va_start( params, pFormat );
+	Logger()->VPrintf( LOG_GROUP_DEVELOPER, LOG_LEVEL_WARNING, pFormat, params );
+	va_end( params );
+}
+
+/*
+==================
+DevError
+==================
+*/
+void DevError( const achar* pFormat, ... )
+{
+	va_list			params;
+	va_start( params, pFormat );
+	Logger()->VPrintf( LOG_GROUP_DEVELOPER, LOG_LEVEL_ERROR, pFormat, params );
+	va_end( params );
+}
+#else
+class CNullLogger : public ILogger
+{
+public:
+	// ILogger interface
+	virtual void AddOutput( ILogOutput* pLogOutput )														{}
+	virtual void RemoveOutput( ILogOutput* pLogOutput )														{}
+	virtual void RemoveAllOutputs()																			{}
+
+	virtual void SetGroupActivate( logGroup_t group, bool bActivate )										{}
+	virtual bool IsGroupActive( logGroup_t group ) const													{ return false; }
+
+	virtual void Printf( logGroup_t group, logLevel_t level, const achar* pFormat, ... )					{}
+	virtual void VPrintf( logGroup_t group, logLevel_t level, const achar* pFormat, va_list params )		{}
+	virtual void SetTextColor( logTextColor_t textColor )													{}
+	virtual logTextColor_t GetTextColor() const																{ return LOG_TEXT_COLOR_DEFAULT; }
+};
 #endif // ENABLE_LOGGING
+
+/*
+==================
+Logger
+==================
+*/
+ILogger* Logger()
+{
+#if ENABLE_LOGGING
+	static CLogger			s_Logger;
+	return &s_Logger;
+#else
+	static CNullLogger		s_NullLogger;
+	return &s_NullLogger;
+#endif // ENABLE_LOGGING
+}
+
 
 #if ENABLE_ASSERT
 /*
@@ -178,40 +293,37 @@ bool Sys_AssertFailed( const achar* pExpr, const achar* pFile, int32 line, const
 	}
 	s_bAlreadyHasError = true;
 
-	// Get final message
+	// Get the message
 	va_list			params;
 	va_start( params, pFormat );
-	std::string		message = S_Sprintf( "Expression: %s\nMessage: %s\n\nFile: %s\nLine: %i", pExpr, S_Strlen( pFormat ) > 0 ? S_Vsprintf( pFormat, params ).c_str() : "<None>", pFile, line);
+	std::string		message = S_Strlen( pFormat ) > 0 ? S_Sprintf( pFormat, params ) : "<None>";
 	va_end( params );
 
-	// Print message and show message box
-	bool	bIsAllowedChangeColor = g_LogColor == LOG_COLOR_DEFAULT;
-	if ( bIsAllowedChangeColor )
-	{
-		Sys_SetLogColor( LOG_COLOR_RED );
-	}
-	s_LogOutputFn( "\n------------ ASSERTION FAILED --------------\n" );
-	s_LogOutputFn( message.c_str() );
-	s_LogOutputFn( "\n--------------------------------------------\n\n" );
-	if ( bIsAllowedChangeColor )
-	{
-		Sys_SetLogColor( LOG_COLOR_DEFAULT );
-	}
+	// Print the message and show message box
+	Error( "------------ ASSERTION FAILED --------------" );
+	Error( "Expression: %s", pExpr );
+	Error( "Message: %s", message.c_str() );
+	Error( "" );
+	Error( "File: %s", pFile );
+	Error( "Line: %i", line );
+	Error( "--------------------------------------------" );
 
 	if ( Sys_IsDebuggerPresent() )
 	{
 		Sys_DebugBreak();
 	}
-	Sys_ShowMessageBox( "Singularity Error", message.c_str(), MESSAGE_BOX_ERROR );
+	std::string		fullMessage = S_Sprintf( "Expression: %s\nMessage: %s\n\nFile: %s\nLine: %i", pExpr, message.c_str(), pFile, line );
+	Sys_ShowMessageBox( "Singularity Error", fullMessage.c_str(), MESSAGE_BOX_ERROR );
 
 	// Set crash dump message
-	CrashDump_SetMessage( message.c_str() );
+	CrashDump_SetMessage( fullMessage.c_str() );
 
 	// Shutdown application
 	Sys_RequestExit( true );
 	return true;
 }
 #endif // ENABLE_ASSERT
+
 
 #if ENABLE_ENSURE
 static bool		s_bEnsureAllowed = true;
@@ -225,25 +337,20 @@ bool Sys_EnsureFailed( const achar* pExpr, const achar* pFile, int32 line, bool 
 {
 	if ( bAlways || s_bEnsureAllowed )
 	{
-		// Get final message
+		// Get the final message
 		va_list			params;
 		va_start( params, pFormat );
-		std::string		message = S_Sprintf( "Expression: %s\nMessage: %s\n\nFile: %s\nLine: %i", pExpr, S_Strlen( pFormat ) > 0 ? S_Vsprintf( pFormat, params ).c_str() : "<None>", pFile, line);
+		std::string		message = S_Strlen( pFormat ) > 0 ? S_Sprintf( pFormat, params ) : "<None>";
 		va_end( params );
 
-		// Print message and show message box
-		bool	bIsAllowedChangeColor = g_LogColor == LOG_COLOR_DEFAULT;
-		if ( bIsAllowedChangeColor )
-		{
-			Sys_SetLogColor( LOG_COLOR_RED );
-		}
-		s_LogOutputFn( "\n------------ ENSURE FAILED --------------\n" );
-		s_LogOutputFn( message.c_str() );
-		s_LogOutputFn( "\n--------------------------------------------\n\n" );
-		if ( bIsAllowedChangeColor )
-		{
-			Sys_SetLogColor( LOG_COLOR_DEFAULT );
-		}
+		// Print the message
+		Error( "------------ ENSURE FAILED --------------" );
+		Error( "Expression: %s", pExpr );
+		Error( "Message: %s", message.c_str() );
+		Error( "" );
+		Error( "File: %s", pFile );
+		Error( "Line: %i", line );
+		Error( "--------------------------------------------" );
 
 		if ( Sys_IsDebuggerPresent() )
 		{

@@ -10,8 +10,6 @@
 class CMemAllocMimalloc : public CMemAllocBase
 {
 public:
-	CMemAllocMimalloc();
-
 	// IMemAlloc interface
 	virtual void* Malloc( size_t numBytes, uint32 alignment = DEFAULT_ALIGNMENT ) override;
 	virtual void* TryMalloc( size_t numBytes, uint32 alignment = DEFAULT_ALIGNMENT ) override;
@@ -22,7 +20,7 @@ public:
 
 	virtual bool GetAllocationSize( void* pOriginal, size_t& numBytes ) override;
 
-	// CMemAllocBase interafce
+	// CMemAllocBase interface
 	virtual bool IsInternallyThreadSafe() const override;
 };
 #endif // PLATFORM_SUPPORTS_MIMALLOC

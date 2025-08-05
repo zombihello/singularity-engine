@@ -2,42 +2,110 @@
 #include "core/core.h"
 
 //-----------------------------------------------------------------------------
-// Debug log
+// Logger
 //-----------------------------------------------------------------------------
-typedef void ( *logOutputFn_t )( const achar* pMsg );
-enum logColor_t
+enum logTextColor_t
 {
-    LOG_COLOR_DEFAULT,
-    LOG_COLOR_WHITE,
-    LOG_COLOR_RED,
-    LOG_COLOR_YELLOW,
-    LOG_COLOR_GREEN,
-    LOG_NUM_COLORS
+	LOG_TEXT_COLOR_DEFAULT,
+    LOG_TEXT_COLOR_WHITE,
+	LOG_TEXT_COLOR_RED,
+	LOG_TEXT_COLOR_YELLOW,
+	LOG_TEXT_COLOR_GREEN,
+	LOG_TEXT_NUM_COLORS
+};
+
+enum logGroup_t
+{
+    LOG_GROUP_GENERAL,
+    LOG_GROUP_DEVELOPER,
+    LOG_NUM_GROUPS
+};
+
+enum logLevel_t
+{
+	LOG_LEVEL_MESSAGE,
+	LOG_LEVEL_WARNING,
+	LOG_LEVEL_ERROR,
+    LOG_NUM_LEVELS
 };
 
 
-CORE_INTERFACE void Sys_SetLogOutputFunc( logOutputFn_t pFunc );
-CORE_INTERFACE logOutputFn_t Sys_GetLogOutputFunc();
-CORE_INTERFACE logOutputFn_t Sys_GetDefaultLogOutput();
-CORE_INTERFACE void Sys_SetLogColor( logColor_t logColor );
-CORE_INTERFACE void Sys_ResetLogColor();
-CORE_INTERFACE void Sys_SetupConsoleIO();
-CORE_INTERFACE bool Sys_IsInitedConsoleIO();
+// A log output
+class ILogOutput
+{
+public:
+	virtual void SetTextColor( logTextColor_t textColor ) = 0;
+	virtual void Print( logLevel_t level, const achar* pMessage ) = 0;
+};
+
+
+// A log output into a console
+class ILogOutputConsole : public ILogOutput
+{
+public:
+	virtual void Show( bool bShowConsole ) = 0;
+	virtual bool IsShown() const = 0;
+};
+
+
+// The logger system that supports multiple outputs
+// (i.g: output into a console, file, etc)
+class ILogger
+{
+public:
+	virtual void AddOutput( ILogOutput* pLogOutput ) = 0;
+	virtual void RemoveOutput( ILogOutput* pLogOutput ) = 0;
+	virtual void RemoveAllOutputs() = 0;
+
+    virtual void SetGroupActivate( logGroup_t group, bool bActivate ) = 0;
+    virtual bool IsGroupActive( logGroup_t group ) const = 0;
+
+	virtual void Printf( logGroup_t group, logLevel_t level, const achar* pFormat, ... ) = 0;
+    virtual void VPrintf( logGroup_t group, logLevel_t level, const achar* pFormat, va_list params ) = 0;
+	virtual void SetTextColor( logTextColor_t textColor ) = 0;
+    virtual logTextColor_t GetTextColor() const = 0;
+};
+
+
+// Helper base implementation of an ILogOutput
+template<class TBaseClass>
+class CBaseLogOutput : public TBaseClass
+{
+public:
+    // ILogOutput interface
+    virtual void SetTextColor( logTextColor_t textColor ) override      { CBaseLogOutput::textColor = textColor; }
+
+    CBaseLogOutput()
+        : textColor( LOG_TEXT_COLOR_DEFAULT )
+    {}
+
+protected:
+    logTextColor_t	textColor;
+};
+
+
+// NOTE: If the module was build with disabled logging the functions return a null implementation
+CORE_INTERFACE ILogger* Logger();
+CORE_INTERFACE ILogOutputConsole* LogConsoleOS();
 
 #if ENABLE_LOGGING
+    // Functions for logging in 'general' group
     CORE_INTERFACE void Msg( const achar* pFormat, ... );
-    CORE_INTERFACE void VMsg( const achar* pFormat, va_list params );
     CORE_INTERFACE void Warning( const achar* pFormat, ... );
-    CORE_INTERFACE void VWarning( const achar* pFormat, va_list params );
     CORE_INTERFACE void Error( const achar* pFormat, ... );
-    CORE_INTERFACE void VError( const achar* pFormat, va_list params );
+
+    // Functions for logging in 'developer' group
+	CORE_INTERFACE void DevMsg( const achar* pFormat, ... );
+	CORE_INTERFACE void DevWarning( const achar* pFormat, ... );
+	CORE_INTERFACE void DevError( const achar* pFormat, ... );
 #else
-    FORCEINLINE void Msg( const achar* pFormat, ... )                   {}
-    FORCEINLINE void VMsg( const achar* pFormat, va_list params )       {}
-    FORCEINLINE void Warning( const achar* pFormat, ... )               {}
-    FORCEINLINE void VWarning( const achar* pFormat, va_list params )   {}
-    FORCEINLINE void Error( const achar* pFormat, ... )                 {}
-    FORCEINLINE void VError( const achar* pFormat, va_list params )     {}
+    FORCEINLINE void Msg( const achar* pFormat, ... )                           {}
+    FORCEINLINE void Warning( const achar* pFormat, ... )                       {}
+    FORCEINLINE void Error( const achar* pFormat, ... )                         {}
+
+    FORCEINLINE void DevMsg( const achar* pFormat, ... )                        {}
+    FORCEINLINE void DevWarning( const achar* pFormat, ... )                    {}
+    FORCEINLINE void DevError( const achar* pFormat, ... )                      {}
 #endif // ENABLE_LOGGING
 
 

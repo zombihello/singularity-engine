@@ -1,11 +1,11 @@
 #include "pch_cvar.h"
+#include "core/icommandline.h"
 #include "filesystem/ifilesystem.h"
 #include "cvar/icvar.h"
 #include "stdlib/convar.h"
 
 #define CVAR_CONFIG_NAME				"config"
 #define CVAR_DEFAULT_CONFIG_NAME		"config_default"
-
 
 //-----------------------------------------------------------------------------
 // Cvar delegates
@@ -14,25 +14,13 @@ DECLARE_MULTICAST_DELEGATE( COnWriteConCmdsToConfigFile, IStreamDataWriter* /* p
 
 
 //-----------------------------------------------------------------------------
-// Cheat cvar
+// Cvars
 //-----------------------------------------------------------------------------
-/*
-==================
-CheatsChanged
-==================
-*/
-static void CheatsChanged( IConVar* pConVar )
-{
-	PROFILE_SCOPE();
+void CheatsCVarChanged( IConVar* pConVar );
+void DeveloperCVarChanged( IConVar* pConVar );
 
-	// Cheats were disabled, revert all cheat cvars to their default values
-	if ( g_pCvar && pConVar->GetInt() == 0 )
-	{
-		g_pCvar->ResetFlaggedVars( FCVAR_CHEAT );
-		Msg( "FCVAR_CHEAT cvars reverted to defaults" );
-	}
-}
-CConVar		cheats( "cheats", "0", "Allow cheats in the game", FCVAR_NONE, CheatsChanged );
+CConVar		cheats( "cheats", "0", "Allow cheats in the game", FCVAR_NONE, CheatsCVarChanged );
+CConVar		developer( "developer", "0", "Enables developer messages", FCVAR_NONE, DeveloperCVarChanged );
 
 
 //-----------------------------------------------------------------------------
@@ -72,6 +60,9 @@ public:
 	// Here's where the app systems get to learn about each other
 	virtual bool Connect( createInterfaceFn_t pFactory ) override;
 	virtual void Disconnect() override;
+
+	// Initialize and shutdown
+	virtual bool Init() override;
 	virtual void Shutdown() override;
 
 	// ICvar interface
@@ -239,6 +230,7 @@ bool CCvar::Connect( createInterfaceFn_t pFactory )
 	}
 
 	ConVar_Register();
+	
 	return true;
 }
 
@@ -251,6 +243,21 @@ void CCvar::Disconnect()
 {
 	ConVar_Unregister();
 	DisconnectStdLib();
+}
+
+/*
+==================
+CCvar::Init
+==================
+*/
+bool CCvar::Init()
+{
+	if ( CommandLine()->HasParam( "dev" ) )
+	{
+		developer.SetBool( true );
+		cheats.SetBool( true );
+	}
+	return true;
 }
 
 /*
@@ -931,4 +938,32 @@ CCvar::SetCVarQuery
 void CCvar::SetCVarQuery( ICvarQuery* pCvarQuery )
 {
 	CCvar::pCvarQuery = pCvarQuery ? pCvarQuery : &s_CvarQuery;
+}
+
+
+/*
+==================
+CheatsChanged
+==================
+*/
+static void CheatsCVarChanged( IConVar* pConVar )
+{
+	PROFILE_SCOPE();
+
+	// Cheats were disabled, revert all cheat cvars to their default values
+	if ( g_pCvar && pConVar->GetInt() == 0 )
+	{
+		g_pCvar->ResetFlaggedVars( FCVAR_CHEAT );
+		Msg( "Cvar: FCVAR_CHEAT cvars reverted to defaults" );
+	}
+}
+
+/*
+==================
+DeveloperCVarChanged
+==================
+*/
+static void DeveloperCVarChanged( IConVar* pConVar )
+{
+	Logger()->SetGroupActivate( LOG_GROUP_DEVELOPER, pConVar->GetBool() );
 }

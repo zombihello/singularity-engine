@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <string>
+#include <vector>
 
 #include "stdlib/builddefines.h"
 #include "stdlib/types.h"
@@ -10,5 +11,5 @@
 #include "core/core_private.h"
 #include "core/threading_private.h"
 #include "core/memory_private.h"
-#include "core/debug_private.h"
+#include "core/debug.h"
 #include "core/profile.h"
