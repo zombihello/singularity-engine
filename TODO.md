@@ -73,5 +73,5 @@
 - [X] Rework read/write config files
 - [X] IEntityDesc shouldn't create an entity, it must be created by IMap (i.g: IMap::CreateEntity(IEntityDesc*)) 
 - [X] Need remove IResourceSystem::UnRegisterResourceFactory and IResourceFactory::Validate
-- [ ] Add multiple log output for the logging system (like FOutputDevice in Unreal Engine)
+- [X] Add multiple log output for the logging system (like FOutputDevice in Unreal Engine)
 - [ ] Tidy up the folder src/devtools/
