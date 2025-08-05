@@ -1,7 +1,8 @@
 import json
 import os
 import shutil
-from premake5 import premake5
+from . import premake5
+from . import utils
 
 # Third party class
 class ThirdParty:
@@ -11,9 +12,9 @@ class ThirdParty:
         self.buildPlatform      = buildPlatform
         self.buildConfiguration = buildConfiguration
 
-        # Export third party into JSON file
-        premake5.ExecPremake5( "export-thirdparty" )
-        print( "" )
+        # Export third party into a JSON file
+        premake5.ExecPremake5( "export-thirdparty", ["--automation-tool"] )
+        print( "", flush=True )
 
         # Load JSON file
         with open( f"{self.repoRoot}/src/thirdparty/thirdparty.json", "r", encoding="utf-8" ) as file:
@@ -41,13 +42,13 @@ class ThirdParty:
             # Skip the third party if we don't copy tools
             libIsTools      = libInfo.get( "IsTools", False )
             if libIsTools and not isCopyTools:
-                print( f"Third party '{libName}' skiped, because it marked as tool but we don't copy tools" )
+                print( f"Third party '{libName}' skiped, because it marked as tool but we don't copy tools", flush=True )
                 continue
 
             # Is the third party for game only
             libForGameOnly  = libInfo.get( "IsForGameOnly", False )
             if libForGameOnly and gameBinDir == None:
-                print( f"Third party '{libName}' skiped, because it marked as game only but a game directory isn't set" )
+                print( f"Third party '{libName}' skiped, because it marked as game only but a game directory isn't set", flush=True )
                 continue
 
             destBinDir = engineBinDir
@@ -65,14 +66,14 @@ class ThirdParty:
                     # Copy DLLs for the configuration
                     libConfigurationDLLs   = libConfigurationData.get( "DLLs", {} )
                     for dllName in libConfigurationDLLs:
-                        print( f"Copy {libPath}/{dllName}" )
+                        print( f"Copy {libPath}/{dllName}", flush=True )
                         os.makedirs( destBinDir, exist_ok=True )
                         shutil.copy( f"{libPath}/{dllName}", f"{destBinDir}/{os.path.basename( dllName )}" )
             
                 # Copy general DLLs
                 libPlatformDLLs            = libPlatformData.get( "DLLs", {} )
                 for dllName in libPlatformDLLs:
-                    print( f"Copy {libPath}/{dllName}" )
+                    print( f"Copy {libPath}/{dllName}", flush=True )
                     os.makedirs( destBinDir, exist_ok=True )
                     shutil.copy( f"{libPath}/{dllName}", f"{destBinDir}/{os.path.basename( dllName )}" )
 
@@ -80,7 +81,7 @@ class ThirdParty:
                 if isCopyTools:
                     libPlatformTools       = libPlatformData.get( "Tools", {} )
                     for toolsName in libPlatformTools:
-                        print( f"Copy {libPath}/{toolsName}" )
+                        print( f"Copy {libPath}/{toolsName}", flush=True )
                         os.makedirs( destBinDir, exist_ok=True )
                         shutil.copy( f"{libPath}/{toolsName}", f"{destBinDir}/{os.path.basename( toolsName )}" )
 
@@ -112,13 +113,13 @@ class ThirdParty:
 
                 # Skip the third party if it isn't used
                 if not libIsUsing:
-                    print( f"Third party '{libName}' skiped, because it isn't used in configuration or platform: {self.buildConfiguration} {self.buildPlatform}" )
+                    print( f"Third party '{libName}' skiped, because it isn't used in configuration or platform: {self.buildConfiguration} {self.buildPlatform}", flush=True )
                     continue
 
                 # Skip the third party if we don't count tools
                 libIsTools                  = libInfo.get( "IsTools", False )
                 if libIsTools and not isWithTools:
-                    print( f"Third party '{libName}' skiped, because it marked as tool but we don't count tools" )
+                    print( f"Third party '{libName}' skiped, because it marked as tool but we don't count tools", flush=True )
                     continue
 
                 # Get path to the third party
@@ -127,7 +128,7 @@ class ThirdParty:
                     raise RuntimeError( f"Third party '{libName}' has invalid 'Path' field" )
 
                 # Copy a license text into our file
-                print( f"Added {libName}" )
+                print( f"Added {libName}", flush=True )
                 outputFile.write( "************************************************************************************\n" )
                 outputFile.write( f"{libName}\n" )
                 outputFile.write( "************************************************************************************\n" )

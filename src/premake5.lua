@@ -41,6 +41,11 @@ newoption {
     description     = "Place the workspace file in the root"
 }
 
+newoption {
+    trigger         = "automation-tool",
+    description     = "Is this generation for Automation Tool"
+}
+
 --------- GLOBAL VARIABLES -----------------
 
 -- Path to intermediate directory for compiling the engine and the game
@@ -104,7 +109,16 @@ if _OPTIONS["workspace-on-root"] then
 else
     workspaceLocation = intermediateDir
 end 
+
+-- Is this generation for Automation Tool
+if _OPTIONS["automation-tool"] then
+    isAutomationTool = true
+else
+    isAutomationTool = false
+end
+
 print( "Workspace file path: " .. workspaceLocation )
+print( "Automation Tool: " .. tostring( isAutomationTool ) )
 print( "" )
 
 include( "devtools/premake5/rule_flex.lua" )

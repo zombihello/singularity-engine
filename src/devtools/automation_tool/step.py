@@ -1,4 +1,4 @@
-# Builder step class
+# Automation step class
 class Step:
     # Initialize the step
     def __init__( self, name, actionFunc, **kwargs ):

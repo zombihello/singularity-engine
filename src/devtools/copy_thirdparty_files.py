@@ -1,11 +1,11 @@
 import argparse
-from builder import compiler
-import thirdparty
+from automation_tool import utils
+from automation_tool import thirdparty
 
 # Execute the script
 if __name__ == "__main__":
     # Initialize and parse arguments
-    argsParser              = argparse.ArgumentParser(  description="Deploy Build (sandbox)" )
+    argsParser              = argparse.ArgumentParser(  description="Copy Third Party Files" )
     argsParser.add_argument( "build_platform",          help="Build platform" )
     argsParser.add_argument( "build_configuration",     help="Build configuration" )
     argsParser.add_argument( "--build_path", "-o",      help="Path to build directory" )
@@ -16,11 +16,11 @@ if __name__ == "__main__":
     buildConfiguration      = None
     buildPlatform           = None
     try:
-        buildConfiguration  = compiler.Configuration( args.build_configuration.capitalize() )
-        buildPlatform       = compiler.Platform( args.build_platform.capitalize() )
+        buildConfiguration  = utils.Configuration( args.build_configuration.capitalize() )
+        buildPlatform       = utils.Platform( args.build_platform.capitalize() )
     except ValueError as exception:
         raise RuntimeError( f"Invalid build configuration or platform: {exception}" )
     
     # Copy third party files
-    _thirdParty = thirdparty.ThirdParty( repoRoot="../../", buildPlatform=buildPlatform, buildConfiguration=buildConfiguration )
-    _thirdParty.CopyFiles( buildDir=args.build_path, isCopyTools=args.copy_tools, gameDir=args.game_dir )
+    thirdParty = thirdparty.ThirdParty( repoRoot="../../", buildPlatform=buildPlatform, buildConfiguration=buildConfiguration )
+    thirdParty.CopyFiles( buildDir=args.build_path, isCopyTools=args.copy_tools, gameDir=args.game_dir )
