@@ -1,7 +1,20 @@
 #pragma once
 
 //-----------------------------------------------------------------------------
-// Some macros
+// Platform specific macros
+//-----------------------------------------------------------------------------
+// By default all defines PLATFORM_XXX are 0
+#define PLATFORM_WINDOWS	0
+
+#if _WIN32 || _WIN64						// Windows platform
+	#include "stdlib/platforms/windows/win_defines.h"
+#else										// Unknown platform
+	#error Unknown platform
+#endif // _WIN32 || _WIN64
+
+
+//-----------------------------------------------------------------------------
+// Generic macros
 //-----------------------------------------------------------------------------
 #undef ARRAYSIZE
 #undef OFFSET_OF
@@ -18,15 +31,3 @@
 #define BIT( Bit )													( 1 << Bit )
 #define STRINGIFY_IMPL( X )											#X
 #define STRINGIFY( X )												STRINGIFY_IMPL( X )
-
-//-----------------------------------------------------------------------------
-// Platform specific macros
-//-----------------------------------------------------------------------------
-// By default all defines PLATFORM_XXX are 0
-#define PLATFORM_WINDOWS	0
-
-#if _WIN32 || _WIN64						// Windows platform
-	#include "stdlib/platforms/windows/win_defines.h"
-#else										// Unknown platform
-	#error Unknown platform
-#endif // _WIN32 || _WIN64

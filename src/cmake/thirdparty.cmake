@@ -1,0 +1,28 @@
+#
+# Paths to third parties
+#
+set( ASSIMP_PATH                ${THIRDPARTY_DIR}/assimp )
+set( BUGTRAP_PATH               ${THIRDPARTY_DIR}/bugtrap )
+set( COMPRESSONATOR_PATH        ${THIRDPARTY_DIR}/compressonator )
+set( FLECS_PATH                 ${THIRDPARTY_DIR}/flecs )
+set( GLM_PATH                   ${THIRDPARTY_DIR}/glm )
+set( MESHOPTIMIZER_PATH         ${THIRDPARTY_DIR}/meshoptimizer )
+set( MIMALLOC_PATH              ${THIRDPARTY_DIR}/mimalloc )
+set( OPTICK_PATH                ${THIRDPARTY_DIR}/optick )
+set( RAPIDJSON_PATH             ${THIRDPARTY_DIR}/rapidjson )
+set( SDL2_PATH                  ${THIRDPARTY_DIR}/sdl2 )
+set( ZLIB_PATH                  ${THIRDPARTY_DIR}/zlib )
+set( VULKANSDK_PATH             ${THIRDPARTY_DIR}/vulkansdk )
+
+include( ${ASSIMP_PATH}/thirdparty.cmake )
+include( ${BUGTRAP_PATH}/thirdparty.cmake )
+include( ${COMPRESSONATOR_PATH}/thirdparty.cmake )
+include( ${FLECS_PATH}/thirdparty.cmake )
+include( ${GLM_PATH}/thirdparty.cmake )
+include( ${MESHOPTIMIZER_PATH}/thirdparty.cmake )
+include( ${MIMALLOC_PATH}/thirdparty.cmake )
+include( ${OPTICK_PATH}/thirdparty.cmake )
+include( ${RAPIDJSON_PATH}/thirdparty.cmake )
+include( ${SDL2_PATH}/thirdparty.cmake )
+include( ${ZLIB_PATH}/thirdparty.cmake )
+include( ${VULKANSDK_PATH}/thirdparty.cmake )

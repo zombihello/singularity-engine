@@ -10,27 +10,26 @@
 # Precompiled Headers and IDE settings
 *.gch
 *.pch
-/.cache
-/.vscode
+*.sln
+*.vcxproj
+*.vcxproj.user
+**/.cache
+**/.vscode
+**/.vs
+**/__pycache__
 /build
-**/__pycache__/**
 compile_commands.json
+Makefile
 
-# Auto generated files
-*.gen.h
+# Backup files
+*.bak
 
-# Game folder and compiled content
-*.stex_c
-*.smat_c
-*.smdl_c
-*.sent_c
-*.smap_c
-/game/bin/**
+# Compiled development tools
+src/devtools/shadercompiler
+src/devtools/ecscompiler
+
+# Project files and directories
 /game/**/bin
 /game/**/shaders
 /game/licenses
 /game/logs
-/game/thirdpartylegalnotices.txt
-
-# Backup files
-*.bak
