@@ -1,14 +1,6 @@
 cmake_minimum_required( VERSION 3.19 )
 
 #
-# Find third parties
-#
-find_package( GLM REQUIRED )
-
-set( THIRDPARTY_INCLUDES				${GLM_INCLUDE} )
-
-
-#
 # Project settings
 #
 set( SRC_DIR							${CMAKE_CURRENT_SOURCE_DIR} )
@@ -51,18 +43,14 @@ target_precompile_headers( filesystem PRIVATE 							pch_filesystem.h )
 set_target_properties( filesystem PROPERTIES FOLDER         			Engine )
 set_target_properties( filesystem PROPERTIES PREFIX 					"" )
 
-target_include_directories( filesystem PRIVATE             				${THIRDPARTY_INCLUDES} )
-target_link_libraries( filesystem 										core stdlib interfaces ${CMAKE_DL_LIBS} )
+target_link_libraries( filesystem PRIVATE 								core stdlib interfaces ${CMAKE_DL_LIBS} )
 add_common_target_defines( filesystem )
 
 
 #
 # Install
 #
-inherit_install_files( filesystem										core stdlib interfaces )
+inherit_install_files( filesystem										TARGETS core stdlib interfaces )
 
 # Binaries
 install_files( filesystem TARGETS RUNTIME filesystem 					DESTINATION	bin/${PLATFORM_BIN_DIR}/ )
-
-# Linceses
-install_files( filesystem FILES ${GLM_INSTALL_LICENSES}	        		DESTINATION	licenses/glm/ )

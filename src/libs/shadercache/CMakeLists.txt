@@ -1,14 +1,6 @@
 cmake_minimum_required( VERSION 3.19 )
 
 #
-# Find third parties
-#
-find_package( GLM REQUIRED )
-
-set( THIRDPARTY_INCLUDES		${GLM_INCLUDE} )
-
-
-#
 # Project settings
 #
 set( SRC_DIR							${CMAKE_CURRENT_SOURCE_DIR} )
@@ -43,12 +35,5 @@ add_library( shadercache STATIC 	                    ${FULL_SRC_FILES} )
 set_target_properties( shadercache PROPERTIES FOLDER    "Engine/Libraries/Data Formats" )
 set_target_properties( shadercache PROPERTIES PREFIX 	"" )
 
-target_include_directories( shadercache PRIVATE         ${THIRDPARTY_INCLUDES} )
+target_link_libraries( shadercache PUBLIC 				stdlib )
 add_common_target_defines( shadercache )
-
-
-#
-# Install
-#
-# Linceses
-install_files( shadercache FILES ${GLM_INSTALL_LICENSES}	DESTINATION licenses/glm/ )

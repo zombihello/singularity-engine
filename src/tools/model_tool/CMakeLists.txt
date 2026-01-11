@@ -3,12 +3,10 @@ cmake_minimum_required( VERSION 3.19 )
 #
 # Find third parties
 #
-find_package( RapidJson REQUIRED )
-find_package( GLM REQUIRED )
 find_package( Assimp REQUIRED )
 find_package( MeshOptimizer REQUIRED )
 
-set( THIRDPARTY_INCLUDES					${RAPIDJSON_INCLUDE} ${GLM_INCLUDE} ${ASSIMP_INCLUDE} ${MESHOPTIMIZER_INCLUDE} )
+set( THIRDPARTY_INCLUDES					${ASSIMP_INCLUDE} ${MESHOPTIMIZER_INCLUDE} )
 set( THIRDPARTY_LIBS						${ASSIMP_LIBS} ${MESHOPTIMIZER_LIBS} )
 set( THIRDPARTY_INSTALL_DEBUG_DLLS			${ASSIMP_INSTALL_DLLS_DEBUG} ${MESHOPTIMIZER_INSTALL_DLLS_DEBUG} )
 set( THIRDPARTY_INSTALL_RELEASE_DLLS		${ASSIMP_INSTALL_DLLS_RELEASE} ${MESHOPTIMIZER_INSTALL_DLLS_RELEASE} )
@@ -57,14 +55,14 @@ set_target_properties( model_tool PROPERTIES FOLDER         			"Tools/Resource C
 set_target_properties( model_tool PROPERTIES PREFIX 					"" )
 
 target_include_directories( model_tool PRIVATE             				${THIRDPARTY_INCLUDES} )
-target_link_libraries( model_tool 										core stdlib interfaces smdldoc ${THIRDPARTY_LIBS} ${CMAKE_DL_LIBS} )
+target_link_libraries( model_tool PRIVATE								core stdlib interfaces smdldoc ${THIRDPARTY_LIBS} ${CMAKE_DL_LIBS} )
 add_common_target_defines( model_tool )
 
 
 #
 # Install
 #
-inherit_install_files( model_tool									core stdlib interfaces smdldoc )
+inherit_install_files( model_tool									TARGETS core stdlib interfaces smdldoc )
 
 # Binaries
 install_files( model_tool TARGETS RUNTIME model_tool 				DESTINATION     bin/${PLATFORM_BIN_DIR}/ )
@@ -72,7 +70,5 @@ install_files( model_tool FILES ${THIRDPARTY_INSTALL_DEBUG_DLLS}	DESTINATION 	bi
 install_files( model_tool FILES ${THIRDPARTY_INSTALL_RELEASE_DLLS}	DESTINATION 	bin/${PLATFORM_BIN_DIR}/	CONFIGURATIONS 	Release Retail )
 
 # Linceses
-install_files( model_tool FILES ${RAPIDJSON_INSTALL_LICENSES} 		DESTINATION 	licenses/rapidjson/ )
-install_files( model_tool FILES ${GLM_INSTALL_LICENSES} 			DESTINATION 	licenses/glm/ )
 install_files( model_tool FILES ${ASSIMP_INSTALL_LICENSES}			DESTINATION 	licenses/assimp/ )
 install_files( model_tool FILES ${MESHOPTIMIZER_INSTALL_LICENSES}	DESTINATION 	licenses/meshoptimizer/ )

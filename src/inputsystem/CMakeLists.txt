@@ -4,9 +4,8 @@ cmake_minimum_required( VERSION 3.19 )
 # Find third parties
 #
 find_package( SDL2 REQUIRED )
-find_package( GLM REQUIRED )
 
-set( THIRDPARTY_INCLUDES					${SDL2_INCLUDE} ${GLM_INCLUDE} )
+set( THIRDPARTY_INCLUDES					${SDL2_INCLUDE} )
 set( THIRDPARTY_LIBS						${SDL2_LIBS} )
 set( THIRDPARTY_INSTALL_DEBUG_DLLS			${SDL2_INSTALL_DLLS_DEBUG} )
 set( THIRDPARTY_INSTALL_RELEASE_DLLS		${SDL2_INSTALL_DLLS_RELEASE} )
@@ -56,14 +55,14 @@ set_target_properties( inputsystem PROPERTIES FOLDER         				Engine )
 set_target_properties( inputsystem PROPERTIES PREFIX 						"" )
 
 target_include_directories( inputsystem PRIVATE             				${THIRDPARTY_INCLUDES} )
-target_link_libraries( inputsystem 											core stdlib interfaces ${CMAKE_DL_LIBS} )
+target_link_libraries( inputsystem PRIVATE									core stdlib interfaces ${THIRDPARTY_LIBS} ${CMAKE_DL_LIBS} )
 add_common_target_defines( inputsystem )
 
 
 #
 # Install
 #
-inherit_install_files( inputsystem										core stdlib interfaces )
+inherit_install_files( inputsystem										TARGETS core stdlib interfaces )
 
 # Binaries
 install_files( inputsystem TARGETS RUNTIME inputsystem 					DESTINATION     bin/${PLATFORM_BIN_DIR}/ )
@@ -72,4 +71,3 @@ install_files( inputsystem FILES ${THIRDPARTY_INSTALL_RELEASE_DLLS}		DESTINATION
 
 # Linceses
 install_files( inputsystem FILES ${SDL2_INSTALL_LICENSES}				DESTINATION 	licenses/sdl2/ )
-install_files( inputsystem FILES ${GLM_INSTALL_LICENSES} 				DESTINATION 	licenses/glm/ )

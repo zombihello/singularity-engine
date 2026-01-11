@@ -3,10 +3,9 @@ cmake_minimum_required( VERSION 3.19 )
 #
 # Find third parties
 #
-find_package( GLM REQUIRED )
 find_package( VulkanSDK REQUIRED )
 
-set( THIRDPARTY_INCLUDES		${GLM_INCLUDE} ${VULKANSDK_INCLUDE} )
+set( THIRDPARTY_INCLUDES		${VULKANSDK_INCLUDE} )
 set( THIRDPARTY_DEFINES 		${VULKANSDK_VOLK_DEFINES} )
 set( THIRDPARTY_LIBS			${VULKANSDK_VOLK_LIBS} )
 
@@ -60,18 +59,17 @@ set_target_properties( studioapi_vk PROPERTIES PREFIX 						"" )
 
 target_include_directories( studioapi_vk PRIVATE             				${SHARED_SRC_DIR} ${THIRDPARTY_INCLUDES} )
 target_compile_definitions( studioapi_vk PRIVATE							STUDIOAPI_VK VK_NO_PROTOTYPES ${THIRDPARTY_DEFINES} )
-target_link_libraries( studioapi_vk 										core stdlib interfaces shadercache pixelformatinfos ${THIRDPARTY_LIBS} ${CMAKE_DL_LIBS} )
+target_link_libraries( studioapi_vk PRIVATE									core stdlib interfaces shadercache pixelformatinfos ${THIRDPARTY_LIBS} ${CMAKE_DL_LIBS} )
 add_common_target_defines( studioapi_vk )
 
 
 #
 # Install
 #
-inherit_install_files( studioapi_vk									core stdlib interfaces shadercache pixelformatinfos )
+inherit_install_files( studioapi_vk									TARGETS core stdlib interfaces shadercache pixelformatinfos )
 
 # Binaries
 install_files( studioapi_vk TARGETS RUNTIME studioapi_vk 			DESTINATION bin/${PLATFORM_BIN_DIR}/ )
 
 # Linceses
-install_files( studioapi_vk FILES ${GLM_INSTALL_LICENSES} 			DESTINATION licenses/glm/ )
 install_files( studioapi_vk FILES ${VULKANSDK_INSTALL_LICENSES}		DESTINATION licenses/vulkansdk/ )

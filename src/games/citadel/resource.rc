@@ -1,5 +1,5 @@
 #include "stdlib/defines.h"
-#include "games/sandbox/version.h"
+#include "games/citadel/version.h"
 
 1 VERSIONINFO
 FILEVERSION     GAME_VERSION_MAJOR, GAME_VERSION_MINOR, GAME_VERSION_PATCH
@@ -20,12 +20,12 @@ BEGIN
         BLOCK "040904b0"
         BEGIN
             VALUE "CompanyName",        "Broken Singularity"
-			VALUE "FileDescription", 	"Singularity Sandbox"
+			VALUE "FileDescription", 	"Citadel"
 			VALUE "FileVersion",        GAME_VERSION_STRING
-            VALUE "InternalName",       "sandbox"
+            VALUE "InternalName",       "citadel"
             VALUE "LegalCopyright", 	"© 2020-2025 Broken Singularity"
             VALUE "OriginalFilename", 	"game.dll"
-            VALUE "ProductName", 		"Singularity Sandbox"
+            VALUE "ProductName", 		"Citadel"
 			VALUE "ProductVersion",     GAME_VERSION_STRING
         END
     END

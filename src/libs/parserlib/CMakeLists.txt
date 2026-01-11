@@ -1,14 +1,6 @@
 cmake_minimum_required( VERSION 3.19 )
 
 #
-# Find third parties
-#
-find_package( GLM REQUIRED )
-
-set( THIRDPARTY_INCLUDES        ${GLM_INCLUDE} )
-
-
-#
 # Project settings
 #
 set( SRC_DIR							${CMAKE_CURRENT_SOURCE_DIR} )
@@ -44,12 +36,5 @@ target_precompile_headers( parserlib PRIVATE 			pch_parserlib.h )
 set_target_properties( parserlib PROPERTIES FOLDER      Engine/Libraries )
 set_target_properties( parserlib PROPERTIES PREFIX 		"" )
 
-target_include_directories( parserlib PRIVATE           ${THIRDPARTY_INCLUDES} )
+target_link_libraries( parserlib PUBLIC 				stdlib )
 add_common_target_defines( parserlib )
-
-
-#
-# Install
-#
-# Linceses
-install_files( parserlib FILES ${GLM_INSTALL_LICENSES}		DESTINATION licenses/glm/ )

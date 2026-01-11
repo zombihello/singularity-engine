@@ -1,5 +1,5 @@
 module TestDraw;
-using "games/sandbox/quad.h";
+using "games/citadel/quad.h";
 using "gameframework/ecs/ecs_render.gen.h";
 
 component Quad

@@ -1,5 +1,5 @@
 {
-	"output-dir":	"//BASE_PATH/sandbox/materials/",
+	"output-dir":	"//BASE_PATH/citadel/materials/",
 	"shader": 		"unlitgeneric",
 	"parameters": [
 		{

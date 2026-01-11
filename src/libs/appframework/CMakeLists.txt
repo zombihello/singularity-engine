@@ -4,9 +4,8 @@ cmake_minimum_required( VERSION 3.19 )
 # Find third parties
 #
 find_package( SDL2 REQUIRED )
-find_package( GLM REQUIRED )
 
-set( THIRDPARTY_INCLUDES		        ${GLM_INCLUDE} ${SDL2_INCLUDE} )
+set( THIRDPARTY_INCLUDES		        ${SDL2_INCLUDE} )
 set( THIRDPARTY_LIBS                    ${SDL2_LIBS} )
 set( THIRDPARTY_INSTALL_DEBUG_DLLS      ${SDL2_INSTALL_DLLS_DEBUG} )
 set( THIRDPARTY_INSTALL_RELEASE_DLLS    ${SDL2_INSTALL_DLLS_RELEASE} )
@@ -48,8 +47,9 @@ target_precompile_headers( appframework PRIVATE 			pch_appframework.h )
 set_target_properties( appframework PROPERTIES FOLDER       Engine/Libraries )
 set_target_properties( appframework PROPERTIES PREFIX 		"" )
 
+target_link_libraries( appframework PUBLIC 					stdlib )
 target_include_directories( appframework PRIVATE            ${THIRDPARTY_INCLUDES} )
-target_link_libraries( appframework 						${THIRDPARTY_LIBS} )
+target_link_libraries( appframework PRIVATE					${THIRDPARTY_LIBS} )
 add_common_target_defines( appframework )
 
 
@@ -57,10 +57,8 @@ add_common_target_defines( appframework )
 # Install
 #
 # Binaries
-install_files( appframework FILES ${THIRDPARTY_INSTALL_DLLS}			DESTINATION 	bin/${PLATFORM_BIN_DIR}/ )
 install_files( appframework FILES ${THIRDPARTY_INSTALL_DEBUG_DLLS}		DESTINATION 	bin/${PLATFORM_BIN_DIR}/	CONFIGURATIONS 	Debug )
 install_files( appframework FILES ${THIRDPARTY_INSTALL_RELEASE_DLLS}	DESTINATION 	bin/${PLATFORM_BIN_DIR}/	CONFIGURATIONS 	Release Retail )
 
 # Linceses
-install_files( appframework FILES ${GLM_INSTALL_LICENSES}				DESTINATION 	licenses/glm/ )
 install_files( appframework FILES ${SDL2_INSTALL_LICENSES}				DESTINATION 	licenses/sdl2/ )

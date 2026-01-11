@@ -1,5 +1,5 @@
 {
-	"output-dir": "//BASE_PATH/sandbox/entities/",
+	"output-dir": "//BASE_PATH/citadel/entities/",
 	"components": [
 		{ "type": "Transform" 	},
 		{ 

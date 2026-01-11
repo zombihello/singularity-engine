@@ -1,15 +1,6 @@
 cmake_minimum_required( VERSION 3.19 )
 
 #
-# Find third parties
-#
-find_package( RapidJson REQUIRED )
-find_package( GLM REQUIRED )
-
-set( THIRDPARTY_INCLUDES		${RAPIDJSON_INCLUDE} ${GLM_INCLUDE} )
-
-
-#
 # Project settings
 #
 set( SRC_DIR							${CMAKE_CURRENT_SOURCE_DIR} )
@@ -52,8 +43,7 @@ target_precompile_headers( resourcecompiler PRIVATE 							pch_resourcecompiler.
 set_target_properties( resourcecompiler PROPERTIES FOLDER         				"Tools/Resource Compiler" )
 set_target_properties( resourcecompiler PROPERTIES PREFIX 						"" )
 
-target_include_directories( resourcecompiler PRIVATE             				${THIRDPARTY_INCLUDES} )
-target_link_libraries( resourcecompiler 										core stdlib appframework interfaces stexdoc smatdoc smdldoc sentdoc smapdoc ${CMAKE_DL_LIBS} )
+target_link_libraries( resourcecompiler PRIVATE									core stdlib appframework interfaces stexdoc smatdoc smdldoc sentdoc smapdoc ${CMAKE_DL_LIBS} )
 add_common_target_defines( resourcecompiler )
 add_dependencies( resourcecompiler 												filesystem cvar texture_tool material_tool model_tool entitydesc_tool map_tool )
 
@@ -61,14 +51,10 @@ add_dependencies( resourcecompiler 												filesystem cvar texture_tool mate
 #
 # Install
 #
-inherit_install_files( resourcecompiler									core filesystem cvar texture_tool material_tool model_tool entitydesc_tool map_tool stdlib appframework interfaces stexdoc smatdoc smdldoc sentdoc smapdoc )
+inherit_install_files( resourcecompiler									TARGETS core filesystem cvar texture_tool material_tool model_tool entitydesc_tool map_tool stdlib appframework interfaces stexdoc smatdoc smdldoc sentdoc smapdoc )
 
 # Binaries
 install_files( resourcecompiler TARGETS RUNTIME resourcecompiler 		DESTINATION     bin/${PLATFORM_BIN_DIR}/ )
-
-# Linceses
-install_files( resourcecompiler FILES ${RAPIDJSON_INSTALL_LICENSES} 	DESTINATION 	licenses/rapidjson/ )
-install_files( resourcecompiler FILES ${GLM_INSTALL_LICENSES} 			DESTINATION 	licenses/glm/ )
 
 # Setup install the target
 if ( INSTALL_TOOLS )

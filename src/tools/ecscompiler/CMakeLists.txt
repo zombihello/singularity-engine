@@ -1,14 +1,6 @@
 cmake_minimum_required( VERSION 3.19 )
 
 #
-# Find third parties
-#
-find_package( GLM REQUIRED )
-
-set( THIRDPARTY_INCLUDES		${GLM_INCLUDE} )
-
-
-#
 # Project settings
 #
 set( SRC_DIR							${CMAKE_CURRENT_SOURCE_DIR} )
@@ -56,8 +48,7 @@ add_executable( ecscompiler	                      	    				${FULL_SRC_FILES} )
 set_target_properties( ecscompiler PROPERTIES FOLDER         			"Tools/ECS Compiler" )
 set_target_properties( ecscompiler PROPERTIES PREFIX 					"" )
 
-target_include_directories( ecscompiler PRIVATE             			${THIRDPARTY_INCLUDES} )
-target_link_libraries( ecscompiler 										core stdlib appframework interfaces parserlib ${CMAKE_DL_LIBS} )
+target_link_libraries( ecscompiler PRIVATE								core stdlib appframework interfaces parserlib ${CMAKE_DL_LIBS} )
 add_common_target_defines( ecscompiler )
 add_dependencies( ecscompiler 											filesystem cvar )
 
@@ -65,13 +56,10 @@ add_dependencies( ecscompiler 											filesystem cvar )
 #
 # Install
 #
-inherit_install_files( ecscompiler								core stdlib appframework interfaces parserlib filesystem cvar )
+inherit_install_files( ecscompiler								TARGETS core stdlib appframework interfaces parserlib filesystem cvar )
 
 # Binaries
 install_files( ecscompiler TARGETS RUNTIME ecscompiler 			DESTINATION     bin/${PLATFORM_BIN_DIR}/ )
-
-# Linceses
-install_files( ecscompiler FILES ${GLM_INSTALL_LICENSES} 		DESTINATION 	licenses/glm/ )
 
 # Setup install the target
 if ( INSTALL_TOOLS )

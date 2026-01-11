@@ -220,7 +220,7 @@ endfunction()
 
 #
 # Inherit install files
-# Usage: inherit_runtime_dependencies( <DEST_TARGET> <SRC_TARGETS, ...> )
+# Usage: inherit_install_files( <DEST_TARGET> [TARGETS <SRC_TARGETS, ...>] [DESTINATION <DESTINATION>] )
 #
 function( inherit_install_files DEST_TARGET )
     if ( NOT TARGET ${DEST_TARGET} )
@@ -236,8 +236,22 @@ function( inherit_install_files DEST_TARGET )
         message( FATAL_ERROR "inherit_install_files: unknown build configurations, CMAKE_CONFIGURATION_TYPES and CMAKE_BUILD_TYPE are invalid" )
     endif()
 
+    # Parse arguments and grab from there targets and destination
+    set( ARGS_OPTIONS )
+    set( ARGS_ONE_VALUE_KEYWORDS        DESTINATION )
+    set( ARGS_MULTI_VALUE_KEYWORDS      TARGETS )
+    cmake_parse_arguments( ARGS "${ARGS_OPTIONS}" "${ARGS_ONE_VALUE_KEYWORDS}" "${ARGS_MULTI_VALUE_KEYWORDS}" ${ARGN} )
+
+    # Handle case when arguments can be unparsed or wasn't set 'TARGETS'
+    if ( ARGS_UNPARSED_ARGUMENTS )
+        message( FATAL_ERROR "inherit_install_files: unknown arguments: ${ARGS_UNPARSED_ARGUMENTS}"  )
+    endif()
+    if ( NOT ARGS_TARGETS )
+        message( FATAL_ERROR "inherit_install_files: specify TARGETS" )
+    endif()
+
     set( INSTALL_DATA_TYPES                 "TARGETS" "TARGETS_RUNTIME" "TARGETS_ARCHIVE" "FILES" "DIRECTORY" )
-    foreach ( SRC_TARGET IN LISTS ARGN )
+    foreach ( SRC_TARGET IN LISTS ARGS_TARGETS )
         if ( NOT TARGET ${SRC_TARGET} )
             message( FATAL_ERROR "inherit_install_files: target '${SRC_TARGET}' does not exist" )
         endif()
@@ -264,6 +278,10 @@ function( inherit_install_files DEST_TARGET )
                         math( EXPR                      NEXT_INDEX "${INDEX} + 1" )
                         list( GET                       SRC_TARGET_PROP_DATA ${INDEX}       DATA )
                         list( GET                       SRC_TARGET_PROP_DATA ${NEXT_INDEX}  DEST_DIR )
+
+                        if ( ARGS_DESTINATION )
+                            set( DEST_DIR               "${ARGS_DESTINATION}/${DEST_DIR}" )
+                        endif()
 
                         append_unique_property( "${DEST_TARGET}" DATA_IS_ADDED "${CURRENT_PROPERTY}" "${DATA}" )
                         if ( DATA_IS_ADDED )
@@ -373,25 +391,34 @@ endfunction()
 #
 function( add_flex_commands DEST_DIR DEST_OUTPUT_FILES )
     set( FLEX_DIR       "${DEVTOOLS_DIR}/flex/" )
+    set( FLEX_BIN_DIR   "${FLEX_DIR}/" )
     set( FLEX_EXE       "" )
     if ( PLATFORM_WINDOWS )
-        set( FLEX_EXE   "win_flex.exe" )
+        set( FLEX_EXE   "${FLEX_BIN_DIR}/win_flex.exe" )
     else()
         message( FATAL_ERROR "add_flex_commands: unknown platform" )
     endif()
 
+    if ( NOT EXISTS "${FLEX_EXE}" )
+        message( WARNING "add_flex_commands: '${FLEX_EXE}' is missing" )
+    endif()
+
+    set( OUTPUT_FILES               ${${DEST_OUTPUT_FILES}} )
     foreach ( FILE IN LISTS ARGN )
         if ( FILE MATCHES "\\.flex$" )
             get_filename_component( FILE_NAME "${FILE}" NAME_WE )
             set( OUTPUT_FILE_CPP "${DEST_DIR}/${FILE_NAME}_flex.cpp" )
             add_custom_command( OUTPUT "${OUTPUT_FILE_CPP}"
-                                COMMAND "${FLEX_DIR}/${FLEX_EXE}" -o "${OUTPUT_FILE_CPP}" "${FILE}"
-                                WORKING_DIRECTORY "${FLEX_DIR}" )
+                                COMMAND "${FLEX_EXE}" -o "${OUTPUT_FILE_CPP}" "${FILE}"
+                                DEPENDS "${FILE}"
+                                WORKING_DIRECTORY "${FLEX_BIN_DIR}" )
 
-            set( "${OUTPUT_FILE_CPP}" PROPERTIES GENERATED TRUE )
-            set( ${DEST_OUTPUT_FILES} ${${DEST_OUTPUT_FILES}} "${OUTPUT_FILE_CPP}" PARENT_SCOPE )
+            set_source_files_properties( "${OUTPUT_FILE_CPP}" PROPERTIES GENERATED TRUE )
+            list( APPEND OUTPUT_FILES "${OUTPUT_FILE_CPP}" )
         endif()
     endforeach()
+
+    set( ${DEST_OUTPUT_FILES} ${OUTPUT_FILES} PARENT_SCOPE )
 endfunction()
 
 
@@ -401,25 +428,79 @@ endfunction()
 #
 function( add_bison_commands DEST_DIR DEST_OUTPUT_FILES )
     set( BISON_DIR       "${DEVTOOLS_DIR}/bison/" )
+    set( BISON_BIN_DIR   "${BISON_DIR}/bin/" )
     set( BISON_EXE       "" )
     if ( PLATFORM_WINDOWS )
-        set( BISON_EXE   "bison.exe" )
+        set( BISON_EXE   "${BISON_BIN_DIR}/bison.exe" )
     else()
         message( FATAL_ERROR "add_bison_commands: unknown platform" )
     endif()
 
+    if ( NOT EXISTS "${BISON_EXE}" )
+        message( WARNING "add_bison_commands: '${BISON_EXE}' is missing" )
+    endif()
+
+    set( OUTPUT_FILES               ${${DEST_OUTPUT_FILES}} )
     foreach ( FILE IN LISTS ARGN )
         if ( FILE MATCHES "\\.bison$" )
             get_filename_component( FILE_NAME "${FILE}" NAME_WE )
             set( OUTPUT_FILE_HEADER "${DEST_DIR}/${FILE_NAME}_bison.cpp.h" )
-            set( OUTPUT_FILE_CPP "${DEST_DIR}/${FILE_NAME}_bison.cpp" )
+            set( OUTPUT_FILE_CPP    "${DEST_DIR}/${FILE_NAME}_bison.cpp" )
             add_custom_command( OUTPUT "${OUTPUT_FILE_HEADER}" "${OUTPUT_FILE_CPP}"
-                                COMMAND "${BISON_DIR}/bin/${BISON_EXE}" --defines="${OUTPUT_FILE_HEADER}" -o "${OUTPUT_FILE_CPP}" "${FILE}"
-                                WORKING_DIRECTORY "${BISON_DIR}/bin" )
+                                COMMAND "${BISON_EXE}" --defines="${OUTPUT_FILE_HEADER}" -o "${OUTPUT_FILE_CPP}" "${FILE}"
+                                DEPENDS "${FILE}"
+                                WORKING_DIRECTORY "${BISON_BIN_DIR}" )
 
-            set( "${OUTPUT_FILE_HEADER}"    PROPERTIES GENERATED TRUE )
-            set( "${OUTPUT_FILE_CPP}"       PROPERTIES GENERATED TRUE )
-            set( ${DEST_OUTPUT_FILES} ${${DEST_OUTPUT_FILES}} "${OUTPUT_FILE_HEADER}" "${OUTPUT_FILE_CPP}" PARENT_SCOPE )
+            set_source_files_properties( "${OUTPUT_FILE_HEADER}" "${OUTPUT_FILE_CPP}" PROPERTIES GENERATED TRUE )
+            list( APPEND OUTPUT_FILES "${OUTPUT_FILE_HEADER}" "${OUTPUT_FILE_CPP}" )
         endif()
     endforeach()
+
+    set( ${DEST_OUTPUT_FILES} ${OUTPUT_FILES} PARENT_SCOPE )
+endfunction()
+
+#
+# Add commands to compile *.bison files
+# Usage: add_ecscompiler_commands( ${<DEST_DIR>} <DEST_OUTPUT_FILES> ${<FILES, ...>} )
+#
+function( add_ecscompiler_commands Q DEST_DIR DEST_OUTPUT_FILES )
+    set( ECSCOMPILER_DIR            "${DEVTOOLS_DIR}/ecscompiler/" )
+    set( ECSCOMPILER_BIN_DIR        "" )
+    set( ECSCOMPILER_EXE            "" )
+    if ( PLATFORM_WINDOWS )
+        set( ECSCOMPILER_BIN_DIR    "${ECSCOMPILER_DIR}/bin/${PLATFORM_NAME}_release/" )
+        set( ECSCOMPILER_EXE        "${ECSCOMPILER_BIN_DIR}/ecscompiler.exe" )
+    else()
+        message( FATAL_ERROR "add_ecscompiler_commands: unknown platform" )
+    endif()
+
+    if ( NOT EXISTS "${ECSCOMPILER_EXE}" )
+        message( WARNING "add_ecscompiler_commands: '${ECSCOMPILER_EXE}' is missing, before compiling you shuild to build ecscompiler in release configuration" )
+    endif()
+
+    set( OUTPUT_FILES               ${${DEST_OUTPUT_FILES}} )
+    foreach ( FILE IN LISTS ARGN )
+        if ( FILE MATCHES "\\.ecs$" )
+            get_filename_component( FILE_DIR "${FILE}" DIRECTORY )
+            file( RELATIVE_PATH RR "${Q}" "${FILE_DIR}"  )
+            set( FILE_DEST_DIR      "${DEST_DIR}" )
+            if ( RR )
+                set( FILE_DEST_DIR  "${FILE_DEST_DIR}/${RR}" )
+            endif()
+
+            get_filename_component( FILE_NAME "${FILE}" NAME_WE )
+            set( OUTPUT_FILE_HEADER "${FILE_DEST_DIR}/${FILE_NAME}.gen.h" )
+            set( OUTPUT_FILE_CPP    "${FILE_DEST_DIR}/${FILE_NAME}.gen.cpp" )
+            add_custom_command( OUTPUT "${OUTPUT_FILE_HEADER}" "${OUTPUT_FILE_CPP}"
+                                COMMAND "${ECSCOMPILER_EXE}" -file "${FILE}" -output "${FILE_DEST_DIR}"
+                                DEPENDS "${FILE}"
+                                WORKING_DIRECTORY "${ROOT_DIR}" )
+
+            set_source_files_properties( "${OUTPUT_FILE_CPP}"                           PROPERTIES HEADER_FILE_ONLY TRUE )
+            set_source_files_properties( "${OUTPUT_FILE_HEADER}" "${OUTPUT_FILE_CPP}"   PROPERTIES GENERATED TRUE )
+            list( APPEND OUTPUT_FILES "${OUTPUT_FILE_HEADER}" "${OUTPUT_FILE_CPP}" )
+        endif()
+    endforeach()
+
+    set( ${DEST_OUTPUT_FILES} ${OUTPUT_FILES} PARENT_SCOPE )
 endfunction()

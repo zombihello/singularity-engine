@@ -1,15 +1,6 @@
 cmake_minimum_required( VERSION 3.19 )
 
 #
-# Find third parties
-#
-find_package( RapidJson REQUIRED )
-find_package( GLM REQUIRED )
-
-set( THIRDPARTY_INCLUDES		${RAPIDJSON_INCLUDE} ${GLM_INCLUDE} )
-
-
-#
 # Project settings
 #
 set( SRC_DIR							${CMAKE_CURRENT_SOURCE_DIR} )
@@ -52,19 +43,14 @@ target_precompile_headers( map_tool PRIVATE 							pch_map_tool.h )
 set_target_properties( map_tool PROPERTIES FOLDER         				"Tools/Resource Compiler" )
 set_target_properties( map_tool PROPERTIES PREFIX 						"" )
 
-target_include_directories( map_tool PRIVATE             				${THIRDPARTY_INCLUDES} )
-target_link_libraries( map_tool 										core stdlib interfaces smapdoc ${CMAKE_DL_LIBS} )
+target_link_libraries( map_tool PRIVATE									core stdlib interfaces smapdoc ${CMAKE_DL_LIBS} )
 add_common_target_defines( map_tool )
 
 
 #
 # Install
 #
-inherit_install_files( map_tool									core stdlib interfaces smapdoc )
+inherit_install_files( map_tool									TARGETS core stdlib interfaces smapdoc )
 
 # Binaries
 install_files( map_tool TARGETS RUNTIME map_tool 				DESTINATION bin/${PLATFORM_BIN_DIR}/ )
-
-# Linceses
-install_files( map_tool FILES ${RAPIDJSON_INSTALL_LICENSES} 	DESTINATION licenses/rapidjson/ )
-install_files( map_tool FILES ${GLM_INSTALL_LICENSES} 			DESTINATION licenses/glm/ )

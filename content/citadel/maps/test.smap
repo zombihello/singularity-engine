@@ -1,5 +1,5 @@
 {
-	"output-dir": "//BASE_PATH/sandbox/maps/",
+	"output-dir": "//BASE_PATH/citadel/maps/",
 	"entities": [
 		{
 			"entity-desc": "entities/test_quad",

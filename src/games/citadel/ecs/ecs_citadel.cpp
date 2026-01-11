@@ -1,5 +1,5 @@
-#include "pch_sandbox.h"
-#include "games/sandbox/ecs/ecs_testdraw.gen.h"
+#include "pch_citadel.h"
+#include "games/citadel/ecs/ecs_testdraw.gen.h"
 
 /*
 ==================

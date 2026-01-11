@@ -1,15 +1,6 @@
 cmake_minimum_required( VERSION 3.19 )
 
 #
-# Find third parties
-#
-find_package( RapidJson REQUIRED )
-find_package( GLM REQUIRED )
-
-set( THIRDPARTY_INCLUDES		${RAPIDJSON_INCLUDE} ${GLM_INCLUDE} )
-
-
-#
 # Project settings
 #
 set( SRC_DIR							${CMAKE_CURRENT_SOURCE_DIR} )
@@ -52,19 +43,14 @@ target_precompile_headers( material_tool PRIVATE 							pch_material_tool.h )
 set_target_properties( material_tool PROPERTIES FOLDER         				"Tools/Resource Compiler" )
 set_target_properties( material_tool PROPERTIES PREFIX 						"" )
 
-target_include_directories( material_tool PRIVATE             				${THIRDPARTY_INCLUDES} )
-target_link_libraries( material_tool 										core stdlib interfaces smatdoc ${CMAKE_DL_LIBS} )
+target_link_libraries( material_tool PRIVATE								core stdlib interfaces smatdoc ${CMAKE_DL_LIBS} )
 add_common_target_defines( material_tool )
 
 
 #
 # Install
 #
-inherit_install_files( material_tool								core stdlib interfaces smatdoc )
+inherit_install_files( material_tool								TARGETS core stdlib interfaces smatdoc )
 
 # Binaries
 install_files( material_tool TARGETS RUNTIME material_tool 			DESTINATION bin/${PLATFORM_BIN_DIR}/ )
-
-# Linceses
-install_files( material_tool FILES ${RAPIDJSON_INSTALL_LICENSES} 	DESTINATION licenses/rapidjson/ )
-install_files( material_tool FILES ${GLM_INSTALL_LICENSES} 			DESTINATION licenses/glm/ )

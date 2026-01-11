@@ -1,15 +1,6 @@
 cmake_minimum_required( VERSION 3.19 )
 
 #
-# Find third parties
-#
-find_package( RapidJson REQUIRED )
-find_package( GLM REQUIRED )
-
-set( THIRDPARTY_INCLUDES		${RAPIDJSON_INCLUDE} ${GLM_INCLUDE} )
-
-
-#
 # Project settings
 #
 set( SRC_DIR							${CMAKE_CURRENT_SOURCE_DIR} )
@@ -44,13 +35,5 @@ add_library( smatdoc STATIC 	                      	${FULL_SRC_FILES} )
 set_target_properties( smatdoc PROPERTIES FOLDER        "Engine/Libraries/Data Formats" )
 set_target_properties( smatdoc PROPERTIES PREFIX 		"" )
 
-target_include_directories( smatdoc PRIVATE             ${THIRDPARTY_INCLUDES} )
+target_link_libraries( smatdoc PUBLIC 					stdlib )
 add_common_target_defines( smatdoc )
-
-
-#
-# Install
-#
-# Linceses
-install_files( smatdoc FILES ${RAPIDJSON_INSTALL_LICENSES}	DESTINATION 	licenses/rapidjson/ )
-install_files( smatdoc FILES ${GLM_INSTALL_LICENSES}		DESTINATION 	licenses/glm/ )

@@ -1,15 +1,6 @@
 cmake_minimum_required( VERSION 3.19 )
 
 #
-# Find third parties
-#
-find_package( RapidJson REQUIRED )
-find_package( GLM REQUIRED )
-
-set( THIRDPARTY_INCLUDES		${RAPIDJSON_INCLUDE} ${GLM_INCLUDE} )
-
-
-#
 # Project settings
 #
 set( SRC_DIR							${CMAKE_CURRENT_SOURCE_DIR} )
@@ -51,19 +42,14 @@ add_library( entitydesc_tool SHARED 	                      	    		${FULL_SRC_FIL
 target_precompile_headers( entitydesc_tool PRIVATE 							pch_entitydesc_tool.h )
 set_target_properties( entitydesc_tool PROPERTIES FOLDER         			"Tools/Resource Compiler" )
 
-target_include_directories( entitydesc_tool PRIVATE             			${THIRDPARTY_INCLUDES} )
-target_link_libraries( entitydesc_tool 										core stdlib interfaces sentdoc ${CMAKE_DL_LIBS} )
+target_link_libraries( entitydesc_tool PRIVATE								core stdlib interfaces sentdoc ${CMAKE_DL_LIBS} )
 add_common_target_defines( entitydesc_tool )
 
 
 #
 # Install
 #
-inherit_install_files( entitydesc_tool								core stdlib interfaces sentdoc )
+inherit_install_files( entitydesc_tool								TARGETS core stdlib interfaces sentdoc )
 
 # Binaries
 install_files( entitydesc_tool TARGETS RUNTIME entitydesc_tool 		DESTINATION bin/${PLATFORM_BIN_DIR}/ )
-
-# Linceses
-install_files( entitydesc_tool FILES ${RAPIDJSON_INSTALL_LICENSES} 	DESTINATION licenses/rapidjson/ )
-install_files( entitydesc_tool FILES ${GLM_INSTALL_LICENSES} 		DESTINATION licenses/glm/ )

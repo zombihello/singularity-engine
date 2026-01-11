@@ -45,7 +45,7 @@ target_precompile_headers( stdlib PRIVATE 				    pch_stdlib.h )
 set_target_properties( stdlib PROPERTIES FOLDER             Engine/Libraries )
 set_target_properties( stdlib PROPERTIES PREFIX 		    "" )
 
-target_include_directories( stdlib PRIVATE                  ${THIRDPARTY_INCLUDES} )
+target_include_directories( stdlib PUBLIC					${THIRDPARTY_INCLUDES} )
 add_common_target_defines( stdlib )
 
 

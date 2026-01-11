@@ -1,15 +1,6 @@
 cmake_minimum_required( VERSION 3.19 )
 
 #
-# Find third parties
-#
-find_package( RapidJson REQUIRED )
-find_package( GLM REQUIRED )
-
-set( THIRDPARTY_INCLUDES				${RAPIDJSON_INCLUDE} ${GLM_INCLUDE} )
-
-
-#
 # Project settings
 #
 set( SRC_DIR							${CMAKE_CURRENT_SOURCE_DIR} )
@@ -56,8 +47,7 @@ target_precompile_headers( shadercompiler PRIVATE 							pch_shadercompiler.h )
 set_target_properties( shadercompiler PROPERTIES FOLDER         			"Tools/Shader Compiler" )
 set_target_properties( shadercompiler PROPERTIES PREFIX 					"" )
 
-target_include_directories( shadercompiler PRIVATE             				${THIRDPARTY_INCLUDES} )
-target_link_libraries( shadercompiler 										core stdlib appframework interfaces shadercache ${CMAKE_DL_LIBS} )
+target_link_libraries( shadercompiler PRIVATE								core stdlib appframework interfaces shadercache ${CMAKE_DL_LIBS} )
 add_common_target_defines( shadercompiler )
 add_dependencies( shadercompiler 											filesystem cvar shadercompiler_vk )
 
@@ -65,14 +55,10 @@ add_dependencies( shadercompiler 											filesystem cvar shadercompiler_vk )
 #
 # Install
 #
-inherit_install_files( shadercompiler								core stdlib appframework interfaces shadercache filesystem cvar shadercompiler_vk )
+inherit_install_files( shadercompiler								TARGETS core stdlib appframework interfaces shadercache filesystem cvar shadercompiler_vk )
 
 # Binaries
 install_files( shadercompiler TARGETS RUNTIME shadercompiler 		DESTINATION     bin/${PLATFORM_BIN_DIR}/ )
-
-# Linceses
-install_files( shadercompiler FILES ${RAPIDJSON_INSTALL_LICENSES} 	DESTINATION 	licenses/rapidjson/ )
-install_files( shadercompiler FILES ${GLM_INSTALL_LICENSES} 		DESTINATION 	licenses/glm/ )
 
 # Setup install the target
 if ( INSTALL_TOOLS )

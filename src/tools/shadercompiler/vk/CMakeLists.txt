@@ -3,10 +3,9 @@ cmake_minimum_required( VERSION 3.19 )
 #
 # Find third parties
 #
-find_package( GLM REQUIRED )
 find_package( VulkanSDK REQUIRED )
 
-set( THIRDPARTY_INCLUDES		${GLM_INCLUDE} ${VULKANSDK_INCLUDE} )
+set( THIRDPARTY_INCLUDES		${VULKANSDK_INCLUDE} )
 set( THIRDPARTY_LIBS			${VULKANSDK_SPIRVCROSS_LIBS} ${VULKANSDK_GLSLANG_LIBS} ${VULKANSDK_SPIRVTOOLS_LIBS} ${VULKANSDK_SHADERC_LIBS} )
 
 
@@ -52,18 +51,17 @@ set_target_properties( shadercompiler_vk PROPERTIES FOLDER         						"Tools/
 set_target_properties( shadercompiler_vk PROPERTIES PREFIX 								"" )
 
 target_include_directories( shadercompiler_vk PRIVATE             						${SHARED_SRC_DIR} ${THIRDPARTY_INCLUDES} )
-target_link_libraries( shadercompiler_vk 												core stdlib interfaces shadercache ${THIRDPARTY_LIBS} ${CMAKE_DL_LIBS} )
+target_link_libraries( shadercompiler_vk PRIVATE										core stdlib interfaces shadercache ${THIRDPARTY_LIBS} ${CMAKE_DL_LIBS} )
 add_common_target_defines( shadercompiler_vk )
 
 
 #
 # Install
 #
-inherit_install_files( shadercompiler_vk								core stdlib interfaces shadercache )
+inherit_install_files( shadercompiler_vk								TARGETS core stdlib interfaces shadercache )
 
 # Binaries
 install_files( shadercompiler_vk TARGETS RUNTIME shadercompiler_vk 		DESTINATION bin/${PLATFORM_BIN_DIR}/ )
 
 # Linceses
-install_files( shadercompiler_vk FILES ${GLM_INSTALL_LICENSES}			DESTINATION licenses/glm/ )
 install_files( shadercompiler_vk FILES ${VULKANSDK_INSTALL_LICENSES}	DESTINATION licenses/vulkansdk/ )

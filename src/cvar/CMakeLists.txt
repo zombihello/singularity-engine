@@ -1,15 +1,6 @@
 cmake_minimum_required( VERSION 3.19 )
 
 #
-# Find third parties
-#
-find_package( RapidJson REQUIRED )
-find_package( GLM REQUIRED )
-
-set( THIRDPARTY_INCLUDES		${RAPIDJSON_INCLUDE} ${GLM_INCLUDE} )
-
-
-#
 # Project settings
 #
 set( SRC_DIR							${CMAKE_CURRENT_SOURCE_DIR} )
@@ -52,19 +43,14 @@ target_precompile_headers( cvar PRIVATE 							pch_cvar.h )
 set_target_properties( cvar PROPERTIES FOLDER         				Engine )
 set_target_properties( cvar PROPERTIES PREFIX 						"" )
 
-target_include_directories( cvar PRIVATE             				${THIRDPARTY_INCLUDES} )
-target_link_libraries( cvar 										core stdlib interfaces ${CMAKE_DL_LIBS} )
+target_link_libraries( cvar PRIVATE									core stdlib interfaces ${CMAKE_DL_LIBS} )
 add_common_target_defines( cvar )
 
 
 #
 # Install
 #
-inherit_install_files( cvar											core stdlib interfaces )
+inherit_install_files( cvar											TARGETS core stdlib interfaces )
 
 # Binaries
 install_files( cvar TARGETS RUNTIME cvar 							DESTINATION		bin/${PLATFORM_BIN_DIR}/ )
-
-# Linceses
-install_files( cvar FILES ${RAPIDJSON_INSTALL_LICENSES} 			DESTINATION 	licenses/rapidjson/ )
-install_files( cvar FILES ${GLM_INSTALL_LICENSES} 					DESTINATION 	licenses/glm/ )

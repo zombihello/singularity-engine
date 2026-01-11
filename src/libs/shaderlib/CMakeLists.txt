@@ -1,14 +1,6 @@
 cmake_minimum_required( VERSION 3.19 )
 
 #
-# Find third parties
-#
-find_package( GLM REQUIRED )
-
-set( THIRDPARTY_INCLUDES		${GLM_INCLUDE} )
-
-
-#
 # Project settings
 #
 set( SRC_DIR							${CMAKE_CURRENT_SOURCE_DIR} )
@@ -44,12 +36,5 @@ target_precompile_headers( shaderlib PRIVATE 			pch_shaderlib.h )
 set_target_properties( shaderlib PROPERTIES FOLDER      Engine/Libraries/ )
 set_target_properties( shaderlib PROPERTIES PREFIX 		"" )
 
-target_include_directories( shaderlib PRIVATE           ${THIRDPARTY_INCLUDES} )
+target_link_libraries( shaderlib PUBLIC 				stdlib )
 add_common_target_defines( shaderlib )
-
-
-#
-# Install
-#
-# Linceses
-install_files( shaderlib FILES ${GLM_INSTALL_LICENSES}		DESTINATION licenses/glm/ )

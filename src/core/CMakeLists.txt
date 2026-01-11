@@ -7,11 +7,9 @@ find_package( Mimalloc REQUIRED )
 find_package( Zlib REQUIRED )
 find_package( SDL2 REQUIRED )
 find_package( Optick REQUIRED )
-find_package( GLM REQUIRED )
 find_package( BugTrap REQUIRED )
 
-set( THIRDPARTY_INCLUDES					${MIMALLOC_INCLUDE} ${ZLIB_INCLUDE} ${SDL2_INCLUDE} ${OPTICK_INCLUDE}
-											${GLM_INCLUDE} ${BUGTRAP_INCLUDE} )
+set( THIRDPARTY_INCLUDES					${MIMALLOC_INCLUDE} ${ZLIB_INCLUDE} ${SDL2_INCLUDE} ${OPTICK_INCLUDE} ${BUGTRAP_INCLUDE} )
 set( THIRDPARTY_LIBS						${MIMALLOC_LIBS} ${ZLIB_LIBS} ${SDL2_LIBS} ${OPTICK_LIBS} ${BUGTRAP_LIBS} )
 set( THIRDPARTY_INSTALL_TOOLS 				${OPTICK_INSTALL_TOOLS} ${BUGTRAP_INSTALL_TOOLS} )
 set( THIRDPARTY_INSTALL_DLLS				${BUGTRAP_INSTALL_DLLS} )
@@ -64,14 +62,14 @@ set_target_properties( core PROPERTIES FOLDER         				Engine )
 set_target_properties( core PROPERTIES PREFIX 						"" )
 
 target_include_directories( core PRIVATE             				${THIRDPARTY_INCLUDES} )
-target_link_libraries( core 										stdlib ${THIRDPARTY_LIBS} ${CMAKE_DL_LIBS} )
+target_link_libraries( core PRIVATE 								stdlib ${THIRDPARTY_LIBS} ${CMAKE_DL_LIBS} )
 add_common_target_defines( core )
 
 
 #
 # Install
 #
-inherit_install_files( core										stdlib )
+inherit_install_files( core										TARGETS stdlib )
 
 # Binaries
 install_files( core TARGETS RUNTIME core						DESTINATION		bin/${PLATFORM_BIN_DIR}/ )
@@ -87,5 +85,4 @@ install_files( core FILES ${MIMALLOC_INSTALL_LICENSES}			DESTINATION 	licenses/m
 install_files( core FILES ${ZLIB_INSTALL_LICENSES}				DESTINATION 	licenses/zlib/ )
 install_files( core FILES ${SDL2_INSTALL_LICENSES}				DESTINATION 	licenses/sdl2/ )
 install_files( core FILES ${OPTICK_INSTALL_LICENSES}			DESTINATION 	licenses/optick/ )
-install_files( core FILES ${GLM_INSTALL_LICENSES}	        	DESTINATION 	licenses/glm/ )
 install_files( core FILES ${BUGTRAP_INSTALL_LICENSES}			DESTINATION 	licenses/bugtrap/ )

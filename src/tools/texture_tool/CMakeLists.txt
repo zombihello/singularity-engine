@@ -3,11 +3,9 @@ cmake_minimum_required( VERSION 3.19 )
 #
 # Find third parties
 #
-find_package( RapidJson REQUIRED )
-find_package( GLM REQUIRED )
 find_package( Compressonator REQUIRED )
 
-set( THIRDPARTY_INCLUDES					${RAPIDJSON_INCLUDE} ${GLM_INCLUDE} ${COMPRESSONATOR_INCLUDE} )
+set( THIRDPARTY_INCLUDES					${COMPRESSONATOR_INCLUDE} )
 set( THIRDPARTY_LIBS						${COMPRESSONATOR_LIBS} )
 set( THIRDPARTY_INSTALL_DEBUG_DLLS			${COMPRESSONATOR_INSTALL_DLLS_DEBUG} )
 set( THIRDPARTY_INSTALL_RELEASE_DLLS		${COMPRESSONATOR_INSTALL_DLLS_RELEASE} )
@@ -56,14 +54,14 @@ set_target_properties( texture_tool PROPERTIES FOLDER         				"Tools/Resourc
 set_target_properties( texture_tool PROPERTIES PREFIX 						"" )
 
 target_include_directories( texture_tool PRIVATE             				${THIRDPARTY_INCLUDES} )
-target_link_libraries( texture_tool 										core stdlib interfaces stexdoc ${THIRDPARTY_LIBS} ${CMAKE_DL_LIBS} )
+target_link_libraries( texture_tool PRIVATE									core stdlib interfaces stexdoc ${THIRDPARTY_LIBS} ${CMAKE_DL_LIBS} )
 add_common_target_defines( texture_tool )
 
 
 #
 # Install
 #
-inherit_install_files( texture_tool												core stdlib interfaces stexdoc )
+inherit_install_files( texture_tool												TARGETS core stdlib interfaces stexdoc )
 
 # Binaries
 install_files( texture_tool TARGETS RUNTIME texture_tool 						DESTINATION     bin/${PLATFORM_BIN_DIR}/ )
@@ -71,6 +69,4 @@ install_files( texture_tool FILES ${THIRDPARTY_INSTALL_DEBUG_DLLS}				DESTINATIO
 install_files( texture_tool FILES ${THIRDPARTY_INSTALL_RELEASE_DLLS}			DESTINATION 	bin/${PLATFORM_BIN_DIR}/	CONFIGURATIONS 	Release Retail )
 
 # Linceses
-install_files( texture_tool FILES ${RAPIDJSON_INSTALL_LICENSES} 				DESTINATION 	licenses/rapidjson/ )
-install_files( texture_tool FILES ${GLM_INSTALL_LICENSES} 						DESTINATION 	licenses/glm/ )
 install_files( texture_tool DIRECTORY ${COMPRESSONATOR_INSTALL_LICENSES_DIR}	DESTINATION 	licenses/compressonator/ )

@@ -1,4 +1,4 @@
-#include "pch_sandbox.h"
+#include "pch_citadel.h"
 #include "studiorender/studioapi/istudioapi.h"
 #include "studiorender/istudio_rendercmd.h"
 #include "studiorender/studio_vertextypes.h"
@@ -14,12 +14,12 @@
 #include "gameframework/ecs/ecs_common.gen.h"
 #include "gameframework/ecs/ecs_movement.gen.h"
 #include "gameframework/ecs/ecs_camera.gen.h"
-#include "games/sandbox/ecs/ecs_testdraw.gen.h"
+#include "games/citadel/ecs/ecs_testdraw.gen.h"
 
 //-----------------------------------------------------------------------------
-// Singularity Sandbox game
+// Citadel game
 //-----------------------------------------------------------------------------
-class CSandboxGame : public CGame
+class CCitadelGame : public CGame
 {
 public:
 	// IAppSystem interfaces
@@ -50,17 +50,17 @@ Game
 */
 CGame* Game()
 {
-	static CSandboxGame		s_SandboxGame;
+	static CCitadelGame		s_SandboxGame;
 	return &s_SandboxGame;
 }
 
 
 /*
 ==================
-CSandboxGame::Connect
+CCitadelGame::Connect
 ==================
 */
-bool CSandboxGame::Connect( createInterfaceFn_t pFactory )
+bool CCitadelGame::Connect( createInterfaceFn_t pFactory )
 {
 	if ( !CGame::Connect( pFactory ) )
 	{
@@ -79,10 +79,10 @@ bool CSandboxGame::Connect( createInterfaceFn_t pFactory )
 
 /*
 ==================
-CSandboxGame::Disconnect
+CCitadelGame::Disconnect
 ==================
 */
-void CSandboxGame::Disconnect()
+void CCitadelGame::Disconnect()
 {
 	g_pStudioAPI = NULL;
 	CGame::Disconnect();
@@ -90,10 +90,10 @@ void CSandboxGame::Disconnect()
 
 /*
 ==================
-CSandboxGame::Init
+CCitadelGame::Init
 ==================
 */
-bool CSandboxGame::Init()
+bool CCitadelGame::Init()
 {
 	if ( !CGame::Init() )
 	{
@@ -104,7 +104,7 @@ bool CSandboxGame::Init()
 	class CInitQuadHelper
 	{
 	public:
-		static void R_InitQuad( CSandboxGame* pGame )
+		static void R_InitQuad( CCitadelGame* pGame )
 		{
 			studioSimpleElementVertex_t			quadVerteces[] =
 			{
@@ -123,7 +123,7 @@ bool CSandboxGame::Init()
 	};
 
 	UNIQUE_RENDER_COMMAND_ONEPARAMETER( CStudioRenderCmd_InitQuad,
-										CSandboxGame*, pGame, this,
+										CCitadelGame*, pGame, this,
 										{
 											CInitQuadHelper::R_InitQuad( pGame );
 										} );
@@ -144,10 +144,10 @@ bool CSandboxGame::Init()
 
 /*
 ==================
-CSandboxGame::Shutdown
+CCitadelGame::Shutdown
 ==================
 */
-void CSandboxGame::Shutdown()
+void CCitadelGame::Shutdown()
 {
 	Quad().Shutdown();
 	pQuadEntity			= NULL;
@@ -157,12 +157,12 @@ void CSandboxGame::Shutdown()
 
 /*
 ==================
-CSandboxGame::GetGameDescription
+CCitadelGame::GetGameDescription
 ==================
 */
-const achar* CSandboxGame::GetGameDescription() const
+const achar* CCitadelGame::GetGameDescription() const
 {
-	return "Singularity Sandbox";
+	return "Citadel";
 }
 
 

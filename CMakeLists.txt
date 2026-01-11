@@ -45,15 +45,18 @@ option( INSTALL_THIRDPARTY_TOOLS                        "Install third-party too
 #
 # Paths
 #
-set( THIRDPARTY_DIR ${CMAKE_SOURCE_DIR}/src/thirdparty/ )
-set( ROOT_DIR       ${CMAKE_SOURCE_DIR} )
-set( PUBLIC_SRC_DIR ${CMAKE_SOURCE_DIR}/src/public/ )
-set( RUNTIME_DIR    ${CMAKE_SOURCE_DIR}/game/ )
-set( DEVTOOLS_DIR   ${CMAKE_SOURCE_DIR}/src/devtools/ )
+set( THIRDPARTY_DIR         ${CMAKE_SOURCE_DIR}/src/thirdparty/ )
+set( ROOT_DIR               ${CMAKE_SOURCE_DIR} )
+set( PUBLIC_SRC_DIR         ${CMAKE_SOURCE_DIR}/src/public/ )
+set( GAME_DIR               ${CMAKE_SOURCE_DIR}/game/ )
+set( DEVTOOLS_DIR           ${CMAKE_SOURCE_DIR}/src/devtools/ )
+set( GENERATED_ROOT_DIR     ${CMAKE_BINARY_DIR} )
 
-include_directories( ${CMAKE_SOURCE_DIR}/src )
-include_directories( ${CMAKE_SOURCE_DIR}/src/public )
-include_directories( ${CMAKE_SOURCE_DIR}/src/public/libs )
+include_directories( ${ROOT_DIR}/src )
+include_directories( ${ROOT_DIR}/src/public )
+include_directories( ${ROOT_DIR}/src/public/libs )
+include_directories( ${GENERATED_ROOT_DIR}/src )
+include_directories( ${GENERATED_ROOT_DIR}/src/libs )
 
 
 #
@@ -148,7 +151,7 @@ add_compile_definitions( GIT_COMMIT="${GIT_COMMIT}" )
 #
 # Libraries
 add_subdirectory( src/libs/appframework )
-# @TODO src/libs/gameframework
+add_subdirectory( src/libs/gameframework )
 add_subdirectory( src/libs/gameinfo )
 add_subdirectory( src/libs/interfaces )
 add_subdirectory( src/libs/parserlib )
@@ -175,7 +178,7 @@ add_subdirectory( src/studiorender/studioapi/vk )
 add_subdirectory( src/studiorender )
 
 # Games
-# @TODO src/games/citadel
+add_subdirectory( src/games/citadel )
 # @TODO src/games/citadel_launcher
 
 # Tools

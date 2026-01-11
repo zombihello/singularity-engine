@@ -4,6 +4,6 @@
 	"filter": 				"anisotropic",
 	"generate-mipmaps": 	true,
 	"format": 				"bc1",
-	"output-dir":			"//BASE_PATH/sandbox/materials/",
+	"output-dir":			"//BASE_PATH/citadel/materials/",
 	"max-anisotropy":		16
 }
