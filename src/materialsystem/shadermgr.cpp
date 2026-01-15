@@ -247,7 +247,7 @@ bool CShaderMgr::LoadShaderCaches( uint32 index )
 	shaderLibInfo_t&	info			= shaderLibs[index];
 	const achar*		pShaderPlatform	= g_pStudioAPI->GetInfo().pShaderPlatform;
 	Assert( pShaderPlatform && info.pShaderLib );
-	std::string			shaderCacheDir	= S_Sprintf( "//%s/shaders/%s/%s/", info.bGameShaderLib ? "GAME" : "CORE", pShaderPlatform, info.pShaderLib->GetName() );
+	std::string			shaderCacheDir	= S_Sprintf( "//%s/shaders/%s/%s/", info.bGameShaderLib ? "GAME" : "CORE", info.pShaderLib->GetName(), pShaderPlatform );
 
 	// Load shader caches for each shader
 	uint32		numShaders			= info.pShaderLib->GetNumShaders();

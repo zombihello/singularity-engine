@@ -461,9 +461,9 @@ endfunction()
 
 #
 # Add commands to compile *.bison files
-# Usage: add_ecscompiler_commands( ${<DEST_DIR>} <DEST_OUTPUT_FILES> ${<FILES, ...>} )
+# Usage: add_ecscompiler_commands( ${<BASE_DIR>} ${<DEST_DIR>} <DEST_OUTPUT_FILES> ${<FILES, ...>} )
 #
-function( add_ecscompiler_commands Q DEST_DIR DEST_OUTPUT_FILES )
+function( add_ecscompiler_commands BASE_DIR DEST_DIR DEST_OUTPUT_FILES )
     set( ECSCOMPILER_DIR            "${DEVTOOLS_DIR}/ecscompiler/" )
     set( ECSCOMPILER_BIN_DIR        "" )
     set( ECSCOMPILER_EXE            "" )
@@ -482,10 +482,10 @@ function( add_ecscompiler_commands Q DEST_DIR DEST_OUTPUT_FILES )
     foreach ( FILE IN LISTS ARGN )
         if ( FILE MATCHES "\\.ecs$" )
             get_filename_component( FILE_DIR "${FILE}" DIRECTORY )
-            file( RELATIVE_PATH RR "${Q}" "${FILE_DIR}"  )
+            file( RELATIVE_PATH     SUB_DIR "${BASE_DIR}" "${FILE_DIR}"  )
             set( FILE_DEST_DIR      "${DEST_DIR}" )
-            if ( RR )
-                set( FILE_DEST_DIR  "${FILE_DEST_DIR}/${RR}" )
+            if ( SUB_DIR )
+                set( FILE_DEST_DIR  "${FILE_DEST_DIR}/${SUB_DIR}" )
             endif()
 
             get_filename_component( FILE_NAME "${FILE}" NAME_WE )
@@ -499,6 +499,50 @@ function( add_ecscompiler_commands Q DEST_DIR DEST_OUTPUT_FILES )
             set_source_files_properties( "${OUTPUT_FILE_CPP}"                           PROPERTIES HEADER_FILE_ONLY TRUE )
             set_source_files_properties( "${OUTPUT_FILE_HEADER}" "${OUTPUT_FILE_CPP}"   PROPERTIES GENERATED TRUE )
             list( APPEND OUTPUT_FILES "${OUTPUT_FILE_HEADER}" "${OUTPUT_FILE_CPP}" )
+        endif()
+    endforeach()
+
+    set( ${DEST_OUTPUT_FILES} ${OUTPUT_FILES} PARENT_SCOPE )
+endfunction()
+
+#
+# Add commands to compile *.bison files
+# Usage: add_shadercompiler_commands( ${<BASE_DIR>} ${<DEST_DIR>} <DEST_OUTPUT_FILES> ${<FILES, ...>} )
+#
+function( add_shadercompiler_commands BASE_DIR DEST_DIR DEST_OUTPUT_FILES )
+    set( SHADERCOMPILER_DIR            "${DEVTOOLS_DIR}/shadercompiler/" )
+    set( SHADERCOMPILER_BIN_DIR        "" )
+    set( SHADERCOMPILER_EXE            "" )
+    if ( PLATFORM_WINDOWS )
+        set( SHADERCOMPILER_BIN_DIR    "${SHADERCOMPILER_DIR}/bin/${PLATFORM_NAME}_release/" )
+        set( SHADERCOMPILER_EXE        "${SHADERCOMPILER_BIN_DIR}/shadercompiler.exe" )
+    else()
+        message( FATAL_ERROR "add_shadercompiler_commands: unknown platform" )
+    endif()
+
+    if ( NOT EXISTS "${SHADERCOMPILER_EXE}" )
+        message( WARNING "add_shadercompiler_commands: '${SHADERCOMPILER_EXE}' is missing, before compiling you shuild to build shadercompiler in release configuration" )
+    endif()
+
+    set( OUTPUT_FILES               ${${DEST_OUTPUT_FILES}} )
+    foreach ( FILE IN LISTS ARGN )
+        if ( FILE MATCHES "\\.shader$" )
+            get_filename_component( FILE_DIR "${FILE}" DIRECTORY )
+            file( RELATIVE_PATH     SUB_DIR "${BASE_DIR}" "${FILE_DIR}"  )
+            set( FILE_DEST_DIR      "${DEST_DIR}" )
+            if ( SUB_DIR )
+                set( FILE_DEST_DIR  "${FILE_DEST_DIR}/${SUB_DIR}" )
+            endif()
+
+            get_filename_component( FILE_NAME "${FILE}" NAME_WE )
+            set( OUTPUT_FILE_HEADER "${FILE_DEST_DIR}/${FILE_NAME}.gen.h" )
+            add_custom_command( OUTPUT "${OUTPUT_FILE_HEADER}"
+                                COMMAND "${SHADERCOMPILER_EXE}" -mode gencpp -file "${FILE}" -output "${FILE_DEST_DIR}"
+                                DEPENDS "${FILE}"
+                                WORKING_DIRECTORY "${ROOT_DIR}" )
+
+            set_source_files_properties( "${OUTPUT_FILE_HEADER}" PROPERTIES GENERATED TRUE )
+            list( APPEND OUTPUT_FILES "${OUTPUT_FILE_HEADER}" )
         endif()
     endforeach()
 

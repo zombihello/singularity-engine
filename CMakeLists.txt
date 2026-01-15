@@ -117,6 +117,7 @@ add_compile_definitions( PLATFORM_64BIT=${PLATFORM_64BIT} )
 add_compile_definitions( PLATFORM_32BIT=${PLATFORM_32BIT} )
 add_compile_definitions( PLATFORM_NAME="${PLATFORM_NAME}" )
 add_compile_definitions( PLATFORM_BIN_DIR="${PLATFORM_BIN_DIR}" )
+add_compile_definitions( PLATFORM_DIR="$<LOWER_CASE:${PLATFORM_NAME}>" )
 
 
 #
@@ -170,16 +171,16 @@ add_subdirectory( src/core )
 add_subdirectory( src/filesystem )
 add_subdirectory( src/cvar )
 add_subdirectory( src/inputsystem )
-# @TODO src/launcher
-# @TODO src/materialsystem/stdshaders
-# @TODO src/materialsystem
-add_subdirectory( src/resourcesystem )
 add_subdirectory( src/studiorender/studioapi/vk )
 add_subdirectory( src/studiorender )
+add_subdirectory( src/materialsystem/stdshaders )
+add_subdirectory( src/materialsystem )
+add_subdirectory( src/resourcesystem )
+add_subdirectory( src/launcher )
 
 # Games
 add_subdirectory( src/games/citadel )
-# @TODO src/games/citadel_launcher
+add_subdirectory( src/games/citadel_launcher )
 
 # Tools
 add_subdirectory( src/tools/ecscompiler )

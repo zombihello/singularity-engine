@@ -5,9 +5,9 @@
 #include "cvar/icvar.h"
 #include "appframework/appframework.h"
 #include "shadercache/shadercache.h"
-#include "tools/shadercompiler/makefile.h"
-#include "tools/shadercompiler/shader_cppclass_generator.h"
+#include "tools/shadercompiler/shadercompiler_cppgenerator.h"
 #include "tools/shadercompiler/shadercompiler.h"
+#include "tools/shadercompiler/shadercompiler_makefile.h"
 #include "tools/shadercompiler/ishadercompiler_backend.h"
 #include "tools/shadercompiler/shadercompiler_environment.h"
 #include "tools/shadercompiler/shadercompiler_output.h"
@@ -24,28 +24,14 @@ static const achar* s_pShaderTypeNames[] =
 };
 static_assert( STUDIOAPI_SHADER_NUM_TYPES == ARRAYSIZE( s_pShaderTypeNames ), "Array size 's_pShaderTypeNames' must be equal to STUDIOAPI_SHADER_NUM_TYPES" );
 
-
-/*
-==================
-PrintShaderCompileHelp
-==================
-*/
-static void PrintShaderCompileHelp()
+// Table of shader compiler mode names
+static const achar* s_pShaderCompilerModeNames[] =
 {
-	Msg( "" );
-	Msg( "Shader compiler for Singularity Engine (" __DATE__ " " __TIME__ ")" );
-	Msg( "Usage: shadercompiler -makefile <path> -backend <name> [-game <path>]" );
-	Msg( "Ex: shadercompiler -makefile C:/singularity_engine/src/materialsystem/stdshaders/shaderlist.makefile -backend shadercompile_dx11" );
-	Msg( "Ex: shadercompiler -makefile ../src/materialsystem/gameshaders/shaderlist.makefile -game sandbox -backend shadercompile_dx11" );
-	Msg( "" );
-	Msg( "makefile\t\tPath to a shader makefile. For syntax example see src/materialsystem/stdshaders/shaderlist.makefile" );
-	Msg( "backend\t\tShader compile backend. When command line has skipcompilation then this is ignoring (e.g: shadercompiler_vk, shadercompile_dx11, etc)" );
-	Msg( "gencpp\t\tIs need generate C++ helper classes for shaders" );
-	Msg( "outcpp\t\tOverride output path for generated shader helper C++ classes (relative path from makefile)" );
-	Msg( "skipcompilation\t\tIs need skip shader compilation" );
-	Msg( "debug\t\tCompile debug shader version" );
-	Msg( "" );
-}
+	"compile",			// SHADER_COMPILER_MODE_COMPILE
+	"gencpp"			// SHADER_COMPILER_MODE_GENCPP
+};
+static_assert( SHADER_COMPILER_MODE_NUM == ARRAYSIZE( s_pShaderCompilerModeNames ), "Array size 's_pShaderCompilerModeNames' must be equal to SHADER_COMPILER_MODE_NUM" );
+
 
 /*
 ==================
@@ -80,11 +66,44 @@ void ConvShaderTypeToString( studioAPIShaderType_t shaderType, const achar*& pSh
 	pShaderTypeName = s_pShaderTypeNames[( uint32 )shaderType];
 }
 
+/*
+==================
+ConvStringToShaderCompilerMode
+==================
+*/
+bool ConvStringToShaderCompilerMode( const achar* pShaderCompilerModeName, shaderCompilerMode_t& shaderCompilerMode )
+{
+	for ( uint32 index = 0; index < ARRAYSIZE( s_pShaderCompilerModeNames ); ++index )
+	{
+		if ( !S_Stricmp( pShaderCompilerModeName, s_pShaderCompilerModeNames[index] ) )
+		{
+			// We found! Return current type
+			shaderCompilerMode = ( shaderCompilerMode_t )index;
+			return true;
+		}
+	}
+
+	// We not found, return invalid type
+	shaderCompilerMode = SHADER_COMPILER_MODE_NUM;
+	return false;
+}
+
+/*
+==================
+ConvShaderCompilerModeToString
+==================
+*/
+void ConvShaderCompilerModeToString( shaderCompilerMode_t shaderCompilerMode, const achar*& pShaderCompilerModeName )
+{
+	Assert( shaderCompilerMode < SHADER_COMPILER_MODE_NUM );
+	pShaderCompilerModeName = s_pShaderCompilerModeNames[( uint32 )shaderCompilerMode];
+}
+
 
 //-----------------------------------------------------------------------------
 // Shader compile app system group
 //-----------------------------------------------------------------------------
-class CShaderCompileAppSystemGroup : public CDefaultAppSystemGroup<CAppSystemGroup>
+class CShaderCompilerAppSystemGroup : public CDefaultAppSystemGroup<CAppSystemGroup>
 {
 public:
 	// IAppSystemGroup interface
@@ -95,28 +114,30 @@ public:
 	// Allow the application to do some work after all AppSystems are shut down
 	virtual void PostShutdown() override;
 
-	CShaderCompileAppSystemGroup();
+	CShaderCompilerAppSystemGroup();
 
 private:
+	void PrintHelp();
 	bool GenerateShaderCppClass();
 	bool CompileShaders();
 	bool CompileShader( const shader_t& shader, CShaderCacheDoc& shaderCacheDoc );
 	bool LoadBackend();
 	void UnloadBackend();
 
-	bool					bDebugConfiguration;
-	CMakeFile				makefile;
-	dllHandle_t				backendHandle;
-	IShaderCompilerBackend*	pShaderCompileBackend;
+	bool						bDebugConfiguration;
+	dllHandle_t					backendHandle;
+	IShaderCompilerBackend*		pShaderCompileBackend;
+	CShaderCompilerMakeFile		makefile;
+	std::string					outputPath;
 };
 
 
 /*
 ==================
-CShaderCompileAppSystemGroup::CShaderCompileAppSystemGroup
+CShaderCompilerAppSystemGroup::CShaderCompilerAppSystemGroup
 ==================
 */
-CShaderCompileAppSystemGroup::CShaderCompileAppSystemGroup()
+CShaderCompilerAppSystemGroup::CShaderCompilerAppSystemGroup()
 	: bDebugConfiguration( false )
 	, backendHandle( NULL )
 	, pShaderCompileBackend( NULL )
@@ -124,96 +145,160 @@ CShaderCompileAppSystemGroup::CShaderCompileAppSystemGroup()
 
 /*
 ==================
-CShaderCompileAppSystemGroup::Main
+CShaderCompilerAppSystemGroup::Main
 ==================
 */
-int32 CShaderCompileAppSystemGroup::Main()
+int32 CShaderCompilerAppSystemGroup::Main()
 {
-	// Is need to print help of usage
-	bool			bPrintHelpUsage = CommandLine()->HasParam( "h" ) || CommandLine()->HasParam( "help" ) || CommandLine()->HasParam( "?" );
-
-	// Get and parse a shader make file
-	const achar*	pMakeFilePath = CommandLine()->GetFirstValue( "makefile" );
-	bool			bInvalidMakeFilePath = !pMakeFilePath || pMakeFilePath[0] == '\0';
-	if ( !bInvalidMakeFilePath && !makefile.LoadMakeFile( pMakeFilePath ) )
+	// Print help if it need
+	if ( CommandLine()->HasParam( "h" ) || CommandLine()->HasParam( "help" ) || CommandLine()->HasParam( "?" ) )
 	{
-		Error( "ShaderCompiler: Failed to load makefile '%s'", pMakeFilePath );
-		return 1;
-	}
-
-	// Check if need compile debug shader versions
-	bDebugConfiguration = CommandLine()->HasParam( "debug" );
-
-	// Make sure what we have valid the backend (if we haven't 'skipcompilation')
-	const achar*	pBackendName = CommandLine()->GetFirstValue( "backend" );
-	bool			bInvalidBackend = !CommandLine()->HasParam( "skipcompilation" ) && ( !pBackendName || pBackendName[0] == '\0' );
-
-	// Print help of usage if it need or some parameters aren't set
-	if ( bPrintHelpUsage || bInvalidMakeFilePath || bInvalidBackend )
-	{
-		PrintShaderCompileHelp();
+		PrintHelp();
 		return 0;
 	}
 
-	// Override output path of shader C++ helper classes
-	if ( CommandLine()->HasParam( "outcpp" ) )
+	// Get shader compiler mode
+	shaderCompilerMode_t	mode = SHADER_COMPILER_MODE_NUM;
 	{
-		std::string		outputCppGenShaders;
-		S_MakeAbsolutePath( CommandLine()->GetFirstValue( "outcpp" ), outputCppGenShaders, makefile.GetMakeFileDir(), false );
-		makefile.SetCppGenOutput( outputCppGenShaders.c_str() );
-	}
-
-	// Generate C++ helper classes for shaders
-	if ( CommandLine()->HasParam( "gencpp" ) )
-	{
-		if ( !GenerateShaderCppClass() )
+		const achar*		pMode = CommandLine()->GetFirstValue( "mode" );
+		if ( !pMode || pMode[0] == '\0' || !ConvStringToShaderCompilerMode( pMode, mode ) )
 		{
+			Error( "ShaderCompiler: Operation mode is unknown or isn't specified" );
 			return 1;
 		}
 	}
 
-	// We are done if no need do compilation of shaders
-	if ( CommandLine()->HasParam( "skipcompilation" ) )
+	// Get shader file
+	const achar*			pFilePath = CommandLine()->GetFirstValue( "file" );
+	if ( !pFilePath || pFilePath[0] == '\0' )
 	{
-		return 0;
-	}
-
-	// Now load backend for compilation
-	if ( !LoadBackend() )
-	{
+		Error( "ShaderCompiler: Shader file isn't specified" );
 		return 1;
 	}
 
-	// Compile shaders
-	if ( !CompileShaders() )
+	// Get path to output directory
+	outputPath = CommandLine()->GetFirstValue( "output" );
+	if ( outputPath.empty() )
 	{
+		Error( "ShaderCompiler: Output directory path isn't specified" );
 		return 1;
 	}
 
-	// We are done
-	UnloadBackend();
+	// Load shader file
+	const achar*	pFileExtension = S_GetFileExtension( pFilePath );
+	if ( !S_Stricmp( pFileExtension, "shader" ) )
+	{ 
+		if ( !makefile.LoadShader( pFilePath ) )
+		{
+			Error( "ShaderCompiler: Failed to load shader '%s'", pFilePath );
+			return 1;
+		}
+	}
+	else if ( !S_Stricmp( pFileExtension, "makefile" ) )
+	{
+		if ( !makefile.LoadMakeFile( pFilePath ) )
+		{
+			Error( "ShaderCompiler: Failed to load makefile '%s'", pFilePath );
+			return 1;
+		}
+	}
+	else
+	{
+		Error( "ShaderCompiler: Shader file extension is unknown" );
+		return 1;
+	}
+
+	// Do some actions
+	switch ( mode )
+	{
+		// Shader compilation mode
+	case SHADER_COMPILER_MODE_COMPILE:
+	{
+		// Check if need compile shaders in debug configuration
+		bDebugConfiguration = CommandLine()->HasParam( "debug" );
+
+		// Add extra include paths from the command line
+		uint32			numIncludes = 0;
+		const achar**	pIncludes	= CommandLine()->GetValues( "include", numIncludes );
+		if ( numIncludes > 0 )
+		{
+			for ( uint32 index = 0; index < numIncludes; ++index )
+			{
+				makefile.AddIncludeDir( pIncludes[index] );
+			}
+		}
+
+		// Load compiler backend and compile shaders
+		if ( !LoadBackend() || !CompileShaders() )
+		{
+			return 1;
+		}
+		UnloadBackend();
+		break;
+	}
+
+		// Generate C++ helper classes mode
+	case SHADER_COMPILER_MODE_GENCPP:
+		if ( !GenerateShaderCppClass() )
+		{
+			return 1;
+		}
+		break;
+
+	default:
+		AssertMsg( false, "Unknown shader compiler mode 0x%X", mode );
+		Error( "ShaderCompiler: Unknown shader compiler mode 0x%X", mode );
+		return 1;
+	}
+
 	return 0;
 }
 
 /*
 ==================
-CShaderCompileAppSystemGroup::GenerateShaderCppClass
+CShaderCompilerAppSystemGroup::PrintHelp
 ==================
 */
-bool CShaderCompileAppSystemGroup::GenerateShaderCppClass()
+void CShaderCompilerAppSystemGroup::PrintHelp()
+{
+	Msg( "" );
+	Msg( "Shader compiler for Singularity Engine (" __DATE__ " " __TIME__ ")" );
+	Msg( "Usage: shadercompiler -mode <name> <input> -output <dir> [options]" );
+	Msg( "Ex: shadercompiler -mode compile -file C:/shaderlist.makefile -output C:/shaders/stdshaders/ -backend shadercompiler_vk" );
+	Msg( "Ex: shadercompiler -mode compile -file C:/test.shader -output C:/shaders/stdshaders/ -include \"C:/hlsl_include\" \"E:/hlsl_include\" -backend shadercompiler_vk" );
+	Msg( "Ex: shadercompiler -mode gencpp -file C:/test.shader -output C:/cpp_shaders/" );
+	Msg( "Ex: shadercompiler -mode gencpp -file C:/shaderlist.makefile -output C:/cpp_shaders/" );
+	Msg( "" );
+	Msg( "-mode <name>\t\tOperation mode." );
+	Msg( "\t\t\t\tValid values:" );
+	Msg( "\t\t\t\t\t* compile (Shader compilation mode)" );
+	Msg( "\t\t\t\t\t* gencpp (Generate C++ helper classes mode)" );
+	Msg( "-help\t\t\tPrint this message" );
+	Msg( "-file <path>\t\tPath to a shader file (*.makefile or *.shader)" );
+	Msg( "-output <dir>\t\tOutput directory path" );
+	Msg( "-include <p1> [p2 ...]\tInclude directories (used in compile mode)" );
+	Msg( "-debug\t\t\tCompile debug shader version (used in compile mode)" );
+	Msg( "-backend <name>\t\tShader compiler backend (used in compile mode)" );
+	Msg( "" );
+}
+
+/*
+==================
+CShaderCompilerAppSystemGroup::GenerateShaderCppClass
+==================
+*/
+bool CShaderCompilerAppSystemGroup::GenerateShaderCppClass()
 {
 	bool							bResult = true;
-	CShaderCppClassGenerator		shaderCppClassGenerator;
+	CShaderCompilerCppGenerator		cppGenerator;
 	const std::vector<shader_t>&	shaders = makefile.GetShaders();	
-	Msg( "ShaderCompiler: Generate C++ class for each shader" );
-
 	for ( uint32 index = 0, count = ( uint32 )shaders.size(); index < count; ++index )
 	{
 		// Generate C++ class for this shader
 		const shader_t&			shader = shaders[index];
-		shaderCppClassGenerator.Reset();
-		shaderCppClassGenerator.Generate( shader );
-		const std::string&		buffer = shaderCppClassGenerator.GetBuffer();
+		cppGenerator.Reset();
+		cppGenerator.Generate( shader );
+		const std::string&		buffer = cppGenerator.GetBuffer();
 
 		// Generate file path from base name of shader source file and the one type
 		std::string		shaderName;
@@ -227,7 +312,7 @@ bool CShaderCompileAppSystemGroup::GenerateShaderCppClass()
 			S_GetFileBaseName( shader.source, shaderName, false );
 
 			// Get file path
-			filePath = S_Sprintf( "%s/%s_%s.gen.h", makefile.GetCppGenOutput().c_str(), shaderName.c_str(), pShaderTypeName );
+			filePath = S_Sprintf( "%s/%s_%s.gen.h", outputPath.c_str(), shaderName.c_str(), pShaderTypeName );
 			S_FixPathSeparators( filePath );
 		}
 
@@ -250,10 +335,10 @@ bool CShaderCompileAppSystemGroup::GenerateShaderCppClass()
 
 /*
 ==================
-CShaderCompileAppSystemGroup::CompileShaders
+CShaderCompilerAppSystemGroup::CompileShaders
 ==================
 */
-bool CShaderCompileAppSystemGroup::CompileShaders()
+bool CShaderCompilerAppSystemGroup::CompileShaders()
 {
 	// Iterate over shaders and each the one compile for all flag combination
 	bool							bResult = true;
@@ -275,7 +360,7 @@ bool CShaderCompileAppSystemGroup::CompileShaders()
 		// Save shader cache
 		std::string		shaderFileName;
 		S_GetFileBaseName( shader.source, shaderFileName, false );
-		std::string		outputFile = S_Sprintf( "%s/shaders/%s/%s/%s.ssc", makefile.GetCacheOutputDir().c_str(), pShaderCompileBackend->GetShaderPlatform(), makefile.GetShaderListName().c_str(), shaderFileName.c_str() );
+		std::string		outputFile = S_Sprintf( "%s/%s/%s.ssc", outputPath.c_str(), pShaderCompileBackend->GetShaderPlatform(), shaderFileName.c_str() );
 		if ( !shaderCacheDoc.SaveFile( outputFile.c_str() ) )
 		{
 			bResult = false;
@@ -288,10 +373,10 @@ bool CShaderCompileAppSystemGroup::CompileShaders()
 
 /*
 ==================
-CShaderCompileAppSystemGroup::CompileShader
+CShaderCompilerAppSystemGroup::CompileShader
 ==================
 */
-bool CShaderCompileAppSystemGroup::CompileShader( const shader_t& shader, CShaderCacheDoc& shaderCacheDoc )
+bool CShaderCompilerAppSystemGroup::CompileShader( const shader_t& shader, CShaderCacheDoc& shaderCacheDoc )
 {
 	std::vector<int32>				flagVarSlots( shader.flags.size() );
 
@@ -307,7 +392,7 @@ bool CShaderCompileAppSystemGroup::CompileShader( const shader_t& shader, CShade
 	}
 
 	bool							bResult		= true;
-	const std::vector<std::string>&	includeDirs = makefile.GetShaderIncludeDirs();
+	const std::vector<std::string>&	includeDirs = makefile.GetIncludeDirs();
 	uint32							currentCombo = 0;
 	while ( currentCombo < shader.numFlagCombos )
 	{
@@ -414,22 +499,30 @@ bool CShaderCompileAppSystemGroup::CompileShader( const shader_t& shader, CShade
 
 /*
 ==================
-CShaderCompileAppSystemGroup::LoadBackend
+CShaderCompilerAppSystemGroup::LoadBackend
 ==================
 */
-bool CShaderCompileAppSystemGroup::LoadBackend()
+bool CShaderCompilerAppSystemGroup::LoadBackend()
 {
 	// Unload old backend
 	UnloadBackend();
 
+	// Make sure what we have valid the backend
+	const achar*	pBackendName = CommandLine()->GetFirstValue( "backend" );
+	if ( !pBackendName || pBackendName[0] == '\0' )
+	{
+		Error( "ShaderCompiler: Shader compiler backend isn't specified" );
+		return false;
+	}
+
 	// Get path to backend
-	std::string		backendPath = S_Sprintf( "//ENGINEBIN/%s" DLL_EXT_STRING, CommandLine()->GetFirstValue( "backend" ) );
+	std::string		backendPath = S_Sprintf( "//ENGINEBIN/%s" DLL_EXT_STRING, pBackendName );
 
 	// Load module
 	dllHandle_t		backendHandle = g_pFileSystem->LoadModule( backendPath.c_str() );
 	if ( !backendHandle )
 	{
-		Warning( "ShaderCompiler: Failed to load backend '%s'", backendPath.c_str() );
+		Error( "ShaderCompiler: Failed to load backend '%s'", backendPath.c_str() );
 		return false;
 	}
 
@@ -437,15 +530,15 @@ bool CShaderCompileAppSystemGroup::LoadBackend()
 	createInterfaceFn_t		pFactory = Sys_GetFactory( backendHandle );
 	if ( !pFactory )
 	{
-		Warning( "ShaderCompiler: Could not find factory interface in '%s'", backendPath.c_str() );
+		Error( "ShaderCompiler: Could not find factory interface in '%s'", backendPath.c_str() );
 		g_pFileSystem->UnloadModule( backendHandle );
 		return false;
 	}
 
-	IShaderCompilerBackend*	pShaderCompileBackend = ( IShaderCompilerBackend* )pFactory( SHADERCOMPILERBACKEND_INTERFACE_VERSION );
+	IShaderCompilerBackend*		pShaderCompileBackend = ( IShaderCompilerBackend* )pFactory( SHADERCOMPILERBACKEND_INTERFACE_VERSION );
 	if ( !pShaderCompileBackend )
 	{
-		Warning( "ShaderCompiler: Could not get IShaderCompilerBackend interface from '%s'", backendPath.c_str() );
+		Error( "ShaderCompiler: Could not get IShaderCompilerBackend interface from '%s'", backendPath.c_str() );
 		g_pFileSystem->UnloadModule( backendHandle );
 		return false;
 	}
@@ -453,24 +546,24 @@ bool CShaderCompileAppSystemGroup::LoadBackend()
 	// Allow the backend to try to connect to interfaces it needs
 	if ( !pShaderCompileBackend->Connect( GetFactory() ) )
 	{
-		Warning( "ShaderCompiler: Failed to init backend '%s'", backendPath.c_str() );
+		Error( "ShaderCompiler: Failed to initialize backend '%s'", backendPath.c_str() );
 		g_pFileSystem->UnloadModule( backendHandle );
 		return false;
 	}
 
 	// We are done
-	Msg( "ShaderCompiler: Backend '%s' loaded", backendPath.c_str() );
-	CShaderCompileAppSystemGroup::backendHandle			= backendHandle;
-	CShaderCompileAppSystemGroup::pShaderCompileBackend	= pShaderCompileBackend;
+	Msg( "ShaderCompiler: Loaded backend '%s'", backendPath.c_str() );
+	CShaderCompilerAppSystemGroup::backendHandle			= backendHandle;
+	CShaderCompilerAppSystemGroup::pShaderCompileBackend	= pShaderCompileBackend;
 	return true;
 }
 
 /*
 ==================
-CShaderCompileAppSystemGroup::UnloadBackend
+CShaderCompilerAppSystemGroup::UnloadBackend
 ==================
 */
-void CShaderCompileAppSystemGroup::UnloadBackend()
+void CShaderCompilerAppSystemGroup::UnloadBackend()
 {
 	if ( backendHandle || pShaderCompileBackend )
 	{
@@ -494,10 +587,10 @@ void CShaderCompileAppSystemGroup::UnloadBackend()
 
 /*
 ==================
-CShaderCompileAppSystemGroup::PostShutdown
+CShaderCompilerAppSystemGroup::PostShutdown
 ==================
 */
-void CShaderCompileAppSystemGroup::PostShutdown()
+void CShaderCompilerAppSystemGroup::PostShutdown()
 {
 	UnloadBackend();
 	DisconnectStdLib();
@@ -560,7 +653,7 @@ int main( int argc, char** argv )
 	}
 
 	// Run application
-	CShaderCompileAppSystemGroup	shaderCompileSystems;
+	CShaderCompilerAppSystemGroup	shaderCompileSystems;
 	CApplication					application( &shaderCompileSystems, "shadercompiler" );
 	return application.Run();
 }

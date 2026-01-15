@@ -217,7 +217,8 @@ void CGameInfoDoc::ReplaceMacros( std::string& string, const achar* pGameInfoPat
 	PROFILE_SCOPE();
 	enum gameInfoMacro_t
 	{
-		GAMEINFO_MACRO_PLATFORM_SUBDIR,		// |platform_subdir|
+		GAMEINFO_MACRO_PLATFORM_DIR,		// |platform_dir|
+		GAMEINFO_MACRO_PLATFORM_BIN_DIR,	// |platform_bin_dir|
 		GAMEINFO_MACRO_GAMEINFO_PATH,		// |gameinfo_path|
 		GAMEINFO_NUM_MACROS					// Number of macros in gameinfo.txt
 	};
@@ -225,15 +226,17 @@ void CGameInfoDoc::ReplaceMacros( std::string& string, const achar* pGameInfoPat
 	// Table of all macros in gameinfo.txt
 	static const achar*		s_pMacrosTable[] =
 	{
-		"|platform_subdir|",		// GAMEINFO_MACRO_PLATFORM_SUBDIR
+		"|platform_dir|",			// GAMEINFO_MACRO_PLATFORM_DIR
+		"|platform_bin_dir|",		// GAMEINFO_MACRO_PLATFORM_BIN_DIR
 		"|gameinfo_path|"			// GAMEINFO_MACRO_GAMEINFO_PATH
 	};
 
 	// Table of macros value 
 	static const achar*		s_pValueMacroTable[] =
 	{
-		PLATFORM_SUBDIR,			// |platform_subdir|
-		"",							// |gameinfo_path|
+		PLATFORM_DIR,			// |platform_dir|
+		PLATFORM_BIN_DIR,		// |platform_bin_dir|
+		"",						// |gameinfo_path|
 	};
 	static_assert( ARRAYSIZE( s_pMacrosTable ) == GAMEINFO_NUM_MACROS && ARRAYSIZE( s_pValueMacroTable ) == GAMEINFO_NUM_MACROS, "Need full init s_pMacrosTable and s_pValueMacroTable array" );
 

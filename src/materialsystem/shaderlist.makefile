@@ -1,30 +1,14 @@
 {
-	// Shader list name
-	"name":								"default",
-	
-	// Output path for generated C++ classes
-	"cppgen_output": 					"generated/",
-	
 	// Include directories
 	"include": [
 		"./",
 		"../public/materialsystem/"
 	],
 	
-	// Output shader cache directory
-	"output":							"//CORE/",
-	
+	// Shaders list (path to *.shader files, relative to the file)
 	"shaders": [
 		// Wireframe
-		{
-			"source": 		"wireframe_vs.hlsl",
-			"main_func": 	"MainVS",
-			"type":			"vertex"
-		},
-		{
-			"source": 		"wireframe_ps.hlsl",
-			"main_func": 	"MainPS",
-			"type":			"pixel"
-		}
+		"wireframe_vs",
+		"wireframe_ps"
 	]
 }

@@ -41,16 +41,6 @@
 
 #define DLL_EXT_STRING			        ".dll"
 #define EXE_EXT_STRING			        ".exe"
-#ifndef PLATFORM_SUBDIR
-	#if PLATFORM_64BIT
-		#define PLATFORM_SUBDIR		    "win64"
-	#elif PLATFORM_32BIT
-		#define PLATFORM_SUBDIR		    "win32"
-	#else
-		#error Unknown platform bit
-	#endif // PLATFORM_64BIT || PLATFORM_DOXYGEN
-#endif // PLATFORM_SUBDIR
-
 #define VARARGS				            __cdecl
 #define CDECL				            __cdecl
 #define STDCALL				            __stdcall

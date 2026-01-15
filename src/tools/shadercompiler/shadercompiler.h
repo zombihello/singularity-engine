@@ -8,6 +8,14 @@
 //-----------------------------------------------------------------------------
 // Shader compiler structs
 //-----------------------------------------------------------------------------
+enum shaderCompilerMode_t
+{
+	SHADER_COMPILER_MODE_COMPILE,
+	SHADER_COMPILER_MODE_GENCPP,
+	SHADER_COMPILER_MODE_NUM
+};
+
+
 struct shaderFlag_t
 {
 	shaderFlag_t()
@@ -50,3 +58,5 @@ struct shader_t
 //-----------------------------------------------------------------------------
 bool ConvStringToShaderType( const achar* pShaderTypeName, studioAPIShaderType_t& shaderType );
 void ConvShaderTypeToString( studioAPIShaderType_t shaderType, const achar*& pShaderTypeName );
+bool ConvStringToShaderCompilerMode( const achar* pShaderCompilerModeName, shaderCompilerMode_t& shaderCompilerMode );
+void ConvShaderCompilerModeToString( shaderCompilerMode_t shaderCompilerMode, const achar*& pShaderCompilerModeName );

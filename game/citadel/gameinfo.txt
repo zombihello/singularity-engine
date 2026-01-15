@@ -6,7 +6,7 @@
 	"search_paths": [
 		{
 			"id": 		"GAMEBIN",
-			"path": 	"|gameinfo_path|/bin/|platform_subdir|"
+			"path": 	"|gameinfo_path|/bin/|platform_bin_dir|"
 		},
 		{
 			"id": 		"GAME",

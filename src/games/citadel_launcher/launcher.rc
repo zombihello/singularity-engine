@@ -1,5 +1,5 @@
 #include "stdlib/defines.h"
-#include "games/sandbox/version.h"
+#include "games/citadel/version.h"
 
 IDI_ICON1	ICON	"launcher.ico"
 
@@ -22,12 +22,12 @@ BEGIN
         BLOCK "040904b0"
         BEGIN
             VALUE "CompanyName",        "Broken Singularity"
-			VALUE "FileDescription", 	"Singularity Sandbox Launcher"
+			VALUE "FileDescription", 	"Citadel Launcher"
 			VALUE "FileVersion",        GAME_VERSION_STRING
-            VALUE "InternalName",       "sandbox_launcher"
-            VALUE "LegalCopyright", 	"© 2020-2025 Broken Singularity"
-            VALUE "OriginalFilename", 	"sandbox.exe"
-            VALUE "ProductName", 		"Singularity Sandbox"
+            VALUE "InternalName",       "citadel_launcher"
+            VALUE "LegalCopyright", 	"© 2020-2026 Broken Singularity"
+            VALUE "OriginalFilename", 	"citadel.exe"
+            VALUE "ProductName", 		"Citadel"
 			VALUE "ProductVersion",     GAME_VERSION_STRING
         END
     END

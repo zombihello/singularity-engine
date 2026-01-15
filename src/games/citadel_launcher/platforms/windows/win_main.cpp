@@ -25,5 +25,5 @@ int WINAPI WinMain( HINSTANCE hInst, HINSTANCE hPreInst, LPSTR lpCmdLine, int nC
 	}
 
 	// Run the launcher
-	return pLauncherMainFunc( hInst, "sandbox", GetCommandLineA() );
+	return pLauncherMainFunc( hInst, "citadel", GetCommandLineA() );
 }

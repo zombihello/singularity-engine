@@ -2,9 +2,9 @@
 #include "tools/shadercompiler/shadercompiler.h"
 
 //-----------------------------------------------------------------------------
-// Generator of a helper C++ class for shader
+// Generator of C++ code for a shader
 //-----------------------------------------------------------------------------
-class CShaderCppClassGenerator
+class CShaderCompilerCppGenerator
 {
 public:
 	void Generate( const shader_t& shader );
