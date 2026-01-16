@@ -4,36 +4,57 @@
       "name": "Debug_Win64",
       "generator": "Ninja",
       "configurationType": "Debug",
-      "cmakeToolchain": "${projectDir}\\src\\cmake\\toolchains\\windows\\msvc_toolchain.cmake",
+      "cmakeToolchain": "${projectDir}\\cmake\\toolchains\\windows\\msvc_toolchain.cmake",
       "buildRoot": "${projectDir}\\build\\${name}",
       "installRoot": "${projectDir}",
       "cmakeCommandArgs": "",
       "ctestCommandArgs": "",
-      "inheritEnvironments": []
+      "inheritEnvironments": [],
+      "variables": [
+        {
+          "name": "CMAKE_INSTALL_PREFIX",
+          "value": "${projectDir}\\..",
+          "type": "PATH"
+        }
+      ]
     },
     {
       "name": "Release_Win64",
       "generator": "Ninja",
       "configurationType": "Release",
-      "cmakeToolchain": "${projectDir}\\src\\cmake\\toolchains\\windows\\msvc_toolchain.cmake",
+      "cmakeToolchain": "${projectDir}\\cmake\\toolchains\\windows\\msvc_toolchain.cmake",
       "buildRoot": "${projectDir}\\build\\${name}",
       "installRoot": "${projectDir}",
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
-      "inheritEnvironments": []
+      "inheritEnvironments": [],
+      "variables": [
+        {
+          "name": "CMAKE_INSTALL_PREFIX",
+          "value": "${projectDir}\\..",
+          "type": "PATH"
+        }
+      ]
     },
     {
       "name": "Retail_Win64",
       "generator": "Ninja",
       "configurationType": "Retail",
-      "cmakeToolchain": "${projectDir}\\src\\cmake\\toolchains\\windows\\msvc_toolchain.cmake",
+      "cmakeToolchain": "${projectDir}\\cmake\\toolchains\\windows\\msvc_toolchain.cmake",
       "buildRoot": "${projectDir}\\build\\${name}",
       "installRoot": "${projectDir}",
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
-      "inheritEnvironments": []
+      "inheritEnvironments": [],
+      "variables": [
+        {
+          "name": "CMAKE_INSTALL_PREFIX",
+          "value": "${projectDir}\\..",
+          "type": "PATH"
+        }
+      ]
     }
   ]
 }

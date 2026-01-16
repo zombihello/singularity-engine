@@ -399,10 +399,6 @@ function( add_flex_commands DEST_DIR DEST_OUTPUT_FILES )
         message( FATAL_ERROR "add_flex_commands: unknown platform" )
     endif()
 
-    if ( NOT EXISTS "${FLEX_EXE}" )
-        message( WARNING "add_flex_commands: '${FLEX_EXE}' is missing" )
-    endif()
-
     set( OUTPUT_FILES               ${${DEST_OUTPUT_FILES}} )
     foreach ( FILE IN LISTS ARGN )
         if ( FILE MATCHES "\\.flex$" )
@@ -434,10 +430,6 @@ function( add_bison_commands DEST_DIR DEST_OUTPUT_FILES )
         set( BISON_EXE   "${BISON_BIN_DIR}/bison.exe" )
     else()
         message( FATAL_ERROR "add_bison_commands: unknown platform" )
-    endif()
-
-    if ( NOT EXISTS "${BISON_EXE}" )
-        message( WARNING "add_bison_commands: '${BISON_EXE}' is missing" )
     endif()
 
     set( OUTPUT_FILES               ${${DEST_OUTPUT_FILES}} )
@@ -472,10 +464,6 @@ function( add_ecscompiler_commands BASE_DIR DEST_DIR DEST_OUTPUT_FILES )
         set( ECSCOMPILER_EXE        "${ECSCOMPILER_BIN_DIR}/ecscompiler.exe" )
     else()
         message( FATAL_ERROR "add_ecscompiler_commands: unknown platform" )
-    endif()
-
-    if ( NOT EXISTS "${ECSCOMPILER_EXE}" )
-        message( WARNING "add_ecscompiler_commands: '${ECSCOMPILER_EXE}' is missing, before compiling you shuild to build ecscompiler in release configuration" )
     endif()
 
     set( OUTPUT_FILES               ${${DEST_OUTPUT_FILES}} )
@@ -518,10 +506,6 @@ function( add_shadercompiler_commands BASE_DIR DEST_DIR DEST_OUTPUT_FILES )
         set( SHADERCOMPILER_EXE        "${SHADERCOMPILER_BIN_DIR}/shadercompiler.exe" )
     else()
         message( FATAL_ERROR "add_shadercompiler_commands: unknown platform" )
-    endif()
-
-    if ( NOT EXISTS "${SHADERCOMPILER_EXE}" )
-        message( WARNING "add_shadercompiler_commands: '${SHADERCOMPILER_EXE}' is missing, before compiling you shuild to build shadercompiler in release configuration" )
     endif()
 
     set( OUTPUT_FILES               ${${DEST_OUTPUT_FILES}} )

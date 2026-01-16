@@ -17,7 +17,7 @@
 **/.vscode
 **/.vs
 **/__pycache__
-/build
+src/build
 compile_commands.json
 Makefile
 

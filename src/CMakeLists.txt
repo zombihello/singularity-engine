@@ -31,7 +31,7 @@ endif()
 #
 # Disable PCH for source files in public folder
 #
-file( GLOB_RECURSE PUBLIC_FILES                         "src/public/*.h" "src/public/*.inl" "src/public/*.cpp" "src/public/*.c" )
+file( GLOB_RECURSE PUBLIC_FILES                         "public/*.h" "public/*.inl" "public/*.cpp" "public/*.c" )
 set_source_files_properties( PUBLIC_FILES PROPERTIES    SKIP_PRECOMPILE_HEADERS ON )
 
 
@@ -45,18 +45,18 @@ option( INSTALL_THIRDPARTY_TOOLS                        "Install third-party too
 #
 # Paths
 #
-set( THIRDPARTY_DIR         ${CMAKE_SOURCE_DIR}/src/thirdparty/ )
+set( THIRDPARTY_DIR         ${CMAKE_SOURCE_DIR}/thirdparty/ )
 set( ROOT_DIR               ${CMAKE_SOURCE_DIR} )
-set( PUBLIC_SRC_DIR         ${CMAKE_SOURCE_DIR}/src/public/ )
+set( PUBLIC_SRC_DIR         ${CMAKE_SOURCE_DIR}/public/ )
 set( GAME_DIR               ${CMAKE_SOURCE_DIR}/game/ )
-set( DEVTOOLS_DIR           ${CMAKE_SOURCE_DIR}/src/devtools/ )
+set( DEVTOOLS_DIR           ${CMAKE_SOURCE_DIR}/devtools/ )
 set( GENERATED_ROOT_DIR     ${CMAKE_BINARY_DIR} )
 
-include_directories( ${ROOT_DIR}/src )
-include_directories( ${ROOT_DIR}/src/public )
-include_directories( ${ROOT_DIR}/src/public/libs )
-include_directories( ${GENERATED_ROOT_DIR}/src )
-include_directories( ${GENERATED_ROOT_DIR}/src/libs )
+include_directories( ${ROOT_DIR} )
+include_directories( ${ROOT_DIR}/public )
+include_directories( ${ROOT_DIR}/public/libs )
+include_directories( ${GENERATED_ROOT_DIR} )
+include_directories( ${GENERATED_ROOT_DIR}/libs )
 
 
 #
@@ -137,8 +137,8 @@ set( CMAKE_STATIC_LINKER_FLAGS_RETAIL       "${CMAKE_STATIC_LINKER_FLAGS_RELEASE
 #
 # Include some cmake files
 #
-include( "${CMAKE_SOURCE_DIR}/src/cmake/utils.cmake" )
-include( "${CMAKE_SOURCE_DIR}/src/cmake/thirdparty.cmake" )
+include( "${CMAKE_SOURCE_DIR}/cmake/utils.cmake" )
+include( "${CMAKE_SOURCE_DIR}/cmake/thirdparty.cmake" )
 
 # Set defines for git branch and commit
 git_get_branch( GIT_BRANCH )
@@ -151,44 +151,44 @@ add_compile_definitions( GIT_COMMIT="${GIT_COMMIT}" )
 # Add project
 #
 # Libraries
-add_subdirectory( src/libs/appframework )
-add_subdirectory( src/libs/gameframework )
-add_subdirectory( src/libs/gameinfo )
-add_subdirectory( src/libs/interfaces )
-add_subdirectory( src/libs/parserlib )
-add_subdirectory( src/libs/pixelformatinfos )
-add_subdirectory( src/libs/sentdoc )
-add_subdirectory( src/libs/shadercache )
-add_subdirectory( src/libs/shaderlib )
-add_subdirectory( src/libs/smapdoc )
-add_subdirectory( src/libs/smatdoc )
-add_subdirectory( src/libs/smdldoc )
-add_subdirectory( src/libs/stexdoc )
-add_subdirectory( src/libs/stdlib )
+add_subdirectory( libs/appframework )
+add_subdirectory( libs/gameframework )
+add_subdirectory( libs/gameinfo )
+add_subdirectory( libs/interfaces )
+add_subdirectory( libs/parserlib )
+add_subdirectory( libs/pixelformatinfos )
+add_subdirectory( libs/sentdoc )
+add_subdirectory( libs/shadercache )
+add_subdirectory( libs/shaderlib )
+add_subdirectory( libs/smapdoc )
+add_subdirectory( libs/smatdoc )
+add_subdirectory( libs/smdldoc )
+add_subdirectory( libs/stexdoc )
+add_subdirectory( libs/stdlib )
 
 # Modules
-add_subdirectory( src/core )
-add_subdirectory( src/filesystem )
-add_subdirectory( src/cvar )
-add_subdirectory( src/inputsystem )
-add_subdirectory( src/studiorender/studioapi/vk )
-add_subdirectory( src/studiorender )
-add_subdirectory( src/materialsystem/stdshaders )
-add_subdirectory( src/materialsystem )
-add_subdirectory( src/resourcesystem )
-add_subdirectory( src/launcher )
+add_subdirectory( core )
+add_subdirectory( filesystem )
+add_subdirectory( cvar )
+add_subdirectory( inputsystem )
+add_subdirectory( studiorender/studioapi/vk )
+add_subdirectory( studiorender )
+add_subdirectory( materialsystem/stdshaders )
+add_subdirectory( materialsystem )
+add_subdirectory( resourcesystem )
+add_subdirectory( launcher )
 
 # Games
-add_subdirectory( src/games/citadel )
-add_subdirectory( src/games/citadel_launcher )
+add_subdirectory( games/citadel )
+add_subdirectory( games/citadel_launcher )
 
 # Tools
-add_subdirectory( src/tools/ecscompiler )
-add_subdirectory( src/tools/entitydesc_tool )
-add_subdirectory( src/tools/map_tool )
-add_subdirectory( src/tools/material_tool )
-add_subdirectory( src/tools/model_tool )
-add_subdirectory( src/tools/texture_tool )
-add_subdirectory( src/tools/resourcecompiler )
-add_subdirectory( src/tools/shadercompiler/vk )
-add_subdirectory( src/tools/shadercompiler )
+add_subdirectory( tools/ecscompiler )
+add_subdirectory( tools/entitydesc_tool )
+add_subdirectory( tools/map_tool )
+add_subdirectory( tools/material_tool )
+add_subdirectory( tools/model_tool )
+add_subdirectory( tools/texture_tool )
+add_subdirectory( tools/resourcecompiler )
+add_subdirectory( tools/shadercompiler/vk )
+add_subdirectory( tools/shadercompiler )
