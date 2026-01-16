@@ -1,0 +1,9 @@
+{
+	"type": 				"2d",
+	"sources": 				[ "veh_btr_br.png" ],
+	"filter": 				"anisotropic",
+	"generate-mipmaps": 	true,
+	"format": 				"bc1",
+	"output-dir":			"//BASE_PATH/citadel/materials/",
+	"max-anisotropy":		16
+}

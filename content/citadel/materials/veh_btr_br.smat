@@ -1,0 +1,11 @@
+{
+	"output-dir":	"//BASE_PATH/citadel/materials/",
+	"shader": 		"unlitgeneric",
+	"parameters": [
+		{
+			"name": 	"baseTexture",
+			"type": 	"texture",
+			"value": 	"materials/veh_btr_br"
+		}
+	]
+}

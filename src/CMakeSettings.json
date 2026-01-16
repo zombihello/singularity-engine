@@ -1,0 +1,60 @@
+﻿{
+  "configurations": [
+    {
+      "name": "Debug_Win64",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "cmakeToolchain": "${projectDir}\\cmake\\toolchains\\windows\\msvc_toolchain.cmake",
+      "buildRoot": "${projectDir}\\build\\${name}",
+      "installRoot": "${projectDir}",
+      "cmakeCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [],
+      "variables": [
+        {
+          "name": "CMAKE_INSTALL_PREFIX",
+          "value": "${projectDir}\\..",
+          "type": "PATH"
+        }
+      ]
+    },
+    {
+      "name": "Release_Win64",
+      "generator": "Ninja",
+      "configurationType": "Release",
+      "cmakeToolchain": "${projectDir}\\cmake\\toolchains\\windows\\msvc_toolchain.cmake",
+      "buildRoot": "${projectDir}\\build\\${name}",
+      "installRoot": "${projectDir}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [],
+      "variables": [
+        {
+          "name": "CMAKE_INSTALL_PREFIX",
+          "value": "${projectDir}\\..",
+          "type": "PATH"
+        }
+      ]
+    },
+    {
+      "name": "Retail_Win64",
+      "generator": "Ninja",
+      "configurationType": "Retail",
+      "cmakeToolchain": "${projectDir}\\cmake\\toolchains\\windows\\msvc_toolchain.cmake",
+      "buildRoot": "${projectDir}\\build\\${name}",
+      "installRoot": "${projectDir}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [],
+      "variables": [
+        {
+          "name": "CMAKE_INSTALL_PREFIX",
+          "value": "${projectDir}\\..",
+          "type": "PATH"
+        }
+      ]
+    }
+  ]
+}

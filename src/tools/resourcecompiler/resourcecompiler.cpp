@@ -159,7 +159,7 @@ bool CResourceCompilerAppSystemGroup::Create()
 		{ "map_tool"			DLL_EXT_STRING,			MAP_TOOL_INTERFACE_VERSION			},
 		{ "", "" }																			// Required to terminate the list
 	};
-
+	
 	// Add all systems from array
 	if ( !AddSystems( appSystemInfos ) )
 	{

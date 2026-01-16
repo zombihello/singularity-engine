@@ -1,0 +1,16 @@
+{
+	"game": 			"Citadel",
+	"version": 			"0.1.0",
+	"support_email": 	"support@brokensingularity.com",
+	"support_url": 		"https://brokensingularity.com/",
+	"search_paths": [
+		{
+			"id": 		"GAMEBIN",
+			"path": 	"|gameinfo_path|/bin/|platform_bin_dir|"
+		},
+		{
+			"id": 		"GAME",
+			"path": 	"|gameinfo_path|"
+		}
+	]
+}

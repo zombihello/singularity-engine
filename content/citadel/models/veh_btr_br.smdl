@@ -1,0 +1,7 @@
+{
+	"source": 				"veh_btr_br.fbx",
+	"materials-dir": 		"materials/models/",
+	"axis-up": 				"+y",
+	"output-dir":			"//BASE_PATH/citadel/models/",
+	"combine-models":		true
+}

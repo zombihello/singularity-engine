@@ -1,9 +1,0 @@
-{
-	"type": 				"2d",
-	"sources": 				[ "nelson.jpg" ],
-	"filter": 				"anisotropic",
-	"generate-mipmaps": 	true,
-	"format": 				"bc1",
-	"output-dir":			"//BASE_PATH/sandbox/materials/",
-	"max-anisotropy":		16
-}

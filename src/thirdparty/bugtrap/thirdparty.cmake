@@ -1,0 +1,1 @@
+set( CMAKE_MODULE_PATH      "${BUGTRAP_PATH}/cmake/modules/" ${CMAKE_MODULE_PATH} )

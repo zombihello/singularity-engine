@@ -2,7 +2,7 @@
 #include "stdlib/builddefines.h"
 #include "stdlib/defines.h"
 
-#if !defined( BUILD_STATIC_LIB ) && !defined( BUILD_MONOLITHIC_ENGINE )
+#if !defined( BUILD_STATIC_LIB )
 	#ifdef CORE_DLL_EXPORT
 		#define CORE_INTERFACE		extern "C" DLL_EXPORT
 		#define CORE_CLASS			DLL_EXPORT
@@ -16,4 +16,4 @@
 	#define CORE_INTERFACE			extern "C"
 	#define CORE_CLASS
 	#define CORE_GLOBAL				extern
-#endif // !BUILD_STATIC_LIB || BUILD_MONOLITHIC_ENGINE
+#endif // !defined(BUILD_STATIC_LIB)

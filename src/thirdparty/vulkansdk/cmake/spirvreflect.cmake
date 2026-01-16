@@ -1,0 +1,10 @@
+if ( NOT TARGET SPIRVReflect )
+    set( SRC_FILES          ${VULKANSDK_SPIRVREFLECT_C_FILE} )
+    set( FULL_SRC_FILES     ${SRC_FILES} )
+    source_group( "src"     FILES ${SRC_FILES} )
+
+    add_library( SPIRVReflect STATIC                            ${FULL_SRC_FILES} )
+    set_target_properties( SPIRVReflect PROPERTIES FOLDER       ThirdParty )
+    target_include_directories( SPIRVReflect PRIVATE            ${VULKANSDK_INCLUDE} )
+    target_include_directories( SPIRVReflect PRIVATE            ${VULKANSDK_SOURCE} )
+endif()

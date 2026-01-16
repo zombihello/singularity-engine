@@ -296,7 +296,7 @@ bool Sys_AssertFailed( const achar* pExpr, const achar* pFile, int32 line, const
 	// Get the message
 	va_list			params;
 	va_start( params, pFormat );
-	std::string		message = S_Strlen( pFormat ) > 0 ? S_Sprintf( pFormat, params ) : "<None>";
+	std::string		message = S_Strlen( pFormat ) > 0 ? S_Vsprintf( pFormat, params ) : "<None>";
 	va_end( params );
 
 	// Print the message and show message box
@@ -340,7 +340,7 @@ bool Sys_EnsureFailed( const achar* pExpr, const achar* pFile, int32 line, bool 
 		// Get the final message
 		va_list			params;
 		va_start( params, pFormat );
-		std::string		message = S_Strlen( pFormat ) > 0 ? S_Sprintf( pFormat, params ) : "<None>";
+		std::string		message = S_Strlen( pFormat ) > 0 ? S_Vsprintf( pFormat, params ) : "<None>";
 		va_end( params );
 
 		// Print the message
