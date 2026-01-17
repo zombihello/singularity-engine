@@ -46,17 +46,17 @@ option( INSTALL_THIRDPARTY_TOOLS                        "Install third-party too
 # Paths
 #
 set( THIRDPARTY_DIR         ${CMAKE_SOURCE_DIR}/thirdparty/ )
-set( ROOT_DIR               ${CMAKE_SOURCE_DIR} )
+set( ROOT_DIR               ${CMAKE_SOURCE_DIR}/../ )
 set( PUBLIC_SRC_DIR         ${CMAKE_SOURCE_DIR}/public/ )
-set( GAME_DIR               ${CMAKE_SOURCE_DIR}/game/ )
+set( GAME_DIR               ${ROOT_DIR}/game/ )
 set( DEVTOOLS_DIR           ${CMAKE_SOURCE_DIR}/devtools/ )
 set( GENERATED_ROOT_DIR     ${CMAKE_BINARY_DIR} )
 
-include_directories( ${ROOT_DIR} )
-include_directories( ${ROOT_DIR}/public )
-include_directories( ${ROOT_DIR}/public/libs )
-include_directories( ${GENERATED_ROOT_DIR} )
-include_directories( ${GENERATED_ROOT_DIR}/libs )
+include_directories( ${CMAKE_SOURCE_DIR} )
+include_directories( ${CMAKE_SOURCE_DIR}/public )
+include_directories( ${CMAKE_SOURCE_DIR}/public/libs )
+include_directories( ${CMAKE_BINARY_DIR} )
+include_directories( ${CMAKE_BINARY_DIR}/libs )
 
 
 #
