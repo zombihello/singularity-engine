@@ -14,7 +14,7 @@ public:
 	virtual void* TryMalloc( size_t numBytes, uint32 alignment = DEFAULT_ALIGNMENT ) override;
 	virtual void* Realloc( void* pOriginal, size_t numBytes, uint32 alignment = DEFAULT_ALIGNMENT ) override;
 	virtual void* TryRealloc( void* pOriginal, size_t numBytes, uint32 alignment = DEFAULT_ALIGNMENT ) override;
-	virtual void Free( void* pOriginal ) override;
+	virtual void  Free( void* pOriginal ) override;
 
 	virtual bool GetAllocationSize( void* pOriginal, size_t& numBytes ) override;
 

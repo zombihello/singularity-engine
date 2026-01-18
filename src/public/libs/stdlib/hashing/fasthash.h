@@ -11,9 +11,9 @@ template<typename TType>
 hash_t FastHash( const TType& value, hash_t hash = 0 );
 
 hash_t FastHashFromString( const void* pData, uint64 size, hash_t hash = 0 );
-hash_t FastHashFromString( const wchar* pString, hash_t hash = 0 );
+hash_t FastHashFromString( const wchar_t* pString, hash_t hash = 0 );
 hash_t FastHashFromString( const std::wstring& string, hash_t hash = 0 );
-hash_t FastHashFromString( const achar* pString, hash_t hash = 0 );
+hash_t FastHashFromString( const char* pString, hash_t hash = 0 );
 hash_t FastHashFromString( const std::string& string, hash_t hash = 0 );
 
 #include "stdlib/hashing/fasthash.inl"

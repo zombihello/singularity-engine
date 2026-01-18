@@ -2,7 +2,7 @@
 #include "core/memalloc_mimalloc.h"
 
 #if PLATFORM_SUPPORTS_MIMALLOC
-#include <mimalloc.h>
+	#include <mimalloc.h>
 
 /*
 ==================
@@ -12,7 +12,7 @@ CMemAllocMimalloc::Malloc
 void* CMemAllocMimalloc::Malloc( size_t numBytes, uint32 alignment /* = DEFAULT_ALIGNMENT */ )
 {
 	PROFILE_SCOPE()
-	void*	pResult = TryMalloc( numBytes, alignment );
+	void* pResult = TryMalloc( numBytes, alignment );
 	if ( !pResult && numBytes )
 	{
 		Sys_OutOfMemory( numBytes, alignment );
@@ -28,7 +28,7 @@ CMemAllocMimalloc::TryMalloc
 void* CMemAllocMimalloc::TryMalloc( size_t numBytes, uint32 alignment /* = DEFAULT_ALIGNMENT */ )
 {
 	PROFILE_SCOPE()
-	void*	pNewPtr = nullptr;
+	void* pNewPtr = nullptr;
 	if ( alignment != DEFAULT_ALIGNMENT )
 	{
 		pNewPtr = mi_malloc_aligned( numBytes, Max<uint32>( numBytes >= 16 ? 16 : 8, alignment ) );
@@ -48,7 +48,7 @@ CMemAllocMimalloc::Realloc
 void* CMemAllocMimalloc::Realloc( void* pOriginal, size_t numBytes, uint32 alignment /* = DEFAULT_ALIGNMENT */ )
 {
 	PROFILE_SCOPE()
-	void*	pResult = TryRealloc( pOriginal, numBytes, alignment );
+	void* pResult = TryRealloc( pOriginal, numBytes, alignment );
 	if ( !pResult && numBytes )
 	{
 		Sys_OutOfMemory( numBytes, alignment );
@@ -65,7 +65,7 @@ CMemAllocMimalloc::TryRealloc
 void* CMemAllocMimalloc::TryRealloc( void* pOriginal, size_t numBytes, uint32 alignment /* = DEFAULT_ALIGNMENT */ )
 {
 	PROFILE_SCOPE()
-	void*	pNewPtr = nullptr;
+	void* pNewPtr = nullptr;
 	if ( numBytes == 0 )
 	{
 		mi_free( pOriginal );
@@ -132,4 +132,4 @@ bool CMemAllocMimalloc::IsInternallyThreadSafe() const
 {
 	return true;
 }
-#endif // PLATFORM_SUPPORTS_MIMALLOC
+#endif	// PLATFORM_SUPPORTS_MIMALLOC

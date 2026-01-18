@@ -5,22 +5,20 @@
 CMaterial::insensitiveStringHash_t::operator()
 ==================
 */
-FORCEINLINE std::size_t CMaterial::insensitiveStringHash_t::operator()( const achar* pString ) const
+FORCEINLINE std::size_t CMaterial::insensitiveStringHash_t::operator()( const char* pString ) const
 {
 	return FastHashFromString( pString );
 }
-
 
 /*
 ==================
 CMaterial::insensitiveCompareString_t::operator()
 ==================
 */
-FORCEINLINE bool CMaterial::insensitiveCompareString_t::operator()( const achar* pLeft, const achar* pRight ) const
+FORCEINLINE bool CMaterial::insensitiveCompareString_t::operator()( const char* pLeft, const char* pRight ) const
 {
 	return !S_Stricmp( pLeft, pRight );
 }
-
 
 /*
 ==================

@@ -7,7 +7,6 @@
 class CStudioAPICmdBufferVk;
 class CStudioAPIQueueVk;
 
-
 //-----------------------------------------------------------------------------
 // Vulkan studioAPI command buffer pool
 //-----------------------------------------------------------------------------
@@ -21,15 +20,15 @@ public:
 	void Shutdown();
 
 	CStudioAPICmdBufferVk* CreateCmdBuffer();
-	void FreeUnusedCmdBuffers();
+	void				   FreeUnusedCmdBuffers();
 
-	FORCEINLINE bool IsValid() const						{ return vkCommandPool != VK_NULL_HANDLE; }
-	FORCEINLINE CStudioAPIQueueVk& GetQueue()				{ return queue; }
-	FORCEINLINE VkCommandPool GetVkCommandPool() const		{ return vkCommandPool; }
+	FORCEINLINE bool IsValid() const { return vkCommandPool != VK_NULL_HANDLE; }
+	FORCEINLINE CStudioAPIQueueVk& GetQueue() { return queue; }
+	FORCEINLINE VkCommandPool	   GetVkCommandPool() const { return vkCommandPool; }
 
 private:
-	VkCommandPool						vkCommandPool;
-	CStudioAPIQueueVk&					queue;
-	std::list<CStudioAPICmdBufferVk*>	cmdBuffers;
-	std::list<CStudioAPICmdBufferVk*>	freeCmdBuffers;
+	VkCommandPool					  vkCommandPool;
+	CStudioAPIQueueVk&				  queue;
+	std::list<CStudioAPICmdBufferVk*> cmdBuffers;
+	std::list<CStudioAPICmdBufferVk*> freeCmdBuffers;
 };

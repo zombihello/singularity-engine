@@ -60,13 +60,12 @@ FORCEINLINE void CStudioAPISemaphoreVk::Destroy()
 	bSignaled = false;
 }
 
-
 /*
 ==================
 CStudioAPINamedSemaphoreVk::operator CStudioAPISemaphoreVk*
 ==================
 */
-FORCEINLINE CStudioAPINamedSemaphoreVk::operator CStudioAPISemaphoreVk* () const
+FORCEINLINE CStudioAPINamedSemaphoreVk::operator CStudioAPISemaphoreVk*() const
 {
 	return GetCurrentSemaphore();
 }

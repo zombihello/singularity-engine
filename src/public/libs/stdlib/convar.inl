@@ -51,7 +51,7 @@ TConCmdBase::GetName
 ==================
 */
 template<class TBaseClass>
-const achar* TConCmdBase<TBaseClass>::GetName() const
+const char* TConCmdBase<TBaseClass>::GetName() const
 {
 	return pName;
 }
@@ -62,7 +62,7 @@ TConCmdBase::SetHelpText
 ==================
 */
 template<class TBaseClass>
-void TConCmdBase<TBaseClass>::SetHelpText( const achar* pHelpText )
+void TConCmdBase<TBaseClass>::SetHelpText( const char* pHelpText )
 {
 	TConCmdBase::pHelpText = pHelpText ? pHelpText : "";
 }
@@ -73,7 +73,7 @@ TConCmdBase::GetHelpText
 ==================
 */
 template<class TBaseClass>
-const achar* TConCmdBase<TBaseClass>::GetHelpText() const
+const char* TConCmdBase<TBaseClass>::GetHelpText() const
 {
 	return pHelpText;
 }
@@ -132,7 +132,6 @@ cvarDLLIdentifier_t TConCmdBase<TBaseClass>::GetDLLIdentifier() const
 {
 	return CCvarLocalRegister::s_dllIdentifier;
 }
-
 
 /*
 ==================

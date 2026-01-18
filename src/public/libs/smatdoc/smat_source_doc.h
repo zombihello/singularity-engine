@@ -14,21 +14,21 @@ class CSMATSourceMaterialDoc
 public:
 	// Save and load a material document
 	// NOTE: For use StdLib must be connected by ConnectStdLib (except LoadFromBuffer)
-	bool SaveFile( const achar* pPath );
-	bool LoadFromFile( const achar* pPath );
-	bool LoadFromBuffer( const achar* pBuffer );
+	bool SaveFile( const char* pPath );
+	bool LoadFromFile( const char* pPath );
+	bool LoadFromBuffer( const char* pBuffer );
 
-	void SetShaderName( const achar* pShaderName );
+	void SetShaderName( const char* pShaderName );
 	void AddVar( const CSMATMaterialVar& var );
 	void RemoveVar( uint32 index );
 	void Clear();
 
-	uint32 GetNumVars() const;
+	uint32								 GetNumVars() const;
 	const std::vector<CSMATMaterialVar>& GetVars() const;
-	const achar* GetShaderName() const;
+	const char*						 GetShaderName() const;
 
-	void SetOutputDir( const achar* pOutputDir );
-	const achar* GetOutputDir() const;
+	void		 SetOutputDir( const char* pOutputDir );
+	const char* GetOutputDir() const;
 
 private:
 	bool GrabData( const CJsonDoc& jsonDoc );
@@ -39,9 +39,9 @@ private:
 	bool GrabValueAsMatrix( const CJsonValue& jsonValue, matrix_t& value ) const;
 	bool GrabValueAsString( const CJsonValue& jsonValue, std::string& value ) const;
 
-	std::string						outputDir;
-	std::string						shaderName;
-	std::vector<CSMATMaterialVar>	vars;
+	std::string					  outputDir;
+	std::string					  shaderName;
+	std::vector<CSMATMaterialVar> vars;
 };
 
 #include "smatdoc/smat_source_doc.inl"

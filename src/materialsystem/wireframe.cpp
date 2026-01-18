@@ -7,7 +7,7 @@
 
 struct shaderParamsBuffer_t
 {
-	vec4_t		color;
+	vec4_t color;
 };
 
 BEGIN_SHADER( Wireframe, "Default shader" )
@@ -15,7 +15,7 @@ BEGIN_SHADER( Wireframe, "Default shader" )
 		SHADER_CACHE( "wireframe_vs" )
 		SHADER_CACHE( "wireframe_ps" )
 	END_SHADER_CACHES
-	 
+
 	BEGIN_SHADER_RESOURCES
 		SHADER_BUFFER( RES_BUFFER0, 0, 1, shaderParamsBuffer_t, STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_CONSTANT_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST )
 	END_SHADER_RESOURCES
@@ -32,18 +32,17 @@ BEGIN_SHADER( Wireframe, "Default shader" )
 	SHADER_UPDATE_BUFFERS
 	{
 		// Initialize buffer data
-		shaderParamsBuffer_t		bufferData = {};
+		shaderParamsBuffer_t bufferData = {};
 		pParams[COLOR]->GetVecValue( &bufferData.color.x, 4 );
 
 		// Update a buffer
-		RES_BUFFER0.UpdateBuffer( pStudioAPICmdContext, ( byte* )&bufferData, pStudioAPIBuffers[RES_BUFFER0] );
+		RES_BUFFER0.UpdateBuffer( pStudioAPICmdContext, (byte*)&bufferData, pStudioAPIBuffers[RES_BUFFER0] );
 	}
 
 	SHADER_BARRIER
 	{
 		// TODO BS yehor.pohuliaka - Add the ability to get the queue type from IStudioAPICmdList
-		studioAPIBarrier_t		studioAPIBarriers[] =
-		{
+		studioAPIBarrier_t studioAPIBarriers[] = {
 			StudioAPI_MakeBufferBarrier( pStudioAPIBuffers[RES_BUFFER0], STUDIOAPI_BUFFER_STATE_CONSTANT_BUFFER, STUDIOAPI_QUEUE_TYPE_GRAPHICS )
 		};
 		pStudioAPICmdList->Barrier( studioAPIBarriers, ARRAYSIZE( studioAPIBarriers ) );

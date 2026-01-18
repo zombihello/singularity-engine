@@ -7,20 +7,18 @@
 //-----------------------------------------------------------------------------
 struct resourceToolMapEntity_t
 {
-	const achar*	pEntityDesc;
-	const achar*	pName;
+	const char* pEntityDesc;
+	const char* pName;
 };
-
 
 struct resourceToolCompileMapParams_t
 {
-	const achar*					pDestPath;
-	const resourceToolMapEntity_t*	pEntities;
-	uint32							numEntities;
+	const char*				   pDestPath;
+	const resourceToolMapEntity_t* pEntities;
+	uint32						   numEntities;
 };
 
-
-#define MAP_TOOL_INTERFACE_VERSION		"SMapTool001"
+#define MAP_TOOL_INTERFACE_VERSION "SMapTool001"
 class IMapTool : public IAppSystem
 {
 public:

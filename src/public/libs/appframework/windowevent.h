@@ -20,41 +20,37 @@ struct windowEvent_t
 		EVENT_WINDOW_DISPLAY_CHANGED
 	};
 
-
 	struct windowDisplayChangedEvent_t
-	{	
-		uint32		displayId;
+	{
+		uint32 displayId;
 	};
-
 
 	struct windowResizeEvent_t
 	{
-		int32		width;
-		int32		height;
+		int32 width;
+		int32 height;
 	};
-
 
 	struct windowMoveEvent_t
 	{
-		int32		x;
-		int32		y;
+		int32 x;
+		int32 y;
 	};
-
 
 	union uevents_t
 	{
 		windowResizeEvent_t			windowResize;
 		windowMoveEvent_t			windowMove;
-		windowDisplayChangedEvent_t	windowDisplayChanged;
+		windowDisplayChangedEvent_t windowDisplayChanged;
 	};
 
-
-	windowEvent_t() 
+	windowEvent_t()
 		: type( EVENT_NONE )
 		, windowId( 0 )
-	{}
+	{
+	}
 
-	type_t			type;
-	uint32			windowId;
-	uevents_t		events;
+	type_t	  type;
+	uint32	  windowId;
+	uevents_t events;
 };

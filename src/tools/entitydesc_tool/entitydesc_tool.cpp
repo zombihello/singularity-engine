@@ -18,7 +18,6 @@ public:
 
 EXPOSE_SINGLE_INTERFACE( CEntityDescTool, IEntityDescTool, ENTITYDESC_TOOL_INTERFACE_VERSION );
 
-
 /*
 ==================
 CEntityDescTool::Connect
@@ -47,31 +46,31 @@ CEntityDescTool::CompileEntityDesc
 bool CEntityDescTool::CompileEntityDesc( const resourceToolCompileEntityDescParams_t& compileParams ) const
 {
 	// Convert entity variables
-	std::string			destPath = S_Sprintf( "%s.sent_c", compileParams.pDestPath );
+	std::string destPath = S_Sprintf( "%s.sent_c", compileParams.pDestPath );
 	Msg( "EntityDescTool: Saving the entity descriptor to '%s'...", destPath.c_str() );
-	CSENTCompiledEntityDescDoc		sentCompiledFile;
+	CSENTCompiledEntityDescDoc sentCompiledFile;
 
-	bool	bEntityDescComponentsAreValid = true;
+	bool bEntityDescComponentsAreValid = true;
 	for ( uint32 componentIdx = 0; componentIdx < compileParams.numComponents; ++componentIdx )
 	{
-		CSENTEntityDescComponent					sentEntityDescComponent;
-		const resourceToolEntityDescComponent_t		resourceToolEntityDescComponent = compileParams.pComponents[componentIdx];
+		CSENTEntityDescComponent				sentEntityDescComponent;
+		const resourceToolEntityDescComponent_t resourceToolEntityDescComponent = compileParams.pComponents[componentIdx];
 		sentEntityDescComponent.SetType( resourceToolEntityDescComponent.pType );
 		for ( uint32 varIdx = 0; varIdx < resourceToolEntityDescComponent.numVars; ++varIdx )
 		{
-			CSENTEntityDescVar						sentEntityDescVar;
-			const resourceToolEntityDescVar_t		resourceToolEntityDescVar = resourceToolEntityDescComponent.pVars[varIdx];
+			CSENTEntityDescVar				  sentEntityDescVar;
+			const resourceToolEntityDescVar_t resourceToolEntityDescVar = resourceToolEntityDescComponent.pVars[varIdx];
 			sentEntityDescVar.SetName( resourceToolEntityDescVar.pName );
 			switch ( resourceToolEntityDescVar.type )
 			{
-			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_BOOL:		sentEntityDescVar.SetBoolValue( resourceToolEntityDescVar.boolValue );			break;
-			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_INT:		sentEntityDescVar.SetIntValue( resourceToolEntityDescVar.intValue );			break;
-			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_FLOAT:		sentEntityDescVar.SetFloatValue( resourceToolEntityDescVar.floatValue );		break;
-			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_VECTOR_2D:	sentEntityDescVar.SetVec2Value( resourceToolEntityDescVar.vector2DValue );		break;
-			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_VECTOR_3D:	sentEntityDescVar.SetVec3Value( resourceToolEntityDescVar.vector3DValue );		break;
-			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_VECTOR_4D:	sentEntityDescVar.SetVec4Value( resourceToolEntityDescVar.vector4DValue );		break;
-			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_MATRIX:		sentEntityDescVar.SetMatrixValue( resourceToolEntityDescVar.matrixValue );		break;
-			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_STRING:		sentEntityDescVar.SetStringValue( resourceToolEntityDescVar.pStringValue );		break;
+			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_BOOL: sentEntityDescVar.SetBoolValue( resourceToolEntityDescVar.boolValue ); break;
+			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_INT: sentEntityDescVar.SetIntValue( resourceToolEntityDescVar.intValue ); break;
+			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_FLOAT: sentEntityDescVar.SetFloatValue( resourceToolEntityDescVar.floatValue ); break;
+			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_VECTOR_2D: sentEntityDescVar.SetVec2Value( resourceToolEntityDescVar.vector2DValue ); break;
+			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_VECTOR_3D: sentEntityDescVar.SetVec3Value( resourceToolEntityDescVar.vector3DValue ); break;
+			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_VECTOR_4D: sentEntityDescVar.SetVec4Value( resourceToolEntityDescVar.vector4DValue ); break;
+			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_MATRIX: sentEntityDescVar.SetMatrixValue( resourceToolEntityDescVar.matrixValue ); break;
+			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_STRING: sentEntityDescVar.SetStringValue( resourceToolEntityDescVar.pStringValue ); break;
 			default:
 				Error( "EntityDescTool: Unknown entity descriptor type 0x%X in variable '%s'", resourceToolEntityDescVar.type, resourceToolEntityDescVar.pName );
 				bEntityDescComponentsAreValid = false;
@@ -83,7 +82,7 @@ bool CEntityDescTool::CompileEntityDesc( const resourceToolCompileEntityDescPara
 
 		sentCompiledFile.AddComponent( sentEntityDescComponent );
 	}
-	
+
 	if ( !bEntityDescComponentsAreValid )
 	{
 		Error( "EntityDescTool: Some entity descriptor components are invalid" );

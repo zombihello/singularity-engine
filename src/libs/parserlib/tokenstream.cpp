@@ -8,7 +8,8 @@ CParserTokenStream::CParserTokenStream
 */
 CParserTokenStream::CParserTokenStream()
 	: readPosition( 0 )
-{}
+{
+}
 
 /*
 ==================
@@ -18,7 +19,8 @@ CParserTokenStream::CParserTokenStream
 CParserTokenStream::CParserTokenStream( const CParserTokenStream& other )
 	: tokens( other.tokens )
 	, readPosition( other.readPosition )
-{}
+{
+}
 
 /*
 ==================
@@ -44,7 +46,7 @@ bool CParserTokenStream::PopToken( parserToken_t& token )
 CParserTokenStream::ExtractBodyTokens
 ==================
 */
-bool CParserTokenStream::ExtractBodyTokens( CParserTokenStream& stream, achar openBodyToken /* = '{' */, achar closeBodyToken /* = '}' */ )
+bool CParserTokenStream::ExtractBodyTokens( CParserTokenStream& stream, char openBodyToken /* = '{' */, char closeBodyToken /* = '}' */ )
 {
 	// Make sure we are not on the top
 	if ( readPosition == 0 )
@@ -59,10 +61,10 @@ bool CParserTokenStream::ExtractBodyTokens( CParserTokenStream& stream, achar op
 	}
 
 	// Level counter
-	uint32	currentLevel = 1;
+	uint32 currentLevel = 1;
 
 	// Extract tokens
-	parserToken_t		token;
+	parserToken_t token;
 	while ( true )
 	{
 		// Pop token
@@ -104,7 +106,7 @@ bool CParserTokenStream::ExtractBodyTokens( CParserTokenStream& stream, achar op
 CParserTokenStream::ExtractInitTokens
 ==================
 */
-bool CParserTokenStream::ExtractInitTokens( CParserTokenStream& stream, achar initializeToken /* = '/* =' */, achar delimiterToken /* = ';' */ )
+bool CParserTokenStream::ExtractInitTokens( CParserTokenStream& stream, char initializeToken /* = '/* =' */, char delimiterToken /* = ';' */ )
 {
 	// Make sure we are not on the top
 	if ( readPosition == 0 )
@@ -129,8 +131,8 @@ bool CParserTokenStream::ExtractInitTokens( CParserTokenStream& stream, achar in
 	}
 
 	// Extract tokens
-	parserToken_t	token;
-	int32			tokenID;
+	parserToken_t token;
+	int32		  tokenID;
 	do
 	{
 		// Pop token
@@ -144,8 +146,7 @@ bool CParserTokenStream::ExtractInitTokens( CParserTokenStream& stream, achar in
 		tokenID = token.tokenID;
 		stream.PushToken( std::forward<parserToken_t>( token ) );
 
-	}
-	while ( tokenID != delimiterToken );
+	} while ( tokenID != delimiterToken );
 
 	// We need to unparse the semicolon
 	--readPosition;

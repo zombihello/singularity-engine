@@ -38,7 +38,8 @@ bool CMemAllocBase::GetAllocationSize( void* pOriginal, size_t& numBytes )
  ==================
  */
 void CMemAllocBase::Trim( bool bTrimThreadCaches )
-{}
+{
+}
 
 /*
  ==================

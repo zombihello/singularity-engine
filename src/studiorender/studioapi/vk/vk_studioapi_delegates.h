@@ -7,7 +7,6 @@
 class CStudioAPIRenderPipelineVk;
 class CStudioAPIDescriptorSetsLayoutVk;
 
-
 //-----------------------------------------------------------------------------
 // Vulkan delegates
 //-----------------------------------------------------------------------------

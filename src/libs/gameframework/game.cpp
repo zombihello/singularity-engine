@@ -17,7 +17,8 @@ CGame::CGame
 ==================
 */
 CGame::CGame()
-{}
+{
+}
 
 /*
 ==================
@@ -34,21 +35,21 @@ bool CGame::Connect( createInterfaceFn_t pFactory )
 	ConVar_Register();
 
 	// Get the window manager
-	g_pWindowMgr = ( IWindowMgr* )pFactory( WINDOWMGR_INTERFACE_VERSION );
+	g_pWindowMgr = (IWindowMgr*)pFactory( WINDOWMGR_INTERFACE_VERSION );
 	if ( !g_pWindowMgr )
 	{
 		return false;
 	}
 
 	// Get StudioRender
-	g_pStudioRender = ( IStudioRender* )pFactory( STUDIORENDER_INTERFACE_VERSION );
+	g_pStudioRender = (IStudioRender*)pFactory( STUDIORENDER_INTERFACE_VERSION );
 	if ( !g_pStudioRender )
 	{
 		return false;
 	}
 
 	// Get the resource system
-	g_pResourceSystem = ( IResourceSystem* )pFactory( RESOURCESYSTEM_INTERFACE_VERSION );
+	g_pResourceSystem = (IResourceSystem*)pFactory( RESOURCESYSTEM_INTERFACE_VERSION );
 	if ( !g_pResourceSystem )
 	{
 		return false;
@@ -67,9 +68,9 @@ void CGame::Disconnect()
 	ConVar_Unregister();
 	DisconnectStdLib();
 
-	g_pWindowMgr		= NULL;
-	g_pStudioRender		= NULL;
-	g_pResourceSystem	= NULL;
+	g_pWindowMgr	  = NULL;
+	g_pStudioRender	  = NULL;
+	g_pResourceSystem = NULL;
 }
 
 /*
@@ -110,14 +111,14 @@ void CGame::Shutdown()
 CGame::MapInit
 ==================
 */
-bool CGame::MapInit( const achar* pPath )
+bool CGame::MapInit( const char* pPath )
 {
 	// Shutdown the old map
 	MapShutdown();
 
 	// Load a new map
-	CSMAPCompiledMapDoc		smapCompiledMapDoc;
-	std::string				mapPath = S_GetFileExtension( pPath ) ? pPath : S_Sprintf( "%s.smap_c", pPath );
+	CSMAPCompiledMapDoc smapCompiledMapDoc;
+	std::string			mapPath = S_GetFileExtension( pPath ) ? pPath : S_Sprintf( "%s.smap_c", pPath );
 	if ( !smapCompiledMapDoc.LoadFromFile( mapPath.c_str() ) )
 	{
 		Warning( "Game: Failed to load map '%s'", mapPath.c_str() );
@@ -158,7 +159,6 @@ void CGame::FrameUpdate()
 	}
 }
 
-
 //-----------------------------------------------------------------------------
 // Game application systems implementation
 //-----------------------------------------------------------------------------
@@ -169,7 +169,7 @@ CGameAppSystems::GetNum
 */
 uint32 CGameAppSystems::GetNum() const
 {
-	return ( uint32 )appSystems.size();
+	return (uint32)appSystems.size();
 }
 
 /*

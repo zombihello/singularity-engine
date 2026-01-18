@@ -22,8 +22,8 @@ public:
 private:
 	void PrintUsageHelp();
 	bool ParseEcsFiles( const std::string& dir, const std::string rootDir, CEcsSystemStub& stubs );
-	bool ParseEcsFile( const achar* pPath, CEcsSystemStub& stubs );
-	bool GenerateCppFiles( const achar* pRootDir, const achar* pOutputDir, const CEcsSystemStub& stubs, ecsCppFileType_t cppFileType );
+	bool ParseEcsFile( const char* pPath, CEcsSystemStub& stubs );
+	bool GenerateCppFiles( const char* pRootDir, const char* pOutputDir, const CEcsSystemStub& stubs, ecsCppFileType_t cppFileType );
 };
 
 /*
@@ -34,19 +34,19 @@ CEcsCompilerAppSystemGroup::Main
 int32 CEcsCompilerAppSystemGroup::Main()
 {
 	// Is need to print help of usage
-	bool			bPrintHelpUsage = CommandLine()->HasParam( "h" ) || CommandLine()->HasParam( "help" ) || CommandLine()->HasParam( "?" );
+	bool bPrintHelpUsage = CommandLine()->HasParam( "h" ) || CommandLine()->HasParam( "help" ) || CommandLine()->HasParam( "?" );
 
 	// Get a path to source ECS file or directory
-	const achar*	pEcsFile = CommandLine()->GetFirstValue( "file" );
-	const achar*	pEcsDir = CommandLine()->GetFirstValue( "dir" );
-	bool			bInvalidEcsFilePath = !pEcsFile || pEcsFile[0] == '\0';
-	bool			bInvalidEcsDir		= !pEcsDir || pEcsDir[0] == '\0';
+	const char* pEcsFile			 = CommandLine()->GetFirstValue( "file" );
+	const char* pEcsDir			 = CommandLine()->GetFirstValue( "dir" );
+	bool		 bInvalidEcsFilePath = !pEcsFile || pEcsFile[0] == '\0';
+	bool		 bInvalidEcsDir		 = !pEcsDir || pEcsDir[0] == '\0';
 
 	// Get an output directory for C++ file
-	const achar*	pCppFileDir = CommandLine()->GetFirstValue( "output" );
-	bool			bInvalidCppFileDir = !pCppFileDir || pCppFileDir[0] == '\0';
+	const char* pCppFileDir		= CommandLine()->GetFirstValue( "output" );
+	bool		 bInvalidCppFileDir = !pCppFileDir || pCppFileDir[0] == '\0';
 
-	// Print help of usage if it need or some parameters aren't set 
+	// Print help of usage if it need or some parameters aren't set
 	if ( bPrintHelpUsage || ( bInvalidEcsFilePath && bInvalidEcsDir ) || bInvalidCppFileDir )
 	{
 		PrintUsageHelp();
@@ -61,7 +61,7 @@ int32 CEcsCompilerAppSystemGroup::Main()
 	}
 
 	// Parse the ECS file if set 'file'
-	CEcsSystemStub		ecsSystemStub;
+	CEcsSystemStub ecsSystemStub;
 	if ( bInvalidEcsDir )
 	{
 		Assert( !bInvalidEcsFilePath );
@@ -101,20 +101,20 @@ CEcsCompilerAppSystemGroup::ParseEcsFiles
 */
 bool CEcsCompilerAppSystemGroup::ParseEcsFiles( const std::string& dir, const std::string rootDir, CEcsSystemStub& stubs )
 {
-	bool						bResult		= true;
-	TRefPtr<IPathArrayResult>	pFiles		= g_pFileSystem->FindFiles( dir.c_str(), true, true );
+	bool					  bResult = true;
+	TRefPtr<IPathArrayResult> pFiles  = g_pFileSystem->FindFiles( dir.c_str(), true, true );
 	for ( uint32 fileIdx = 0, numFiles = pFiles->GetNum(); fileIdx < numFiles; ++fileIdx )
 	{
 		// If the file is a directory look in
-		const achar*		pPath = pFiles->GetPath( fileIdx );
+		const char* pPath = pFiles->GetPath( fileIdx );
 		if ( g_pFileSystem->IsFileDirectory( pPath ) )
 		{
-			bResult &= ParseEcsFiles( S_Sprintf( "%s/", pPath ), rootDir, stubs);
+			bResult &= ParseEcsFiles( S_Sprintf( "%s/", pPath ), rootDir, stubs );
 			continue;
 		}
 
 		// If the file has 'ecs' extension its our ECS file and parse it
-		const achar*	pFileExtension = S_GetFileExtension( pPath );
+		const char* pFileExtension = S_GetFileExtension( pPath );
 		if ( pFileExtension && !S_Stricmp( pFileExtension, "ecs" ) )
 		{
 			bResult &= ParseEcsFile( pPath, stubs );
@@ -129,23 +129,23 @@ bool CEcsCompilerAppSystemGroup::ParseEcsFiles( const std::string& dir, const st
 CEcsCompilerAppSystemGroup::ParseEcsFile
 ==================
 */
-bool CEcsCompilerAppSystemGroup::ParseEcsFile( const achar* pPath, CEcsSystemStub& stubs )
+bool CEcsCompilerAppSystemGroup::ParseEcsFile( const char* pPath, CEcsSystemStub& stubs )
 {
 	// Read whole the file
-	TRefPtr<IStreamDataReader>	pFileReader = g_pFileSystem->CreateFileReader( pPath );
+	TRefPtr<IStreamDataReader> pFileReader = g_pFileSystem->CreateFileReader( pPath );
 	if ( !pFileReader )
 	{
 		Error( "EcsCompiler: Failed to open ECS file '%s'", pPath );
 		return false;
 	}
 
-	std::string		buffer;
+	std::string buffer;
 	buffer.resize( pFileReader->GetSize() );
 	pFileReader->Read( buffer.data(), buffer.size() );
-	pFileReader		= NULL;
+	pFileReader = NULL;
 
 	// Parse the ECS file
-	CEcsFileParser		ecsFileParser( stubs );
+	CEcsFileParser ecsFileParser( stubs );
 	if ( !ecsFileParser.ParseFile( pPath, buffer.c_str() ) )
 	{
 		Error( "EcsCompiler: Failed to parse ECS file '%s'", pPath );
@@ -159,24 +159,24 @@ bool CEcsCompilerAppSystemGroup::ParseEcsFile( const achar* pPath, CEcsSystemStu
 CEcsCompilerAppSystemGroup::GenerateCppFiles
 ==================
 */
-bool CEcsCompilerAppSystemGroup::GenerateCppFiles( const achar* pRootDir, const achar* pOutputDir, const CEcsSystemStub& stubs, ecsCppFileType_t cppFileType )
+bool CEcsCompilerAppSystemGroup::GenerateCppFiles( const char* pRootDir, const char* pOutputDir, const CEcsSystemStub& stubs, ecsCppFileType_t cppFileType )
 {
-	const std::vector<TRefPtr<CEcsStubModule>>&		ecsStubModules = stubs.GetModules();
-	CEcsCppGenerator								ecsCppGenerator;
+	const std::vector<TRefPtr<CEcsStubModule>>& ecsStubModules = stubs.GetModules();
+	CEcsCppGenerator							ecsCppGenerator;
 
 	// Get file extension and type name
-	const achar*	pCppFileExtension;
-	const achar*	pCppFileTypeName;
+	const char* pCppFileExtension;
+	const char* pCppFileTypeName;
 	switch ( cppFileType )
 	{
 	case ECS_CPP_FILE_TYPE_HEADER:
-		pCppFileExtension	= "h";
-		pCppFileTypeName	= "header";
+		pCppFileExtension = "h";
+		pCppFileTypeName  = "header";
 		break;
 
 	case ECS_CPP_FILE_TYPE_SOURCE:
-		pCppFileExtension	= "cpp";
-		pCppFileTypeName	= "source";
+		pCppFileExtension = "cpp";
+		pCppFileTypeName  = "source";
 		break;
 
 	default:
@@ -185,8 +185,8 @@ bool CEcsCompilerAppSystemGroup::GenerateCppFiles( const achar* pRootDir, const 
 	}
 
 	// Convert the root and the output directory into absolute path
-	std::string		rootDir = pRootDir;
-	std::string		outputDir = pOutputDir;
+	std::string rootDir	  = pRootDir;
+	std::string outputDir = pOutputDir;
 	if ( !S_IsAbsolutePath( pRootDir ) )
 	{
 		S_MakeAbsolutePath( pRootDir, rootDir );
@@ -196,20 +196,20 @@ bool CEcsCompilerAppSystemGroup::GenerateCppFiles( const achar* pRootDir, const 
 		S_MakeAbsolutePath( pOutputDir, outputDir );
 	}
 
-	for ( uint32 ecsStubModuleIdx = 0, numEcsStubModules = ( uint32 )ecsStubModules.size(); ecsStubModuleIdx < numEcsStubModules; ++ecsStubModuleIdx )
+	for ( uint32 ecsStubModuleIdx = 0, numEcsStubModules = (uint32)ecsStubModules.size(); ecsStubModuleIdx < numEcsStubModules; ++ecsStubModuleIdx )
 	{
 		// Generate C++ header for this module
-		CEcsStubModule*			pEcsStubModule = ecsStubModules[ecsStubModuleIdx];
+		CEcsStubModule* pEcsStubModule = ecsStubModules[ecsStubModuleIdx];
 		ecsCppGenerator.Reset();
 		ecsCppGenerator.Generate( pEcsStubModule, cppFileType );
 		if ( ecsCppGenerator.HasError() )
 		{
 			return false;
 		}
-		const std::string&		buffer = ecsCppGenerator.GetBuffer();
+		const std::string& buffer = ecsCppGenerator.GetBuffer();
 
 		// Make sub directories if we use 'dir' command
-		std::string		subDir;
+		std::string subDir;
 		if ( !rootDir.empty() )
 		{
 			S_GetFilePath( pEcsStubModule->GetContext().file.AsChar() + rootDir.size(), subDir, false );
@@ -217,18 +217,18 @@ bool CEcsCompilerAppSystemGroup::GenerateCppFiles( const achar* pRootDir, const 
 		}
 
 		// Generate file path from the module name
-		std::string				filePath;
+		std::string filePath;
 		{
-			std::string		moduleNameLower = pEcsStubModule->GetName();
+			std::string moduleNameLower = pEcsStubModule->GetName();
 			S_Strlwr( moduleNameLower.data() );
-			filePath		= S_Sprintf( "%s/%secs_%s.gen.%s", outputDir.c_str(), subDir.c_str(), moduleNameLower.c_str(), pCppFileExtension );
+			filePath = S_Sprintf( "%s/%secs_%s.gen.%s", outputDir.c_str(), subDir.c_str(), moduleNameLower.c_str(), pCppFileExtension );
 		}
 
 		// Save buffer into the file
-		TRefPtr<IStreamDataWriter>		pFileWriter = g_pFileSystem->CreateFileWriter( filePath.c_str() );
+		TRefPtr<IStreamDataWriter> pFileWriter = g_pFileSystem->CreateFileWriter( filePath.c_str() );
 		if ( pFileWriter )
 		{
-			pFileWriter->Write( ( void* )buffer.data(), buffer.size() * sizeof( achar ) );
+			pFileWriter->Write( (void*)buffer.data(), buffer.size() * sizeof( char ) );
 			Msg( "EcsCompiler: C++ %s for '%s' saved to '%s'", pCppFileTypeName, pEcsStubModule->GetName(), filePath.c_str() );
 		}
 		else
@@ -262,7 +262,6 @@ void CEcsCompilerAppSystemGroup::PrintUsageHelp()
 	Msg( "" );
 }
 
-
 /*
 ==================
 main
@@ -273,7 +272,7 @@ int main( int argc, char** argv )
 	// Enable developer messages if we in debug configuration
 #if DEBUG
 	Logger()->SetGroupActivate( LOG_GROUP_DEVELOPER, true );
-#endif // DEBUG
+#endif	// DEBUG
 
 	// Initialize the main thread
 	Sys_InitMainThread();
@@ -286,8 +285,8 @@ int main( int argc, char** argv )
 
 	// Initialize a command line
 	{
-		std::string		arguments;
-		for ( uint32 index = 0; index < ( uint32 )argc; ++index )
+		std::string arguments;
+		for ( uint32 index = 0; index < (uint32)argc; ++index )
 		{
 			if ( *argv[index] == '-' || *argv[index] == '/' )
 			{
@@ -303,7 +302,7 @@ int main( int argc, char** argv )
 	}
 
 	// Run the application
-	CEcsCompilerAppSystemGroup		ecsCompilerSystems;
-	CApplication					application( &ecsCompilerSystems, "ecscompiler" );
+	CEcsCompilerAppSystemGroup ecsCompilerSystems;
+	CApplication			   application( &ecsCompilerSystems, "ecscompiler" );
 	return application.Run();
 }

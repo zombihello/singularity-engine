@@ -9,8 +9,8 @@ template<typename TUploadLambda>
 FORCEINLINE void CStudioAPIDataUploaderVk::Upload( uint64 dataSize, uint32 stagingBufferOffsetAlignment, TUploadLambda uploadLambda )
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
-	CStudioAPICmdContextVk* pTransferCmdContext = ( CStudioAPICmdContextVk* )g_StudioAPIVk.GetImmediateCmdContext( STUDIOAPI_QUEUE_TYPE_TRANSFER );
-	uint64						remainDataSize = dataSize;
+	CStudioAPICmdContextVk* pTransferCmdContext = (CStudioAPICmdContextVk*)g_StudioAPIVk.GetImmediateCmdContext( STUDIOAPI_QUEUE_TYPE_TRANSFER );
+	uint64					remainDataSize		= dataSize;
 	while ( remainDataSize > 0 )
 	{
 		// Will wait only if staging buffer is in flight
@@ -18,13 +18,13 @@ FORCEINLINE void CStudioAPIDataUploaderVk::Upload( uint64 dataSize, uint32 stagi
 		WaitUpload( currentStagingBufferIndex );
 
 		// Initialize upload parameters
-		uploadParams_t		uploadParams = {};
-		uint32				offset = Align( stagingBuffer.currentOffset, stagingBufferOffsetAlignment );
-		uploadParams.partialUploadSize = Min( STAGING_BUFFER_SIZE - ( int32 )offset, ( int32 )remainDataSize );
-		uploadParams.remainSizeToUpload = remainDataSize;
-		uploadParams.vkStagingBuffer = stagingBuffer.vkBuffer;
+		uploadParams_t uploadParams		 = {};
+		uint32		   offset			 = Align( stagingBuffer.currentOffset, stagingBufferOffsetAlignment );
+		uploadParams.partialUploadSize	 = Min( STAGING_BUFFER_SIZE - (int32)offset, (int32)remainDataSize );
+		uploadParams.remainSizeToUpload	 = remainDataSize;
+		uploadParams.vkStagingBuffer	 = stagingBuffer.vkBuffer;
 		uploadParams.stagingBufferOffset = offset;
-		uploadParams.pStagingBufferData = stagingBuffer.pBufferData + offset;
+		uploadParams.pStagingBufferData	 = stagingBuffer.pBufferData + offset;
 
 		// Submit the current staging buffer if we haven't enough memory
 		if ( uploadParams.partialUploadSize <= 0 )
@@ -41,7 +41,7 @@ FORCEINLINE void CStudioAPIDataUploaderVk::Upload( uint64 dataSize, uint32 stagi
 		uploadParams.pCmdBuffer = stagingBuffer.pCmdList->GetCmdBuffer();
 
 		// Call the lambda
-		int32	uploadedSize = uploadLambda( uploadParams );
+		int32 uploadedSize = uploadLambda( uploadParams );
 		Assert( uploadedSize <= uploadParams.partialUploadSize );
 		if ( uploadedSize <= 0 )
 		{

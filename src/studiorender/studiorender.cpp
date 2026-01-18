@@ -9,10 +9,9 @@
 #include "studiorender/studio_renderobject_quad.h"
 #include "studiorender/studiorender.h"
 
-CConVar				r_vsync( "r_vsync", "0", "Should use vertical synchronization (VSync)", FCVAR_ARCHIVE );
-CStudioRender		g_StudioRender;
+CConVar		  r_vsync( "r_vsync", "0", "Should use vertical synchronization (VSync)", FCVAR_ARCHIVE );
+CStudioRender g_StudioRender;
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CStudioRender, IStudioRender, STUDIORENDER_INTERFACE_VERSION, g_StudioRender );
-
 
 /*
 ==================
@@ -29,20 +28,20 @@ bool CStudioRender::Connect( createInterfaceFn_t pFactory )
 	ConVar_Register();
 
 	// Get Studio API
-	g_pStudioAPI = ( IStudioAPI* )pFactory( STUDIOAPI_INTERFACE_VERSION );
+	g_pStudioAPI = (IStudioAPI*)pFactory( STUDIOAPI_INTERFACE_VERSION );
 	if ( !g_pStudioAPI )
 	{
 		return false;
 	}
 
 	// Get shader manager
-	g_pShaderMgr = ( IShaderMgr* )pFactory( SHADERMGR_INTERFACE_VERSION );
+	g_pShaderMgr = (IShaderMgr*)pFactory( SHADERMGR_INTERFACE_VERSION );
 	if ( !g_pShaderMgr )
 	{
 		return false;
 	}
 
-	g_pStudioRender	= this;
+	g_pStudioRender = this;
 	return true;
 }
 
@@ -57,9 +56,9 @@ void CStudioRender::Disconnect()
 	ConVar_Unregister();
 	DisconnectStdLib();
 
-	g_pStudioAPI		= NULL;
-	g_pStudioRender		= NULL;
-	g_pShaderMgr		= NULL;
+	g_pStudioAPI	= NULL;
+	g_pStudioRender = NULL;
+	g_pShaderMgr	= NULL;
 }
 
 /*
@@ -91,7 +90,7 @@ void CStudioRender::Shutdown()
 {
 	// Stop the render thread
 	Studio_StopRenderThread();
-	
+
 	// Shutdown the present pass
 	presentRenderPass.Shutdown();
 
@@ -107,8 +106,8 @@ CStudioRender::SetCameraView
 void CStudioRender::SetCameraView( const studioCameraView_t& cameraView )
 {
 	// Calculate a view matrix
-	vec3_t		targetDirection = cameraView.rotation * g_vectorForward;
-	vec3_t		axisUp			= cameraView.rotation * g_vectorUp;
+	vec3_t targetDirection = cameraView.rotation * g_vectorForward;
+	vec3_t axisUp		   = cameraView.rotation * g_vectorUp;
 	S_MatrixLookAt( cameraView.location, cameraView.location + targetDirection, axisUp, sceneView.viewMatrix );
 
 	// Calculate a perspective matrix
@@ -132,7 +131,7 @@ CStudioRender::UnregisterObject
 */
 void CStudioRender::UnregisterObject( IStudioRenderObject* pRenderObject )
 {
-	for ( uint32 renderObjectIdx = 0, numRenderObjects = ( uint32 )renderObjects.size(); renderObjectIdx < numRenderObjects; ++renderObjectIdx )
+	for ( uint32 renderObjectIdx = 0, numRenderObjects = (uint32)renderObjects.size(); renderObjectIdx < numRenderObjects; ++renderObjectIdx )
 	{
 		if ( renderObjects[renderObjectIdx] == pRenderObject )
 		{
@@ -216,7 +215,7 @@ void CStudioRender::R_DrawFrame( CStudioViewport* pViewport )
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 	Assert( Studio_IsInRenderThread() );
 	Assert( !renderObjects.empty() );
-	presentRenderPass.R_DrawPass( pViewport, ( CStudioRenderObjectQuad* )renderObjects[0].GetPtr() );
+	presentRenderPass.R_DrawPass( pViewport, (CStudioRenderObjectQuad*)renderObjects[0].GetPtr() );
 }
 
 /*

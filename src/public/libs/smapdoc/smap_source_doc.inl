@@ -36,7 +36,7 @@ FORCEINLINE void CSMAPSourceMapDoc::Clear()
 CSMAPSourceMapDoc::GetOutputDir
 ==================
 */
-FORCEINLINE const achar* CSMAPSourceMapDoc::GetOutputDir() const
+FORCEINLINE const char* CSMAPSourceMapDoc::GetOutputDir() const
 {
 	return outputDir.c_str();
 }
@@ -48,7 +48,7 @@ CSMAPSourceMapDoc::GetNumEntities
 */
 FORCEINLINE uint32 CSMAPSourceMapDoc::GetNumEntities() const
 {
-	return ( uint32 )entities.size();
+	return (uint32)entities.size();
 }
 
 /*

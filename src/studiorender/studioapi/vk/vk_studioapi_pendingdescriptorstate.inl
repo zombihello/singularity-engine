@@ -10,13 +10,12 @@ FORCEINLINE void CStudioAPIDescriptorStateCommonVk::Reset()
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 	Mem_Memzero( descriptorSetWriteContainer.vkDescriptorBufferInfos.data(), descriptorSetWriteContainer.vkDescriptorBufferInfos.size() * sizeof( VkDescriptorBufferInfo ) );
 	Mem_Memzero( descriptorSetWriteContainer.vkDescriptorImageInfos.data(), descriptorSetWriteContainer.vkDescriptorImageInfos.size() * sizeof( VkDescriptorImageInfo ) );
-	for ( uint32 index = 0, count = ( uint32 )descriptorSetWriteContainer.studioAPIBuffers.size(); index < count; ++index )
+	for ( uint32 index = 0, count = (uint32)descriptorSetWriteContainer.studioAPIBuffers.size(); index < count; ++index )
 	{
 		descriptorSetWriteContainer.studioAPIBuffers[index] = NULL;
 	}
 	bDirtyDescriptorSets = false;
 }
-
 
 /*
 ==================
@@ -39,7 +38,7 @@ FORCEINLINE void CStudioAPIDescriptorStateRenderVk::BindDescriptorSets( CStudioA
 	if ( !vkDescriptorSets.empty() )
 	{
 		CStudioAPIBoundShaderStateVk* pBoundShaderState = pRenderPipeline->GetBoundShaderState();
-		vkCmdBindDescriptorSets( pCmdList->GetCmdBuffer()->GetVkCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, pBoundShaderState->GetDescriptorSetsLayout().GetVkPipelineLayout(), 0, ( uint32 )vkDescriptorSets.size(), vkDescriptorSets.data(), 0, NULL );
+		vkCmdBindDescriptorSets( pCmdList->GetCmdBuffer()->GetVkCommandBuffer(), VK_PIPELINE_BIND_POINT_GRAPHICS, pBoundShaderState->GetDescriptorSetsLayout().GetVkPipelineLayout(), 0, (uint32)vkDescriptorSets.size(), vkDescriptorSets.data(), 0, NULL );
 	}
 }
 

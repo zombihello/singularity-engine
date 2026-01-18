@@ -12,7 +12,6 @@ class CStudioAPICmdBufferVk;
 class CStudioAPISwapChainVk;
 class CStudioAPICmdListVk;
 
-
 //-----------------------------------------------------------------------------
 // Vulkan swap chain image
 //-----------------------------------------------------------------------------
@@ -21,7 +20,7 @@ class CStudioAPISwapChainImageVk : public IStudioAPISwapChainImage
 public:
 	// IStudioAPISwapChainImage interface
 	virtual IStudioAPISwapChain* GetSwapChain() const override;
-	virtual uint32 GetIndex() const override;
+	virtual uint32				 GetIndex() const override;
 
 	CStudioAPISwapChainImageVk( CStudioAPISwapChainVk* pSwapChain, uint32 imageIndex, VkImage vkImage, VkSurfaceFormatKHR vkSurfaceFormat );
 	~CStudioAPISwapChainImageVk();
@@ -34,18 +33,17 @@ public:
 	// an image layout and make barriers for the texture
 	void UpdateSyncStateWithBarrier( CStudioAPICmdListVk* pCmdList, VkImageLayout vkDstImageLayout, VkAccessFlags vkDstAccessMask, VkPipelineStageFlags vkDstStageMask, uint32 dstQueueFamilyIndex );
 
-	VkImage GetVkImage() const;
-	VkImageView GetVkImageView() const;
+	VkImage							   GetVkImage() const;
+	VkImageView						   GetVkImageView() const;
 	const studioAPISyncStateImageVk_t& GetSyncState() const;
 
 private:
-	uint32							imageIndex;
-	VkImage							vkImage;
-	VkImageView						vkImageView;
-	studioAPISyncStateImageVk_t		syncState;
-	CStudioAPISwapChainVk*			pSwapChain;
+	uint32						imageIndex;
+	VkImage						vkImage;
+	VkImageView					vkImageView;
+	studioAPISyncStateImageVk_t syncState;
+	CStudioAPISwapChainVk*		pSwapChain;
 };
-
 
 //-----------------------------------------------------------------------------
 // Vulkan StudioAPI swap chain
@@ -59,28 +57,28 @@ public:
 	virtual bool Present() override;
 	virtual bool ReCreate() override;
 
-	virtual bool IsUseVSync() const override;
-	virtual bool IsValid() const override;
-	virtual ivec2_t GetSize() const override;
-	virtual uint32 GetCurrentImageIndex() const override;
+	virtual bool					  IsUseVSync() const override;
+	virtual bool					  IsValid() const override;
+	virtual ivec2_t					  GetSize() const override;
+	virtual uint32					  GetCurrentImageIndex() const override;
 	virtual IStudioAPISwapChainImage* GetCurrentImage() const override;
-	virtual uint32 GetNumImages() const override;
+	virtual uint32					  GetNumImages() const override;
 	virtual IStudioAPISwapChainImage* GetImage( uint32 index ) const override;
-	virtual windowHandle_t GetWindowHandle() const override;
+	virtual windowHandle_t			  GetWindowHandle() const override;
 
 	virtual IOnReCreated* OnReCreated() const override;
 
 	DECLARE_MULTICAST_DELEGATE( COnReCreated, IStudioAPISwapChain* /* pStudioAPISwapChain */, bool /* bChangedImageFormat */ );
 
-	CStudioAPISwapChainVk( const achar* pDebugName = "" );
+	CStudioAPISwapChainVk( const char* pDebugName = "" );
 	~CStudioAPISwapChainVk();
 
 	bool Create( windowHandle_t windowHandle, uint32 width, uint32 height, VkFormat vkPixelFormat, VkColorSpaceKHR vkColorSpace, bool bUseVSync );
 	void Destroy();
 
 	VkSurfaceFormatKHR GetVkSurfaceFormat() const;
-	VkSwapchainKHR GetVkSwapChain() const;
-	bool IsCreated() const;
+	VkSwapchainKHR	   GetVkSwapChain() const;
+	bool			   IsCreated() const;
 
 	// NOTE: The semaphore must be set as wait semaphore at begin of a frame
 	// NOTE: The semaphore valid only from AcquireNextImage call and to Present
@@ -93,18 +91,18 @@ public:
 private:
 	static void OnStudioAPIVkShutdown( void* pUserData );
 
-	bool											bUseVSync;
-	windowHandle_t									windowHandle;
-	VkSurfaceKHR									vkSurface;
-	VkSwapchainKHR									vkSwapChain;
-	VkSurfaceFormatKHR								vkSurfaceFormat;
-	ivec2_t											size;
-	uint32											currentImageIndex;
-	COnStudioAPIVkShutdown::funcDelegate_t*			pStudioAPIVkShutdownDelegate;
-	COnReCreated									onReCreated;
-	CStudioAPISemaphoreVk*							pImageAvailableSemaphores[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];
-	std::vector<CStudioAPISemaphoreVk*>				renderFinishedSemaphores;
-	std::vector<CStudioAPISwapChainImageVk*>		swapChainImages;
+	bool									 bUseVSync;
+	windowHandle_t							 windowHandle;
+	VkSurfaceKHR							 vkSurface;
+	VkSwapchainKHR							 vkSwapChain;
+	VkSurfaceFormatKHR						 vkSurfaceFormat;
+	ivec2_t									 size;
+	uint32									 currentImageIndex;
+	COnStudioAPIVkShutdown::funcDelegate_t*	 pStudioAPIVkShutdownDelegate;
+	COnReCreated							 onReCreated;
+	CStudioAPISemaphoreVk*					 pImageAvailableSemaphores[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];
+	std::vector<CStudioAPISemaphoreVk*>		 renderFinishedSemaphores;
+	std::vector<CStudioAPISwapChainImageVk*> swapChainImages;
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_swapchain.inl"

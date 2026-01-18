@@ -9,7 +9,8 @@ CStudioAPISyncMgrVk::CStudioAPISyncMgrVk
 ==================
 */
 CStudioAPISyncMgrVk::CStudioAPISyncMgrVk()
-{}
+{
+}
 
 /*
 ==================
@@ -27,7 +28,8 @@ CStudioAPISyncMgrVk::Init
 ==================
 */
 void CStudioAPISyncMgrVk::Init()
-{}
+{
+}
 
 /*
 ==================
@@ -74,7 +76,7 @@ CStudioAPIFenceVk* CStudioAPISyncMgrVk::CreateFence( bool bCreateSignaled /* = f
 	// The first we search a free fence in the free list
 	if ( !freeFences.empty() )
 	{
-		CStudioAPIFenceVk*	pFence = freeFences.front();
+		CStudioAPIFenceVk* pFence = freeFences.front();
 		freeFences.pop_front();
 		fences.emplace_back( pFence );
 
@@ -100,7 +102,7 @@ CStudioAPISemaphoreVk* CStudioAPISyncMgrVk::CreateSemaphore()
 	// The first we search a free semaphore in the free list
 	if ( !freeSemaphores.empty() )
 	{
-		CStudioAPISemaphoreVk*		pSemaphore = freeSemaphores.front();
+		CStudioAPISemaphoreVk* pSemaphore = freeSemaphores.front();
 		freeSemaphores.pop_front();
 		semaphores.emplace_back( pSemaphore );
 		return pSemaphore;
@@ -115,10 +117,10 @@ CStudioAPISemaphoreVk* CStudioAPISyncMgrVk::CreateSemaphore()
 CStudioAPISyncMgrVk::FindOrCreateNamedSemaphore
 ==================
 */
-CStudioAPINamedSemaphoreVk* CStudioAPISyncMgrVk::FindOrCreateNamedSemaphore( const achar* pName )
+CStudioAPINamedSemaphoreVk* CStudioAPISyncMgrVk::FindOrCreateNamedSemaphore( const char* pName )
 {
-	// The first we search already created the named semaphore in the dictionary 
-	auto	itFind = namedSemaphoresDict.find( pName );
+	// The first we search already created the named semaphore in the dictionary
+	auto itFind = namedSemaphoresDict.find( pName );
 	if ( itFind != namedSemaphoresDict.end() )
 	{
 		++itFind->second->countReferences;
@@ -126,14 +128,14 @@ CStudioAPINamedSemaphoreVk* CStudioAPISyncMgrVk::FindOrCreateNamedSemaphore( con
 	}
 
 	// Create a new named semaphore
-	CStudioAPINamedSemaphoreVk*					pNamedSemaphore	= new CStudioAPINamedSemaphoreVk();
+	CStudioAPINamedSemaphoreVk* pNamedSemaphore = new CStudioAPINamedSemaphoreVk();
 	pNamedSemaphore->name						= pName;
 	namedSemaphoresDict[pNamedSemaphore->name]	= pNamedSemaphore;
 
 	// Use a free semaphores or create a new one for each frame in-flight
 	for ( uint32 index = 0; index < STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT; ++index )
 	{
-		CStudioAPISemaphoreVk*	pSemaphore = NULL;
+		CStudioAPISemaphoreVk* pSemaphore = NULL;
 		if ( !freeSemaphores.empty() )
 		{
 			pSemaphore = freeSemaphores.front();
@@ -222,14 +224,14 @@ void CStudioAPISyncMgrVk::WaitFrameInFlight( uint32 indexFrameInFlight )
 	PROFILE_TAG( "Frame In Flight", indexFrameInFlight )
 
 	// Wait until the current frame in-flight will be available
-	std::list<CStudioAPIFenceVk*>&		currentFrameInFlightFences = frameInFlightFences[indexFrameInFlight];
+	std::list<CStudioAPIFenceVk*>& currentFrameInFlightFences = frameInFlightFences[indexFrameInFlight];
 	for ( auto it = currentFrameInFlightFences.begin(), itEnd = currentFrameInFlightFences.end(); it != itEnd; ++it )
 	{
 		// Wait a fence if it isn't signaled
-		CStudioAPIFenceVk*		pFence = *it;
+		CStudioAPIFenceVk* pFence = *it;
 		if ( !pFence->IsSignaled() )
 		{
-			bool	bResult = pFence->Wait( UINT64_MAX );
+			bool bResult = pFence->Wait( UINT64_MAX );
 			Assert( bResult );
 		}
 
@@ -239,28 +241,27 @@ void CStudioAPISyncMgrVk::WaitFrameInFlight( uint32 indexFrameInFlight )
 	currentFrameInFlightFences.clear();
 
 	// Free all pending fences
-	std::list<CStudioAPIFenceVk*>&		currentPendingFreeFences = pendingFreeFences[indexFrameInFlight];
+	std::list<CStudioAPIFenceVk*>& currentPendingFreeFences = pendingFreeFences[indexFrameInFlight];
 	for ( auto it = currentPendingFreeFences.begin(), itEnd = currentPendingFreeFences.end(); it != itEnd; ++it )
 	{
 		// Reset a fence and add the one into the list of free fences
-		CStudioAPIFenceVk*	pFence = *it;
+		CStudioAPIFenceVk* pFence = *it;
 		pFence->Reset();
 		freeFences.emplace_back( pFence );
 	}
 	currentPendingFreeFences.clear();
 
 	// Free all pending semaphores
-	std::list<CStudioAPISemaphoreVk*>&	currentPendingFreeSemaphores = pendingFreeSemaphores[indexFrameInFlight];
+	std::list<CStudioAPISemaphoreVk*>& currentPendingFreeSemaphores = pendingFreeSemaphores[indexFrameInFlight];
 	for ( auto it = currentPendingFreeSemaphores.begin(), itEnd = currentPendingFreeSemaphores.end(); it != itEnd; ++it )
 	{
 		// Reset a semaphore and add the one into the list of free semaphores
-		CStudioAPISemaphoreVk*	pSemaphore = *it;
-		pSemaphore->bSignaled	= false;
+		CStudioAPISemaphoreVk* pSemaphore = *it;
+		pSemaphore->bSignaled			  = false;
 		freeSemaphores.emplace_back( pSemaphore );
 	}
 	currentPendingFreeSemaphores.clear();
 }
-
 
 /*
 ==================
@@ -270,8 +271,8 @@ VK_UpdateSyncStateBuffer
 void VK_UpdateSyncStateBuffer( VkAccessFlags vkDstAccessMask, VkPipelineStageFlags vkDstStageMask, uint32 dstQueueFamilyIndex, studioAPISyncStateBufferVk_t& syncState )
 {
 	// Split vkDstAccessMask by read and write mask
-	VkAccessFlags	vkDstReadAccessMask		= vkDstAccessMask & STUDIOAPI_VK_ACCESS_READ_FLAGS;
-	VkAccessFlags	vkDstWriteAccessMask	= vkDstAccessMask & STUDIOAPI_VK_ACCESS_WRITE_FLAGS;
+	VkAccessFlags vkDstReadAccessMask  = vkDstAccessMask & STUDIOAPI_VK_ACCESS_READ_FLAGS;
+	VkAccessFlags vkDstWriteAccessMask = vkDstAccessMask & STUDIOAPI_VK_ACCESS_WRITE_FLAGS;
 	Assert( ( vkDstAccessMask & ~( STUDIOAPI_VK_ACCESS_KNOWN_FLAGS ) ) == 0 );
 
 	// Save a new owner queue family if early the resource not used
@@ -285,54 +286,54 @@ void VK_UpdateSyncStateBuffer( VkAccessFlags vkDstAccessMask, VkPipelineStageFla
 		// Remember all scopes for the new queue family
 		if ( vkDstReadAccessMask != VK_ACCESS_NONE )
 		{
-			syncState.readScope.vkAccessFlags		= vkDstReadAccessMask;
-			syncState.readScope.vkPipelineStages	= vkDstStageMask;
+			syncState.readScope.vkAccessFlags	 = vkDstReadAccessMask;
+			syncState.readScope.vkPipelineStages = vkDstStageMask;
 		}
 		else
 		{
-			syncState.readScope.vkAccessFlags		= VK_ACCESS_NONE;
-			syncState.readScope.vkPipelineStages	= VK_PIPELINE_STAGE_NONE;
+			syncState.readScope.vkAccessFlags	 = VK_ACCESS_NONE;
+			syncState.readScope.vkPipelineStages = VK_PIPELINE_STAGE_NONE;
 		}
 
 		if ( vkDstWriteAccessMask != VK_ACCESS_NONE )
 		{
-			syncState.writeScope.vkAccessFlags		= vkDstWriteAccessMask;
-			syncState.writeScope.vkPipelineStages	= vkDstStageMask;
+			syncState.writeScope.vkAccessFlags	  = vkDstWriteAccessMask;
+			syncState.writeScope.vkPipelineStages = vkDstStageMask;
 		}
 		else
 		{
-			syncState.writeScope.vkAccessFlags		= VK_ACCESS_NONE;
-			syncState.writeScope.vkPipelineStages	= VK_PIPELINE_STAGE_NONE;
+			syncState.writeScope.vkAccessFlags	  = VK_ACCESS_NONE;
+			syncState.writeScope.vkPipelineStages = VK_PIPELINE_STAGE_NONE;
 		}
-		
+
 		// Remember the new owner and reset syncState.bHasPendingOwnershipTransfer
 		Assert( !syncState.bHasPendingOwnershipTransfer );
-		syncState.ownerQueueFamilyIndex	= dstQueueFamilyIndex;
+		syncState.ownerQueueFamilyIndex = dstQueueFamilyIndex;
 
 		// We are done
 		return;
 	}
 
 	// Update the state for write operations
-	bool	bNewIsRead	= vkDstReadAccessMask != VK_ACCESS_NONE;
-	bool	bNewIsWrite	= vkDstWriteAccessMask != VK_ACCESS_NONE;
+	bool bNewIsRead	 = vkDstReadAccessMask != VK_ACCESS_NONE;
+	bool bNewIsWrite = vkDstWriteAccessMask != VK_ACCESS_NONE;
 	if ( bNewIsWrite )
 	{
 		// Store where write happened
-		syncState.writeScope.vkAccessFlags		= vkDstWriteAccessMask;
-		syncState.writeScope.vkPipelineStages	= vkDstStageMask;
+		syncState.writeScope.vkAccessFlags	  = vkDstWriteAccessMask;
+		syncState.writeScope.vkPipelineStages = vkDstStageMask;
 
 		// Reset read state
-		syncState.readScope.vkAccessFlags		= VK_ACCESS_NONE;
-		syncState.readScope.vkPipelineStages	= VK_PIPELINE_STAGE_NONE;
+		syncState.readScope.vkAccessFlags	 = VK_ACCESS_NONE;
+		syncState.readScope.vkPipelineStages = VK_PIPELINE_STAGE_NONE;
 	}
 
 	// Update the state for read operations
 	if ( bNewIsRead )
 	{
 		// Remember this read happened
-		syncState.readScope.vkAccessFlags		|= vkDstReadAccessMask;
-		syncState.readScope.vkPipelineStages	|= vkDstStageMask;
+		syncState.readScope.vkAccessFlags |= vkDstReadAccessMask;
+		syncState.readScope.vkPipelineStages |= vkDstStageMask;
 	}
 }
 
@@ -346,17 +347,17 @@ bool VK_UpdateSyncStateBufferWithBarrier( VkAccessFlags vkDstAccessMask, VkPipel
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 
 	// Split vkDstAccessMask by read and write mask
-	bool				bIsNeedBarrier			= false;
-	VkAccessFlags		vkDstReadAccessMask		= vkDstAccessMask & STUDIOAPI_VK_ACCESS_READ_FLAGS;
-	VkAccessFlags		vkDstWriteAccessMask	= vkDstAccessMask & STUDIOAPI_VK_ACCESS_WRITE_FLAGS;
+	bool		  bIsNeedBarrier	   = false;
+	VkAccessFlags vkDstReadAccessMask  = vkDstAccessMask & STUDIOAPI_VK_ACCESS_READ_FLAGS;
+	VkAccessFlags vkDstWriteAccessMask = vkDstAccessMask & STUDIOAPI_VK_ACCESS_WRITE_FLAGS;
 	Assert( ( vkDstAccessMask & ~( STUDIOAPI_VK_ACCESS_KNOWN_FLAGS ) ) == 0 );
 
 	// Initialize base fields of a buffer barrier and reset output fields
-	bufferMemoryBarrier.vkBufferMemoryBarrier.sType					= VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
-	bufferMemoryBarrier.vkBufferMemoryBarrier.srcQueueFamilyIndex	= VK_QUEUE_FAMILY_IGNORED;
-	bufferMemoryBarrier.vkBufferMemoryBarrier.dstQueueFamilyIndex	= VK_QUEUE_FAMILY_IGNORED;
-	bufferMemoryBarrier.vkSrcStageMask								= VK_PIPELINE_STAGE_NONE;
-	bufferMemoryBarrier.vkDstStageMask								= vkDstStageMask;
+	bufferMemoryBarrier.vkBufferMemoryBarrier.sType				  = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+	bufferMemoryBarrier.vkBufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	bufferMemoryBarrier.vkBufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	bufferMemoryBarrier.vkSrcStageMask							  = VK_PIPELINE_STAGE_NONE;
+	bufferMemoryBarrier.vkDstStageMask							  = vkDstStageMask;
 
 	// Save a new owner queue family if early the resource not used
 	if ( syncState.ownerQueueFamilyIndex == VK_QUEUE_FAMILY_IGNORED )
@@ -367,54 +368,54 @@ bool VK_UpdateSyncStateBufferWithBarrier( VkAccessFlags vkDstAccessMask, VkPipel
 	else if ( syncState.ownerQueueFamilyIndex != dstQueueFamilyIndex )
 	{
 		// Set source and destination queue family index
-		bufferMemoryBarrier.vkBufferMemoryBarrier.srcQueueFamilyIndex	= syncState.ownerQueueFamilyIndex;
-		bufferMemoryBarrier.vkBufferMemoryBarrier.dstQueueFamilyIndex	= dstQueueFamilyIndex;
-		
+		bufferMemoryBarrier.vkBufferMemoryBarrier.srcQueueFamilyIndex = syncState.ownerQueueFamilyIndex;
+		bufferMemoryBarrier.vkBufferMemoryBarrier.dstQueueFamilyIndex = dstQueueFamilyIndex;
+
 		// Do transfer ownership only if the buffer hasn't STUDIOAPI_BUFFER_USAGE_FLAG_CONCURRENT
 		bIsNeedBarrier = !( bufferUsageFlags & STUDIOAPI_BUFFER_USAGE_FLAG_CONCURRENT );
 
 		// Make the transfer ownership barrier to another queue family if need a barrier
 		if ( bIsNeedBarrier && !syncState.bHasPendingOwnershipTransfer )
 		{
-			bufferMemoryBarrier.vkBufferMemoryBarrier.srcAccessMask		= syncState.readScope.vkAccessFlags | syncState.writeScope.vkAccessFlags;
-			bufferMemoryBarrier.vkSrcStageMask							= syncState.readScope.vkPipelineStages | syncState.writeScope.vkPipelineStages;
-			bufferMemoryBarrier.vkBufferMemoryBarrier.dstAccessMask		= VK_ACCESS_NONE;
-			bufferMemoryBarrier.vkDstStageMask							= VK_PIPELINE_STAGE_ALL_COMMANDS_BIT;
-			syncState.bHasPendingOwnershipTransfer = true;
+			bufferMemoryBarrier.vkBufferMemoryBarrier.srcAccessMask = syncState.readScope.vkAccessFlags | syncState.writeScope.vkAccessFlags;
+			bufferMemoryBarrier.vkSrcStageMask						= syncState.readScope.vkPipelineStages | syncState.writeScope.vkPipelineStages;
+			bufferMemoryBarrier.vkBufferMemoryBarrier.dstAccessMask = VK_ACCESS_NONE;
+			bufferMemoryBarrier.vkDstStageMask						= VK_PIPELINE_STAGE_ALL_COMMANDS_BIT;
+			syncState.bHasPendingOwnershipTransfer					= true;
 		}
 		// Make an acquire ownership barrier in another queue family
 		else
 		{
-			bufferMemoryBarrier.vkBufferMemoryBarrier.srcAccessMask		= VK_ACCESS_NONE;
-			bufferMemoryBarrier.vkSrcStageMask							= VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
-			bufferMemoryBarrier.vkBufferMemoryBarrier.dstAccessMask		= vkDstAccessMask;
-			syncState.bHasPendingOwnershipTransfer	= false;
+			bufferMemoryBarrier.vkBufferMemoryBarrier.srcAccessMask = VK_ACCESS_NONE;
+			bufferMemoryBarrier.vkSrcStageMask						= VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+			bufferMemoryBarrier.vkBufferMemoryBarrier.dstAccessMask = vkDstAccessMask;
+			syncState.bHasPendingOwnershipTransfer					= false;
 
 			// Remember all scopes for the new queue family
 			if ( vkDstReadAccessMask != VK_ACCESS_NONE )
 			{
-				syncState.readScope.vkAccessFlags		= vkDstReadAccessMask;
-				syncState.readScope.vkPipelineStages	= vkDstStageMask;
+				syncState.readScope.vkAccessFlags	 = vkDstReadAccessMask;
+				syncState.readScope.vkPipelineStages = vkDstStageMask;
 			}
 			else
 			{
-				syncState.readScope.vkAccessFlags		= VK_ACCESS_NONE;
-				syncState.readScope.vkPipelineStages	= VK_PIPELINE_STAGE_NONE;
+				syncState.readScope.vkAccessFlags	 = VK_ACCESS_NONE;
+				syncState.readScope.vkPipelineStages = VK_PIPELINE_STAGE_NONE;
 			}
 
 			if ( vkDstWriteAccessMask != VK_ACCESS_NONE )
 			{
-				syncState.writeScope.vkAccessFlags		= vkDstWriteAccessMask;
-				syncState.writeScope.vkPipelineStages	= vkDstStageMask;
+				syncState.writeScope.vkAccessFlags	  = vkDstWriteAccessMask;
+				syncState.writeScope.vkPipelineStages = vkDstStageMask;
 			}
 			else
 			{
-				syncState.writeScope.vkAccessFlags		= VK_ACCESS_NONE;
-				syncState.writeScope.vkPipelineStages	= VK_PIPELINE_STAGE_NONE;
+				syncState.writeScope.vkAccessFlags	  = VK_ACCESS_NONE;
+				syncState.writeScope.vkPipelineStages = VK_PIPELINE_STAGE_NONE;
 			}
 
 			// Remember the new owner
-			syncState.ownerQueueFamilyIndex	= dstQueueFamilyIndex;
+			syncState.ownerQueueFamilyIndex = dstQueueFamilyIndex;
 		}
 
 		// We are done
@@ -422,10 +423,10 @@ bool VK_UpdateSyncStateBufferWithBarrier( VkAccessFlags vkDstAccessMask, VkPipel
 	}
 
 	// Update the state for write operations
-	bool	bPreviousIsRead		= syncState.readScope.vkAccessFlags != VK_ACCESS_NONE;
-	bool	bPreviousIsWrite	= syncState.writeScope.vkAccessFlags != VK_ACCESS_NONE;
-	bool	bNewIsRead			= vkDstReadAccessMask != VK_ACCESS_NONE;
-	bool	bNewIsWrite			= vkDstWriteAccessMask != VK_ACCESS_NONE;
+	bool bPreviousIsRead  = syncState.readScope.vkAccessFlags != VK_ACCESS_NONE;
+	bool bPreviousIsWrite = syncState.writeScope.vkAccessFlags != VK_ACCESS_NONE;
+	bool bNewIsRead		  = vkDstReadAccessMask != VK_ACCESS_NONE;
+	bool bNewIsWrite	  = vkDstWriteAccessMask != VK_ACCESS_NONE;
 	Assert( !syncState.bHasPendingOwnershipTransfer );
 	if ( bNewIsWrite )
 	{
@@ -435,17 +436,17 @@ bool VK_UpdateSyncStateBufferWithBarrier( VkAccessFlags vkDstAccessMask, VkPipel
 			// Set source stage and access masks
 			bufferMemoryBarrier.vkSrcStageMask						= syncState.readScope.vkPipelineStages | syncState.writeScope.vkPipelineStages;
 			bufferMemoryBarrier.vkBufferMemoryBarrier.srcAccessMask = syncState.readScope.vkAccessFlags | syncState.writeScope.vkAccessFlags;
-			bufferMemoryBarrier.vkBufferMemoryBarrier.dstAccessMask	= vkDstReadAccessMask | vkDstWriteAccessMask;
+			bufferMemoryBarrier.vkBufferMemoryBarrier.dstAccessMask = vkDstReadAccessMask | vkDstWriteAccessMask;
 			bIsNeedBarrier											= bufferMemoryBarrier.vkSrcStageMask != VK_PIPELINE_STAGE_NONE;
 		}
 
 		// Store where write happened
-		syncState.writeScope.vkAccessFlags		= vkDstWriteAccessMask;
-		syncState.writeScope.vkPipelineStages	= vkDstStageMask;
+		syncState.writeScope.vkAccessFlags	  = vkDstWriteAccessMask;
+		syncState.writeScope.vkPipelineStages = vkDstStageMask;
 
 		// Reset read state
-		syncState.readScope.vkAccessFlags		= VK_ACCESS_NONE;
-		syncState.readScope.vkPipelineStages	= VK_PIPELINE_STAGE_NONE;
+		syncState.readScope.vkAccessFlags	 = VK_ACCESS_NONE;
+		syncState.readScope.vkPipelineStages = VK_PIPELINE_STAGE_NONE;
 	}
 
 	// Update the state for read operations
@@ -463,15 +464,14 @@ bool VK_UpdateSyncStateBufferWithBarrier( VkAccessFlags vkDstAccessMask, VkPipel
 
 		// Check whether this is a new barrier
 		// If not we already synchronized, no need to do a barrier
-		if ( ( syncState.readScope.vkAccessFlags & vkDstReadAccessMask ) == vkDstReadAccessMask &&
-			 ( syncState.readScope.vkPipelineStages & vkDstStageMask ) == vkDstStageMask )
+		if ( ( syncState.readScope.vkAccessFlags & vkDstReadAccessMask ) == vkDstReadAccessMask && ( syncState.readScope.vkPipelineStages & vkDstStageMask ) == vkDstStageMask )
 		{
 			bIsNeedBarrier = false;
 		}
 
 		// Remember this read happened
-		syncState.readScope.vkAccessFlags		|= vkDstReadAccessMask;
-		syncState.readScope.vkPipelineStages	|= vkDstStageMask;
+		syncState.readScope.vkAccessFlags |= vkDstReadAccessMask;
+		syncState.readScope.vkPipelineStages |= vkDstStageMask;
 	}
 
 	return bIsNeedBarrier;
@@ -485,10 +485,10 @@ VK_UpdateSyncStateImage
 void VK_UpdateSyncStateImage( VkImageLayout vkDstImageLayout, VkAccessFlags vkDstAccessMask, VkPipelineStageFlags vkDstStageMask, uint32 dstQueueFamilyIndex, studioAPISyncStateImageVk_t& syncState )
 {
 	// Split vkDstAccessMask by read and write mask and get a source image layout
-	VkAccessFlags	vkDstReadAccessMask		= vkDstAccessMask & STUDIOAPI_VK_ACCESS_READ_FLAGS;
-	VkAccessFlags	vkDstWriteAccessMask	= vkDstAccessMask & STUDIOAPI_VK_ACCESS_WRITE_FLAGS;
-	VkImageLayout	vkSrcImageLayout		= ( vkDstReadAccessMask == 0 ) ? VK_IMAGE_LAYOUT_UNDEFINED : syncState.vkImageLayout;
-	bool			bIsLayoutTransfer		= vkDstImageLayout != vkSrcImageLayout;
+	VkAccessFlags vkDstReadAccessMask  = vkDstAccessMask & STUDIOAPI_VK_ACCESS_READ_FLAGS;
+	VkAccessFlags vkDstWriteAccessMask = vkDstAccessMask & STUDIOAPI_VK_ACCESS_WRITE_FLAGS;
+	VkImageLayout vkSrcImageLayout	   = ( vkDstReadAccessMask == 0 ) ? VK_IMAGE_LAYOUT_UNDEFINED : syncState.vkImageLayout;
+	bool		  bIsLayoutTransfer	   = vkDstImageLayout != vkSrcImageLayout;
 	Assert( ( vkDstAccessMask & ~( STUDIOAPI_VK_ACCESS_KNOWN_FLAGS ) ) == 0 );
 
 	// Save a new owner queue family if early the resource not used
@@ -502,58 +502,58 @@ void VK_UpdateSyncStateImage( VkImageLayout vkDstImageLayout, VkAccessFlags vkDs
 		// Remember all scopes for the new queue family
 		if ( vkDstReadAccessMask != VK_ACCESS_NONE )
 		{
-			syncState.readScope.vkAccessFlags		= vkDstReadAccessMask;
-			syncState.readScope.vkPipelineStages	= vkDstStageMask;
+			syncState.readScope.vkAccessFlags	 = vkDstReadAccessMask;
+			syncState.readScope.vkPipelineStages = vkDstStageMask;
 		}
 		else
 		{
-			syncState.readScope.vkAccessFlags		= VK_ACCESS_NONE;
-			syncState.readScope.vkPipelineStages	= VK_PIPELINE_STAGE_NONE;
+			syncState.readScope.vkAccessFlags	 = VK_ACCESS_NONE;
+			syncState.readScope.vkPipelineStages = VK_PIPELINE_STAGE_NONE;
 		}
 
 		if ( vkDstWriteAccessMask != VK_ACCESS_NONE )
 		{
-			syncState.writeScope.vkAccessFlags		= vkDstWriteAccessMask;
-			syncState.writeScope.vkPipelineStages	= vkDstStageMask;
+			syncState.writeScope.vkAccessFlags	  = vkDstWriteAccessMask;
+			syncState.writeScope.vkPipelineStages = vkDstStageMask;
 		}
 		else
 		{
-			syncState.writeScope.vkAccessFlags		= VK_ACCESS_NONE;
-			syncState.writeScope.vkPipelineStages	= VK_PIPELINE_STAGE_NONE;
+			syncState.writeScope.vkAccessFlags	  = VK_ACCESS_NONE;
+			syncState.writeScope.vkPipelineStages = VK_PIPELINE_STAGE_NONE;
 		}
-		
+
 		// Remember the new image layout, owner queue family index
 		Assert( !syncState.bHasPendingOwnershipTransfer );
-		syncState.vkImageLayout				= vkDstImageLayout;
-		syncState.ownerQueueFamilyIndex		= dstQueueFamilyIndex;
-		
+		syncState.vkImageLayout			= vkDstImageLayout;
+		syncState.ownerQueueFamilyIndex = dstQueueFamilyIndex;
+
 		// We are done
 		return;
 	}
 
 	// Update the state for write operations and image layout transfer
-	bool	bNewIsRead		= vkDstReadAccessMask != VK_ACCESS_NONE;
-	bool	bNewIsWrite		= vkDstWriteAccessMask != VK_ACCESS_NONE;
+	bool bNewIsRead	 = vkDstReadAccessMask != VK_ACCESS_NONE;
+	bool bNewIsWrite = vkDstWriteAccessMask != VK_ACCESS_NONE;
 	if ( bNewIsWrite || bIsLayoutTransfer )
 	{
 		// Store where write happened
-		syncState.writeScope.vkAccessFlags		= vkDstWriteAccessMask;
-		syncState.writeScope.vkPipelineStages	= vkDstStageMask;
+		syncState.writeScope.vkAccessFlags	  = vkDstWriteAccessMask;
+		syncState.writeScope.vkPipelineStages = vkDstStageMask;
 
 		// Reset read state
-		syncState.readScope.vkAccessFlags		= VK_ACCESS_NONE;
-		syncState.readScope.vkPipelineStages	= VK_PIPELINE_STAGE_NONE;
+		syncState.readScope.vkAccessFlags	 = VK_ACCESS_NONE;
+		syncState.readScope.vkPipelineStages = VK_PIPELINE_STAGE_NONE;
 
 		// Store a new image layout
-		syncState.vkImageLayout					= vkDstImageLayout;
+		syncState.vkImageLayout = vkDstImageLayout;
 	}
 
 	// Update the state for read operations
 	if ( bNewIsRead )
 	{
 		// Remember this read happened
-		syncState.readScope.vkAccessFlags		|= vkDstReadAccessMask;
-		syncState.readScope.vkPipelineStages	|= vkDstStageMask;
+		syncState.readScope.vkAccessFlags |= vkDstReadAccessMask;
+		syncState.readScope.vkPipelineStages |= vkDstStageMask;
 	}
 }
 
@@ -565,11 +565,11 @@ VK_UpdateSyncStateImageWithBarrier
 bool VK_UpdateSyncStateImageWithBarrier( VkImageLayout vkDstImageLayout, VkAccessFlags vkDstAccessMask, VkPipelineStageFlags vkDstStageMask, uint32 dstQueueFamilyIndex, studioAPISyncStateImageVk_t& syncState, studioAPIImageMemoryBarrierVk_t& imageMemoryBarrier, uint32 textureUsageFlags )
 {
 	// Split vkDstAccessMask by read and write mask and get a source image layout
-	bool			bIsNeedBarrier			= false;
-	VkAccessFlags	vkDstReadAccessMask		= vkDstAccessMask & STUDIOAPI_VK_ACCESS_READ_FLAGS;
-	VkAccessFlags	vkDstWriteAccessMask	= vkDstAccessMask & STUDIOAPI_VK_ACCESS_WRITE_FLAGS;
-	VkImageLayout	vkSrcImageLayout		= ( vkDstReadAccessMask == 0 ) ? VK_IMAGE_LAYOUT_UNDEFINED : syncState.vkImageLayout;
-	bool			bIsLayoutTransfer		= vkDstImageLayout != vkSrcImageLayout;
+	bool		  bIsNeedBarrier	   = false;
+	VkAccessFlags vkDstReadAccessMask  = vkDstAccessMask & STUDIOAPI_VK_ACCESS_READ_FLAGS;
+	VkAccessFlags vkDstWriteAccessMask = vkDstAccessMask & STUDIOAPI_VK_ACCESS_WRITE_FLAGS;
+	VkImageLayout vkSrcImageLayout	   = ( vkDstReadAccessMask == 0 ) ? VK_IMAGE_LAYOUT_UNDEFINED : syncState.vkImageLayout;
+	bool		  bIsLayoutTransfer	   = vkDstImageLayout != vkSrcImageLayout;
 	Assert( ( vkDstAccessMask & ~( STUDIOAPI_VK_ACCESS_KNOWN_FLAGS ) ) == 0 );
 
 	// Initialize base fields of an image barrier and reset output fields
@@ -580,7 +580,7 @@ bool VK_UpdateSyncStateImageWithBarrier( VkImageLayout vkDstImageLayout, VkAcces
 	imageMemoryBarrier.vkImageMemoryBarrier.dstQueueFamilyIndex				= VK_QUEUE_FAMILY_IGNORED;
 	imageMemoryBarrier.vkImageMemoryBarrier.subresourceRange.baseMipLevel	= 0;
 	imageMemoryBarrier.vkImageMemoryBarrier.subresourceRange.levelCount		= VK_REMAINING_MIP_LEVELS;
-	imageMemoryBarrier.vkImageMemoryBarrier.subresourceRange.baseArrayLayer	= 0;
+	imageMemoryBarrier.vkImageMemoryBarrier.subresourceRange.baseArrayLayer = 0;
 	imageMemoryBarrier.vkImageMemoryBarrier.subresourceRange.layerCount		= VK_REMAINING_ARRAY_LAYERS;
 	imageMemoryBarrier.vkSrcStageMask										= VK_PIPELINE_STAGE_NONE;
 	imageMemoryBarrier.vkDstStageMask										= vkDstStageMask;
@@ -594,55 +594,55 @@ bool VK_UpdateSyncStateImageWithBarrier( VkImageLayout vkDstImageLayout, VkAcces
 	else if ( syncState.ownerQueueFamilyIndex != dstQueueFamilyIndex )
 	{
 		// Set source and destination queue family index
-		imageMemoryBarrier.vkImageMemoryBarrier.srcQueueFamilyIndex		= syncState.ownerQueueFamilyIndex;
-		imageMemoryBarrier.vkImageMemoryBarrier.dstQueueFamilyIndex		= dstQueueFamilyIndex;
-		
+		imageMemoryBarrier.vkImageMemoryBarrier.srcQueueFamilyIndex = syncState.ownerQueueFamilyIndex;
+		imageMemoryBarrier.vkImageMemoryBarrier.dstQueueFamilyIndex = dstQueueFamilyIndex;
+
 		// Do transfer ownership only if the buffer hasn't STUDIOAPI_TEXTURE_USAGE_FLAG_CONCURRENT
 		bIsNeedBarrier = !( textureUsageFlags & STUDIOAPI_TEXTURE_USAGE_FLAG_CONCURRENT );
 
 		// Make the transfer ownership barrier to another queue family if need a barrier
 		if ( bIsNeedBarrier && !syncState.bHasPendingOwnershipTransfer )
 		{
-			imageMemoryBarrier.vkImageMemoryBarrier.srcAccessMask		= syncState.readScope.vkAccessFlags | syncState.writeScope.vkAccessFlags;
-			imageMemoryBarrier.vkSrcStageMask							= syncState.readScope.vkPipelineStages | syncState.writeScope.vkPipelineStages;
-			imageMemoryBarrier.vkImageMemoryBarrier.dstAccessMask		= VK_ACCESS_NONE;
-			imageMemoryBarrier.vkDstStageMask							= VK_PIPELINE_STAGE_ALL_COMMANDS_BIT;
-			syncState.bHasPendingOwnershipTransfer = true;
+			imageMemoryBarrier.vkImageMemoryBarrier.srcAccessMask = syncState.readScope.vkAccessFlags | syncState.writeScope.vkAccessFlags;
+			imageMemoryBarrier.vkSrcStageMask					  = syncState.readScope.vkPipelineStages | syncState.writeScope.vkPipelineStages;
+			imageMemoryBarrier.vkImageMemoryBarrier.dstAccessMask = VK_ACCESS_NONE;
+			imageMemoryBarrier.vkDstStageMask					  = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT;
+			syncState.bHasPendingOwnershipTransfer				  = true;
 		}
 		// Make an acquire ownership barrier in another queue family
 		else
 		{
-			imageMemoryBarrier.vkImageMemoryBarrier.srcAccessMask		= VK_ACCESS_NONE;
-			imageMemoryBarrier.vkSrcStageMask							= VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
-			imageMemoryBarrier.vkImageMemoryBarrier.dstAccessMask		= vkDstAccessMask;
-			syncState.bHasPendingOwnershipTransfer	= false;
+			imageMemoryBarrier.vkImageMemoryBarrier.srcAccessMask = VK_ACCESS_NONE;
+			imageMemoryBarrier.vkSrcStageMask					  = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+			imageMemoryBarrier.vkImageMemoryBarrier.dstAccessMask = vkDstAccessMask;
+			syncState.bHasPendingOwnershipTransfer				  = false;
 
 			// Remember all scopes for the new queue family
 			if ( vkDstReadAccessMask != VK_ACCESS_NONE )
 			{
-				syncState.readScope.vkAccessFlags		= vkDstReadAccessMask;
-				syncState.readScope.vkPipelineStages	= vkDstStageMask;
+				syncState.readScope.vkAccessFlags	 = vkDstReadAccessMask;
+				syncState.readScope.vkPipelineStages = vkDstStageMask;
 			}
 			else
 			{
-				syncState.readScope.vkAccessFlags		= VK_ACCESS_NONE;
-				syncState.readScope.vkPipelineStages	= VK_PIPELINE_STAGE_NONE;
+				syncState.readScope.vkAccessFlags	 = VK_ACCESS_NONE;
+				syncState.readScope.vkPipelineStages = VK_PIPELINE_STAGE_NONE;
 			}
 
 			if ( vkDstWriteAccessMask != VK_ACCESS_NONE )
 			{
-				syncState.writeScope.vkAccessFlags		= vkDstWriteAccessMask;
-				syncState.writeScope.vkPipelineStages	= vkDstStageMask;
+				syncState.writeScope.vkAccessFlags	  = vkDstWriteAccessMask;
+				syncState.writeScope.vkPipelineStages = vkDstStageMask;
 			}
 			else
 			{
-				syncState.writeScope.vkAccessFlags		= VK_ACCESS_NONE;
-				syncState.writeScope.vkPipelineStages	= VK_PIPELINE_STAGE_NONE;
+				syncState.writeScope.vkAccessFlags	  = VK_ACCESS_NONE;
+				syncState.writeScope.vkPipelineStages = VK_PIPELINE_STAGE_NONE;
 			}
 
 			// Remember the new owner and image layout
 			syncState.vkImageLayout			= vkDstImageLayout;
-			syncState.ownerQueueFamilyIndex	= dstQueueFamilyIndex;
+			syncState.ownerQueueFamilyIndex = dstQueueFamilyIndex;
 		}
 
 		// We are done
@@ -650,10 +650,10 @@ bool VK_UpdateSyncStateImageWithBarrier( VkImageLayout vkDstImageLayout, VkAcces
 	}
 
 	// Update the state for write operations and image layout transfer
-	bool	bPreviousIsRead		= syncState.readScope.vkAccessFlags != VK_ACCESS_NONE;
-	bool	bPreviousIsWrite	= syncState.writeScope.vkAccessFlags != VK_ACCESS_NONE;
-	bool	bNewIsRead			= vkDstReadAccessMask != VK_ACCESS_NONE;
-	bool	bNewIsWrite			= vkDstWriteAccessMask != VK_ACCESS_NONE;
+	bool bPreviousIsRead  = syncState.readScope.vkAccessFlags != VK_ACCESS_NONE;
+	bool bPreviousIsWrite = syncState.writeScope.vkAccessFlags != VK_ACCESS_NONE;
+	bool bNewIsRead		  = vkDstReadAccessMask != VK_ACCESS_NONE;
+	bool bNewIsWrite	  = vkDstWriteAccessMask != VK_ACCESS_NONE;
 	Assert( !syncState.bHasPendingOwnershipTransfer );
 	if ( bNewIsWrite || bIsLayoutTransfer )
 	{
@@ -661,10 +661,10 @@ bool VK_UpdateSyncStateImageWithBarrier( VkImageLayout vkDstImageLayout, VkAcces
 		if ( bPreviousIsRead || bPreviousIsWrite || bIsLayoutTransfer )
 		{
 			// Set source stage and access masks
-			imageMemoryBarrier.vkSrcStageMask						= syncState.readScope.vkPipelineStages | syncState.writeScope.vkPipelineStages;
-			imageMemoryBarrier.vkImageMemoryBarrier.srcAccessMask	= syncState.readScope.vkAccessFlags | syncState.writeScope.vkAccessFlags;
-			imageMemoryBarrier.vkImageMemoryBarrier.dstAccessMask	= vkDstReadAccessMask | vkDstWriteAccessMask;
-			bIsNeedBarrier											= bIsLayoutTransfer || imageMemoryBarrier.vkSrcStageMask != VK_PIPELINE_STAGE_NONE;
+			imageMemoryBarrier.vkSrcStageMask					  = syncState.readScope.vkPipelineStages | syncState.writeScope.vkPipelineStages;
+			imageMemoryBarrier.vkImageMemoryBarrier.srcAccessMask = syncState.readScope.vkAccessFlags | syncState.writeScope.vkAccessFlags;
+			imageMemoryBarrier.vkImageMemoryBarrier.dstAccessMask = vkDstReadAccessMask | vkDstWriteAccessMask;
+			bIsNeedBarrier										  = bIsLayoutTransfer || imageMemoryBarrier.vkSrcStageMask != VK_PIPELINE_STAGE_NONE;
 
 			// Set source stage mask into vkDstStageMask if we need issue barrier, but the stage isn't valid
 			if ( bIsNeedBarrier && imageMemoryBarrier.vkSrcStageMask == VK_PIPELINE_STAGE_NONE )
@@ -675,15 +675,15 @@ bool VK_UpdateSyncStateImageWithBarrier( VkImageLayout vkDstImageLayout, VkAcces
 		}
 
 		// Store where write happened
-		syncState.writeScope.vkAccessFlags		= vkDstWriteAccessMask;
-		syncState.writeScope.vkPipelineStages	= vkDstStageMask;
+		syncState.writeScope.vkAccessFlags	  = vkDstWriteAccessMask;
+		syncState.writeScope.vkPipelineStages = vkDstStageMask;
 
 		// Reset read state
-		syncState.readScope.vkAccessFlags		= VK_ACCESS_NONE;
-		syncState.readScope.vkPipelineStages	= VK_PIPELINE_STAGE_NONE;
+		syncState.readScope.vkAccessFlags	 = VK_ACCESS_NONE;
+		syncState.readScope.vkPipelineStages = VK_PIPELINE_STAGE_NONE;
 
 		// Store a new image layout
-		syncState.vkImageLayout					= vkDstImageLayout;
+		syncState.vkImageLayout = vkDstImageLayout;
 	}
 
 	// Update the state for read operations
@@ -693,24 +693,22 @@ bool VK_UpdateSyncStateImageWithBarrier( VkImageLayout vkDstImageLayout, VkAcces
 		if ( !bNewIsWrite && !bIsLayoutTransfer && bPreviousIsWrite )
 		{
 			// Set source stage and access masks
-			imageMemoryBarrier.vkSrcStageMask						= syncState.writeScope.vkPipelineStages;
-			imageMemoryBarrier.vkImageMemoryBarrier.srcAccessMask	= syncState.writeScope.vkAccessFlags;
-			imageMemoryBarrier.vkImageMemoryBarrier.dstAccessMask	= syncState.readScope.vkAccessFlags | vkDstReadAccessMask;
-			bIsNeedBarrier											= imageMemoryBarrier.vkSrcStageMask != VK_PIPELINE_STAGE_NONE;
+			imageMemoryBarrier.vkSrcStageMask					  = syncState.writeScope.vkPipelineStages;
+			imageMemoryBarrier.vkImageMemoryBarrier.srcAccessMask = syncState.writeScope.vkAccessFlags;
+			imageMemoryBarrier.vkImageMemoryBarrier.dstAccessMask = syncState.readScope.vkAccessFlags | vkDstReadAccessMask;
+			bIsNeedBarrier										  = imageMemoryBarrier.vkSrcStageMask != VK_PIPELINE_STAGE_NONE;
 		}
 
 		// Check whether this is a new barrier
 		// If not we already synchronized, no need to do a barrier
-		if ( ( syncState.readScope.vkAccessFlags & vkDstReadAccessMask ) == vkDstReadAccessMask &&
-			 ( syncState.readScope.vkPipelineStages & vkDstStageMask ) == vkDstStageMask &&
-			 !bIsLayoutTransfer )
+		if ( ( syncState.readScope.vkAccessFlags & vkDstReadAccessMask ) == vkDstReadAccessMask && ( syncState.readScope.vkPipelineStages & vkDstStageMask ) == vkDstStageMask && !bIsLayoutTransfer )
 		{
 			bIsNeedBarrier = false;
 		}
 
 		// Remember this read happened
-		syncState.readScope.vkAccessFlags		|= vkDstReadAccessMask;
-		syncState.readScope.vkPipelineStages	|= vkDstStageMask;
+		syncState.readScope.vkAccessFlags |= vkDstReadAccessMask;
+		syncState.readScope.vkPipelineStages |= vkDstStageMask;
 	}
 
 	return bIsNeedBarrier;

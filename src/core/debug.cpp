@@ -13,27 +13,25 @@ public:
 	virtual void SetGroupActivate( logGroup_t group, bool bActivate ) override;
 	virtual bool IsGroupActive( logGroup_t group ) const override;
 
-	virtual void Printf( logGroup_t group, logLevel_t level, const achar* pFormat, ... ) override;
-	virtual void VPrintf( logGroup_t group, logLevel_t level, const achar* pFormat, va_list params ) override;
-	virtual void SetTextColor( logTextColor_t textColor ) override;
+	virtual void		   Printf( logGroup_t group, logLevel_t level, const char* pFormat, ... ) override;
+	virtual void		   VPrintf( logGroup_t group, logLevel_t level, const char* pFormat, va_list params ) override;
+	virtual void		   SetTextColor( logTextColor_t textColor ) override;
 	virtual logTextColor_t GetTextColor() const override;
 
 	CLogger();
 
 private:
-	std::vector<ILogOutput*>	outputs;
-	bool						bActiveGroups[LOG_NUM_GROUPS];
-	logTextColor_t				textColor;
+	std::vector<ILogOutput*> outputs;
+	bool					 bActiveGroups[LOG_NUM_GROUPS];
+	logTextColor_t			 textColor;
 };
 
-static const achar*				s_pLogLevelNames[] =
-{
+static const char* s_pLogLevelNames[] = {
 	"Msg",		// LOG_LEVEL_MESSAGE
 	"Warning",	// LOG_LEVEL_WARNING
 	"Error"		// LOG_LEVEL_ERROR
 };
 static_assert( ARRAYSIZE( s_pLogLevelNames ) == LOG_NUM_LEVELS, "Invalid array size of s_pLogLevelNames, must be equal to LOG_NUM_LEVELS" );
-
 
 /*
 ==================
@@ -43,8 +41,8 @@ CLogger::CLogger
 CLogger::CLogger()
 	: textColor( LOG_TEXT_COLOR_DEFAULT )
 {
-	bActiveGroups[LOG_GROUP_GENERAL]	= true;
-	bActiveGroups[LOG_GROUP_DEVELOPER]	= false;
+	bActiveGroups[LOG_GROUP_GENERAL]   = true;
+	bActiveGroups[LOG_GROUP_DEVELOPER] = false;
 	Sys_SetupDefaultLogOutputs( this );
 }
 
@@ -66,7 +64,7 @@ CLogger::RemoveOutput
 */
 void CLogger::RemoveOutput( ILogOutput* pLogOutput )
 {
-	for ( uint32 index = 0, count = ( uint32 )outputs.size(); index < count; ++index )
+	for ( uint32 index = 0, count = (uint32)outputs.size(); index < count; ++index )
 	{
 		if ( outputs[index] == pLogOutput )
 		{
@@ -113,9 +111,9 @@ bool CLogger::IsGroupActive( logGroup_t group ) const
 CLogger::Printf
 ==================
 */
-void CLogger::Printf( logGroup_t group, logLevel_t level, const achar* pFormat, ... )
+void CLogger::Printf( logGroup_t group, logLevel_t level, const char* pFormat, ... )
 {
-	va_list		params;
+	va_list params;
 	va_start( params, pFormat );
 	VPrintf( group, level, pFormat, params );
 	va_end( params );
@@ -126,13 +124,13 @@ void CLogger::Printf( logGroup_t group, logLevel_t level, const achar* pFormat, 
 CLogger::VPrintf
 ==================
 */
-void CLogger::VPrintf( logGroup_t group, logLevel_t level, const achar* pFormat, va_list params )
+void CLogger::VPrintf( logGroup_t group, logLevel_t level, const char* pFormat, va_list params )
 {
 	if ( IsGroupActive( group ) )
 	{
 		Assert( level < LOG_NUM_LEVELS );
-		std::string		message = S_Sprintf( "%s: %s\n", s_pLogLevelNames[level], S_Vsprintf( pFormat, params ).c_str() );
-		for ( uint32 index = 0, count = ( uint32 )outputs.size(); index < count; ++index )
+		std::string message = S_Sprintf( "%s: %s\n", s_pLogLevelNames[level], S_Vsprintf( pFormat, params ).c_str() );
+		for ( uint32 index = 0, count = (uint32)outputs.size(); index < count; ++index )
 		{
 			outputs[index]->Print( level, message.c_str() );
 		}
@@ -147,7 +145,7 @@ CLogger::SetTextColor
 void CLogger::SetTextColor( logTextColor_t textColor )
 {
 	CLogger::textColor = textColor;
-	for ( uint32 index = 0, count = ( uint32 )outputs.size(); index < count; ++index )
+	for ( uint32 index = 0, count = (uint32)outputs.size(); index < count; ++index )
 	{
 		outputs[index]->SetTextColor( textColor );
 	}
@@ -163,17 +161,16 @@ logTextColor_t CLogger::GetTextColor() const
 	return textColor;
 }
 
-
 /*
 ==================
 Msg
 ==================
 */
-void Msg( const achar* pFormat, ... )
+void Msg( const char* pFormat, ... )
 {
-	va_list			params;
+	va_list params;
 	va_start( params, pFormat );
-	Logger()->VPrintf(LOG_GROUP_GENERAL, LOG_LEVEL_MESSAGE, pFormat, params);
+	Logger()->VPrintf( LOG_GROUP_GENERAL, LOG_LEVEL_MESSAGE, pFormat, params );
 	va_end( params );
 }
 
@@ -182,9 +179,9 @@ void Msg( const achar* pFormat, ... )
 Warning
 ==================
 */
-void Warning( const achar* pFormat, ... )
+void Warning( const char* pFormat, ... )
 {
-	va_list			params;
+	va_list params;
 	va_start( params, pFormat );
 	Logger()->VPrintf( LOG_GROUP_GENERAL, LOG_LEVEL_WARNING, pFormat, params );
 	va_end( params );
@@ -195,9 +192,9 @@ void Warning( const achar* pFormat, ... )
 Error
 ==================
 */
-void Error( const achar* pFormat, ... )
+void Error( const char* pFormat, ... )
 {
-	va_list			params;
+	va_list params;
 	va_start( params, pFormat );
 	Logger()->VPrintf( LOG_GROUP_GENERAL, LOG_LEVEL_ERROR, pFormat, params );
 	va_end( params );
@@ -208,9 +205,9 @@ void Error( const achar* pFormat, ... )
 DevMsg
 ==================
 */
-void DevMsg( const achar* pFormat, ... )
+void DevMsg( const char* pFormat, ... )
 {
-	va_list			params;
+	va_list params;
 	va_start( params, pFormat );
 	Logger()->VPrintf( LOG_GROUP_DEVELOPER, LOG_LEVEL_MESSAGE, pFormat, params );
 	va_end( params );
@@ -221,9 +218,9 @@ void DevMsg( const achar* pFormat, ... )
 DevWarning
 ==================
 */
-void DevWarning( const achar* pFormat, ... )
+void DevWarning( const char* pFormat, ... )
 {
-	va_list			params;
+	va_list params;
 	va_start( params, pFormat );
 	Logger()->VPrintf( LOG_GROUP_DEVELOPER, LOG_LEVEL_WARNING, pFormat, params );
 	va_end( params );
@@ -234,9 +231,9 @@ void DevWarning( const achar* pFormat, ... )
 DevError
 ==================
 */
-void DevError( const achar* pFormat, ... )
+void DevError( const char* pFormat, ... )
 {
-	va_list			params;
+	va_list params;
 	va_start( params, pFormat );
 	Logger()->VPrintf( LOG_GROUP_DEVELOPER, LOG_LEVEL_ERROR, pFormat, params );
 	va_end( params );
@@ -246,19 +243,19 @@ class CNullLogger : public ILogger
 {
 public:
 	// ILogger interface
-	virtual void AddOutput( ILogOutput* pLogOutput )														{}
-	virtual void RemoveOutput( ILogOutput* pLogOutput )														{}
-	virtual void RemoveAllOutputs()																			{}
+	virtual void AddOutput( ILogOutput* pLogOutput ) {}
+	virtual void RemoveOutput( ILogOutput* pLogOutput ) {}
+	virtual void RemoveAllOutputs() {}
 
-	virtual void SetGroupActivate( logGroup_t group, bool bActivate )										{}
-	virtual bool IsGroupActive( logGroup_t group ) const													{ return false; }
+	virtual void SetGroupActivate( logGroup_t group, bool bActivate ) {}
+	virtual bool IsGroupActive( logGroup_t group ) const { return false; }
 
-	virtual void Printf( logGroup_t group, logLevel_t level, const achar* pFormat, ... )					{}
-	virtual void VPrintf( logGroup_t group, logLevel_t level, const achar* pFormat, va_list params )		{}
-	virtual void SetTextColor( logTextColor_t textColor )													{}
-	virtual logTextColor_t GetTextColor() const																{ return LOG_TEXT_COLOR_DEFAULT; }
+	virtual void		   Printf( logGroup_t group, logLevel_t level, const char* pFormat, ... ) {}
+	virtual void		   VPrintf( logGroup_t group, logLevel_t level, const char* pFormat, va_list params ) {}
+	virtual void		   SetTextColor( logTextColor_t textColor ) {}
+	virtual logTextColor_t GetTextColor() const { return LOG_TEXT_COLOR_DEFAULT; }
 };
-#endif // ENABLE_LOGGING
+#endif	// ENABLE_LOGGING
 
 /*
 ==================
@@ -268,14 +265,13 @@ Logger
 ILogger* Logger()
 {
 #if ENABLE_LOGGING
-	static CLogger			s_Logger;
+	static CLogger s_Logger;
 	return &s_Logger;
 #else
-	static CNullLogger		s_NullLogger;
+	static CNullLogger s_NullLogger;
 	return &s_NullLogger;
-#endif // ENABLE_LOGGING
+#endif	// ENABLE_LOGGING
 }
-
 
 #if ENABLE_ASSERT
 /*
@@ -283,10 +279,10 @@ ILogger* Logger()
 Sys_AssertFailed
 ==================
 */
-bool Sys_AssertFailed( const achar* pExpr, const achar* pFile, int32 line, const achar* pFormat /*= "" */, ... )
+bool Sys_AssertFailed( const char* pExpr, const char* pFile, int32 line, const char* pFormat /*= "" */, ... )
 {
 	// Don't show message if we already shutdown the game by a critical error
-	static bool		s_bAlreadyHasError = false;
+	static bool s_bAlreadyHasError = false;
 	if ( s_bAlreadyHasError )
 	{
 		return false;
@@ -294,9 +290,9 @@ bool Sys_AssertFailed( const achar* pExpr, const achar* pFile, int32 line, const
 	s_bAlreadyHasError = true;
 
 	// Get the message
-	va_list			params;
+	va_list params;
 	va_start( params, pFormat );
-	std::string		message = S_Strlen( pFormat ) > 0 ? S_Vsprintf( pFormat, params ) : "<None>";
+	std::string message = S_Strlen( pFormat ) > 0 ? S_Vsprintf( pFormat, params ) : "<None>";
 	va_end( params );
 
 	// Print the message and show message box
@@ -312,7 +308,7 @@ bool Sys_AssertFailed( const achar* pExpr, const achar* pFile, int32 line, const
 	{
 		Sys_DebugBreak();
 	}
-	std::string		fullMessage = S_Sprintf( "Expression: %s\nMessage: %s\n\nFile: %s\nLine: %i", pExpr, message.c_str(), pFile, line );
+	std::string fullMessage = S_Sprintf( "Expression: %s\nMessage: %s\n\nFile: %s\nLine: %i", pExpr, message.c_str(), pFile, line );
 	Sys_ShowMessageBox( "Singularity Error", fullMessage.c_str(), MESSAGE_BOX_ERROR );
 
 	// Set crash dump message
@@ -322,25 +318,24 @@ bool Sys_AssertFailed( const achar* pExpr, const achar* pFile, int32 line, const
 	Sys_RequestExit( true );
 	return true;
 }
-#endif // ENABLE_ASSERT
-
+#endif	// ENABLE_ASSERT
 
 #if ENABLE_ENSURE
-static bool		s_bEnsureAllowed = true;
+static bool s_bEnsureAllowed = true;
 
 /*
 ==================
 Sys_EnsureFailed
 ==================
 */
-bool Sys_EnsureFailed( const achar* pExpr, const achar* pFile, int32 line, bool bAlways, const achar* pFormat /*= ""*/, ... )
+bool Sys_EnsureFailed( const char* pExpr, const char* pFile, int32 line, bool bAlways, const char* pFormat /*= ""*/, ... )
 {
 	if ( bAlways || s_bEnsureAllowed )
 	{
 		// Get the final message
-		va_list			params;
+		va_list params;
 		va_start( params, pFormat );
-		std::string		message = S_Strlen( pFormat ) > 0 ? S_Vsprintf( pFormat, params ) : "<None>";
+		std::string message = S_Strlen( pFormat ) > 0 ? S_Vsprintf( pFormat, params ) : "<None>";
 		va_end( params );
 
 		// Print the message
@@ -371,4 +366,4 @@ void Sys_SetEnsureAllow( bool bAllowed )
 {
 	s_bEnsureAllowed = bAllowed;
 }
-#endif // ENABLE_ENSURE
+#endif	// ENABLE_ENSURE

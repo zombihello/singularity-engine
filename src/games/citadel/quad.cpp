@@ -8,9 +8,9 @@ CQuad::Init
 */
 void CQuad::Init( IStudioAPIBuffer* pStudioAPIVertexBuffer, IStudioAPIBuffer* pStudioAPIIndexBuffer, IResource* pMaterial )
 {
-	CQuad::pStudioAPIVertexBuffer	= pStudioAPIVertexBuffer;
-	CQuad::pStudioAPIIndexBuffer	= pStudioAPIIndexBuffer;
-	CQuad::pMaterial				= pMaterial;
+	CQuad::pStudioAPIVertexBuffer = pStudioAPIVertexBuffer;
+	CQuad::pStudioAPIIndexBuffer  = pStudioAPIIndexBuffer;
+	CQuad::pMaterial			  = pMaterial;
 }
 
 /*
@@ -20,11 +20,10 @@ CQuad::Shutdown
 */
 void CQuad::Shutdown()
 {
-	pStudioAPIVertexBuffer	= NULL;
-	pStudioAPIIndexBuffer	= NULL;
-	pMaterial				= NULL;
+	pStudioAPIVertexBuffer = NULL;
+	pStudioAPIIndexBuffer  = NULL;
+	pMaterial			   = NULL;
 }
-
 
 /*
 ==================
@@ -33,6 +32,6 @@ Quad
 */
 CQuad& Quad()
 {
-	static CQuad	s_Quad;
+	static CQuad s_Quad;
 	return s_Quad;
 }

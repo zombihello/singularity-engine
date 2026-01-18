@@ -43,7 +43,7 @@ FORCEINLINE void parserLexerState_t::StoreSequenceStart( uint32 charactersToSkip
 parserLexerState_t::UpdateContext
 ==================
 */
-FORCEINLINE void parserLexerState_t::UpdateContext( const achar* pToken, uint32 tokenByteLength )
+FORCEINLINE void parserLexerState_t::UpdateContext( const char* pToken, uint32 tokenByteLength )
 {
 	currentContext.byteOffset += tokenByteLength;
 	currentContext.charOffset += Parserlib_GetNumChars( pToken, tokenByteLength );
@@ -84,7 +84,7 @@ FORCEINLINE void parserLexerState_t::EmitComment()
 parserLexerState_t::EmitError
 ==================
 */
-FORCEINLINE void parserLexerState_t::EmitError( const achar* pMessage )
+FORCEINLINE void parserLexerState_t::EmitError( const char* pMessage )
 {
 	pLexerListener->Error( *this, pMessage );
 }

@@ -7,8 +7,7 @@
 // Material system
 //-----------------------------------------------------------------------------
 // Application systems factory. It used for connect materialsystem's submodules (e.g: stdshaders)
-extern createInterfaceFn_t	g_pAppSystemFactory;
-
+extern createInterfaceFn_t g_pAppSystemFactory;
 
 class CMaterialSystem : public CBaseAppSystem<IMaterialSystem>
 {
@@ -19,13 +18,13 @@ public:
 
 	// Here's where systems can access other interfaces implemented by this object
 	// Returns NULL if it doesn't implement the requested interface
-	virtual void* QueryInterface( const achar* pInterfaceName ) override;
+	virtual void* QueryInterface( const char* pInterfaceName ) override;
 
 	// Initialize and shutdown
 	virtual bool Init() override;
 	virtual void Shutdown() override;
 
 private:
-	CTextureFactory			textureFactory;
-	CMaterialFactory		materialFactory;
+	CTextureFactory	 textureFactory;
+	CMaterialFactory materialFactory;
 };

@@ -10,10 +10,10 @@ FORCEINLINE void CSENTEntityDescComponent::Copy( const CSENTEntityDescComponent&
 	varsDict.clear();
 	type = other.type;
 	vars = other.vars;
-	for ( uint32 varIdx = 0, numVars = ( uint32 )vars.size(); varIdx < numVars; ++varIdx )
+	for ( uint32 varIdx = 0, numVars = (uint32)vars.size(); varIdx < numVars; ++varIdx )
 	{
-		const CSENTEntityDescVar&	sentVar = vars[varIdx];
-		varsDict[sentVar.GetName()]	= varIdx;
+		const CSENTEntityDescVar& sentVar = vars[varIdx];
+		varsDict[sentVar.GetName()]		  = varIdx;
 	}
 }
 
@@ -22,7 +22,7 @@ FORCEINLINE void CSENTEntityDescComponent::Copy( const CSENTEntityDescComponent&
 CSENTEntityDescComponent::SetType
 ==================
 */
-FORCEINLINE void CSENTEntityDescComponent::SetType( const achar* pType )
+FORCEINLINE void CSENTEntityDescComponent::SetType( const char* pType )
 {
 	type = pType;
 }
@@ -34,9 +34,9 @@ CSENTEntityDescComponent::AddVar
 */
 FORCEINLINE void CSENTEntityDescComponent::AddVar( const CSENTEntityDescVar& var )
 {
-	uint32						varIdx	= ( uint32 )vars.size();
-	const CSENTEntityDescVar&	newVar	= vars.emplace_back( var );
-	varsDict[newVar.GetName()]	= varIdx;
+	uint32					  varIdx = (uint32)vars.size();
+	const CSENTEntityDescVar& newVar = vars.emplace_back( var );
+	varsDict[newVar.GetName()]		 = varIdx;
 }
 
 /*
@@ -68,7 +68,7 @@ FORCEINLINE void CSENTEntityDescComponent::Clear()
 CSENTEntityDescComponent::GetType
 ==================
 */
-FORCEINLINE const achar* CSENTEntityDescComponent::GetType() const
+FORCEINLINE const char* CSENTEntityDescComponent::GetType() const
 {
 	return type.c_str();
 }
@@ -80,7 +80,7 @@ CSENTEntityDescComponent::GetNumVars
 */
 FORCEINLINE uint32 CSENTEntityDescComponent::GetNumVars() const
 {
-	return ( uint32 )vars.size();
+	return (uint32)vars.size();
 }
 
 /*
@@ -109,14 +109,14 @@ FORCEINLINE const CSENTEntityDescVar& CSENTEntityDescComponent::GetVar( uint32 i
 CSENTEntityDescComponent::GetVar
 ==================
 */
-FORCEINLINE CSENTEntityDescVar* CSENTEntityDescComponent::GetVar( const achar* pName ) const
+FORCEINLINE CSENTEntityDescVar* CSENTEntityDescComponent::GetVar( const char* pName ) const
 {
-	auto	itFind = varsDict.find( pName );
+	auto itFind = varsDict.find( pName );
 	if ( itFind == varsDict.end() )
 	{
 		return NULL;
 	}
-	return ( CSENTEntityDescVar* )&vars[itFind->second];
+	return (CSENTEntityDescVar*)&vars[itFind->second];
 }
 
 /*

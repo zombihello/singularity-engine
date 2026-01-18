@@ -11,10 +11,9 @@
 //-----------------------------------------------------------------------------
 struct gameInfoSearchPath_t
 {
-	std::string		id;
-	std::string		path;
+	std::string id;
+	std::string path;
 };
-
 
 class CGameInfoDoc
 {
@@ -23,27 +22,27 @@ public:
 
 	// Methods for load from file/buffer and clear the document
 	// NOTE: For LoadFromFile must be connected StdLib
-	bool LoadFromFile( const achar* pPath );
-	bool LoadFromBuffer( const achar* pBuffer, const achar* pGameInfoPath );
+	bool LoadFromFile( const char* pPath );
+	bool LoadFromBuffer( const char* pBuffer, const char* pGameInfoPath );
 	void Clear();
 
-	const std::string& GetGame() const;
-	const std::string& GetVersion() const;
-	const std::string& GetSupportEmail() const;
-	const std::string& GetSupportURL() const;
+	const std::string&						 GetGame() const;
+	const std::string&						 GetVersion() const;
+	const std::string&						 GetSupportEmail() const;
+	const std::string&						 GetSupportURL() const;
 	const std::vector<gameInfoSearchPath_t>& GetSearchPaths() const;
-	bool IsLoaded() const;
+	bool									 IsLoaded() const;
 
 private:
-	bool GrabData( const CJsonDoc& jsonDoc, const achar* pGameInfoPath );
-	void ReplaceMacros( std::string& string, const achar* pGameInfoPath );
+	bool GrabData( const CJsonDoc& jsonDoc, const char* pGameInfoPath );
+	void ReplaceMacros( std::string& string, const char* pGameInfoPath );
 
-	bool									bLoaded;
-	std::string								game;
-	std::string								version;
-	std::string								supportEmail;
-	std::string								supportURL;
-	std::vector<gameInfoSearchPath_t>		searchPaths;
+	bool							  bLoaded;
+	std::string						  game;
+	std::string						  version;
+	std::string						  supportEmail;
+	std::string						  supportURL;
+	std::vector<gameInfoSearchPath_t> searchPaths;
 };
 
 #include "gameinfo/gameinfo.inl"

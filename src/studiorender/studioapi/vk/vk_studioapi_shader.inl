@@ -10,7 +10,6 @@ FORCEINLINE const VkPipelineVertexInputStateCreateInfo& CStudioAPIVertexDeclarat
 	return vkPipelineVertexInputStateInfo;
 }
 
-
 /*
 ==================
 CStudioAPIShaderVk::GetVkShaderModule
@@ -60,7 +59,6 @@ FORCEINLINE const std::vector<VkPushConstantRange>& CStudioAPIShaderVk::GetVkPus
 {
 	return vkPushConstantRanges;
 }
-
 
 /*
 ==================

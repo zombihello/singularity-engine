@@ -8,7 +8,7 @@ TRefCounted::AddRef
 template<class TBaseClass>
 void TRefCounted<TBaseClass>::AddRef()
 {
-	Sys_InterlockedIncrement( ( int32* )&countReferences );
+	Sys_InterlockedIncrement( (int32*)&countReferences );
 }
 
 /*
@@ -19,7 +19,7 @@ TRefCounted::ReleaseRef
 template<class TBaseClass>
 void TRefCounted<TBaseClass>::ReleaseRef()
 {
-	if ( !countReferences || !Sys_InterlockedDecrement( ( int32* )&countReferences ) )
+	if ( !countReferences || !Sys_InterlockedDecrement( (int32*)&countReferences ) )
 	{
 		delete this;
 	}
@@ -35,7 +35,6 @@ uint32 TRefCounted<TBaseClass>::GetRefCount() const
 {
 	return countReferences;
 }
-
 
 /*
 ==================
@@ -106,7 +105,7 @@ FORCEINLINE TRefPtr<TPtrType>& TRefPtr<TPtrType>::operator=( const TRefPtr<TBase
 		pPtr->ReleaseRef();
 	}
 
-	pPtr = ( TPtrType* )( copy.GetPtr() );
+	pPtr = (TPtrType*)( copy.GetPtr() );
 
 	if ( pPtr )
 	{
@@ -178,7 +177,7 @@ TRefPtr::operator ptrint
 template<typename TPtrType>
 FORCEINLINE TRefPtr<TPtrType>::operator ptrint() const
 {
-	return ( ptrint )pPtr;
+	return (ptrint)pPtr;
 }
 
 /*
@@ -189,7 +188,7 @@ TRefPtr::operator uptrint
 template<typename TPtrType>
 FORCEINLINE TRefPtr<TPtrType>::operator uptrint() const
 {
-	return ( uptrint )pPtr;
+	return (uptrint)pPtr;
 }
 
 /*

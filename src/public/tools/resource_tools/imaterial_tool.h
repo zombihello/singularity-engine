@@ -20,37 +20,34 @@ enum resourceToolMaterialVarType_t
 	RESOURCE_TOOL_MATERIAL_VAR_TYPE_MATERIAL
 };
 
-
 struct resourceToolMaterialVar_t
 {
-	const achar*					pName;
-	resourceToolMaterialVarType_t	type;
+	const char*				  pName;
+	resourceToolMaterialVarType_t type;
 	union
 	{
-		bool						boolValue;
-		int32						intValue;
-		float						floatValue;
-		vec2_t						vector2DValue;
-		vec3_t						vector3DValue;
-		vec4_t						vector4DValue;
-		matrix_t					matrixValue;
-		const achar*				pStringValue;
-		const achar*				pTextureValue;
-		const achar*				pMaterialValue;
+		bool		 boolValue;
+		int32		 intValue;
+		float		 floatValue;
+		vec2_t		 vector2DValue;
+		vec3_t		 vector3DValue;
+		vec4_t		 vector4DValue;
+		matrix_t	 matrixValue;
+		const char* pStringValue;
+		const char* pTextureValue;
+		const char* pMaterialValue;
 	};
 };
 
-
 struct resourceToolCompileMaterialParams_t
 {
-	const achar*						pDestPath;
-	const achar*						pShaderName;
-	const resourceToolMaterialVar_t*	pVars;
-	uint32								numVars;
+	const char*					 pDestPath;
+	const char*					 pShaderName;
+	const resourceToolMaterialVar_t* pVars;
+	uint32							 numVars;
 };
 
-
-#define MATERIAL_TOOL_INTERFACE_VERSION				"SMaterialTool001"
+#define MATERIAL_TOOL_INTERFACE_VERSION "SMaterialTool001"
 class IMaterialTool : public IAppSystem
 {
 public:

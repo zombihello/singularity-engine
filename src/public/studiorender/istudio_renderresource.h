@@ -14,17 +14,16 @@
 class IStudioRenderResource
 {
 public:
-	virtual void InitResource() = 0;
-	virtual void ReleaseResource() = 0;
-	virtual void UpdateResource() = 0;
+	virtual void InitResource()			  = 0;
+	virtual void ReleaseResource()		  = 0;
+	virtual void UpdateResource()		  = 0;
 	virtual bool IsInitedResource() const = 0;
 
 protected:
-	virtual void InitStudioAPI() = 0;
+	virtual void InitStudioAPI()	= 0;
 	virtual void ReleaseStudioAPI() = 0;
-	virtual void UpdateStudioAPI() = 0;
+	virtual void UpdateStudioAPI()	= 0;
 };
-
 
 //-----------------------------------------------------------------------------
 // Studio functions
@@ -42,7 +41,6 @@ void Studio_BeginUpdateResourceSafe( TRefPtr<TStudioRenderResourceClass> pResour
 template<class TStudioRenderResourceClass>
 void Studio_BeginReleaseResourceSafe( TRefPtr<TStudioRenderResourceClass> pResource );
 
-
 //-----------------------------------------------------------------------------
 // Container for all global render resources in the module
 //-----------------------------------------------------------------------------
@@ -59,7 +57,6 @@ public:
 private:
 	static CThreadMutex& GetThreadMutex();
 };
-
 
 //-----------------------------------------------------------------------------
 // Base class to implement a render resource
@@ -105,7 +102,7 @@ protected:
 	virtual void UpdateStudioAPI() override;
 
 private:
-	volatile bool	bInitedResource;
+	volatile bool bInitedResource;
 };
 
 #include "studiorender/istudio_renderresource.inl"

@@ -23,8 +23,8 @@ void CTexture::InitStudioAPI()
 {
 	// Create a StudioAPI texture
 	Assert( !mipmaps.empty() );
-	const textureMipMap_t&		mipmap0 = mipmaps[0];
-	pStudioAPITexture = g_pStudioAPI->CreateTexture( type, mipmap0.sizeX, mipmap0.sizeY, mipmap0.sizeZ, numLayers, ( uint32 )mipmaps.size(), STUDIOAPI_TEXTURE_USAGE_FLAG_TEXTURE, pixelFormat, data.data() );
+	const textureMipMap_t& mipmap0 = mipmaps[0];
+	pStudioAPITexture			   = g_pStudioAPI->CreateTexture( type, mipmap0.sizeX, mipmap0.sizeY, mipmap0.sizeZ, numLayers, (uint32)mipmaps.size(), STUDIOAPI_TEXTURE_USAGE_FLAG_TEXTURE, pixelFormat, data.data() );
 	data.clear();
 
 	// Create a StudioAPI sampler
@@ -72,10 +72,10 @@ void CTexture::SetData( studioAPITextureType_t type, studioAPIPixelFormat_t pixe
 	Mem_Memcpy( mipmaps.data(), pMipmaps, numMipmaps * sizeof( textureMipMap_t ) );
 
 	// Copy a new texture parameters
-	CTexture::type				= type;
-	CTexture::pixelFormat		= pixelFormat;
-	CTexture::numLayers			= numLayers;
-	studioAPISamplerCreateInfo	= samplerInfo;
+	CTexture::type			   = type;
+	CTexture::pixelFormat	   = pixelFormat;
+	CTexture::numLayers		   = numLayers;
+	studioAPISamplerCreateInfo = samplerInfo;
 
 	// Copy a texture data
 	data.clear();
@@ -113,7 +113,7 @@ CTexture::GetNumMips
 */
 uint32 CTexture::GetNumMips() const
 {
-	return ( uint32 )mipmaps.size();
+	return (uint32)mipmaps.size();
 }
 
 /*

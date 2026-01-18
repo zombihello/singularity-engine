@@ -5,11 +5,10 @@
 #include "stdlib/compression/zlib.h"
 
 // Shader cache magic
-#define SSC_MAGIC				( ( 'C'<<16 ) + ( 'S'<<8 ) + 'S' )	// Singularity Shader Cache
+#define SSC_MAGIC ( ( 'C' << 16 ) + ( 'S' << 8 ) + 'S' )  // Singularity Shader Cache
 
 // Shader cache version
-#define SSC_VERSION				1
-
+#define SSC_VERSION 1
 
 /*
 ==================
@@ -21,17 +20,17 @@ void CShaderCacheDoc::shaderCache_t::Serialize( IStreamDataWriter* pStreamWriter
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 
 	// Save the entry point name
-	uint32		entryPointNameSize = ( uint32 )entryPointName.size();
-	pStreamWriter->Write( &entryPointNameSize,				sizeof( uint32 ) );
-	pStreamWriter->Write( ( byte* )entryPointName.c_str(),	entryPointNameSize * sizeof( achar ) );
+	uint32 entryPointNameSize = (uint32)entryPointName.size();
+	pStreamWriter->Write( &entryPointNameSize, sizeof( uint32 ) );
+	pStreamWriter->Write( (byte*)entryPointName.c_str(), entryPointNameSize * sizeof( char ) );
 
 	// Save the byte code
-	uint64		bytecodeSize = ( uint64 )bytecode.size();
+	uint64 bytecodeSize = (uint64)bytecode.size();
 	pStreamWriter->Write( &bytecodeSize, sizeof( uint64 ) );
 	CZLib::Compress( pStreamWriter, bytecode.data(), bytecodeSize );
 
 	// Save the reflection data
-	uint64		reflectionDataSize = ( uint64 )reflectionData.size();
+	uint64 reflectionDataSize = (uint64)reflectionData.size();
 	pStreamWriter->Write( &reflectionDataSize, sizeof( uint64 ) );
 	CZLib::Compress( pStreamWriter, reflectionData.data(), reflectionDataSize );
 }
@@ -46,24 +45,23 @@ void CShaderCacheDoc::shaderCache_t::Deserialize( IStreamDataReader* pStreamRead
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 
 	// Load the entry point name
-	uint32		entryPointNameSize = 0;
+	uint32 entryPointNameSize = 0;
 	pStreamReader->Read( &entryPointNameSize, sizeof( uint32 ) );
 	entryPointName.resize( entryPointNameSize );
-	pStreamReader->Read( entryPointName.data(), entryPointNameSize * sizeof( achar ) );
+	pStreamReader->Read( entryPointName.data(), entryPointNameSize * sizeof( char ) );
 
 	// Load the byte code
-	uint64		bytecodeSize = 0;
+	uint64 bytecodeSize = 0;
 	pStreamReader->Read( &bytecodeSize, sizeof( uint64 ) );
 	bytecode.resize( bytecodeSize );
 	CZLib::Uncompress( pStreamReader, bytecode.data(), bytecodeSize );
 
 	// Load the reflection data
-	uint64		reflectionDataSize = 0;
+	uint64 reflectionDataSize = 0;
 	pStreamReader->Read( &reflectionDataSize, sizeof( uint64 ) );
 	reflectionData.resize( reflectionDataSize );
 	CZLib::Uncompress( pStreamReader, reflectionData.data(), reflectionDataSize );
 }
-
 
 /*
 ==================
@@ -81,7 +79,7 @@ CShaderCacheDoc::CShaderCacheDoc()
 CShaderCacheDoc::SaveFile
 ==================
 */
-bool CShaderCacheDoc::SaveFile( const achar* pPath )
+bool CShaderCacheDoc::SaveFile( const char* pPath )
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 
@@ -94,7 +92,7 @@ bool CShaderCacheDoc::SaveFile( const achar* pPath )
 	}
 
 	// Create shader cache file
-	TRefPtr<IStreamDataWriter>	pFile = g_pFileSystem->CreateFileWriter( pPath );
+	TRefPtr<IStreamDataWriter> pFile = g_pFileSystem->CreateFileWriter( pPath );
 	if ( !pFile )
 	{
 		Error( "ShaderCacheDoc: Failed to create file '%s'", pPath );
@@ -102,14 +100,14 @@ bool CShaderCacheDoc::SaveFile( const achar* pPath )
 	}
 
 	// Write the shader cache header
-	uint32	magic	= SSC_MAGIC;
-	uint32	version = SSC_VERSION;
-	pFile->Write( &magic,		sizeof( uint32 ) );
-	pFile->Write( &version,		sizeof( uint32 ) );
-	pFile->Write( &type,		sizeof( studioAPIShaderType_t ) );
+	uint32 magic   = SSC_MAGIC;
+	uint32 version = SSC_VERSION;
+	pFile->Write( &magic, sizeof( uint32 ) );
+	pFile->Write( &version, sizeof( uint32 ) );
+	pFile->Write( &type, sizeof( studioAPIShaderType_t ) );
 
 	// Write the shader caches
-	uint64		numCaches = ( uint64 )caches.size();
+	uint64 numCaches = (uint64)caches.size();
 	pFile->Write( &numCaches, sizeof( uint64 ) );
 	for ( uint64 cacheIdx = 0; cacheIdx < numCaches; ++cacheIdx )
 	{
@@ -125,7 +123,7 @@ bool CShaderCacheDoc::SaveFile( const achar* pPath )
 CShaderCacheDoc::LoadFromFile
 ==================
 */
-bool CShaderCacheDoc::LoadFromFile( const achar* pPath )
+bool CShaderCacheDoc::LoadFromFile( const char* pPath )
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 
@@ -140,15 +138,15 @@ bool CShaderCacheDoc::LoadFromFile( const achar* pPath )
 	Clear();
 
 	// Try to open file
-	TRefPtr<IStreamDataReader>	pFile = g_pFileSystem->CreateFileReader( pPath );
+	TRefPtr<IStreamDataReader> pFile = g_pFileSystem->CreateFileReader( pPath );
 	if ( !pFile )
 	{
 		return false;
 	}
 
 	// Read the shader cache header
-	uint32	magic	= 0;
-	uint32	version = 0;
+	uint32 magic   = 0;
+	uint32 version = 0;
 	pFile->Read( &magic, sizeof( uint32 ) );
 	pFile->Read( &version, sizeof( uint32 ) );
 	if ( magic != SSC_MAGIC )
@@ -165,7 +163,7 @@ bool CShaderCacheDoc::LoadFromFile( const achar* pPath )
 	pFile->Read( &type, sizeof( studioAPIShaderType_t ) );
 
 	// Read the shader caches
-	uint64		numCaches = 0;
+	uint64 numCaches = 0;
 	pFile->Read( &numCaches, sizeof( uint64 ) );
 	caches.resize( numCaches );
 	for ( uint64 cacheIdx = 0; cacheIdx < numCaches; ++cacheIdx )

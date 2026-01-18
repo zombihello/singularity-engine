@@ -5,46 +5,42 @@
 #include "smdldoc/smdl_source_doc.h"
 
 // Table for convert text to axisUp_t
-static const achar* s_pAxisUpNames[] =
-{
-	"+x",	// AXIS_UP_PLUS_X
-	"-x",	// AXIS_UP_MINUS_X
-	"+y",	// AXIS_UP_PLUS_Y
-	"-y",	// AXIS_UP_MINUS_Y
-	"+z",	// AXIS_UP_PLUS_Z
-	"-z"	// AXIS_UP_MINUS_Z
+static const char* s_pAxisUpNames[] = {
+	"+x",  // AXIS_UP_PLUS_X
+	"-x",  // AXIS_UP_MINUS_X
+	"+y",  // AXIS_UP_PLUS_Y
+	"-y",  // AXIS_UP_MINUS_Y
+	"+z",  // AXIS_UP_PLUS_Z
+	"-z"   // AXIS_UP_MINUS_Z
 };
 static_assert( ARRAYSIZE( s_pAxisUpNames ) == AXIS_UP_NUM, "Array size 's_pAxisUpNames' must be equal to AXIS_UP_NUM" );
-
 
 /*
 ==================
 ConvTextToAxisUp
 ==================
 */
-static axisUp_t ConvTextToAxisUp( const achar* pText )
+static axisUp_t ConvTextToAxisUp( const char* pText )
 {
 	for ( uint32 index = 0; index < ARRAYSIZE( s_pAxisUpNames ); ++index )
 	{
 		if ( !S_Stricmp( pText, s_pAxisUpNames[index] ) )
 		{
-			return ( axisUp_t )index;
+			return (axisUp_t)index;
 		}
 	}
 	return AXIS_UP_DEFAULT;
 }
-
 
 /*
 ==================
 ConvAxisUpToText
 ==================
 */
-static const achar* ConvAxisUpToText( axisUp_t axisUp )
+static const char* ConvAxisUpToText( axisUp_t axisUp )
 {
 	return s_pAxisUpNames[axisUp];
 }
-
 
 /*
 ==================
@@ -55,30 +51,31 @@ CSMDLSourceModelDoc::CSMDLSourceModelDoc()
 	: bCombineModels( false )
 	, axisUp( AXIS_UP_DEFAULT )
 	, materialsDir( "materials/" )
-{}
+{
+}
 
 /*
 ==================
 CSMDLSourceModelDoc::LoadFromFile
 ==================
 */
-bool CSMDLSourceModelDoc::LoadFromFile( const achar* pPath )
+bool CSMDLSourceModelDoc::LoadFromFile( const char* pPath )
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 
 	// Load a JSON file
-	CJsonDoc	jsonDoc;
+	CJsonDoc jsonDoc;
 	if ( !jsonDoc.LoadFromFile( pPath ) )
 	{
 		Warning( "SMDLDoc: Failed to load '%s', maybe wrong JSON syntax?", pPath );
 		return false;
 	}
 	Clear();
-	bool	bResult = true;
+	bool bResult = true;
 
 	// Get combine models
 	{
-		CJsonValue		jsonCombineModels = jsonDoc.GetValue( "combine-models" );
+		CJsonValue jsonCombineModels = jsonDoc.GetValue( "combine-models" );
 		if ( jsonCombineModels.IsValid() )
 		{
 			if ( jsonCombineModels.IsNumber() )
@@ -99,12 +96,12 @@ bool CSMDLSourceModelDoc::LoadFromFile( const achar* pPath )
 
 	// Get axis up
 	{
-		CJsonValue		jsonAxisUp = jsonDoc.GetValue( "axis-up" );
+		CJsonValue jsonAxisUp = jsonDoc.GetValue( "axis-up" );
 		if ( jsonAxisUp.IsValid() )
 		{
 			if ( jsonAxisUp.IsA( JSONVALUE_TYPE_STRING ) )
 			{
-				std::string		axisUp = jsonAxisUp.GetString();
+				std::string axisUp = jsonAxisUp.GetString();
 				if ( axisUp.empty() )
 				{
 					Error( "SMDLDoc: Invalid 'axis-up', an axis up can't be empty" );
@@ -127,12 +124,12 @@ bool CSMDLSourceModelDoc::LoadFromFile( const achar* pPath )
 
 	// Get source path
 	{
-		CJsonValue		jsonSourcePath = jsonDoc.GetValue( "source" );
+		CJsonValue jsonSourcePath = jsonDoc.GetValue( "source" );
 		if ( jsonSourcePath.IsValid() )
 		{
 			if ( jsonSourcePath.IsA( JSONVALUE_TYPE_STRING ) )
 			{
-				std::string		sourcePath = jsonSourcePath.GetString();
+				std::string sourcePath = jsonSourcePath.GetString();
 				if ( sourcePath.empty() )
 				{
 					Error( "SMDLDoc: Invalid 'source', an source path can't be empty" );
@@ -156,12 +153,12 @@ bool CSMDLSourceModelDoc::LoadFromFile( const achar* pPath )
 
 	// Get materials directory
 	{
-		CJsonValue		jsonMaterialsDir = jsonDoc.GetValue( "materials-dir" );
+		CJsonValue jsonMaterialsDir = jsonDoc.GetValue( "materials-dir" );
 		if ( jsonMaterialsDir.IsValid() )
 		{
 			if ( jsonMaterialsDir.IsA( JSONVALUE_TYPE_STRING ) )
 			{
-				std::string		materialsDir = jsonMaterialsDir.GetString();
+				std::string materialsDir = jsonMaterialsDir.GetString();
 				if ( materialsDir.empty() )
 				{
 					Error( "SMDLDoc: Invalid 'materials-dir', an materials directory can't be empty" );
@@ -184,12 +181,12 @@ bool CSMDLSourceModelDoc::LoadFromFile( const achar* pPath )
 
 	// Get output directory
 	{
-		CJsonValue		jsonOutputDir = jsonDoc.GetValue( "output-dir" );
+		CJsonValue jsonOutputDir = jsonDoc.GetValue( "output-dir" );
 		if ( jsonOutputDir.IsValid() )
 		{
 			if ( jsonOutputDir.IsA( JSONVALUE_TYPE_STRING ) )
 			{
-				std::string		outputDir = jsonOutputDir.GetString();
+				std::string outputDir = jsonOutputDir.GetString();
 				if ( outputDir.empty() )
 				{
 					Error( "SMDLDoc: Invalid 'output-dir', an output directory can't be empty" );
@@ -213,20 +210,20 @@ bool CSMDLSourceModelDoc::LoadFromFile( const achar* pPath )
 
 	// Get renamed materials
 	{
-		CJsonValue		jsonRenamedMaterialsVar = jsonDoc.GetValue( "rename-materials" );
+		CJsonValue jsonRenamedMaterialsVar = jsonDoc.GetValue( "rename-materials" );
 		if ( jsonRenamedMaterialsVar.IsValid() )
 		{
 			if ( jsonRenamedMaterialsVar.IsA( JSONVALUE_TYPE_ARRAY ) )
 			{
-				std::vector<CJsonValue>		jsonRenamedMaterialsArray = jsonRenamedMaterialsVar.GetArray();
-				for ( uint32 renamedMaterialIdx = 0, count = ( uint32 )jsonRenamedMaterialsArray.size(); renamedMaterialIdx < count; ++renamedMaterialIdx )
+				std::vector<CJsonValue> jsonRenamedMaterialsArray = jsonRenamedMaterialsVar.GetArray();
+				for ( uint32 renamedMaterialIdx = 0, count = (uint32)jsonRenamedMaterialsArray.size(); renamedMaterialIdx < count; ++renamedMaterialIdx )
 				{
-					const CJsonValue&		jsonValue = jsonRenamedMaterialsArray[renamedMaterialIdx];
+					const CJsonValue& jsonValue = jsonRenamedMaterialsArray[renamedMaterialIdx];
 					if ( jsonValue.IsValid() && jsonValue.IsA( JSONVALUE_TYPE_OBJECT ) )
 					{
-						CJsonObject		jsonObject		= jsonValue.GetObject();
-						std::string		originalName	= jsonObject.GetValue( "original" ).GetString();
-						std::string		newName			= jsonObject.GetValue( "new" ).GetString();
+						CJsonObject jsonObject	 = jsonValue.GetObject();
+						std::string originalName = jsonObject.GetValue( "original" ).GetString();
+						std::string newName		 = jsonObject.GetValue( "new" ).GetString();
 						if ( originalName.empty() )
 						{
 							Error( "SMDLDoc: Invalid 'original' at renamed material id '%i'", renamedMaterialIdx );
@@ -266,20 +263,20 @@ bool CSMDLSourceModelDoc::LoadFromFile( const achar* pPath )
 CSMDLSourceModelDoc::SaveFile
 ==================
 */
-bool CSMDLSourceModelDoc::SaveFile( const achar* pPath )
+bool CSMDLSourceModelDoc::SaveFile( const char* pPath )
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 	Assert( g_pFileSystem );
 
 	// Try to open a file
-	TRefPtr<IStreamDataWriter>	pFile = g_pFileSystem->CreateFileWriter( pPath );
+	TRefPtr<IStreamDataWriter> pFile = g_pFileSystem->CreateFileWriter( pPath );
 	if ( !pFile )
 	{
 		Error( "SMDLDoc: Failed to open file '%s' for save a SMDL source model", pPath );
 		return false;
 	}
 
-	std::string		buffer;
+	std::string buffer;
 	buffer += "{\n";
 
 	// Write is need combine models, axis up, source path, materials directory and output directory
@@ -305,6 +302,6 @@ bool CSMDLSourceModelDoc::SaveFile( const achar* pPath )
 	buffer += "\t]\n";
 
 	buffer += "}\n";
-	pFile->Write( buffer.data(), buffer.size() * sizeof( achar ) );
+	pFile->Write( buffer.data(), buffer.size() * sizeof( char ) );
 	return true;
 }

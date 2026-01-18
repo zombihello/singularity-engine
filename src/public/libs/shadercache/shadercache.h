@@ -15,42 +15,44 @@ public:
 	struct shaderCache_t
 	{
 		shaderCache_t()
-		{}
+		{
+		}
 
 		shaderCache_t( const std::string& entryPointName, const std::vector<byte>& reflectionData, const std::vector<byte>& bytecode )
 			: entryPointName( entryPointName )
 			, reflectionData( reflectionData )
 			, bytecode( bytecode )
-		{}
+		{
+		}
 
 		void Serialize( IStreamDataWriter* pStreamWriter );
 		void Deserialize( IStreamDataReader* pStreamReader );
 
-		std::string				entryPointName;
-		std::vector<byte>		reflectionData;
-		std::vector<byte>		bytecode;
+		std::string		  entryPointName;
+		std::vector<byte> reflectionData;
+		std::vector<byte> bytecode;
 	};
 
 	CShaderCacheDoc();
 
 	// Save, load and clear a shader cache document
 	// NOTE: For use save and load functions StdLib must be connected
-	bool SaveFile( const achar* pPath );
-	bool LoadFromFile( const achar* pPath );
+	bool SaveFile( const char* pPath );
+	bool LoadFromFile( const char* pPath );
 	void Clear();
 
 	// Set/get type
-	void SetType( studioAPIShaderType_t type );
+	void				  SetType( studioAPIShaderType_t type );
 	studioAPIShaderType_t GetType() const;
 
 	// Add and get a shader cache
-	void AddCache( const std::string& entryPointName, const std::vector<byte>& reflectionData, const std::vector<byte>& bytecode );
-	uint64 GetNumCaches() const;
+	void				 AddCache( const std::string& entryPointName, const std::vector<byte>& reflectionData, const std::vector<byte>& bytecode );
+	uint64				 GetNumCaches() const;
 	const shaderCache_t& GetCache( uint64 cacheId ) const;
 
 private:
-	studioAPIShaderType_t		type;
-	std::vector<shaderCache_t>	caches;
+	studioAPIShaderType_t	   type;
+	std::vector<shaderCache_t> caches;
 };
 
 #include "shadercache/shadercache.inl"

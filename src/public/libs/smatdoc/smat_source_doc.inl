@@ -5,7 +5,7 @@
 CSMATSourceMaterialDoc::SetShaderName
 ==================
 */
-FORCEINLINE void CSMATSourceMaterialDoc::SetShaderName( const achar* pShaderName )
+FORCEINLINE void CSMATSourceMaterialDoc::SetShaderName( const char* pShaderName )
 {
 	shaderName = pShaderName;
 }
@@ -38,7 +38,7 @@ CSMATSourceMaterialDoc::Clear
 */
 FORCEINLINE void CSMATSourceMaterialDoc::Clear()
 {
-	outputDir = "";
+	outputDir  = "";
 	shaderName = "";
 	vars.clear();
 }
@@ -50,7 +50,7 @@ CSMATSourceMaterialDoc::GetNumVars
 */
 FORCEINLINE uint32 CSMATSourceMaterialDoc::GetNumVars() const
 {
-	return ( uint32 )vars.size();
+	return (uint32)vars.size();
 }
 
 /*
@@ -68,7 +68,7 @@ FORCEINLINE const std::vector<CSMATMaterialVar>& CSMATSourceMaterialDoc::GetVars
 CSMATSourceMaterialDoc::GetShaderName
 ==================
 */
-FORCEINLINE const achar* CSMATSourceMaterialDoc::GetShaderName() const
+FORCEINLINE const char* CSMATSourceMaterialDoc::GetShaderName() const
 {
 	return shaderName.c_str();
 }
@@ -78,7 +78,7 @@ FORCEINLINE const achar* CSMATSourceMaterialDoc::GetShaderName() const
 CSMATSourceMaterialDoc::SetOutputDir
 ==================
 */
-FORCEINLINE void CSMATSourceMaterialDoc::SetOutputDir( const achar* pOutputDir )
+FORCEINLINE void CSMATSourceMaterialDoc::SetOutputDir( const char* pOutputDir )
 {
 	outputDir = pOutputDir;
 }
@@ -88,7 +88,7 @@ FORCEINLINE void CSMATSourceMaterialDoc::SetOutputDir( const achar* pOutputDir )
 CSMATSourceMaterialDoc::GetOutputDir
 ==================
 */
-FORCEINLINE const achar* CSMATSourceMaterialDoc::GetOutputDir() const
+FORCEINLINE const char* CSMATSourceMaterialDoc::GetOutputDir() const
 {
 	return outputDir.c_str();
 }

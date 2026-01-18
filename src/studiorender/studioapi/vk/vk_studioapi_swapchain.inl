@@ -41,7 +41,6 @@ FORCEINLINE const studioAPISyncStateImageVk_t& CStudioAPISwapChainImageVk::GetSy
 	return syncState;
 }
 
-
 /*
 ==================
 CStudioAPISwapChainVk::GetVkSurfaceFormat

@@ -21,22 +21,22 @@ void CTextureFactory::Init()
 	pDefaultTexture = g_pResourceSystem->FindOrLoadResource( "//CORE/materials/default", RESOURCE_TYPE_TEXTURE );
 	if ( !pDefaultTexture )
 	{
-		pDefaultTexture				= g_pResourceSystem->CreateProceduralResource( "default", RESOURCE_TYPE_TEXTURE );		
-		CTexture*	pTexture		= ( CTexture* )pDefaultTexture->GetData();
+		pDefaultTexture	   = g_pResourceSystem->CreateProceduralResource( "default", RESOURCE_TYPE_TEXTURE );
+		CTexture* pTexture = (CTexture*)pDefaultTexture->GetData();
 
-		uint8				data[4]	= { 0xFF, 0x00, 0xFF, 0xFF };
-		textureMipMap_t		mipmap0 = {};
-		mipmap0.sizeX = 1;
-		mipmap0.sizeY = 1;
-		mipmap0.sizeZ = 1;
+		uint8			data[4] = { 0xFF, 0x00, 0xFF, 0xFF };
+		textureMipMap_t mipmap0 = {};
+		mipmap0.sizeX			= 1;
+		mipmap0.sizeY			= 1;
+		mipmap0.sizeZ			= 1;
 
-		studioAPISamplerCreateInfo_t		studioAPISamplerInfo = {};
-		studioAPISamplerInfo.filer			= STUDIOAPI_SAMPLER_FILTER_POINT;
-		studioAPISamplerInfo.addressModeU	= STUDIOAPI_SAMPLER_ADDRESS_MODE_WRAP;
-		studioAPISamplerInfo.addressModeV	= STUDIOAPI_SAMPLER_ADDRESS_MODE_WRAP;
-		studioAPISamplerInfo.addressModeW	= STUDIOAPI_SAMPLER_ADDRESS_MODE_WRAP;
-		studioAPISamplerInfo.minLod			= -FLT_MAX;
-		studioAPISamplerInfo.maxLod			= FLT_MAX;
+		studioAPISamplerCreateInfo_t studioAPISamplerInfo = {};
+		studioAPISamplerInfo.filer						  = STUDIOAPI_SAMPLER_FILTER_POINT;
+		studioAPISamplerInfo.addressModeU				  = STUDIOAPI_SAMPLER_ADDRESS_MODE_WRAP;
+		studioAPISamplerInfo.addressModeV				  = STUDIOAPI_SAMPLER_ADDRESS_MODE_WRAP;
+		studioAPISamplerInfo.addressModeW				  = STUDIOAPI_SAMPLER_ADDRESS_MODE_WRAP;
+		studioAPISamplerInfo.minLod						  = -FLT_MAX;
+		studioAPISamplerInfo.maxLod						  = FLT_MAX;
 		pTexture->SetData( STUDIOAPI_TEXTURE_TYPE_2D, STUDIOAPI_PIXEL_FORMAT_RGBA8, 1, &mipmap0, 1, studioAPISamplerInfo, data, ARRAYSIZE( data ) );
 	}
 }
@@ -71,40 +71,40 @@ TRefPtr<IRefCounted> CTextureFactory::CreateProceduralResource() const
 CTextureFactory::LoadResource
 ==================
 */
-TRefPtr<IRefCounted> CTextureFactory::LoadResource( const achar* pPath, uint32 loadFlags /* = RESOURCE_LOAD_FLAG_NONE */ ) const
+TRefPtr<IRefCounted> CTextureFactory::LoadResource( const char* pPath, uint32 loadFlags /* = RESOURCE_LOAD_FLAG_NONE */ ) const
 {
-	CSTEXCompiledTextureDoc		stexCompiledTextureDoc;
+	CSTEXCompiledTextureDoc stexCompiledTextureDoc;
 	if ( !stexCompiledTextureDoc.LoadFromFile( S_GetFileExtension( pPath ) ? pPath : S_Sprintf( "%s.stex_c", pPath ).c_str() ) )
 	{
 		return false;
 	}
 
 	// Convert STX mipmap information to the engine format
-	std::vector<textureMipMap_t>	mipmaps;
-	const std::vector<byte>&		data = stexCompiledTextureDoc.GetData();
+	std::vector<textureMipMap_t> mipmaps;
+	const std::vector<byte>&	 data = stexCompiledTextureDoc.GetData();
 	mipmaps.resize( stexCompiledTextureDoc.GetNumMips() );
 	for ( uint32 mipIdx = 0, numMips = stexCompiledTextureDoc.GetNumMips(); mipIdx < numMips; ++mipIdx )
 	{
-		const stexTextureMipMap_t	srcMipmap	= stexCompiledTextureDoc.GetMip( mipIdx );
-		textureMipMap_t&			destMipmap	= mipmaps[mipIdx];
-		destMipmap.sizeX = srcMipmap.sizeX;
-		destMipmap.sizeY = srcMipmap.sizeY;
-		destMipmap.sizeZ = srcMipmap.sizeZ;
+		const stexTextureMipMap_t srcMipmap	 = stexCompiledTextureDoc.GetMip( mipIdx );
+		textureMipMap_t&		  destMipmap = mipmaps[mipIdx];
+		destMipmap.sizeX					 = srcMipmap.sizeX;
+		destMipmap.sizeY					 = srcMipmap.sizeY;
+		destMipmap.sizeZ					 = srcMipmap.sizeZ;
 	}
 
 	// Initialize a sampler information
-	studioAPISamplerCreateInfo_t		studioAPISamplerInfo = {};
-	studioAPISamplerInfo.filer			= stexCompiledTextureDoc.GetFilter();
-	studioAPISamplerInfo.addressModeU	= stexCompiledTextureDoc.GetAddressModeU();
-	studioAPISamplerInfo.addressModeV	= stexCompiledTextureDoc.GetAddressModeV();
-	studioAPISamplerInfo.addressModeW	= stexCompiledTextureDoc.GetAddressModeW();
-	studioAPISamplerInfo.maxAnisotropy	= stexCompiledTextureDoc.GetMaxAnisotropy();
-	studioAPISamplerInfo.minLod			= -FLT_MAX;
-	studioAPISamplerInfo.maxLod			= FLT_MAX;
+	studioAPISamplerCreateInfo_t studioAPISamplerInfo = {};
+	studioAPISamplerInfo.filer						  = stexCompiledTextureDoc.GetFilter();
+	studioAPISamplerInfo.addressModeU				  = stexCompiledTextureDoc.GetAddressModeU();
+	studioAPISamplerInfo.addressModeV				  = stexCompiledTextureDoc.GetAddressModeV();
+	studioAPISamplerInfo.addressModeW				  = stexCompiledTextureDoc.GetAddressModeW();
+	studioAPISamplerInfo.maxAnisotropy				  = stexCompiledTextureDoc.GetMaxAnisotropy();
+	studioAPISamplerInfo.minLod						  = -FLT_MAX;
+	studioAPISamplerInfo.maxLod						  = FLT_MAX;
 
 	// Create a new texture and initialize it
-	TRefPtr<CTexture>		pTexture = new CTexture();
-	pTexture->SetData( stexCompiledTextureDoc.GetType(), stexCompiledTextureDoc.GetPixelFormat(), stexCompiledTextureDoc.GetNumLayers(), mipmaps.data(), stexCompiledTextureDoc.GetNumMips(), studioAPISamplerInfo, data.data(), ( uint32 )data.size() );
+	TRefPtr<CTexture> pTexture = new CTexture();
+	pTexture->SetData( stexCompiledTextureDoc.GetType(), stexCompiledTextureDoc.GetPixelFormat(), stexCompiledTextureDoc.GetNumLayers(), mipmaps.data(), stexCompiledTextureDoc.GetNumMips(), studioAPISamplerInfo, data.data(), (uint32)data.size() );
 	return pTexture;
 }
 
@@ -115,7 +115,7 @@ CTextureFactory::UnloadResource
 */
 void CTextureFactory::UnloadResource( IRefCounted* pResoruce ) const
 {
-	CTexture*	pTexture = ( CTexture* )pResoruce;
+	CTexture* pTexture = (CTexture*)pResoruce;
 	pTexture->Clear();
 }
 
@@ -134,7 +134,7 @@ TRefPtr<IResource> CTextureFactory::GetDefaultResource() const
 CTextureFactory::GetFormatType
 ==================
 */
-const achar* CTextureFactory::GetFormatType() const
+const char* CTextureFactory::GetFormatType() const
 {
 	return "STEX";
 }

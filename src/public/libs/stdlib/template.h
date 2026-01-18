@@ -19,7 +19,6 @@ TType Clamp( const TType x, const TType min, const TType max );
 template<typename TType>
 void Swap( TType& a, TType& b );
 
-
 //-----------------------------------------------------------------------------
 // Template classes
 //-----------------------------------------------------------------------------
@@ -38,7 +37,6 @@ private:
 	CNonCopyable& operator=( const CNonCopyable& other ) { return *this; }
 };
 
-
 // Exception-safe guard around saving/restoring a value
 template<typename TType>
 class TGuardValue : private CNonCopyable
@@ -52,7 +50,8 @@ class TGuardValue : private CNonCopyable
 	TGuardValue( TType& refValue )
 		: value( refValue )
 		, oldValue( refValue )
-	{}
+	{
+	}
 	~TGuardValue()
 	{
 		value = oldValue;
@@ -61,8 +60,8 @@ class TGuardValue : private CNonCopyable
 	const TType& operator*() const;
 
 private:
-	TType&	value;
-	TType	oldValue;
+	TType& value;
+	TType  oldValue;
 };
 
 #include "stdlib/template.inl"

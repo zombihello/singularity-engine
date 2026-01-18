@@ -6,23 +6,22 @@
  * @ingroup studiorender
  * @brief The size of the render command buffer, in bytes
  */
-#define RENDER_COMMAND_BUFFER_SIZE			( 1024 * 1024 )
+#define RENDER_COMMAND_BUFFER_SIZE ( 1024 * 1024 )
 
 /**
  * @ingroup studiorender
  * @brief Whether the renderer is currently running in a separate thread
  */
-static bool				s_bIsThreadedRendering = false;
+static bool s_bIsThreadedRendering = false;
 
 // The render command buffer
-CStudioCmdBuffer		g_StudioCmdBuffer( RENDER_COMMAND_BUFFER_SIZE, 16 );
+CStudioCmdBuffer g_StudioCmdBuffer( RENDER_COMMAND_BUFFER_SIZE, 16 );
 
 /**
  * @ingroup studiorender
  * @brief The render thread id
  */
-threadId_t				g_RenderThreadId = INVALID_THREAD_ID;
-
+threadId_t g_RenderThreadId = INVALID_THREAD_ID;
 
 /**
  * @ingroup studiorender
@@ -65,21 +64,21 @@ protected:
 	 */
 	virtual uint32 ThreadRun() override
 	{
-		void*	pReadPointer = nullptr;
-		uint32	numReadBytes = 0;
+		void*  pReadPointer = nullptr;
+		uint32 numReadBytes = 0;
 		while ( s_bIsThreadedRendering )
-		{	
+		{
 			// Command processing loop
 			while ( g_StudioCmdBuffer.BeginRead( pReadPointer, numReadBytes ) )
 			{
 				// Execute the Render Command
-				IStudioRenderCmd*		pCommand = ( IStudioRenderCmd* )pReadPointer;
-				uint32					commandSize = pCommand->Execute();
+				IStudioRenderCmd* pCommand	  = (IStudioRenderCmd*)pReadPointer;
+				uint32			  commandSize = pCommand->Execute();
 				pCommand->~IStudioRenderCmd();
 				g_StudioCmdBuffer.EndRead( commandSize );
 			}
 		}
-		
+
 		return 0;
 	}
 
@@ -100,9 +99,8 @@ protected:
 	}
 };
 
-
 /** Thread used for rendering */
-static CRenderThread*	s_pRenderThread = NULL;
+static CRenderThread* s_pRenderThread = NULL;
 
 /*
 ==================
@@ -123,8 +121,8 @@ void Studio_StartRenderThread()
 		g_pStudioAPI->ReleaseThreadOwnership();
 
 		// Start thread
-		const uint32	stackSize = 0;
-		bool			bResult = s_pRenderThread->Start( stackSize );
+		const uint32 stackSize = 0;
+		bool		 bResult   = s_pRenderThread->Start( stackSize );
 		if ( !bResult )
 		{
 			Sys_Error( "Failed to start the render thread" );
@@ -144,7 +142,7 @@ void Studio_StopRenderThread()
 	// This function is not thread-safe. Ensure it is only called by the main thread
 	Assert( Sys_IsInMainThread() );
 
-	static bool		s_bIsRenderThreadStopping = false;
+	static bool s_bIsRenderThreadStopping = false;
 	if ( s_bIsThreadedRendering && !s_bIsRenderThreadStopping )
 	{
 		s_bIsRenderThreadStopping = true;

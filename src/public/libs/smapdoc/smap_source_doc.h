@@ -13,23 +13,23 @@ class CSMAPSourceMapDoc
 public:
 	// Load and save a file
 	// NOTE: For use StdLib must be connected by ConnectStdLib
-	bool LoadFromFile( const achar* pPath );
-	bool SaveFile( const achar* pPath );
+	bool LoadFromFile( const char* pPath );
+	bool SaveFile( const char* pPath );
 
 	void AddEntity( const CSMAPEntity& entity );
 	void RemoveEntity( uint32 index );
 	void Clear();
 
-	const achar* GetOutputDir() const;
-	uint32 GetNumEntities() const;
+	const char*					GetOutputDir() const;
+	uint32							GetNumEntities() const;
 	const std::vector<CSMAPEntity>& GetEntities() const;
 
 private:
 	bool GrabData( const CJsonDoc& jsonDoc );
 	bool GrabValueAsEntity( const CJsonValue& jsonValue, CSMAPEntity& entity ) const;
 
-	std::string					outputDir;
-	std::vector<CSMAPEntity>	entities;
+	std::string				 outputDir;
+	std::vector<CSMAPEntity> entities;
 };
 
 #include "smapdoc/smap_source_doc.inl"

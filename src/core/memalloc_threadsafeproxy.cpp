@@ -8,7 +8,7 @@
  */
 void* CMemAllocThreadSafeProxy::Malloc( size_t numBytes, uint32 alignment /*= DEFAULT_ALIGNMENT*/ )
 {
-	CScopeLock		scopeLock( &synchronizationObject );
+	CScopeLock scopeLock( &synchronizationObject );
 	return pUsedMemAlloc->Malloc( numBytes, alignment );
 }
 
@@ -19,7 +19,7 @@ void* CMemAllocThreadSafeProxy::Malloc( size_t numBytes, uint32 alignment /*= DE
  */
 void* CMemAllocThreadSafeProxy::Realloc( void* pOriginal, size_t numBytes, uint32 alignment /*= DEFAULT_ALIGNMENT*/ )
 {
-	CScopeLock		scopeLock( &synchronizationObject );
+	CScopeLock scopeLock( &synchronizationObject );
 	return pUsedMemAlloc->Realloc( pOriginal, numBytes, alignment );
 }
 
@@ -32,7 +32,7 @@ void CMemAllocThreadSafeProxy::Free( void* pOriginal )
 {
 	if ( pOriginal )
 	{
-		CScopeLock		scopeLock( &synchronizationObject );
+		CScopeLock scopeLock( &synchronizationObject );
 		pUsedMemAlloc->Free( pOriginal );
 	}
 }
@@ -44,7 +44,7 @@ void CMemAllocThreadSafeProxy::Free( void* pOriginal )
  */
 bool CMemAllocThreadSafeProxy::GetAllocationSize( void* pOriginal, size_t& numBytes )
 {
-	CScopeLock		scopeLock( &synchronizationObject );
+	CScopeLock scopeLock( &synchronizationObject );
 	return pUsedMemAlloc->GetAllocationSize( pOriginal, numBytes );
 }
 
@@ -55,7 +55,7 @@ bool CMemAllocThreadSafeProxy::GetAllocationSize( void* pOriginal, size_t& numBy
  */
 void CMemAllocThreadSafeProxy::Trim( bool bTrimThreadCaches )
 {
-	CScopeLock		scopeLock( &synchronizationObject );
+	CScopeLock scopeLock( &synchronizationObject );
 	pUsedMemAlloc->Trim( bTrimThreadCaches );
 }
 

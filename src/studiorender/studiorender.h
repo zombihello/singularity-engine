@@ -11,16 +11,14 @@
 //-----------------------------------------------------------------------------
 class CStudioViewport;
 
-
 //-----------------------------------------------------------------------------
 // Studio scene view
 //-----------------------------------------------------------------------------
 struct studioSceneView_t
 {
-	matrix_t	viewMatrix;
-	matrix_t	projectionMatrix;
+	matrix_t viewMatrix;
+	matrix_t projectionMatrix;
 };
-
 
 //-----------------------------------------------------------------------------
 // Studio render
@@ -45,14 +43,14 @@ public:
 	virtual void UnregisterObject( IStudioRenderObject* pRenderObject ) override;
 	virtual void UnregisterAllObjects() override;
 
-	virtual IStudioViewport* CreateViewport() const override;
+	virtual IStudioViewport*		  CreateViewport() const override;
 	virtual IStudioRenderPipelineSet* CreateRenderPipelineSet() const override;
 	// NOTE: FOR TEST ONLY!
 	virtual IStudioRenderObject* CreateQuadRenderObject( IMaterial* pMaterial, IStudioAPIBuffer* pVertexBuffer, IStudioAPIBuffer* pIndexBuffer ) const override;
 
 	// Returns a command buffer of the render thread. If return NULL it's mean what StudioRender don't use render thread
 	virtual IStudioCmdBuffer* GetCommandBuffer() const override;
-	virtual bool IsInRenderThread() const override;
+	virtual bool			  IsInRenderThread() const override;
 
 	void BeginFrame();
 	void EndFrame();
@@ -60,8 +58,8 @@ public:
 	void R_DrawFrame( CStudioViewport* pViewport );
 
 private:
-	CStudioRenderPassPresent					presentRenderPass;
-	studioSceneView_t							sceneView;
-	std::vector<TRefPtr<IStudioRenderObject>>	renderObjects;
+	CStudioRenderPassPresent				  presentRenderPass;
+	studioSceneView_t						  sceneView;
+	std::vector<TRefPtr<IStudioRenderObject>> renderObjects;
 };
-extern CStudioRender			g_StudioRender;
+extern CStudioRender g_StudioRender;

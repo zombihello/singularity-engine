@@ -18,7 +18,6 @@ public:
 	virtual void Create( CEcsWorld ecsWorld, ecsEntity_t ecsEntity ) = 0;
 };
 
-
 template<typename TEcsComponent, void ( *pParserSENTComponentVarsFunc )( const CSENTEntityDescComponent& /*sentComponent*/, TEcsComponent& /*ecsComponent*/ )>
 class TEcsComponentFactory : public TRefCounted<IEcsComponentFactory>
 {
@@ -30,27 +29,25 @@ public:
 	TEcsComponentFactory( const TEcsComponentFactory& other );
 
 private:
-	TEcsComponent		ecsArchetypeComponent;
+	TEcsComponent ecsArchetypeComponent;
 };
-
 
 //-----------------------------------------------------------------------------
 // ECS component types
 //-----------------------------------------------------------------------------
 typedef IEcsComponentFactory* ( *createEcsComponentFactoryFn_t )( const CSENTEntityDescComponent& /*sentComponent*/ );
 
-
 class CEcsComponentTypes
 {
 public:
-	void RegisterType( const achar* pTypeName, createEcsComponentFactoryFn_t pCreateFunc );
-	void UnregisterType( const achar* pTypeName );
-	void UnregisterAllTypes();
+	void				  RegisterType( const char* pTypeName, createEcsComponentFactoryFn_t pCreateFunc );
+	void				  UnregisterType( const char* pTypeName );
+	void				  UnregisterAllTypes();
 	IEcsComponentFactory* CreateFactory( const CSENTEntityDescComponent& sentComponent ) const;
 
 private:
-	typedef std::unordered_map<const achar*, createEcsComponentFactoryFn_t, stlInsensitiveStringHash_t, stlInsensitiveCompareString_t>	componentTypesDict_t;
-	componentTypesDict_t		componentTypesDict;
+	typedef std::unordered_map<const char*, createEcsComponentFactoryFn_t, stlInsensitiveStringHash_t, stlInsensitiveCompareString_t> componentTypesDict_t;
+	componentTypesDict_t																											   componentTypesDict;
 };
 
 #include "gameframework/ecs/ecs_component_factory.inl"

@@ -11,7 +11,8 @@ CStudioAPICmdBufferPoolVk::CStudioAPICmdBufferPoolVk
 CStudioAPICmdBufferPoolVk::CStudioAPICmdBufferPoolVk( CStudioAPIQueueVk& queue )
 	: vkCommandPool( VK_NULL_HANDLE )
 	, queue( queue )
-{}
+{
+}
 
 /*
 ==================
@@ -34,10 +35,10 @@ void CStudioAPICmdBufferPoolVk::Init()
 
 	// Create the command pool
 	Assert( vkCommandPool == VK_NULL_HANDLE );
-	VkCommandPoolCreateInfo						vkCommandPoolCreateInfo = {};
-	vkCommandPoolCreateInfo.sType				= VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-	vkCommandPoolCreateInfo.flags				= VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-	vkCommandPoolCreateInfo.queueFamilyIndex	= queue.GetQueueFamilyIndex();
+	VkCommandPoolCreateInfo vkCommandPoolCreateInfo = {};
+	vkCommandPoolCreateInfo.sType					= VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+	vkCommandPoolCreateInfo.flags					= VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+	vkCommandPoolCreateInfo.queueFamilyIndex		= queue.GetQueueFamilyIndex();
 	STUDIOAPI_VK_VERIFY_RESULT( vkCreateCommandPool( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), &vkCommandPoolCreateInfo, NULL, &vkCommandPool ) );
 }
 
@@ -81,7 +82,7 @@ CStudioAPICmdBufferVk* CStudioAPICmdBufferPoolVk::CreateCmdBuffer()
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 
 	// Try to find the command buffer in the free list
-	CStudioAPICmdBufferVk*	pCmdBuffer = NULL;
+	CStudioAPICmdBufferVk* pCmdBuffer = NULL;
 	if ( !freeCmdBuffers.empty() )
 	{
 		pCmdBuffer = freeCmdBuffers.front();
@@ -116,7 +117,7 @@ void CStudioAPICmdBufferPoolVk::FreeUnusedCmdBuffers()
 	// Free all command buffers
 	for ( auto it = cmdBuffers.begin(), itEnd = cmdBuffers.end(); it != itEnd; ++it )
 	{
-		CStudioAPICmdBufferVk*		pCmdBuffer = *it;
+		CStudioAPICmdBufferVk* pCmdBuffer = *it;
 		pCmdBuffer->FreeMemory();
 		freeCmdBuffers.emplace_back( pCmdBuffer );
 	}

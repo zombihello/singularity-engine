@@ -23,15 +23,15 @@ FORCEINLINE VkSurfaceKHR VK_Plat_CreateSurfaceKHR( VkInstance vkInstance, window
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 	Assert( windowHandle && vkCreateWin32SurfaceKHR );
-	VkSurfaceKHR	vkSurface;
+	VkSurfaceKHR vkSurface;
 
 	// Create Vulkan surface for Windows
-	VkWin32SurfaceCreateInfoKHR				vkWin32SurfaceCreateInfoKHR = {};
-	vkWin32SurfaceCreateInfoKHR.sType		= VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-	vkWin32SurfaceCreateInfoKHR.hwnd		= ( HWND )windowHandle;
-	vkWin32SurfaceCreateInfoKHR.hinstance	= GetModuleHandle( NULL );
-	vkWin32SurfaceCreateInfoKHR.flags		= 0x0;
-	vkWin32SurfaceCreateInfoKHR.pNext		= NULL;
+	VkWin32SurfaceCreateInfoKHR vkWin32SurfaceCreateInfoKHR = {};
+	vkWin32SurfaceCreateInfoKHR.sType						= VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+	vkWin32SurfaceCreateInfoKHR.hwnd						= (HWND)windowHandle;
+	vkWin32SurfaceCreateInfoKHR.hinstance					= GetModuleHandle( NULL );
+	vkWin32SurfaceCreateInfoKHR.flags						= 0x0;
+	vkWin32SurfaceCreateInfoKHR.pNext						= NULL;
 
 	if ( vkCreateWin32SurfaceKHR( vkInstance, &vkWin32SurfaceCreateInfoKHR, NULL, &vkSurface ) != VK_SUCCESS )
 	{
@@ -49,11 +49,10 @@ FORCEINLINE VkSurfaceKHR VK_Plat_CreateSurfaceKHR( VkInstance vkInstance, window
  * @param size	Output array size with required instance extensions
  * @return Return array with required instance extensions
  */
-FORCEINLINE const achar** VK_Plat_GetRequiredInstanceExtensions( uint32& size )
+FORCEINLINE const char** VK_Plat_GetRequiredInstanceExtensions( uint32& size )
 {
 	// List of required instance extensions for platform
-	static const achar*		s_pPlatInstanceExtensions[] =
-	{
+	static const char* s_pPlatInstanceExtensions[] = {
 		VK_KHR_WIN32_SURFACE_EXTENSION_NAME
 	};
 
@@ -75,4 +74,4 @@ FORCEINLINE bool VK_Plat_IsPhysicalDeviceSurfaceSupport( VkPhysicalDevice vkPhys
 	return vkGetPhysicalDeviceWin32PresentationSupportKHR( vkPhysicalDevice, queueFamilyIndex );
 }
 
-#endif // !WIN_VK_PLATFORM_H
+#endif	// !WIN_VK_PLATFORM_H

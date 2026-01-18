@@ -48,14 +48,14 @@ CStudioViewport::AcquireIndex
 */
 FORCEINLINE uint32 CStudioViewport::AcquireIndex()
 {
-	CScopeLock		scopeLock( s_ViewportIndexMutex );
+	CScopeLock scopeLock( s_ViewportIndexMutex );
 	if ( s_FreeViewportIndices.empty() )
 	{
 		++s_LastViewportIndex;
 		return s_LastViewportIndex;
 	}
 
-	uint32		freeViewportIndex = s_FreeViewportIndices.back();
+	uint32 freeViewportIndex = s_FreeViewportIndices.back();
 	s_FreeViewportIndices.pop_back();
 	return freeViewportIndex;
 }
@@ -67,7 +67,7 @@ CStudioViewport::ReleaseIndex
 */
 FORCEINLINE void CStudioViewport::ReleaseIndex( uint32 viewportIndex )
 {
-	CScopeLock		scopeLock( s_ViewportIndexMutex );
+	CScopeLock scopeLock( s_ViewportIndexMutex );
 	s_FreeViewportIndices.emplace_back( viewportIndex );
 	onReleaseViewportIndex.Broadcast( this );
 }

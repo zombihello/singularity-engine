@@ -7,8 +7,8 @@ CTransform::CopyTranslation
 */
 FORCEINLINE void CTransform::CopyTranslation( const CTransform& other )
 {
-	translation		= other.translation;
-	bDirtyMatrix	= true;
+	translation	 = other.translation;
+	bDirtyMatrix = true;
 }
 
 /*
@@ -18,8 +18,8 @@ CTransform::AddToTranslation
 */
 FORCEINLINE void CTransform::AddToTranslation( const vec3_t& deltaTranslation )
 {
-	translation		+= deltaTranslation;
-	bDirtyMatrix	= true;
+	translation += deltaTranslation;
+	bDirtyMatrix = true;
 }
 
 /*
@@ -29,8 +29,8 @@ CTransform::SubtractFromTranslation
 */
 FORCEINLINE void CTransform::SubtractFromTranslation( const vec3_t& deltaTranslation )
 {
-	translation		-= deltaTranslation;
-	bDirtyMatrix	= true;
+	translation -= deltaTranslation;
+	bDirtyMatrix = true;
 }
 
 /*
@@ -40,8 +40,8 @@ CTransform::AddToRotation
 */
 FORCEINLINE void CTransform::AddToRotation( const quat_t& deltaRotation )
 {
-	rotation		= deltaRotation * rotation;
-	bDirtyMatrix	= true;
+	rotation	 = deltaRotation * rotation;
+	bDirtyMatrix = true;
 }
 
 /*
@@ -51,8 +51,8 @@ CTransform::SubtractFromRotation
 */
 FORCEINLINE void CTransform::SubtractFromRotation( const quat_t& deltaRotation )
 {
-	rotation		= S_QuaternionInverse( deltaRotation ) * rotation;
-	bDirtyMatrix	= true;
+	rotation	 = S_QuaternionInverse( deltaRotation ) * rotation;
+	bDirtyMatrix = true;
 }
 
 /*
@@ -62,8 +62,8 @@ CTransform::AddToScale
 */
 FORCEINLINE void CTransform::AddToScale( const vec3_t& deltaScale )
 {
-	scale			+= deltaScale;
-	bDirtyMatrix	= true;
+	scale += deltaScale;
+	bDirtyMatrix = true;
 }
 
 /*
@@ -73,8 +73,8 @@ CTransform::SubtractFromScale
 */
 FORCEINLINE void CTransform::SubtractFromScale( const vec3_t& deltaScale )
 {
-	scale			-= deltaScale;
-	bDirtyMatrix	= true;
+	scale -= deltaScale;
+	bDirtyMatrix = true;
 }
 
 /*
@@ -84,8 +84,8 @@ CTransform::CopyRotation
 */
 FORCEINLINE void CTransform::CopyRotation( const CTransform& other )
 {
-	rotation		= other.rotation;
-	bDirtyMatrix	= true;
+	rotation	 = other.rotation;
+	bDirtyMatrix = true;
 }
 
 /*
@@ -95,8 +95,8 @@ CTransform::CopyScale
 */
 FORCEINLINE void CTransform::CopyScale( const CTransform& other )
 {
-	scale			= other.scale;
-	bDirtyMatrix	= true;
+	scale		 = other.scale;
+	bDirtyMatrix = true;
 }
 
 /*
@@ -106,9 +106,9 @@ CTransform::Add
 */
 FORCEINLINE void CTransform::Add( const CTransform& other )
 {
-	translation	+= other.translation;
-	rotation	= other.rotation * rotation;
-	scale		+= other.scale;
+	translation += other.translation;
+	rotation = other.rotation * rotation;
+	scale += other.scale;
 	bDirtyMatrix = true;
 }
 
@@ -119,9 +119,9 @@ CTransform::Subtract
 */
 FORCEINLINE void CTransform::Subtract( const CTransform& other )
 {
-	translation	-= other.translation;
-	rotation	= S_QuaternionInverse( other.rotation ) * rotation;
-	scale		-= other.scale;
+	translation -= other.translation;
+	rotation = S_QuaternionInverse( other.rotation ) * rotation;
+	scale -= other.scale;
 	bDirtyMatrix = true;
 }
 
@@ -162,8 +162,8 @@ CTransform::SetLocation
 */
 FORCEINLINE void CTransform::SetLocation( const vec3_t& newLocation )
 {
-	translation		= newLocation;
-	bDirtyMatrix	= true;
+	translation	 = newLocation;
+	bDirtyMatrix = true;
 }
 
 /*
@@ -173,8 +173,8 @@ CTransform::SetRotation
 */
 FORCEINLINE void CTransform::SetRotation( const quat_t& newRotation )
 {
-	rotation		= newRotation;
-	bDirtyMatrix	= true;
+	rotation	 = newRotation;
+	bDirtyMatrix = true;
 }
 
 /*
@@ -184,8 +184,8 @@ CTransform::SetScale
 */
 FORCEINLINE void CTransform::SetScale( const vec3_t& newScale )
 {
-	scale			= newScale;
-	bDirtyMatrix	= true;
+	scale		 = newScale;
+	bDirtyMatrix = true;
 }
 
 /*
@@ -195,10 +195,10 @@ CTransform::SetIdentity
 */
 FORCEINLINE void CTransform::SetIdentity()
 {
-	translation		= g_vectorZero;
-	rotation		= g_quaternionZero;
-	scale			= g_vectorOne;
-	bDirtyMatrix	= true;
+	translation	 = g_vectorZero;
+	rotation	 = g_quaternionZero;
+	scale		 = g_vectorOne;
+	bDirtyMatrix = true;
 }
 
 /*
@@ -210,10 +210,10 @@ FORCEINLINE vec3_t CTransform::GetUnitAxis( axis_t axis ) const
 {
 	switch ( axis )
 	{
-	case AXIS_X:	return RotateVector( vec3_t( 1.f, 0.f, 0.f ) );	break;
-	case AXIS_Y:	return RotateVector( vec3_t( 0.f, 1.f, 0.f ) );	break;
-	case AXIS_Z:	return RotateVector( vec3_t( 0.f, 0.f, 1.f ) );	break;
-	default:		Assert( false ); break;
+	case AXIS_X: return RotateVector( vec3_t( 1.f, 0.f, 0.f ) ); break;
+	case AXIS_Y: return RotateVector( vec3_t( 0.f, 1.f, 0.f ) ); break;
+	case AXIS_Z: return RotateVector( vec3_t( 0.f, 0.f, 1.f ) ); break;
+	default: Assert( false ); break;
 	}
 
 	return g_vectorZero;
@@ -273,10 +273,10 @@ FORCEINLINE void CTransform::AsMatrix( matrix_t& destMatrix ) const
 {
 	if ( bDirtyMatrix )
 	{
-		matrix			= S_MatrixTranslate( translation ) * S_QuaternionToMatrix( rotation ) * S_MatrixScale( scale );
-		bDirtyMatrix	= false;
+		matrix		 = S_MatrixTranslate( translation ) * S_QuaternionToMatrix( rotation ) * S_MatrixScale( scale );
+		bDirtyMatrix = false;
 	}
-	destMatrix			= matrix;
+	destMatrix = matrix;
 }
 
 /*

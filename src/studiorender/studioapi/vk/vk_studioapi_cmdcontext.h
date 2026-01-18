@@ -16,10 +16,9 @@ class CStudioAPIQueueVk;
 class CStudioAPIPendingRenderStateVk;
 class CStudioAPIPendingComputeStateVk;
 
-
 //-----------------------------------------------------------------------------
 // Vulkan StudioAPI command context
-// 
+//
 // Tracks pipeline state and records command lists.
 // This is where the actual rendering commands are recorded
 //-----------------------------------------------------------------------------
@@ -59,12 +58,12 @@ public:
 	void AddPendingMemoryBarriers( CStudioAPICmdListVk* pCmdList, uint32 numMemoryBarriers, const VkMemoryBarrier* pVkMemoryBarrier, VkPipelineStageFlags vkSrcStageMask, VkPipelineStageFlags vkDstStageMask );
 	void FlushPendingBarriers( CStudioAPICmdListVk* pCmdList );
 
-	void AddSupportQueueTypes( uint8 type );
-	bool HasSupportQueueTypes( uint8 types ) const;
+	void  AddSupportQueueTypes( uint8 type );
+	bool  HasSupportQueueTypes( uint8 types ) const;
 	uint8 GetSupportQueueTypes() const;
 
-	CStudioAPIQueueVk& GetQueue();
-	CStudioAPICmdBufferPoolVk& GetCmdBufferPool();
+	CStudioAPIQueueVk&			 GetQueue();
+	CStudioAPICmdBufferPoolVk&	 GetCmdBufferPool();
 	CStudioAPICmdListBatchMgrVk& GetCmdListBatchMgr();
 
 private:
@@ -72,21 +71,21 @@ private:
 	template<typename TType, uint32 maxNumPendingBarriers>
 	struct studioAPIPendingPipelineBarrierGroupVk_t
 	{
-		TType					vkPendingBarriers[maxNumPendingBarriers];
-		uint32					numPendingBarriers;
-		VkPipelineStageFlags	vkSrcStageMask;
-		VkPipelineStageFlags	vkDstStageMask;
+		TType				 vkPendingBarriers[maxNumPendingBarriers];
+		uint32				 numPendingBarriers;
+		VkPipelineStageFlags vkSrcStageMask;
+		VkPipelineStageFlags vkDstStageMask;
 	};
 
-	uint8																											supportQueueTypes;							
-	CStudioAPIQueueVk&																								queue;						
-	CStudioAPICmdListBatchMgrVk																						cmdListBatchMgr;						
-	CStudioAPICmdBufferPoolVk																						cmdBufferPools[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];	
-	studioAPIPendingPipelineBarrierGroupVk_t<VkBufferMemoryBarrier, STUDIOAPI_VK_MAX_NUM_PENDING_BUFFER_BARRIERS>	pendingBufferBarriers;		
-	studioAPIPendingPipelineBarrierGroupVk_t<VkImageMemoryBarrier, STUDIOAPI_VK_MAX_NUM_PENDING_IMAGE_BARRIERS>		pendingImageBarriers;		
-	studioAPIPendingPipelineBarrierGroupVk_t<VkMemoryBarrier, STUDIOAPI_VK_MAX_NUM_PENDING_MEMORY_BARRIERS>			pendingMemoryBarriers;		
-	CStudioAPIPendingRenderStateVk*																					pPendingRenderState;		
-	CStudioAPIPendingComputeStateVk*																				pPendingComputeState;		
+	uint8																										  supportQueueTypes;
+	CStudioAPIQueueVk&																							  queue;
+	CStudioAPICmdListBatchMgrVk																					  cmdListBatchMgr;
+	CStudioAPICmdBufferPoolVk																					  cmdBufferPools[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];
+	studioAPIPendingPipelineBarrierGroupVk_t<VkBufferMemoryBarrier, STUDIOAPI_VK_MAX_NUM_PENDING_BUFFER_BARRIERS> pendingBufferBarriers;
+	studioAPIPendingPipelineBarrierGroupVk_t<VkImageMemoryBarrier, STUDIOAPI_VK_MAX_NUM_PENDING_IMAGE_BARRIERS>	  pendingImageBarriers;
+	studioAPIPendingPipelineBarrierGroupVk_t<VkMemoryBarrier, STUDIOAPI_VK_MAX_NUM_PENDING_MEMORY_BARRIERS>		  pendingMemoryBarriers;
+	CStudioAPIPendingRenderStateVk*																				  pPendingRenderState;
+	CStudioAPIPendingComputeStateVk*																			  pPendingComputeState;
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_cmdcontext.inl"

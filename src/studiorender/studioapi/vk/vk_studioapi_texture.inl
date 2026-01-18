@@ -79,25 +79,24 @@ CStudioAPIImageSubresourceRangeVk::AsVkStructure
 */
 FORCEINLINE VkImageSubresourceRange CStudioAPIImageSubresourceRangeVk::AsVkStructure( VkImageAspectFlags vkImageAspectFlags ) const
 {
-	VkImageSubresourceRange				vkImageSubresourceRange = {};
-	vkImageSubresourceRange.aspectMask = vkImageAspectFlags;
+	VkImageSubresourceRange vkImageSubresourceRange = {};
+	vkImageSubresourceRange.aspectMask				= vkImageAspectFlags;
 	if ( IsAllSubresources() )
 	{
-		vkImageSubresourceRange.baseMipLevel = 0;
-		vkImageSubresourceRange.levelCount = VK_REMAINING_MIP_LEVELS;
+		vkImageSubresourceRange.baseMipLevel   = 0;
+		vkImageSubresourceRange.levelCount	   = VK_REMAINING_MIP_LEVELS;
 		vkImageSubresourceRange.baseArrayLayer = 0;
-		vkImageSubresourceRange.layerCount = VK_REMAINING_ARRAY_LAYERS;
+		vkImageSubresourceRange.layerCount	   = VK_REMAINING_ARRAY_LAYERS;
 	}
 	else
 	{
-		vkImageSubresourceRange.baseMipLevel = startMip;
-		vkImageSubresourceRange.levelCount = numMips;
+		vkImageSubresourceRange.baseMipLevel   = startMip;
+		vkImageSubresourceRange.levelCount	   = numMips;
 		vkImageSubresourceRange.baseArrayLayer = startLayer;
-		vkImageSubresourceRange.layerCount = numLayers;
+		vkImageSubresourceRange.layerCount	   = numLayers;
 	}
 	return vkImageSubresourceRange;
 }
-
 
 /*
 ==================
@@ -108,7 +107,6 @@ FORCEINLINE VkSampler CStudioAPISamplerVk::GetVkSampler() const
 {
 	return vkSampler;
 }
-
 
 /*
 ==================
@@ -221,16 +219,16 @@ CStudioAPITextureVk::GetMipSize
 FORCEINLINE uint32 CStudioAPITextureVk::GetMipSize( uint32 mip ) const
 {
 	pixelFormatInfo_t* pPixelFormatInfo = &g_PixelFormatInfos[pixelFormat];
-	uint32 blockSizeX = pPixelFormatInfo->blockSizeX;
-	uint32 blockSizeY = pPixelFormatInfo->blockSizeY;
-	uint32 blockSizeZ = pPixelFormatInfo->blockSizeZ;
-	uint32 blockBytes = pPixelFormatInfo->blockBytes;
-	uint32 mipSizeX = Max( sizeX >> mip, blockSizeX );
-	uint32 mipSizeY = Max( sizeY >> mip, blockSizeY );
-	uint32 mipSizeZ = Max( sizeZ >> mip, blockSizeZ );
-	uint32 numBlocksX = ( mipSizeX + blockSizeX - 1 ) / blockSizeX;
-	uint32 numBlocksY = ( mipSizeY + blockSizeY - 1 ) / blockSizeY;
-	uint32 numBlocksZ = ( mipSizeZ + blockSizeZ - 1 ) / blockSizeZ;
+	uint32			   blockSizeX		= pPixelFormatInfo->blockSizeX;
+	uint32			   blockSizeY		= pPixelFormatInfo->blockSizeY;
+	uint32			   blockSizeZ		= pPixelFormatInfo->blockSizeZ;
+	uint32			   blockBytes		= pPixelFormatInfo->blockBytes;
+	uint32			   mipSizeX			= Max( sizeX >> mip, blockSizeX );
+	uint32			   mipSizeY			= Max( sizeY >> mip, blockSizeY );
+	uint32			   mipSizeZ			= Max( sizeZ >> mip, blockSizeZ );
+	uint32			   numBlocksX		= ( mipSizeX + blockSizeX - 1 ) / blockSizeX;
+	uint32			   numBlocksY		= ( mipSizeY + blockSizeY - 1 ) / blockSizeY;
+	uint32			   numBlocksZ		= ( mipSizeZ + blockSizeZ - 1 ) / blockSizeZ;
 	return numBlocksX * numBlocksY * numBlocksZ * blockBytes;
 }
 
@@ -242,10 +240,10 @@ CStudioAPITextureVk::GetMipRowPitch
 FORCEINLINE uint32 CStudioAPITextureVk::GetMipRowPitch( uint32 mip ) const
 {
 	pixelFormatInfo_t* pPixelFormatInfo = &g_PixelFormatInfos[pixelFormat];
-	uint32 blockSizeX = pPixelFormatInfo->blockSizeX;
-	uint32 blockBytes = pPixelFormatInfo->blockBytes;
-	uint32 mipSizeX = Max( sizeX >> mip, blockSizeX );
-	uint32 numBlocksX = ( mipSizeX + blockSizeX - 1 ) / blockSizeX;
+	uint32			   blockSizeX		= pPixelFormatInfo->blockSizeX;
+	uint32			   blockBytes		= pPixelFormatInfo->blockBytes;
+	uint32			   mipSizeX			= Max( sizeX >> mip, blockSizeX );
+	uint32			   numBlocksX		= ( mipSizeX + blockSizeX - 1 ) / blockSizeX;
 	return numBlocksX * blockBytes;
 }
 
@@ -257,13 +255,13 @@ CStudioAPITextureVk::GetMipDepthPitch
 FORCEINLINE uint32 CStudioAPITextureVk::GetMipDepthPitch( uint32 mip ) const
 {
 	pixelFormatInfo_t* pPixelFormatInfo = &g_PixelFormatInfos[pixelFormat];
-	uint32 blockSizeX = pPixelFormatInfo->blockSizeX;
-	uint32 blockSizeY = pPixelFormatInfo->blockSizeY;
-	uint32 blockBytes = pPixelFormatInfo->blockBytes;
-	uint32 mipSizeX = Max( sizeX >> mip, blockSizeX );
-	uint32 mipSizeY = Max( sizeY >> mip, blockSizeY );
-	uint32 numBlocksX = ( mipSizeX + blockSizeX - 1 ) / blockSizeX;
-	uint32 numBlocksY = ( mipSizeY + blockSizeY - 1 ) / blockSizeY;
+	uint32			   blockSizeX		= pPixelFormatInfo->blockSizeX;
+	uint32			   blockSizeY		= pPixelFormatInfo->blockSizeY;
+	uint32			   blockBytes		= pPixelFormatInfo->blockBytes;
+	uint32			   mipSizeX			= Max( sizeX >> mip, blockSizeX );
+	uint32			   mipSizeY			= Max( sizeY >> mip, blockSizeY );
+	uint32			   numBlocksX		= ( mipSizeX + blockSizeX - 1 ) / blockSizeX;
+	uint32			   numBlocksY		= ( mipSizeY + blockSizeY - 1 ) / blockSizeY;
 	return numBlocksX * numBlocksY * blockBytes;
 }
 
@@ -274,7 +272,7 @@ CStudioAPITextureVk::GetMipOffset
 */
 FORCEINLINE uint32 CStudioAPITextureVk::GetMipOffset( uint32 mip ) const
 {
-	uint32	offset = 0;
+	uint32 offset = 0;
 	for ( uint32 mipIdx = 0; mipIdx < mip; ++mipIdx )
 	{
 		offset += GetMipSize( mipIdx );
@@ -289,6 +287,6 @@ CStudioAPITextureVk::GetSyncStateIndex
 */
 FORCEINLINE uint32 CStudioAPITextureVk::GetSyncStateIndex( uint32 mip, uint32 layer ) const
 {
-	Assert( mip + numMips * layer < ( uint32 )syncStates.size() );
+	Assert( mip + numMips * layer < (uint32)syncStates.size() );
 	return mip + numMips * layer;
 }

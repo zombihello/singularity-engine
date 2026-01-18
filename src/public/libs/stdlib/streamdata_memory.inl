@@ -29,7 +29,8 @@ CBaseStreamDataMemory::Flush
 */
 template<class TBaseClass>
 void CBaseStreamDataMemory<TBaseClass>::Flush()
-{}
+{
+}
 
 /*
 ==================
@@ -39,7 +40,7 @@ CBaseStreamDataMemory::IsEndOfStream
 template<class TBaseClass>
 bool CBaseStreamDataMemory<TBaseClass>::IsEndOfStream() const
 {
-	uint64		size = GetSize();
+	uint64 size = GetSize();
 	return Tell() == size;
 }
 
@@ -71,7 +72,7 @@ CBaseStreamDataMemory::GetPath
 ==================
 */
 template<class TBaseClass>
-const achar* CBaseStreamDataMemory<TBaseClass>::GetPath() const
+const char* CBaseStreamDataMemory<TBaseClass>::GetPath() const
 {
 	return "";
 }

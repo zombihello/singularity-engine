@@ -7,7 +7,7 @@ CResource::SetData
 */
 FORCEINLINE void CResource::SetData( IRefCounted* pData, resourceType_t type )
 {
-	CResource::type = type;
+	CResource::type	 = type;
 	CResource::pData = pData;
 }
 
@@ -26,7 +26,7 @@ FORCEINLINE bool CResource::IsProcedural() const
 CResource::GetPath
 ==================
 */
-FORCEINLINE const achar* CResource::GetPath() const
+FORCEINLINE const char* CResource::GetPath() const
 {
 	return path.c_str();
 }

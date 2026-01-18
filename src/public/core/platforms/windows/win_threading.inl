@@ -7,7 +7,7 @@ Sys_InterlockedIncrement
 */
 FORCEINLINE int32 Sys_InterlockedIncrement( volatile int32* pValue )
 {
-	return ( int32 )InterlockedIncrement( ( LPLONG )pValue );
+	return (int32)InterlockedIncrement( (LPLONG)pValue );
 }
 
 /*
@@ -17,7 +17,7 @@ Sys_InterlockedDecrement
 */
 FORCEINLINE int32 Sys_InterlockedDecrement( volatile int32* pValue )
 {
-	return ( int32 )InterlockedDecrement( ( LPLONG )pValue );
+	return (int32)InterlockedDecrement( (LPLONG)pValue );
 }
 
 /*
@@ -27,7 +27,7 @@ Sys_InterlockedAdd
 */
 FORCEINLINE int32 Sys_InterlockedAdd( volatile int32* pValue, int32 amount )
 {
-	return ( int32 )InterlockedExchangeAdd( ( LPLONG )pValue, ( LONG )amount );
+	return (int32)InterlockedExchangeAdd( (LPLONG)pValue, (LONG)amount );
 }
 
 /*
@@ -37,7 +37,7 @@ Sys_InterlockedExchange
 */
 FORCEINLINE int32 Sys_InterlockedExchange( volatile int32* pValue, int32 exchange )
 {
-	return ( int32 )InterlockedExchange( ( LPLONG )pValue, ( LONG )exchange );
+	return (int32)InterlockedExchange( (LPLONG)pValue, (LONG)exchange );
 }
 
 /*
@@ -47,7 +47,7 @@ Sys_InterlockedExchange64
 */
 FORCEINLINE int64 Sys_InterlockedExchange64( volatile int64* pValue, int64 exchange )
 {
-	return ( int64 )InterlockedExchange64( pValue, exchange );
+	return (int64)InterlockedExchange64( pValue, exchange );
 }
 
 /*
@@ -57,7 +57,7 @@ Sys_InterlockedCompareExchange
 */
 FORCEINLINE int32 Sys_InterlockedCompareExchange( volatile int32* pDest, int32 exchange, int32 comperand )
 {
-	return ( int32 )InterlockedCompareExchange( ( LPLONG )pDest, ( LONG )exchange, ( LONG )comperand );
+	return (int32)InterlockedCompareExchange( (LPLONG)pDest, (LONG)exchange, (LONG)comperand );
 }
 
 /*
@@ -67,7 +67,7 @@ Sys_InterlockedCompareExchange64
 */
 FORCEINLINE int64 Sys_InterlockedCompareExchange64( volatile int64* pDest, int64 exchange, int64 comperand )
 {
-	return ( int64 )InterlockedCompareExchange64( pDest, exchange, comperand );
+	return (int64)InterlockedCompareExchange64( pDest, exchange, comperand );
 }
 
 /*
@@ -87,7 +87,7 @@ Sys_InterlockedOr
 */
 FORCEINLINE int32 Sys_InterlockedOr( volatile int32* pDest, int32 value )
 {
-	return ( int32 )InterlockedOr( ( LPLONG )pDest, ( LONG )value );
+	return (int32)InterlockedOr( (LPLONG)pDest, (LONG)value );
 }
 
 /*
@@ -127,5 +127,5 @@ Sys_Sleep
 */
 FORCEINLINE void Sys_Sleep( float seconds )
 {
-	Sleep( ( DWORD )( seconds * 1000.0 ) );
+	Sleep( (DWORD)( seconds * 1000.0 ) );
 }

@@ -17,9 +17,8 @@ public:
 	void PrepareForDispatch( CStudioAPICmdListVk* pCmdList );
 
 private:
-	CStudioAPICmdContextVk&		cmdContext;
+	CStudioAPICmdContextVk& cmdContext;
 };
-
 
 //-----------------------------------------------------------------------------
 // All the current Vulkan render pipeline states in use
@@ -29,9 +28,9 @@ class CStudioAPIPendingRenderStateVk
 public:
 	CStudioAPIPendingRenderStateVk( CStudioAPICmdContextVk& cmdContext );
 	~CStudioAPIPendingRenderStateVk();
-	
+
 	void Reset();
-	
+
 	void SetViewport( float x, float y, float width, float height, float minDepth, float maxDepth );
 	void SetScissor( bool bEnable, int32 x, int32 y, uint32 width, uint32 height );
 	void SetVertexBuffer( CStudioAPICmdListVk* pCmdList, uint32 slot, CStudioAPIBufferVk* pBuffer, uint64 offset );
@@ -50,53 +49,53 @@ private:
 	{
 		vertexBuffer_t()
 			: offset( 0 )
-		{}
+		{
+		}
 
 		void Clear();
 
-		TRefPtr<CStudioAPIBufferVk>		pBuffer;
-		VkDeviceSize					offset;
+		TRefPtr<CStudioAPIBufferVk> pBuffer;
+		VkDeviceSize				offset;
 	};
-
 
 	struct indexBuffer_t
 	{
 		indexBuffer_t()
 			: offset( 0 )
-		{}
+		{
+		}
 
 		void Clear();
 
-		TRefPtr<CStudioAPIBufferVk>	pBuffer;
+		TRefPtr<CStudioAPIBufferVk> pBuffer;
 		VkDeviceSize				offset;
 	};
-
 
 	struct descriptorStateCache_t
 	{
 		descriptorStateCache_t()
 			: pRenderDescriptorState( NULL )
 			, pRenderPipelineDeletedDelegate( NULL )
-		{}
+		{
+		}
 
-		CStudioAPIDescriptorStateRenderVk*						pRenderDescriptorState;
-		COnStudioAPIRenderPipelineDeletedVk::funcDelegate_t*	pRenderPipelineDeletedDelegate;
+		CStudioAPIDescriptorStateRenderVk*					 pRenderDescriptorState;
+		COnStudioAPIRenderPipelineDeletedVk::funcDelegate_t* pRenderPipelineDeletedDelegate;
 	};
-
 
 	static void OndRenderPipelineDeleted( void* pUserData, CStudioAPIRenderPipelineVk* pRenderPipeline );
 
-	bool																		bScissorEnabled;
-	bool																		bDirtyVertexBuffers;
-	bool																		bDirtyIndexBuffer;
-	VkViewport																	vkViewport;
-	VkRect2D																	vkScissor;
-	CStudioAPICmdContextVk&														cmdContext;
-	TRefPtr<CStudioAPIRenderPipelineVk>											pCurrentRenderPipeline;
-	CStudioAPIDescriptorStateRenderVk*											pCurrentRenderDescriptorState;
-	indexBuffer_t																indexBuffer;
-	vertexBuffer_t																vertexBuffers[STUDIOAPI_VK_MAX_VERTEX_ELEMENT_COUNT];
-	std::unordered_map<CStudioAPIRenderPipelineVk*, descriptorStateCache_t>		descriptorStatesDict;
+	bool																	bScissorEnabled;
+	bool																	bDirtyVertexBuffers;
+	bool																	bDirtyIndexBuffer;
+	VkViewport																vkViewport;
+	VkRect2D																vkScissor;
+	CStudioAPICmdContextVk&													cmdContext;
+	TRefPtr<CStudioAPIRenderPipelineVk>										pCurrentRenderPipeline;
+	CStudioAPIDescriptorStateRenderVk*										pCurrentRenderDescriptorState;
+	indexBuffer_t															indexBuffer;
+	vertexBuffer_t															vertexBuffers[STUDIOAPI_VK_MAX_VERTEX_ELEMENT_COUNT];
+	std::unordered_map<CStudioAPIRenderPipelineVk*, descriptorStateCache_t> descriptorStatesDict;
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_pendingstate.inl"

@@ -7,25 +7,22 @@ class CStudioAPIFenceVk;
 class CStudioAPISemaphoreVk;
 class CStudioAPINamedSemaphoreVk;
 
-
 //-----------------------------------------------------------------------------
 // Vulkan barriers
 //-----------------------------------------------------------------------------
 struct studioAPIBufferMemoryBarrierVk_t
 {
-	VkBufferMemoryBarrier	vkBufferMemoryBarrier;
-	VkPipelineStageFlags	vkDstStageMask;
-	VkPipelineStageFlags	vkSrcStageMask;
+	VkBufferMemoryBarrier vkBufferMemoryBarrier;
+	VkPipelineStageFlags  vkDstStageMask;
+	VkPipelineStageFlags  vkSrcStageMask;
 };
-
 
 struct studioAPIImageMemoryBarrierVk_t
 {
-	VkImageMemoryBarrier	vkImageMemoryBarrier;
-	VkPipelineStageFlags	vkDstStageMask;
-	VkPipelineStageFlags	vkSrcStageMask;
+	VkImageMemoryBarrier vkImageMemoryBarrier;
+	VkPipelineStageFlags vkDstStageMask;
+	VkPipelineStageFlags vkSrcStageMask;
 };
-
 
 //-----------------------------------------------------------------------------
 // Vulkan StudioAPI synchronization scope
@@ -35,19 +32,20 @@ struct studioAPISyncScopeVk_t
 	studioAPISyncScopeVk_t()
 		: vkAccessFlags( VK_ACCESS_NONE )
 		, vkPipelineStages( VK_PIPELINE_STAGE_NONE )
-	{}
+	{
+	}
 	studioAPISyncScopeVk_t( VkAccessFlags vkAccessFlags, VkPipelineStageFlags vkPipelineStages )
 		: vkAccessFlags( vkAccessFlags )
 		, vkPipelineStages( vkPipelineStages )
-	{}
+	{
+	}
 
 	bool operator==( const studioAPISyncScopeVk_t& other ) const;
 	bool operator!=( const studioAPISyncScopeVk_t& other ) const;
 
-	VkAccessFlags			vkAccessFlags;
-	VkPipelineStageFlags	vkPipelineStages;
+	VkAccessFlags		 vkAccessFlags;
+	VkPipelineStageFlags vkPipelineStages;
 };
-
 
 //-----------------------------------------------------------------------------
 // Vulkan StudioAPI buffer synchronization state
@@ -58,23 +56,24 @@ public:
 	studioAPISyncStateBufferVk_t()
 		: bHasPendingOwnershipTransfer( false )
 		, ownerQueueFamilyIndex( VK_QUEUE_FAMILY_IGNORED )
-	{}
+	{
+	}
 	studioAPISyncStateBufferVk_t( const studioAPISyncScopeVk_t& readScope, const studioAPISyncScopeVk_t& writeScope, uint32 ownerQueueFamilyIndex )
 		: bHasPendingOwnershipTransfer( false )
 		, readScope( readScope )
 		, writeScope( writeScope )
 		, ownerQueueFamilyIndex( ownerQueueFamilyIndex )
-	{}
+	{
+	}
 
 	bool operator==( const studioAPISyncStateBufferVk_t& other ) const;
 	bool operator!=( const studioAPISyncStateBufferVk_t& other ) const;
 
-	bool					bHasPendingOwnershipTransfer;
-	studioAPISyncScopeVk_t	readScope;
-	studioAPISyncScopeVk_t	writeScope;
-	uint32					ownerQueueFamilyIndex;
+	bool				   bHasPendingOwnershipTransfer;
+	studioAPISyncScopeVk_t readScope;
+	studioAPISyncScopeVk_t writeScope;
+	uint32				   ownerQueueFamilyIndex;
 };
-
 
 //-----------------------------------------------------------------------------
 // Vulkan StudioAPI image synchronization state
@@ -85,25 +84,26 @@ struct studioAPISyncStateImageVk_t
 		: bHasPendingOwnershipTransfer( false )
 		, vkImageLayout( VK_IMAGE_LAYOUT_UNDEFINED )
 		, ownerQueueFamilyIndex( VK_QUEUE_FAMILY_IGNORED )
-	{}
+	{
+	}
 	studioAPISyncStateImageVk_t( VkImageLayout vkImageLayout, const studioAPISyncScopeVk_t& readScope, const studioAPISyncScopeVk_t& writeScope, uint32 ownerQueueFamilyIndex )
 		: bHasPendingOwnershipTransfer( false )
 		, vkImageLayout( vkImageLayout )
 		, readScope( readScope )
 		, writeScope( writeScope )
 		, ownerQueueFamilyIndex( ownerQueueFamilyIndex )
-	{}
+	{
+	}
 
 	bool operator==( const studioAPISyncStateImageVk_t& other ) const;
 	bool operator!=( const studioAPISyncStateImageVk_t& other ) const;
 
-	bool					bHasPendingOwnershipTransfer;
-	VkImageLayout			vkImageLayout;
-	studioAPISyncScopeVk_t	readScope;
-	studioAPISyncScopeVk_t	writeScope;
-	uint32					ownerQueueFamilyIndex;
+	bool				   bHasPendingOwnershipTransfer;
+	VkImageLayout		   vkImageLayout;
+	studioAPISyncScopeVk_t readScope;
+	studioAPISyncScopeVk_t writeScope;
+	uint32				   ownerQueueFamilyIndex;
 };
-
 
 //-----------------------------------------------------------------------------
 // Vulkan StudioAPI synchronization manager
@@ -122,9 +122,9 @@ public:
 	void WaitFrameInFlight( uint32 indexFrameInFlight );
 	void WaitAllFrameInFlights();
 
-	CStudioAPIFenceVk* CreateFence( bool bCreateSignaled = false );
-	CStudioAPISemaphoreVk* CreateSemaphore();
-	CStudioAPINamedSemaphoreVk* FindOrCreateNamedSemaphore( const achar* pName );
+	CStudioAPIFenceVk*			CreateFence( bool bCreateSignaled = false );
+	CStudioAPISemaphoreVk*		CreateSemaphore();
+	CStudioAPINamedSemaphoreVk* FindOrCreateNamedSemaphore( const char* pName );
 
 	// The function places a fence/semaphore into a pending list to free and will be released
 	// at same index of frame in-flight later
@@ -133,16 +133,15 @@ public:
 	void ReleaseNamedSemaphore( CStudioAPINamedSemaphoreVk*& pNamedSemaphore );
 
 private:
-	std::list<CStudioAPIFenceVk*>										fences;
-	std::list<CStudioAPISemaphoreVk*>									semaphores;
-	std::list<CStudioAPIFenceVk*>										frameInFlightFences[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];
-	std::list<CStudioAPIFenceVk*>										pendingFreeFences[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];
-	std::list<CStudioAPISemaphoreVk*>									pendingFreeSemaphores[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];
-	std::list<CStudioAPIFenceVk*>										freeFences;
-	std::list<CStudioAPISemaphoreVk*>									freeSemaphores;
-	std::unordered_map<std::string_view, CStudioAPINamedSemaphoreVk*>	namedSemaphoresDict;
+	std::list<CStudioAPIFenceVk*>									  fences;
+	std::list<CStudioAPISemaphoreVk*>								  semaphores;
+	std::list<CStudioAPIFenceVk*>									  frameInFlightFences[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];
+	std::list<CStudioAPIFenceVk*>									  pendingFreeFences[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];
+	std::list<CStudioAPISemaphoreVk*>								  pendingFreeSemaphores[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];
+	std::list<CStudioAPIFenceVk*>									  freeFences;
+	std::list<CStudioAPISemaphoreVk*>								  freeSemaphores;
+	std::unordered_map<std::string_view, CStudioAPINamedSemaphoreVk*> namedSemaphoresDict;
 };
-
 
 //-----------------------------------------------------------------------------
 // Update synchronization functions

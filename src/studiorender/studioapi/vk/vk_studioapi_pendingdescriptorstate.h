@@ -14,7 +14,6 @@ class CStudioAPICmdListVk;
 class CStudioAPIBufferVk;
 class CStudioAPICmdListVk;
 
-
 //-----------------------------------------------------------------------------
 // Common Vulkan descriptor state
 //-----------------------------------------------------------------------------
@@ -32,14 +31,13 @@ public:
 protected:
 	void InitDescriptorWriteInfos();
 
-	bool											bDirtyDescriptorSets;
-	CStudioAPICmdContextVk&							cmdContext;
-	const CStudioAPIDescriptorSetsLayoutVk*			pDescriptorSetsLayout;
-	studioAPIDescriptorSetWriteContainerVk_t		descriptorSetWriteContainer;
-	std::vector<CStudioAPIDescriptorSetWriterVk>	descriptorSetWriters;
-	std::vector<VkDescriptorSet>					vkDescriptorSets;
+	bool										 bDirtyDescriptorSets;
+	CStudioAPICmdContextVk&						 cmdContext;
+	const CStudioAPIDescriptorSetsLayoutVk*		 pDescriptorSetsLayout;
+	studioAPIDescriptorSetWriteContainerVk_t	 descriptorSetWriteContainer;
+	std::vector<CStudioAPIDescriptorSetWriterVk> descriptorSetWriters;
+	std::vector<VkDescriptorSet>				 vkDescriptorSets;
 };
-
 
 //-----------------------------------------------------------------------------
 // Vulkan descriptor state for compute pipeline
@@ -49,7 +47,6 @@ class CStudioAPIDescriptorStateComputeVk : public CStudioAPIDescriptorStateCommo
 public:
 	CStudioAPIDescriptorStateComputeVk( CStudioAPICmdContextVk& cmdContext );
 };
-
 
 //-----------------------------------------------------------------------------
 // Vulkan descriptor state for render pipeline
@@ -66,7 +63,7 @@ public:
 	CStudioAPIRenderPipelineVk* GetRenderPipeline() const;
 
 private:
-	CStudioAPIRenderPipelineVk*		pRenderPipeline;
+	CStudioAPIRenderPipelineVk* pRenderPipeline;
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_pendingdescriptorstate.inl"

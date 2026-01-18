@@ -18,42 +18,38 @@ enum resourceToolEntityDescVarType_t
 	RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_STRING
 };
 
-
 struct resourceToolEntityDescVar_t
 {
-	const achar*							pName;
-	resourceToolEntityDescVarType_t			type;
+	const char*					pName;
+	resourceToolEntityDescVarType_t type;
 	union
 	{
-		bool								boolValue;
-		int32								intValue;
-		float								floatValue;
-		vec2_t								vector2DValue;
-		vec3_t								vector3DValue;
-		vec4_t								vector4DValue;
-		matrix_t							matrixValue;
-		const achar*						pStringValue;
+		bool		 boolValue;
+		int32		 intValue;
+		float		 floatValue;
+		vec2_t		 vector2DValue;
+		vec3_t		 vector3DValue;
+		vec4_t		 vector4DValue;
+		matrix_t	 matrixValue;
+		const char* pStringValue;
 	};
 };
 
-
 struct resourceToolEntityDescComponent_t
 {
-	const achar*							pType;
-	const resourceToolEntityDescVar_t*		pVars;
-	uint32									numVars;
+	const char*					   pType;
+	const resourceToolEntityDescVar_t* pVars;
+	uint32							   numVars;
 };
-
 
 struct resourceToolCompileEntityDescParams_t
 {
-	const achar*								pDestPath;
-	const resourceToolEntityDescComponent_t*	pComponents;
-	uint32										numComponents;
+	const char*							 pDestPath;
+	const resourceToolEntityDescComponent_t* pComponents;
+	uint32									 numComponents;
 };
 
-
-#define ENTITYDESC_TOOL_INTERFACE_VERSION		"SEntityDescTool001"
+#define ENTITYDESC_TOOL_INTERFACE_VERSION "SEntityDescTool001"
 class IEntityDescTool : public IAppSystem
 {
 public:

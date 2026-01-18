@@ -14,7 +14,6 @@
 class CStudioAPICmdBufferPoolVk;
 class CStudioAPIDescriptorPoolSetContainerVk;
 
-
 //-----------------------------------------------------------------------------
 // Vulkan StudioAPI command buffer
 //-----------------------------------------------------------------------------
@@ -30,8 +29,8 @@ public:
 
 	bool AcquirePoolSetAndDescriptorsIfNeed( const CStudioAPIDescriptorSetsLayoutVk& descriptorSetsLayout, bool bNeedDescriptorSets, VkDescriptorSet* pDestDescriptorSets );
 
-	FORCEINLINE CStudioAPICmdBufferPoolVk& GetCmdBufferPool()		{ return cmdBufferPool; }
-	FORCEINLINE VkCommandBuffer GetVkCommandBuffer() const			{ return vkCommandBuffer; }
+	FORCEINLINE CStudioAPICmdBufferPoolVk& GetCmdBufferPool() { return cmdBufferPool; }
+	FORCEINLINE VkCommandBuffer			   GetVkCommandBuffer() const { return vkCommandBuffer; }
 
 private:
 	CStudioAPICmdBufferVk( CStudioAPICmdBufferPoolVk& cmdBufferPool );
@@ -43,6 +42,6 @@ private:
 
 	bool									bIsAllocatedMemory;
 	VkCommandBuffer							vkCommandBuffer;
-	CStudioAPICmdBufferPoolVk&				cmdBufferPool;	
+	CStudioAPICmdBufferPoolVk&				cmdBufferPool;
 	CStudioAPIDescriptorPoolSetContainerVk* pCurrentDescriptorPoolSetContainer;
 };

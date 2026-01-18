@@ -15,12 +15,12 @@ public:
 
 	// IStreamData interface
 	virtual uint64 Tell() const override;
-	virtual void Seek( uint64 position ) override;
-	virtual void Flush() override;
-	
-	virtual bool IsEndOfStream() const override;
+	virtual void   Seek( uint64 position ) override;
+	virtual void   Flush() override;
+
+	virtual bool   IsEndOfStream() const override;
 	virtual uint64 GetSize() const override;
-	
+
 	// IStreamDataReader interface
 	virtual void Read( void* pBuffer, uint64 size ) override;
 
@@ -30,9 +30,8 @@ public:
 	}
 
 private:
-	FILE*	pFile;
+	FILE* pFile;
 };
-
 
 //-----------------------------------------------------------------------------
 // The class for write to the std file
@@ -45,10 +44,10 @@ public:
 
 	// IStreamData interface
 	virtual uint64 Tell() const override;
-	virtual void Seek( uint64 position ) override;
-	virtual void Flush() override;
+	virtual void   Seek( uint64 position ) override;
+	virtual void   Flush() override;
 
-	virtual bool IsEndOfStream() const override;
+	virtual bool   IsEndOfStream() const override;
 	virtual uint64 GetSize() const override;
 
 	// IStreamDataWriter interface
@@ -60,5 +59,5 @@ public:
 	}
 
 private:
-	FILE*	pFile;
+	FILE* pFile;
 };

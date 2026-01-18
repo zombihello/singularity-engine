@@ -38,7 +38,7 @@ CSENTCompiledEntityDescDoc::GetNumComponents
 */
 FORCEINLINE uint32 CSENTCompiledEntityDescDoc::GetNumComponents() const
 {
-	return ( uint32 )components.size();
+	return (uint32)components.size();
 }
 
 /*

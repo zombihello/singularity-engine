@@ -15,9 +15,8 @@ public:
 	virtual void Unlock() const override;
 
 private:
-	CRITICAL_SECTION	criticalSection;
+	CRITICAL_SECTION criticalSection;
 };
-
 
 //-----------------------------------------------------------------------------
 // Windows version of a thread event
@@ -25,7 +24,7 @@ private:
 class CORE_CLASS CWindowsThreadEvent : public IThreadEvent
 {
 public:
-	CWindowsThreadEvent( bool bManualReset = false, const achar* pName = NULL );
+	CWindowsThreadEvent( bool bManualReset = false, const char* pName = NULL );
 	virtual ~CWindowsThreadEvent();
 
 	virtual void Trigger() override;
@@ -34,9 +33,8 @@ public:
 	virtual bool Wait( uint32 waitTime = -1 ) override;
 
 private:
-	HANDLE	handle;
+	HANDLE handle;
 };
-
 
 //-----------------------------------------------------------------------------
 // Windows version of a thread semaphore
@@ -44,7 +42,7 @@ private:
 class CORE_CLASS CWindowsThreadSemaphore : public IThreadSemaphore
 {
 public:
-	CWindowsThreadSemaphore( uint32 initialValue, uint32 maxValue, const achar* pName = NULL );
+	CWindowsThreadSemaphore( uint32 initialValue, uint32 maxValue, const char* pName = NULL );
 	virtual ~CWindowsThreadSemaphore();
 
 	virtual bool Signal() override;
@@ -54,9 +52,8 @@ public:
 	virtual bool TryWait() override;
 
 private:
-	HANDLE	handle;
+	HANDLE handle;
 };
-
 
 //-----------------------------------------------------------------------------
 // Windows version of a base thread class
@@ -72,15 +69,15 @@ public:
 	virtual void Suspend( bool bShouldPause = true ) override;
 	virtual void WaitForCompletion() override;
 
-	virtual void SetName( const achar* pName ) override;
+	virtual void SetName( const char* pName ) override;
 	virtual void SetPriority( threadPriority_t priority ) override;
 
-	virtual bool IsAlive() const override;
-	virtual const achar* GetName() const override;
+	virtual bool			 IsAlive() const override;
+	virtual const char*	 GetName() const override;
 	virtual threadPriority_t GetPriority() const override;
-	virtual threadHandle_t GetThreadHandle() const override;
-	virtual threadId_t GetThreadId() const override;
-	virtual int32 GetExitCode() const override;
+	virtual threadHandle_t	 GetThreadHandle() const override;
+	virtual threadId_t		 GetThreadId() const override;
+	virtual int32			 GetExitCode() const override;
 
 protected:
 	virtual bool ThreadInit() override;
@@ -90,10 +87,10 @@ protected:
 private:
 	static DWORD STDCALL ThreadMain( LPVOID pThis );
 
-	int32					exitCode;
-	threadPriority_t		threadPriority;
-	achar					name[64];
-	threadHandle_t			handle;
-	threadId_t				id;
-	CWindowsThreadEvent*	pThreadInitSyncEvent;
+	int32				 exitCode;
+	threadPriority_t	 threadPriority;
+	char				 name[64];
+	threadHandle_t		 handle;
+	threadId_t			 id;
+	CWindowsThreadEvent* pThreadInitSyncEvent;
 };

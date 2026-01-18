@@ -6,22 +6,20 @@
 #include "materialsystem/ishader.h"
 #include "materialsystem/materialsystem.h"
 
-
 //-----------------------------------------------------------------------------
 // Information about a shader library
 //-----------------------------------------------------------------------------
 struct shaderLibInfo_t
 {
-	typedef std::unordered_map<const achar*, IShader*, stlInsensitiveStringHash_t, stlInsensitiveCompareString_t>		shadersDict_t;
+	typedef std::unordered_map<const char*, IShader*, stlInsensitiveStringHash_t, stlInsensitiveCompareString_t> shadersDict_t;
 
-	std::string									fileName;
-	dllHandle_t									moduleHandle;
-	IShaderLib*									pShaderLib;
-	bool										bGameShaderLib;		// TRUE if this is a game's shader library, in which case it's not allowed to override any existing shader names
-	shadersDict_t								shadersDict;
-	std::vector<TRefPtr<IStudioAPIShader>>		shaderCaches[STUDIOAPI_SHADER_NUM_TYPES];
+	std::string							   fileName;
+	dllHandle_t							   moduleHandle;
+	IShaderLib*							   pShaderLib;
+	bool								   bGameShaderLib;	// TRUE if this is a game's shader library, in which case it's not allowed to override any existing shader names
+	shadersDict_t						   shadersDict;
+	std::vector<TRefPtr<IStudioAPIShader>> shaderCaches[STUDIOAPI_SHADER_NUM_TYPES];
 };
-
 
 //-----------------------------------------------------------------------------
 // Shader manager
@@ -40,16 +38,16 @@ public:
 	virtual void GameInit() override;
 	virtual void GameShutdown() override;
 
-	virtual IShader* FindShader( const achar* pShaderName ) const override;
+	virtual IShader*		  FindShader( const char* pShaderName ) const override;
 	virtual IStudioAPIShader* GetStudioAPIShader( uint32 shaderLibIndex, studioAPIShaderType_t shaderType, uint64 shaderIndex ) const override;
 
 private:
-	bool LoadShaderLib( const achar* pPath, bool bGameShaderLib = false );
-	void UnloadShaderLib( uint32 index );
-	uint32 FindShaderLib( const achar* pPath ) const;
-	bool InitShaderLibInfo( const shaderLibInfo_t& shaderLibInfo );
-	void SetupShaderDictionary( uint32 index );
-	
+	bool   LoadShaderLib( const char* pPath, bool bGameShaderLib = false );
+	void   UnloadShaderLib( uint32 index );
+	uint32 FindShaderLib( const char* pPath ) const;
+	bool   InitShaderLibInfo( const shaderLibInfo_t& shaderLibInfo );
+	void   SetupShaderDictionary( uint32 index );
+
 	bool LoadShaderCaches( uint32 index );
 	void UnloadShaderCaches( uint32 index );
 
@@ -58,13 +56,12 @@ private:
 	void LoadGameShaderLibs();
 	void UnloadGameShaderLibs();
 
-	std::vector<shaderLibInfo_t>		shaderLibs;
+	std::vector<shaderLibInfo_t> shaderLibs;
 };
 
-CShaderLib		g_ShaderLib( "default" );
+CShaderLib g_ShaderLib( "default" );
 EXPOSE_SINGLE_INTERFACE( CShaderMgr, IShaderMgr, SHADERMGR_INTERFACE_VERSION );
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CShaderLib, IShaderLib, SHADERLIB_INTERFACE_VERSION, g_ShaderLib );
-
 
 /*
 ==================
@@ -115,10 +112,10 @@ void CShaderMgr::GameShutdown()
 CShaderMgr::LoadShaderLib
 ==================
 */
-bool CShaderMgr::LoadShaderLib( const achar* pPath, bool bGameShaderLib /* = false */ )
+bool CShaderMgr::LoadShaderLib( const char* pPath, bool bGameShaderLib /* = false */ )
 {
 	// Load shader module
-	dllHandle_t		shaderModule = g_pFileSystem->LoadModule( pPath );
+	dllHandle_t shaderModule = g_pFileSystem->LoadModule( pPath );
 	if ( !shaderModule )
 	{
 		Warning( "ShaderMgr: Failed to load shader library '%s'", pPath );
@@ -126,7 +123,7 @@ bool CShaderMgr::LoadShaderLib( const achar* pPath, bool bGameShaderLib /* = fal
 	}
 
 	// Get at the shader library interface
-	createInterfaceFn_t		pFactory = Sys_GetFactory( shaderModule );
+	createInterfaceFn_t pFactory = Sys_GetFactory( shaderModule );
 	if ( !pFactory )
 	{
 		Warning( "ShaderMgr: Could not find factory interface in '%s'", pPath );
@@ -134,7 +131,7 @@ bool CShaderMgr::LoadShaderLib( const achar* pPath, bool bGameShaderLib /* = fal
 		return false;
 	}
 
-	IShaderLib*		pShaderLib = ( IShaderLib* )pFactory( SHADERLIB_INTERFACE_VERSION );
+	IShaderLib* pShaderLib = (IShaderLib*)pFactory( SHADERLIB_INTERFACE_VERSION );
 	if ( !pShaderLib )
 	{
 		Warning( "ShaderMgr: Could not get IShaderLib interface from '%s'", pPath );
@@ -151,11 +148,11 @@ bool CShaderMgr::LoadShaderLib( const achar* pPath, bool bGameShaderLib /* = fal
 	}
 
 	// Initialize a shader library information
-	shaderLibInfo_t					shaderLibInfo = {};
-	shaderLibInfo.fileName			= pPath;
-	shaderLibInfo.moduleHandle		= shaderModule;
-	shaderLibInfo.pShaderLib		= pShaderLib;
-	shaderLibInfo.bGameShaderLib	= bGameShaderLib;
+	shaderLibInfo_t shaderLibInfo = {};
+	shaderLibInfo.fileName		  = pPath;
+	shaderLibInfo.moduleHandle	  = shaderModule;
+	shaderLibInfo.pShaderLib	  = pShaderLib;
+	shaderLibInfo.bGameShaderLib  = bGameShaderLib;
 	return InitShaderLibInfo( shaderLibInfo );
 }
 
@@ -167,8 +164,8 @@ CShaderMgr::InitShaderLibInfo
 bool CShaderMgr::InitShaderLibInfo( const shaderLibInfo_t& shaderLibInfo )
 {
 	// Now replace any existing shader
-	uint32				shaderLibIndex = FindShaderLib( shaderLibInfo.fileName.c_str() );
-	shaderLibInfo_t*	pShaderLibInfo = NULL;
+	uint32			 shaderLibIndex = FindShaderLib( shaderLibInfo.fileName.c_str() );
+	shaderLibInfo_t* pShaderLibInfo = NULL;
 	if ( shaderLibIndex != INVALID_INDEX )
 	{
 		UnloadShaderLib( shaderLibIndex );
@@ -176,15 +173,15 @@ bool CShaderMgr::InitShaderLibInfo( const shaderLibInfo_t& shaderLibInfo )
 	}
 	else
 	{
-		shaderLibIndex = ( uint32 )shaderLibs.size();
+		shaderLibIndex = (uint32)shaderLibs.size();
 		pShaderLibInfo = &shaderLibs.emplace_back();
 	}
 
 	// Ok, the shader library good!
-	pShaderLibInfo->fileName		= shaderLibInfo.fileName;
-	pShaderLibInfo->moduleHandle	= shaderLibInfo.moduleHandle;
-	pShaderLibInfo->pShaderLib		= shaderLibInfo.pShaderLib;
-	pShaderLibInfo->bGameShaderLib	= shaderLibInfo.bGameShaderLib;
+	pShaderLibInfo->fileName	   = shaderLibInfo.fileName;
+	pShaderLibInfo->moduleHandle   = shaderLibInfo.moduleHandle;
+	pShaderLibInfo->pShaderLib	   = shaderLibInfo.pShaderLib;
+	pShaderLibInfo->bGameShaderLib = shaderLibInfo.bGameShaderLib;
 
 	// Add the shaders to the dictionary of shaders and initialize the library
 	SetupShaderDictionary( shaderLibIndex );
@@ -210,15 +207,15 @@ void CShaderMgr::UnloadShaderLib( uint32 index )
 {
 	// Get a shader library info by the index
 	Assert( index != INVALID_INDEX );
-	shaderLibInfo_t&	info = shaderLibs[index];
-	
+	shaderLibInfo_t& info = shaderLibs[index];
+
 	// Unload all shader caches
 	UnloadShaderCaches( index );
 
 	// Shutdown the shader library
 	if ( info.pShaderLib )
 	{
-		info.pShaderLib->Shutdown();		
+		info.pShaderLib->Shutdown();
 	}
 
 	// Unload the shader module
@@ -231,8 +228,8 @@ void CShaderMgr::UnloadShaderLib( uint32 index )
 	Msg( "ShaderMgr: Shader library '%s' unloaded", info.fileName.c_str() );
 	info.fileName.clear();
 	info.shadersDict.clear();
-	info.pShaderLib		= NULL;
-	info.moduleHandle	= NULL;
+	info.pShaderLib	  = NULL;
+	info.moduleHandle = NULL;
 }
 
 /*
@@ -244,26 +241,26 @@ bool CShaderMgr::LoadShaderCaches( uint32 index )
 {
 	// Get a shader library info and shader platform name
 	Assert( index != INVALID_INDEX );
-	shaderLibInfo_t&	info			= shaderLibs[index];
-	const achar*		pShaderPlatform	= g_pStudioAPI->GetInfo().pShaderPlatform;
+	shaderLibInfo_t& info			 = shaderLibs[index];
+	const char*	 pShaderPlatform = g_pStudioAPI->GetInfo().pShaderPlatform;
 	Assert( pShaderPlatform && info.pShaderLib );
-	std::string			shaderCacheDir	= S_Sprintf( "//%s/shaders/%s/%s/", info.bGameShaderLib ? "GAME" : "CORE", info.pShaderLib->GetName(), pShaderPlatform );
+	std::string shaderCacheDir = S_Sprintf( "//%s/shaders/%s/%s/", info.bGameShaderLib ? "GAME" : "CORE", info.pShaderLib->GetName(), pShaderPlatform );
 
 	// Load shader caches for each shader
-	uint32		numShaders			= info.pShaderLib->GetNumShaders();
-	uint32		numLoadedShaders	= 0;
+	uint32 numShaders		= info.pShaderLib->GetNumShaders();
+	uint32 numLoadedShaders = 0;
 	for ( uint32 shaderIdx = 0; shaderIdx < numShaders; ++shaderIdx )
 	{
 		// Load shader caches for a shader
-		shaderInitParams_t		shaderInitParams	= {};
-		IShader*				pShader				= info.pShaderLib->GetShader( shaderIdx );
-		uint32					numCacheNames		= pShader->GetNumCacheNames();
-		bool					bOk					= true;
+		shaderInitParams_t shaderInitParams = {};
+		IShader*		   pShader			= info.pShaderLib->GetShader( shaderIdx );
+		uint32			   numCacheNames	= pShader->GetNumCacheNames();
+		bool			   bOk				= true;
 		for ( uint32 cacheNameIdx = 0; cacheNameIdx < numCacheNames && bOk; ++cacheNameIdx )
 		{
 			// Load shader cache file for the shader
-			const achar*		pCacheName = pShader->GetCacheName( cacheNameIdx );
-			CShaderCacheDoc		shaderCacheDoc;
+			const char*	pCacheName = pShader->GetCacheName( cacheNameIdx );
+			CShaderCacheDoc shaderCacheDoc;
 			if ( !shaderCacheDoc.LoadFromFile( S_Sprintf( "%s/%s.ssc", shaderCacheDir.c_str(), pCacheName ).c_str() ) )
 			{
 				Warning( "ShaderMgr: Failed to load shader cache '%s/%s.ssc' for '%s'", shaderCacheDir.c_str(), pCacheName, pShader->GetName() );
@@ -272,24 +269,24 @@ bool CShaderMgr::LoadShaderCaches( uint32 index )
 			}
 
 			// Load all shader caches
-			studioAPIShaderType_t			shaderType		= shaderCacheDoc.GetType();
-			shaderCacheInfo_t&				shaderCacheInfo = shaderInitParams.cacheInfos[shaderType];
-			shaderCacheInfo.numCaches		= shaderCacheDoc.GetNumCaches();
-			shaderCacheInfo.indexOffset		= ( uint64 )info.shaderCaches[shaderType].size();
+			studioAPIShaderType_t shaderType	  = shaderCacheDoc.GetType();
+			shaderCacheInfo_t&	  shaderCacheInfo = shaderInitParams.cacheInfos[shaderType];
+			shaderCacheInfo.numCaches			  = shaderCacheDoc.GetNumCaches();
+			shaderCacheInfo.indexOffset			  = (uint64)info.shaderCaches[shaderType].size();
 			for ( uint64 cacheIdx = 0; cacheIdx < shaderCacheInfo.numCaches && bOk; ++cacheIdx )
 			{
 				// Load the shader cache for the vertex type
-				const CShaderCacheDoc::shaderCache_t&	shaderCache = shaderCacheDoc.GetCache( cacheIdx );
-				TRefPtr<IStudioAPIShader>				pStudioAPIShader;
+				const CShaderCacheDoc::shaderCache_t& shaderCache = shaderCacheDoc.GetCache( cacheIdx );
+				TRefPtr<IStudioAPIShader>			  pStudioAPIShader;
 				switch ( shaderType )
 				{
-				case STUDIOAPI_SHADER_TYPE_VERTEX:			pStudioAPIShader = g_pStudioAPI->CreateVertexShader( shaderCache.entryPointName.c_str(), shaderCache.bytecode.data(), shaderCache.bytecode.size(), shaderCache.reflectionData.data(), shaderCache.reflectionData.size() );		break;
-				case STUDIOAPI_SHADER_TYPE_HULL:			pStudioAPIShader = g_pStudioAPI->CreateHullShader( shaderCache.entryPointName.c_str(), shaderCache.bytecode.data(), shaderCache.bytecode.size(), shaderCache.reflectionData.data(), shaderCache.reflectionData.size() );		break;
-				case STUDIOAPI_SHADER_TYPE_DOMAIN:			pStudioAPIShader = g_pStudioAPI->CreateDomainShader( shaderCache.entryPointName.c_str(), shaderCache.bytecode.data(), shaderCache.bytecode.size(), shaderCache.reflectionData.data(), shaderCache.reflectionData.size() );		break;
-				case STUDIOAPI_SHADER_TYPE_GEOMETRY:		pStudioAPIShader = g_pStudioAPI->CreateGeometryShader( shaderCache.entryPointName.c_str(), shaderCache.bytecode.data(), shaderCache.bytecode.size(), shaderCache.reflectionData.data(), shaderCache.reflectionData.size() );	break;
-				case STUDIOAPI_SHADER_TYPE_PIXEL:			pStudioAPIShader = g_pStudioAPI->CreatePixelShader( shaderCache.entryPointName.c_str(), shaderCache.bytecode.data(), shaderCache.bytecode.size(), shaderCache.reflectionData.data(), shaderCache.reflectionData.size() );		break;
+				case STUDIOAPI_SHADER_TYPE_VERTEX: pStudioAPIShader = g_pStudioAPI->CreateVertexShader( shaderCache.entryPointName.c_str(), shaderCache.bytecode.data(), shaderCache.bytecode.size(), shaderCache.reflectionData.data(), shaderCache.reflectionData.size() ); break;
+				case STUDIOAPI_SHADER_TYPE_HULL: pStudioAPIShader = g_pStudioAPI->CreateHullShader( shaderCache.entryPointName.c_str(), shaderCache.bytecode.data(), shaderCache.bytecode.size(), shaderCache.reflectionData.data(), shaderCache.reflectionData.size() ); break;
+				case STUDIOAPI_SHADER_TYPE_DOMAIN: pStudioAPIShader = g_pStudioAPI->CreateDomainShader( shaderCache.entryPointName.c_str(), shaderCache.bytecode.data(), shaderCache.bytecode.size(), shaderCache.reflectionData.data(), shaderCache.reflectionData.size() ); break;
+				case STUDIOAPI_SHADER_TYPE_GEOMETRY: pStudioAPIShader = g_pStudioAPI->CreateGeometryShader( shaderCache.entryPointName.c_str(), shaderCache.bytecode.data(), shaderCache.bytecode.size(), shaderCache.reflectionData.data(), shaderCache.reflectionData.size() ); break;
+				case STUDIOAPI_SHADER_TYPE_PIXEL: pStudioAPIShader = g_pStudioAPI->CreatePixelShader( shaderCache.entryPointName.c_str(), shaderCache.bytecode.data(), shaderCache.bytecode.size(), shaderCache.reflectionData.data(), shaderCache.reflectionData.size() ); break;
 				default:
-					Warning( "ShaderMgr: Unsupported shader type 0x%X (cache: %i, path: '%s/%s.ssc')", shaderType, cacheIdx+1, shaderCacheDir.c_str(), pCacheName );
+					Warning( "ShaderMgr: Unsupported shader type 0x%X (cache: %i, path: '%s/%s.ssc')", shaderType, cacheIdx + 1, shaderCacheDir.c_str(), pCacheName );
 					bOk = false;
 					break;
 				}
@@ -299,12 +296,12 @@ bool CShaderMgr::LoadShaderCaches( uint32 index )
 				{
 					if ( pStudioAPIShader )
 					{
-						Msg( "ShaderMgr: Shader cache %i/%i loaded (path: '%s/%s.ssc')", cacheIdx+1, shaderCacheInfo.numCaches, shaderCacheDir.c_str(), pCacheName );
+						Msg( "ShaderMgr: Shader cache %i/%i loaded (path: '%s/%s.ssc')", cacheIdx + 1, shaderCacheInfo.numCaches, shaderCacheDir.c_str(), pCacheName );
 						info.shaderCaches[shaderType].emplace_back( pStudioAPIShader );
 					}
 					else
 					{
-						Warning( "ShaderMgr: Failed to load shader cache %i/%i (path: '%s/%s.ssc')", cacheIdx+1, shaderCacheInfo.numCaches, shaderCacheDir.c_str(), pCacheName );
+						Warning( "ShaderMgr: Failed to load shader cache %i/%i (path: '%s/%s.ssc')", cacheIdx + 1, shaderCacheInfo.numCaches, shaderCacheDir.c_str(), pCacheName );
 						bOk = false;
 						break;
 					}
@@ -337,7 +334,7 @@ void CShaderMgr::UnloadShaderCaches( uint32 index )
 {
 	// Get a shader library info by the index
 	Assert( index != INVALID_INDEX );
-	shaderLibInfo_t&	info = shaderLibs[index];
+	shaderLibInfo_t& info = shaderLibs[index];
 
 	// Unload all shader caches
 	for ( uint32 shaderTypeIdx = 0; shaderTypeIdx < STUDIOAPI_SHADER_NUM_TYPES; ++shaderTypeIdx )
@@ -354,17 +351,17 @@ CShaderMgr::SetupShaderDictionary
 */
 void CShaderMgr::SetupShaderDictionary( uint32 index )
 {
-	shaderLibInfo_t&	info = shaderLibs[index];
-	uint32				numShaders = info.pShaderLib->GetNumShaders();
+	shaderLibInfo_t& info		= shaderLibs[index];
+	uint32			 numShaders = info.pShaderLib->GetNumShaders();
 	for ( uint32 index = 0; index < numShaders; ++index )
 	{
 		// Make sure it doesn't try to override another shader library's names
-		IShader*	pShader	= info.pShaderLib->GetShader( index );
+		IShader* pShader = info.pShaderLib->GetShader( index );
 		if ( info.bGameShaderLib )
 		{
-			for ( uint32 testIdx = 0, countShaderLibs = ( uint32 )shaderLibs.size(); testIdx < countShaderLibs; ++testIdx )
+			for ( uint32 testIdx = 0, countShaderLibs = (uint32)shaderLibs.size(); testIdx < countShaderLibs; ++testIdx )
 			{
-				const shaderLibInfo_t&	testInfo = shaderLibs[testIdx];
+				const shaderLibInfo_t& testInfo = shaderLibs[testIdx];
 				if ( !testInfo.bGameShaderLib )
 				{
 					if ( testInfo.shadersDict.find( pShader->GetName() ) != testInfo.shadersDict.end() )
@@ -384,12 +381,12 @@ void CShaderMgr::SetupShaderDictionary( uint32 index )
 CShaderMgr::FindShaderLib
 ==================
 */
-uint32 CShaderMgr::FindShaderLib( const achar* pPath ) const
+uint32 CShaderMgr::FindShaderLib( const char* pPath ) const
 {
 	PROFILE_SCOPE();
-	for ( int32 index = ( int32 )shaderLibs.size(); --index >= 0; )
+	for ( int32 index = (int32)shaderLibs.size(); --index >= 0; )
 	{
-		const shaderLibInfo_t&	info = shaderLibs[index];
+		const shaderLibInfo_t& info = shaderLibs[index];
 		if ( !S_Stricmp( pPath, info.fileName.c_str() ) )
 		{
 			return index;
@@ -410,11 +407,11 @@ void CShaderMgr::LoadShaderLibs()
 	UnloadShaderLibs();
 
 	// Initialize default shader library
-	shaderLibInfo_t						defaultShaderLibInfo = {};
-	defaultShaderLibInfo.fileName		= g_ShaderLib.GetName();
-	defaultShaderLibInfo.moduleHandle	= INVALID_DLL_HANDLE;
-	defaultShaderLibInfo.pShaderLib		= &g_ShaderLib;
-	defaultShaderLibInfo.bGameShaderLib = false;
+	shaderLibInfo_t defaultShaderLibInfo = {};
+	defaultShaderLibInfo.fileName		 = g_ShaderLib.GetName();
+	defaultShaderLibInfo.moduleHandle	 = INVALID_DLL_HANDLE;
+	defaultShaderLibInfo.pShaderLib		 = &g_ShaderLib;
+	defaultShaderLibInfo.bGameShaderLib	 = false;
 	if ( !InitShaderLibInfo( defaultShaderLibInfo ) )
 	{
 		Sys_Error( "Failed to initialize shader library '%s'", g_ShaderLib.GetName() );
@@ -436,7 +433,7 @@ void CShaderMgr::UnloadShaderLibs()
 {
 	if ( !shaderLibs.empty() )
 	{
-		for ( int32 index = ( int32 )shaderLibs.size(); --index >= 0; )
+		for ( int32 index = (int32)shaderLibs.size(); --index >= 0; )
 		{
 			UnloadShaderLib( index );
 		}
@@ -468,9 +465,9 @@ void CShaderMgr::UnloadGameShaderLibs()
 {
 	if ( !shaderLibs.empty() )
 	{
-		for ( int32 index = ( int32 )shaderLibs.size(); --index >= 0; )
+		for ( int32 index = (int32)shaderLibs.size(); --index >= 0; )
 		{
-			const shaderLibInfo_t&	info = shaderLibs[index];
+			const shaderLibInfo_t& info = shaderLibs[index];
 			if ( info.bGameShaderLib )
 			{
 				UnloadShaderLib( index );
@@ -488,11 +485,11 @@ CShaderMgr::GetStudioAPIShader
 IStudioAPIShader* CShaderMgr::GetStudioAPIShader( uint32 shaderLibIndex, studioAPIShaderType_t shaderType, uint64 shaderIndex ) const
 {
 	PROFILE_SCOPE();
-	Assert( shaderLibIndex < ( uint32 )shaderLibs.size() );
+	Assert( shaderLibIndex < (uint32)shaderLibs.size() );
 	Assert( shaderType < STUDIOAPI_SHADER_NUM_TYPES );
-	
-	const shaderLibInfo_t&					info = shaderLibs[shaderLibIndex];
-	Assert( shaderIndex < ( uint64 )info.shaderCaches[shaderType].size() );
+
+	const shaderLibInfo_t& info = shaderLibs[shaderLibIndex];
+	Assert( shaderIndex < (uint64)info.shaderCaches[shaderType].size() );
 	return info.shaderCaches[shaderType][shaderIndex];
 }
 
@@ -501,13 +498,13 @@ IStudioAPIShader* CShaderMgr::GetStudioAPIShader( uint32 shaderLibIndex, studioA
 CShaderMgr::FindShader
 ==================
 */
-IShader* CShaderMgr::FindShader( const achar* pShaderName ) const
+IShader* CShaderMgr::FindShader( const char* pShaderName ) const
 {
 	PROFILE_SCOPE();
-	for ( int32 shaderLibIdx = ( int32 )shaderLibs.size(); --shaderLibIdx >= 0; )
+	for ( int32 shaderLibIdx = (int32)shaderLibs.size(); --shaderLibIdx >= 0; )
 	{
-		const shaderLibInfo_t&	info	= shaderLibs[shaderLibIdx];
-		auto					itFind	= info.shadersDict.find( pShaderName );
+		const shaderLibInfo_t& info	  = shaderLibs[shaderLibIdx];
+		auto				   itFind = info.shadersDict.find( pShaderName );
 		if ( itFind == info.shadersDict.end() )
 		{
 			continue;

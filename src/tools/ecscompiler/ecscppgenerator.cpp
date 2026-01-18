@@ -2,54 +2,51 @@
 #include "tools/ecscompiler/ecscppgenerator.h"
 
 // Table for convert ecsSystemStage_t to text
-static std::pair<const achar*, const achar*> s_pEcsSystemStageNames[] =
-{
-	{ "on_start",		"OnStart" },		// ECS_SYSTEM_STAGE_ONSTART
-	{ "on_load",		"OnLoad" },			// ECS_SYSTEM_STAGE_ONLOAD
-	{ "post_load",		"PostLoad" },		// ECS_SYSTEM_STAGE_POSTLOAD
-	{ "pre_update",		"PreUpdate" },		// ECS_SYSTEM_STAGE_PREUPDATE
-	{ "on_update",		"OnUpdate" },		// ECS_SYSTEM_STAGE_ONUPDATE
-	{ "on_validate",	"OnValidate" },		// ECS_SYSTEM_STAGE_ONVALIDATE
-	{ "post_update",	"PostUpdate" },		// ECS_SYSTEM_STAGE_POSTUPDATE
-	{ "pre_store",		"PreStore" },		// ECS_SYSTEM_STAGE_PRESTORE
-	{ "on_store",		"OnStore" }			// ECS_SYSTEM_STAGE_ONSTORE
+static std::pair<const char*, const char*> s_pEcsSystemStageNames[] = {
+	{ "on_start", "OnStart" },		  // ECS_SYSTEM_STAGE_ONSTART
+	{ "on_load", "OnLoad" },		  // ECS_SYSTEM_STAGE_ONLOAD
+	{ "post_load", "PostLoad" },	  // ECS_SYSTEM_STAGE_POSTLOAD
+	{ "pre_update", "PreUpdate" },	  // ECS_SYSTEM_STAGE_PREUPDATE
+	{ "on_update", "OnUpdate" },	  // ECS_SYSTEM_STAGE_ONUPDATE
+	{ "on_validate", "OnValidate" },  // ECS_SYSTEM_STAGE_ONVALIDATE
+	{ "post_update", "PostUpdate" },  // ECS_SYSTEM_STAGE_POSTUPDATE
+	{ "pre_store", "PreStore" },	  // ECS_SYSTEM_STAGE_PRESTORE
+	{ "on_store", "OnStore" }		  // ECS_SYSTEM_STAGE_ONSTORE
 };
 static_assert( ARRAYSIZE( s_pEcsSystemStageNames ) == ECS_SYSTEM_NUM_STAGES, "Size of s_pEcsSystemStageNames must be equal to ECS_SYSTEM_NUM_STAGES" );
 
 // Table for convert profiler group to profileScopeGroup_t
-static std::pair<const achar*, const achar*> s_pProfilerScopeGroupNames[] =
-{
-	{ "none",		"PROFILE_SCOPE_GROUP_NONE" },			// PROFILE_SCOPE_GROUP_NONE
-	{ "ai",			"PROFILE_SCOPE_GROUP_AI" },				// PROFILE_SCOPE_GROUP_AI
-	{ "animation",	"PROFILE_SCOPE_GROUP_ANIMATION" },		// PROFILE_SCOPE_GROUP_ANIMATION
-	{ "audio",		"PROFILE_SCOPE_GROUP_AUDIO" },			// PROFILE_SCOPE_GROUP_AUDIO
-	{ "debug",		"PROFILE_SCOPE_GROUP_DEBUG" },			// PROFILE_SCOPE_GROUP_DEBUG
-	{ "camera",		"PROFILE_SCOPE_GROUP_CAMERA" },			// PROFILE_SCOPE_GROUP_CAMERA
-	{ "cloth",		"PROFILE_SCOPE_GROUP_CLOTH" },			// PROFILE_SCOPE_GROUP_CLOTH
-	{ "gamelogic",	"PROFILE_SCOPE_GROUP_GAMELOGIC" },		// PROFILE_SCOPE_GROUP_GAMELOGIC
-	{ "input",		"PROFILE_SCOPE_GROUP_INPUT" },			// PROFILE_SCOPE_GROUP_INPUT
-	{ "navigation", "PROFILE_SCOPE_GROUP_NAVIGATION" },		// PROFILE_SCOPE_GROUP_NAVIGATION
-	{ "network",	"PROFILE_SCOPE_GROUP_NETWORK" },		// PROFILE_SCOPE_GROUP_NETWORK
-	{ "physics",	"PROFILE_SCOPE_GROUP_PHYSICS" },		// PROFILE_SCOPE_GROUP_PHYSICS
-	{ "rendering",	"PROFILE_SCOPE_GROUP_PHYSICS" },		// PROFILE_SCOPE_GROUP_PHYSICS
-	{ "scene",		"PROFILE_SCOPE_GROUP_SCENE" },			// PROFILE_SCOPE_GROUP_SCENE
-	{ "script",		"PROFILE_SCOPE_GROUP_SCRIPT" },			// PROFILE_SCOPE_GROUP_SCRIPT
-	{ "streaming",	"PROFILE_SCOPE_GROUP_STREAMING" },		// PROFILE_SCOPE_GROUP_STREAMING
-	{ "ui",			"PROFILE_SCOPE_GROUP_UI" },				// PROFILE_SCOPE_GROUP_UI
-	{ "vfx",		"PROFILE_SCOPE_GROUP_VFX" },			// PROFILE_SCOPE_GROUP_VFX
-	{ "visibility", "PROFILE_SCOPE_GROUP_VISIBILITY" },		// PROFILE_SCOPE_GROUP_VISIBILITY
-	{ "wait",		"PROFILE_SCOPE_GROUP_WAIT" },			// PROFILE_SCOPE_GROUP_WAIT
-	{ "io",			"PROFILE_SCOPE_GROUP_IO" }				// PROFILE_SCOPE_GROUP_IO
+static std::pair<const char*, const char*> s_pProfilerScopeGroupNames[] = {
+	{ "none", "PROFILE_SCOPE_GROUP_NONE" },				 // PROFILE_SCOPE_GROUP_NONE
+	{ "ai", "PROFILE_SCOPE_GROUP_AI" },					 // PROFILE_SCOPE_GROUP_AI
+	{ "animation", "PROFILE_SCOPE_GROUP_ANIMATION" },	 // PROFILE_SCOPE_GROUP_ANIMATION
+	{ "audio", "PROFILE_SCOPE_GROUP_AUDIO" },			 // PROFILE_SCOPE_GROUP_AUDIO
+	{ "debug", "PROFILE_SCOPE_GROUP_DEBUG" },			 // PROFILE_SCOPE_GROUP_DEBUG
+	{ "camera", "PROFILE_SCOPE_GROUP_CAMERA" },			 // PROFILE_SCOPE_GROUP_CAMERA
+	{ "cloth", "PROFILE_SCOPE_GROUP_CLOTH" },			 // PROFILE_SCOPE_GROUP_CLOTH
+	{ "gamelogic", "PROFILE_SCOPE_GROUP_GAMELOGIC" },	 // PROFILE_SCOPE_GROUP_GAMELOGIC
+	{ "input", "PROFILE_SCOPE_GROUP_INPUT" },			 // PROFILE_SCOPE_GROUP_INPUT
+	{ "navigation", "PROFILE_SCOPE_GROUP_NAVIGATION" },	 // PROFILE_SCOPE_GROUP_NAVIGATION
+	{ "network", "PROFILE_SCOPE_GROUP_NETWORK" },		 // PROFILE_SCOPE_GROUP_NETWORK
+	{ "physics", "PROFILE_SCOPE_GROUP_PHYSICS" },		 // PROFILE_SCOPE_GROUP_PHYSICS
+	{ "rendering", "PROFILE_SCOPE_GROUP_PHYSICS" },		 // PROFILE_SCOPE_GROUP_PHYSICS
+	{ "scene", "PROFILE_SCOPE_GROUP_SCENE" },			 // PROFILE_SCOPE_GROUP_SCENE
+	{ "script", "PROFILE_SCOPE_GROUP_SCRIPT" },			 // PROFILE_SCOPE_GROUP_SCRIPT
+	{ "streaming", "PROFILE_SCOPE_GROUP_STREAMING" },	 // PROFILE_SCOPE_GROUP_STREAMING
+	{ "ui", "PROFILE_SCOPE_GROUP_UI" },					 // PROFILE_SCOPE_GROUP_UI
+	{ "vfx", "PROFILE_SCOPE_GROUP_VFX" },				 // PROFILE_SCOPE_GROUP_VFX
+	{ "visibility", "PROFILE_SCOPE_GROUP_VISIBILITY" },	 // PROFILE_SCOPE_GROUP_VISIBILITY
+	{ "wait", "PROFILE_SCOPE_GROUP_WAIT" },				 // PROFILE_SCOPE_GROUP_WAIT
+	{ "io", "PROFILE_SCOPE_GROUP_IO" }					 // PROFILE_SCOPE_GROUP_IO
 };
 static_assert( ARRAYSIZE( s_pProfilerScopeGroupNames ) == PROFILE_SCOPE_NUM_GROUPS, "Size of s_pProfilerScopeGroupNames must be equal to PROFILE_SCOPE_NUM_GROUPS" );
-
 
 /*
 ==================
 ConvTextToSystemStage
 ==================
 */
-static bool ConvTextToSystemStage( const achar* pName, const achar*& pSystemStage )
+static bool ConvTextToSystemStage( const char* pName, const char*& pSystemStage )
 {
 	pSystemStage = NULL;
 	for ( uint32 systemStageIdx = 0; systemStageIdx < ECS_SYSTEM_NUM_STAGES; ++systemStageIdx )
@@ -69,7 +66,7 @@ static bool ConvTextToSystemStage( const achar* pName, const achar*& pSystemStag
 ConvTextToProfilerScopeGroup
 ==================
 */
-static bool ConvTextToProfilerScopeGroup( const achar* pName, const achar*& pProfilerScopeGroup )
+static bool ConvTextToProfilerScopeGroup( const char* pName, const char*& pProfilerScopeGroup )
 {
 	pProfilerScopeGroup = NULL;
 	for ( uint32 groupIdx = 0; groupIdx < PROFILE_SCOPE_NUM_GROUPS; ++groupIdx )
@@ -84,7 +81,6 @@ static bool ConvTextToProfilerScopeGroup( const achar* pName, const achar*& pPro
 	return false;
 }
 
-
 /*
 ==================
 CEcsCppGenerator::CEcsCppGenerator
@@ -92,7 +88,8 @@ CEcsCppGenerator::CEcsCppGenerator
 */
 CEcsCppGenerator::CEcsCppGenerator()
 	: bHasError( false )
-{}
+{
+}
 
 /*
 ==================
@@ -102,15 +99,15 @@ CEcsCppGenerator::Generate
 void CEcsCppGenerator::Generate( CEcsStubModule* pEcsStubModule, ecsCppFileType_t cppFileType )
 {
 	// Write header and include guard
-	buffer +=  "//\n"
-				"// This is automatically generated by the ecscompiler.\n"
-				"// DO NOT modify this manually! Edit the corresponding .ecs files instead!\n"
-				"// Broken Singularity, All Rights Reserved.\n"
-				"//\n\n";
+	buffer += "//\n"
+			  "// This is automatically generated by the ecscompiler.\n"
+			  "// DO NOT modify this manually! Edit the corresponding .ecs files instead!\n"
+			  "// Broken Singularity, All Rights Reserved.\n"
+			  "//\n\n";
 	switch ( cppFileType )
 	{
-	case ECS_CPP_FILE_TYPE_HEADER:		GenerateHeader( pEcsStubModule );	break;
-	case ECS_CPP_FILE_TYPE_SOURCE:		GenerateSource( pEcsStubModule );	break;
+	case ECS_CPP_FILE_TYPE_HEADER: GenerateHeader( pEcsStubModule ); break;
+	case ECS_CPP_FILE_TYPE_SOURCE: GenerateSource( pEcsStubModule ); break;
 	default:
 		AssertMsg( false, "Unknown C++ file type 0x%X", cppFileType );
 		break;
@@ -167,9 +164,9 @@ void CEcsCppGenerator::GenerateUsings( const std::vector<TRefPtr<CEcsStubUsing>>
 	if ( !ecsStubUsings.empty() )
 	{
 		buffer += S_Sprintf( "\n// BEGIN USING\n" );
-		for ( uint32 usingIdx = 0, numUsings = ( uint32 )ecsStubUsings.size(); usingIdx < numUsings; ++usingIdx )
+		for ( uint32 usingIdx = 0, numUsings = (uint32)ecsStubUsings.size(); usingIdx < numUsings; ++usingIdx )
 		{
-			CEcsStubUsing*		pEcsStubUsing = ecsStubUsings[usingIdx];
+			CEcsStubUsing* pEcsStubUsing = ecsStubUsings[usingIdx];
 			buffer += S_Sprintf( "#include \"%s\"\n", pEcsStubUsing->GetName() );
 		}
 		buffer += S_Sprintf( "// END USING\n" );
@@ -183,21 +180,21 @@ CEcsCppGenerator::GenerateComponents
 */
 void CEcsCppGenerator::GenerateStructs( const std::vector<TRefPtr<CEcsStubDataType>>& ecsStubDataTypes, ecsStructType_t structsType )
 {
-	const achar*	pCppComment			= NULL;
-	const achar*	pStructPrefix		= NULL;
-	const achar*	pStructCapsPrefix	= NULL;
+	const char* pCppComment	   = NULL;
+	const char* pStructPrefix	   = NULL;
+	const char* pStructCapsPrefix = NULL;
 	switch ( structsType )
 	{
 	case ECS_STRUCT_TYPE_COMPONENT:
-		pCppComment			= "COMPONENTS";
-		pStructPrefix		= "Component";
-		pStructCapsPrefix	= "COMPONENT";
+		pCppComment		  = "COMPONENTS";
+		pStructPrefix	  = "Component";
+		pStructCapsPrefix = "COMPONENT";
 		break;
 
 	case ECS_STRUCT_TYPE_RESOURCE:
-		pCppComment			= "RESOURCES";
-		pStructPrefix		= "Resource";
-		pStructCapsPrefix	= "RESOURCE";
+		pCppComment		  = "RESOURCES";
+		pStructPrefix	  = "Resource";
+		pStructCapsPrefix = "RESOURCE";
 		break;
 
 	default:
@@ -207,16 +204,16 @@ void CEcsCppGenerator::GenerateStructs( const std::vector<TRefPtr<CEcsStubDataTy
 	if ( !ecsStubDataTypes.empty() )
 	{
 		buffer += S_Sprintf( "\n// BEGIN ECS %s\n", pCppComment );
-		for ( uint32 dataTypeIdx = 0, numDataTypes = ( uint32 )ecsStubDataTypes.size(); dataTypeIdx < numDataTypes; ++dataTypeIdx )
+		for ( uint32 dataTypeIdx = 0, numDataTypes = (uint32)ecsStubDataTypes.size(); dataTypeIdx < numDataTypes; ++dataTypeIdx )
 		{
-			CEcsStubDataType*										pEcsStubDataType				= ecsStubDataTypes[dataTypeIdx];
-			const std::vector<TRefPtr<CEcsStubDefaultFieldValue>>&	ecsStubDefaultFieldValues		= pEcsStubDataType->GetDefaultFieldValues();
-			const std::vector<TRefPtr<CEcsStubField>>&				ecsStubFields					= pEcsStubDataType->GetFields();
-			CEcsStubMetadata*										pEcsStubDataTypeMetadata		= pEcsStubDataType->GetMetadata();
-			CEcsStubMetadataValue*									pEcsStubDataTypeNameMetadata	= pEcsStubDataTypeMetadata ? pEcsStubDataTypeMetadata->GetValue( ECS_METADATA_TYPE_NAME ) : NULL;
-			std::string												ecsDataTypeName					= pEcsStubDataTypeNameMetadata && pEcsStubDataTypeNameMetadata->HasValue() ? pEcsStubDataTypeNameMetadata->GetValue() : pEcsStubDataType->GetName();
+			CEcsStubDataType*									   pEcsStubDataType				= ecsStubDataTypes[dataTypeIdx];
+			const std::vector<TRefPtr<CEcsStubDefaultFieldValue>>& ecsStubDefaultFieldValues	= pEcsStubDataType->GetDefaultFieldValues();
+			const std::vector<TRefPtr<CEcsStubField>>&			   ecsStubFields				= pEcsStubDataType->GetFields();
+			CEcsStubMetadata*									   pEcsStubDataTypeMetadata		= pEcsStubDataType->GetMetadata();
+			CEcsStubMetadataValue*								   pEcsStubDataTypeNameMetadata = pEcsStubDataTypeMetadata ? pEcsStubDataTypeMetadata->GetValue( ECS_METADATA_TYPE_NAME ) : NULL;
+			std::string											   ecsDataTypeName				= pEcsStubDataTypeNameMetadata && pEcsStubDataTypeNameMetadata->HasValue() ? pEcsStubDataTypeNameMetadata->GetValue() : pEcsStubDataType->GetName();
 			buffer += S_Sprintf( "struct ecs%s%s_t\n{\n"
-								 "\tECS_%s_BODY( \"%s\" )", 
+								 "\tECS_%s_BODY( \"%s\" )",
 								 pStructPrefix, pEcsStubDataType->GetName(),
 								 pStructCapsPrefix, ecsDataTypeName.c_str() );
 
@@ -224,9 +221,9 @@ void CEcsCppGenerator::GenerateStructs( const std::vector<TRefPtr<CEcsStubDataTy
 			if ( !ecsStubDefaultFieldValues.empty() )
 			{
 				buffer += S_Sprintf( "\n\tecs%s%s_t()\n", pStructPrefix, pEcsStubDataType->GetName() );
-				for ( uint32 defaultFieldValueIdx = 0, numDefaultFieldValues = ( uint32 )ecsStubDefaultFieldValues.size(); defaultFieldValueIdx < numDefaultFieldValues; ++defaultFieldValueIdx )
+				for ( uint32 defaultFieldValueIdx = 0, numDefaultFieldValues = (uint32)ecsStubDefaultFieldValues.size(); defaultFieldValueIdx < numDefaultFieldValues; ++defaultFieldValueIdx )
 				{
-					CEcsStubDefaultFieldValue*		pEcsStubDefaultFieldValue = ecsStubDefaultFieldValues[defaultFieldValueIdx];
+					CEcsStubDefaultFieldValue* pEcsStubDefaultFieldValue = ecsStubDefaultFieldValues[defaultFieldValueIdx];
 					buffer += S_Sprintf( "\t\t%s %s( %s )\n", defaultFieldValueIdx == 0 ? ":" : ",", pEcsStubDefaultFieldValue->GetName(), pEcsStubDefaultFieldValue->GetValue() );
 				}
 				buffer += "\t{}";
@@ -237,13 +234,13 @@ void CEcsCppGenerator::GenerateStructs( const std::vector<TRefPtr<CEcsStubDataTy
 			}
 
 			// Write fields
-			for ( uint32 fieldIdx = 0, numFields = ( uint32 )ecsStubFields.size(); fieldIdx < numFields; ++fieldIdx )
+			for ( uint32 fieldIdx = 0, numFields = (uint32)ecsStubFields.size(); fieldIdx < numFields; ++fieldIdx )
 			{
-				CEcsStubField*		pEcsStubField			= ecsStubFields[fieldIdx];
+				CEcsStubField* pEcsStubField = ecsStubFields[fieldIdx];
 				buffer += S_Sprintf( "\n\t%s %s;", pEcsStubField->GetType(), pEcsStubField->GetName() );
 			}
-			buffer += S_Sprintf( "\n};\n");
-			
+			buffer += S_Sprintf( "\n};\n" );
+
 			// Write component factories
 			if ( structsType == ECS_STRUCT_TYPE_COMPONENT )
 			{
@@ -269,33 +266,33 @@ void CEcsCppGenerator::GenerateSystems( const std::vector<TRefPtr<CEcsStubSystem
 	if ( !ecsStubSystems.empty() )
 	{
 		buffer += S_Sprintf( "\n// BEGIN ECS SYSTEMS\n" );
-		for ( uint32 systemIdx = 0, numSystems = ( uint32 )ecsStubSystems.size(); systemIdx < numSystems; ++systemIdx )
+		for ( uint32 systemIdx = 0, numSystems = (uint32)ecsStubSystems.size(); systemIdx < numSystems; ++systemIdx )
 		{
-			CEcsStubSystem*				pEcsStubSystem				= ecsStubSystems[systemIdx];
-			CEcsStubMetadata*			pEcsStubSystemMetadata		= pEcsStubSystem->GetMetadata();
-			CEcsStubMetadataValue*		pEcsStubSystemNameMetadata	= pEcsStubSystemMetadata ? pEcsStubSystemMetadata->GetValue( ECS_METADATA_TYPE_NAME ) : NULL;
-			std::string					ecsSystemName				= pEcsStubSystemNameMetadata && pEcsStubSystemNameMetadata->HasValue() ? pEcsStubSystemNameMetadata->GetValue() : pEcsStubSystem->GetName();
+			CEcsStubSystem*		   pEcsStubSystem			  = ecsStubSystems[systemIdx];
+			CEcsStubMetadata*	   pEcsStubSystemMetadata	  = pEcsStubSystem->GetMetadata();
+			CEcsStubMetadataValue* pEcsStubSystemNameMetadata = pEcsStubSystemMetadata ? pEcsStubSystemMetadata->GetValue( ECS_METADATA_TYPE_NAME ) : NULL;
+			std::string			   ecsSystemName			  = pEcsStubSystemNameMetadata && pEcsStubSystemNameMetadata->HasValue() ? pEcsStubSystemNameMetadata->GetValue() : pEcsStubSystem->GetName();
 
-			std::string										updateParams;
+			std::string updateParams;
 			for ( uint32 fieldAccessType = 0; fieldAccessType < ECS_FIELD_NUM_ACCESS_TYPES; ++fieldAccessType )
 			{
-				const std::vector<TRefPtr<CEcsStubField>>&		fields = pEcsStubSystem->GetFields( ( ecsFieldAccessType_t )fieldAccessType );
+				const std::vector<TRefPtr<CEcsStubField>>& fields = pEcsStubSystem->GetFields( (ecsFieldAccessType_t)fieldAccessType );
 				if ( fieldAccessType != 0 && !fields.empty() && !updateParams.empty() )
 				{
 					updateParams += ", ";
 				}
 
-				for ( uint32 fieldIdx = 0, numFields = ( uint32 )fields.size(); fieldIdx < numFields; ++fieldIdx )
+				for ( uint32 fieldIdx = 0, numFields = (uint32)fields.size(); fieldIdx < numFields; ++fieldIdx )
 				{
-					CEcsStubField*		pField = fields[fieldIdx];
+					CEcsStubField* pField = fields[fieldIdx];
 					switch ( fieldAccessType )
 					{
-					case ECS_FIELD_ACCESS_TYPE_READ:				updateParams += S_Sprintf( "const ecsComponent%s_t& %s", pField->GetType(), pField->GetName() );											break;
-					case ECS_FIELD_ACCESS_TYPE_WRITE:				updateParams += S_Sprintf( "ecsComponent%s_t& %s", pField->GetType(), pField->GetName() );													break;
-					case ECS_FIELD_ACCESS_TYPE_READ_OPTIONAL:		updateParams += S_Sprintf( "const ecsComponent%s_t* p%s", pField->GetType(), GetStringWithUpperFirstChar( pField->GetName() ).c_str() );	break;
-					case ECS_FIELD_ACCESS_TYPE_READ_RESOURCE:		updateParams += S_Sprintf( "const ecsResource%s_t& %s", pField->GetType(), pField->GetName() );												break;
-					case ECS_FIELD_ACCESS_TYPE_WRITE_OPTIONAL:		updateParams += S_Sprintf( "ecsComponent%s_t* p%s", pField->GetType(), GetStringWithUpperFirstChar( pField->GetName() ).c_str() );			break;
-					case ECS_FIELD_ACCESS_TYPE_WRITE_RESOURCE:		updateParams += S_Sprintf( "ecsResource%s_t& %s", pField->GetType(), pField->GetName() );													break;
+					case ECS_FIELD_ACCESS_TYPE_READ: updateParams += S_Sprintf( "const ecsComponent%s_t& %s", pField->GetType(), pField->GetName() ); break;
+					case ECS_FIELD_ACCESS_TYPE_WRITE: updateParams += S_Sprintf( "ecsComponent%s_t& %s", pField->GetType(), pField->GetName() ); break;
+					case ECS_FIELD_ACCESS_TYPE_READ_OPTIONAL: updateParams += S_Sprintf( "const ecsComponent%s_t* p%s", pField->GetType(), GetStringWithUpperFirstChar( pField->GetName() ).c_str() ); break;
+					case ECS_FIELD_ACCESS_TYPE_READ_RESOURCE: updateParams += S_Sprintf( "const ecsResource%s_t& %s", pField->GetType(), pField->GetName() ); break;
+					case ECS_FIELD_ACCESS_TYPE_WRITE_OPTIONAL: updateParams += S_Sprintf( "ecsComponent%s_t* p%s", pField->GetType(), GetStringWithUpperFirstChar( pField->GetName() ).c_str() ); break;
+					case ECS_FIELD_ACCESS_TYPE_WRITE_RESOURCE: updateParams += S_Sprintf( "ecsResource%s_t& %s", pField->GetType(), pField->GetName() ); break;
 					default:
 						AssertMsg( false, "Unknown field access 0x%X", fieldAccessType );
 						break;
@@ -312,8 +309,8 @@ void CEcsCppGenerator::GenerateSystems( const std::vector<TRefPtr<CEcsStubSystem
 								 "{\n"
 								 "public:\n"
 								 "\tECS_SYSTEM_BODY( \"%s\" )\n"
-								 "\tstatic void OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity%s );\n", 
-								 pEcsStubSystem->GetName(), 
+								 "\tstatic void OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity%s );\n",
+								 pEcsStubSystem->GetName(),
 								 ecsSystemName.c_str(),
 								 !updateParams.empty() ? S_Sprintf( ", %s", updateParams.c_str() ).c_str() : "" );
 			buffer += S_Sprintf( "};\n" );
@@ -338,8 +335,8 @@ void CEcsCppGenerator::GenerateRegistrar( CEcsStubModule* pEcsStubModule )
 						 "{\n"
 						 "%s\n\n"
 						 "%s\n"
-						 "};\n", 
-						 pEcsStubModule->GetName(), 
+						 "};\n",
+						 pEcsStubModule->GetName(),
 						 GenerateRegistrarConstructor( pEcsStubModule ).c_str(),
 						 GenerateRegistrarDestructor( pEcsStubModule ).c_str() );
 	buffer += S_Sprintf( "void EcsInitReflection_%s();\n", pEcsStubModule->GetName() );
@@ -352,10 +349,10 @@ CEcsCppGenerator::GenerateRegistrarConstructor
 */
 std::string CEcsCppGenerator::GenerateRegistrarConstructor( CEcsStubModule* pEcsStubModule )
 {
-	std::string										result;
-	const std::vector<TRefPtr<CEcsStubDataType>>&	ecsStubComponents	= pEcsStubModule->GetComponents();
-	const std::vector<TRefPtr<CEcsStubDataType>>&	ecsStubResources	= pEcsStubModule->GetResources();
-	const std::vector<TRefPtr<CEcsStubSystem>>&		ecsStubSystems		= pEcsStubModule->GetSystems();
+	std::string									  result;
+	const std::vector<TRefPtr<CEcsStubDataType>>& ecsStubComponents = pEcsStubModule->GetComponents();
+	const std::vector<TRefPtr<CEcsStubDataType>>& ecsStubResources	= pEcsStubModule->GetResources();
+	const std::vector<TRefPtr<CEcsStubSystem>>&	  ecsStubSystems	= pEcsStubModule->GetSystems();
 
 	// Write the constructor header
 	result += S_Sprintf( "\tecsModule%s_t( flecs::world& flecsWorld )\n"
@@ -366,9 +363,9 @@ std::string CEcsCppGenerator::GenerateRegistrarConstructor( CEcsStubModule* pEcs
 	if ( !ecsStubComponents.empty() )
 	{
 		result += "\n\t\t// Register components\n";
-		for ( uint32 componentIdx = 0, numComponents = ( uint32 )ecsStubComponents.size(); componentIdx < numComponents; ++componentIdx )
+		for ( uint32 componentIdx = 0, numComponents = (uint32)ecsStubComponents.size(); componentIdx < numComponents; ++componentIdx )
 		{
-			CEcsStubDataType*			pEcsStubComponent = ecsStubComponents[componentIdx];
+			CEcsStubDataType* pEcsStubComponent = ecsStubComponents[componentIdx];
 			result += S_Sprintf( "\t\tflecsWorld.component<ecsComponent%s_t>();\n", pEcsStubComponent->GetName() );
 		}
 	}
@@ -377,9 +374,9 @@ std::string CEcsCppGenerator::GenerateRegistrarConstructor( CEcsStubModule* pEcs
 	if ( !ecsStubResources.empty() )
 	{
 		result += "\n\t\t// Register resources\n";
-		for ( uint32 resourceIdx = 0, numResources = ( uint32 )ecsStubResources.size(); resourceIdx < numResources; ++resourceIdx )
+		for ( uint32 resourceIdx = 0, numResources = (uint32)ecsStubResources.size(); resourceIdx < numResources; ++resourceIdx )
 		{
-			CEcsStubDataType*		pEcsStubResource = ecsStubResources[resourceIdx];
+			CEcsStubDataType* pEcsStubResource = ecsStubResources[resourceIdx];
 			result += S_Sprintf( "\t\tflecsWorld.component<ecsResource%s_t>();\n", pEcsStubResource->GetName() );
 		}
 	}
@@ -388,82 +385,84 @@ std::string CEcsCppGenerator::GenerateRegistrarConstructor( CEcsStubModule* pEcs
 	if ( !ecsStubSystems.empty() )
 	{
 		result += S_Sprintf( "\n\t\t// Register systems\n" );
-		for ( uint32 systemIdx = 0, numSystems = ( uint32 )ecsStubSystems.size(); systemIdx < numSystems; ++systemIdx )
+		for ( uint32 systemIdx = 0, numSystems = (uint32)ecsStubSystems.size(); systemIdx < numSystems; ++systemIdx )
 		{
-			CEcsStubSystem*			pEcsStubSystem = ecsStubSystems[systemIdx];
-			std::string				templateParams;
-			std::string				readWriteFuncs;
-			std::string				filterFuncs;
-			std::string				updateParams;
-			std::string				callUpdateParams;
+			CEcsStubSystem* pEcsStubSystem = ecsStubSystems[systemIdx];
+			std::string		templateParams;
+			std::string		readWriteFuncs;
+			std::string		filterFuncs;
+			std::string		updateParams;
+			std::string		callUpdateParams;
 
 			// Write template params and Flecs read/write functions
 			for ( uint32 fieldAccessType = 0, globalFieldIdx = 0; fieldAccessType < ECS_FIELD_NUM_ACCESS_TYPES; ++fieldAccessType )
 			{
-				const std::vector<TRefPtr<CEcsStubField>>&		fields = pEcsStubSystem->GetFields( ( ecsFieldAccessType_t )fieldAccessType );
+				const std::vector<TRefPtr<CEcsStubField>>& fields = pEcsStubSystem->GetFields( (ecsFieldAccessType_t)fieldAccessType );
 				if ( fieldAccessType != 0 && !fields.empty() && !updateParams.empty() )
 				{
-					templateParams		+= ", ";
-					updateParams		+= ", ";
-					callUpdateParams	+= ", ";
-					readWriteFuncs		+= "\n";
+					templateParams += ", ";
+					updateParams += ", ";
+					callUpdateParams += ", ";
+					readWriteFuncs += "\n";
 				}
 
-				for ( uint32 fieldIdx = 0, numFields = ( uint32 )fields.size(); fieldIdx < numFields; ++fieldIdx, ++globalFieldIdx )
+				for ( uint32 fieldIdx = 0, numFields = (uint32)fields.size(); fieldIdx < numFields; ++fieldIdx, ++globalFieldIdx )
 				{
-					CEcsStubField*		pField = fields[fieldIdx];
+					CEcsStubField* pField = fields[fieldIdx];
 					switch ( fieldAccessType )
 					{
-					case ECS_FIELD_ACCESS_TYPE_READ:		
-						updateParams		+= S_Sprintf( "const ecsComponent%s_t& %s", pField->GetType(), pField->GetName() );
-						templateParams		+= S_Sprintf( "const ecsComponent%s_t", pField->GetType() );
-						readWriteFuncs		+= S_Sprintf( "\t\t\t.read<ecsComponent%s_t>()", pField->GetType() );
-						callUpdateParams	+= S_Sprintf( "%s", pField->GetName() );
+					case ECS_FIELD_ACCESS_TYPE_READ:
+						updateParams += S_Sprintf( "const ecsComponent%s_t& %s", pField->GetType(), pField->GetName() );
+						templateParams += S_Sprintf( "const ecsComponent%s_t", pField->GetType() );
+						readWriteFuncs += S_Sprintf( "\t\t\t.read<ecsComponent%s_t>()", pField->GetType() );
+						callUpdateParams += S_Sprintf( "%s", pField->GetName() );
 						break;
-					
+
 					case ECS_FIELD_ACCESS_TYPE_READ_OPTIONAL:
 					{
-						std::string			fieldName = GetStringWithUpperFirstChar( pField->GetName() );
-						updateParams		+= S_Sprintf( "const ecsComponent%s_t* p%s", pField->GetType(), fieldName.c_str() );
-						templateParams		+= S_Sprintf( "const ecsComponent%s_t*", pField->GetType() );
-						readWriteFuncs		+= S_Sprintf( "\t\t\t.read<ecsComponent%s_t*>()", pField->GetType() );
-						callUpdateParams	+= S_Sprintf( "p%s", fieldName.c_str() );
+						std::string fieldName = GetStringWithUpperFirstChar( pField->GetName() );
+						updateParams += S_Sprintf( "const ecsComponent%s_t* p%s", pField->GetType(), fieldName.c_str() );
+						templateParams += S_Sprintf( "const ecsComponent%s_t*", pField->GetType() );
+						readWriteFuncs += S_Sprintf( "\t\t\t.read<ecsComponent%s_t*>()", pField->GetType() );
+						callUpdateParams += S_Sprintf( "p%s", fieldName.c_str() );
 						break;
 					}
-					
-					case ECS_FIELD_ACCESS_TYPE_READ_RESOURCE:		
-						updateParams		+= S_Sprintf( "const ecsResource%s_t& %s", pField->GetType(), pField->GetName() );
-						templateParams		+= S_Sprintf( "const ecsResource%s_t", pField->GetType() );
-						readWriteFuncs		+= S_Sprintf( "\t\t\t.term_at( %i ).singleton()\n"
-														  "\t\t\t.read<ecsResource%s_t>()", globalFieldIdx, pField->GetType() );
-						callUpdateParams	+= S_Sprintf( "%s", pField->GetName() );
+
+					case ECS_FIELD_ACCESS_TYPE_READ_RESOURCE:
+						updateParams += S_Sprintf( "const ecsResource%s_t& %s", pField->GetType(), pField->GetName() );
+						templateParams += S_Sprintf( "const ecsResource%s_t", pField->GetType() );
+						readWriteFuncs += S_Sprintf( "\t\t\t.term_at( %i ).singleton()\n"
+													 "\t\t\t.read<ecsResource%s_t>()",
+													 globalFieldIdx, pField->GetType() );
+						callUpdateParams += S_Sprintf( "%s", pField->GetName() );
 						break;
 
-					case ECS_FIELD_ACCESS_TYPE_WRITE:	
-						updateParams		+= S_Sprintf( "ecsComponent%s_t& %s", pField->GetType(), pField->GetName() );
-						templateParams		+= S_Sprintf( "ecsComponent%s_t", pField->GetType() );
-						readWriteFuncs		+= S_Sprintf( "\t\t\t.write<ecsComponent%s_t>()", pField->GetType() );
-						callUpdateParams	+= S_Sprintf( "%s", pField->GetName() );
+					case ECS_FIELD_ACCESS_TYPE_WRITE:
+						updateParams += S_Sprintf( "ecsComponent%s_t& %s", pField->GetType(), pField->GetName() );
+						templateParams += S_Sprintf( "ecsComponent%s_t", pField->GetType() );
+						readWriteFuncs += S_Sprintf( "\t\t\t.write<ecsComponent%s_t>()", pField->GetType() );
+						callUpdateParams += S_Sprintf( "%s", pField->GetName() );
 						break;
-					
+
 					case ECS_FIELD_ACCESS_TYPE_WRITE_OPTIONAL:
 					{
-						std::string			fieldName = GetStringWithUpperFirstChar( pField->GetName() );
-						updateParams		+= S_Sprintf( "ecsComponent%s_t* p%s", pField->GetType(), fieldName.c_str() );
-						templateParams		+= S_Sprintf( "ecsComponent%s_t*", pField->GetType() );
-						readWriteFuncs		+= S_Sprintf( "\t\t\t.write<ecsComponent%s_t*>()", pField->GetType() );
-						callUpdateParams	+= S_Sprintf( "p%s", fieldName.c_str() );
+						std::string fieldName = GetStringWithUpperFirstChar( pField->GetName() );
+						updateParams += S_Sprintf( "ecsComponent%s_t* p%s", pField->GetType(), fieldName.c_str() );
+						templateParams += S_Sprintf( "ecsComponent%s_t*", pField->GetType() );
+						readWriteFuncs += S_Sprintf( "\t\t\t.write<ecsComponent%s_t*>()", pField->GetType() );
+						callUpdateParams += S_Sprintf( "p%s", fieldName.c_str() );
 						break;
 					}
 
-					case ECS_FIELD_ACCESS_TYPE_WRITE_RESOURCE:	
-						updateParams		+= S_Sprintf( "ecsResource%s_t& %s", pField->GetType(), pField->GetName() );
-						templateParams		+= S_Sprintf( "ecsResource%s_t", pField->GetType() );
-						readWriteFuncs		+= S_Sprintf( "\t\t\t.term_at( %i ).singleton()\n"
-														  "\t\t\t.write<ecsResource%s_t>()", globalFieldIdx, pField->GetType() );
-						callUpdateParams	+= S_Sprintf( "%s", pField->GetName() );
+					case ECS_FIELD_ACCESS_TYPE_WRITE_RESOURCE:
+						updateParams += S_Sprintf( "ecsResource%s_t& %s", pField->GetType(), pField->GetName() );
+						templateParams += S_Sprintf( "ecsResource%s_t", pField->GetType() );
+						readWriteFuncs += S_Sprintf( "\t\t\t.term_at( %i ).singleton()\n"
+													 "\t\t\t.write<ecsResource%s_t>()",
+													 globalFieldIdx, pField->GetType() );
+						callUpdateParams += S_Sprintf( "%s", pField->GetName() );
 						break;
-					
+
 					default:
 						AssertMsg( false, "Unknown field access 0x%X", fieldAccessType );
 						break;
@@ -471,10 +470,10 @@ std::string CEcsCppGenerator::GenerateRegistrarConstructor( CEcsStubModule* pEcs
 
 					if ( fieldIdx + 1 < numFields )
 					{
-						templateParams		+= ", ";
-						updateParams		+= ", ";
-						callUpdateParams	+= ", ";
-						readWriteFuncs		+= "\n";
+						templateParams += ", ";
+						updateParams += ", ";
+						callUpdateParams += ", ";
+						readWriteFuncs += "\n";
 					}
 				}
 			}
@@ -486,24 +485,24 @@ std::string CEcsCppGenerator::GenerateRegistrarConstructor( CEcsStubModule* pEcs
 			// Write Flecs filters
 			for ( uint32 systemFilterType = 0; systemFilterType < ECS_SYSTEM_NUM_FILTER_TYPES; ++systemFilterType )
 			{
-				const std::vector<TRefPtr<CEcsStubSystemFilter>>&		filters = pEcsStubSystem->GetFilters( ( ecsSystemFilterType_t )systemFilterType );
+				const std::vector<TRefPtr<CEcsStubSystemFilter>>& filters = pEcsStubSystem->GetFilters( (ecsSystemFilterType_t)systemFilterType );
 				if ( systemFilterType != 0 && !filters.empty() && !filterFuncs.empty() )
 				{
 					filterFuncs += "\n";
 				}
 
-				for ( uint32 filterIdx = 0, numFilters = ( uint32 )filters.size(); filterIdx < numFilters; ++filterIdx )
+				for ( uint32 filterIdx = 0, numFilters = (uint32)filters.size(); filterIdx < numFilters; ++filterIdx )
 				{
-					CEcsStubSystemFilter*	pEcsSystemFilter = filters[filterIdx];
+					CEcsStubSystemFilter* pEcsSystemFilter = filters[filterIdx];
 					switch ( systemFilterType )
 					{
-					case ECS_SYSTEM_FILTER_TYPE_INCLUDE:		filterFuncs += S_Sprintf( "\t\t\t.with<ecsComponent%s_t>()", pEcsSystemFilter->GetName() );		break;
-					case ECS_SYSTEM_FILTER_TYPE_EXCLUDE:		filterFuncs += S_Sprintf( "\t\t\t.without<ecsComponent%s_t>()", pEcsSystemFilter->GetName() );	break;
+					case ECS_SYSTEM_FILTER_TYPE_INCLUDE: filterFuncs += S_Sprintf( "\t\t\t.with<ecsComponent%s_t>()", pEcsSystemFilter->GetName() ); break;
+					case ECS_SYSTEM_FILTER_TYPE_EXCLUDE: filterFuncs += S_Sprintf( "\t\t\t.without<ecsComponent%s_t>()", pEcsSystemFilter->GetName() ); break;
 					default:
 						AssertMsg( false, "Unknown system filter 0x%X", systemFilterType );
 						break;
 					}
-				
+
 					if ( filterIdx + 1 < numFilters )
 					{
 						filterFuncs += "\n";
@@ -516,20 +515,18 @@ std::string CEcsCppGenerator::GenerateRegistrarConstructor( CEcsStubModule* pEcs
 			}
 
 			// Register the system
-			CEcsStubMetadata*		pEcsStubSystemMetadata				= pEcsStubSystem->GetMetadata();
-			CEcsStubMetadataValue*	pEcsStubSystemMetadataProfilerGroup = pEcsStubSystemMetadata ? pEcsStubSystemMetadata->GetValue( ECS_METADATA_TYPE_PROFILER_GROUP ) : NULL;
-			const achar*			pProfilerScopeGroupName				= NULL;
-			if ( pEcsStubSystemMetadataProfilerGroup && S_Strlen( pEcsStubSystemMetadataProfilerGroup->GetValue() ) > 0 && 
-				 !ConvTextToProfilerScopeGroup( pEcsStubSystemMetadataProfilerGroup->GetValue(), pProfilerScopeGroupName ) )
+			CEcsStubMetadata*	   pEcsStubSystemMetadata			   = pEcsStubSystem->GetMetadata();
+			CEcsStubMetadataValue* pEcsStubSystemMetadataProfilerGroup = pEcsStubSystemMetadata ? pEcsStubSystemMetadata->GetValue( ECS_METADATA_TYPE_PROFILER_GROUP ) : NULL;
+			const char*		   pProfilerScopeGroupName			   = NULL;
+			if ( pEcsStubSystemMetadataProfilerGroup && S_Strlen( pEcsStubSystemMetadataProfilerGroup->GetValue() ) > 0 && !ConvTextToProfilerScopeGroup( pEcsStubSystemMetadataProfilerGroup->GetValue(), pProfilerScopeGroupName ) )
 			{
 				Error( "%s: Unknown profiler group '%s'", pEcsStubSystemMetadataProfilerGroup->GetValueContext().ToString().c_str(), pEcsStubSystemMetadataProfilerGroup->GetValue() );
 				bHasError = true;
 			}
 
-			CEcsStubMetadataValue*	pEcsStubSystemMetadataStage		= pEcsStubSystemMetadata ? pEcsStubSystemMetadata->GetValue( ECS_METADATA_TYPE_STAGE ) : NULL;
-			const achar*			pSystemStageName				= s_pEcsSystemStageNames[ECS_SYSTEM_STAGE_ONUPDATE].second;
-			if ( pEcsStubSystemMetadataStage && S_Strlen( pEcsStubSystemMetadataStage->GetValue() ) > 0 &&
-				 !ConvTextToSystemStage( pEcsStubSystemMetadataStage->GetValue(), pSystemStageName ) )
+			CEcsStubMetadataValue* pEcsStubSystemMetadataStage = pEcsStubSystemMetadata ? pEcsStubSystemMetadata->GetValue( ECS_METADATA_TYPE_STAGE ) : NULL;
+			const char*		   pSystemStageName			   = s_pEcsSystemStageNames[ECS_SYSTEM_STAGE_ONUPDATE].second;
+			if ( pEcsStubSystemMetadataStage && S_Strlen( pEcsStubSystemMetadataStage->GetValue() ) > 0 && !ConvTextToSystemStage( pEcsStubSystemMetadataStage->GetValue(), pSystemStageName ) )
 			{
 				Error( "%s: Unknown system stage '%s'", pEcsStubSystemMetadataStage->GetValueContext().ToString().c_str(), pEcsStubSystemMetadataStage->GetValue() );
 				bHasError = true;
@@ -543,10 +540,10 @@ std::string CEcsCppGenerator::GenerateRegistrarConstructor( CEcsStubModule* pEcs
 								 "\t\t\t{\n"
 								 "%s"
 								 "\t\t\t\tCEcsSystem%s::OnUpdate( entity.world(), entity%s );\n"
-								 "\t\t\t} );\n", 
-								 templateParams.c_str(), 
+								 "\t\t\t} );\n",
+								 templateParams.c_str(),
 								 pSystemStageName,
-								 readWriteFuncs.c_str(), 
+								 readWriteFuncs.c_str(),
 								 filterFuncs.c_str(),
 								 !updateParams.empty() ? S_Sprintf( ", %s", updateParams.c_str() ).c_str() : "",
 								 pProfilerScopeGroupName ? S_Sprintf( "\t\t\t\tPROFILE_SCOPE( %s );\n", pProfilerScopeGroupName ).c_str() : "",
@@ -575,10 +572,10 @@ CEcsCppGenerator::GenerateRegistrarDestructor
 */
 std::string CEcsCppGenerator::GenerateRegistrarDestructor( CEcsStubModule* pEcsStubModule )
 {
-	std::string										result;
-	const std::vector<TRefPtr<CEcsStubDataType>>&	ecsStubComponents	= pEcsStubModule->GetComponents();
-	const std::vector<TRefPtr<CEcsStubDataType>>&	ecsStubResources	= pEcsStubModule->GetResources();
-	const std::vector<TRefPtr<CEcsStubSystem>>&		ecsStubSystems		= pEcsStubModule->GetSystems();
+	std::string									  result;
+	const std::vector<TRefPtr<CEcsStubDataType>>& ecsStubComponents = pEcsStubModule->GetComponents();
+	const std::vector<TRefPtr<CEcsStubDataType>>& ecsStubResources	= pEcsStubModule->GetResources();
+	const std::vector<TRefPtr<CEcsStubSystem>>&	  ecsStubSystems	= pEcsStubModule->GetSystems();
 
 	// Write the destructor header
 	result += S_Sprintf( "\t~ecsModule%s_t()\n"
@@ -597,21 +594,21 @@ CEcsCppGenerator::GenerateImplementationEcsReadDataFuncs
 */
 void CEcsCppGenerator::GenerateImplementationEcsReadDataFuncs( CEcsStubModule* pEcsStubModule )
 {
-	const std::vector<TRefPtr<CEcsStubDataType>>&	ecsStubComponents = pEcsStubModule->GetComponents();
-	for ( uint32 componentIdx = 0, numComponents = ( uint32 )ecsStubComponents.size(); componentIdx < numComponents; ++componentIdx )
+	const std::vector<TRefPtr<CEcsStubDataType>>& ecsStubComponents = pEcsStubModule->GetComponents();
+	for ( uint32 componentIdx = 0, numComponents = (uint32)ecsStubComponents.size(); componentIdx < numComponents; ++componentIdx )
 	{
-		std::string									sentReadDataFields;
-		CEcsStubDataType*							pEcsStubComponent	= ecsStubComponents[componentIdx];
-		const std::vector<TRefPtr<CEcsStubField>>&	ecsStubFields		= pEcsStubComponent->GetFields();
-		for ( uint32 varIdx = 0, numVars = ( uint32 )ecsStubFields.size(); varIdx < numVars; ++varIdx )
+		std::string								   sentReadDataFields;
+		CEcsStubDataType*						   pEcsStubComponent = ecsStubComponents[componentIdx];
+		const std::vector<TRefPtr<CEcsStubField>>& ecsStubFields	 = pEcsStubComponent->GetFields();
+		for ( uint32 varIdx = 0, numVars = (uint32)ecsStubFields.size(); varIdx < numVars; ++varIdx )
 		{
-			CEcsStubField*		pEcsStubField			= ecsStubFields[varIdx];
-			CEcsStubMetadata*	pEcsStubFieldMetadata	= pEcsStubField->GetMetadata();
+			CEcsStubField*	  pEcsStubField			= ecsStubFields[varIdx];
+			CEcsStubMetadata* pEcsStubFieldMetadata = pEcsStubField->GetMetadata();
 			if ( pEcsStubFieldMetadata && pEcsStubFieldMetadata->HasValue( ECS_METADATA_TYPE_SERIALIZE ) )
 			{
-				CEcsStubDefaultFieldValue*	pEcsStubDefaultFieldValue	= pEcsStubComponent->FindDefaultFieldValue( pEcsStubField->GetName() );
-				CEcsStubMetadataValue*		pEcsStubFieldNameMetadata	= pEcsStubFieldMetadata->GetValue( ECS_METADATA_TYPE_NAME );
-				std::string					fieldName					= pEcsStubFieldNameMetadata && pEcsStubFieldNameMetadata->HasValue() ? pEcsStubFieldNameMetadata->GetValue() : "";
+				CEcsStubDefaultFieldValue* pEcsStubDefaultFieldValue = pEcsStubComponent->FindDefaultFieldValue( pEcsStubField->GetName() );
+				CEcsStubMetadataValue*	   pEcsStubFieldNameMetadata = pEcsStubFieldMetadata->GetValue( ECS_METADATA_TYPE_NAME );
+				std::string				   fieldName				 = pEcsStubFieldNameMetadata && pEcsStubFieldNameMetadata->HasValue() ? pEcsStubFieldNameMetadata->GetValue() : "";
 				if ( fieldName.empty() )
 				{
 					fieldName = pEcsStubField->GetName();
@@ -650,7 +647,7 @@ void CEcsCppGenerator::GenerateImplementationEcsReadDataFuncs( CEcsStubModule* p
 								 "{\n"
 								 "\tPROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );\n"
 								 "%s\n"
-								 "}\n", 
+								 "}\n",
 								 pEcsStubComponent->GetName(), sentReadDataFields.c_str() );
 		}
 	}
@@ -663,16 +660,16 @@ CEcsCppGenerator::GenerateImplementationEcsFactories
 */
 void CEcsCppGenerator::GenerateImplementationEcsFactories( CEcsStubModule* pEcsStubModule )
 {
-	const std::vector<TRefPtr<CEcsStubDataType>>&		ecsStubComponents = pEcsStubModule->GetComponents();
-	for ( uint32 componentIdx = 0, numComponents = ( uint32 )ecsStubComponents.size(); componentIdx < numComponents; ++componentIdx )
+	const std::vector<TRefPtr<CEcsStubDataType>>& ecsStubComponents = pEcsStubModule->GetComponents();
+	for ( uint32 componentIdx = 0, numComponents = (uint32)ecsStubComponents.size(); componentIdx < numComponents; ++componentIdx )
 	{
-		bool										bHasSerializableField	= false;
-		CEcsStubDataType*							pEcsStubComponent		= ecsStubComponents[componentIdx];
-		const std::vector<TRefPtr<CEcsStubField>>&	ecsStubFields			= pEcsStubComponent->GetFields();
-		for ( uint32 varIdx = 0, numVars = ( uint32 ) ecsStubFields.size(); varIdx < numVars; ++varIdx )
+		bool									   bHasSerializableField = false;
+		CEcsStubDataType*						   pEcsStubComponent	 = ecsStubComponents[componentIdx];
+		const std::vector<TRefPtr<CEcsStubField>>& ecsStubFields		 = pEcsStubComponent->GetFields();
+		for ( uint32 varIdx = 0, numVars = (uint32)ecsStubFields.size(); varIdx < numVars; ++varIdx )
 		{
-			CEcsStubField*		pEcsStubField			= ecsStubFields[varIdx];
-			CEcsStubMetadata*	pEcsStubFieldMetadata	= pEcsStubField->GetMetadata();
+			CEcsStubField*	  pEcsStubField			= ecsStubFields[varIdx];
+			CEcsStubMetadata* pEcsStubFieldMetadata = pEcsStubField->GetMetadata();
 			if ( pEcsStubFieldMetadata && pEcsStubFieldMetadata->HasValue( ECS_METADATA_TYPE_SERIALIZE ) )
 			{
 				bHasSerializableField = true;
@@ -688,7 +685,7 @@ void CEcsCppGenerator::GenerateImplementationEcsFactories( CEcsStubModule* pEcsS
 		buffer += S_Sprintf( "IEcsComponentFactory* EcsCreateComponent%sFactory( const CSENTEntityDescComponent& sentComponent )\n"
 							 "{\n"
 							 "\treturn new TEcsComponentFactory<ecsComponent%s_t, %s>( sentComponent );\n"
-							 "}\n", 
+							 "}\n",
 							 pEcsStubComponent->GetName(), pEcsStubComponent->GetName(), bHasSerializableField ? "EcsReadData" : "NULL" );
 	}
 }
@@ -707,14 +704,14 @@ void CEcsCppGenerator::GenerateImplementationEcsReflection( CEcsStubModule* pEcs
 	buffer += "*/\n";
 	buffer += S_Sprintf( "void EcsInitReflection_%s()\n{", pEcsStubModule->GetName() );
 
-	const std::vector<TRefPtr<CEcsStubDataType>>&		ecsStubComponents = pEcsStubModule->GetComponents();
+	const std::vector<TRefPtr<CEcsStubDataType>>& ecsStubComponents = pEcsStubModule->GetComponents();
 	if ( !ecsStubComponents.empty() )
 	{
 		buffer += "\n\t// Register component types\n";
 		buffer += "\tCEcsComponentTypes&\t\tecsComponentTypes = Game()->GetEcsComponentTypes();\n";
-		for ( uint32 componentIdx = 0, numComponents = ( uint32 )ecsStubComponents.size(); componentIdx < numComponents; ++componentIdx )
+		for ( uint32 componentIdx = 0, numComponents = (uint32)ecsStubComponents.size(); componentIdx < numComponents; ++componentIdx )
 		{
-			CEcsStubDataType*			pEcsStubComponent = ecsStubComponents[componentIdx];
+			CEcsStubDataType* pEcsStubComponent = ecsStubComponents[componentIdx];
 			buffer += S_Sprintf( "\tecsComponentTypes.RegisterType( ecsComponent%s_t::GetComponentName(), EcsCreateComponent%sFactory );\n", pEcsStubComponent->GetName(), pEcsStubComponent->GetName() );
 		}
 	}

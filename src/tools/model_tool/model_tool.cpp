@@ -15,31 +15,30 @@ struct modelToolAiMesh_t
 {
 	modelToolAiMesh_t()
 		: pMesh( NULL )
-	{}
+	{
+	}
 	modelToolAiMesh_t( const aiMatrix4x4& transformation, aiMesh* pMesh )
 		: transformation( transformation )
 		, pMesh( pMesh )
-	{}
+	{
+	}
 
-	aiMatrix4x4		transformation;
-	aiMesh*			pMesh;
+	aiMatrix4x4 transformation;
+	aiMesh*		pMesh;
 };
-
 
 // Assimp meshes dictionary type
 // Material Index -> Ai meshes
-typedef std::unordered_map<uint32, std::vector<modelToolAiMesh_t>>			modelToolAiMeshesMap_t;
-
+typedef std::unordered_map<uint32, std::vector<modelToolAiMesh_t>> modelToolAiMeshesMap_t;
 
 struct modelToolMeshData_t
 {
-	std::string						name;
-	std::vector<smdlVertex_t>		vertices;
-	std::vector<uint32>				indices;
-	smdlSurface_t					surface;
-	uint32							materialID;
+	std::string				  name;
+	std::vector<smdlVertex_t> vertices;
+	std::vector<uint32>		  indices;
+	smdlSurface_t			  surface;
+	uint32					  materialID;
 };
-
 
 /*
 ==================
@@ -72,7 +71,6 @@ static void ModelTool_ChangeAxisUp( aiVector3D& vector, axisUp_t axisUp )
 	}
 }
 
-
 //-----------------------------------------------------------------------------
 // Model tool
 //-----------------------------------------------------------------------------
@@ -94,7 +92,6 @@ private:
 };
 
 EXPOSE_SINGLE_INTERFACE( CModelTool, IModelTool, MODEL_TOOL_INTERFACE_VERSION );
-
 
 /*
 ==================
@@ -124,8 +121,8 @@ CModelTool::CompileModel
 bool CModelTool::CompileModel( const resourceToolCompileModelParams_t& compileParams ) const
 {
 	// Parse model data from a file
-	std::vector<modelToolMeshData_t>	parsedMeshes;
-	std::vector<std::string>			parsedMaterials;
+	std::vector<modelToolMeshData_t> parsedMeshes;
+	std::vector<std::string>		 parsedMaterials;
 
 	Msg( "ModelTool: Loading models from '%s'..", compileParams.pSrcPath );
 	if ( !ParseModels( compileParams, parsedMeshes, parsedMaterials ) )
@@ -136,71 +133,71 @@ bool CModelTool::CompileModel( const resourceToolCompileModelParams_t& compilePa
 
 	// Optimize models
 	Msg( "ModelTool: Optimize models.." );
-	for ( uint32 modelIdx = 0, numModels = ( uint32 )parsedMeshes.size(); modelIdx < numModels; ++modelIdx )
+	for ( uint32 modelIdx = 0, numModels = (uint32)parsedMeshes.size(); modelIdx < numModels; ++modelIdx )
 	{
-		modelToolMeshData_t&		modelToolMeshData = parsedMeshes[modelIdx];
+		modelToolMeshData_t& modelToolMeshData = parsedMeshes[modelIdx];
 		OptimizeModel( modelToolMeshData );
 		Msg( "ModelTool: Model '%s' optimized", modelToolMeshData.name.c_str() );
 	}
 	Msg( "ModelTool: Models optimized.." );
 
 	// Combine sub-models to one
-	std::vector<CSMDLCompiledModelDoc>		smdlCompiledFiles;
+	std::vector<CSMDLCompiledModelDoc> smdlCompiledFiles;
 	if ( compileParams.bCombineModels && parsedMeshes.size() > 1 )
 	{
 		// Separate meshes by material ID
 		Msg( "ModelTool: Combining models to one.." );
-		std::unordered_map<uint32, std::vector<uint32>>		parsedMeshesDict;		// Key - material ID, Item - index to a mesh data in the meshes
-		for ( uint32 meshIdx = 0, numMeshes = ( uint32 )parsedMeshes.size(); meshIdx < numMeshes; ++meshIdx )
+		std::unordered_map<uint32, std::vector<uint32>> parsedMeshesDict;  // Key - material ID, Item - index to a mesh data in the meshes
+		for ( uint32 meshIdx = 0, numMeshes = (uint32)parsedMeshes.size(); meshIdx < numMeshes; ++meshIdx )
 		{
-			const modelToolMeshData_t&		modelToolMeshData = parsedMeshes[meshIdx];
+			const modelToolMeshData_t& modelToolMeshData = parsedMeshes[meshIdx];
 			parsedMeshesDict[modelToolMeshData.materialID].emplace_back( meshIdx );
 		}
 
 		// Combine meshes
-		std::vector<smdlVertex_t>		smdlVertices;
-		std::vector<uint32>				indices;
-		std::vector<smdlSurface_t>		smdlSurfaces;
+		std::vector<smdlVertex_t>  smdlVertices;
+		std::vector<uint32>		   indices;
+		std::vector<smdlSurface_t> smdlSurfaces;
 		for ( auto itMaterial = parsedMeshesDict.begin(), itMaterialEnd = parsedMeshesDict.end(); itMaterial != itMaterialEnd; ++itMaterial )
 		{
-			smdlSurface_t				smdlSurface = {};
-			smdlSurface.firstIndex		= ( uint32 )indices.size();
-			smdlSurface.materialID		= itMaterial->first;
-			
-			for ( uint32 meshIdx = 0, numMeshes = ( uint32 )itMaterial->second.size(); meshIdx < numMeshes; ++meshIdx )
+			smdlSurface_t smdlSurface = {};
+			smdlSurface.firstIndex	  = (uint32)indices.size();
+			smdlSurface.materialID	  = itMaterial->first;
+
+			for ( uint32 meshIdx = 0, numMeshes = (uint32)itMaterial->second.size(); meshIdx < numMeshes; ++meshIdx )
 			{
 				// Copy new vertices
-				const modelToolMeshData_t&		modelToolMeshData	= parsedMeshes[itMaterial->second[meshIdx]];
-				uint32							offsetVertices		= ( uint32 )smdlVertices.size();
+				const modelToolMeshData_t& modelToolMeshData = parsedMeshes[itMaterial->second[meshIdx]];
+				uint32					   offsetVertices	 = (uint32)smdlVertices.size();
 				smdlVertices.resize( smdlVertices.size() + modelToolMeshData.vertices.size() );
 				Mem_Memcpy( smdlVertices.data() + offsetVertices, modelToolMeshData.vertices.data(), modelToolMeshData.vertices.size() * sizeof( smdlVertex_t ) );
 
 				// Copy new indices
-				uint32							offsetIndices = ( uint32 )indices.size();
+				uint32 offsetIndices = (uint32)indices.size();
 				indices.resize( indices.size() + modelToolMeshData.indices.size() );
-				for ( uint32 indexIdx = 0, numIndices = ( uint32 )modelToolMeshData.indices.size(); indexIdx < numIndices; ++indexIdx )
+				for ( uint32 indexIdx = 0, numIndices = (uint32)modelToolMeshData.indices.size(); indexIdx < numIndices; ++indexIdx )
 				{
 					indices[offsetIndices + indexIdx] = offsetVertices + modelToolMeshData.indices[indexIdx];
 				}
 			}
 
-			smdlSurface.numIndices = ( uint32 )indices.size() - smdlSurface.firstIndex;
+			smdlSurface.numIndices = (uint32)indices.size() - smdlSurface.firstIndex;
 			smdlSurfaces.emplace_back( smdlSurface );
 		}
 
-		CSMDLCompiledModelDoc&		smdlCompiledFile = smdlCompiledFiles.emplace_back();
+		CSMDLCompiledModelDoc& smdlCompiledFile = smdlCompiledFiles.emplace_back();
 		smdlCompiledFile.SetData( smdlVertices, indices, smdlSurfaces, parsedMaterials );
 		Msg( "ModelTool: ..Combine is done" );
 	}
 	// Otherwise compile separated meshes
 	else
 	{
-		for ( uint32 modelIdx = 0, numModels = ( uint32 )parsedMeshes.size(); modelIdx < numModels; ++modelIdx )
+		for ( uint32 modelIdx = 0, numModels = (uint32)parsedMeshes.size(); modelIdx < numModels; ++modelIdx )
 		{
-			CSMDLCompiledModelDoc&			smdlCompiledFile	= smdlCompiledFiles.emplace_back();
-			modelToolMeshData_t&			modelToolMeshData	= parsedMeshes[modelIdx];
-			std::vector<smdlSurface_t>		smdlSurfaces;
-			std::vector<std::string>		materials;
+			CSMDLCompiledModelDoc&	   smdlCompiledFile	 = smdlCompiledFiles.emplace_back();
+			modelToolMeshData_t&	   modelToolMeshData = parsedMeshes[modelIdx];
+			std::vector<smdlSurface_t> smdlSurfaces;
+			std::vector<std::string>   materials;
 
 			smdlSurfaces.emplace_back( modelToolMeshData.surface );
 			materials.emplace_back( parsedMaterials[modelToolMeshData.materialID] );
@@ -210,12 +207,12 @@ bool CModelTool::CompileModel( const resourceToolCompileModelParams_t& compilePa
 
 	// Save models to SMDL format
 	Msg( "ModelTool: Saving models.." );
-	uint32			numErrors = 0;
-	for ( uint32 modelIdx = 0, numModels = ( uint32 )smdlCompiledFiles.size(); modelIdx < numModels; ++modelIdx )
+	uint32 numErrors = 0;
+	for ( uint32 modelIdx = 0, numModels = (uint32)smdlCompiledFiles.size(); modelIdx < numModels; ++modelIdx )
 	{
-		CSMDLCompiledModelDoc&			smdlCompiledFile	= smdlCompiledFiles[modelIdx];
-		const modelToolMeshData_t&		modelToolMeshData	= parsedMeshes[modelIdx];
-		std::string						destFilePath		= S_Sprintf( "%s%s.smdl_c", compileParams.pDestPath, smdlCompiledFiles.size() > 1 ? S_Sprintf( "_%i", modelIdx ).c_str() : "" );
+		CSMDLCompiledModelDoc&	   smdlCompiledFile	 = smdlCompiledFiles[modelIdx];
+		const modelToolMeshData_t& modelToolMeshData = parsedMeshes[modelIdx];
+		std::string				   destFilePath		 = S_Sprintf( "%s%s.smdl_c", compileParams.pDestPath, smdlCompiledFiles.size() > 1 ? S_Sprintf( "_%i", modelIdx ).c_str() : "" );
 		if ( !smdlCompiledFile.SaveFile( destFilePath.c_str() ) )
 		{
 			Error( "ModelTool: Failed to save model '%s' to '%s'", modelToolMeshData.name.c_str(), destFilePath.c_str() );
@@ -249,7 +246,7 @@ void CModelTool::ProcessNode( aiNode* pNode, const aiScene* pScene, modelToolAiM
 {
 	for ( uint32 meshIdx = 0; meshIdx < pNode->mNumMeshes; ++meshIdx )
 	{
-		aiMesh*		pMesh = pScene->mMeshes[pNode->mMeshes[meshIdx]];
+		aiMesh* pMesh = pScene->mMeshes[pNode->mMeshes[meshIdx]];
 		meshesDict[pMesh->mMaterialIndex].emplace_back( pNode->mTransformation, pMesh );
 	}
 
@@ -267,8 +264,8 @@ CModelTool::ParseModels
 bool CModelTool::ParseModels( const resourceToolCompileModelParams_t& compileParams, std::vector<modelToolMeshData_t>& parsedMeshes, std::vector<std::string>& parsedMaterials ) const
 {
 	// Loading a model
-	Assimp::Importer	aiImport;
-	const aiScene*		pAIScene = aiImport.ReadFile( compileParams.pSrcPath, aiProcess_Triangulate | aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals | aiProcess_LimitBoneWeights | aiProcess_JoinIdenticalVertices );
+	Assimp::Importer aiImport;
+	const aiScene*	 pAIScene = aiImport.ReadFile( compileParams.pSrcPath, aiProcess_Triangulate | aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals | aiProcess_LimitBoneWeights | aiProcess_JoinIdenticalVertices );
 	if ( !pAIScene )
 	{
 		Error( "ModelTool: Failed to read file '%s', %s", compileParams.pSrcPath, aiImport.GetErrorString() );
@@ -276,7 +273,7 @@ bool CModelTool::ParseModels( const resourceToolCompileModelParams_t& compilePar
 	}
 
 	// Fill meshes array from the Assimp scene
-	modelToolAiMeshesMap_t		aiMeshes;
+	modelToolAiMeshesMap_t aiMeshes;
 	ProcessNode( pAIScene->mRootNode, pAIScene, aiMeshes );
 	if ( aiMeshes.empty() )
 	{
@@ -290,12 +287,12 @@ bool CModelTool::ParseModels( const resourceToolCompileModelParams_t& compilePar
 	{
 		for ( auto itMesh = itMaterial->second.begin(), itMeshEnd = itMaterial->second.end(); itMesh != itMeshEnd; ++itMesh )
 		{
-			aiMesh*									pAiMesh				= ( *itMesh ).pMesh;
-			modelToolMeshData_t						modelToolMeshData	= {};
-			modelToolMeshData.name					= pAiMesh->mName.C_Str();
-			modelToolMeshData.materialID			= itMaterial->first;
-			modelToolMeshData.surface.materialID	= itMaterial->first;
-			modelToolMeshData.surface.firstIndex	= ( uint32 )modelToolMeshData.indices.size();
+			aiMesh*				pAiMesh			  = ( *itMesh ).pMesh;
+			modelToolMeshData_t modelToolMeshData = {};
+			modelToolMeshData.name				  = pAiMesh->mName.C_Str();
+			modelToolMeshData.materialID		  = itMaterial->first;
+			modelToolMeshData.surface.materialID  = itMaterial->first;
+			modelToolMeshData.surface.firstIndex  = (uint32)modelToolMeshData.indices.size();
 
 			// Prepare the vertex buffer
 			modelToolMeshData.vertices.resize( pAiMesh->mNumVertices );
@@ -303,8 +300,8 @@ bool CModelTool::ParseModels( const resourceToolCompileModelParams_t& compilePar
 			// Read all vertices
 			for ( uint32 vertexIdx = 0; vertexIdx < pAiMesh->mNumVertices; ++vertexIdx )
 			{
-				smdlVertex_t	smdlVertex	= {};
-				aiVector3D		aiVertex	= ( *itMesh ).transformation * pAiMesh->mVertices[vertexIdx];
+				smdlVertex_t smdlVertex = {};
+				aiVector3D	 aiVertex	= ( *itMesh ).transformation * pAiMesh->mVertices[vertexIdx];
 				ModelTool_ChangeAxisUp( aiVertex, compileParams.axisUp );
 
 				smdlVertex.position.x = aiVertex.x;
@@ -344,7 +341,7 @@ bool CModelTool::ParseModels( const resourceToolCompileModelParams_t& compilePar
 
 				if ( pAiMesh->mTextureCoords[0] )
 				{
-					aiVertex = ( *itMesh ).pMesh->mTextureCoords[0][vertexIdx];
+					aiVertex			  = ( *itMesh ).pMesh->mTextureCoords[0][vertexIdx];
 					smdlVertex.texCoord.x = aiVertex.x;
 					smdlVertex.texCoord.y = aiVertex.y;
 				}
@@ -355,36 +352,36 @@ bool CModelTool::ParseModels( const resourceToolCompileModelParams_t& compilePar
 			// Read all indices
 			for ( uint32 faceIdx = 0; faceIdx < pAiMesh->mNumFaces; ++faceIdx )
 			{
-				aiFace*		pAiFace = &pAiMesh->mFaces[faceIdx];
-				uint32		offset	= ( uint32 )modelToolMeshData.indices.size();
+				aiFace* pAiFace = &pAiMesh->mFaces[faceIdx];
+				uint32	offset	= (uint32)modelToolMeshData.indices.size();
 				modelToolMeshData.indices.resize( offset + pAiFace->mNumIndices );
 				Mem_Memcpy( modelToolMeshData.indices.data() + offset, pAiFace->mIndices, pAiFace->mNumIndices * sizeof( uint32 ) );
 			}
 
-			modelToolMeshData.surface.numIndices = ( uint32 )modelToolMeshData.indices.size();
+			modelToolMeshData.surface.numIndices = (uint32)modelToolMeshData.indices.size();
 			parsedMeshes.emplace_back( modelToolMeshData );
 		}
 	}
-	
+
 	// Initialize dictionary to fast find materials to rename
-	std::unordered_map<std::string, std::string>						renamedMaterialsDict;
+	std::unordered_map<std::string, std::string> renamedMaterialsDict;
 	for ( uint32 materialIdx = 0; materialIdx < compileParams.numRenamedMaterials; ++materialIdx )
 	{
-		const resourceToolRenamedMaterial_t&							resourceRenamedMaterial = compileParams.pRenamedMaterials[materialIdx];
-		renamedMaterialsDict[resourceRenamedMaterial.pOriginalName]		= resourceRenamedMaterial.pNewName;
+		const resourceToolRenamedMaterial_t& resourceRenamedMaterial = compileParams.pRenamedMaterials[materialIdx];
+		renamedMaterialsDict[resourceRenamedMaterial.pOriginalName]	 = resourceRenamedMaterial.pNewName;
 	}
 
 	// Parse materials
 	parsedMaterials.resize( pAIScene->mNumMaterials );
 	for ( uint32 materialIdx = 0; materialIdx < pAIScene->mNumMaterials; ++materialIdx )
 	{
-		aiMaterial*		pMaterial = pAIScene->mMaterials[materialIdx];
-		aiString		aiMaterialName;
+		aiMaterial* pMaterial = pAIScene->mMaterials[materialIdx];
+		aiString	aiMaterialName;
 		pMaterial->Get( AI_MATKEY_NAME, aiMaterialName );
-		
+
 		// Rename material if it need
-		std::string		materialName		= aiMaterialName.C_Str();
-		auto			itRenamedMaterial	= renamedMaterialsDict.find( materialName );
+		std::string materialName	  = aiMaterialName.C_Str();
+		auto		itRenamedMaterial = renamedMaterialsDict.find( materialName );
 		if ( itRenamedMaterial != renamedMaterialsDict.end() )
 		{
 			materialName = itRenamedMaterial->second;
@@ -404,18 +401,18 @@ CModelTool::OptimizeModel
 */
 void CModelTool::OptimizeModel( modelToolMeshData_t& meshData ) const
 {
-	uint32		numIndices	= ( uint32 )meshData.indices.size();
-	uint32		numVertices	= ( uint32 )meshData.vertices.size();
+	uint32 numIndices  = (uint32)meshData.indices.size();
+	uint32 numVertices = (uint32)meshData.vertices.size();
 
 	// Create a remap table
-	std::vector<uint32>		meshoptVertexRemap( numIndices );
-	uint32					optimizedNumVertices = ( uint32 )meshopt_generateVertexRemap( meshoptVertexRemap.data(), 
-																						  meshData.indices.data(), numIndices,
-																						  meshData.vertices.data(), numVertices, sizeof( smdlVertex_t ) );
+	std::vector<uint32> meshoptVertexRemap( numIndices );
+	uint32				optimizedNumVertices = (uint32)meshopt_generateVertexRemap( meshoptVertexRemap.data(),
+																		meshData.indices.data(), numIndices,
+																		meshData.vertices.data(), numVertices, sizeof( smdlVertex_t ) );
 
 	// Allocate memory for optimized vertices and indices
-	std::vector<uint32>			optimizedIndices( numIndices );
-	std::vector<smdlVertex_t>	optimizedVertices( optimizedNumVertices );
+	std::vector<uint32>		  optimizedIndices( numIndices );
+	std::vector<smdlVertex_t> optimizedVertices( optimizedNumVertices );
 
 	// Remove duplicate vertices
 	meshopt_remapIndexBuffer( optimizedIndices.data(), meshData.indices.data(), numIndices, meshoptVertexRemap.data() );
@@ -425,13 +422,13 @@ void CModelTool::OptimizeModel( modelToolMeshData_t& meshData ) const
 	meshopt_optimizeVertexCache( optimizedIndices.data(), optimizedIndices.data(), numIndices, optimizedNumVertices );
 
 	// Reduce pixel overdraw
-	meshopt_optimizeOverdraw( optimizedIndices.data(), optimizedIndices.data(), numIndices, 
+	meshopt_optimizeOverdraw( optimizedIndices.data(), optimizedIndices.data(), numIndices,
 							  &optimizedVertices[0].position.x, optimizedNumVertices, sizeof( smdlVertex_t ), 1.05f );
 
 	// Optimize access to the vertex buffer
 	meshopt_optimizeVertexFetch( optimizedVertices.data(), optimizedIndices.data(), numIndices, optimizedVertices.data(), optimizedNumVertices, sizeof( smdlVertex_t ) );
 
 	// Save the optimized vertices and indices
-	meshData.vertices	= std::move( optimizedVertices );
-	meshData.indices	= std::move( optimizedIndices );
+	meshData.vertices = std::move( optimizedVertices );
+	meshData.indices  = std::move( optimizedIndices );
 }

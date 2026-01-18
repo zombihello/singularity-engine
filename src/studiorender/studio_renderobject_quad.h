@@ -13,14 +13,15 @@ public:
 		: pStudioAPIVertexBuffer( pStudioAPIVertexBuffer )
 		, pStudioAPIIndexBuffer( pStudioAPIIndexBuffer )
 		, pMaterial( pMaterial )
-	{}
+	{
+	}
 
-	FORCEINLINE IStudioAPIBuffer*	GetStudioAPIVertexBuffer() const	{ return pStudioAPIVertexBuffer; }
-	FORCEINLINE IStudioAPIBuffer*	GetStudioAPIIndexBuffer() const		{ return pStudioAPIIndexBuffer; }
-	FORCEINLINE IMaterial*			GetMaterial() const					{ return pMaterial; }
+	FORCEINLINE IStudioAPIBuffer* GetStudioAPIVertexBuffer() const { return pStudioAPIVertexBuffer; }
+	FORCEINLINE IStudioAPIBuffer* GetStudioAPIIndexBuffer() const { return pStudioAPIIndexBuffer; }
+	FORCEINLINE IMaterial* GetMaterial() const { return pMaterial; }
 
 public:
-	TRefPtr<IStudioAPIBuffer>		pStudioAPIVertexBuffer;
-	TRefPtr<IStudioAPIBuffer>		pStudioAPIIndexBuffer;
-	TRefPtr<IMaterial>				pMaterial;
+	TRefPtr<IStudioAPIBuffer> pStudioAPIVertexBuffer;
+	TRefPtr<IStudioAPIBuffer> pStudioAPIIndexBuffer;
+	TRefPtr<IMaterial>		  pMaterial;
 };

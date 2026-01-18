@@ -11,10 +11,11 @@
 CShaderLib::CShaderLib
 ==================
 */
-CShaderLib::CShaderLib( const achar* pName )
+CShaderLib::CShaderLib( const char* pName )
 	: name( pName )
 	, index( INVALID_INDEX )
-{}
+{
+}
 
 /*
 ==================
@@ -30,28 +31,28 @@ bool CShaderLib::Connect( createInterfaceFn_t pFactory )
 	}
 
 	// Get StudioAPI
-	g_pStudioAPI = ( IStudioAPI* )pFactory( STUDIOAPI_INTERFACE_VERSION );
+	g_pStudioAPI = (IStudioAPI*)pFactory( STUDIOAPI_INTERFACE_VERSION );
 	if ( !g_pStudioAPI )
 	{
 		return false;
 	}
 
 	// Get StudioRender
-	g_pStudioRender = ( IStudioRender* )pFactory( STUDIORENDER_INTERFACE_VERSION );
+	g_pStudioRender = (IStudioRender*)pFactory( STUDIORENDER_INTERFACE_VERSION );
 	if ( !g_pStudioRender )
 	{
 		return false;
 	}
 
 	// Get shader manager
-	g_pShaderMgr = ( IShaderMgr* )pFactory( SHADERMGR_INTERFACE_VERSION );
+	g_pShaderMgr = (IShaderMgr*)pFactory( SHADERMGR_INTERFACE_VERSION );
 	if ( !g_pShaderMgr )
 	{
 		return false;
 	}
 
 	// Get resource system
-	g_pResourceSystem = ( IResourceSystem* )pFactory( RESOURCESYSTEM_INTERFACE_VERSION );
+	g_pResourceSystem = (IResourceSystem*)pFactory( RESOURCESYSTEM_INTERFACE_VERSION );
 	if ( !g_pResourceSystem )
 	{
 		return false;
@@ -92,7 +93,7 @@ CShaderLib::Shutdown
 */
 void CShaderLib::Shutdown()
 {
-	for ( uint32 shaderIdx = 0, numShaders = ( uint32 )shaders.size(); shaderIdx < numShaders; ++shaderIdx )
+	for ( uint32 shaderIdx = 0, numShaders = (uint32)shaders.size(); shaderIdx < numShaders; ++shaderIdx )
 	{
 		shaders[shaderIdx]->Shutdown();
 	}
@@ -104,7 +105,7 @@ void CShaderLib::Shutdown()
 CShaderLib::GetName
 ==================
 */
-const achar* CShaderLib::GetName() const
+const char* CShaderLib::GetName() const
 {
 	return name.c_str();
 }
@@ -116,7 +117,7 @@ CShaderLib::GetNumShaders
 */
 uint32 CShaderLib::GetNumShaders() const
 {
-	return ( uint32 )shaders.size();
+	return (uint32)shaders.size();
 }
 
 /*
@@ -126,7 +127,7 @@ CShaderLib::GetShader
 */
 IShader* CShaderLib::GetShader( uint32 index ) const
 {
-	Assert( index < ( uint32 )shaders.size() );
+	Assert( index < (uint32)shaders.size() );
 	return shaders[index];
 }
 

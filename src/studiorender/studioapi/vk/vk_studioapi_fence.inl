@@ -16,7 +16,7 @@ FORCEINLINE bool CStudioAPIFenceVk::IsSignaled() const
 	}
 
 	// Get the fence status by Vulkan
-	VkResult	vkResult = vkGetFenceStatus( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), vkFence );
+	VkResult vkResult = vkGetFenceStatus( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), vkFence );
 	switch ( vkResult )
 	{
 	case VK_SUCCESS:
@@ -50,7 +50,7 @@ FORCEINLINE bool CStudioAPIFenceVk::Wait( uint64 waitTime )
 	}
 
 	// Wait for fence by Vulkan
-	VkResult	vkResult = vkWaitForFences( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), 1, &vkFence, true, waitTime );
+	VkResult vkResult = vkWaitForFences( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), 1, &vkFence, true, waitTime );
 	switch ( vkResult )
 	{
 	case VK_SUCCESS:

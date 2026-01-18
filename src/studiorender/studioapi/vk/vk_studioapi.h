@@ -16,7 +16,6 @@
 class CStudioAPICmdContextVk;
 class CStudioAPIDescriptorPoolsMgrVk;
 
-
 //-----------------------------------------------------------------------------
 // Vulkan Studio API
 //-----------------------------------------------------------------------------
@@ -38,24 +37,24 @@ public:
 	virtual void ReleaseThreadOwnership() override;
 
 	// Create Studio API resources
-	virtual TRefPtr<IStudioAPICmdContext> CreateCmdContext( studioAPIQueueType_t queueType ) const override;
-	virtual TRefPtr<IStudioAPICmdList> CreateCmdList( IStudioAPICmdContext* pCmdContext ) const override;
-	virtual TRefPtr<IStudioAPICmdListBatch> CreateCmdListBatch( IStudioAPICmdContext* pCmdContext ) const override;
-	virtual TRefPtr<IStudioAPISwapChain> CreateSwapChain( windowHandle_t windowHandle, uint32 width, uint32 height, bool bUseVSync = false ) const override;
-	virtual TRefPtr<IStudioAPIShader> CreateVertexShader( const achar* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const achar* pDebugName = "" ) const override;
-	virtual TRefPtr<IStudioAPIShader> CreateHullShader( const achar* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const achar* pDebugName = "" ) const override;
-	virtual TRefPtr<IStudioAPIShader> CreateDomainShader( const achar* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const achar* pDebugName = "" ) const override;
-	virtual TRefPtr<IStudioAPIShader> CreateGeometryShader( const achar* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const achar* pDebugName = "" ) const override;
-	virtual TRefPtr<IStudioAPIShader> CreatePixelShader( const achar* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const achar* pDebugName = "" ) const override;
-	virtual TRefPtr<IStudioAPIShader> CreateComputeShader( const achar* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const achar* pDebugName = "" ) const override;
-	virtual TRefPtr<IStudioAPIBoundShaderState> FindOrCreateBoundShaderState( IStudioAPIVertexDeclaration* pVertexDeclaration, IStudioAPIShader* pVertexShader, IStudioAPIShader* pPixelShader, IStudioAPIShader* pHullShader = NULL, IStudioAPIShader* pDomainShader = NULL, IStudioAPIShader* pGeometryShader = NULL ) const override;
-	virtual TRefPtr<IStudioAPIRenderPipeline> CreateRenderPipeline( const studioAPIRenderPipelineCreateInfo_t& createInfo, const achar* pDebugName = "" ) const override;
+	virtual TRefPtr<IStudioAPICmdContext>		 CreateCmdContext( studioAPIQueueType_t queueType ) const override;
+	virtual TRefPtr<IStudioAPICmdList>			 CreateCmdList( IStudioAPICmdContext* pCmdContext ) const override;
+	virtual TRefPtr<IStudioAPICmdListBatch>		 CreateCmdListBatch( IStudioAPICmdContext* pCmdContext ) const override;
+	virtual TRefPtr<IStudioAPISwapChain>		 CreateSwapChain( windowHandle_t windowHandle, uint32 width, uint32 height, bool bUseVSync = false ) const override;
+	virtual TRefPtr<IStudioAPIShader>			 CreateVertexShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName = "" ) const override;
+	virtual TRefPtr<IStudioAPIShader>			 CreateHullShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName = "" ) const override;
+	virtual TRefPtr<IStudioAPIShader>			 CreateDomainShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName = "" ) const override;
+	virtual TRefPtr<IStudioAPIShader>			 CreateGeometryShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName = "" ) const override;
+	virtual TRefPtr<IStudioAPIShader>			 CreatePixelShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName = "" ) const override;
+	virtual TRefPtr<IStudioAPIShader>			 CreateComputeShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName = "" ) const override;
+	virtual TRefPtr<IStudioAPIBoundShaderState>	 FindOrCreateBoundShaderState( IStudioAPIVertexDeclaration* pVertexDeclaration, IStudioAPIShader* pVertexShader, IStudioAPIShader* pPixelShader, IStudioAPIShader* pHullShader = NULL, IStudioAPIShader* pDomainShader = NULL, IStudioAPIShader* pGeometryShader = NULL ) const override;
+	virtual TRefPtr<IStudioAPIRenderPipeline>	 CreateRenderPipeline( const studioAPIRenderPipelineCreateInfo_t& createInfo, const char* pDebugName = "" ) const override;
 	virtual TRefPtr<IStudioAPIVertexDeclaration> CreateVertexDeclaration( const studioAPIVertexInputBuffer_t* pVertexInputBuffers, uint32 numVertexInputBuffers, const studioAPIVertexInputAttribute_t* pVertexInputAttributes, uint32 numVertexInputAttributes ) const override;
-	virtual TRefPtr<IStudioAPIFrameBuffer> CreateFrameBuffer( const studioAPIFrameBufferCreateInfo_t& createInfo, const achar* pDebugName = "" ) const override;
-	virtual TRefPtr<IStudioAPIRenderPass> CreateRenderPass( const studioAPIRenderPassCreateInfo_t& createInfo, const achar* pDebugName = "" ) const override;
-	virtual TRefPtr<IStudioAPIBuffer> CreateBuffer( const byte* pData, uint64 dataSize, uint32 dataStride, uint32 usageFlags, const achar* pDebugName = "" ) const override;
-	virtual TRefPtr<IStudioAPITexture> CreateTexture( studioAPITextureType_t type, uint32 sizeX, uint32 sizeY, uint32 sizeZ, uint32 numLayers, uint32 numMips, uint32 usageFlags, studioAPIPixelFormat_t pixelFormat, const byte* pData = NULL, const achar* pDebugName = "" ) const override;
-	virtual TRefPtr<IStudioAPISampler> CreateSampler( const studioAPISamplerCreateInfo_t& createInfo, const achar* pDebugName = "" ) const override;
+	virtual TRefPtr<IStudioAPIFrameBuffer>		 CreateFrameBuffer( const studioAPIFrameBufferCreateInfo_t& createInfo, const char* pDebugName = "" ) const override;
+	virtual TRefPtr<IStudioAPIRenderPass>		 CreateRenderPass( const studioAPIRenderPassCreateInfo_t& createInfo, const char* pDebugName = "" ) const override;
+	virtual TRefPtr<IStudioAPIBuffer>			 CreateBuffer( const byte* pData, uint64 dataSize, uint32 dataStride, uint32 usageFlags, const char* pDebugName = "" ) const override;
+	virtual TRefPtr<IStudioAPITexture>			 CreateTexture( studioAPITextureType_t type, uint32 sizeX, uint32 sizeY, uint32 sizeZ, uint32 numLayers, uint32 numMips, uint32 usageFlags, studioAPIPixelFormat_t pixelFormat, const byte* pData = NULL, const char* pDebugName = "" ) const override;
+	virtual TRefPtr<IStudioAPISampler>			 CreateSampler( const studioAPISamplerCreateInfo_t& createInfo, const char* pDebugName = "" ) const override;
 
 	// Begin/end drawing a frame
 	virtual void BeginDrawingFrame() override;
@@ -66,35 +65,35 @@ public:
 	virtual bool WaitCmdListBatch( IStudioAPICmdListBatch* pCmdListBatch, uint64 waitTime = 0 ) override;
 
 	virtual const studioAPIInfo_t& GetInfo() const override;
-	virtual uint64 GetFrameNumber() const override;
-	virtual IStudioAPICmdContext* GetImmediateCmdContext( studioAPIQueueType_t queueType ) const override;
+	virtual uint64				   GetFrameNumber() const override;
+	virtual IStudioAPICmdContext*  GetImmediateCmdContext( studioAPIQueueType_t queueType ) const override;
 
 	CStudioAPIVk();
 
-	const CStudioAPIDeviceVk& GetDevice() const;
-	const CStudioAPIMemoryMgrVk& GetMemoryMgr() const;
-	COnStudioAPIVkShutdown& OnStudioAPIVkShutdown() const;
+	const CStudioAPIDeviceVk&		   GetDevice() const;
+	const CStudioAPIMemoryMgrVk&	   GetMemoryMgr() const;
+	COnStudioAPIVkShutdown&			   OnStudioAPIVkShutdown() const;
 	CStudioAPIBoundShaderStateCacheVk& GetBoundShaderStateCache();
-	CStudioAPIDescriptorPoolsMgrVk& GetDescriptorPoolsMgr();
-	CStudioAPIDataUploaderVk& GetDataUploader();
-	CStudioAPISyncMgrVk& GetSyncMgr();
-	uint32 GetCurrentFrameInFlight() const;
+	CStudioAPIDescriptorPoolsMgrVk&	   GetDescriptorPoolsMgr();
+	CStudioAPIDataUploaderVk&		   GetDataUploader();
+	CStudioAPISyncMgrVk&			   GetSyncMgr();
+	uint32							   GetCurrentFrameInFlight() const;
 
 private:
-	uint64										frameNumber;
-	uint32										currentFrameInFlight;
-	CStudioAPIDeviceVk							device;
-	TRefPtr<CStudioAPICmdContextVk>				pGraphicsCmdContext;
-	TRefPtr<CStudioAPICmdContextVk>				pTransferCmdContext;
-	TRefPtr<CStudioAPICmdContextVk>				pComputeCmdContext;
-	CStudioAPIMemoryMgrVk						memoryMgr;
-	CStudioAPIDescriptorPoolsMgrVk				descriptorPoolsMgr;
-	CStudioAPIDataUploaderVk					dataUploader;
-	CStudioAPISyncMgrVk							syncMgr;
-	studioAPIInfo_t								info;
-	mutable CStudioAPIBoundShaderStateCacheVk	boundShaderStateCache;
-	mutable	COnStudioAPIVkShutdown				onStudioAPIVkShutdown;
+	uint64									  frameNumber;
+	uint32									  currentFrameInFlight;
+	CStudioAPIDeviceVk						  device;
+	TRefPtr<CStudioAPICmdContextVk>			  pGraphicsCmdContext;
+	TRefPtr<CStudioAPICmdContextVk>			  pTransferCmdContext;
+	TRefPtr<CStudioAPICmdContextVk>			  pComputeCmdContext;
+	CStudioAPIMemoryMgrVk					  memoryMgr;
+	CStudioAPIDescriptorPoolsMgrVk			  descriptorPoolsMgr;
+	CStudioAPIDataUploaderVk				  dataUploader;
+	CStudioAPISyncMgrVk						  syncMgr;
+	studioAPIInfo_t							  info;
+	mutable CStudioAPIBoundShaderStateCacheVk boundShaderStateCache;
+	mutable COnStudioAPIVkShutdown			  onStudioAPIVkShutdown;
 };
-extern CStudioAPIVk		g_StudioAPIVk;
+extern CStudioAPIVk g_StudioAPIVk;
 
 #include "studiorender/studioapi/vk/vk_studioapi.inl"

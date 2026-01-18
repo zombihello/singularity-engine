@@ -8,7 +8,6 @@
 //-----------------------------------------------------------------------------
 class CStudioAPICmdListVk;
 
-
 //-----------------------------------------------------------------------------
 // Vulkan StudioAPI buffer
 //-----------------------------------------------------------------------------
@@ -24,17 +23,17 @@ public:
 	virtual uint32 GetUsageFlags() const override;
 	virtual uint64 GetSize() const override;
 	virtual uint32 GetStride() const override;
-	virtual uint8 GetMemoryFlags() const override;
+	virtual uint8  GetMemoryFlags() const override;
 
 	// NOTE: Before use check memory flags by GetMemoryFlags(). If STUDIOAPI_BUFFER_MEMORY_FLAG_CPU is set then you can use the function,
 	// otherwise use IStudioAPICmdList::CopyBuffer
 	virtual void MapMemory( uint64 size, uint64 offset, studioAPIMappedBufferData_t& mappedData ) override;
 	virtual void UnmapMemory( studioAPIMappedBufferData_t& mappedData ) override;
 
-	// For use the buffer must have STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST flag 
+	// For use the buffer must have STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST flag
 	virtual void UpdateData( IStudioAPICmdContext* pCmdContext, byte* pData, uint64 dataSize, uint64 offset = 0 ) override;
 
-	CStudioAPIBufferVk( const byte* pData, uint64 dataSize, uint32 dataStride, uint32 usageFlags, const achar* pDebugName = "" );
+	CStudioAPIBufferVk( const byte* pData, uint64 dataSize, uint32 dataStride, uint32 usageFlags, const char* pDebugName = "" );
 	~CStudioAPIBufferVk();
 
 	// The function update a synchronization state of the buffer. Useful for for implicit transfer of ownership without barrier
@@ -47,13 +46,13 @@ public:
 
 	void SwapCurrentBufferIndex();
 
-	uint64 GetOffset() const;
-	VkBuffer GetVkBuffer() const;
-	VkIndexType GetVkIndexType() const;
+	uint64								GetOffset() const;
+	VkBuffer							GetVkBuffer() const;
+	VkIndexType							GetVkIndexType() const;
 	const studioAPISyncStateBufferVk_t& GetSyncState() const;
 
 private:
-	static void OnStudioAPIVkShutdown( void* pUserData );
+	static void	  OnStudioAPIVkShutdown( void* pUserData );
 	static uint32 GetNumBuffersFromUsage( uint32 usageFlags );
 
 	uint32									usageFlags;
@@ -66,7 +65,7 @@ private:
 	VkBuffer								vkBuffer;
 	VmaAllocation							vmaAllocation;
 	studioAPISyncStateBufferVk_t			syncState;
-	COnStudioAPIVkShutdown::funcDelegate_t*	pStudioAPIVkShutdownDelegate;
+	COnStudioAPIVkShutdown::funcDelegate_t* pStudioAPIVkShutdownDelegate;
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_buffer.inl"

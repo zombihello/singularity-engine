@@ -21,8 +21,8 @@ void CMaterialFactory::Init()
 	pDefaultMaterial = g_pResourceSystem->FindOrLoadResource( "//CORE/materials/default", RESOURCE_TYPE_MATERIAL );
 	if ( !pDefaultMaterial )
 	{
-		pDefaultMaterial = g_pResourceSystem->CreateProceduralResource( "default", RESOURCE_TYPE_MATERIAL );
-		CMaterial*		pMaterial = ( CMaterial* )pDefaultMaterial->GetData();
+		pDefaultMaterial	 = g_pResourceSystem->CreateProceduralResource( "default", RESOURCE_TYPE_MATERIAL );
+		CMaterial* pMaterial = (CMaterial*)pDefaultMaterial->GetData();
 		pMaterial->SetShader( "wireframe" );
 	}
 }
@@ -57,9 +57,9 @@ TRefPtr<IRefCounted> CMaterialFactory::CreateProceduralResource() const
 CMaterialFactory::LoadResource
 ==================
 */
-TRefPtr<IRefCounted> CMaterialFactory::LoadResource( const achar* pPath, uint32 loadFlags /* = RESOURCE_LOAD_FLAG_NONE */ ) const
+TRefPtr<IRefCounted> CMaterialFactory::LoadResource( const char* pPath, uint32 loadFlags /* = RESOURCE_LOAD_FLAG_NONE */ ) const
 {
-	CSMATCompiledMaterialDoc		smatCompiledMaterialDoc;
+	CSMATCompiledMaterialDoc smatCompiledMaterialDoc;
 	if ( !smatCompiledMaterialDoc.LoadFromFile( S_GetFileExtension( pPath ) ? pPath : S_Sprintf( "%s.smat_c", pPath ).c_str() ) )
 	{
 		return NULL;
@@ -75,7 +75,7 @@ CMaterialFactory::UnloadResource
 */
 void CMaterialFactory::UnloadResource( IRefCounted* pResoruce ) const
 {
-	CMaterial*		pMaterial = ( CMaterial* )pResoruce;
+	CMaterial* pMaterial = (CMaterial*)pResoruce;
 	pMaterial->Clear();
 }
 
@@ -94,7 +94,7 @@ TRefPtr<IResource> CMaterialFactory::GetDefaultResource() const
 CMaterialFactory::GetFormatType
 ==================
 */
-const achar* CMaterialFactory::GetFormatType() const
+const char* CMaterialFactory::GetFormatType() const
 {
 	return "SMAT";
 }

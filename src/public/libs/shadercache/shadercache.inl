@@ -37,7 +37,7 @@ CShaderCacheDoc::GetNumCaches
 */
 FORCEINLINE uint64 CShaderCacheDoc::GetNumCaches() const
 {
-	return ( uint64 )caches.size();
+	return (uint64)caches.size();
 }
 
 /*
@@ -47,6 +47,6 @@ CShaderCacheDoc::GetCache
 */
 FORCEINLINE const CShaderCacheDoc::shaderCache_t& CShaderCacheDoc::GetCache( uint64 cacheId ) const
 {
-	Assert( cacheId < ( uint64 )caches.size() );
+	Assert( cacheId < (uint64)caches.size() );
 	return caches[cacheId];
 }

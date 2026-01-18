@@ -6,8 +6,8 @@
 S_SetCurrentDirectory
 ==================
 */
-FORCEINLINE bool S_SetCurrentDirectory( const achar* pDirName )
-{ 
+FORCEINLINE bool S_SetCurrentDirectory( const char* pDirName )
+{
 	return _chdir( pDirName ) == 0;
 }
 
@@ -16,7 +16,7 @@ FORCEINLINE bool S_SetCurrentDirectory( const achar* pDirName )
 S_GetCurrentDirectory
 ==================
 */
-FORCEINLINE bool S_GetCurrentDirectory( achar* pDestStr, uint32 maxLen )
+FORCEINLINE bool S_GetCurrentDirectory( char* pDestStr, uint32 maxLen )
 {
 	Assert( maxLen >= 1 );
 	Assert( pDestStr );
@@ -33,7 +33,7 @@ FORCEINLINE bool S_GetCurrentDirectory( achar* pDestStr, uint32 maxLen )
 S_IsAbsolutePath
 ==================
 */
-FORCEINLINE bool S_IsAbsolutePath( const achar* pPath )
+FORCEINLINE bool S_IsAbsolutePath( const char* pPath )
 {
 	return ( pPath[0] && pPath[1] == ':' ) || pPath[0] == '/' || pPath[0] == '\\';
 }

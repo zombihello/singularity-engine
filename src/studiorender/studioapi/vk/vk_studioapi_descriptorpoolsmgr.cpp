@@ -12,26 +12,26 @@ CStudioAPIDescriptorPoolVk::CStudioAPIDescriptorPoolVk( const CStudioAPIDescript
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 
 	// When we're hashing pools with types usage hash the descriptor pool can be used for different layouts so the initial layout does not make much sense
-	std::vector<VkDescriptorPoolSize>		vkDescriptorPoolSizes;
+	std::vector<VkDescriptorPoolSize> vkDescriptorPoolSizes;
 	for ( uint32 index = STUDIOAPI_VK_DESCRIPTOR_TYPE_BEGIN_RANGE; index <= STUDIOAPI_VK_DESCRIPTOR_TYPE_END_RANGE; ++index )
 	{
-		VkDescriptorType		vkDescriptorType		= ( VkDescriptorType )index;
-		uint32					numUsedDescriptorTypes	= descriptorSetsLayout.GetNumUsedDescriptorTypes( vkDescriptorType );
+		VkDescriptorType vkDescriptorType		= (VkDescriptorType)index;
+		uint32			 numUsedDescriptorTypes = descriptorSetsLayout.GetNumUsedDescriptorTypes( vkDescriptorType );
 		if ( numUsedDescriptorTypes > 0 )
 		{
-			VkDescriptorPoolSize&					vkDescriptorPoolSize = vkDescriptorPoolSizes.emplace_back();
+			VkDescriptorPoolSize& vkDescriptorPoolSize = vkDescriptorPoolSizes.emplace_back();
 			Mem_Memzero( &vkDescriptorPoolSize, sizeof( VkDescriptorPoolSize ) );
-			vkDescriptorPoolSize.type				= vkDescriptorType;
-			vkDescriptorPoolSize.descriptorCount	= numUsedDescriptorTypes * maxSetsAllocations;
+			vkDescriptorPoolSize.type			 = vkDescriptorType;
+			vkDescriptorPoolSize.descriptorCount = numUsedDescriptorTypes * maxSetsAllocations;
 		}
 	}
 
 	// Create a descriptor pool
-	VkDescriptorPoolCreateInfo					vkDescriptorPoolCreateInfo = {};
-	vkDescriptorPoolCreateInfo.sType			= VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-	vkDescriptorPoolCreateInfo.poolSizeCount	= ( uint32 )vkDescriptorPoolSizes.size();
-	vkDescriptorPoolCreateInfo.pPoolSizes		= vkDescriptorPoolSizes.data();
-	vkDescriptorPoolCreateInfo.maxSets			= maxSetsAllocations;
+	VkDescriptorPoolCreateInfo vkDescriptorPoolCreateInfo = {};
+	vkDescriptorPoolCreateInfo.sType					  = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	vkDescriptorPoolCreateInfo.poolSizeCount			  = (uint32)vkDescriptorPoolSizes.size();
+	vkDescriptorPoolCreateInfo.pPoolSizes				  = vkDescriptorPoolSizes.data();
+	vkDescriptorPoolCreateInfo.maxSets					  = maxSetsAllocations;
 	STUDIOAPI_VK_VERIFY_RESULT( vkCreateDescriptorPool( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), &vkDescriptorPoolCreateInfo, NULL, &vkDescriptorPool ) );
 }
 
@@ -74,13 +74,12 @@ bool CStudioAPIDescriptorPoolVk::AllocateDescriptorSets( const VkDescriptorSetAl
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 	if ( vkDescriptorPool != VK_NULL_HANDLE )
 	{
-		VkDescriptorSetAllocateInfo		tmpVkDescriptorSetAllocateInfo = vkDescriptorSetAllocateInfo;
-		tmpVkDescriptorSetAllocateInfo.descriptorPool = vkDescriptorPool;
+		VkDescriptorSetAllocateInfo tmpVkDescriptorSetAllocateInfo = vkDescriptorSetAllocateInfo;
+		tmpVkDescriptorSetAllocateInfo.descriptorPool			   = vkDescriptorPool;
 		return vkAllocateDescriptorSets( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), &tmpVkDescriptorSetAllocateInfo, pDestDescriptorSets ) == VK_SUCCESS;
 	}
 	return false;
 }
-
 
 /*
 ==================
@@ -132,7 +131,7 @@ bool CStudioAPITypedDescriptorPoolSetVk::AllocateDescriptorSets( const CStudioAP
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 	if ( !descriptorSetsLayout.GetVkDescriptorSetLayouts().empty() )
 	{
-		CStudioAPIDescriptorPoolVk*		pPool = *poolCurrentIt;
+		CStudioAPIDescriptorPoolVk* pPool = *poolCurrentIt;
 		while ( !pPool->AllocateDescriptorSets( descriptorSetsLayout.GetVkAllocateInfo(), pDestDescriptorSets ) )
 		{
 			pPool = GetFreePool( true );
@@ -156,7 +155,7 @@ CStudioAPIDescriptorPoolVk* CStudioAPITypedDescriptorPoolSetVk::GetFreePool( boo
 		return *poolCurrentIt;
 	}
 
-	std::list<CStudioAPIDescriptorPoolVk*>::iterator	nextPoolIt = std::next( poolCurrentIt, 1 );
+	std::list<CStudioAPIDescriptorPoolVk*>::iterator nextPoolIt = std::next( poolCurrentIt, 1 );
 	if ( nextPoolIt != poolList.end() )
 	{
 		poolCurrentIt = nextPoolIt;
@@ -176,17 +175,16 @@ CStudioAPIDescriptorPoolVk* CStudioAPITypedDescriptorPoolSetVk::PushNewPool()
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 
 	// Max number of descriptor sets layout allocations
-	const uint32	maxSetsAllocationsBase = 32;
+	const uint32 maxSetsAllocationsBase = 32;
 
 	// Allow max 128 sets per pool (32 << 2)
-	const uint32	maxSetsAllocations = maxSetsAllocationsBase << Min<uint32>( ( uint32 )poolList.size(), 2 );
+	const uint32 maxSetsAllocations = maxSetsAllocationsBase << Min<uint32>( (uint32)poolList.size(), 2 );
 
 	// Allocate a new descriptor pool
-	CStudioAPIDescriptorPoolVk*		pNewPool = poolList.emplace_back( new CStudioAPIDescriptorPoolVk( descriptorSetsLayout, maxSetsAllocations ) );
-	poolCurrentIt = --poolList.end();
+	CStudioAPIDescriptorPoolVk* pNewPool = poolList.emplace_back( new CStudioAPIDescriptorPoolVk( descriptorSetsLayout, maxSetsAllocations ) );
+	poolCurrentIt						 = --poolList.end();
 	return pNewPool;
 }
-
 
 /*
 ==================
@@ -196,7 +194,8 @@ CStudioAPIDescriptorPoolSetContainerVk::CStudioAPIDescriptorPoolSetContainerVk
 CStudioAPIDescriptorPoolSetContainerVk::CStudioAPIDescriptorPoolSetContainerVk()
 	: bUsed( true )
 	, lastFrameUsed( g_StudioAPIVk.GetFrameNumber() )
-{}
+{
+}
 
 /*
 ==================
@@ -220,9 +219,8 @@ CStudioAPIDescriptorPoolSetContainerVk::SetUsed
 void CStudioAPIDescriptorPoolSetContainerVk::SetUsed( bool bUsed )
 {
 	CStudioAPIDescriptorPoolSetContainerVk::bUsed = bUsed;
-	lastFrameUsed = g_StudioAPIVk.GetFrameNumber();
+	lastFrameUsed								  = g_StudioAPIVk.GetFrameNumber();
 }
-
 
 /*
 ==================
@@ -231,7 +229,8 @@ CStudioAPIDescriptorPoolsMgrVk::CStudioAPIDescriptorPoolsMgrVk
 */
 CStudioAPIDescriptorPoolsMgrVk::CStudioAPIDescriptorPoolsMgrVk()
 	: pStudioAPIVkShutdownDelegate( NULL )
-{}
+{
+}
 
 /*
 ==================
@@ -290,7 +289,7 @@ CStudioAPIDescriptorPoolSetContainerVk* CStudioAPIDescriptorPoolsMgrVk::AcquireP
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 	for ( auto it = poolSets.begin(), itEnd = poolSets.end(); it != itEnd; ++it )
 	{
-		CStudioAPIDescriptorPoolSetContainerVk*		pPoolSet = *it;
+		CStudioAPIDescriptorPoolSetContainerVk* pPoolSet = *it;
 		if ( !pPoolSet->IsUsed() )
 		{
 			pPoolSet->SetUsed( true );
@@ -326,7 +325,7 @@ void CStudioAPIDescriptorPoolsMgrVk::FreeUnusedPoolSets()
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 	for ( auto it = poolSets.rbegin(), itEnd = poolSets.rend(); it != itEnd; ++it )
 	{
-		CStudioAPIDescriptorPoolSetContainerVk*		pPoolSet = *it;
+		CStudioAPIDescriptorPoolSetContainerVk* pPoolSet = *it;
 		if ( !pPoolSet->IsUsed() && g_StudioAPIVk.GetFrameNumber() - pPoolSet->GetLastFrameUsed() > STUDIOAPI_VK_NUM_FRAMES_TO_WAIT_BEFORE_RELEASING_TO_OS )
 		{
 			delete pPoolSet;
@@ -344,7 +343,7 @@ CStudioAPIDescriptorPoolsMgrVk::OnStudioAPIVkShutdown
 void CStudioAPIDescriptorPoolsMgrVk::OnStudioAPIVkShutdown( void* pUserData )
 {
 	Assert( pUserData );
-	CStudioAPIDescriptorPoolsMgrVk*		pStudioAPIDescriptorPoolsMgr	= ( CStudioAPIDescriptorPoolsMgrVk* )pUserData;
-	pStudioAPIDescriptorPoolsMgr->pStudioAPIVkShutdownDelegate			= NULL;
+	CStudioAPIDescriptorPoolsMgrVk* pStudioAPIDescriptorPoolsMgr = (CStudioAPIDescriptorPoolsMgrVk*)pUserData;
+	pStudioAPIDescriptorPoolsMgr->pStudioAPIVkShutdownDelegate	 = NULL;
 	pStudioAPIDescriptorPoolsMgr->Shutdown();
 }

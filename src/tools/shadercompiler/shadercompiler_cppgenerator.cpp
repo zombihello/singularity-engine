@@ -16,28 +16,28 @@ void CShaderCompilerCppGenerator::Generate( const shader_t& shader )
 	buffer += "//\n\n";
 
 	// Generate class name from base name of shader source file and the one type
-	std::string		className;
+	std::string className;
 	{
 		// Convert shader type to string
-		const achar*	pShaderTypeName = "";
+		const char* pShaderTypeName = "";
 		ConvShaderTypeToString( shader.type, pShaderTypeName );
 
 		// Get base name from shader source file
-		std::string		fileBaseName;
+		std::string fileBaseName;
 		S_GetFileBaseName( shader.source, fileBaseName, false );
 
 		// Get class name
 		className = S_Sprintf( "C_%s_%s_Index", fileBaseName.c_str(), pShaderTypeName );
 	}
 
-	// Generate C++ class header	
+	// Generate C++ class header
 	buffer += S_Sprintf( "class %s\n", className.c_str() );
 	buffer += "{\n";
 
 	// Generate for each shader flag a var and set function of the one
-	for ( uint32 index = 0, count = ( uint32 )shader.flags.size(); index < count; ++index )
+	for ( uint32 index = 0, count = (uint32)shader.flags.size(); index < count; ++index )
 	{
-		const shaderFlag_t&		shaderFlag = shader.flags[index];
+		const shaderFlag_t& shaderFlag = shader.flags[index];
 		buffer += "\t//\n";
 		buffer += S_Sprintf( "\t// Shader flag '%s' with range [%i;%i]\n", shaderFlag.name.c_str(), shaderFlag.minValue, shaderFlag.maxValue );
 		buffer += "\t//\n";
@@ -108,20 +108,20 @@ void CShaderCompilerCppGenerator::GenerateVar( const shaderFlag_t& shaderFlag )
 CShaderCompilerCppGenerator::GenerateVar
 ==================
 */
-void CShaderCompilerCppGenerator::GenerateConstructor( const achar* pClassName, const shader_t& shader )
+void CShaderCompilerCppGenerator::GenerateConstructor( const char* pClassName, const shader_t& shader )
 {
 	buffer += "public:\n";
 	buffer += S_Sprintf( "\t%s()\n", pClassName );
 	if ( !shader.flags.empty() )
 	{
-		for ( uint32 index = 0, count = ( uint32 )shader.flags.size(); index < count; ++index )
+		for ( uint32 index = 0, count = (uint32)shader.flags.size(); index < count; ++index )
 		{
-			const shaderFlag_t&	shaderFlag = shader.flags[index];
-			buffer				+= S_Sprintf( "\t\t%s", index == 0 ? ": " : ", " );
-			buffer				+= S_Sprintf( "%s( %i )\n", shaderFlag.name.c_str(), shaderFlag.bSetDefault ? shaderFlag.defaultValue : shaderFlag.minValue );
-			buffer				+= "#if DEBUG\n";
-			buffer				+= S_Sprintf( "\t\t, b%s( %s )\n", shaderFlag.name.c_str(), shaderFlag.bSetDefault ? "true" : "false" );
-			buffer				+= "#endif // DEBUG\n";
+			const shaderFlag_t& shaderFlag = shader.flags[index];
+			buffer += S_Sprintf( "\t\t%s", index == 0 ? ": " : ", " );
+			buffer += S_Sprintf( "%s( %i )\n", shaderFlag.name.c_str(), shaderFlag.bSetDefault ? shaderFlag.defaultValue : shaderFlag.minValue );
+			buffer += "#if DEBUG\n";
+			buffer += S_Sprintf( "\t\t, b%s( %s )\n", shaderFlag.name.c_str(), shaderFlag.bSetDefault ? "true" : "false" );
+			buffer += "#endif // DEBUG\n";
 		}
 	}
 	buffer += "\t{}";
@@ -144,10 +144,10 @@ void CShaderCompilerCppGenerator::GenerateGetIndexFunc( const shader_t& shader )
 		buffer += "\t\t// Asserts to make sure that we are setting all of the combination vars\n";
 		buffer += "#if DEBUG\n";
 		buffer += S_Sprintf( "\t\tbool bAllVarsDefined = " );
-		
-		for ( uint32 index = 0, count = ( uint32 )shader.flags.size(); index < count; ++index )
+
+		for ( uint32 index = 0, count = (uint32)shader.flags.size(); index < count; ++index )
 		{
-			const shaderFlag_t&	shaderFlag = shader.flags[index];
+			const shaderFlag_t& shaderFlag = shader.flags[index];
 			buffer += S_Sprintf( "b%s", shaderFlag.name.c_str() );
 			if ( index + 1 < count )
 			{
@@ -162,17 +162,17 @@ void CShaderCompilerCppGenerator::GenerateGetIndexFunc( const shader_t& shader )
 		buffer += "\t\tAssert( bAllVarsDefined );\n";
 		buffer += "#endif // DEBUG\n";
 	}
-	
-	// Generate code of calculation shader index for the flags combination 
+
+	// Generate code of calculation shader index for the flags combination
 	buffer += "\t\treturn ";
 	if ( !shader.flags.empty() )
 	{
-		uint32	scale = 1;
-		for ( uint32 index = 0, count = ( uint32 )shader.flags.size(); index < count; ++index )
+		uint32 scale = 1;
+		for ( uint32 index = 0, count = (uint32)shader.flags.size(); index < count; ++index )
 		{
-			const shaderFlag_t&	shaderFlag = shader.flags[index];
-			buffer	+= S_Sprintf( "( %i * %s ) + ", scale, shaderFlag.name.c_str() );
-			scale	*= shaderFlag.maxValue - shaderFlag.minValue + 1;
+			const shaderFlag_t& shaderFlag = shader.flags[index];
+			buffer += S_Sprintf( "( %i * %s ) + ", scale, shaderFlag.name.c_str() );
+			scale *= shaderFlag.maxValue - shaderFlag.minValue + 1;
 		}
 	}
 

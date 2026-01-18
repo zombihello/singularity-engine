@@ -10,10 +10,10 @@ CMemAllocStd::CMemAllocStd()
 {
 #if PLATFORM_WINDOWS
 	// Enable low fragmentation heap http://msdn2.microsoft.com/en-US/library/aa366750.aspx
-	intptr_t	pCRTHeapHandle	= _get_heap_handle();
-	ULONG		enableLFH		= 2;
-	HeapSetInformation( ( void* )pCRTHeapHandle, HeapCompatibilityInformation, &enableLFH, sizeof( enableLFH ) );
-#endif // PLATFORM_WINDOWS
+	intptr_t pCRTHeapHandle = _get_heap_handle();
+	ULONG	 enableLFH		= 2;
+	HeapSetInformation( (void*)pCRTHeapHandle, HeapCompatibilityInformation, &enableLFH, sizeof( enableLFH ) );
+#endif	// PLATFORM_WINDOWS
 }
 
 /*
@@ -24,7 +24,7 @@ CMemAllocStd::Malloc
 void* CMemAllocStd::Malloc( size_t numBytes, uint32 alignment /* = DEFAULT_ALIGNMENT */ )
 {
 	PROFILE_SCOPE()
-	void*	pResult = TryMalloc( numBytes, alignment );
+	void* pResult = TryMalloc( numBytes, alignment );
 	if ( !pResult && numBytes )
 	{
 		Sys_OutOfMemory( numBytes, alignment );
@@ -41,22 +41,22 @@ CMemAllocStd::TryMalloc
 void* CMemAllocStd::TryMalloc( size_t numBytes, uint32 alignment /* = DEFAULT_ALIGNMENT */ )
 {
 	PROFILE_SCOPE()
-	alignment = Max<uint32>( numBytes >= 16 ? 16 : 8, alignment );
-	void*	pResult = nullptr;
+	alignment	  = Max<uint32>( numBytes >= 16 ? 16 : 8, alignment );
+	void* pResult = nullptr;
 
 	// Allocate memory
 #if PLATFORM_USE__ALIGNED_MALLOC
 	pResult = _aligned_malloc( numBytes, alignment );
 #else
-	void*	pPtr = L_malloc_system( numBytes + alignment + sizeof( void* ) + sizeof( size_t ) );
+	void* pPtr = L_malloc_system( numBytes + alignment + sizeof( void* ) + sizeof( size_t ) );
 	if ( pPtr )
 	{
-		pResult = Align( ( uint8* )pPtr + sizeof( void* ) + sizeof( size_t ), alignment );
-		*( ( void** )( ( uint8* )pResult - sizeof( void* ) ) ) = pPtr;
-		*( ( size_t* )( ( uint8* )pResult - sizeof( void* ) - sizeof( size_t ) ) ) = numBytes;
+		pResult																   = Align( (uint8*)pPtr + sizeof( void* ) + sizeof( size_t ), alignment );
+		*( (void**)( (uint8*)pResult - sizeof( void* ) ) )					   = pPtr;
+		*( (size_t*)( (uint8*)pResult - sizeof( void* ) - sizeof( size_t ) ) ) = numBytes;
 	}
-#endif // PLATFORM_USE__ALIGNED_MALLOC
-	
+#endif	// PLATFORM_USE__ALIGNED_MALLOC
+
 	return pResult;
 }
 
@@ -68,7 +68,7 @@ CMemAllocStd::Realloc
 void* CMemAllocStd::Realloc( void* pOriginal, size_t numBytes, uint32 alignment /* = DEFAULT_ALIGNMENT */ )
 {
 	PROFILE_SCOPE()
-	void*	pResult = TryRealloc( pOriginal, numBytes, alignment );
+	void* pResult = TryRealloc( pOriginal, numBytes, alignment );
 	if ( !pResult && numBytes != 0 )
 	{
 		Sys_OutOfMemory( numBytes, alignment );
@@ -85,9 +85,9 @@ CMemAllocStd::TryRealloc
 void* CMemAllocStd::TryRealloc( void* pOriginal, size_t numBytes, uint32 alignment /* = DEFAULT_ALIGNMENT */ )
 {
 	PROFILE_SCOPE()
-	alignment = Max<uint32>( numBytes >= 16 ? 16 : 8, alignment );
+	alignment	  = Max<uint32>( numBytes >= 16 ? 16 : 8, alignment );
 	void* pResult = nullptr;
-	
+
 #if PLATFORM_USE__ALIGNED_MALLOC
 	if ( pOriginal && numBytes )
 	{
@@ -106,9 +106,9 @@ void* CMemAllocStd::TryRealloc( void* pOriginal, size_t numBytes, uint32 alignme
 	if ( pOriginal && numBytes )
 	{
 		// Can't use realloc as it might screw with alignment
-		pResult = TryMalloc( numBytes, alignment );
-		size_t	ptrSize = 0;
-		bool	bResult = GetAllocationSize( pOriginal, ptrSize );
+		pResult		   = TryMalloc( numBytes, alignment );
+		size_t ptrSize = 0;
+		bool   bResult = GetAllocationSize( pOriginal, ptrSize );
 		Assert( ptrSize );
 		L_memcpy( pResult, pOriginal, Min( numBytes, ptrSize ) );
 		Free( pOriginal );
@@ -119,10 +119,10 @@ void* CMemAllocStd::TryRealloc( void* pOriginal, size_t numBytes, uint32 alignme
 	}
 	else
 	{
-		L_free_system( *( ( void** )( ( uint8* )pOriginal - sizeof( void* ) ) ) );
+		L_free_system( *( (void**)( (uint8*)pOriginal - sizeof( void* ) ) ) );
 		pResult = nullptr;
 	}
-#endif // PLATFORM_USE__ALIGNED_MALLOC
+#endif	// PLATFORM_USE__ALIGNED_MALLOC
 
 	return pResult;
 }
@@ -140,9 +140,9 @@ void CMemAllocStd::Free( void* pOriginal )
 #else
 	if ( pOriginal )
 	{
-		L_free_system( *( ( void** )( ( uint8* )pOriginal - sizeof( void* ) ) ) );
+		L_free_system( *( (void**)( (uint8*)pOriginal - sizeof( void* ) ) ) );
 	}
-#endif // PLATFORM_USE__ALIGNED_MALLOC
+#endif	// PLATFORM_USE__ALIGNED_MALLOC
 }
 
 /*
@@ -159,12 +159,12 @@ bool CMemAllocStd::GetAllocationSize( void* pOriginal, size_t& numBytes )
 	}
 
 #if PLATFORM_USE__ALIGNED_MALLOC
-	numBytes = _aligned_msize( pOriginal, 16, 0 ); // Assumes alignment of 16
+	numBytes = _aligned_msize( pOriginal, 16, 0 );	// Assumes alignment of 16
 	return true;
 #else
-	numBytes = *( ( size_t* )( ( uint8* )pOriginal - sizeof( void* ) - sizeof( size_t ) ) );
+	numBytes = *( (size_t*)( (uint8*)pOriginal - sizeof( void* ) - sizeof( size_t ) ) );
 	return true;
-#endif // PLATFORM_USE__ALIGNED_MALLOC
+#endif	// PLATFORM_USE__ALIGNED_MALLOC
 }
 
 /*

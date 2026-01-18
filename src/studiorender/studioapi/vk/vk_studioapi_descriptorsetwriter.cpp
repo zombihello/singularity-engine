@@ -17,7 +17,8 @@ CStudioAPIDescriptorSetWriterVk::CStudioAPIDescriptorSetWriterVk()
 	, pStudioAPIBuffers( NULL )
 	, pStudioAPITexturesSamplers( NULL )
 	, pSlotToWriteDescriptorSetMap( NULL )
-{}
+{
+}
 
 /*
 ==================
@@ -29,30 +30,30 @@ void CStudioAPIDescriptorSetWriterVk::SetupDescriptorSetWrites( const studioAPID
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 
 	// Remember some data
-	CStudioAPIDescriptorSetWriterVk::pVkWriteDescriptorSets			= pVkWriteDescriptorSets;
-	CStudioAPIDescriptorSetWriterVk::pVkDescriptorBufferInfos		= pVkDescriptorBufferInfos;
-	CStudioAPIDescriptorSetWriterVk::pVkDescriptorImageInfos		= pVkDescriptorImageInfos;
-	CStudioAPIDescriptorSetWriterVk::pStudioAPIBuffers				= pStudioAPIBuffers;
-	CStudioAPIDescriptorSetWriterVk::pStudioAPITexturesSamplers		= pStudioAPITexturesSamplers;
-	CStudioAPIDescriptorSetWriterVk::pSlotToWriteDescriptorSetMap	= pSlotToWriteDescriptorSetMap;
-	numWriteDescriptorSets	= ( uint32 )descriptorSetInfo.vkDescriptorTypes.size();
-	numSlots				= ( uint32 )descriptorSetInfo.slotToDescriptorTypeIndexMap.size();
-	numBufferInfos			= descriptorSetInfo.numBufferInfos;
-	numImageInfos			= descriptorSetInfo.numImageInfos;
+	CStudioAPIDescriptorSetWriterVk::pVkWriteDescriptorSets		  = pVkWriteDescriptorSets;
+	CStudioAPIDescriptorSetWriterVk::pVkDescriptorBufferInfos	  = pVkDescriptorBufferInfos;
+	CStudioAPIDescriptorSetWriterVk::pVkDescriptorImageInfos	  = pVkDescriptorImageInfos;
+	CStudioAPIDescriptorSetWriterVk::pStudioAPIBuffers			  = pStudioAPIBuffers;
+	CStudioAPIDescriptorSetWriterVk::pStudioAPITexturesSamplers	  = pStudioAPITexturesSamplers;
+	CStudioAPIDescriptorSetWriterVk::pSlotToWriteDescriptorSetMap = pSlotToWriteDescriptorSetMap;
+	numWriteDescriptorSets										  = (uint32)descriptorSetInfo.vkDescriptorTypes.size();
+	numSlots													  = (uint32)descriptorSetInfo.slotToDescriptorTypeIndexMap.size();
+	numBufferInfos												  = descriptorSetInfo.numBufferInfos;
+	numImageInfos												  = descriptorSetInfo.numImageInfos;
 	Assert( numSlots >= numWriteDescriptorSets );
 
 	// Initialize Vulkan write descriptor sets
 	for ( uint32 slot = 0; slot < numSlots; ++slot, ++pSlotToWriteDescriptorSetMap )
 	{
-		uint8		writeDescriptorTypeIndex = descriptorSetInfo.slotToDescriptorTypeIndexMap[slot];
-		if ( writeDescriptorTypeIndex != ( uint8 )-1 )
+		uint8 writeDescriptorTypeIndex = descriptorSetInfo.slotToDescriptorTypeIndexMap[slot];
+		if ( writeDescriptorTypeIndex != (uint8)-1 )
 		{
 			pVkWriteDescriptorSets->sType			= VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			pVkWriteDescriptorSets->dstBinding		= slot;
 			pVkWriteDescriptorSets->descriptorCount = 1;
 			pVkWriteDescriptorSets->descriptorType	= descriptorSetInfo.vkDescriptorTypes[writeDescriptorTypeIndex];
-			*pSlotToWriteDescriptorSetMap			= writeDescriptorTypeIndex;			
-			
+			*pSlotToWriteDescriptorSetMap			= writeDescriptorTypeIndex;
+
 			switch ( pVkWriteDescriptorSets->descriptorType )
 			{
 			case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:

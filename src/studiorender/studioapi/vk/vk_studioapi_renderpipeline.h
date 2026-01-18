@@ -10,18 +10,18 @@
 class CStudioAPIRenderPipelineVk : public TRefCounted<IStudioAPIRenderPipeline>
 {
 public:
-	CStudioAPIRenderPipelineVk( const studioAPIRenderPipelineCreateInfo_t& createInfo, const achar* pDebugName = "" );
+	CStudioAPIRenderPipelineVk( const studioAPIRenderPipelineCreateInfo_t& createInfo, const char* pDebugName = "" );
 	~CStudioAPIRenderPipelineVk();
 
-	FORCEINLINE VkPipeline GetVkPipeline() const										{ return vkPipeline; }
-	FORCEINLINE CStudioAPIBoundShaderStateVk* GetBoundShaderState() const				{ return pBoundShaderState; }
-	FORCEINLINE COnStudioAPIRenderPipelineDeletedVk& OnRenderPipelineDeleted() const	{ return onRenderPipelineDeleted; }
+	FORCEINLINE VkPipeline GetVkPipeline() const { return vkPipeline; }
+	FORCEINLINE CStudioAPIBoundShaderStateVk* GetBoundShaderState() const { return pBoundShaderState; }
+	FORCEINLINE COnStudioAPIRenderPipelineDeletedVk& OnRenderPipelineDeleted() const { return onRenderPipelineDeleted; }
 
 private:
 	static void OnStudioAPIVkShutdown( void* pUserData );
 
-	VkPipeline										vkPipeline;
-	COnStudioAPIVkShutdown::funcDelegate_t*			pStudioAPIVkShutdownDelegate;
-	TRefPtr<CStudioAPIBoundShaderStateVk>			pBoundShaderState;
-	mutable COnStudioAPIRenderPipelineDeletedVk		onRenderPipelineDeleted;
+	VkPipeline									vkPipeline;
+	COnStudioAPIVkShutdown::funcDelegate_t*		pStudioAPIVkShutdownDelegate;
+	TRefPtr<CStudioAPIBoundShaderStateVk>		pBoundShaderState;
+	mutable COnStudioAPIRenderPipelineDeletedVk onRenderPipelineDeleted;
 };

@@ -4,11 +4,10 @@
 #include "tools/ecscompiler/ecsfileparser.h"
 
 // Entry function to call lexer to tokenize source code
-extern void EcsCode_Tokenize( const achar* pSourceCode, CParserLexerListener* pLexerListener );
+extern void EcsCode_Tokenize( const char* pSourceCode, CParserLexerListener* pLexerListener );
 
 // Entry function grammar to parse file source code
 extern int EcsCode_GrammarFile( CParserTokenStream& tokens, CEcsFileParser& fileParser );
-
 
 /*
 ==================
@@ -22,29 +21,30 @@ CEcsFileParser::CEcsFileParser( CEcsSystemStub& stubs )
 	, pCurrentComponent( NULL )
 	, pCurrentResource( NULL )
 	, pCurrentSystem( NULL )
-{}
+{
+}
 
 /*
 ==================
 CEcsFileParser::ParseFile
 ==================
 */
-bool CEcsFileParser::ParseFile( const achar* pPath, const achar* pCode )
+bool CEcsFileParser::ParseFile( const char* pPath, const char* pCode )
 {
 	// Setup token output list
 	Msg( "EcsCompiler: Parse ECS file '%s'", pPath );
-	CParserTokenStream		tokens;
-	
+	CParserTokenStream tokens;
+
 	// Tokenize the code
 	{
-		CParserTokenEater		tokenEater( tokens, pPath );
-		CParserLexerListener	lexerListener( tokenEater, pPath );
+		CParserTokenEater	 tokenEater( tokens, pPath );
+		CParserLexerListener lexerListener( tokenEater, pPath );
 		EcsCode_Tokenize( pCode, &lexerListener );
 		bHasError = lexerListener.HasError();
 	}
 
 	// Parser the code
-	int32	result = EcsCode_GrammarFile( tokens, *this );
+	int32 result = EcsCode_GrammarFile( tokens, *this );
 
 	// Did we parse stuff correctly?
 	return result == 0 && !bHasError;
@@ -55,12 +55,12 @@ bool CEcsFileParser::ParseFile( const achar* pPath, const achar* pCode )
 CEcsFileParser::StartModule
 ==================
 */
-void CEcsFileParser::StartModule( const parserFileContext_t* pContext, const achar* pName )
+void CEcsFileParser::StartModule( const parserFileContext_t* pContext, const char* pName )
 {
 	// Make sure that the context and name are valid
 	AssertMsg( pContext, "Invalid context for a module" );
 	AssertMsg( S_Strlen( pName ) > 0, "Module name isn't valid" );
-	
+
 	// We cann't declare a new module in another module
 	if ( pCurrentModule )
 	{
@@ -77,7 +77,7 @@ void CEcsFileParser::StartModule( const parserFileContext_t* pContext, const ach
 CEcsFileParser::AddUsing
 ==================
 */
-void CEcsFileParser::AddUsing( const parserFileContext_t* pContext, const achar* pName )
+void CEcsFileParser::AddUsing( const parserFileContext_t* pContext, const char* pName )
 {
 	AssertMsg( pContext, "Invalid context for a using" );
 	AssertMsg( S_Strlen( pName ) > 0, "Using name isn't valid" );
@@ -102,42 +102,42 @@ void CEcsFileParser::EndDefinition( int32 line, const parserFileContext_t* pScop
 	AssertMsg( line > -1, "Invalid end line" );
 
 	// Exit context
-	ecsScopeStub_t*		pScope = NULL;
+	ecsScopeStub_t* pScope = NULL;
 	if ( pCurrentComponent )
 	{
-		pScope				= &pCurrentComponent->GetScope();
-		pCurrentComponent	= NULL;
+		pScope			  = &pCurrentComponent->GetScope();
+		pCurrentComponent = NULL;
 	}
 	else if ( pCurrentResource )
 	{
-		pScope				= &pCurrentResource->GetScope();
-		pCurrentResource	= NULL;
+		pScope			 = &pCurrentResource->GetScope();
+		pCurrentResource = NULL;
 	}
 	else if ( pCurrentSystem )
 	{
 		// A system must have at least one read or write component
-		bool	bHasAnyFields = false;
+		bool bHasAnyFields = false;
 		for ( uint32 accessType = 0; accessType < ECS_FIELD_NUM_ACCESS_TYPES; ++accessType )
 		{
-			bHasAnyFields |= pCurrentSystem->HasFields( ( ecsFieldAccessType_t )accessType );
+			bHasAnyFields |= pCurrentSystem->HasFields( (ecsFieldAccessType_t)accessType );
 		}
 		if ( !bHasAnyFields )
 		{
 			EmitError( pScopeStart, "A system must have at least one read or write component" );
 		}
 
-		pScope				= &pCurrentSystem->GetScope();
-		pCurrentSystem		= NULL;
+		pScope		   = &pCurrentSystem->GetScope();
+		pCurrentSystem = NULL;
 	}
 	else if ( pCurrentModule )
 	{
-		pScope			= &pCurrentModule->GetScope();
-		pCurrentModule	= NULL;
+		pScope		   = &pCurrentModule->GetScope();
+		pCurrentModule = NULL;
 	}
 
 	AssertMsg( pScope, "No stub to end" );
-	pScope->startContext	= *pScopeStart;
-	pScope->endContext		= *pScopeEnd;
+	pScope->startContext = *pScopeStart;
+	pScope->endContext	 = *pScopeEnd;
 }
 
 /*
@@ -145,7 +145,7 @@ void CEcsFileParser::EndDefinition( int32 line, const parserFileContext_t* pScop
 CEcsFileParser::StartComponent
 ==================
 */
-void CEcsFileParser::StartComponent( const parserFileContext_t* pContext, const achar* pName )
+void CEcsFileParser::StartComponent( const parserFileContext_t* pContext, const char* pName )
 {
 	AssertMsg( pContext, "Invalid context for a component" );
 	AssertMsg( S_Strlen( pName ) > 0, "Component name isn't valid" );
@@ -153,9 +153,9 @@ void CEcsFileParser::StartComponent( const parserFileContext_t* pContext, const 
 	// Update the metadata scope
 	if ( pCurrentMetadata )
 	{
-		ecsScopeStub_t&		scope = pCurrentMetadata->GetScope();
-		scope.startContext	= pCurrentMetadata->GetContext();
-		scope.endContext	= *pContext;
+		ecsScopeStub_t& scope = pCurrentMetadata->GetScope();
+		scope.startContext	  = pCurrentMetadata->GetContext();
+		scope.endContext	  = *pContext;
 	}
 
 	// Create a component we can only in a module
@@ -176,7 +176,7 @@ void CEcsFileParser::StartComponent( const parserFileContext_t* pContext, const 
 CEcsFileParser::StartResource
 ==================
 */
-void CEcsFileParser::StartResource( const parserFileContext_t* pContext, const achar* pName )
+void CEcsFileParser::StartResource( const parserFileContext_t* pContext, const char* pName )
 {
 	AssertMsg( pContext, "Invalid context for a resource" );
 	AssertMsg( S_Strlen( pName ) > 0, "Resource name isn't valid" );
@@ -184,9 +184,9 @@ void CEcsFileParser::StartResource( const parserFileContext_t* pContext, const a
 	// Update the metadata scope
 	if ( pCurrentMetadata )
 	{
-		ecsScopeStub_t&		scope = pCurrentMetadata->GetScope();
-		scope.startContext	= pCurrentMetadata->GetContext();
-		scope.endContext	= *pContext;
+		ecsScopeStub_t& scope = pCurrentMetadata->GetScope();
+		scope.startContext	  = pCurrentMetadata->GetContext();
+		scope.endContext	  = *pContext;
 	}
 
 	// Create a resource we can only in a module
@@ -207,7 +207,7 @@ void CEcsFileParser::StartResource( const parserFileContext_t* pContext, const a
 CEcsFileParser::AddField
 ==================
 */
-void CEcsFileParser::AddField( const parserFileContext_t* pContext, const parserFileContext_t* pTypeContext, const achar* pName, const achar* pType )
+void CEcsFileParser::AddField( const parserFileContext_t* pContext, const parserFileContext_t* pTypeContext, const char* pName, const char* pType )
 {
 	AssertMsg( pContext, "Invalid context for a field" );
 	AssertMsg( pTypeContext, "Invalid context for a field type" );
@@ -217,9 +217,9 @@ void CEcsFileParser::AddField( const parserFileContext_t* pContext, const parser
 	// Update the metadata scope
 	if ( pCurrentMetadata )
 	{
-		ecsScopeStub_t&		scope = pCurrentMetadata->GetScope();
-		scope.startContext	= pCurrentMetadata->GetContext();
-		scope.endContext	= *pContext;
+		ecsScopeStub_t& scope = pCurrentMetadata->GetScope();
+		scope.startContext	  = pCurrentMetadata->GetContext();
+		scope.endContext	  = *pContext;
 	}
 
 	// Add the field into the current component
@@ -245,7 +245,7 @@ void CEcsFileParser::AddField( const parserFileContext_t* pContext, const parser
 CEcsFileParser::SetDefaultFieldValue
 ==================
 */
-void CEcsFileParser::SetDefaultFieldValue( const parserFileContext_t* pContext, const parserFileContext_t* pValueContext, const achar* pName, const achar* pValue )
+void CEcsFileParser::SetDefaultFieldValue( const parserFileContext_t* pContext, const parserFileContext_t* pValueContext, const char* pName, const char* pValue )
 {
 	AssertMsg( pContext, "Invalid context for a field" );
 	AssertMsg( pValueContext, "Invalid context for a field value" );
@@ -273,7 +273,7 @@ void CEcsFileParser::SetDefaultFieldValue( const parserFileContext_t* pContext, 
 CEcsFileParser::EmitError
 ==================
 */
-void CEcsFileParser::EmitError( const parserFileContext_t* pContext, const achar* pMessage )
+void CEcsFileParser::EmitError( const parserFileContext_t* pContext, const char* pMessage )
 {
 	Error( "%s: %s", pContext->ToString().c_str(), pMessage );
 	bHasError = true;
@@ -300,7 +300,7 @@ void CEcsFileParser::AddMetadata( const parserFileContext_t* pContext, ecsMetada
 CEcsFileParser::AddMetadata
 ==================
 */
-void CEcsFileParser::AddMetadata( const parserFileContext_t* pContext, const parserFileContext_t* pValueContext, ecsMetadataType_t type, const achar* pValue )
+void CEcsFileParser::AddMetadata( const parserFileContext_t* pContext, const parserFileContext_t* pValueContext, ecsMetadataType_t type, const char* pValue )
 {
 	AssertMsg( pContext, "Invalid context for a metadata" );
 	AssertMsg( type != ECS_METADATA_NUM_TYPES, "Invalid metadata type" );
@@ -316,7 +316,7 @@ void CEcsFileParser::AddMetadata( const parserFileContext_t* pContext, const par
 CEcsFileParser::StartSystem
 ==================
 */
-void CEcsFileParser::StartSystem( const parserFileContext_t* pContext, const achar* pName )
+void CEcsFileParser::StartSystem( const parserFileContext_t* pContext, const char* pName )
 {
 	AssertMsg( pContext, "Invalid context for a system" );
 	AssertMsg( S_Strlen( pName ) > 0, "System name isn't valid" );
@@ -324,9 +324,9 @@ void CEcsFileParser::StartSystem( const parserFileContext_t* pContext, const ach
 	// Update the metadata scope
 	if ( pCurrentMetadata )
 	{
-		ecsScopeStub_t&		scope = pCurrentMetadata->GetScope();
-		scope.startContext	= pCurrentMetadata->GetContext();
-		scope.endContext	= *pContext;
+		ecsScopeStub_t& scope = pCurrentMetadata->GetScope();
+		scope.startContext	  = pCurrentMetadata->GetContext();
+		scope.endContext	  = *pContext;
 	}
 
 	// Create a system we can only in a module
@@ -347,7 +347,7 @@ void CEcsFileParser::StartSystem( const parserFileContext_t* pContext, const ach
 CEcsFileParser::AddSystemField
 ==================
 */
-void CEcsFileParser::AddSystemField( const parserFileContext_t* pContext, const parserFileContext_t* pTypeContext, const achar* pName, const achar* pType, ecsFieldAccessType_t accessType )
+void CEcsFileParser::AddSystemField( const parserFileContext_t* pContext, const parserFileContext_t* pTypeContext, const char* pName, const char* pType, ecsFieldAccessType_t accessType )
 {
 	AssertMsg( pContext, "Invalid context for a system field" );
 	AssertMsg( pTypeContext, "Invalid context for a system field type" );
@@ -371,7 +371,7 @@ void CEcsFileParser::AddSystemField( const parserFileContext_t* pContext, const 
 CEcsFileParser::AddSystemFilter
 ==================
 */
-void CEcsFileParser::AddSystemFilter( const parserFileContext_t* pContext, const achar* pName, ecsSystemFilterType_t filterType )
+void CEcsFileParser::AddSystemFilter( const parserFileContext_t* pContext, const char* pName, ecsSystemFilterType_t filterType )
 {
 	AssertMsg( pContext, "Invalid context for a system filter" );
 	AssertMsg( S_Strlen( pName ) > 0, "System filter isn't valid" );

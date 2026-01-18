@@ -31,7 +31,6 @@ FORCEINLINE CJsonObject& CJsonObject::operator=( const CJsonObject& copy )
 	return *this;
 }
 
-
 /*
 ==================
 CJsonValue::IsValid
@@ -79,8 +78,8 @@ FORCEINLINE void CJsonValue::SetBool( bool value )
 		CJsonValue::pValue = new bool;
 	}
 
-	( *( bool* )CJsonValue::pValue ) = value;
-	type = JSONVALUE_TYPE_BOOL;
+	( *(bool*)CJsonValue::pValue ) = value;
+	type						   = JSONVALUE_TYPE_BOOL;
 }
 
 /*
@@ -100,8 +99,8 @@ FORCEINLINE void CJsonValue::SetInt( int32 value )
 		CJsonValue::pValue = new int32;
 	}
 
-	( *( int32* )CJsonValue::pValue ) = value;
-	type = JSONVALUE_TYPE_INT;
+	( *(int32*)CJsonValue::pValue ) = value;
+	type							= JSONVALUE_TYPE_INT;
 }
 
 /*
@@ -121,8 +120,8 @@ FORCEINLINE void CJsonValue::SetFloat( float value )
 		CJsonValue::pValue = new float;
 	}
 
-	( *( float* )CJsonValue::pValue ) = value;
-	type = JSONVALUE_TYPE_FLOAT;
+	( *(float*)CJsonValue::pValue ) = value;
+	type							= JSONVALUE_TYPE_FLOAT;
 }
 
 /*
@@ -142,8 +141,8 @@ FORCEINLINE void CJsonValue::SetString( const std::string& value )
 		CJsonValue::pValue = new std::string();
 	}
 
-	( *( std::string* )CJsonValue::pValue ) = value;
-	type = JSONVALUE_TYPE_STRING;
+	( *(std::string*)CJsonValue::pValue ) = value;
+	type								  = JSONVALUE_TYPE_STRING;
 }
 
 /*
@@ -163,8 +162,8 @@ FORCEINLINE void CJsonValue::SetObject( const CJsonObject& value )
 		CJsonValue::pValue = new CJsonObject();
 	}
 
-	( *( CJsonObject* )CJsonValue::pValue ) = value;
-	type = JSONVALUE_TYPE_OBJECT;
+	( *(CJsonObject*)CJsonValue::pValue ) = value;
+	type								  = JSONVALUE_TYPE_OBJECT;
 }
 
 /*
@@ -184,8 +183,8 @@ FORCEINLINE void CJsonValue::SetArray( const std::vector<CJsonValue>& value )
 		CJsonValue::pValue = new std::vector<CJsonValue>();
 	}
 
-	( *( std::vector<CJsonValue>* )CJsonValue::pValue ) = value;
-	type = JSONVALUE_TYPE_ARRAY;
+	( *(std::vector<CJsonValue>*)CJsonValue::pValue ) = value;
+	type											  = JSONVALUE_TYPE_ARRAY;
 }
 
 /*
@@ -210,7 +209,7 @@ FORCEINLINE bool CJsonValue::GetBool( bool defaultValue /*= false*/ ) const
 		return defaultValue;
 	}
 
-	return *( bool* )pValue;
+	return *(bool*)pValue;
 }
 
 /*
@@ -227,11 +226,11 @@ FORCEINLINE float CJsonValue::GetNumber( float defaultValue /*= 0.f*/ ) const
 
 	if ( type == JSONVALUE_TYPE_BOOL )
 	{
-		return ( float )GetBool();
+		return (float)GetBool();
 	}
 	else if ( type == JSONVALUE_TYPE_INT )
 	{
-		return ( float )GetInt();
+		return (float)GetInt();
 	}
 	else
 	{
@@ -251,7 +250,7 @@ FORCEINLINE int32 CJsonValue::GetInt( int32 defaultValue /*= 0*/ ) const
 		return defaultValue;
 	}
 
-	return *( int32* )pValue;
+	return *(int32*)pValue;
 }
 
 /*
@@ -266,7 +265,7 @@ FORCEINLINE float CJsonValue::GetFloat( float defaultValue /*= 0.f*/ ) const
 		return defaultValue;
 	}
 
-	return *( float* )pValue;
+	return *(float*)pValue;
 }
 
 /*
@@ -281,7 +280,7 @@ FORCEINLINE std::string CJsonValue::GetString( const std::string& defaultValue /
 		return defaultValue;
 	}
 
-	return *( std::string* )pValue;
+	return *(std::string*)pValue;
 }
 
 /*
@@ -296,7 +295,7 @@ FORCEINLINE CJsonObject CJsonValue::GetObject( const CJsonObject& defaultValue /
 		return defaultValue;
 	}
 
-	return *( CJsonObject* )pValue;
+	return *(CJsonObject*)pValue;
 }
 
 /*
@@ -304,14 +303,14 @@ FORCEINLINE CJsonObject CJsonValue::GetObject( const CJsonObject& defaultValue /
 CJsonValue::GetArray
 ==================
 */
-FORCEINLINE std::vector<CJsonValue>	CJsonValue::GetArray( const std::vector<CJsonValue>& defaultValue /*= std::vector<CJsonValue>()*/ ) const
+FORCEINLINE std::vector<CJsonValue> CJsonValue::GetArray( const std::vector<CJsonValue>& defaultValue /*= std::vector<CJsonValue>()*/ ) const
 {
 	if ( type != JSONVALUE_TYPE_ARRAY || !pValue )
 	{
 		return defaultValue;
 	}
 
-	return *( std::vector<CJsonValue>* )pValue;
+	return *(std::vector<CJsonValue>*)pValue;
 }
 
 /*
@@ -325,13 +324,12 @@ FORCEINLINE CJsonValue& CJsonValue::operator=( const CJsonValue& copy )
 	return *this;
 }
 
-
 /*
 ==================
 CJsonDoc::SetValue
 ==================
 */
-FORCEINLINE void CJsonDoc::SetValue( const achar* pName, const CJsonValue& value )
+FORCEINLINE void CJsonDoc::SetValue( const char* pName, const CJsonValue& value )
 {
 	valuesDict[pName] = value;
 }
@@ -341,9 +339,9 @@ FORCEINLINE void CJsonDoc::SetValue( const achar* pName, const CJsonValue& value
 CJsonDoc::GetValue
 ==================
 */
-FORCEINLINE CJsonValue CJsonDoc::GetValue( const achar* pName ) const
+FORCEINLINE CJsonValue CJsonDoc::GetValue( const char* pName ) const
 {
-	valuesDict_t::const_iterator	itValues = valuesDict.find( pName );
+	valuesDict_t::const_iterator itValues = valuesDict.find( pName );
 	if ( itValues == valuesDict.end() )
 	{
 		return CJsonValue();

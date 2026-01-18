@@ -6,8 +6,8 @@ CStudioAPIPendingComputeStateVk::Reset
 ==================
 */
 FORCEINLINE void CStudioAPIPendingComputeStateVk::Reset()
-{}
-
+{
+}
 
 /*
 ==================
@@ -17,15 +17,15 @@ CStudioAPIPendingRenderStateVk::SetViewport
 FORCEINLINE void CStudioAPIPendingRenderStateVk::SetViewport( float x, float y, float width, float height, float minDepth, float maxDepth )
 {
 	// Update viewport
-	vkViewport.x = x;
-	vkViewport.y = y;
-	vkViewport.width = width;
-	vkViewport.height = height;
+	vkViewport.x		= x;
+	vkViewport.y		= y;
+	vkViewport.width	= width;
+	vkViewport.height	= height;
 	vkViewport.minDepth = minDepth;
 	vkViewport.maxDepth = maxDepth;
 
 	// Update scissor
-	SetScissor( false, ( int32 )x, ( int32 )y, ( uint32 )width, ( uint32 )height );
+	SetScissor( false, (int32)x, (int32)y, (uint32)width, (uint32)height );
 }
 
 /*
@@ -37,17 +37,17 @@ FORCEINLINE void CStudioAPIPendingRenderStateVk::SetScissor( bool bEnable, int32
 {
 	if ( bEnable )
 	{
-		vkScissor.offset.x = x;
-		vkScissor.offset.y = y;
-		vkScissor.extent.width = width;
+		vkScissor.offset.x		= x;
+		vkScissor.offset.y		= y;
+		vkScissor.extent.width	= width;
 		vkScissor.extent.height = height;
 	}
 	else
 	{
-		vkScissor.offset.x = ( int32 )vkViewport.x;
-		vkScissor.offset.y = ( int32 )vkViewport.y;
-		vkScissor.extent.width = ( uint32 )vkViewport.width;
-		vkScissor.extent.height = ( uint32 )vkViewport.height;
+		vkScissor.offset.x		= (int32)vkViewport.x;
+		vkScissor.offset.y		= (int32)vkViewport.y;
+		vkScissor.extent.width	= (uint32)vkViewport.width;
+		vkScissor.extent.height = (uint32)vkViewport.height;
 	}
 
 	bScissorEnabled = bEnable;
@@ -64,7 +64,6 @@ FORCEINLINE void CStudioAPIPendingRenderStateVk::BindRenderPipeline( CStudioAPIC
 	pCmdList->MarkHasPipeline();
 }
 
-
 /*
 ==================
 CStudioAPIPendingRenderStateVk::vertexBuffer_t::Clear
@@ -75,7 +74,6 @@ FORCEINLINE void CStudioAPIPendingRenderStateVk::vertexBuffer_t::Clear()
 	pBuffer = NULL;
 	offset	= 0;
 }
-
 
 /*
 ==================

@@ -5,7 +5,7 @@
 CSMATCompiledMaterialDoc::SetShaderName
 ==================
 */
-FORCEINLINE void CSMATCompiledMaterialDoc::SetShaderName( const achar* pShaderName )
+FORCEINLINE void CSMATCompiledMaterialDoc::SetShaderName( const char* pShaderName )
 {
 	shaderName = pShaderName;
 }
@@ -49,7 +49,7 @@ CSMATCompiledMaterialDoc::GetNumVars
 */
 FORCEINLINE uint32 CSMATCompiledMaterialDoc::GetNumVars() const
 {
-	return ( uint32 )vars.size();
+	return (uint32)vars.size();
 }
 
 /*
@@ -67,7 +67,7 @@ FORCEINLINE const std::vector<CSMATMaterialVar>& CSMATCompiledMaterialDoc::GetVa
 CSMATCompiledMaterialDoc::GetShaderName
 ==================
 */
-FORCEINLINE const achar* CSMATCompiledMaterialDoc::GetShaderName() const
+FORCEINLINE const char* CSMATCompiledMaterialDoc::GetShaderName() const
 {
 	return shaderName.c_str();
 }

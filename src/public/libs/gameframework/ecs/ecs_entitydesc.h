@@ -10,7 +10,6 @@
 //-----------------------------------------------------------------------------
 class CEcsMap;
 
-
 //-----------------------------------------------------------------------------
 // ECS entity descriptor
 // By this you can create an ECS entity
@@ -23,7 +22,7 @@ public:
 	~CEcsEntityDesc();
 
 	ecsEntity_t GetEcsPrefab( CEcsMap* pEcsMap );
-	void Clear();
+	void		Clear();
 
 private:
 	struct ecsPrefab_t
@@ -31,15 +30,15 @@ private:
 		CEcsMap*						pEcsMap;
 		ecsEntity_t						ecsEntity;
 		IOnMapReseted::funcDelegate_t*	pOnMapResetedDelegate;
-		IOnMapUnloaded::funcDelegate_t*	pOnMapUnloadedDelegate;
+		IOnMapUnloaded::funcDelegate_t* pOnMapUnloadedDelegate;
 	};
 
-	void Init( const CSENTCompiledEntityDescDoc& sentCompiledDoc );
-	uint32 CreateEcsPrefab( CEcsMap* pEcsMap, const achar* pName, uint32 ecsPrefabIdx = INVALID_INDEX ) const;
+	void		Init( const CSENTCompiledEntityDescDoc& sentCompiledDoc );
+	uint32		CreateEcsPrefab( CEcsMap* pEcsMap, const char* pName, uint32 ecsPrefabIdx = INVALID_INDEX ) const;
 	static void OnMapResetedOrUnloaded( void* pUserData, IMap* pMap );
 
-	mutable std::vector<ecsPrefab_t>				ecsPrefabs;
-	std::vector<TRefPtr<IEcsComponentFactory>>		ecsComponentFactories;
-	CGuid											guid;
-	mutable uint32									lastUsedEcsPrefabIdx;
+	mutable std::vector<ecsPrefab_t>		   ecsPrefabs;
+	std::vector<TRefPtr<IEcsComponentFactory>> ecsComponentFactories;
+	CGuid									   guid;
+	mutable uint32							   lastUsedEcsPrefabIdx;
 };

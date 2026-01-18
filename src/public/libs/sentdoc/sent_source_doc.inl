@@ -5,7 +5,7 @@
 CSENTSourceEntityDescDoc::SetOutputDir
 ==================
 */
-FORCEINLINE void CSENTSourceEntityDescDoc::SetOutputDir( const achar* pOutputDir )
+FORCEINLINE void CSENTSourceEntityDescDoc::SetOutputDir( const char* pOutputDir )
 {
 	outputDir = pOutputDir;
 }
@@ -47,7 +47,7 @@ FORCEINLINE void CSENTSourceEntityDescDoc::Clear()
 CSENTSourceEntityDescDoc::GetOutputDir
 ==================
 */
-FORCEINLINE const achar* CSENTSourceEntityDescDoc::GetOutputDir() const
+FORCEINLINE const char* CSENTSourceEntityDescDoc::GetOutputDir() const
 {
 	return outputDir.c_str();
 }
@@ -59,7 +59,7 @@ CSENTSourceEntityDescDoc::GetNumComponents
 */
 FORCEINLINE uint32 CSENTSourceEntityDescDoc::GetNumComponents() const
 {
-	return ( uint32 )components.size();
+	return (uint32)components.size();
 }
 
 /*

@@ -28,7 +28,7 @@ CStudioAPICmdListVk::MarkHasViewport
 FORCEINLINE void CStudioAPICmdListVk::MarkHasViewport( VkViewport vkViewport )
 {
 	vkCurrentViewport = vkViewport;
-	bHasViewport = true;
+	bHasViewport	  = true;
 }
 
 /*
@@ -39,7 +39,7 @@ CStudioAPICmdListVk::MarkHasScissor
 FORCEINLINE void CStudioAPICmdListVk::MarkHasScissor( VkRect2D vkScissor )
 {
 	vkCurrentScissor = vkScissor;
-	bHasScissor = true;
+	bHasScissor		 = true;
 }
 
 /*

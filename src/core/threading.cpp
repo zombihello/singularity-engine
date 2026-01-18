@@ -3,7 +3,7 @@
 #include "core/threading_private.h"
 
 // Main thread ID
-static threadId_t		s_MainThreadId = INVALID_THREAD_ID;
+static threadId_t s_MainThreadId = INVALID_THREAD_ID;
 
 /*
  ==================

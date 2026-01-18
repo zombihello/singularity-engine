@@ -15,7 +15,6 @@ enum shaderCompilerMode_t
 	SHADER_COMPILER_MODE_NUM
 };
 
-
 struct shaderFlag_t
 {
 	shaderFlag_t()
@@ -23,22 +22,21 @@ struct shaderFlag_t
 		, maxValue( 0 )
 		, bSetDefault( false )
 		, defaultValue( 0 )
-	{}
+	{
+	}
 
-	std::string		name;
-	int32			minValue;
-	int32			maxValue;
-	bool			bSetDefault;
-	int32			defaultValue;
+	std::string name;
+	int32		minValue;
+	int32		maxValue;
+	bool		bSetDefault;
+	int32		defaultValue;
 };
-
 
 struct shaderDefine_t
 {
-	std::string		name;
-	std::string		value;
+	std::string name;
+	std::string value;
 };
-
 
 struct shader_t
 {
@@ -49,14 +47,13 @@ struct shader_t
 	std::string					source;
 	std::string					mainFunc;
 	std::vector<shaderFlag_t>	flags;
-	std::vector<shaderDefine_t>	defines;
+	std::vector<shaderDefine_t> defines;
 };
-
 
 //-----------------------------------------------------------------------------
 // General functions
 //-----------------------------------------------------------------------------
-bool ConvStringToShaderType( const achar* pShaderTypeName, studioAPIShaderType_t& shaderType );
-void ConvShaderTypeToString( studioAPIShaderType_t shaderType, const achar*& pShaderTypeName );
-bool ConvStringToShaderCompilerMode( const achar* pShaderCompilerModeName, shaderCompilerMode_t& shaderCompilerMode );
-void ConvShaderCompilerModeToString( shaderCompilerMode_t shaderCompilerMode, const achar*& pShaderCompilerModeName );
+bool ConvStringToShaderType( const char* pShaderTypeName, studioAPIShaderType_t& shaderType );
+void ConvShaderTypeToString( studioAPIShaderType_t shaderType, const char*& pShaderTypeName );
+bool ConvStringToShaderCompilerMode( const char* pShaderCompilerModeName, shaderCompilerMode_t& shaderCompilerMode );
+void ConvShaderCompilerModeToString( shaderCompilerMode_t shaderCompilerMode, const char*& pShaderCompilerModeName );

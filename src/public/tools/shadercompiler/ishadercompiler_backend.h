@@ -8,10 +8,9 @@
 //-----------------------------------------------------------------------------
 enum shaderCompilerFlags_t
 {
-	SHADERCOMPILER_NONE			= 0,
-	SHADERCOMPILER_DEBUG		= 1 << 0,	// Debug shader version
+	SHADERCOMPILER_NONE	 = 0,
+	SHADERCOMPILER_DEBUG = 1 << 0,	// Debug shader version
 };
-
 
 //-----------------------------------------------------------------------------
 // Interface of the environment used to compile shader
@@ -19,13 +18,12 @@ enum shaderCompilerFlags_t
 class IShaderCompilerEnvironment
 {
 public:
-	virtual uint32 GetCompileFlags() const = 0;
-	virtual uint32 GetNumIncludeDirs() const = 0;
-	virtual uint32 GetNumDefines() const = 0;
-	virtual const achar* GetIncludeDir( uint32 index ) const = 0;
-	virtual void GetDefine( uint32 index, const achar*& pName, const achar*& pValue ) const = 0;
+	virtual uint32		 GetCompileFlags() const													= 0;
+	virtual uint32		 GetNumIncludeDirs() const													= 0;
+	virtual uint32		 GetNumDefines() const														= 0;
+	virtual const char* GetIncludeDir( uint32 index ) const										= 0;
+	virtual void		 GetDefine( uint32 index, const char*& pName, const char*& pValue ) const = 0;
 };
-
 
 //-----------------------------------------------------------------------------
 // Interface of the output shader compile
@@ -33,22 +31,21 @@ public:
 class IShaderCompilerOutput
 {
 public:
-	virtual void SetBytecode( const byte* pData, uint64 size ) = 0;
-	virtual void SetErrorMsg( const achar* pMsg ) = 0;
+	virtual void SetBytecode( const byte* pData, uint64 size )		 = 0;
+	virtual void SetErrorMsg( const char* pMsg )					 = 0;
 	virtual void SetReflectionData( const byte* pData, uint64 size ) = 0;
 };
-
 
 //-----------------------------------------------------------------------------
 // Interface of shader compiler backend
 //-----------------------------------------------------------------------------
-#define SHADERCOMPILERBACKEND_INTERFACE_VERSION			"SShaderCompilerBackend001"
+#define SHADERCOMPILERBACKEND_INTERFACE_VERSION "SShaderCompilerBackend001"
 class IShaderCompilerBackend
 {
 public:
 	virtual bool Connect( createInterfaceFn_t pFactory ) = 0;
-	virtual void Disconnect() = 0;
+	virtual void Disconnect()							 = 0;
 
-	virtual bool CompileShader( const achar* pSrcFileName, const achar* pFunctionName, studioAPIShaderType_t type, IShaderCompilerEnvironment* pEnvironment, IShaderCompilerOutput* pOutput ) = 0;
-	virtual const achar* GetShaderPlatform() const = 0;
+	virtual bool		 CompileShader( const char* pSrcFileName, const char* pFunctionName, studioAPIShaderType_t type, IShaderCompilerEnvironment* pEnvironment, IShaderCompilerOutput* pOutput ) = 0;
+	virtual const char* GetShaderPlatform() const																																					  = 0;
 };

@@ -13,18 +13,18 @@ class CSENTCompiledEntityDescDoc
 public:
 	// Save and load a entity descriptor document
 	// NOTE: For use StdLib must be connected by ConnectStdLib
-	bool SaveFile( const achar* pPath );
-	bool LoadFromFile( const achar* pPath );
+	bool SaveFile( const char* pPath );
+	bool LoadFromFile( const char* pPath );
 
 	void AddComponent( const CSENTEntityDescComponent& component );
 	void RemoveComponent( uint32 index );
 	void Clear();
 
-	uint32 GetNumComponents() const;
+	uint32										 GetNumComponents() const;
 	const std::vector<CSENTEntityDescComponent>& GetComponents() const;
 
 private:
-	std::vector<CSENTEntityDescComponent>		components;
+	std::vector<CSENTEntityDescComponent> components;
 };
 
 #include "sentdoc/sent_compiled_doc.inl"

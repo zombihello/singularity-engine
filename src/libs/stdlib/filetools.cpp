@@ -13,7 +13,7 @@ void S_GetCurrentDirectory( std::string& destStr, bool bShrinkToFit /*= true*/ )
 	destStr.resize( 1024 );
 
 	// Try get the current directory
-	while ( !S_GetCurrentDirectory( destStr.data(), ( uint32 )destStr.size() ) )
+	while ( !S_GetCurrentDirectory( destStr.data(), (uint32)destStr.size() ) )
 	{
 		destStr.resize( destStr.size() * 2 );
 	}
@@ -33,7 +33,7 @@ void S_GetCurrentDirectory( std::string& destStr, bool bShrinkToFit /*= true*/ )
 S_MakeAbsolutePath
 ==================
 */
-bool S_MakeAbsolutePath( const achar* pSrcPath, achar* pDestPath, uint32 maxLen, const achar* pStartingDir /*= nullptr*/ )
+bool S_MakeAbsolutePath( const char* pSrcPath, char* pDestPath, uint32 maxLen, const char* pStartingDir /*= nullptr*/ )
 {
 	Assert( pDestPath );
 	Assert( maxLen >= 1 );
@@ -49,7 +49,7 @@ bool S_MakeAbsolutePath( const achar* pSrcPath, achar* pDestPath, uint32 maxLen,
 	if ( S_IsAbsolutePath( pSrcPath ) )
 	{
 		// Calculate count of chars to copy
-		uint32	length = S_Strlen( pSrcPath );
+		uint32 length = S_Strlen( pSrcPath );
 
 		// If length of source path too big do nothing
 		if ( length > maxLen )
@@ -66,13 +66,13 @@ bool S_MakeAbsolutePath( const achar* pSrcPath, achar* pDestPath, uint32 maxLen,
 	else
 	{
 		// Length of the final string
-		uint32		finalLength = 0;
+		uint32 finalLength = 0;
 
 		// Make sure the starting directory is absolute
 		if ( pStartingDir && S_IsAbsolutePath( pStartingDir ) )
 		{
 			// Calculate count of chars to copy
-			uint32	length = S_Strlen( pStartingDir );
+			uint32 length = S_Strlen( pStartingDir );
 
 			// If length of pStartingDir too big do nothing
 			if ( length > maxLen )
@@ -107,7 +107,7 @@ bool S_MakeAbsolutePath( const achar* pSrcPath, achar* pDestPath, uint32 maxLen,
 				finalLength += 1;
 
 				// Make sure what size of pDestPath enough to append pStartingDir
-				uint32	length = S_Strlen( pStartingDir );	
+				uint32 length = S_Strlen( pStartingDir );
 				if ( length > maxLen - finalLength )
 				{
 					*pDestPath = 0;
@@ -128,7 +128,7 @@ bool S_MakeAbsolutePath( const achar* pSrcPath, achar* pDestPath, uint32 maxLen,
 		finalLength += 1;
 
 		// Make sure what size of pDestPath enough to append pSrcPath
-		uint32	length = S_Strlen( pSrcPath );
+		uint32 length = S_Strlen( pSrcPath );
 		if ( length > maxLen - finalLength )
 		{
 			*pDestPath = 0;
@@ -153,7 +153,7 @@ void S_MakeAbsolutePath( const std::string& srcPath, std::string& destPath, cons
 	destPath.resize( 1024 );
 
 	// Try to make an absolute path
-	while ( !S_MakeAbsolutePath( srcPath.c_str(), destPath.data(), ( uint32 )destPath.size(), startingDir.c_str() ) )
+	while ( !S_MakeAbsolutePath( srcPath.c_str(), destPath.data(), (uint32)destPath.size(), startingDir.c_str() ) )
 	{
 		destPath.resize( destPath.size() * 2 );
 	}
@@ -173,13 +173,13 @@ void S_MakeAbsolutePath( const std::string& srcPath, std::string& destPath, cons
 S_MakeRelativePath
 ==================
 */
-int32 S_MakeRelativePath( const achar* pFullPath, const achar* pDirPath, achar* pRelativePath, uint32 maxLen )
+int32 S_MakeRelativePath( const char* pFullPath, const char* pDirPath, char* pRelativePath, uint32 maxLen )
 {
 	enum
 	{
-		RESULT_OK						= 0,
-		RESULT_ERR_DEST_TOO_SMALL		= 1,
-		RESULT_ERR_ON_SEPARATE_DRIVES	= 2
+		RESULT_OK					  = 0,
+		RESULT_ERR_DEST_TOO_SMALL	  = 1,
+		RESULT_ERR_ON_SEPARATE_DRIVES = 2
 	};
 
 	Assert( pRelativePath );
@@ -187,18 +187,17 @@ int32 S_MakeRelativePath( const achar* pFullPath, const achar* pDirPath, achar* 
 	*pRelativePath = 0;
 
 	// Strip out common parts of the path
-	const achar*	pLastCommonPath = nullptr;
-	const achar*	pLastCommonDir = nullptr;
+	const char* pLastCommonPath = nullptr;
+	const char* pLastCommonDir	 = nullptr;
 	{
-		const achar*	pCurPath = pFullPath;
-		const achar*	pCurDir = pDirPath;
-		while ( *pCurPath && ( S_ToLower( *pCurPath ) == S_ToLower( *pCurDir ) ||
-				  ( S_IsPathSeparator( *pCurPath ) && ( S_IsPathSeparator( *pCurDir ) || ( *pCurDir == 0 ) ) ) ) )
+		const char* pCurPath = pFullPath;
+		const char* pCurDir  = pDirPath;
+		while ( *pCurPath && ( S_ToLower( *pCurPath ) == S_ToLower( *pCurDir ) || ( S_IsPathSeparator( *pCurPath ) && ( S_IsPathSeparator( *pCurDir ) || ( *pCurDir == 0 ) ) ) ) )
 		{
 			if ( S_IsPathSeparator( *pCurPath ) )
 			{
 				pLastCommonPath = pCurPath + 1;
-				pLastCommonDir = pCurDir + 1;
+				pLastCommonDir	= pCurDir + 1;
 			}
 
 			if ( *pCurDir == 0 )
@@ -207,7 +206,7 @@ int32 S_MakeRelativePath( const achar* pFullPath, const achar* pDirPath, achar* 
 				break;
 			}
 
-			++pCurDir; 
+			++pCurDir;
 			++pCurPath;
 		}
 	}
@@ -219,8 +218,8 @@ int32 S_MakeRelativePath( const achar* pFullPath, const achar* pDirPath, achar* 
 	}
 
 	// For each path separator remaining in the directory, need a ../
-	uint32	finalLength = 0;
-	bool	bLastCharWasSeparator = true;
+	uint32 finalLength			 = 0;
+	bool   bLastCharWasSeparator = true;
 	for ( ; *pLastCommonDir; ++pLastCommonDir )
 	{
 		if ( S_IsPathSeparator( *pLastCommonDir ) )
@@ -235,7 +234,7 @@ int32 S_MakeRelativePath( const achar* pFullPath, const achar* pDirPath, achar* 
 			pRelativePath[finalLength++] = '.';
 			pRelativePath[finalLength++] = '.';
 			pRelativePath[finalLength++] = PATH_SEPARATOR;
-			bLastCharWasSeparator = true;
+			bLastCharWasSeparator		 = true;
 		}
 		else
 		{
@@ -300,10 +299,10 @@ bool S_MakeRelativePath( const std::string& fullPath, const std::string& dirPath
 	relativePath.resize( 1024 );
 
 	// Try to make an relative path
-	int32	result = 1;
+	int32 result = 1;
 	while ( result == 1 )
 	{
-		result = S_MakeRelativePath( fullPath.c_str(), dirPath.c_str(), relativePath.data(), ( uint32 )relativePath.size() );
+		result = S_MakeRelativePath( fullPath.c_str(), dirPath.c_str(), relativePath.data(), (uint32)relativePath.size() );
 		if ( result == 1 )
 		{
 			relativePath.resize( relativePath.size() * 2 );
@@ -330,7 +329,7 @@ bool S_MakeRelativePath( const std::string& fullPath, const std::string& dirPath
 S_AppendPathSeparator
 ==================
 */
-bool S_AppendPathSeparator( achar* pStr, uint32 strSize )
+bool S_AppendPathSeparator( char* pStr, uint32 strSize )
 {
 	// Do nothing if pStr isn't valid
 	if ( !pStr || !pStr[0] )
@@ -339,7 +338,7 @@ bool S_AppendPathSeparator( achar* pStr, uint32 strSize )
 	}
 
 	// Append a path separator
-	uint32		length = S_Strlen( pStr );
+	uint32 length = S_Strlen( pStr );
 	Assert( length > 0 );
 	if ( !S_IsPathSeparator( pStr[length - 1] ) )
 	{
@@ -348,8 +347,8 @@ bool S_AppendPathSeparator( achar* pStr, uint32 strSize )
 			return false;
 		}
 
-		pStr[length] = PATH_SEPARATOR;
-		pStr[length+1] = 0;
+		pStr[length]	 = PATH_SEPARATOR;
+		pStr[length + 1] = 0;
 	}
 
 	return true;
@@ -373,7 +372,7 @@ void S_AppendPathSeparator( std::string& str )
 S_FixPathSeparators
 ==================
 */
-void S_FixPathSeparators( achar* pPath )
+void S_FixPathSeparators( char* pPath )
 {
 	while ( *pPath )
 	{
@@ -390,10 +389,10 @@ void S_FixPathSeparators( achar* pPath )
 S_GetFileExtension
 ==================
 */
-const achar* S_GetFileExtension( const achar* pPath, bool bIncludeDot /*= false*/ )
+const char* S_GetFileExtension( const char* pPath, bool bIncludeDot /*= false*/ )
 {
 	// By default we at end of the path
-	const achar*	pResult = pPath + S_Strlen( pPath ) - 1;
+	const char* pResult = pPath + S_Strlen( pPath ) - 1;
 
 	// Back up until a . or the start of path
 	while ( pResult != pPath && *( pResult - 1 ) != '.' )
@@ -423,7 +422,7 @@ const achar* S_GetFileExtension( const achar* pPath, bool bIncludeDot /*= false*
 S_GetFileBaseName
 ==================
 */
-bool S_GetFileBaseName( const achar* pPath, achar* pFileName, uint32 maxLen )
+bool S_GetFileBaseName( const char* pPath, char* pFileName, uint32 maxLen )
 {
 	Assert( pFileName );
 	Assert( maxLen >= 1 );
@@ -436,9 +435,9 @@ bool S_GetFileBaseName( const achar* pPath, achar* pFileName, uint32 maxLen )
 	}
 
 	// Get string length
-	uint32	length = S_Strlen( pPath );
-	int32	startId = 0;
-	int32	endId = 0;
+	uint32 length  = S_Strlen( pPath );
+	int32  startId = 0;
+	int32  endId   = 0;
 
 	// Scan backward for '.'
 	endId = length ? length - 1 : 0;
@@ -487,7 +486,7 @@ bool S_GetFileBaseName( const achar* pPath, achar* pFileName, uint32 maxLen )
 	}
 
 	// Copy partial string
-	uint32	maxCharsToCopy = Min<uint32>( length, maxLen );
+	uint32 maxCharsToCopy = Min<uint32>( length, maxLen );
 	S_Strncpy( pFileName, &pPath[startId], maxCharsToCopy );
 	return true;
 }
@@ -503,7 +502,7 @@ void S_GetFileBaseName( const std::string& path, std::string& fileName, bool bSh
 	fileName.resize( 1024 );
 
 	// Try copy the base file name
-	while ( !S_GetFileBaseName( path.c_str(), fileName.data(), ( uint32 )fileName.size() ) )
+	while ( !S_GetFileBaseName( path.c_str(), fileName.data(), (uint32)fileName.size() ) )
 	{
 		fileName.resize( fileName.size() * 2 );
 	}
@@ -523,12 +522,12 @@ void S_GetFileBaseName( const std::string& path, std::string& fileName, bool bSh
 S_GetFileName
 ==================
 */
-const achar* S_GetFileName( const achar* pPath )
+const char* S_GetFileName( const char* pPath )
 {
 	// Back up until the character after the first path separator we find,
 	// or the beginning of the string
-	const achar*	pResult = pPath + S_Strlen( pPath ) - 1;
-	while ( pResult > pPath && !S_IsPathSeparator( *( pResult-1 ) ) )
+	const char* pResult = pPath + S_Strlen( pPath ) - 1;
+	while ( pResult > pPath && !S_IsPathSeparator( *( pResult - 1 ) ) )
 	{
 		--pResult;
 	}
@@ -540,7 +539,7 @@ const achar* S_GetFileName( const achar* pPath )
 S_GetFilePath
 ==================
 */
-bool S_GetFilePath( const achar* pSrcPath, achar* pDestPath, uint32 maxLen )
+bool S_GetFilePath( const char* pSrcPath, char* pDestPath, uint32 maxLen )
 {
 	Assert( pDestPath );
 	Assert( maxLen >= 1 );
@@ -553,8 +552,8 @@ bool S_GetFilePath( const achar* pSrcPath, achar* pDestPath, uint32 maxLen )
 	}
 
 	// Get string length
-	uint32			length = S_Strlen( pSrcPath );
-	const achar*	pSrc = pSrcPath + ( length ? length-1 : 0 );
+	uint32		 length = S_Strlen( pSrcPath );
+	const char* pSrc	= pSrcPath + ( length ? length - 1 : 0 );
 
 	// Back up until a path separator or the start
 	while ( pSrc != pSrcPath && !S_IsPathSeparator( *( pSrc - 1 ) ) )
@@ -573,7 +572,7 @@ bool S_GetFilePath( const achar* pSrcPath, achar* pDestPath, uint32 maxLen )
 	}
 
 	// Copy partial string
-	uint32	maxCharsToCopy = Min<uint32>( length, maxLen );
+	uint32 maxCharsToCopy = Min<uint32>( length, maxLen );
 	S_Strncpy( pDestPath, pSrcPath, maxCharsToCopy );
 	return true;
 }
@@ -589,7 +588,7 @@ void S_GetFilePath( const std::string& srcPath, std::string& destPath, bool bShr
 	destPath.resize( 1024 );
 
 	// Try copy the path
-	while ( !S_GetFilePath( srcPath.c_str(), destPath.data(), ( uint32 )destPath.size() ) )
+	while ( !S_GetFilePath( srcPath.c_str(), destPath.data(), (uint32)destPath.size() ) )
 	{
 		destPath.resize( destPath.size() * 2 );
 	}
@@ -609,12 +608,12 @@ void S_GetFilePath( const std::string& srcPath, std::string& destPath, bool bShr
 S_RemoveDotPathSeparators
 ==================
 */
-void S_RemoveDotPathSeparators( achar* pPath, bool bRemoveDoubleSeparators /*= true*/ )
+void S_RemoveDotPathSeparators( char* pPath, bool bRemoveDoubleSeparators /*= true*/ )
 {
 	// Read and write position in the string
-	achar*		pRead = pPath;
-	achar*		pWrite = pPath;
-	bool		bBoundary = true;
+	char* pRead	 = pPath;
+	char* pWrite	 = pPath;
+	bool   bBoundary = true;
 
 	// Remove all dot path separators ("./", "../")
 	while ( *pRead )
@@ -642,8 +641,8 @@ void S_RemoveDotPathSeparators( achar* pPath, bool bRemoveDoubleSeparators /*= t
 			}
 
 			// Skip the '..' but not the slash, next loop iteration will handle separator
-			pRead		+= 2;
-			bBoundary	= ( pWrite == pPath );
+			pRead += 2;
+			bBoundary = ( pWrite == pPath );
 		}
 		// Handle "./" by simply skipping this sequence. bBoundary is unchanged
 		else if ( bBoundary && pRead[0] == '.' && ( S_IsPathSeparator( pRead[1] ) || !pRead[1] ) )
@@ -668,10 +667,10 @@ void S_RemoveDotPathSeparators( achar* pPath, bool bRemoveDoubleSeparators /*= t
 		// Handle "/"
 		else if ( S_IsPathSeparator( pRead[0] ) )
 		{
-			*pWrite		= PATH_SEPARATOR;
-			pWrite		+= 1 - ( bBoundary & bRemoveDoubleSeparators & ( pWrite != pPath ) );
-			pRead		+= 1;
-			bBoundary	= true;
+			*pWrite = PATH_SEPARATOR;
+			pWrite += 1 - ( bBoundary & bRemoveDoubleSeparators & ( pWrite != pPath ) );
+			pRead += 1;
+			bBoundary = true;
 		}
 		// Otherwise iterate over the path
 		else
@@ -680,9 +679,9 @@ void S_RemoveDotPathSeparators( achar* pPath, bool bRemoveDoubleSeparators /*= t
 			{
 				*pWrite = *pRead;
 			}
-			pWrite		+= 1;
-			pRead		+= 1;
-			bBoundary	= false;
+			pWrite += 1;
+			pRead += 1;
+			bBoundary = false;
 		}
 	}
 
@@ -690,14 +689,14 @@ void S_RemoveDotPathSeparators( achar* pPath, bool bRemoveDoubleSeparators /*= t
 	*pWrite = 0;
 }
 
-
 /*
 ==================
 CFilename::CFilename
 ==================
 */
 CFilename::CFilename()
-{}
+{
+}
 
 /*
 ==================

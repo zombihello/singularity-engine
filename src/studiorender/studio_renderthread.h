@@ -4,11 +4,11 @@
 //-----------------------------------------------------------------------------
 // Render thread functions
 //-----------------------------------------------------------------------------
-extern CStudioCmdBuffer		g_StudioCmdBuffer;
+extern CStudioCmdBuffer g_StudioCmdBuffer;
 
 FORCEINLINE bool Studio_IsInRenderThread()
 {
-	extern threadId_t	g_RenderThreadId;
+	extern threadId_t g_RenderThreadId;
 	return g_RenderThreadId == INVALID_THREAD_ID || g_RenderThreadId == Sys_GetCurrentThreadId();
 }
 

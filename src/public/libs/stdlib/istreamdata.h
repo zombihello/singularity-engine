@@ -14,25 +14,23 @@ enum streamDataType_t
 class IStreamData : public IRefCounted
 {
 public:
-	virtual uint64 Tell() const = 0;
-	virtual void Seek( uint64 position ) = 0;
-	virtual void Flush() = 0;
+	virtual uint64 Tell() const			   = 0;
+	virtual void   Seek( uint64 position ) = 0;
+	virtual void   Flush()				   = 0;
 
-	virtual bool IsWriter() const = 0;
-	virtual bool IsReader() const = 0;
-	virtual bool IsEndOfStream() const = 0;
-	virtual uint64 GetSize() const = 0;
-	virtual const achar* GetPath() const = 0;
-	virtual streamDataType_t GetType() const = 0;
+	virtual bool			 IsWriter() const	   = 0;
+	virtual bool			 IsReader() const	   = 0;
+	virtual bool			 IsEndOfStream() const = 0;
+	virtual uint64			 GetSize() const	   = 0;
+	virtual const char*	 GetPath() const	   = 0;
+	virtual streamDataType_t GetType() const	   = 0;
 };
-
 
 class IStreamDataReader : public IStreamData
 {
 public:
 	virtual void Read( void* pBuffer, uint64 size ) = 0;
 };
-
 
 class IStreamDataWriter : public IStreamData
 {

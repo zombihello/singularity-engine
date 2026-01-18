@@ -5,18 +5,17 @@
 // Code setting the thread name for use in the debugger
 // http://msdn.microsoft.com/en-us/library/xcb2z8hs.aspx
 //-----------------------------------------------------------------------------
-#define MS_VC_EXCEPTION				0x406D1388
+#define MS_VC_EXCEPTION 0x406D1388
 
 #pragma pack( push, 8 )
 typedef struct tagTHREADNAME_INFO
 {
-	DWORD		dwType;			// Must be 0x1000.
-	LPCSTR		szName;			// Pointer to name (in user addr space).
-	DWORD		dwThreadID;		// Thread ID (-1=caller thread).
-	DWORD		dwFlags;		// Reserved for future use, must be zero.
+	DWORD  dwType;		// Must be 0x1000.
+	LPCSTR szName;		// Pointer to name (in user addr space).
+	DWORD  dwThreadID;	// Thread ID (-1=caller thread).
+	DWORD  dwFlags;		// Reserved for future use, must be zero.
 } THREADNAME_INFO;
 #pragma pack( pop )
-
 
 /*
 ==================
@@ -27,12 +26,11 @@ void Sys_SetThreadPriority( threadHandle_t threadHandle, threadPriority_t thread
 {
 	Assert( threadPriority == THREAD_PRIOR_NORMAL || threadPriority == THREAD_PRIOR_LOW || threadPriority == THREAD_PRIOR_ABOVE_NORMAL || threadPriority == THREAD_PRIOR_BELOW_NORMAL || threadPriority == THREAD_PRIOR_HIGH || threadPriority == THREAD_PRIOR_REALTIME );
 	SetThreadPriority( threadHandle,
-		threadPriority == THREAD_PRIOR_LOW ? THREAD_PRIORITY_LOWEST :
-		threadPriority == THREAD_PRIOR_BELOW_NORMAL ? THREAD_PRIORITY_BELOW_NORMAL :
-		threadPriority == THREAD_PRIOR_ABOVE_NORMAL ? THREAD_PRIORITY_NORMAL :
-		threadPriority == THREAD_PRIOR_HIGH ? THREAD_PRIORITY_ABOVE_NORMAL :
-		threadPriority == THREAD_PRIOR_REALTIME ? THREAD_PRIORITY_HIGHEST :
-		THREAD_PRIORITY_NORMAL );
+					   threadPriority == THREAD_PRIOR_LOW ? THREAD_PRIORITY_LOWEST : threadPriority == THREAD_PRIOR_BELOW_NORMAL ? THREAD_PRIORITY_BELOW_NORMAL
+																				 : threadPriority == THREAD_PRIOR_ABOVE_NORMAL	 ? THREAD_PRIORITY_NORMAL
+																				 : threadPriority == THREAD_PRIOR_HIGH			 ? THREAD_PRIORITY_ABOVE_NORMAL
+																				 : threadPriority == THREAD_PRIOR_REALTIME		 ? THREAD_PRIORITY_HIGHEST
+																																 : THREAD_PRIORITY_NORMAL );
 }
 
 /*
@@ -40,17 +38,17 @@ void Sys_SetThreadPriority( threadHandle_t threadHandle, threadPriority_t thread
 Sys_SetThreadName
 ==================
 */
-void Sys_SetThreadName( threadHandle_t threadHandle, const achar* pThreadName )
+void Sys_SetThreadName( threadHandle_t threadHandle, const char* pThreadName )
 {
-	THREADNAME_INFO				threadNameInfo;
-	threadNameInfo.dwType		= 0x1000;
-	threadNameInfo.szName		= pThreadName;
-	threadNameInfo.dwThreadID	= GetThreadId( threadHandle );
-	threadNameInfo.dwFlags		= 0;
+	THREADNAME_INFO threadNameInfo;
+	threadNameInfo.dwType	  = 0x1000;
+	threadNameInfo.szName	  = pThreadName;
+	threadNameInfo.dwThreadID = GetThreadId( threadHandle );
+	threadNameInfo.dwFlags	  = 0;
 
 	__try
 	{
-		RaiseException( MS_VC_EXCEPTION, 0, sizeof( threadNameInfo ) / sizeof( ULONG_PTR ), ( ULONG_PTR* )&threadNameInfo );
+		RaiseException( MS_VC_EXCEPTION, 0, sizeof( threadNameInfo ) / sizeof( ULONG_PTR ), (ULONG_PTR*)&threadNameInfo );
 	}
 	__except ( EXCEPTION_EXECUTE_HANDLER )
 	{
@@ -128,13 +126,12 @@ void CWindowsThreadMutex::Unlock() const
 	const_cast<CWindowsThreadMutex*>( this )->Unlock();
 }
 
-
 /*
 ==================
 CWindowsThreadEvent::CWindowsThreadEvent
 ==================
 */
-CWindowsThreadEvent::CWindowsThreadEvent( bool bManualReset /* = false */, const achar* pName /* = NULL */ )
+CWindowsThreadEvent::CWindowsThreadEvent( bool bManualReset /* = false */, const char* pName /* = NULL */ )
 	: handle( NULL )
 {
 	handle = CreateEventA( NULL, bManualReset, 0, pName );
@@ -191,13 +188,12 @@ bool CWindowsThreadEvent::Wait( uint32 waitTime /* = -1 */ )
 	return WaitForSingleObject( handle, waitTime ) == WAIT_OBJECT_0;
 }
 
-
 /*
 ==================
 CWindowsThreadSemaphore::CWindowsThreadSemaphore
 ==================
 */
-CWindowsThreadSemaphore::CWindowsThreadSemaphore( uint32 initialValue, uint32 maxValue, const achar* pName /* = NULL */ )
+CWindowsThreadSemaphore::CWindowsThreadSemaphore( uint32 initialValue, uint32 maxValue, const char* pName /* = NULL */ )
 	: handle( NULL )
 {
 	AssertMsg( maxValue > 0, "Invalid max value for semaphore" );
@@ -233,7 +229,7 @@ CWindowsThreadSemaphore::Post
 */
 bool CWindowsThreadSemaphore::Post( uint32 value )
 {
-	bool	bResult = ReleaseSemaphore( handle, value, NULL );
+	bool bResult = ReleaseSemaphore( handle, value, NULL );
 	AssertMsg( bResult, "Failed to post semaphore (GetLastError 0x%X)", GetLastError() );
 	return bResult;
 }
@@ -245,7 +241,7 @@ CWindowsThreadSemaphore::Wait
 */
 void CWindowsThreadSemaphore::Wait()
 {
-	uint32	result = WaitForSingleObject( handle, INFINITE );
+	uint32 result = WaitForSingleObject( handle, INFINITE );
 	Assert( result == WAIT_OBJECT_0 );
 }
 
@@ -256,7 +252,7 @@ CWindowsThreadSemaphore::Wait
 */
 bool CWindowsThreadSemaphore::Wait( uint32 milliseconds )
 {
-	uint32	result = WaitForSingleObject( handle, milliseconds );
+	uint32 result = WaitForSingleObject( handle, milliseconds );
 	Assert( result != WAIT_FAILED );
 	return result != WAIT_TIMEOUT;
 }
@@ -270,7 +266,6 @@ bool CWindowsThreadSemaphore::TryWait()
 {
 	return Wait( 0 );
 }
-
 
 /*
 ==================
@@ -360,18 +355,18 @@ void CWindowsThread::Stop( bool bShouldWait /* = false */, int32 exitCode /* = 0
 	if ( bShouldWait )
 	{
 		// Wait indefinitely for the thread to finish
-		// 
+		//
 		// IMPORTANT: It's not safe to just go and kill the thread with TerminateThread()
-		// as it could have a mutex lock that's shared with a thread that's continuing to run, 
+		// as it could have a mutex lock that's shared with a thread that's continuing to run,
 		// which would cause that other thread to dead-lock
 		WaitForSingleObject( handle, INFINITE );
 	}
 
 	// Now clean up the thread handle so we don't leak
 	CloseHandle( handle );
-	handle		= INVALID_THREAD_HANDLE;
-	id			= INVALID_THREAD_ID;
-	name[0]		= '\0';
+	handle	= INVALID_THREAD_HANDLE;
+	id		= INVALID_THREAD_ID;
+	name[0] = '\0';
 }
 
 /*
@@ -428,7 +423,7 @@ bool CWindowsThread::IsAlive() const
 CWindowsThread::SetName
 ==================
 */
-void CWindowsThread::SetName( const achar* pName )
+void CWindowsThread::SetName( const char* pName )
 {
 	S_Strncpy( name, pName, sizeof( name ) - 1 );
 	name[sizeof( name ) - 1] = '\0';
@@ -443,11 +438,11 @@ void CWindowsThread::SetName( const achar* pName )
 CWindowsThread::GetName
 ==================
 */
-const achar* CWindowsThread::GetName() const
+const char* CWindowsThread::GetName() const
 {
 	if ( !name[0] )
 	{
-		achar*	pName = const_cast<achar*>( name );
+		char* pName = const_cast<char*>( name );
 		S_Snprintf( pName, sizeof( name ) - 1, "Thread(%p/%p)", this, handle );
 		pName[sizeof( name ) - 1] = '\0';
 	}
@@ -524,7 +519,8 @@ CWindowsThread::ThreadStop
 ==================
 */
 void CWindowsThread::ThreadStop()
-{}
+{
+}
 
 /*
 ==================
@@ -532,7 +528,8 @@ CWindowsThread::ThreadExit
 ==================
 */
 void CWindowsThread::ThreadExit()
-{}
+{
+}
 
 /*
 ==================
@@ -541,7 +538,7 @@ CWindowsThread::ThreadMain
 */
 DWORD STDCALL CWindowsThread::ThreadMain( LPVOID pThis )
 {
-	CWindowsThread*		theThread = ( CWindowsThread* )pThis;
+	CWindowsThread* theThread = (CWindowsThread*)pThis;
 
 	// Notify the crash dumper about thread startup, set thread priority and debug name
 	CrashDump_OnThreadRun();
@@ -550,7 +547,7 @@ DWORD STDCALL CWindowsThread::ThreadMain( LPVOID pThis )
 
 	// Initialize the thread
 	theThread->exitCode = -1;
-	bool	bInitResult = theThread->ThreadInit();
+	bool bInitResult	= theThread->ThreadInit();
 	PROFILE_THREAD( theThread->GetName() );
 
 	// Initialization has completed, release the sync event
@@ -569,7 +566,8 @@ DWORD STDCALL CWindowsThread::ThreadMain( LPVOID pThis )
 		theThread->exitCode = theThread->ThreadRun();
 	}
 	catch ( ... )
-	{ }
+	{
+	}
 
 	// Allow any allocated resources to be cleaned up
 	theThread->ThreadExit();
@@ -580,9 +578,9 @@ DWORD STDCALL CWindowsThread::ThreadMain( LPVOID pThis )
 	// Clean ourselves up without waiting
 	// Now clean up the thread handle so we don't leak
 	CloseHandle( theThread->handle );
-	theThread->handle		= INVALID_THREAD_HANDLE;
-	theThread->id			= INVALID_THREAD_ID;
-	theThread->name[0]		= '\0';
+	theThread->handle  = INVALID_THREAD_HANDLE;
+	theThread->id	   = INVALID_THREAD_ID;
+	theThread->name[0] = '\0';
 
 	// Return from the thread with the exit code
 	return theThread->exitCode;

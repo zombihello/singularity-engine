@@ -19,63 +19,57 @@ struct inputEvent_t
 		EVENT_TEXT_INPUT
 	};
 
-
 	struct keyEvent_t
 	{
-		buttonCode_t	code;
-		bool			bAlt;
-		bool			bControl;
-		bool			bShift;
-		bool			bSuper;
-		bool			bCapsLock;
-		bool			bNumLock;
+		buttonCode_t code;
+		bool		 bAlt;
+		bool		 bControl;
+		bool		 bShift;
+		bool		 bSuper;
+		bool		 bCapsLock;
+		bool		 bNumLock;
 	};
-
 
 	struct mouseButtonEvent_t
 	{
-		buttonCode_t	code;
-		int32			x;
-		int32			y;
+		buttonCode_t code;
+		int32		 x;
+		int32		 y;
 	};
-
 
 	struct mouseMoveEvent_t
 	{
-		int32		x;
-		int32		y;
-		int32		xDirection;
-		int32		yDirection;
+		int32 x;
+		int32 y;
+		int32 xDirection;
+		int32 yDirection;
 	};
-
 
 	struct mouseWheelEvent_t
 	{
-		int32		x;
-		int32		y;
+		int32 x;
+		int32 y;
 	};
-
 
 	struct textInputEvent_t
 	{
-		achar*		pText;
+		char* pText;
 	};
-
 
 	union uevents_t
 	{
-		keyEvent_t				key;
-		mouseButtonEvent_t		mouseButton;
-		mouseMoveEvent_t		mouseMove;
-		mouseWheelEvent_t		mouseWheel;
-		textInputEvent_t		textInputEvent;
+		keyEvent_t		   key;
+		mouseButtonEvent_t mouseButton;
+		mouseMoveEvent_t   mouseMove;
+		mouseWheelEvent_t  mouseWheel;
+		textInputEvent_t   textInputEvent;
 	};
-
 
 	inputEvent_t()
 		: type( EVENT_NONE )
-	{}
+	{
+	}
 
-	type_t			type;
-	uevents_t		events;
+	type_t	  type;
+	uevents_t events;
 };

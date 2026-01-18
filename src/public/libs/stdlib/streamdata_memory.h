@@ -14,23 +14,23 @@ class CBaseStreamDataMemory : public TRefCounted<TBaseClass>
 public:
 	CBaseStreamDataMemory()
 		: offset( 0 )
-	{}
+	{
+	}
 
 	// IStreamData interface
 	virtual uint64 Tell() const override;
-	virtual void Seek( uint64 position ) override;
-	virtual void Flush() override;
+	virtual void   Seek( uint64 position ) override;
+	virtual void   Flush() override;
 
-	virtual bool IsEndOfStream() const override;
-	virtual bool IsReader() const override;
-	virtual bool IsWriter() const override;
-	virtual const achar* GetPath() const override;
+	virtual bool			 IsEndOfStream() const override;
+	virtual bool			 IsReader() const override;
+	virtual bool			 IsWriter() const override;
+	virtual const char*	 GetPath() const override;
 	virtual streamDataType_t GetType() const override;
 
-protected:	
-	uint64		offset;
+protected:
+	uint64 offset;
 };
-
 
 //-----------------------------------------------------------------------------
 // The class for reading from the memory
@@ -41,18 +41,18 @@ public:
 	CStreamDataMemoryReader( const byte* pData, uint64 size )
 		: pData( pData )
 		, size( size )
-	{}
-	
+	{
+	}
+
 	// IStreamDataReader interface
-	virtual void Read( void* pBuffer, uint64 size ) override;
-	virtual bool IsReader() const override;
+	virtual void   Read( void* pBuffer, uint64 size ) override;
+	virtual bool   IsReader() const override;
 	virtual uint64 GetSize() const override;
 
 private:
-	const byte*		pData;
-	uint64			size;
+	const byte* pData;
+	uint64		size;
 };
-
 
 //-----------------------------------------------------------------------------
 // The class for write to the memory
@@ -62,15 +62,16 @@ class CStreamDataMemoryWriter : public CBaseStreamDataMemory<IStreamDataWriter>
 public:
 	CStreamDataMemoryWriter( std::vector<byte>& data )
 		: data( data )
-	{}
+	{
+	}
 
 	// IStreamDataWriter interface
-	virtual void Write( void* pBuffer, uint64 size ) override;
-	virtual bool IsWriter() const override;
+	virtual void   Write( void* pBuffer, uint64 size ) override;
+	virtual bool   IsWriter() const override;
 	virtual uint64 GetSize() const override;
 
 private:
-	std::vector<byte>&		data;
+	std::vector<byte>& data;
 };
 
 #include "stdlib/streamdata_memory.inl"

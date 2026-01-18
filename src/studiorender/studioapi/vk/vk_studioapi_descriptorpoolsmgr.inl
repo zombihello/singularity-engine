@@ -10,7 +10,6 @@ FORCEINLINE VkDescriptorPool CStudioAPIDescriptorPoolVk::GetVkDescriptorPool() c
 	return vkDescriptorPool;
 }
 
-
 /*
 ==================
 CStudioAPITypedDescriptorPoolSetVk::GetDescriptorSetsLayout
@@ -21,7 +20,6 @@ FORCEINLINE const CStudioAPIDescriptorSetsLayoutVk& CStudioAPITypedDescriptorPoo
 	return descriptorSetsLayout;
 }
 
-
 /*
 ==================
 CStudioAPIDescriptorPoolSetContainerVk::AcquireTypedPoolSet
@@ -30,8 +28,8 @@ CStudioAPIDescriptorPoolSetContainerVk::AcquireTypedPoolSet
 FORCEINLINE CStudioAPITypedDescriptorPoolSetVk* CStudioAPIDescriptorPoolSetContainerVk::AcquireTypedPoolSet( const CStudioAPIDescriptorSetsLayoutVk& descriptorSetsLayout )
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
-	hash_t		hash = descriptorSetsLayout.GetDescriptorTypesUsageHash();
-	auto		it = typedDescriptorPoolsDict.find( hash );
+	hash_t hash = descriptorSetsLayout.GetDescriptorTypesUsageHash();
+	auto   it	= typedDescriptorPoolsDict.find( hash );
 	if ( it == typedDescriptorPoolsDict.end() )
 	{
 		it = typedDescriptorPoolsDict.insert( std::make_pair( hash, new CStudioAPITypedDescriptorPoolSetVk( descriptorSetsLayout ) ) ).first;

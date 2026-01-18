@@ -8,23 +8,24 @@ template<class TFileParserClass, typename TGrammarContextType>
 class TGrammarInterface
 {
 public:
-    TGrammarInterface( CParserTokenStream& tokens, TFileParserClass& fileParser )
-        : pTokens( &tokens )
-        , pFileParser( &fileParser )
-        , pCurrentToken( NULL )
-    {}
+	TGrammarInterface( CParserTokenStream& tokens, TFileParserClass& fileParser )
+		: pTokens( &tokens )
+		, pFileParser( &fileParser )
+		, pCurrentToken( NULL )
+	{
+	}
 
-    uint32 GetNextToken( TGrammarContextType* pContext );
-    void EmitError( const achar* pMessage, TGrammarContextType* pContext );
+	uint32 GetNextToken( TGrammarContextType* pContext );
+	void   EmitError( const char* pMessage, TGrammarContextType* pContext );
 
-    TFileParserClass* GetFileParser() const;
-    int32 GetCurrentTokenLine() const;
-    int32 GetLastTokenLine() const;
+	TFileParserClass* GetFileParser() const;
+	int32			  GetCurrentTokenLine() const;
+	int32			  GetLastTokenLine() const;
 
 private:
-    CParserTokenStream*     pTokens;
-    TFileParserClass*       pFileParser;
-    parserToken_t*          pCurrentToken;
+	CParserTokenStream* pTokens;
+	TFileParserClass*	pFileParser;
+	parserToken_t*		pCurrentToken;
 };
 
 #include "parserlib/grammarinterface.inl"

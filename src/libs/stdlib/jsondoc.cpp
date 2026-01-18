@@ -14,8 +14,8 @@ CJsonObject::AsJson
 std::string CJsonObject::AsJson( uint32 countTabs /* = 0 */ ) const
 {
 	// Print tabs
-	std::stringstream	strStream;
-	std::string			tabs;
+	std::stringstream strStream;
+	std::string		  tabs;
 	for ( uint32 index = 0; index < countTabs; ++index )
 	{
 		tabs += "\t";
@@ -36,7 +36,7 @@ std::string CJsonObject::AsJson( uint32 countTabs /* = 0 */ ) const
 		}
 	}
 
-	strStream << tabs << "}";	
+	strStream << tabs << "}";
 	return strStream.str();
 }
 
@@ -50,8 +50,8 @@ void CJsonObject::Set( const rapidjson::Value& value )
 	// Set values from rapidjson::Value
 	for ( auto itValue = value.MemberBegin(), itValueEnd = value.MemberEnd(); itValue != itValueEnd; ++itValue )
 	{
-		const achar*	pValueName = itValue->name.GetString();
-		CJsonValue		value;
+		const char* pValueName = itValue->name.GetString();
+		CJsonValue	 value;
 
 		value.Set( itValue->value );
 		valuesDict[pValueName] = value;
@@ -63,7 +63,7 @@ void CJsonObject::Set( const rapidjson::Value& value )
 CJsonObject::SetValue
 ==================
 */
-void CJsonObject::SetValue( const achar* pName, const class CJsonValue& value )
+void CJsonObject::SetValue( const char* pName, const class CJsonValue& value )
 {
 	valuesDict[pName] = value;
 }
@@ -73,9 +73,9 @@ void CJsonObject::SetValue( const achar* pName, const class CJsonValue& value )
 CJsonObject::GetValue
 ==================
 */
-CJsonValue CJsonObject::GetValue( const achar* pName ) const
+CJsonValue CJsonObject::GetValue( const char* pName ) const
 {
-	auto	itValue = valuesDict.find( pName );
+	auto itValue = valuesDict.find( pName );
 	if ( itValue == valuesDict.end() )
 	{
 		return CJsonValue();
@@ -83,7 +83,6 @@ CJsonValue CJsonObject::GetValue( const achar* pName ) const
 
 	return itValue->second;
 }
-
 
 /*
 ==================
@@ -101,16 +100,16 @@ void CJsonValue::Clear()
 	// Free allocate memory
 	switch ( type )
 	{
-	case JSONVALUE_TYPE_BOOL:           delete ( ( bool* )pValue );						break;
-	case JSONVALUE_TYPE_INT:			delete ( ( int32* )pValue );					break;
-	case JSONVALUE_TYPE_FLOAT:			delete ( ( float* )pValue );					break;
-	case JSONVALUE_TYPE_STRING:			delete ( ( std::string* )pValue );				break;
-	case JSONVALUE_TYPE_OBJECT:			delete ( ( CJsonObject* )pValue );				break;
-	case JSONVALUE_TYPE_ARRAY:			delete ( ( std::vector<CJsonValue>* )pValue );	break;
+	case JSONVALUE_TYPE_BOOL: delete ( (bool*)pValue ); break;
+	case JSONVALUE_TYPE_INT: delete ( (int32*)pValue ); break;
+	case JSONVALUE_TYPE_FLOAT: delete ( (float*)pValue ); break;
+	case JSONVALUE_TYPE_STRING: delete ( (std::string*)pValue ); break;
+	case JSONVALUE_TYPE_OBJECT: delete ( (CJsonObject*)pValue ); break;
+	case JSONVALUE_TYPE_ARRAY: delete ( (std::vector<CJsonValue>*)pValue ); break;
 	}
 
 	pValue = nullptr;
-	type = JSONVALUE_TYPE_UNKNOWN;
+	type   = JSONVALUE_TYPE_UNKNOWN;
 }
 
 /*
@@ -123,15 +122,15 @@ void CJsonValue::Copy( const CJsonValue& copy )
 	type = copy.type;
 	switch ( type )
 	{
-	case JSONVALUE_TYPE_BOOL:		SetBool( copy.GetBool() );		break;
-	case JSONVALUE_TYPE_INT:		SetInt( copy.GetInt() );		break;
-	case JSONVALUE_TYPE_FLOAT:		SetFloat( copy.GetFloat() );	break;
-	case JSONVALUE_TYPE_STRING:		SetString( copy.GetString() );	break;
-	case JSONVALUE_TYPE_OBJECT:		SetObject( copy.GetObject() );	break;
-	case JSONVALUE_TYPE_ARRAY:		SetArray( copy.GetArray() );	break;
-	default:		
-		pValue	= nullptr;
-		type	= JSONVALUE_TYPE_UNKNOWN;
+	case JSONVALUE_TYPE_BOOL: SetBool( copy.GetBool() ); break;
+	case JSONVALUE_TYPE_INT: SetInt( copy.GetInt() ); break;
+	case JSONVALUE_TYPE_FLOAT: SetFloat( copy.GetFloat() ); break;
+	case JSONVALUE_TYPE_STRING: SetString( copy.GetString() ); break;
+	case JSONVALUE_TYPE_OBJECT: SetObject( copy.GetObject() ); break;
+	case JSONVALUE_TYPE_ARRAY: SetArray( copy.GetArray() ); break;
+	default:
+		pValue = nullptr;
+		type   = JSONVALUE_TYPE_UNKNOWN;
 		break;
 	}
 }
@@ -144,15 +143,15 @@ CJsonValue::AsJson
 std::string CJsonValue::AsJson( uint32 countTabs /* = 0 */ ) const
 {
 	// Convert JSON value to string
-	std::stringstream	strStream;
+	std::stringstream strStream;
 	switch ( type )
 	{
-	case JSONVALUE_TYPE_BOOL:		strStream << GetBool() ? "true" : "false";			break;
-	case JSONVALUE_TYPE_FLOAT:		strStream << GetFloat();							break;
-	case JSONVALUE_TYPE_INT:		strStream << GetInt();								break;
-	case JSONVALUE_TYPE_STRING:		strStream << "\"" << GetString() << "\"";			break;
-	case JSONVALUE_TYPE_OBJECT:		strStream << GetObject().AsJson( countTabs + 1 );	break;
-	default:						strStream << "null";								break;
+	case JSONVALUE_TYPE_BOOL: strStream << GetBool() ? "true" : "false"; break;
+	case JSONVALUE_TYPE_FLOAT: strStream << GetFloat(); break;
+	case JSONVALUE_TYPE_INT: strStream << GetInt(); break;
+	case JSONVALUE_TYPE_STRING: strStream << "\"" << GetString() << "\""; break;
+	case JSONVALUE_TYPE_OBJECT: strStream << GetObject().AsJson( countTabs + 1 ); break;
+	default: strStream << "null"; break;
 	}
 
 	return strStream.str();
@@ -193,15 +192,15 @@ void CJsonValue::Set( const rapidjson::Value& value )
 	// Object value
 	else if ( value.IsObject() )
 	{
-		CJsonObject		object;
+		CJsonObject object;
 		object.Set( value );
 		SetObject( object );
 	}
 	// Array value
 	else if ( value.IsArray() )
 	{
-		auto						array = value.GetArray();
-		std::vector<CJsonValue>		jsonValues;
+		auto					array = value.GetArray();
+		std::vector<CJsonValue> jsonValues;
 		for ( uint32 index = 0, count = array.Size(); index < count; ++index )
 		{
 			jsonValues.emplace_back().Set( array[index] );
@@ -215,13 +214,12 @@ void CJsonValue::Set( const rapidjson::Value& value )
 	}
 }
 
-
 /*
 ==================
 CJsonDoc::LoadFromFile
 ==================
 */
-bool CJsonDoc::LoadFromFile( const achar* pPath )
+bool CJsonDoc::LoadFromFile( const char* pPath )
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 
@@ -233,21 +231,21 @@ bool CJsonDoc::LoadFromFile( const achar* pPath )
 	}
 
 	// Try open file
-	TRefPtr<IStreamDataReader>	file = g_pFileSystem->CreateFileReader( pPath );
+	TRefPtr<IStreamDataReader> file = g_pFileSystem->CreateFileReader( pPath );
 	if ( !file )
 	{
 		return false;
 	}
-	
+
 	// Allocate memory for buffer
-	uint64	fileSize = file->GetSize() + 1;
-	byte*	pBuffer = ( byte* )Mem_MallocZero( fileSize );
+	uint64 fileSize = file->GetSize() + 1;
+	byte*  pBuffer	= (byte*)Mem_MallocZero( fileSize );
 
 	// Serialize data to string buffer
 	file->Read( pBuffer, fileSize );
 
 	// Load data from buffer
-	bool	bResult = LoadFromBuffer( ( const achar* )pBuffer );
+	bool bResult = LoadFromBuffer( (const char*)pBuffer );
 
 	// Free allocated memory
 	Mem_Free( pBuffer );
@@ -259,7 +257,7 @@ bool CJsonDoc::LoadFromFile( const achar* pPath )
 CJsonDoc::LoadFromBuffer
 ==================
 */
-bool CJsonDoc::LoadFromBuffer( const achar* pBuffer )
+bool CJsonDoc::LoadFromBuffer( const char* pBuffer )
 {
 	// Do nothing if buffer isn't valid
 	Assert( pBuffer && pBuffer[0] );
@@ -269,7 +267,7 @@ bool CJsonDoc::LoadFromBuffer( const achar* pBuffer )
 	}
 
 	// Parse JSON with help RapidJSON
-	rapidjson::Document		jsonDocument;
+	rapidjson::Document jsonDocument;
 	jsonDocument.Parse<rapidjson::kParseDefaultFlags | rapidjson::kParseCommentsFlag>( pBuffer );
 	if ( jsonDocument.HasParseError() )
 	{
@@ -280,8 +278,8 @@ bool CJsonDoc::LoadFromBuffer( const achar* pBuffer )
 	// Read all JSON values
 	for ( auto itValue = jsonDocument.MemberBegin(), itValueEnd = jsonDocument.MemberEnd(); itValue != itValueEnd; ++itValue )
 	{
-		const achar*	pValueName = itValue->name.GetString();
-		CJsonValue*		pJsonValue = &valuesDict.insert( std::make_pair( pValueName, CJsonValue() ) ).first->second;
+		const char* pValueName = itValue->name.GetString();
+		CJsonValue*	 pJsonValue = &valuesDict.insert( std::make_pair( pValueName, CJsonValue() ) ).first->second;
 		pJsonValue->Set( itValue->value );
 	}
 
@@ -293,7 +291,7 @@ bool CJsonDoc::LoadFromBuffer( const achar* pBuffer )
 CJsonDoc::SaveToFile
 ==================
 */
-bool CJsonDoc::SaveToFile( const achar* path )
+bool CJsonDoc::SaveToFile( const char* path )
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 
@@ -305,7 +303,7 @@ bool CJsonDoc::SaveToFile( const achar* path )
 	}
 
 	// Save data to buffer
-	std::string		buffer;
+	std::string buffer;
 	if ( !SaveToBuffer( buffer ) )
 	{
 		Warning( "StdLib: Failed to save JSON document into buffer" );
@@ -313,7 +311,7 @@ bool CJsonDoc::SaveToFile( const achar* path )
 	}
 
 	// Try open file for save
-	TRefPtr<IStreamDataWriter>	file = g_pFileSystem->CreateFileWriter( path );
+	TRefPtr<IStreamDataWriter> file = g_pFileSystem->CreateFileWriter( path );
 	if ( !file )
 	{
 		Warning( "StdLib: Failed to create a file" );
@@ -321,7 +319,7 @@ bool CJsonDoc::SaveToFile( const achar* path )
 	}
 
 	// Serialize buffer to the file
-	file->Write( buffer.data(), buffer.size() * sizeof( achar ) );
+	file->Write( buffer.data(), buffer.size() * sizeof( char ) );
 	return true;
 }
 

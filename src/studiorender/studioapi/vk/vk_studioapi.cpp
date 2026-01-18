@@ -14,9 +14,8 @@
 #include "studiorender/studioapi/vk/vk_studioapi_cmdlist.h"
 #include "studiorender/studioapi/vk/vk_studioapi_texture.h"
 
-CStudioAPIVk		g_StudioAPIVk;
+CStudioAPIVk g_StudioAPIVk;
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CStudioAPIVk, IStudioAPI, STUDIOAPI_INTERFACE_VERSION, g_StudioAPIVk );
-
 
 /*
 ==================
@@ -72,9 +71,9 @@ bool CStudioAPIVk::Init()
 	device.Init( ENGINE_VERSION_MAJOR, ENGINE_VERSION_MINOR, ENGINE_VERSION_PATCH );
 
 	// Initialize StudioAPI information
-	info.bSupportMultiBuffer	= true;
-	info.gpuVendorId			= device.GetGPUVendorId();
-	info.pShaderPlatform		= STUDIOAPI_VK_SHADER_PLATFORM_NAME;
+	info.bSupportMultiBuffer = true;
+	info.gpuVendorId		 = device.GetGPUVendorId();
+	info.pShaderPlatform	 = STUDIOAPI_VK_SHADER_PLATFORM_NAME;
 
 	// Initialize the StudioAPI memory manager
 	memoryMgr.Init( VK_API_VERSION_1_3 );
@@ -212,7 +211,8 @@ CStudioAPIVk::AcquireThreadOwnership
 ==================
 */
 void CStudioAPIVk::AcquireThreadOwnership()
-{}
+{
+}
 
 /*
 ==================
@@ -220,7 +220,8 @@ CStudioAPIVk::ReleaseThreadOwnership
 ==================
 */
 void CStudioAPIVk::ReleaseThreadOwnership()
-{}
+{
+}
 
 /*
 ==================
@@ -230,7 +231,7 @@ CStudioAPIVk::CreateCmdContext
 TRefPtr<IStudioAPICmdContext> CStudioAPIVk::CreateCmdContext( studioAPIQueueType_t queueType ) const
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
-	CStudioAPICmdContextVk*		pImmediateCmdContext = ( CStudioAPICmdContextVk* )GetImmediateCmdContext( queueType );
+	CStudioAPICmdContextVk* pImmediateCmdContext = (CStudioAPICmdContextVk*)GetImmediateCmdContext( queueType );
 	return new CStudioAPICmdContextVk( pImmediateCmdContext->GetQueue(), pImmediateCmdContext->GetSupportQueueTypes() );
 }
 
@@ -242,7 +243,7 @@ CStudioAPIVk::CreateCmdList
 TRefPtr<IStudioAPICmdList> CStudioAPIVk::CreateCmdList( IStudioAPICmdContext* pCmdContext ) const
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
-	return new CStudioAPICmdListVk( ( CStudioAPICmdContextVk* )pCmdContext );
+	return new CStudioAPICmdListVk( (CStudioAPICmdContextVk*)pCmdContext );
 }
 
 /*
@@ -253,7 +254,7 @@ CStudioAPIVk::CreateCmdListBatch
 TRefPtr<IStudioAPICmdListBatch> CStudioAPIVk::CreateCmdListBatch( IStudioAPICmdContext* pCmdContext ) const
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
-	return new CStudioAPICmdListBatchVk( ( CStudioAPICmdContextVk* )pCmdContext );
+	return new CStudioAPICmdListBatchVk( (CStudioAPICmdContextVk*)pCmdContext );
 }
 
 /*
@@ -264,7 +265,7 @@ CStudioAPIVk::CreateSwapChain
 TRefPtr<IStudioAPISwapChain> CStudioAPIVk::CreateSwapChain( windowHandle_t windowHandle, uint32 width, uint32 height, bool bUseVSync /* = false */ ) const
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
-	TRefPtr<CStudioAPISwapChainVk>		pStudioAPISwapChain = new CStudioAPISwapChainVk( S_Sprintf( "VkSwapChain [0x%X]", windowHandle ).c_str() );
+	TRefPtr<CStudioAPISwapChainVk> pStudioAPISwapChain = new CStudioAPISwapChainVk( S_Sprintf( "VkSwapChain [0x%X]", windowHandle ).c_str() );
 	if ( !pStudioAPISwapChain->Create( windowHandle, width, height, VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR, bUseVSync ) )
 	{
 		Sys_Error( "Failed to create the swap chain (%ux%u)", width, height );
@@ -279,7 +280,7 @@ TRefPtr<IStudioAPISwapChain> CStudioAPIVk::CreateSwapChain( windowHandle_t windo
 CStudioAPIVk::CreateVertexShader
 ==================
 */
-TRefPtr<IStudioAPIShader> CStudioAPIVk::CreateVertexShader( const achar* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const achar* pDebugName /* = "" */ ) const
+TRefPtr<IStudioAPIShader> CStudioAPIVk::CreateVertexShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName /* = "" */ ) const
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIVertexShaderVk( pEntryPointName, pBytecode, bytecodeSize, pReflectionData, reflectionDataSize, pDebugName );
@@ -290,7 +291,7 @@ TRefPtr<IStudioAPIShader> CStudioAPIVk::CreateVertexShader( const achar* pEntryP
 CStudioAPIVk::CreateHullShader
 ==================
 */
-TRefPtr<IStudioAPIShader> CStudioAPIVk::CreateHullShader( const achar* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const achar* pDebugName /* = "" */ ) const
+TRefPtr<IStudioAPIShader> CStudioAPIVk::CreateHullShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName /* = "" */ ) const
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIHullShaderVk( pEntryPointName, pBytecode, bytecodeSize, pReflectionData, reflectionDataSize, pDebugName );
@@ -301,7 +302,7 @@ TRefPtr<IStudioAPIShader> CStudioAPIVk::CreateHullShader( const achar* pEntryPoi
 CStudioAPIVk::CreateDomainShader
 ==================
 */
-TRefPtr<IStudioAPIShader> CStudioAPIVk::CreateDomainShader( const achar* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const achar* pDebugName /* = "" */ ) const
+TRefPtr<IStudioAPIShader> CStudioAPIVk::CreateDomainShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName /* = "" */ ) const
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIDomainShaderVk( pEntryPointName, pBytecode, bytecodeSize, pReflectionData, reflectionDataSize, pDebugName );
@@ -312,7 +313,7 @@ TRefPtr<IStudioAPIShader> CStudioAPIVk::CreateDomainShader( const achar* pEntryP
 CStudioAPIVk::CreateGeometryShader
 ==================
 */
-TRefPtr<IStudioAPIShader> CStudioAPIVk::CreateGeometryShader( const achar* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const achar* pDebugName /* = "" */ ) const
+TRefPtr<IStudioAPIShader> CStudioAPIVk::CreateGeometryShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName /* = "" */ ) const
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIGeometryShaderVk( pEntryPointName, pBytecode, bytecodeSize, pReflectionData, reflectionDataSize, pDebugName );
@@ -323,7 +324,7 @@ TRefPtr<IStudioAPIShader> CStudioAPIVk::CreateGeometryShader( const achar* pEntr
 CStudioAPIVk::CreatePixelShader
 ==================
 */
-TRefPtr<IStudioAPIShader> CStudioAPIVk::CreatePixelShader( const achar* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const achar* pDebugName /* = "" */ ) const
+TRefPtr<IStudioAPIShader> CStudioAPIVk::CreatePixelShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName /* = "" */ ) const
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIPixelShaderVk( pEntryPointName, pBytecode, bytecodeSize, pReflectionData, reflectionDataSize, pDebugName );
@@ -334,7 +335,7 @@ TRefPtr<IStudioAPIShader> CStudioAPIVk::CreatePixelShader( const achar* pEntryPo
 CStudioAPIVk::CreateComputeShader
 ==================
 */
-TRefPtr<IStudioAPIShader> CStudioAPIVk::CreateComputeShader( const achar* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const achar* pDebugName /* = "" */ ) const
+TRefPtr<IStudioAPIShader> CStudioAPIVk::CreateComputeShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName /* = "" */ ) const
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIComputeShaderVk( pEntryPointName, pBytecode, bytecodeSize, pReflectionData, reflectionDataSize, pDebugName );
@@ -348,22 +349,22 @@ CStudioAPIVk::CreateRenderPipeline
 TRefPtr<IStudioAPIBoundShaderState> CStudioAPIVk::FindOrCreateBoundShaderState( IStudioAPIVertexDeclaration* pVertexDeclaration, IStudioAPIShader* pVertexShader, IStudioAPIShader* pPixelShader, IStudioAPIShader* pHullShader /* = NULL */, IStudioAPIShader* pDomainShader /* = NULL */, IStudioAPIShader* pGeometryShader /* = NULL */ ) const
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
-	CStudioAPIBoundShaderStateKeyVk		key( ( CStudioAPIVertexDeclarationVk* )pVertexDeclaration, 
-											 ( CStudioAPIVertexShaderVk* )pVertexShader, 
-											 ( CStudioAPIPixelShaderVk* )pPixelShader, 
-											 ( CStudioAPIHullShaderVk* )pHullShader,
-											 ( CStudioAPIDomainShaderVk* )pDomainShader,
-											 ( CStudioAPIGeometryShaderVk* )pGeometryShader );
-	CStudioAPIBoundShaderStateVk*		boundShaderState = boundShaderStateCache.Find( key );
+	CStudioAPIBoundShaderStateKeyVk key( (CStudioAPIVertexDeclarationVk*)pVertexDeclaration,
+										 (CStudioAPIVertexShaderVk*)pVertexShader,
+										 (CStudioAPIPixelShaderVk*)pPixelShader,
+										 (CStudioAPIHullShaderVk*)pHullShader,
+										 (CStudioAPIDomainShaderVk*)pDomainShader,
+										 (CStudioAPIGeometryShaderVk*)pGeometryShader );
+	CStudioAPIBoundShaderStateVk*	boundShaderState = boundShaderStateCache.Find( key );
 	if ( !boundShaderState )
 	{
 		boundShaderState = new CStudioAPIBoundShaderStateVk( key,
-															 ( CStudioAPIVertexDeclarationVk* )pVertexDeclaration,
-															 ( CStudioAPIVertexShaderVk* )pVertexShader,
-															 ( CStudioAPIPixelShaderVk* )pPixelShader,
-															 ( CStudioAPIHullShaderVk* )pHullShader,
-															 ( CStudioAPIDomainShaderVk* )pDomainShader,
-															 ( CStudioAPIGeometryShaderVk* )pGeometryShader );
+															 (CStudioAPIVertexDeclarationVk*)pVertexDeclaration,
+															 (CStudioAPIVertexShaderVk*)pVertexShader,
+															 (CStudioAPIPixelShaderVk*)pPixelShader,
+															 (CStudioAPIHullShaderVk*)pHullShader,
+															 (CStudioAPIDomainShaderVk*)pDomainShader,
+															 (CStudioAPIGeometryShaderVk*)pGeometryShader );
 		boundShaderStateCache.Add( key, boundShaderState );
 	}
 
@@ -375,7 +376,7 @@ TRefPtr<IStudioAPIBoundShaderState> CStudioAPIVk::FindOrCreateBoundShaderState( 
 CStudioAPIVk::CreateRenderPipeline
 ==================
 */
-TRefPtr<IStudioAPIRenderPipeline> CStudioAPIVk::CreateRenderPipeline( const studioAPIRenderPipelineCreateInfo_t& createInfo, const achar* pDebugName /* = "" */ ) const
+TRefPtr<IStudioAPIRenderPipeline> CStudioAPIVk::CreateRenderPipeline( const studioAPIRenderPipelineCreateInfo_t& createInfo, const char* pDebugName /* = "" */ ) const
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIRenderPipelineVk( createInfo, pDebugName );
@@ -397,7 +398,7 @@ TRefPtr<IStudioAPIVertexDeclaration> CStudioAPIVk::CreateVertexDeclaration( cons
 CStudioAPIVk::CreateVertexDeclaration
 ==================
 */
-TRefPtr<IStudioAPIFrameBuffer> CStudioAPIVk::CreateFrameBuffer( const studioAPIFrameBufferCreateInfo_t& createInfo, const achar* pDebugName /* = "" */ ) const
+TRefPtr<IStudioAPIFrameBuffer> CStudioAPIVk::CreateFrameBuffer( const studioAPIFrameBufferCreateInfo_t& createInfo, const char* pDebugName /* = "" */ ) const
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIFrameBufferVk( createInfo, pDebugName );
@@ -408,7 +409,7 @@ TRefPtr<IStudioAPIFrameBuffer> CStudioAPIVk::CreateFrameBuffer( const studioAPIF
 CStudioAPIVk::CreateVertexDeclaration
 ==================
 */
-TRefPtr<IStudioAPIRenderPass> CStudioAPIVk::CreateRenderPass( const studioAPIRenderPassCreateInfo_t& createInfo, const achar* pDebugName /* = "" */ ) const
+TRefPtr<IStudioAPIRenderPass> CStudioAPIVk::CreateRenderPass( const studioAPIRenderPassCreateInfo_t& createInfo, const char* pDebugName /* = "" */ ) const
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIRenderPassVk( createInfo, pDebugName );
@@ -419,7 +420,7 @@ TRefPtr<IStudioAPIRenderPass> CStudioAPIVk::CreateRenderPass( const studioAPIRen
 CStudioAPIVk::CreateBuffer
 ==================
 */
-TRefPtr<IStudioAPIBuffer> CStudioAPIVk::CreateBuffer( const byte* pData, uint64 dataSize, uint32 dataStride, uint32 usageFlags, const achar* pDebugName /* = "" */ ) const
+TRefPtr<IStudioAPIBuffer> CStudioAPIVk::CreateBuffer( const byte* pData, uint64 dataSize, uint32 dataStride, uint32 usageFlags, const char* pDebugName /* = "" */ ) const
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIBufferVk( pData, dataSize, dataStride, usageFlags, pDebugName );
@@ -430,7 +431,7 @@ TRefPtr<IStudioAPIBuffer> CStudioAPIVk::CreateBuffer( const byte* pData, uint64 
 CStudioAPIVk::CreateTexture
 ==================
 */
-TRefPtr<IStudioAPITexture> CStudioAPIVk::CreateTexture( studioAPITextureType_t type, uint32 sizeX, uint32 sizeY, uint32 sizeZ, uint32 numLayers, uint32 numMips, uint32 usageFlags, studioAPIPixelFormat_t pixelFormat, const byte* pData /* = NULL */, const achar* pDebugName /* = "" */ ) const
+TRefPtr<IStudioAPITexture> CStudioAPIVk::CreateTexture( studioAPITextureType_t type, uint32 sizeX, uint32 sizeY, uint32 sizeZ, uint32 numLayers, uint32 numMips, uint32 usageFlags, studioAPIPixelFormat_t pixelFormat, const byte* pData /* = NULL */, const char* pDebugName /* = "" */ ) const
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 	return new CStudioAPITextureVk( type, sizeX, sizeY, sizeZ, numLayers, numMips, usageFlags, pixelFormat, pData, pDebugName );
@@ -441,7 +442,7 @@ TRefPtr<IStudioAPITexture> CStudioAPIVk::CreateTexture( studioAPITextureType_t t
 CStudioAPIVk::CreateSampler
 ==================
 */
-TRefPtr<IStudioAPISampler> CStudioAPIVk::CreateSampler( const studioAPISamplerCreateInfo_t& createInfo, const achar* pDebugName /* = "" */ ) const
+TRefPtr<IStudioAPISampler> CStudioAPIVk::CreateSampler( const studioAPISamplerCreateInfo_t& createInfo, const char* pDebugName /* = "" */ ) const
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 	return new CStudioAPISamplerVk( createInfo, pDebugName );
@@ -503,8 +504,8 @@ void CStudioAPIVk::SubmitCmdListBatch( IStudioAPICmdListBatch* pCmdListBatch, bo
 	dataUploader.Flush();
 
 	// Submit the batch
-	CStudioAPICmdListBatchVk*		pStudioAPICmdListBatch	= ( CStudioAPICmdListBatchVk* )pCmdListBatch;
-	CStudioAPICmdContextVk*			pStudioAPICmdContext	= ( CStudioAPICmdContextVk* )pStudioAPICmdListBatch->GetCmdContext();
+	CStudioAPICmdListBatchVk* pStudioAPICmdListBatch = (CStudioAPICmdListBatchVk*)pCmdListBatch;
+	CStudioAPICmdContextVk*	  pStudioAPICmdContext	 = (CStudioAPICmdContextVk*)pStudioAPICmdListBatch->GetCmdContext();
 	pStudioAPICmdContext->GetCmdListBatchMgr().Submit( pStudioAPICmdListBatch, bWait, waitTime );
 }
 
@@ -516,8 +517,8 @@ CStudioAPIVk::WaitCmdListBatch
 bool CStudioAPIVk::WaitCmdListBatch( IStudioAPICmdListBatch* pCmdListBatch, uint64 waitTime /* = 0 */ )
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_WAIT );
-	CStudioAPICmdListBatchVk*		pStudioAPICmdListBatch	= ( CStudioAPICmdListBatchVk* )pCmdListBatch;
-	CStudioAPICmdContextVk*			pStudioAPICmdContext	= ( CStudioAPICmdContextVk* )pStudioAPICmdListBatch->GetCmdContext();
+	CStudioAPICmdListBatchVk* pStudioAPICmdListBatch = (CStudioAPICmdListBatchVk*)pCmdListBatch;
+	CStudioAPICmdContextVk*	  pStudioAPICmdContext	 = (CStudioAPICmdContextVk*)pStudioAPICmdListBatch->GetCmdContext();
 	return pStudioAPICmdContext->GetCmdListBatchMgr().Wait( pStudioAPICmdListBatch, waitTime );
 }
 
@@ -550,9 +551,9 @@ IStudioAPICmdContext* CStudioAPIVk::GetImmediateCmdContext( studioAPIQueueType_t
 {
 	switch ( queueType )
 	{
-	case STUDIOAPI_QUEUE_TYPE_GRAPHICS:		return pGraphicsCmdContext;
-	case STUDIOAPI_QUEUE_TYPE_COMPUTE:		return pComputeCmdContext;
-	case STUDIOAPI_QUEUE_TYPE_TRANSFER:		return pTransferCmdContext;
+	case STUDIOAPI_QUEUE_TYPE_GRAPHICS: return pGraphicsCmdContext;
+	case STUDIOAPI_QUEUE_TYPE_COMPUTE: return pComputeCmdContext;
+	case STUDIOAPI_QUEUE_TYPE_TRANSFER: return pTransferCmdContext;
 	default:
 		AssertMsg( false, "Unknown StudioAPI queue type 0x%X", queueType );
 		return NULL;

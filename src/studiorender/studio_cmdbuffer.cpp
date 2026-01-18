@@ -1,7 +1,7 @@
 #include "pch_studiorender.h"
 #include "studiorender/studio_cmdbuffer.h"
 
-static CThreadMutex		s_StudioCmdBufferMutex;
+static CThreadMutex s_StudioCmdBufferMutex;
 
 /*
 ==================
@@ -16,9 +16,9 @@ CStudioCmdBuffer::CStudioCmdBuffer( uint32 bufferSize, uint32 alignment /* = 1 *
 	, pReadPointer( NULL )
 	, alignment( alignment )
 {
-	pData			= new byte[bufferSize];
-	pDataEnd		= pData + bufferSize;
-	pReadPointer	= pWritePointer = pData;
+	pData		 = new byte[bufferSize];
+	pDataEnd	 = pData + bufferSize;
+	pReadPointer = pWritePointer = pData;
 }
 
 /*
@@ -43,13 +43,13 @@ studioCmdAlloc_t CStudioCmdBuffer::GetAllocation( uint32 allocationSize )
 
 	// Only allow a single allocation chunk at a time
 	AssertMsg( !bWriting, "Only allow a single allocation chunk at a time" );
-	bWriting				= true;
-	studioCmdAlloc_t		studioCmdAlloc;
+	bWriting = true;
+	studioCmdAlloc_t studioCmdAlloc;
 	Mem_Memzero( &studioCmdAlloc, sizeof( studioCmdAlloc_t ) );
 
 	// Check that the allocation will fit in the buffer
-	const uint32	alignedAllocationSize	= Align( allocationSize, alignment );
-	const uint32	bufferSize				= ( uint32 )( pDataEnd - pData );
+	const uint32 alignedAllocationSize = Align( allocationSize, alignment );
+	const uint32 bufferSize			   = ( uint32 )( pDataEnd - pData );
 	AssertMsg( alignedAllocationSize < bufferSize, "No enough space for the allocation in the command buffer" );
 
 	// Use the memory referenced by WritePointer for the allocation, wrapped around to the beginning of the buffer
@@ -57,14 +57,14 @@ studioCmdAlloc_t CStudioCmdBuffer::GetAllocation( uint32 allocationSize )
 	studioCmdAlloc.pAllocation = pWritePointer != pDataEnd ? pWritePointer : pData;
 
 	// If there isn't enough space left in the buffer to allocate the full size, allocate all the remaining bytes in the buffer
-	byte*	 pAllocationEnd			= Min( pDataEnd, studioCmdAlloc.pAllocation + alignedAllocationSize );
-	studioCmdAlloc.allocatedSize	= ( uint32 )( pAllocationEnd - studioCmdAlloc.pAllocation );
+	byte* pAllocationEnd		 = Min( pDataEnd, studioCmdAlloc.pAllocation + alignedAllocationSize );
+	studioCmdAlloc.allocatedSize = ( uint32 )( pAllocationEnd - studioCmdAlloc.pAllocation );
 
 	// Wait until the reading thread has finished reading the area of the buffer we want to allocate
 	while ( true )
 	{
 		// Make a snapshot of a recent value of ReadPointer
-		byte*	pCurReadPointer = pReadPointer;
+		byte* pCurReadPointer = pReadPointer;
 
 		// If the ReadPointer and WritePointer are the same, the buffer is empty and there's no risk of overwriting unread data
 		if ( pCurReadPointer == pWritePointer )
@@ -76,7 +76,7 @@ studioCmdAlloc_t CStudioCmdBuffer::GetAllocation( uint32 allocationSize )
 			// If the allocation doesn't contain the read pointer, the allocation won't overwrite unread data
 			// Note that it needs to also prevent advancing WritePointer to match the current ReadPointer, since that would signal that the
 			// buffer is empty instead of the expected full
-			const bool		bAllocationContainsReadPointer = studioCmdAlloc.pAllocation <= pCurReadPointer && pCurReadPointer <= pAllocationEnd;
+			const bool bAllocationContainsReadPointer = studioCmdAlloc.pAllocation <= pCurReadPointer && pCurReadPointer <= pAllocationEnd;
 			if ( !bAllocationContainsReadPointer )
 			{
 				break;
@@ -138,7 +138,7 @@ bool CStudioCmdBuffer::BeginRead( void*& pReadPointer, uint32& readSize )
 	PROFILE_SCOPE();
 
 	// Make a snapshot of a recent value of WritePointer
-	byte*	pCurWritePointer = pWritePointer;
+	byte* pCurWritePointer = pWritePointer;
 
 	// Do nothing if read buffer is empty
 	if ( IsReadBufferEmpty() )
@@ -147,7 +147,7 @@ bool CStudioCmdBuffer::BeginRead( void*& pReadPointer, uint32& readSize )
 	}
 
 	// Determine whether the write pointer or the buffer end should delimit this contiguous read
-	byte*	pReadEndPointer = NULL;
+	byte* pReadEndPointer = NULL;
 	if ( pCurWritePointer >= CStudioCmdBuffer::pReadPointer )
 	{
 		pReadEndPointer = pCurWritePointer;
@@ -157,8 +157,8 @@ bool CStudioCmdBuffer::BeginRead( void*& pReadPointer, uint32& readSize )
 		// If the read pointer has reached the end of readable data in the buffer, reset it to the beginning of the buffer
 		if ( CStudioCmdBuffer::pReadPointer == pDataEnd )
 		{
-			CStudioCmdBuffer::pReadPointer	= pData;
-			pReadEndPointer					= pCurWritePointer;
+			CStudioCmdBuffer::pReadPointer = pData;
+			pReadEndPointer				   = pCurWritePointer;
 		}
 		else
 		{
@@ -169,8 +169,8 @@ bool CStudioCmdBuffer::BeginRead( void*& pReadPointer, uint32& readSize )
 	// Determine whether there's data to read, and how much
 	if ( CStudioCmdBuffer::pReadPointer < pReadEndPointer )
 	{
-		pReadPointer	= CStudioCmdBuffer::pReadPointer;
-		readSize		= ( uint32 )( pReadEndPointer - CStudioCmdBuffer::pReadPointer );
+		pReadPointer = CStudioCmdBuffer::pReadPointer;
+		readSize	 = ( uint32 )( pReadEndPointer - CStudioCmdBuffer::pReadPointer );
 		return true;
 	}
 

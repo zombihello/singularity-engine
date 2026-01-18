@@ -5,7 +5,7 @@
 CParserTokenStream::PushToken
 ==================
 */
-FORCEINLINE void CParserTokenStream::PushToken( const achar* pTokenString, uint32 tokenStringSize, int32 tokenID, int32 scopeLevel, const parserFileContext_t& context )
+FORCEINLINE void CParserTokenStream::PushToken( const char* pTokenString, uint32 tokenStringSize, int32 tokenID, int32 scopeLevel, const parserFileContext_t& context )
 {
 	tokens.emplace_back( pTokenString, tokenStringSize, tokenID, scopeLevel, context );
 }
@@ -15,7 +15,7 @@ FORCEINLINE void CParserTokenStream::PushToken( const achar* pTokenString, uint3
 CParserTokenStream::PushToken
 ==================
 */
-FORCEINLINE void CParserTokenStream::PushToken( const achar* pTokenString, int32 tokenID, int32 scopeLevel, const parserFileContext_t& context )
+FORCEINLINE void CParserTokenStream::PushToken( const char* pTokenString, int32 tokenID, int32 scopeLevel, const parserFileContext_t& context )
 {
 	tokens.emplace_back( pTokenString, tokenID, scopeLevel, context );
 }

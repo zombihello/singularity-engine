@@ -11,19 +11,17 @@
 //-----------------------------------------------------------------------------
 class CStudioAPIFenceVk;
 
-
 //-----------------------------------------------------------------------------
 // Vulkan StudioAPI queue flag
 //-----------------------------------------------------------------------------
 enum studioAPIVkQueueFlag_t
 {
-	STUDIOAPI_VK_QUEUE_FLAG_NONE		= 0,
-	STUDIOAPI_VK_QUEUE_FLAG_GRAPHICS	= 1 << 1,
-	STUDIOAPI_VK_QUEUE_FLAG_PRESENT		= 1 << 2,
-	STUDIOAPI_VK_QUEUE_FLAG_COMPUTE		= 1 << 3,
-	STUDIOAPI_VK_QUEUE_FLAG_TRANSFER	= 1 << 4
+	STUDIOAPI_VK_QUEUE_FLAG_NONE	 = 0,
+	STUDIOAPI_VK_QUEUE_FLAG_GRAPHICS = 1 << 1,
+	STUDIOAPI_VK_QUEUE_FLAG_PRESENT	 = 1 << 2,
+	STUDIOAPI_VK_QUEUE_FLAG_COMPUTE	 = 1 << 3,
+	STUDIOAPI_VK_QUEUE_FLAG_TRANSFER = 1 << 4
 };
-
 
 //-----------------------------------------------------------------------------
 // Class that helps to setup sharingMode, queueFamilyIndexCount, pQueueFamilyIndices in Vulkan structures
@@ -37,10 +35,9 @@ public:
 	bool IsExclusive() const;
 
 private:
-	uint32		numQueueFamilyIndices;
-	uint32		queueFamilyIndices[4];
+	uint32 numQueueFamilyIndices;
+	uint32 queueFamilyIndices[4];
 };
-
 
 //-----------------------------------------------------------------------------
 // Vulkan Studio API queue
@@ -56,14 +53,14 @@ public:
 
 	void Submit( VkSubmitInfo* pVkSubmitInfos, uint32 numVkSubmitInfos, CStudioAPIFenceVk* pFence = NULL );
 
-	uint32 GetQueueFamilyIndex() const;
-	VkQueue GetVkQueue() const;
+	uint32						   GetQueueFamilyIndex() const;
+	VkQueue						   GetVkQueue() const;
 	const VkQueueFamilyProperties& GetVkQueueFamilyProperties() const;
 
 private:
-	uint32						queueFamilyIndex;
-	VkQueue						vkQueue;
-	VkQueueFamilyProperties		vkQueueFamilyProperties;
+	uint32					queueFamilyIndex;
+	VkQueue					vkQueue;
+	VkQueueFamilyProperties vkQueueFamilyProperties;
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_queue.inl"

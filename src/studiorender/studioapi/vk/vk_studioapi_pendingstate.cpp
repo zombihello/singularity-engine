@@ -9,7 +9,8 @@ CStudioAPIPendingComputeStateVk::CStudioAPIPendingComputeStateVk
 */
 CStudioAPIPendingComputeStateVk::CStudioAPIPendingComputeStateVk( CStudioAPICmdContextVk& cmdContext )
 	: cmdContext( cmdContext )
-{}
+{
+}
 
 /*
 ==================
@@ -24,7 +25,6 @@ void CStudioAPIPendingComputeStateVk::PrepareForDispatch( CStudioAPICmdListVk* p
 	cmdContext.FlushPendingBarriers( pCmdList );
 	AssertMsg( false, "Need implement" );
 }
-
 
 /*
 ==================
@@ -66,11 +66,11 @@ CStudioAPIPendingRenderStateVk::Reset
 void CStudioAPIPendingRenderStateVk::Reset()
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
-	pCurrentRenderPipeline			= NULL;
-	pCurrentRenderDescriptorState	= NULL;
-	bScissorEnabled					= false;
-	bDirtyVertexBuffers				= false;
-	bDirtyIndexBuffer				= false;
+	pCurrentRenderPipeline		  = NULL;
+	pCurrentRenderDescriptorState = NULL;
+	bScissorEnabled				  = false;
+	bDirtyVertexBuffers			  = false;
+	bDirtyIndexBuffer			  = false;
 	indexBuffer.Clear();
 
 	for ( uint32 index = 0; index < ARRAYSIZE( vertexBuffers ); ++index )
@@ -89,19 +89,16 @@ CStudioAPIPendingRenderStateVk::SetVertexBuffer
 void CStudioAPIPendingRenderStateVk::SetVertexBuffer( CStudioAPICmdListVk* pCmdList, uint32 slot, CStudioAPIBufferVk* pBuffer, uint64 offset )
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
-	vertexBuffer_t&		vertexBuffer = vertexBuffers[slot];
-	if ( vertexBuffer.pBuffer != pBuffer ||
-		 vertexBuffer.offset != offset ||
-		 vertexBuffer.pBuffer->GetVkBuffer() != pBuffer->GetVkBuffer() ||
-		 vertexBuffer.pBuffer->GetOffset() != pBuffer->GetOffset() )
+	vertexBuffer_t& vertexBuffer = vertexBuffers[slot];
+	if ( vertexBuffer.pBuffer != pBuffer || vertexBuffer.offset != offset || vertexBuffer.pBuffer->GetVkBuffer() != pBuffer->GetVkBuffer() || vertexBuffer.pBuffer->GetOffset() != pBuffer->GetOffset() )
 	{
 		// Update a synchronization state of the buffer
 		pBuffer->UpdateSyncState( VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT, VK_PIPELINE_STAGE_VERTEX_INPUT_BIT, cmdContext.GetQueue().GetQueueFamilyIndex() );
 
 		// Update the vertex buffer state
-		vertexBuffers[slot].pBuffer		= pBuffer;
-		vertexBuffers[slot].offset		= ( VkDeviceSize )offset;
-		bDirtyVertexBuffers				= true;
+		vertexBuffers[slot].pBuffer = pBuffer;
+		vertexBuffers[slot].offset	= (VkDeviceSize)offset;
+		bDirtyVertexBuffers			= true;
 	}
 }
 
@@ -113,17 +110,14 @@ CStudioAPIPendingRenderStateVk::SetIndexBuffer
 void CStudioAPIPendingRenderStateVk::SetIndexBuffer( CStudioAPICmdListVk* pCmdList, CStudioAPIBufferVk* pBuffer, uint64 offset )
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
-	if ( indexBuffer.pBuffer != pBuffer ||
-		 indexBuffer.offset != offset ||
-		 indexBuffer.pBuffer->GetVkBuffer() != pBuffer->GetVkBuffer() ||
-		 indexBuffer.pBuffer->GetOffset() != pBuffer->GetOffset() )
+	if ( indexBuffer.pBuffer != pBuffer || indexBuffer.offset != offset || indexBuffer.pBuffer->GetVkBuffer() != pBuffer->GetVkBuffer() || indexBuffer.pBuffer->GetOffset() != pBuffer->GetOffset() )
 	{
 		// Update a synchronization state of the buffer
 		pBuffer->UpdateSyncState( VK_ACCESS_INDEX_READ_BIT, VK_PIPELINE_STAGE_VERTEX_INPUT_BIT, cmdContext.GetQueue().GetQueueFamilyIndex() );
 
 		// Update the index buffer state
 		indexBuffer.pBuffer = pBuffer;
-		indexBuffer.offset	= ( VkDeviceSize )offset;
+		indexBuffer.offset	= (VkDeviceSize)offset;
 		bDirtyIndexBuffer	= true;
 	}
 }
@@ -174,13 +168,13 @@ bool CStudioAPIPendingRenderStateVk::SetRenderPipeline( CStudioAPIRenderPipeline
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 
 	// Change a pipeline if different
-	bool	bChanged = bForceReset;
+	bool bChanged = bForceReset;
 	if ( pCurrentRenderPipeline != pRenderPipeline )
 	{
 		pCurrentRenderPipeline = pRenderPipeline;
 
 		// Find already created a descriptor state for the new pipeline
-		auto	it = descriptorStatesDict.find( pRenderPipeline );
+		auto it = descriptorStatesDict.find( pRenderPipeline );
 		if ( it != descriptorStatesDict.end() )
 		{
 			pCurrentRenderDescriptorState = it->second.pRenderDescriptorState;
@@ -189,9 +183,9 @@ bool CStudioAPIPendingRenderStateVk::SetRenderPipeline( CStudioAPIRenderPipeline
 		// Otherwise allocate a new and subscribe on event OnRenderPipelineDeleted
 		else
 		{
-			descriptorStateCache_t								descriptorStateCache;
+			descriptorStateCache_t descriptorStateCache;
 			descriptorStateCache.pRenderDescriptorState			= new CStudioAPIDescriptorStateRenderVk( cmdContext, pRenderPipeline );
-			descriptorStateCache.pRenderPipelineDeletedDelegate	= pRenderPipeline->OnRenderPipelineDeleted().AddFunc( &CStudioAPIPendingRenderStateVk::OndRenderPipelineDeleted, this );
+			descriptorStateCache.pRenderPipelineDeletedDelegate = pRenderPipeline->OnRenderPipelineDeleted().AddFunc( &CStudioAPIPendingRenderStateVk::OndRenderPipelineDeleted, this );
 			pCurrentRenderDescriptorState						= descriptorStateCache.pRenderDescriptorState;
 			descriptorStatesDict.insert( std::make_pair( pRenderPipeline, descriptorStateCache ) );
 		}
@@ -219,7 +213,7 @@ void CStudioAPIPendingRenderStateVk::UpdateDynamicStates( CStudioAPICmdListVk* p
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 
 	// Update viewport if it need
-	bool	bNeedUpdateViewport = !pCmdList->HasViewport() || Mem_Memcmp( &vkViewport, &pCmdList->GetVkCurrentViewport(), sizeof( VkViewport ) ) != 0;
+	bool bNeedUpdateViewport = !pCmdList->HasViewport() || Mem_Memcmp( &vkViewport, &pCmdList->GetVkCurrentViewport(), sizeof( VkViewport ) ) != 0;
 	if ( bNeedUpdateViewport )
 	{
 		vkCmdSetViewport( pCmdList->GetCmdBuffer()->GetVkCommandBuffer(), 0, 1, &vkViewport );
@@ -227,7 +221,7 @@ void CStudioAPIPendingRenderStateVk::UpdateDynamicStates( CStudioAPICmdListVk* p
 	}
 
 	// Update scissor
-	bool	bNeedUpdateScissor = !pCmdList->HasScissor() || Mem_Memcmp( &vkScissor, &pCmdList->GetVkCurrentScissor(), sizeof( VkRect2D ) ) != 0;
+	bool bNeedUpdateScissor = !pCmdList->HasScissor() || Mem_Memcmp( &vkScissor, &pCmdList->GetVkCurrentScissor(), sizeof( VkRect2D ) ) != 0;
 	if ( bNeedUpdateScissor )
 	{
 		vkCmdSetScissor( pCmdList->GetCmdBuffer()->GetVkCommandBuffer(), 0, 1, &vkScissor );
@@ -259,17 +253,17 @@ void CStudioAPIPendingRenderStateVk::PrepareForDraw( CStudioAPICmdListVk* pCmdLi
 	// Update vertex buffers if it need
 	if ( bDirtyVertexBuffers )
 	{
-		VkBuffer		vkVertexBuffers[STUDIOAPI_VK_MAX_VERTEX_ELEMENT_COUNT];
-		VkDeviceSize	vkVertexOffsets[STUDIOAPI_VK_MAX_VERTEX_ELEMENT_COUNT];
-		uint32			numUsedSlots = 0;
+		VkBuffer	 vkVertexBuffers[STUDIOAPI_VK_MAX_VERTEX_ELEMENT_COUNT];
+		VkDeviceSize vkVertexOffsets[STUDIOAPI_VK_MAX_VERTEX_ELEMENT_COUNT];
+		uint32		 numUsedSlots = 0;
 		for ( uint32 index = 0; index < STUDIOAPI_VK_MAX_VERTEX_ELEMENT_COUNT; ++index )
 		{
 			// Verify the vertex buffer is set
-			const vertexBuffer_t	vertexBuffer = vertexBuffers[index];
+			const vertexBuffer_t vertexBuffer = vertexBuffers[index];
 			if ( vertexBuffer.pBuffer )
 			{
-				vkVertexBuffers[numUsedSlots]	= vertexBuffer.pBuffer->GetVkBuffer();
-				vkVertexOffsets[numUsedSlots]	= vertexBuffer.pBuffer->GetOffset() + vertexBuffer.offset;
+				vkVertexBuffers[numUsedSlots] = vertexBuffer.pBuffer->GetVkBuffer();
+				vkVertexOffsets[numUsedSlots] = vertexBuffer.pBuffer->GetOffset() + vertexBuffer.offset;
 				++numUsedSlots;
 			}
 		}
@@ -302,17 +296,17 @@ CStudioAPIPendingRenderStateVk::OndRenderPipelineDeleted
 void CStudioAPIPendingRenderStateVk::OndRenderPipelineDeleted( void* pUserData, CStudioAPIRenderPipelineVk* pRenderPipeline )
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
-	CStudioAPIPendingRenderStateVk*		pPendingRenderState = ( CStudioAPIPendingRenderStateVk* )pUserData;
-	auto								it = pPendingRenderState->descriptorStatesDict.find( pRenderPipeline );
+	CStudioAPIPendingRenderStateVk* pPendingRenderState = (CStudioAPIPendingRenderStateVk*)pUserData;
+	auto							it					= pPendingRenderState->descriptorStatesDict.find( pRenderPipeline );
 	if ( it != pPendingRenderState->descriptorStatesDict.end() )
 	{
 		delete it->second.pRenderDescriptorState;
 		pPendingRenderState->descriptorStatesDict.erase( it );
 	}
-	
+
 	if ( pPendingRenderState->pCurrentRenderPipeline == pRenderPipeline )
 	{
-		pPendingRenderState->pCurrentRenderPipeline			= NULL;
-		pPendingRenderState->pCurrentRenderDescriptorState	= NULL;
+		pPendingRenderState->pCurrentRenderPipeline		   = NULL;
+		pPendingRenderState->pCurrentRenderDescriptorState = NULL;
 	}
 }

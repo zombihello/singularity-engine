@@ -6,16 +6,16 @@
 S_Vsprintf
 ==================
 */
-std::string S_Vsprintf( const achar* pFormat, va_list params )
+std::string S_Vsprintf( const char* pFormat, va_list params )
 {
-	int32	bufferSize = 1024;
-	achar*	pBuffer = nullptr;
-	int		result = -1;
+	int32  bufferSize = 1024;
+	char* pBuffer	  = nullptr;
+	int	   result	  = -1;
 
 	while ( result == -1 )
 	{
 		free( pBuffer );
-		pBuffer = ( achar* )malloc( bufferSize * sizeof( achar ) );
+		pBuffer = (char*)malloc( bufferSize * sizeof( char ) );
 
 		// Get formated string with args
 		result = S_Vsnprintf( pBuffer, bufferSize, pFormat, params );
@@ -28,7 +28,7 @@ std::string S_Vsprintf( const achar* pFormat, va_list params )
 	}
 	pBuffer[result] = 0;
 
-	std::string		formatedString = pBuffer;
+	std::string formatedString = pBuffer;
 	free( pBuffer );
 	return formatedString;
 }
@@ -38,16 +38,16 @@ std::string S_Vsprintf( const achar* pFormat, va_list params )
 S_Vsprintf
 ==================
 */
-std::wstring S_Vsprintf( const wchar* pFormat, va_list params )
+std::wstring S_Vsprintf( const wchar_t* pFormat, va_list params )
 {
-	int32	bufferSize = 1024;
-	wchar*	pBuffer = nullptr;
-	int		result = -1;
+	int32  bufferSize = 1024;
+	wchar_t* pBuffer	  = nullptr;
+	int	   result	  = -1;
 
 	while ( result == -1 )
 	{
 		free( pBuffer );
-		pBuffer = ( wchar* )malloc( bufferSize * sizeof( wchar ) );
+		pBuffer = (wchar_t*)malloc( bufferSize * sizeof( wchar_t ) );
 
 		// Get formated string with args
 		result = S_Vsnprintf( pBuffer, bufferSize, pFormat, params );
@@ -60,7 +60,7 @@ std::wstring S_Vsprintf( const wchar* pFormat, va_list params )
 	}
 	pBuffer[result] = 0;
 
-	std::wstring		formatedString = pBuffer;
+	std::wstring formatedString = pBuffer;
 	free( pBuffer );
 	return formatedString;
 }
@@ -70,15 +70,15 @@ std::wstring S_Vsprintf( const wchar* pFormat, va_list params )
 S_Strncat
 ==================
 */
-achar* S_Strncat( achar* pDest, const achar* pSrc, uint32 destBufferSize, int32 maxCharsToCopy /*= COPY_ALL_CHARACTERS*/ )
+char* S_Strncat( char* pDest, const char* pSrc, uint32 destBufferSize, int32 maxCharsToCopy /*= COPY_ALL_CHARACTERS*/ )
 {
 	Assert( pDest );
 	Assert( pSrc );
 
 	// Get string length of pDest and pSrc
-	uint32		charsToCopy = 0;
-	uint32		destLen = S_Strlen( pDest );
-	uint32		srcLen = S_Strlen( pSrc );
+	uint32 charsToCopy = 0;
+	uint32 destLen	   = S_Strlen( pDest );
+	uint32 srcLen	   = S_Strlen( pSrc );
 
 	// Determining whether to copy the entire line or part
 	if ( maxCharsToCopy <= COPY_ALL_CHARACTERS )
@@ -87,7 +87,7 @@ achar* S_Strncat( achar* pDest, const achar* pSrc, uint32 destBufferSize, int32 
 	}
 	else
 	{
-		charsToCopy = Min( ( uint32 )maxCharsToCopy, srcLen );
+		charsToCopy = Min( (uint32)maxCharsToCopy, srcLen );
 	}
 
 	// Make sure what we won't out of bounds
@@ -97,7 +97,7 @@ achar* S_Strncat( achar* pDest, const achar* pSrc, uint32 destBufferSize, int32 
 	}
 
 	// If nothing to copy exit
-	if ( ( int32 )charsToCopy <= 0 )
+	if ( (int32)charsToCopy <= 0 )
 	{
 		return pDest;
 	}
@@ -111,15 +111,15 @@ achar* S_Strncat( achar* pDest, const achar* pSrc, uint32 destBufferSize, int32 
 S_Strncat
 ==================
 */
-wchar* S_Strncat( wchar* pDest, const wchar* pSrc, uint32 destBufferSize, int32 maxCharsToCopy /*= COPY_ALL_CHARACTERS*/ )
+wchar_t* S_Strncat( wchar_t* pDest, const wchar_t* pSrc, uint32 destBufferSize, int32 maxCharsToCopy /*= COPY_ALL_CHARACTERS*/ )
 {
 	Assert( pDest );
 	Assert( pSrc );
 
 	// Get string length of pDest and pSrc
-	uint32		charsToCopy = 0;
-	uint32		destLen = S_Strlen( pDest );
-	uint32		srcLen = S_Strlen( pSrc );
+	uint32 charsToCopy = 0;
+	uint32 destLen	   = S_Strlen( pDest );
+	uint32 srcLen	   = S_Strlen( pSrc );
 
 	// Determining whether to copy the entire line or part
 	if ( maxCharsToCopy <= COPY_ALL_CHARACTERS )
@@ -128,7 +128,7 @@ wchar* S_Strncat( wchar* pDest, const wchar* pSrc, uint32 destBufferSize, int32 
 	}
 	else
 	{
-		charsToCopy = Min( ( uint32 )maxCharsToCopy, srcLen );
+		charsToCopy = Min( (uint32)maxCharsToCopy, srcLen );
 	}
 
 	// Make sure what we won't out of bounds
@@ -138,7 +138,7 @@ wchar* S_Strncat( wchar* pDest, const wchar* pSrc, uint32 destBufferSize, int32 
 	}
 
 	// If nothing to copy exit
-	if ( ( int32 )charsToCopy <= 0 )
+	if ( (int32)charsToCopy <= 0 )
 	{
 		return pDest;
 	}

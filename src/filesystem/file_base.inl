@@ -28,7 +28,7 @@ CBaseStreamDataFile::GetPath
 ==================
 */
 template<class TBaseClass>
-const achar* CBaseStreamDataFile<TBaseClass>::GetPath() const
+const char* CBaseStreamDataFile<TBaseClass>::GetPath() const
 {
 	return !path.empty() ? path.c_str() : "";
 }
@@ -44,7 +44,6 @@ streamDataType_t CBaseStreamDataFile<TBaseClass>::GetType() const
 	return STREAMDATA_TYPE_FILE;
 }
 
-
 /*
 ==================
 CBaseStreamDataFileReader::IsReader
@@ -54,7 +53,6 @@ FORCEINLINE bool CBaseStreamDataFileReader::IsReader() const
 {
 	return true;
 }
-
 
 /*
 ==================

@@ -11,7 +11,6 @@ FORCEINLINE void EcsInitWorld( CEcsWorld& ecsWorld )
 	EcsInitWorld_GameOnly( ecsWorld );
 }
 
-
 /*
 ==================
 ecsEntity_t::operator=
@@ -22,7 +21,6 @@ FORCEINLINE ecsEntity_t& ecsEntity_t::operator=( const ecsEntity_t& other )
 	flecsEntity = other.flecsEntity;
 	return *this;
 }
-
 
 /*
 ==================
@@ -51,7 +49,7 @@ void CEcsWorld::UnRegisterModule()
 CEcsWorld::CreateEntity
 ==================
 */
-FORCEINLINE ecsEntity_t CEcsWorld::CreateEntity( const achar* pName, ecsEntity_t ecsPrefab )
+FORCEINLINE ecsEntity_t CEcsWorld::CreateEntity( const char* pName, ecsEntity_t ecsPrefab )
 {
 	AssertMsg( IsValidEntity( ecsPrefab ) && IsPrefab( ecsPrefab ), "Prefab isn't valid" );
 	return ecsEntity_t( flecsWorld.entity( pName ).is_a( ecsPrefab.flecsEntity ) );
@@ -62,7 +60,7 @@ FORCEINLINE ecsEntity_t CEcsWorld::CreateEntity( const achar* pName, ecsEntity_t
 CEcsWorld::CreatePrefab
 ==================
 */
-FORCEINLINE ecsEntity_t CEcsWorld::CreatePrefab( const achar* pName )
+FORCEINLINE ecsEntity_t CEcsWorld::CreatePrefab( const char* pName )
 {
 	return ecsEntity_t( flecsWorld.prefab( pName ) );
 }
@@ -84,10 +82,10 @@ FORCEINLINE void CEcsWorld::DestroyEntity( ecsEntity_t& ecsEntity )
 CEcsWorld::CloneEntity
 ==================
 */
-FORCEINLINE ecsEntity_t CEcsWorld::CloneEntity( ecsEntity_t ecsEntity, const achar* pName /* = NULL */ )
+FORCEINLINE ecsEntity_t CEcsWorld::CloneEntity( ecsEntity_t ecsEntity, const char* pName /* = NULL */ )
 {
 	AssertMsg( IsValidEntity( ecsEntity ), "Entity must be valid" );
-	ecsEntity_t		newEntity = ecsEntity.flecsEntity.clone();
+	ecsEntity_t newEntity = ecsEntity.flecsEntity.clone();
 	if ( pName && S_Strlen( pName ) > 0 )
 	{
 		newEntity.flecsEntity.set_name( pName );
@@ -100,7 +98,7 @@ FORCEINLINE ecsEntity_t CEcsWorld::CloneEntity( ecsEntity_t ecsEntity, const ach
 CEcsWorld::SetEntityName
 ==================
 */
-FORCEINLINE void CEcsWorld::SetEntityName( ecsEntity_t ecsEntity, const achar* pName )
+FORCEINLINE void CEcsWorld::SetEntityName( ecsEntity_t ecsEntity, const char* pName )
 {
 	AssertMsg( IsValidEntity( ecsEntity ), "Entity must be valid" );
 	ecsEntity.flecsEntity.set_name( pName );
@@ -111,7 +109,7 @@ FORCEINLINE void CEcsWorld::SetEntityName( ecsEntity_t ecsEntity, const achar* p
 CEcsWorld::GetEntityName
 ==================
 */
-FORCEINLINE const achar* CEcsWorld::GetEntityName( const ecsEntity_t& ecsEntity ) const
+FORCEINLINE const char* CEcsWorld::GetEntityName( const ecsEntity_t& ecsEntity ) const
 {
 	AssertMsg( IsValidEntity( ecsEntity ), "Entity must be valid" );
 	return ecsEntity.flecsEntity.name().c_str();
@@ -122,7 +120,7 @@ FORCEINLINE const achar* CEcsWorld::GetEntityName( const ecsEntity_t& ecsEntity 
 CEcsWorld::FindEntity
 ==================
 */
-FORCEINLINE ecsEntity_t CEcsWorld::FindEntity( const achar* pName ) const
+FORCEINLINE ecsEntity_t CEcsWorld::FindEntity( const char* pName ) const
 {
 	return flecsWorld.lookup( pName );
 }

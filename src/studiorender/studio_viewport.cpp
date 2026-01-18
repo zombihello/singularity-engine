@@ -5,10 +5,10 @@
 #include "studiorender/studiorender.h"
 
 // Static fields
-TRefPtr<CStudioViewport>		CStudioViewport::s_pActiveViewport;
-CThreadMutex					CStudioViewport::s_ViewportIndexMutex;
-uint32							CStudioViewport::s_LastViewportIndex = ( uint32 )-1;
-std::list<uint32>				CStudioViewport::s_FreeViewportIndices;
+TRefPtr<CStudioViewport> CStudioViewport::s_pActiveViewport;
+CThreadMutex			 CStudioViewport::s_ViewportIndexMutex;
+uint32					 CStudioViewport::s_LastViewportIndex = (uint32)-1;
+std::list<uint32>		 CStudioViewport::s_FreeViewportIndices;
 
 /*
 ==================
@@ -22,7 +22,8 @@ CStudioViewport::CStudioViewport()
 	, pStudioViewportClient( NULL )
 	, size( 0.f, 0.f )
 	, pSwapChainReCreatedDelegate( NULL )
-{}
+{
+}
 
 /*
 ==================
@@ -77,8 +78,8 @@ void CStudioViewport::ReleaseStudioAPI()
 
 	// Release StudioAPI resources
 	studioAPIFrameBuffers.clear();
-	pStudioAPIRenderPass	= NULL;
-	pStudioAPISwapChain		= NULL;
+	pStudioAPIRenderPass = NULL;
+	pStudioAPISwapChain	 = NULL;
 }
 
 /*
@@ -110,32 +111,32 @@ CStudioViewport::OnSwapChainRenderPassUpdated
 void CStudioViewport::OnSwapChainReCreated( void* pUserData, IStudioAPISwapChain* pStudioAPISwapChain, bool bChangedImageFormat )
 {
 	// Create a new render pass if swap chain image format has been changed
-	CStudioViewport*		pStudioViewport = ( CStudioViewport* )pUserData;
+	CStudioViewport* pStudioViewport = (CStudioViewport*)pUserData;
 	Assert( pStudioViewport );
 	if ( bChangedImageFormat )
 	{
-		studioAPIRenderPassCreateInfo_t								studioAPIRenderPassCreateInfo		= {};
-		studioAPIColorRenderTargetInfo_t&							studioAPIColorRenderTargetInfo		= studioAPIRenderPassCreateInfo.colorRenderTargets[0];
-		studioAPIColorRenderTargetInfo.pSwapChain					= pStudioAPISwapChain;
-		studioAPIColorRenderTargetInfo.bSwapChain					= true;
-		studioAPIColorRenderTargetInfo.loadOp						= STUDIOAPI_RENDER_TARGET_LOAD_OP_CLEAR;
-		studioAPIColorRenderTargetInfo.storeOp						= STUDIOAPI_RENDER_TARGET_STORE_OP_STORE;
-		pStudioViewport->pStudioAPIRenderPass						= g_pStudioAPI->CreateRenderPass( studioAPIRenderPassCreateInfo, "SwapChain RenderPass" );
+		studioAPIRenderPassCreateInfo_t	  studioAPIRenderPassCreateInfo	 = {};
+		studioAPIColorRenderTargetInfo_t& studioAPIColorRenderTargetInfo = studioAPIRenderPassCreateInfo.colorRenderTargets[0];
+		studioAPIColorRenderTargetInfo.pSwapChain						 = pStudioAPISwapChain;
+		studioAPIColorRenderTargetInfo.bSwapChain						 = true;
+		studioAPIColorRenderTargetInfo.loadOp							 = STUDIOAPI_RENDER_TARGET_LOAD_OP_CLEAR;
+		studioAPIColorRenderTargetInfo.storeOp							 = STUDIOAPI_RENDER_TARGET_STORE_OP_STORE;
+		pStudioViewport->pStudioAPIRenderPass							 = g_pStudioAPI->CreateRenderPass( studioAPIRenderPassCreateInfo, "SwapChain RenderPass" );
 	}
 
 	// Create new frame buffers
 	pStudioViewport->studioAPIFrameBuffers.resize( pStudioAPISwapChain->GetNumImages() );
 	for ( uint32 swapChainImageIdx = 0, numSwapChainImages = pStudioAPISwapChain->GetNumImages(); swapChainImageIdx < numSwapChainImages; ++swapChainImageIdx )
 	{
-		studioAPIFrameBufferCreateInfo_t							studioAPIFrameBufferCreateInfo	= {};
-		studioAPIRenderTarget_t&									studioAPIRenderTarget			= studioAPIFrameBufferCreateInfo.colorRenderTargets[0];
-		studioAPIFrameBufferCreateInfo.pRenderPass					= pStudioViewport->pStudioAPIRenderPass;
-		studioAPIRenderTarget.pSwapChainImage						= pStudioAPISwapChain->GetImage( swapChainImageIdx );
-		studioAPIRenderTarget.flags									= STUDIOAPI_RENDER_TARGET_FLAG_SWAPCHAIN_IMAGE;
-		studioAPIFrameBufferCreateInfo.size							= pStudioAPISwapChain->GetSize();
-		studioAPIFrameBufferCreateInfo.bClearColor					= true;
-		studioAPIFrameBufferCreateInfo.clearColor					= CColor::black;
-		pStudioViewport->studioAPIFrameBuffers[swapChainImageIdx]	= g_pStudioAPI->CreateFrameBuffer( studioAPIFrameBufferCreateInfo, "SwapChain FrameBuffer" );
+		studioAPIFrameBufferCreateInfo_t studioAPIFrameBufferCreateInfo = {};
+		studioAPIRenderTarget_t&		 studioAPIRenderTarget			= studioAPIFrameBufferCreateInfo.colorRenderTargets[0];
+		studioAPIFrameBufferCreateInfo.pRenderPass						= pStudioViewport->pStudioAPIRenderPass;
+		studioAPIRenderTarget.pSwapChainImage							= pStudioAPISwapChain->GetImage( swapChainImageIdx );
+		studioAPIRenderTarget.flags										= STUDIOAPI_RENDER_TARGET_FLAG_SWAPCHAIN_IMAGE;
+		studioAPIFrameBufferCreateInfo.size								= pStudioAPISwapChain->GetSize();
+		studioAPIFrameBufferCreateInfo.bClearColor						= true;
+		studioAPIFrameBufferCreateInfo.clearColor						= CColor::black;
+		pStudioViewport->studioAPIFrameBuffers[swapChainImageIdx]		= g_pStudioAPI->CreateFrameBuffer( studioAPIFrameBufferCreateInfo, "SwapChain FrameBuffer" );
 	}
 
 	// If a render pass was re-created broadcast the event
@@ -153,12 +154,12 @@ CStudioViewport::Init
 void CStudioViewport::Init( windowHandle_t windowHandle, uint32 width, uint32 height, bool bUseVSync /* = false */ )
 {
 	AssertMsg( windowHandle != INVALID_WINDOW_HANDLE, "StudioRender: Window handle must be valid" );
-	bool		bUpdateStudioAPISwapChain = CStudioViewport::windowHandle != windowHandle || size.x != width || size.y != height || CStudioViewport::bUseVSync != bUseVSync;
+	bool bUpdateStudioAPISwapChain = CStudioViewport::windowHandle != windowHandle || size.x != width || size.y != height || CStudioViewport::bUseVSync != bUseVSync;
 
 	// Update the viewport attributes
-	CStudioViewport::bUseVSync		= bUseVSync;
-	CStudioViewport::windowHandle	= windowHandle;
-	size							= ivec2_t( width, height );
+	CStudioViewport::bUseVSync	  = bUseVSync;
+	CStudioViewport::windowHandle = windowHandle;
+	size						  = ivec2_t( width, height );
 
 	// Begin the StudioAPI resource if it need
 	if ( bUpdateStudioAPISwapChain )
@@ -220,7 +221,7 @@ CStudioViewport::DrawFrame
 */
 void CStudioViewport::DrawFrame( bool bShouldPresent /* = true */, bool bFlushRenderCmds /* = true */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING);
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 
 	// Do nothing if the studio resource isn't yet initialized or isn't valid
 	if ( !IsInitedResource() || !IsInited() )
@@ -241,13 +242,13 @@ void CStudioViewport::DrawFrame( bool bShouldPresent /* = true */, bool bFlushRe
 	{
 		Studio_FlushRenderCommands();
 	}
-	
+
 	UNIQUE_RENDER_COMMAND_TWOPARAMETER( CStudioRenderCmd_DrawFrame,
 										CStudioViewport*, pStudioViewport, this,
 										bool, bShouldPresent, bShouldPresent,
 										{
 											pStudioViewport->R_DrawFrame( bShouldPresent );
-										});
+										} );
 }
 
 /*

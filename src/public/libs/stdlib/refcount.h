@@ -10,11 +10,10 @@
 class IRefCounted
 {
 public:
-	virtual void AddRef() = 0;
-	virtual void ReleaseRef() = 0;
+	virtual void   AddRef()			   = 0;
+	virtual void   ReleaseRef()		   = 0;
 	virtual uint32 GetRefCount() const = 0;
 };
-
 
 //-----------------------------------------------------------------------------
 // Base classes to implement reference counting
@@ -25,20 +24,20 @@ class TRefCounted : public TBaseClass
 public:
 	TRefCounted()
 		: countReferences( 0 )
-	{}
-	virtual	~TRefCounted()
+	{
+	}
+	virtual ~TRefCounted()
 	{
 		Assert( !countReferences );
 	}
 
-	virtual void AddRef() override;
-	virtual void ReleaseRef() override;
+	virtual void   AddRef() override;
+	virtual void   ReleaseRef() override;
 	virtual uint32 GetRefCount() const override;
 
 private:
-	uint32	countReferences;
+	uint32 countReferences;
 };
-
 
 //-----------------------------------------------------------------------------
 // Reference-counting pointer
@@ -55,8 +54,9 @@ public:
 
 	TRefPtr()
 		: pPtr( NULL )
-	{}
-	TRefPtr( TPtrType* pPtr ) 
+	{
+	}
+	TRefPtr( TPtrType* pPtr )
 		: pPtr( pPtr )
 	{
 		if ( pPtr )
@@ -64,7 +64,7 @@ public:
 			pPtr->AddRef();
 		}
 	}
-	TRefPtr( const TRefPtr& copy ) 
+	TRefPtr( const TRefPtr& copy )
 		: pPtr( copy.pPtr )
 	{
 		if ( pPtr )
@@ -75,7 +75,7 @@ public:
 
 	template<typename TBasePtrType>
 	TRefPtr( const TRefPtr<TBasePtrType>& copy )
-		: pPtr( ( TPtrType* )( copy.GetPtr() ) )
+		: pPtr( (TPtrType*)( copy.GetPtr() ) )
 	{
 		if ( pPtr )
 		{
@@ -90,31 +90,31 @@ public:
 		}
 	}
 
-	void SafeRelease();
-	bool IsValid() const;
-	uint32 GetRefCount() const;
+	void	  SafeRelease();
+	bool	  IsValid() const;
+	uint32	  GetRefCount() const;
 	TPtrType* GetPtr() const;
 
 	template<typename TBasePtrType>
-	TRefPtr& operator=( const TRefPtr<TBasePtrType>& copy );
-	TRefPtr& operator=( TPtrType* pPtr );
-	TRefPtr& operator=( const TRefPtr& copy );
-	bool operator==( const TRefPtr& right ) const;
-	bool operator==( TPtrType* pRight ) const;
-	bool operator!=( const TRefPtr& right ) const;
-	bool operator!=( TPtrType* pRight ) const;
-	operator bool() const;
-	operator ptrint() const;
-	operator uptrint() const;
-	operator TPtrType&() const;
-	operator TPtrType*() const;
-	operator TPtrType*&();
-	TPtrType* operator->() const;
-	TPtrType& operator*();
+	TRefPtr&   operator=( const TRefPtr<TBasePtrType>& copy );
+	TRefPtr&   operator=( TPtrType* pPtr );
+	TRefPtr&   operator=( const TRefPtr& copy );
+	bool	   operator==( const TRefPtr& right ) const;
+	bool	   operator==( TPtrType* pRight ) const;
+	bool	   operator!=( const TRefPtr& right ) const;
+	bool	   operator!=( TPtrType* pRight ) const;
+			   operator bool() const;
+			   operator ptrint() const;
+			   operator uptrint() const;
+			   operator TPtrType&() const;
+			   operator TPtrType*() const;
+			   operator TPtrType*&();
+	TPtrType*  operator->() const;
+	TPtrType&  operator*();
 	TPtrType** operator&();
 
 private:
-	TPtrType*	pPtr;
+	TPtrType* pPtr;
 };
 
 #include "stdlib/refcount.inl"

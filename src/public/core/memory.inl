@@ -7,7 +7,7 @@ Mem_Malloc
 */
 FORCEINLINE void* Mem_Malloc( size_t numBytes, uint32 alignment /*= DEFAULT_ALIGNMENT*/ )
 {
-	return MemAlloc()->Malloc(numBytes, alignment);
+	return MemAlloc()->Malloc( numBytes, alignment );
 }
 
 /*
@@ -17,7 +17,7 @@ Mem_MallocZero
 */
 FORCEINLINE void* Mem_MallocZero( size_t numBytes, uint32 alignment /*= DEFAULT_ALIGNMENT*/ )
 {
-	void*	pData = Mem_Malloc( numBytes, alignment );
+	void* pData = Mem_Malloc( numBytes, alignment );
 	Mem_Memzero( pData, numBytes );
 	return pData;
 }
@@ -49,7 +49,7 @@ Mem_AllocSize
 */
 FORCEINLINE size_t Mem_AllocSize( void* pOriginal )
 {
-	size_t	numBytes = 0;
+	size_t numBytes = 0;
 	return MemAlloc()->GetAllocationSize( pOriginal, numBytes ) ? numBytes : 0;
 }
 
@@ -82,7 +82,6 @@ FORCEINLINE void Mem_FreeSystem( void* pOriginal )
 {
 	free( pOriginal );
 }
-
 
 /*
 ==================

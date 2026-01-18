@@ -9,16 +9,15 @@
 //-----------------------------------------------------------------------------
 struct stlInsensitiveStringHash_t
 {
-	std::size_t operator()( const achar* pString ) const;
+	std::size_t operator()( const char* pString ) const;
 };
-
 
 //-----------------------------------------------------------------------------
 // Comparator for std::unordered_map to insensitive compre strings
 //-----------------------------------------------------------------------------
 struct stlInsensitiveCompareString_t
 {
-	bool operator()( const achar* pLeft, const achar* pRight ) const;
+	bool operator()( const char* pLeft, const char* pRight ) const;
 };
 
 #include "stdlib/stl.inl"

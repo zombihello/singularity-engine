@@ -24,7 +24,6 @@ enum smatMaterialVarType_t
 	SMAT_MATERIAL_VAR_NUM_TYPES
 };
 
-
 class CSMATMaterialVar
 {
 public:
@@ -34,7 +33,7 @@ public:
 
 	void Copy( const CSMATMaterialVar& other );
 
-	void SetName( const achar* pName );
+	void SetName( const char* pName );
 	void SetUndefined();
 	void SetBoolValue( bool bValue );
 	void SetIntValue( int32 value );
@@ -44,40 +43,40 @@ public:
 	void SetVecValue( const vec3_t& value );
 	void SetVecValue( const vec4_t& value );
 	void SetMatrixValue( const matrix_t& value );
-	void SetStringValue( const achar* pValue );
-	void SetTextureValue( const achar* pValue );
-	void SetMaterialValue( const achar* pValue );
+	void SetStringValue( const char* pValue );
+	void SetTextureValue( const char* pValue );
+	void SetMaterialValue( const char* pValue );
 
-	bool IsDefined() const;
-	const achar* GetName() const;
+	bool				  IsDefined() const;
+	const char*		  GetName() const;
 	smatMaterialVarType_t GetType() const;
-	bool GetBoolValue() const;
-	int32 GetIntValue() const;
-	float GetFloatValue() const;
-	void GetVecValue( float* pValue, uint32 numComps ) const;
-	matrix_t GetMatrixValue() const;
-	const achar* GetStringValue() const;
-	const achar* GetTextureValue() const;
-	const achar* GetMaterialValue() const;
+	bool				  GetBoolValue() const;
+	int32				  GetIntValue() const;
+	float				  GetFloatValue() const;
+	void				  GetVecValue( float* pValue, uint32 numComps ) const;
+	matrix_t			  GetMatrixValue() const;
+	const char*		  GetStringValue() const;
+	const char*		  GetTextureValue() const;
+	const char*		  GetMaterialValue() const;
 
 	CSMATMaterialVar& operator=( const CSMATMaterialVar& right );
 
 private:
-	std::string				name;
-	smatMaterialVarType_t	type;
-	std::string				stringValue;
+	std::string			  name;
+	smatMaterialVarType_t type;
+	std::string			  stringValue;
 	union
 	{
-		bool				boolValue;
-		int32				intValue;
-		float				floatValue;
-		vec2_t				vector2DValue;
-		vec3_t				vector3DValue;
-		vec4_t				vector4DValue;
-		matrix_t			matrixValue;
-		const achar*		pStringValue;
-		const achar*		pTextureValue;
-		const achar*		pMaterialValue;
+		bool		 boolValue;
+		int32		 intValue;
+		float		 floatValue;
+		vec2_t		 vector2DValue;
+		vec3_t		 vector3DValue;
+		vec4_t		 vector4DValue;
+		matrix_t	 matrixValue;
+		const char* pStringValue;
+		const char* pTextureValue;
+		const char* pMaterialValue;
 	};
 };
 

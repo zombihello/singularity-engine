@@ -7,12 +7,13 @@
 class CColor
 {
 public:
-	CColor() 
+	CColor()
 		: r( 0 )
 		, g( 0 )
 		, b( 0 )
 		, a( 255 )
-	{}
+	{
+	}
 	CColor( uint8 red, uint8 green, uint8 blue, uint8 alpha = 255 )
 	{
 		Set( red, green, blue, alpha );
@@ -30,22 +31,22 @@ public:
 	void Set( float red, float green, float blue, float alpha = 1.f );
 	void Set( const vec4_t& linearColor );
 
-	uint32& GetUInt32Color();
+	uint32&		  GetUInt32Color();
 	const uint32& GetUInt32Color() const;
-	vec4_t AsVector4D() const;
-	vec4_t AsNormalizedVector4D() const;
+	vec4_t		  AsVector4D() const;
+	vec4_t		  AsNormalizedVector4D() const;
 
 	bool operator==( const CColor& other ) const;
 	bool operator!=( const CColor& other ) const;
 
-	uint8			r;
-	uint8			g;
-	uint8			b;
-	uint8			a;
+	uint8 r;
+	uint8 g;
+	uint8 b;
+	uint8 a;
 
-	static CColor	black;
-	static CColor	white;
-	static CColor	red;
+	static CColor black;
+	static CColor white;
+	static CColor red;
 };
 
 #include "stdlib/math/color.inl"

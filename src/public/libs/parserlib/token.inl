@@ -7,10 +7,10 @@ parserToken_t::operator=
 */
 FORCEINLINE parserToken_t& parserToken_t::operator=( const parserToken_t& other )
 {
-	tokenString		= other.tokenString;
-	tokenID			= other.tokenID;
-	scopeLevel		= other.scopeLevel;
-	context			= other.context;
+	tokenString = other.tokenString;
+	tokenID		= other.tokenID;
+	scopeLevel	= other.scopeLevel;
+	context		= other.context;
 	return *this;
 }
 

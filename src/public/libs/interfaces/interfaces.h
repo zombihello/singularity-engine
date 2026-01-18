@@ -14,7 +14,6 @@ class IShaderMgr;
 class IMaterialSystem;
 class IResourceSystem;
 
-
 //-----------------------------------------------------------------------------
 // Global pointers to app systems
 //-----------------------------------------------------------------------------
