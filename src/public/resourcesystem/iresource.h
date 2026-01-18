@@ -8,7 +8,6 @@ class IMaterial;
 class ITexture;
 class IEntityDesc;
 
-
 //-----------------------------------------------------------------------------
 // Resource types
 //-----------------------------------------------------------------------------
@@ -21,7 +20,6 @@ enum resourceType_t
 	RESOURCE_NUM_TYPES
 };
 
-
 //-----------------------------------------------------------------------------
 // Resource interface
 //-----------------------------------------------------------------------------
@@ -31,10 +29,9 @@ public:
 	virtual ~IResource() {}
 
 	// If the data isn't valid return the default resource or NULL if it isn't exist in the system
-	virtual IRefCounted* GetData() const = 0;
+	virtual IRefCounted*   GetData() const = 0;
 	virtual resourceType_t GetType() const = 0;
 };
-
 
 //-----------------------------------------------------------------------------
 // Resource pointer
@@ -42,13 +39,13 @@ public:
 template<class TClassType>
 bool ResourceSystem_IsValidClassForType( resourceType_t type );
 
-
 template<class TResourceClass>
 class TResourcePtr
 {
 public:
 	TResourcePtr()
-	{}
+	{
+	}
 	TResourcePtr( IResource* pPtr )
 		: pPtr( pPtr )
 	{
@@ -62,21 +59,21 @@ public:
 
 	IResource* GetPtr() const;
 
-	TResourcePtr& operator=( IResource* pPtr );
-	TResourcePtr& operator=( const TResourcePtr& copy );
-	bool operator==( const TResourcePtr& right ) const;
-	bool operator==( IResource* pRight ) const;
-	bool operator!=( const TResourcePtr& right ) const;
-	bool operator!=( IResource* pRight ) const;
-	operator bool() const;
-	operator ptrint() const;
-	operator uptrint() const;
-	operator IResource*() const;
+	TResourcePtr&	operator=( IResource* pPtr );
+	TResourcePtr&	operator=( const TResourcePtr& copy );
+	bool			operator==( const TResourcePtr& right ) const;
+	bool			operator==( IResource* pRight ) const;
+	bool			operator!=( const TResourcePtr& right ) const;
+	bool			operator!=( IResource* pRight ) const;
+					operator bool() const;
+					operator ptrint() const;
+					operator uptrint() const;
+					operator IResource*() const;
 	TResourceClass* operator->() const;
 	TResourceClass* operator*() const;
 
 private:
-	TRefPtr<IResource>		pPtr;
+	TRefPtr<IResource> pPtr;
 };
 
 #include "resourcesystem/iresource.inl"

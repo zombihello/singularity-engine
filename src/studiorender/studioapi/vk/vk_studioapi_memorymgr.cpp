@@ -5,7 +5,7 @@
 #include "studiorender/studioapi/vk/vk_studioapi.h"
 
 // Pending free command buffer size
-#define STUDIOAPI_VK_PENDING_FREE_CMDBUFFER_SIZE		10 * 1024 * 1024	// 10MB
+#define STUDIOAPI_VK_PENDING_FREE_CMDBUFFER_SIZE 10 * 1024 * 1024  // 10MB
 
 /*
 ==================
@@ -14,12 +14,14 @@ CStudioAPIMemoryMgrVk::CStudioAPIMemoryMgrVk
 */
 CStudioAPIMemoryMgrVk::CStudioAPIMemoryMgrVk()
 #if STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
-	: memoryUsage( 0 ),
+	: memoryUsage( 0 )
+	,
 #else
 	:
-#endif // STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
+#endif	// STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
 	vmaAllocator( VK_NULL_HANDLE )
-{}
+{
+}
 
 /*
 ==================
@@ -40,30 +42,30 @@ void CStudioAPIMemoryMgrVk::Init( uint32 vkVersion )
 {
 	// Initialize Vulkan memory allocator
 	AssertMsg( vmaAllocator == VK_NULL_HANDLE, "StudioAPI Vulkan allocator can't be initialized twice!" );
-	VmaAllocatorCreateInfo		vmaAllocatorCreateInfo	= {};
-	vmaAllocatorCreateInfo.vulkanApiVersion				= vkVersion;
-	vmaAllocatorCreateInfo.physicalDevice				= g_StudioAPIVk.GetDevice().GetVkPhysicalDevice();
-	vmaAllocatorCreateInfo.device						= g_StudioAPIVk.GetDevice().GetVkLogicalDevice();
-	vmaAllocatorCreateInfo.instance						= g_StudioAPIVk.GetDevice().GetVkInstance();
-	
+	VmaAllocatorCreateInfo vmaAllocatorCreateInfo = {};
+	vmaAllocatorCreateInfo.vulkanApiVersion		  = vkVersion;
+	vmaAllocatorCreateInfo.physicalDevice		  = g_StudioAPIVk.GetDevice().GetVkPhysicalDevice();
+	vmaAllocatorCreateInfo.device				  = g_StudioAPIVk.GetDevice().GetVkLogicalDevice();
+	vmaAllocatorCreateInfo.instance				  = g_StudioAPIVk.GetDevice().GetVkInstance();
+
 #if VMA_DYNAMIC_VULKAN_FUNCTIONS
-	VmaVulkanFunctions			vmaVulkanFunctions		= {};
-	vmaVulkanFunctions.vkGetInstanceProcAddr			= vkGetInstanceProcAddr;
-	vmaVulkanFunctions.vkGetDeviceProcAddr				= vkGetDeviceProcAddr;
-	vmaAllocatorCreateInfo.pVulkanFunctions				= &vmaVulkanFunctions;
+	VmaVulkanFunctions vmaVulkanFunctions	 = {};
+	vmaVulkanFunctions.vkGetInstanceProcAddr = vkGetInstanceProcAddr;
+	vmaVulkanFunctions.vkGetDeviceProcAddr	 = vkGetDeviceProcAddr;
+	vmaAllocatorCreateInfo.pVulkanFunctions	 = &vmaVulkanFunctions;
 #endif
-	
+
 	// Create VMA allocator
 	STUDIOAPI_VK_VERIFY_RESULT( vmaCreateAllocator( &vmaAllocatorCreateInfo, &vmaAllocator ) );
 
 	// Initialize command buffers for pending free resources
 	for ( uint32 frameIdx = 0; frameIdx < STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT; ++frameIdx )
 	{
-		cmdBuffer_t&		cmdBuffer = pendingFreeCmdBuffers[frameIdx];
-		cmdBuffer.pBuffer	= ( byte* )Mem_MallocZero( STUDIOAPI_VK_PENDING_FREE_CMDBUFFER_SIZE );
-		cmdBuffer.pWritePtr	= cmdBuffer.pBuffer;
-		cmdBuffer.size		= STUDIOAPI_VK_PENDING_FREE_CMDBUFFER_SIZE;
-		cmdBuffer.numCmds	= 0;
+		cmdBuffer_t& cmdBuffer = pendingFreeCmdBuffers[frameIdx];
+		cmdBuffer.pBuffer	   = (byte*)Mem_MallocZero( STUDIOAPI_VK_PENDING_FREE_CMDBUFFER_SIZE );
+		cmdBuffer.pWritePtr	   = cmdBuffer.pBuffer;
+		cmdBuffer.size		   = STUDIOAPI_VK_PENDING_FREE_CMDBUFFER_SIZE;
+		cmdBuffer.numCmds	   = 0;
 	}
 }
 
@@ -75,10 +77,10 @@ CStudioAPIMemoryMgrVk::Shutdown
 void CStudioAPIMemoryMgrVk::Shutdown()
 {
 	// Execute all pending free command buffers and free memory
-	// TODO BS yehor.pohuliaka - Need rework it because time to time the application crash at this action (in Retail configuration) 
+	// TODO BS yehor.pohuliaka - Need rework it because time to time the application crash at this action (in Retail configuration)
 	for ( uint32 frameIdx = 0; frameIdx < STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT; ++frameIdx )
 	{
-		cmdBuffer_t&		cmdBuffer = pendingFreeCmdBuffers[frameIdx];
+		cmdBuffer_t& cmdBuffer = pendingFreeCmdBuffers[frameIdx];
 		ExecPendingFreeCmdBuffer( cmdBuffer );
 		Mem_Free( cmdBuffer.pBuffer );
 		Mem_Memzero( &cmdBuffer, sizeof( cmdBuffer_t ) );
@@ -95,7 +97,7 @@ void CStudioAPIMemoryMgrVk::Shutdown()
 #if STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
 	memoryUsage = 0;
 	allocationDict.clear();
-#endif // STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
+#endif	// STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
 }
 
 /*
@@ -103,15 +105,15 @@ void CStudioAPIMemoryMgrVk::Shutdown()
 CStudioAPIMemoryMgrVk::AllocateBuffer
 ==================
 */
-VmaAllocation CStudioAPIMemoryMgrVk::AllocateBuffer( const achar* pDebugTag, const VkBufferCreateInfo& vkBufferCreateInfo, const VmaAllocationCreateInfo& vmaAllocationCreateInfo, VkBuffer& vkBuffer, VkDeviceSize* pAllocatedSize /* = NULL */ ) const
+VmaAllocation CStudioAPIMemoryMgrVk::AllocateBuffer( const char* pDebugTag, const VkBufferCreateInfo& vkBufferCreateInfo, const VmaAllocationCreateInfo& vmaAllocationCreateInfo, VkBuffer& vkBuffer, VkDeviceSize* pAllocatedSize /* = NULL */ ) const
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 
 	// Create a buffer
 	Assert( vkBufferCreateInfo.size > 0 );
-	VmaAllocationInfo	vmaAllocationInfo	= {};
-	VmaAllocation		vmaAllocation		= VK_NULL_HANDLE;
-	VkResult			vkResult			= vmaCreateBuffer( vmaAllocator, &vkBufferCreateInfo, &vmaAllocationCreateInfo, &vkBuffer, &vmaAllocation, &vmaAllocationInfo );
+	VmaAllocationInfo vmaAllocationInfo = {};
+	VmaAllocation	  vmaAllocation		= VK_NULL_HANDLE;
+	VkResult		  vkResult			= vmaCreateBuffer( vmaAllocator, &vkBufferCreateInfo, &vmaAllocationCreateInfo, &vkBuffer, &vmaAllocation, &vmaAllocationInfo );
 	if ( vmaAllocation == VK_NULL_HANDLE || vkResult != VK_SUCCESS )
 	{
 		// Print message about error
@@ -120,9 +122,9 @@ VmaAllocation CStudioAPIMemoryMgrVk::AllocateBuffer( const achar* pDebugTag, con
 		Error( "StudioAPIVk:\tRequested size %llu", vkBufferCreateInfo.size );
 
 #if STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
-		studioAPIMemoryStatsVk_t		memoryStats = GetStats();
+		studioAPIMemoryStatsVk_t memoryStats = GetStats();
 		Error( "StudioAPIVk:\tGPU memory usage: %llu/%llu", memoryStats.usedMemory, memoryStats.totalAvailableMemory );
-#endif // STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
+#endif	// STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
 
 		// Exit from the method
 		vkBuffer = VK_NULL_HANDLE;
@@ -142,11 +144,11 @@ VmaAllocation CStudioAPIMemoryMgrVk::AllocateBuffer( const achar* pDebugTag, con
 
 	// Add to track GPU memory allocation
 #if STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
-	allocationInfo_t&		allocationInfo = allocationDict[vmaAllocation];
-	allocationInfo.type		= ALLOCATION_TYPE_BUFFER;
-	allocationInfo.size		= vmaAllocationInfo.size;
-	memoryUsage				+= vmaAllocationInfo.size;
-#endif // STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
+	allocationInfo_t& allocationInfo = allocationDict[vmaAllocation];
+	allocationInfo.type				 = ALLOCATION_TYPE_BUFFER;
+	allocationInfo.size				 = vmaAllocationInfo.size;
+	memoryUsage += vmaAllocationInfo.size;
+#endif	// STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
 
 	// We are done!
 	return vmaAllocation;
@@ -157,14 +159,14 @@ VmaAllocation CStudioAPIMemoryMgrVk::AllocateBuffer( const achar* pDebugTag, con
 CStudioAPIMemoryMgrVk::AllocateImage
 ==================
 */
-VmaAllocation CStudioAPIMemoryMgrVk::AllocateImage( const achar* pDebugTag, const VkImageCreateInfo& vkImageCreateInfo, const VmaAllocationCreateInfo& vmaAllocationCreateInfo, VkImage& vkImage, VkDeviceSize* pAllocatedSize /* = NULL */ ) const
+VmaAllocation CStudioAPIMemoryMgrVk::AllocateImage( const char* pDebugTag, const VkImageCreateInfo& vkImageCreateInfo, const VmaAllocationCreateInfo& vmaAllocationCreateInfo, VkImage& vkImage, VkDeviceSize* pAllocatedSize /* = NULL */ ) const
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 
 	// Create a image
-	VmaAllocationInfo	vmaAllocationInfo	= {};
-	VmaAllocation		vmaAllocation		= VK_NULL_HANDLE;
-	VkResult			vkResult			= vmaCreateImage( vmaAllocator, &vkImageCreateInfo, &vmaAllocationCreateInfo, &vkImage, &vmaAllocation, &vmaAllocationInfo );
+	VmaAllocationInfo vmaAllocationInfo = {};
+	VmaAllocation	  vmaAllocation		= VK_NULL_HANDLE;
+	VkResult		  vkResult			= vmaCreateImage( vmaAllocator, &vkImageCreateInfo, &vmaAllocationCreateInfo, &vkImage, &vmaAllocation, &vmaAllocationInfo );
 	if ( vmaAllocation == VK_NULL_HANDLE || vkResult != VK_SUCCESS )
 	{
 		// Print message about error
@@ -175,9 +177,9 @@ VmaAllocation CStudioAPIMemoryMgrVk::AllocateImage( const achar* pDebugTag, cons
 		Error( "StudioAPIVk:\tLayers: %i", vkImageCreateInfo.arrayLayers );
 
 #if STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
-		studioAPIMemoryStatsVk_t		memoryStats = GetStats();
+		studioAPIMemoryStatsVk_t memoryStats = GetStats();
 		Error( "StudioAPIVk:\tGPU memory usage: %llu/%llu", memoryStats.usedMemory, memoryStats.totalAvailableMemory );
-#endif // STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
+#endif	// STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
 
 		// Exit from the method
 		vkImage = VK_NULL_HANDLE;
@@ -197,11 +199,11 @@ VmaAllocation CStudioAPIMemoryMgrVk::AllocateImage( const achar* pDebugTag, cons
 
 	// Add to track GPU memory allocation
 #if STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
-	allocationInfo_t&		allocationInfo = allocationDict[vmaAllocation];
-	allocationInfo.type		= ALLOCATION_TYPE_IMAGE;
-	allocationInfo.size		= vmaAllocationInfo.size;
-	memoryUsage				+= vmaAllocationInfo.size;
-#endif // STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
+	allocationInfo_t& allocationInfo = allocationDict[vmaAllocation];
+	allocationInfo.type				 = ALLOCATION_TYPE_IMAGE;
+	allocationInfo.size				 = vmaAllocationInfo.size;
+	memoryUsage += vmaAllocationInfo.size;
+#endif	// STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
 
 	// We are done!
 	return vmaAllocation;
@@ -226,7 +228,7 @@ void CStudioAPIMemoryMgrVk::DestroyBuffer( VkBuffer vkBuffer, VmaAllocation vmaA
 
 	// Free information about GPU memory allocation
 #if STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
-	auto	it = allocationDict.find( vmaAllocation );
+	auto it = allocationDict.find( vmaAllocation );
 	if ( it != allocationDict.end() )
 	{
 		memoryUsage -= it->second.size;
@@ -236,7 +238,7 @@ void CStudioAPIMemoryMgrVk::DestroyBuffer( VkBuffer vkBuffer, VmaAllocation vmaA
 	{
 		Warning( "StudioAPIVk: Could not find GPU memory allocation (vmaAllocation: 0x%p)", vmaAllocation );
 	}
-#endif // STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
+#endif	// STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
 }
 
 /*
@@ -258,7 +260,7 @@ void CStudioAPIMemoryMgrVk::DestroyImage( VkImage vkImage, VmaAllocation vmaAllo
 
 	// Free information about GPU memory allocation
 #if STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
-	auto	it = allocationDict.find( vmaAllocation );
+	auto it = allocationDict.find( vmaAllocation );
 	if ( it != allocationDict.end() )
 	{
 		memoryUsage -= it->second.size;
@@ -268,7 +270,7 @@ void CStudioAPIMemoryMgrVk::DestroyImage( VkImage vkImage, VmaAllocation vmaAllo
 	{
 		Warning( "StudioAPIVk: Could not find GPU memory allocation (vmaAllocation: 0x%p)", vmaAllocation );
 	}
-#endif // STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
+#endif	// STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
 }
 
 /*
@@ -278,15 +280,15 @@ CStudioAPIMemoryMgrVk::GetStats
 */
 studioAPIMemoryStatsVk_t CStudioAPIMemoryMgrVk::GetStats() const
 {
-	studioAPIMemoryStatsVk_t					studioAPIMemoryStatsVk = {};
+	studioAPIMemoryStatsVk_t studioAPIMemoryStatsVk = {};
 #if STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
 	// Get heap budgets
-	const VkPhysicalDeviceMemoryProperties&		vkPhysicalDeviceMemoryProperties = g_StudioAPIVk.GetDevice().GetVkMemoryInfo();
-	std::vector<VmaBudget>						vmaBudgets( vkPhysicalDeviceMemoryProperties.memoryHeapCount );
+	const VkPhysicalDeviceMemoryProperties& vkPhysicalDeviceMemoryProperties = g_StudioAPIVk.GetDevice().GetVkMemoryInfo();
+	std::vector<VmaBudget>					vmaBudgets( vkPhysicalDeviceMemoryProperties.memoryHeapCount );
 	vmaGetHeapBudgets( vmaAllocator, vmaBudgets.data() );
 
 	// Calculate total budget
-	uint64		totalBudget = 0;
+	uint64 totalBudget = 0;
 	for ( uint32 budgetIdx = 0; budgetIdx < vkPhysicalDeviceMemoryProperties.memoryHeapCount; ++budgetIdx )
 	{
 		totalBudget += vmaBudgets[budgetIdx].budget;
@@ -319,8 +321,8 @@ studioAPIMemoryStatsVk_t CStudioAPIMemoryMgrVk::GetStats() const
 	studioAPIMemoryStatsVk.allocationCount		= allocationDict.size();
 	studioAPIMemoryStatsVk.usedMemory			= memoryUsage;
 	studioAPIMemoryStatsVk.totalAvailableMemory = totalBudget;
-#endif // STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
-	
+#endif	// STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
+
 	return studioAPIMemoryStatsVk;
 }
 
@@ -331,14 +333,14 @@ CStudioAPIMemoryMgrVk::GetBufferAlignmentFromVkUsageFlags
 */
 uint64 CStudioAPIMemoryMgrVk::GetBufferAlignmentFromVkUsageFlags( VkBufferUsageFlags vkBufferUsageFlags )
 {
-	const VkPhysicalDeviceLimits&		vkDeviceLimits = g_StudioAPIVk.GetDevice().GetVkDeviceLimits();
-	bool bIsTexelBuffer					= ( vkBufferUsageFlags & ( VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT | VK_BUFFER_USAGE_STORAGE_TEXEL_BUFFER_BIT ) ) != 0;
-	bool bIsStorageBuffer				= ( vkBufferUsageFlags & VK_BUFFER_USAGE_STORAGE_BUFFER_BIT ) != 0;
-	bool bIsVertexOrIndexBuffer			= ( vkBufferUsageFlags & ( VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT ) ) != 0;
-	bool bIsAccelerationStructureBuffer = ( vkBufferUsageFlags & VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR ) != 0;
-	bool bIsUniformBuffer				= ( vkBufferUsageFlags & VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT ) != 0;
+	const VkPhysicalDeviceLimits& vkDeviceLimits				 = g_StudioAPIVk.GetDevice().GetVkDeviceLimits();
+	bool						  bIsTexelBuffer				 = ( vkBufferUsageFlags & ( VK_BUFFER_USAGE_UNIFORM_TEXEL_BUFFER_BIT | VK_BUFFER_USAGE_STORAGE_TEXEL_BUFFER_BIT ) ) != 0;
+	bool						  bIsStorageBuffer				 = ( vkBufferUsageFlags & VK_BUFFER_USAGE_STORAGE_BUFFER_BIT ) != 0;
+	bool						  bIsVertexOrIndexBuffer		 = ( vkBufferUsageFlags & ( VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT ) ) != 0;
+	bool						  bIsAccelerationStructureBuffer = ( vkBufferUsageFlags & VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR ) != 0;
+	bool						  bIsUniformBuffer				 = ( vkBufferUsageFlags & VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT ) != 0;
 
-	uint64		alignment = 1;
+	uint64 alignment = 1;
 	if ( bIsTexelBuffer || bIsStorageBuffer )
 	{
 		alignment = Max( alignment, vkDeviceLimits.minTexelBufferOffsetAlignment );
@@ -382,13 +384,13 @@ CStudioAPIMemoryMgrVk::ExecPendingFreeCmdBuffer
 void CStudioAPIMemoryMgrVk::ExecPendingFreeCmdBuffer( cmdBuffer_t& cmdBuffer ) const
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
-	byte*	pReadPtr = cmdBuffer.pBuffer;
+	byte* pReadPtr = cmdBuffer.pBuffer;
 	for ( uint32 cmdIdx = 0; cmdIdx < cmdBuffer.numCmds; ++cmdIdx )
 	{
-		pendingFreeResourceFn_t		pFunc	= *( pendingFreeResourceFn_t* )pReadPtr;
+		pendingFreeResourceFn_t pFunc = *(pendingFreeResourceFn_t*)pReadPtr;
 		pReadPtr += sizeof( pendingFreeResourceFn_t );
-		uint32						size	= *( uint32* )pReadPtr;
-		pReadPtr += sizeof( uint32 );	
+		uint32 size = *(uint32*)pReadPtr;
+		pReadPtr += sizeof( uint32 );
 
 		pFunc( pReadPtr );
 		pReadPtr += size;

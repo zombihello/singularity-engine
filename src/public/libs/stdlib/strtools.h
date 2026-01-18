@@ -9,53 +9,51 @@
 //-----------------------------------------------------------------------------
 enum
 {
-	COPY_ALL_CHARACTERS = -1		// Used in S_Strncat for copy all characters from source string
+	COPY_ALL_CHARACTERS = -1  // Used in S_Strncat for copy all characters from source string
 };
 
-
-int32 S_Vsnprintf( wchar* pDest, uint32 maxLen, const wchar* pFormat, va_list params );
-int32 S_Vsnprintf( achar* pDest, uint32 maxLen, const achar* pFormat, va_list params );
-int32 S_Vsscanf( const wchar* pString, const wchar* pFormat, va_list params );
-int32 S_Sscanf( const wchar* pString, const wchar* pFormat, ... );
-int32 S_Vsscanf( const achar* pString, const achar* pFormat, va_list params );
-int32 S_Sscanf( const achar* pString, const achar* pFormat, ... );
-uint32 S_Strlen( const achar* pString );
-uint32 S_Strlen( const wchar* pString );
-void S_Strcpy( achar* pDest, const achar* pSrc );
-void S_Strcpy( wchar* pDest, const wchar* pSrc );
-void S_Strncpy( achar* pDest, const achar* pSrc, uint32 maxLen );
-void S_Strncpy( wchar* pDest, const wchar* pSrc, uint32 maxLen );
-achar* S_Strstr( const achar* pString, const achar* pFind );
-wchar* S_Strstr( const wchar* pString, const wchar* pFind );
-uint32 S_Strcmp( const achar* pString1, const achar* pString2 );
-uint32 S_Strcmp( const wchar* pString1, const wchar* pString2 );
-uint32 S_Strncmp( const achar* pString1, const achar* pString2, uint32 count );
-uint32 S_Strncmp( const wchar* pString1, const wchar* pString2, uint32 count );
-uint32 S_Stricmp( const achar* pString1, const achar* pString2 );
-uint32 S_Stricmp( const wchar* pString1, const wchar* pString2 );
-uint32 S_Strnicmp( const achar* pString1, const achar* pString2, uint32 count );
-uint32 S_Strnicmp( const wchar* pString1, const wchar* pString2, uint32 count );
-achar* S_Strncat( achar* pDest, const achar* pSrc, uint32 destBufferSize, int32 maxCharsToCopy = COPY_ALL_CHARACTERS );
-wchar* S_Strncat( wchar* pDest, const wchar* pSrc, uint32 destBufferSize, int32 maxCharsToCopy = COPY_ALL_CHARACTERS );
-int32 S_Atoi( const achar* pString );
-int32 S_Atoi( const wchar* pString );
-float S_Atof( const achar* pString );
-float S_Atof( const wchar* pString );
-int32 S_Snprintf( wchar* pDest, uint32 maxLen, const wchar* pFormat, ... );
-int32 S_Snprintf( achar* pDest, uint32 maxLen, const achar* pFormat, ... );
-std::string S_Vsprintf( const achar* pFormat, va_list params );
-std::string S_Sprintf( const achar* pFormat, ... );
-std::wstring S_Vsprintf( const wchar* pFormat, va_list params );
-std::wstring S_Sprintf( const wchar* pFormat, ... );
-int32 S_ToUpper( int32 ch );
-int32 S_ToLower( int32 ch );
-achar* S_Strupr( achar* pString );
-achar* S_Strlwr( achar* pString );
-wchar* S_Strupr( wchar* pString );
-wchar* S_Strlwr( wchar* pString );
-bool S_IsSpace( achar c );
-bool S_IsSpace( wchar c );
-
+int32		 S_Vsnprintf( wchar_t* pDest, uint32 maxLen, const wchar_t* pFormat, va_list params );
+int32		 S_Vsnprintf( char* pDest, uint32 maxLen, const char* pFormat, va_list params );
+int32		 S_Vsscanf( const wchar_t* pString, const wchar_t* pFormat, va_list params );
+int32		 S_Sscanf( const wchar_t* pString, const wchar_t* pFormat, ... );
+int32		 S_Vsscanf( const char* pString, const char* pFormat, va_list params );
+int32		 S_Sscanf( const char* pString, const char* pFormat, ... );
+uint32		 S_Strlen( const char* pString );
+uint32		 S_Strlen( const wchar_t* pString );
+void		 S_Strcpy( char* pDest, const char* pSrc );
+void		 S_Strcpy( wchar_t* pDest, const wchar_t* pSrc );
+void		 S_Strncpy( char* pDest, const char* pSrc, uint32 maxLen );
+void		 S_Strncpy( wchar_t* pDest, const wchar_t* pSrc, uint32 maxLen );
+char*		 S_Strstr( const char* pString, const char* pFind );
+wchar_t*	 S_Strstr( const wchar_t* pString, const wchar_t* pFind );
+uint32		 S_Strcmp( const char* pString1, const char* pString2 );
+uint32		 S_Strcmp( const wchar_t* pString1, const wchar_t* pString2 );
+uint32		 S_Strncmp( const char* pString1, const char* pString2, uint32 count );
+uint32		 S_Strncmp( const wchar_t* pString1, const wchar_t* pString2, uint32 count );
+uint32		 S_Stricmp( const char* pString1, const char* pString2 );
+uint32		 S_Stricmp( const wchar_t* pString1, const wchar_t* pString2 );
+uint32		 S_Strnicmp( const char* pString1, const char* pString2, uint32 count );
+uint32		 S_Strnicmp( const wchar_t* pString1, const wchar_t* pString2, uint32 count );
+char*		 S_Strncat( char* pDest, const char* pSrc, uint32 destBufferSize, int32 maxCharsToCopy = COPY_ALL_CHARACTERS );
+wchar_t*	 S_Strncat( wchar_t* pDest, const wchar_t* pSrc, uint32 destBufferSize, int32 maxCharsToCopy = COPY_ALL_CHARACTERS );
+int32		 S_Atoi( const char* pString );
+int32		 S_Atoi( const wchar_t* pString );
+float		 S_Atof( const char* pString );
+float		 S_Atof( const wchar_t* pString );
+int32		 S_Snprintf( wchar_t* pDest, uint32 maxLen, const wchar_t* pFormat, ... );
+int32		 S_Snprintf( char* pDest, uint32 maxLen, const char* pFormat, ... );
+std::string	 S_Vsprintf( const char* pFormat, va_list params );
+std::string	 S_Sprintf( const char* pFormat, ... );
+std::wstring S_Vsprintf( const wchar_t* pFormat, va_list params );
+std::wstring S_Sprintf( const wchar_t* pFormat, ... );
+int32		 S_ToUpper( int32 ch );
+int32		 S_ToLower( int32 ch );
+char*		 S_Strupr( char* pString );
+char*		 S_Strlwr( char* pString );
+wchar_t*	 S_Strupr( wchar_t* pString );
+wchar_t*	 S_Strlwr( wchar_t* pString );
+bool		 S_IsSpace( char c );
+bool		 S_IsSpace( wchar_t c );
 
 //-----------------------------------------------------------------------------
 // Class that handles the ANSI to WCHAR conversion
@@ -65,10 +63,9 @@ class CANSIToWCHAR_Convert
 public:
 	// Converts the string to the desired format. Allocates memory if the
 	// specified destination buffer isn't large enough
-	wchar* Convert( const achar* pSrcData, wchar* pDstData, uint32 size ) const;
-	uint32 GetLength( wchar* pData ) const;
+	wchar_t* Convert( const char* pSrcData, wchar_t* pDstData, uint32 size ) const;
+	uint32	 GetLength( wchar_t* pData ) const;
 };
-
 
 //-----------------------------------------------------------------------------
 // Class that handles the WCHAR to ANSI conversion
@@ -78,10 +75,9 @@ class CWCHARToANSI_Convert
 public:
 	// Converts the string to the desired format. Allocates memory if the
 	// specified destination buffer isn't large enough
-	achar* Convert( const wchar* pSrcData, achar* pDstData, uint32 size ) const;
-	uint32 GetLength( achar* pData );
+	char*  Convert( const wchar_t* pSrcData, char* pDstData, uint32 size ) const;
+	uint32 GetLength( char* pData );
 };
-
 
 //-----------------------------------------------------------------------------
 // Class takes one type of string and converts it to another
@@ -120,31 +116,29 @@ public:
 		}
 	}
 
-	operator TConverTo* () const;
+		   operator TConverTo*() const;
 	uint32 GetLength() const;
 
 private:
-	TStringConversion() 
-		: pConvertedString( NULL )
-	{};
+	TStringConversion()
+		: pConvertedString( NULL ) {};
 
-	TConverTo	buffer[defaultConversionSize];	// Holds the converted data if the size is large enough
-	TConverTo*	pConvertedString;				// Points to the converted data. If this pointer doesn't match Buffer, then memory was allocated and needs to be freed
+	TConverTo  buffer[defaultConversionSize];  // Holds the converted data if the size is large enough
+	TConverTo* pConvertedString;			   // Points to the converted data. If this pointer doesn't match Buffer, then memory was allocated and needs to be freed
 };
-
 
 //-----------------------------------------------------------------------------
 // Converter types and macroses
 //-----------------------------------------------------------------------------
-typedef TStringConversion<wchar, achar, CANSIToWCHAR_Convert>		ansiToWchar_t;
-typedef TStringConversion<achar, wchar, CWCHARToANSI_Convert>		wcharToAnsi_t;
+typedef TStringConversion<wchar_t, char, CANSIToWCHAR_Convert> ansiToWchar_t;
+typedef TStringConversion<char, wchar_t, CWCHARToANSI_Convert> wcharToAnsi_t;
 
-#define ANSI_TO_WCHAR( String )										( wchar* )ansiToWchar_t( ( const achar* )String )
-#define WCHAR_TO_ANSI( String )										( achar* )wcharToAnsi_t( ( const wchar* )String )
+#define ANSI_TO_WCHAR( String ) (wchar_t*)ansiToWchar_t( (const char*)String )
+#define WCHAR_TO_ANSI( String ) (char*)wcharToAnsi_t( (const wchar_t*)String )
 
 #include "stdlib/strtools.inl"
 #if PLATFORM_WINDOWS
 	#include "stdlib/platforms/windows/win_strtools.inl"
 #else
 	#error Unknown platform
-#endif // PLATFORM_WINDOWS
+#endif	// PLATFORM_WINDOWS

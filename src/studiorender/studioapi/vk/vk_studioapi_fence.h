@@ -6,7 +6,6 @@
 //-----------------------------------------------------------------------------
 class CStudioAPISyncMgrVk;
 
-
 //-----------------------------------------------------------------------------
 // Vulkan StudioAPI fence
 //-----------------------------------------------------------------------------
@@ -20,9 +19,9 @@ public:
 		, vkFence( VK_NULL_HANDLE )
 	{
 		// Create fence
-		VkFenceCreateInfo				vkFenceCreateInfo = {};
-		vkFenceCreateInfo.sType			= VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-		vkFenceCreateInfo.flags			= bCreateSignaled ? VK_FENCE_CREATE_SIGNALED_BIT : 0;
+		VkFenceCreateInfo vkFenceCreateInfo = {};
+		vkFenceCreateInfo.sType				= VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+		vkFenceCreateInfo.flags				= bCreateSignaled ? VK_FENCE_CREATE_SIGNALED_BIT : 0;
 		STUDIOAPI_VK_VERIFY_RESULT( vkCreateFence( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), &vkFenceCreateInfo, NULL, &vkFence ) );
 	}
 	~CStudioAPIFenceVk()
@@ -35,7 +34,7 @@ public:
 	bool Wait( uint64 waitTime );
 	bool WaitAndReset( uint64 waitTime );
 
-	bool IsSignaled() const;
+	bool	IsSignaled() const;
 	VkFence GetVkFence() const;
 
 private:
@@ -47,8 +46,8 @@ private:
 
 	void Destroy();
 
-	mutable fenceState_t	state;
-	VkFence					vkFence;
+	mutable fenceState_t state;
+	VkFence				 vkFence;
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_fence.inl"

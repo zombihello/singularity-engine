@@ -7,12 +7,13 @@
 CResource::CResource
 ==================
 */
-CResource::CResource( const achar* pPath, IRefCounted* pData, resourceType_t type, bool bProcedural /* = false */ )
+CResource::CResource( const char* pPath, IRefCounted* pData, resourceType_t type, bool bProcedural /* = false */ )
 	: bProcedural( bProcedural )
 	, type( type )
 	, path( pPath )
 	, pData( pData )
-{}
+{
+}
 
 /*
 ==================

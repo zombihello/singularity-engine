@@ -8,4 +8,4 @@
 	#include "studiorender/studioapi/vk/platforms/windows/win_vk_platform.h"
 #else
 	#error Unknown platform
-#endif // PLATFORM_WINDOWS
+#endif	// PLATFORM_WINDOWS

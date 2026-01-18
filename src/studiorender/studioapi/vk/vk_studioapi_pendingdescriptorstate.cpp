@@ -12,7 +12,8 @@ CStudioAPIDescriptorStateCommonVk::CStudioAPIDescriptorStateCommonVk( CStudioAPI
 	: bDirtyDescriptorSets( false )
 	, cmdContext( cmdContext )
 	, pDescriptorSetsLayout( NULL )
-{}
+{
+}
 
 /*
 ==================
@@ -24,7 +25,7 @@ void CStudioAPIDescriptorStateCommonVk::SetConstantBuffer( CStudioAPICmdListVk* 
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 
 	// Do nothing if the set isn't valid
-	if ( set >= ( uint32 )descriptorSetWriters.size() )
+	if ( set >= (uint32)descriptorSetWriters.size() )
 	{
 		return;
 	}
@@ -35,12 +36,7 @@ void CStudioAPIDescriptorStateCommonVk::SetConstantBuffer( CStudioAPICmdListVk* 
 		if ( pConstantBuffer )
 		{
 			pConstantBuffer->UpdateSyncState( VK_ACCESS_UNIFORM_READ_BIT,
-											  VK_PIPELINE_STAGE_VERTEX_SHADER_BIT |
-											  VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT |
-											  VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT |
-											  VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT |
-											  VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT |
-											  VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+											  VK_PIPELINE_STAGE_VERTEX_SHADER_BIT | VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT | VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT | VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT | VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
 											  cmdContext.GetQueue().GetQueueFamilyIndex() );
 		}
 		bDirtyDescriptorSets = true;
@@ -57,7 +53,7 @@ void CStudioAPIDescriptorStateCommonVk::SetTexture( CStudioAPICmdListVk* pCmdLis
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 
 	// Do nothing if the set isn't valid
-	if ( set >= ( uint32 )descriptorSetWriters.size() )
+	if ( set >= (uint32)descriptorSetWriters.size() )
 	{
 		return;
 	}
@@ -68,8 +64,8 @@ void CStudioAPIDescriptorStateCommonVk::SetTexture( CStudioAPICmdListVk* pCmdLis
 		if ( pTexture )
 		{
 			pTexture->UpdateSyncState( CStudioAPIImageSubresourceRangeVk::CreateForAllSubresources(),
-									   pTexture->GetSyncState().vkImageLayout, 
-									   VK_ACCESS_SHADER_READ_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 
+									   pTexture->GetSyncState().vkImageLayout,
+									   VK_ACCESS_SHADER_READ_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
 									   cmdContext.GetQueue().GetQueueFamilyIndex() );
 		}
 		bDirtyDescriptorSets = true;
@@ -86,7 +82,7 @@ void CStudioAPIDescriptorStateCommonVk::SetSampler( CStudioAPICmdListVk* pCmdLis
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 
 	// Do nothing if the set isn't valid
-	if ( set >= ( uint32 )descriptorSetWriters.size() )
+	if ( set >= (uint32)descriptorSetWriters.size() )
 	{
 		return;
 	}
@@ -108,57 +104,56 @@ void CStudioAPIDescriptorStateCommonVk::InitDescriptorWriteInfos()
 
 	// Initialize descriptor set write container
 	Assert( pDescriptorSetsLayout );
-	const std::vector<studioAPIDescriptorSetInfoVk_t>&	descriptorSetInfos = pDescriptorSetsLayout->GetDescriptorSetInfos();
-	uint32												numDescriptorSets = ( uint32 )descriptorSetInfos.size();
+	const std::vector<studioAPIDescriptorSetInfoVk_t>& descriptorSetInfos = pDescriptorSetsLayout->GetDescriptorSetInfos();
+	uint32											   numDescriptorSets  = (uint32)descriptorSetInfos.size();
 	for ( uint32 set = 0; set < numDescriptorSets; ++set )
 	{
-		const studioAPIDescriptorSetInfoVk_t&		descriptorSetInfo = descriptorSetInfos[set];
-		descriptorSetWriteContainer.vkWriteDescriptorSets.resize(		descriptorSetWriteContainer.vkWriteDescriptorSets.size() + descriptorSetInfo.vkDescriptorTypes.size()					);
-		descriptorSetWriteContainer.vkDescriptorBufferInfos.resize(		descriptorSetWriteContainer.vkDescriptorBufferInfos.size() + descriptorSetInfo.numBufferInfos							);
-		descriptorSetWriteContainer.vkDescriptorImageInfos.resize(		descriptorSetWriteContainer.vkDescriptorImageInfos.size() + descriptorSetInfo.numImageInfos								);
-		descriptorSetWriteContainer.studioAPIBuffers.resize(			descriptorSetWriteContainer.studioAPIBuffers.size() + descriptorSetInfo.numBufferInfos									);
-		descriptorSetWriteContainer.studioAPITexturesSamplers.resize(	descriptorSetWriteContainer.studioAPITexturesSamplers.size() + descriptorSetInfo.numImageInfos							);
-		descriptorSetWriteContainer.slotToWriteDescriptorSetMap.resize( descriptorSetWriteContainer.slotToWriteDescriptorSetMap.size() + descriptorSetInfo.slotToDescriptorTypeIndexMap.size()	);
+		const studioAPIDescriptorSetInfoVk_t& descriptorSetInfo = descriptorSetInfos[set];
+		descriptorSetWriteContainer.vkWriteDescriptorSets.resize( descriptorSetWriteContainer.vkWriteDescriptorSets.size() + descriptorSetInfo.vkDescriptorTypes.size() );
+		descriptorSetWriteContainer.vkDescriptorBufferInfos.resize( descriptorSetWriteContainer.vkDescriptorBufferInfos.size() + descriptorSetInfo.numBufferInfos );
+		descriptorSetWriteContainer.vkDescriptorImageInfos.resize( descriptorSetWriteContainer.vkDescriptorImageInfos.size() + descriptorSetInfo.numImageInfos );
+		descriptorSetWriteContainer.studioAPIBuffers.resize( descriptorSetWriteContainer.studioAPIBuffers.size() + descriptorSetInfo.numBufferInfos );
+		descriptorSetWriteContainer.studioAPITexturesSamplers.resize( descriptorSetWriteContainer.studioAPITexturesSamplers.size() + descriptorSetInfo.numImageInfos );
+		descriptorSetWriteContainer.slotToWriteDescriptorSetMap.resize( descriptorSetWriteContainer.slotToWriteDescriptorSetMap.size() + descriptorSetInfo.slotToDescriptorTypeIndexMap.size() );
 	}
-	Mem_Memset( descriptorSetWriteContainer.slotToWriteDescriptorSetMap.data(), ( uint8 )-1, ( uint32 )descriptorSetWriteContainer.slotToWriteDescriptorSetMap.size() * sizeof( uint8 ) );
+	Mem_Memset( descriptorSetWriteContainer.slotToWriteDescriptorSetMap.data(), (uint8)-1, (uint32)descriptorSetWriteContainer.slotToWriteDescriptorSetMap.size() * sizeof( uint8 ) );
 
 	// Reserve mamory for Vulkan descriptor sets
 	vkDescriptorSets.resize( pDescriptorSetsLayout->GetNumDescriptorSets() );
 
 	// Setup descriptor set writers
 	descriptorSetWriters.resize( numDescriptorSets );
-	VkWriteDescriptorSet*				pCurrentVkWriteDescriptorSet			= descriptorSetWriteContainer.vkWriteDescriptorSets.data();
-	VkDescriptorBufferInfo*				pCurrentVkDescriptorBufferInfo			= descriptorSetWriteContainer.vkDescriptorBufferInfos.data();
-	VkDescriptorImageInfo*				pCurrentVkDescriptorImageInfo			= descriptorSetWriteContainer.vkDescriptorImageInfos.data();
-	TRefPtr<CStudioAPIBufferVk>*		pCurrentStudioAPIBuffer					= descriptorSetWriteContainer.studioAPIBuffers.data();
-	studioAPITextureSamplerPairVk_t*	pCurrentStudioAPITexturesSamplers		= descriptorSetWriteContainer.studioAPITexturesSamplers.data();
-	uint8*								pCurrentSlotToWriteDescriptorSetMap		= descriptorSetWriteContainer.slotToWriteDescriptorSetMap.data();
+	VkWriteDescriptorSet*			 pCurrentVkWriteDescriptorSet		 = descriptorSetWriteContainer.vkWriteDescriptorSets.data();
+	VkDescriptorBufferInfo*			 pCurrentVkDescriptorBufferInfo		 = descriptorSetWriteContainer.vkDescriptorBufferInfos.data();
+	VkDescriptorImageInfo*			 pCurrentVkDescriptorImageInfo		 = descriptorSetWriteContainer.vkDescriptorImageInfos.data();
+	TRefPtr<CStudioAPIBufferVk>*	 pCurrentStudioAPIBuffer			 = descriptorSetWriteContainer.studioAPIBuffers.data();
+	studioAPITextureSamplerPairVk_t* pCurrentStudioAPITexturesSamplers	 = descriptorSetWriteContainer.studioAPITexturesSamplers.data();
+	uint8*							 pCurrentSlotToWriteDescriptorSetMap = descriptorSetWriteContainer.slotToWriteDescriptorSetMap.data();
 	for ( uint32 set = 0; set < numDescriptorSets; ++set )
 	{
 		// Skip empty descriptor set info
-		const studioAPIDescriptorSetInfoVk_t&	descriptorSetInfo = descriptorSetInfos[set];
+		const studioAPIDescriptorSetInfoVk_t& descriptorSetInfo = descriptorSetInfos[set];
 		if ( descriptorSetInfo.vkDescriptorTypes.empty() )
 		{
 			continue;
 		}
 
 		// Setup descriptor set writers
-		descriptorSetWriters[set].SetupDescriptorSetWrites( descriptorSetInfo, 
-															pCurrentVkWriteDescriptorSet, 
-															pCurrentVkDescriptorBufferInfo, 
+		descriptorSetWriters[set].SetupDescriptorSetWrites( descriptorSetInfo,
+															pCurrentVkWriteDescriptorSet,
+															pCurrentVkDescriptorBufferInfo,
 															pCurrentVkDescriptorImageInfo,
 															pCurrentStudioAPIBuffer,
 															pCurrentStudioAPITexturesSamplers,
 															pCurrentSlotToWriteDescriptorSetMap );
-		pCurrentVkWriteDescriptorSet			+= descriptorSetInfo.vkDescriptorTypes.size();
-		pCurrentVkDescriptorBufferInfo			+= descriptorSetInfo.numBufferInfos;
-		pCurrentVkDescriptorImageInfo			+= descriptorSetInfo.numImageInfos;
-		pCurrentStudioAPIBuffer					+= descriptorSetInfo.numBufferInfos;
-		pCurrentStudioAPITexturesSamplers		+= descriptorSetInfo.numImageInfos;
-		pCurrentSlotToWriteDescriptorSetMap		+= descriptorSetInfo.slotToDescriptorTypeIndexMap.size();
+		pCurrentVkWriteDescriptorSet += descriptorSetInfo.vkDescriptorTypes.size();
+		pCurrentVkDescriptorBufferInfo += descriptorSetInfo.numBufferInfos;
+		pCurrentVkDescriptorImageInfo += descriptorSetInfo.numImageInfos;
+		pCurrentStudioAPIBuffer += descriptorSetInfo.numBufferInfos;
+		pCurrentStudioAPITexturesSamplers += descriptorSetInfo.numImageInfos;
+		pCurrentSlotToWriteDescriptorSetMap += descriptorSetInfo.slotToDescriptorTypeIndexMap.size();
 	}
 }
-
 
 /*
 ==================
@@ -171,7 +166,6 @@ CStudioAPIDescriptorStateComputeVk::CStudioAPIDescriptorStateComputeVk( CStudioA
 	InitDescriptorWriteInfos();
 }
 
-
 /*
 ==================
 CStudioAPIDescriptorStateRenderVk::CStudioAPIDescriptorStateRenderVk
@@ -182,8 +176,8 @@ CStudioAPIDescriptorStateRenderVk::CStudioAPIDescriptorStateRenderVk( CStudioAPI
 	, pRenderPipeline( pRenderPipeline )
 {
 	// Initialize descriptor write infos
-	CStudioAPIBoundShaderStateVk*	pBoundShaderState = pRenderPipeline->GetBoundShaderState();
-	pDescriptorSetsLayout			= &pBoundShaderState->GetDescriptorSetsLayout();
+	CStudioAPIBoundShaderStateVk* pBoundShaderState = pRenderPipeline->GetBoundShaderState();
+	pDescriptorSetsLayout							= &pBoundShaderState->GetDescriptorSetsLayout();
 	InitDescriptorWriteInfos();
 }
 
@@ -197,7 +191,7 @@ bool CStudioAPIDescriptorStateRenderVk::UpdateDescriptorSets( CStudioAPICmdListV
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 
 	// Allocated a new descriptor sets
-	CStudioAPIBoundShaderStateVk*	pBoundShaderState = pRenderPipeline->GetBoundShaderState();
+	CStudioAPIBoundShaderStateVk* pBoundShaderState = pRenderPipeline->GetBoundShaderState();
 	if ( !pBoundShaderState )
 	{
 		return false;
@@ -206,7 +200,7 @@ bool CStudioAPIDescriptorStateRenderVk::UpdateDescriptorSets( CStudioAPICmdListV
 	// Update descriptor sets
 	if ( pCmdList->GetCmdBuffer()->AcquirePoolSetAndDescriptorsIfNeed( *pDescriptorSetsLayout, bDirtyDescriptorSets, vkDescriptorSets.data() ) )
 	{
-		for ( uint32 index = 0, numSets = ( uint32 )vkDescriptorSets.size(); index < numSets; ++index )
+		for ( uint32 index = 0, numSets = (uint32)vkDescriptorSets.size(); index < numSets; ++index )
 		{
 			CStudioAPIDescriptorSetWriterVk& descriptorSetWriter = descriptorSetWriters[index];
 			if ( !descriptorSetWriter.IsEmpty() )
@@ -215,7 +209,7 @@ bool CStudioAPIDescriptorStateRenderVk::UpdateDescriptorSets( CStudioAPICmdListV
 			}
 		}
 
-		vkUpdateDescriptorSets( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), ( uint32 )descriptorSetWriteContainer.vkWriteDescriptorSets.size(), descriptorSetWriteContainer.vkWriteDescriptorSets.data(), 0, NULL );
+		vkUpdateDescriptorSets( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), (uint32)descriptorSetWriteContainer.vkWriteDescriptorSets.size(), descriptorSetWriteContainer.vkWriteDescriptorSets.data(), 0, NULL );
 		return true;
 	}
 	return false;

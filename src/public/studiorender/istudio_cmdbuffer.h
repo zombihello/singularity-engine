@@ -7,16 +7,14 @@
 //-----------------------------------------------------------------------------
 class IStudioCmdBuffer;
 
-
 //-----------------------------------------------------------------------------
 // Studio render command buffer interface
 //-----------------------------------------------------------------------------
 struct studioCmdAlloc_t
 {
-	byte*	pAllocation;
-	uint32	allocatedSize;
+	byte*  pAllocation;
+	uint32 allocatedSize;
 };
-
 
 class IStudioCmdBuffer
 {
@@ -26,5 +24,5 @@ public:
 	virtual studioCmdAlloc_t GetAllocation( uint32 allocationSize ) = 0;
 
 	virtual void CommitAllocation( studioCmdAlloc_t& allocContext ) = 0;
-	virtual void Flush() = 0;
+	virtual void Flush()											= 0;
 };

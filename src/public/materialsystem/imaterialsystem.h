@@ -7,11 +7,10 @@
 //-----------------------------------------------------------------------------
 class IMaterial;
 
-
 //-----------------------------------------------------------------------------
 // Material system interface
 //-----------------------------------------------------------------------------
-#define MATERIALSYSTEM_INTERFACE_VERSION		"SMaterialSystem001"
+#define MATERIALSYSTEM_INTERFACE_VERSION "SMaterialSystem001"
 class IMaterialSystem : public IAppSystem
 {
 public:

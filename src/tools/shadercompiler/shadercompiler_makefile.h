@@ -8,11 +8,11 @@
 class CShaderCompilerMakeFile
 {
 public:
-	bool LoadMakeFile( const achar* pPath, const achar* pBaseDir = "" );
-	bool LoadShader( const achar* pPath, const achar* pBaseDir = "" );
-	FORCEINLINE void AddIncludeDir( const achar* pPath, const achar* pBaseDir = "" )
+	bool			 LoadMakeFile( const char* pPath, const char* pBaseDir = "" );
+	bool			 LoadShader( const char* pPath, const char* pBaseDir = "" );
+	FORCEINLINE void AddIncludeDir( const char* pPath, const char* pBaseDir = "" )
 	{
-		std::string		absoluteIncludeDir;
+		std::string absoluteIncludeDir;
 		S_MakeAbsolutePath( pPath, absoluteIncludeDir, pBaseDir );
 		includeDirs.emplace_back( absoluteIncludeDir );
 	}
@@ -32,6 +32,6 @@ public:
 	}
 
 private:
-	std::vector<std::string>	includeDirs;
-	std::vector<shader_t>		shaders;
+	std::vector<std::string> includeDirs;
+	std::vector<shader_t>	 shaders;
 };

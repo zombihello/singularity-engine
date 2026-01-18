@@ -19,13 +19,13 @@ public:
 	CStudioAPIQueueVk& GetTransferQueue() const;
 	CStudioAPIQueueVk& GetComputeQueue() const;
 
-	VkInstance GetVkInstance() const;
-	VkPhysicalDevice GetVkPhysicalDevice() const;
-	VkDevice GetVkLogicalDevice() const;
+	VkInstance								GetVkInstance() const;
+	VkPhysicalDevice						GetVkPhysicalDevice() const;
+	VkDevice								GetVkLogicalDevice() const;
 	const VkPhysicalDeviceMemoryProperties& GetVkMemoryInfo() const;
-	const VkPhysicalDeviceProperties& GetVkDeviceInfo() const;
-	const VkPhysicalDeviceLimits& GetVkDeviceLimits() const;
-	studioAPIGPUVendorId_t GetGPUVendorId() const;
+	const VkPhysicalDeviceProperties&		GetVkDeviceInfo() const;
+	const VkPhysicalDeviceLimits&			GetVkDeviceLimits() const;
+	studioAPIGPUVendorId_t					GetGPUVendorId() const;
 
 private:
 	struct queueFamilyIndices_t
@@ -35,37 +35,38 @@ private:
 			, presentFamilyIndex( VK_QUEUE_FAMILY_IGNORED )
 			, transferFamilyIndex( VK_QUEUE_FAMILY_IGNORED )
 			, computeFamilyIndex( VK_QUEUE_FAMILY_IGNORED )
-		{}
+		{
+		}
 
 		void Clear();
 		bool IsValid( uint32 queueFamilyTypes ) const;
 
-		uint32						graphicsFamilyIndex;
-		uint32						presentFamilyIndex;
-		uint32						transferFamilyIndex;
-		uint32						computeFamilyIndex;
-		VkQueueFamilyProperties		graphicsFamilyProperties;
-		VkQueueFamilyProperties		presentFamilyProperties;
-		VkQueueFamilyProperties		transferFamilyProperties;
-		VkQueueFamilyProperties		computeFamilyProperties;
+		uint32					graphicsFamilyIndex;
+		uint32					presentFamilyIndex;
+		uint32					transferFamilyIndex;
+		uint32					computeFamilyIndex;
+		VkQueueFamilyProperties graphicsFamilyProperties;
+		VkQueueFamilyProperties presentFamilyProperties;
+		VkQueueFamilyProperties transferFamilyProperties;
+		VkQueueFamilyProperties computeFamilyProperties;
 	};
 
-	void CreateVkDevice();
+	void				 CreateVkDevice();
 	queueFamilyIndices_t FindQueueFamilyIndices( const VkPhysicalDevice& vkPhysicalDevice, const std::vector<VkQueueFamilyProperties>& vkQueueFamiliesProperties, uint32 queueFamilyTypes ) const;
 
-	VkInstance								vkInstance;
-	VkPhysicalDevice						vkPhysicalDevice;
-	VkDevice								vkLogicalDevice;
-	CStudioAPIQueueVk						graphicsQueue;
-	CStudioAPIQueueVk						presentQueue;
-	CStudioAPIQueueVk						transferQueue;
-	CStudioAPIQueueVk						computeQueue;
-	VkPhysicalDeviceMemoryProperties		vkMemoryInfo;
-	VkPhysicalDeviceProperties				vkDeviceInfo;
-	studioAPIGPUVendorId_t					gpuVendorId;
+	VkInstance						 vkInstance;
+	VkPhysicalDevice				 vkPhysicalDevice;
+	VkDevice						 vkLogicalDevice;
+	CStudioAPIQueueVk				 graphicsQueue;
+	CStudioAPIQueueVk				 presentQueue;
+	CStudioAPIQueueVk				 transferQueue;
+	CStudioAPIQueueVk				 computeQueue;
+	VkPhysicalDeviceMemoryProperties vkMemoryInfo;
+	VkPhysicalDeviceProperties		 vkDeviceInfo;
+	studioAPIGPUVendorId_t			 gpuVendorId;
 #if !RETAIL
-	VkDebugUtilsMessengerEXT				vkDebugMessenger;
-#endif // !RETAIL
+	VkDebugUtilsMessengerEXT vkDebugMessenger;
+#endif	// !RETAIL
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_device.inl"

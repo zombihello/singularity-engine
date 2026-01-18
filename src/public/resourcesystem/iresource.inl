@@ -89,7 +89,7 @@ TResourcePtr::operator ptrint
 template<class TResourceClass>
 FORCEINLINE TResourcePtr<TResourceClass>::operator ptrint() const
 {
-	return ( ptrint )pPtr;
+	return (ptrint)pPtr;
 }
 
 /*
@@ -100,7 +100,7 @@ TResourcePtr::operator uptrint
 template<class TResourceClass>
 FORCEINLINE TResourcePtr<TResourceClass>::operator uptrint() const
 {
-	return ( uptrint )pPtr;
+	return (uptrint)pPtr;
 }
 
 /*
@@ -111,7 +111,7 @@ TResourcePtr::operator IResource*
 template<class TResourceClass>
 FORCEINLINE TResourcePtr<TResourceClass>::operator IResource*() const
 {
-	return ( IResource* )pPtr;
+	return (IResource*)pPtr;
 }
 
 /*
@@ -123,7 +123,7 @@ template<class TResourceClass>
 FORCEINLINE TResourceClass* TResourcePtr<TResourceClass>::operator->() const
 {
 	Assert( pPtr );
-	return ( TResourceClass* )pPtr->GetData();
+	return (TResourceClass*)pPtr->GetData();
 }
 
 /*
@@ -135,7 +135,7 @@ template<class TResourceClass>
 FORCEINLINE TResourceClass* TResourcePtr<TResourceClass>::operator*() const
 {
 	Assert( pPtr );
-	return ( TResourceClass* )pPtr->GetData();
+	return (TResourceClass*)pPtr->GetData();
 }
 
 /*

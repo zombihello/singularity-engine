@@ -20,7 +20,6 @@ FORCEINLINE bool CGuid::keyFunc_t::operator()( const CGuid& a, const CGuid& b ) 
 	return a < b;
 }
 
-
 /*
 ==================
 CGuid::IsValid
@@ -118,7 +117,7 @@ CGuid::InitFromString
 FORCEINLINE bool CGuid::InitFromString( const std::string& string )
 {
 	// Size matches, try to parse it
-	bool	bSuccessful = false;
+	bool bSuccessful = false;
 	if ( string.size() == 32 )
 	{
 		S_Sscanf( string.c_str(), "%08X%08X%08X%08X", &a, &b, &c, &d );

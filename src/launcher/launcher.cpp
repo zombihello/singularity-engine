@@ -17,10 +17,9 @@
 #include "gameframework/igame.h"
 #include "gameinfo/gameinfo.h"
 
-CConVar		window_width( "window_width", "1280", "Window width", FCVAR_ARCHIVE );
-CConVar		window_height( "window_height", "720", "Window height", FCVAR_ARCHIVE );
-CConVar		fullscreen( "fullscreen", "0", "Is need open the window in fullscreen mode", FCVAR_ARCHIVE );
-
+CConVar window_width( "window_width", "1280", "Window width", FCVAR_ARCHIVE );
+CConVar window_height( "window_height", "720", "Window height", FCVAR_ARCHIVE );
+CConVar fullscreen( "fullscreen", "0", "Is need open the window in fullscreen mode", FCVAR_ARCHIVE );
 
 //-----------------------------------------------------------------------------
 // IConVars overrider
@@ -30,8 +29,7 @@ class CConVarsOverrider : public IConVarsOverrider
 public:
 	virtual void OverrideFromCommandLine() override;
 };
-static CConVarsOverrider	s_conVarsOverrider;
-
+static CConVarsOverrider s_conVarsOverrider;
 
 //-----------------------------------------------------------------------------
 // Game viewport client
@@ -41,14 +39,13 @@ class CGameViewportClient : public TBaseStudioViewportClient<IStudioViewportClie
 public:
 };
 
-
 //-----------------------------------------------------------------------------
 // Singularity Engine app system group
 //-----------------------------------------------------------------------------
 class CSingularityAppSystemGroup : public CDefaultAppSystemGroup<CAppSystemGroup>
 {
 public:
-	CSingularityAppSystemGroup( const achar* pDefaultGameDir, appInstanceHandle_t hInstance = NULL );
+	CSingularityAppSystemGroup( const char* pDefaultGameDir, appInstanceHandle_t hInstance = NULL );
 
 	// IAppSystemGroup interface
 	// An installed application creation function, you should tell the group
@@ -90,17 +87,16 @@ private:
 
 	static void OnProcessWindowEvent( void* pUserData, const windowEvent_t& windowEvent );
 
-	bool									bInFocus;
-	appInstanceHandle_t						hInstance;
-	const achar*							pDefaultGameDir;
-	CGameInfoDoc							gameInfo;
-	CGameViewportClient						gameViewportClient;
-	dllHandle_t								gameDLLHandle;
-	createInterfaceFn_t						pGameFactory;
-	TRefPtr<IStudioViewport>				pStudioViewport;
-	IOnProcessWindowEvent::funcDelegate_t*	pProcessWindowEventDelegate;
+	bool								   bInFocus;
+	appInstanceHandle_t					   hInstance;
+	const char*						   pDefaultGameDir;
+	CGameInfoDoc						   gameInfo;
+	CGameViewportClient					   gameViewportClient;
+	dllHandle_t							   gameDLLHandle;
+	createInterfaceFn_t					   pGameFactory;
+	TRefPtr<IStudioViewport>			   pStudioViewport;
+	IOnProcessWindowEvent::funcDelegate_t* pProcessWindowEventDelegate;
 };
-
 
 /*
 ==================
@@ -109,7 +105,7 @@ CConVarsOverrider::OverrideFromCommandLine
 */
 void CConVarsOverrider::OverrideFromCommandLine()
 {
-	ICommandLine*	pCommandLine = CommandLine();
+	ICommandLine* pCommandLine = CommandLine();
 
 	// Check for windowed mode command line override
 	if ( pCommandLine->HasParam( "windowed" ) || pCommandLine->HasParam( "window" ) )
@@ -123,7 +119,7 @@ void CConVarsOverrider::OverrideFromCommandLine()
 	}
 
 	// Get width
-	const achar*	pWidthParam = NULL;
+	const char* pWidthParam = NULL;
 	if ( pCommandLine->HasParam( "width" ) )
 	{
 		pWidthParam = "width";
@@ -140,7 +136,7 @@ void CConVarsOverrider::OverrideFromCommandLine()
 	}
 
 	// Get height
-	const achar*	pHeightParam = NULL;
+	const char* pHeightParam = NULL;
 	if ( pCommandLine->HasParam( "height" ) )
 	{
 		pHeightParam = "height";
@@ -157,20 +153,20 @@ void CConVarsOverrider::OverrideFromCommandLine()
 	}
 }
 
-
 /*
 ==================
 CSingularityAppSystemGroup::CSingularityAppSystemGroup
 ==================
 */
-CSingularityAppSystemGroup::CSingularityAppSystemGroup( const achar* pDefaultGameDir, appInstanceHandle_t hInstance /* = NULL */ )
+CSingularityAppSystemGroup::CSingularityAppSystemGroup( const char* pDefaultGameDir, appInstanceHandle_t hInstance /* = NULL */ )
 	: bInFocus( true )
 	, hInstance( hInstance )
 	, pDefaultGameDir( pDefaultGameDir )
 	, gameDLLHandle( NULL )
 	, pGameFactory( NULL )
 	, pProcessWindowEventDelegate( NULL )
-{}
+{
+}
 
 /*
 ==================
@@ -180,14 +176,13 @@ CSingularityAppSystemGroup::AddEngineSystems
 bool CSingularityAppSystemGroup::AddEngineSystems()
 {
 	// Load engine application systems
-	appSystemInfo_t		appSystemInfos[] =
-	{
-		{ "inputsystem"		DLL_EXT_STRING,		INPUTSYSTEM_INTERFACE_VERSION		},
-		{ "studioapi_vk"	DLL_EXT_STRING,		STUDIOAPI_INTERFACE_VERSION			},
-		{ "studiorender"	DLL_EXT_STRING,		STUDIORENDER_INTERFACE_VERSION		},
-		{ "resourcesystem"	DLL_EXT_STRING,		RESOURCESYSTEM_INTERFACE_VERSION	},
-		{ "materialsystem"	DLL_EXT_STRING,		MATERIALSYSTEM_INTERFACE_VERSION	},
-		{ "", "" }																		// Required to terminate the list
+	appSystemInfo_t appSystemInfos[] = {
+		{ "inputsystem" DLL_EXT_STRING, INPUTSYSTEM_INTERFACE_VERSION },
+		{ "studioapi_vk" DLL_EXT_STRING, STUDIOAPI_INTERFACE_VERSION },
+		{ "studiorender" DLL_EXT_STRING, STUDIORENDER_INTERFACE_VERSION },
+		{ "resourcesystem" DLL_EXT_STRING, RESOURCESYSTEM_INTERFACE_VERSION },
+		{ "materialsystem" DLL_EXT_STRING, MATERIALSYSTEM_INTERFACE_VERSION },
+		{ "", "" }	// Required to terminate the list
 	};
 
 	// Add the window manager to app systems list
@@ -207,22 +202,22 @@ bool CSingularityAppSystemGroup::AddGameSystems()
 {
 	// Add to the group the game's app systems if IGameAppSystems is exist
 	Assert( pGameFactory );
-	IGameAppSystems*	pGameAppSystems = ( IGameAppSystems* )pGameFactory( GAME_APPSYSTEMS_INTERFACE_VERSION );
+	IGameAppSystems* pGameAppSystems = (IGameAppSystems*)pGameFactory( GAME_APPSYSTEMS_INTERFACE_VERSION );
 	if ( pGameAppSystems )
 	{
-		std::vector<appSystemInfo_t>	appSystems_before;
-		std::vector<appSystemInfo_t>	appSystems_after;
+		std::vector<appSystemInfo_t> appSystems_before;
+		std::vector<appSystemInfo_t> appSystems_after;
 		for ( uint32 index = 0, count = pGameAppSystems->GetNum(); index < count; ++index )
 		{
-			gameAppSystemInfo_t			gameAppSystem = pGameAppSystems->GetInfo( index );
-			appSystemInfo_t				appSystem;
-			appSystem.pModuleName		= gameAppSystem.pModuleName;
-			appSystem.pInterfaceName	= gameAppSystem.pInterfaceName;
+			gameAppSystemInfo_t gameAppSystem = pGameAppSystems->GetInfo( index );
+			appSystemInfo_t		appSystem;
+			appSystem.pModuleName	 = gameAppSystem.pModuleName;
+			appSystem.pInterfaceName = gameAppSystem.pInterfaceName;
 
 			switch ( gameAppSystem.order )
 			{
-			case GAME_APPSYSTEM_ORDER_BEFORE_GAME:		appSystems_before.emplace_back( appSystem );	break;
-			case GAME_APPSYSTEM_ORDER_AFTER_GAME:		appSystems_after.emplace_back( appSystem );		break;
+			case GAME_APPSYSTEM_ORDER_BEFORE_GAME: appSystems_before.emplace_back( appSystem ); break;
+			case GAME_APPSYSTEM_ORDER_AFTER_GAME: appSystems_after.emplace_back( appSystem ); break;
 			default:
 				AssertMsg( false, "Unknown game app system order 0x%X", gameAppSystem.order );
 				return false;
@@ -230,7 +225,7 @@ bool CSingularityAppSystemGroup::AddGameSystems()
 		}
 
 		// Terminate arrays
-		appSystemInfo_t		nullTerminateInfo = { "", "" };
+		appSystemInfo_t nullTerminateInfo = { "", "" };
 		appSystems_before.emplace_back( nullTerminateInfo );
 		appSystems_after.emplace_back( nullTerminateInfo );
 
@@ -271,7 +266,7 @@ bool CSingularityAppSystemGroup::GameDLL_Load()
 	if ( pGameFactory )
 	{
 		// Get game interface from dll
-		g_pGame = ( IGame* )pGameFactory( GAME_INTERFACE_VERSION );
+		g_pGame = (IGame*)pGameFactory( GAME_INTERFACE_VERSION );
 		if ( !g_pGame )
 		{
 			Warning( "Launcher: Could not get " GAME_INTERFACE_VERSION " from '//GAMEBIN/game" DLL_EXT_STRING "'" );
@@ -303,9 +298,9 @@ void CSingularityAppSystemGroup::GameDLL_Unload()
 		Msg( "Launcher: game" DLL_EXT_STRING " unloaded" );
 		g_pFileSystem->UnloadModule( gameDLLHandle );
 
-		gameDLLHandle	= NULL;
-		pGameFactory	= NULL;
-		g_pGame			= NULL;
+		gameDLLHandle = NULL;
+		pGameFactory  = NULL;
+		g_pGame		  = NULL;
 	}
 }
 
@@ -320,7 +315,7 @@ bool CSingularityAppSystemGroup::Create()
 	Msg( "Launcher: User %s//%s", Sys_GetComputerName(), Sys_GetUserName() );
 
 	// Load gameinfo.txt
-	const achar*		pGameDir = CommandLine()->HasParam( "game" ) ? CommandLine()->GetFirstValue( "game" ) : pDefaultGameDir;
+	const char* pGameDir = CommandLine()->HasParam( "game" ) ? CommandLine()->GetFirstValue( "game" ) : pDefaultGameDir;
 	if ( !gameInfo.LoadFromFile( S_Sprintf( "//BASE_PATH/%s/gameinfo.txt", pGameDir ).c_str() ) )
 	{
 		Sys_Error( "Setup file 'gameinfo.txt' doesn't exist in subdirectory '%s'", pGameDir );
@@ -328,10 +323,10 @@ bool CSingularityAppSystemGroup::Create()
 	}
 
 	// Initialize the file system for the game
-	const std::vector<gameInfoSearchPath_t>&	searchPaths = gameInfo.GetSearchPaths();
-	for ( uint32 index = 0, count = ( uint32 )searchPaths.size(); index < count; ++index )
+	const std::vector<gameInfoSearchPath_t>& searchPaths = gameInfo.GetSearchPaths();
+	for ( uint32 index = 0, count = (uint32)searchPaths.size(); index < count; ++index )
 	{
-		const gameInfoSearchPath_t&		searchPath = searchPaths[index];
+		const gameInfoSearchPath_t& searchPath = searchPaths[index];
 		g_pFileSystem->AddSearchPath( searchPath.path.c_str(), searchPath.id.c_str() );
 	}
 
@@ -358,8 +353,8 @@ bool CSingularityAppSystemGroup::Create()
 		return false;
 	}
 
-	g_pInputSystem	= ( IInputSystem* )FindSystem( INPUTSYSTEM_INTERFACE_VERSION );
-	g_pStudioRender = ( IStudioRender* )FindSystem( STUDIORENDER_INTERFACE_VERSION );
+	g_pInputSystem	= (IInputSystem*)FindSystem( INPUTSYSTEM_INTERFACE_VERSION );
+	g_pStudioRender = (IStudioRender*)FindSystem( STUDIORENDER_INTERFACE_VERSION );
 	return true;
 }
 
@@ -375,8 +370,8 @@ bool CSingularityAppSystemGroup::PreInit()
 
 	// Set true in cheats and developer cvars if we in debug configuration
 #if DEBUG
-	CConVarRef	cheatsRef( "cheats" );
-	CConVarRef	developerRef( "developer" );
+	CConVarRef cheatsRef( "cheats" );
+	CConVarRef developerRef( "developer" );
 	if ( cheatsRef.IsValid() )
 	{
 		cheatsRef->SetBool( true );
@@ -385,14 +380,14 @@ bool CSingularityAppSystemGroup::PreInit()
 	{
 		developerRef->SetBool( true );
 	}
-#endif // DEBUG
+#endif	// DEBUG
 
 	// Setup application information for the crash dump
-	crashDumpAppInfo_t				crashDumpAppInfo = {};
-	crashDumpAppInfo.pAppName		= gameInfo.GetGame().c_str();
-	crashDumpAppInfo.pAppVersion	= gameInfo.GetVersion().c_str();
-	crashDumpAppInfo.pSupportEmail	= gameInfo.GetSupportEmail().c_str();
-	crashDumpAppInfo.pSupportURL	= gameInfo.GetSupportURL().c_str();
+	crashDumpAppInfo_t crashDumpAppInfo = {};
+	crashDumpAppInfo.pAppName			= gameInfo.GetGame().c_str();
+	crashDumpAppInfo.pAppVersion		= gameInfo.GetVersion().c_str();
+	crashDumpAppInfo.pSupportEmail		= gameInfo.GetSupportEmail().c_str();
+	crashDumpAppInfo.pSupportURL		= gameInfo.GetSupportURL().c_str();
 	CrashDump_SetAppInfo( crashDumpAppInfo );
 
 	// Read file configuration and override it from the command line
@@ -429,9 +424,9 @@ bool CSingularityAppSystemGroup::PostInit()
 		return false;
 	}
 
-	uint32		windowWidth = 0;
-	uint32		windowHeight = 0;
-	CConVarRef	r_vsyncRef( "r_vsync" );
+	uint32	   windowWidth	= 0;
+	uint32	   windowHeight = 0;
+	CConVarRef r_vsyncRef( "r_vsync" );
 	g_pWindowMgr->GetSize( windowWidth, windowHeight );
 	g_pWindowMgr->SetFullscreen( fullscreen.GetBool() );
 	pStudioViewport->SetViewportClient( &gameViewportClient );
@@ -525,11 +520,11 @@ void CSingularityAppSystemGroup::PostShutdown()
 
 	// Otherwise we look for search paths in gameinfo.txt and
 	// remove they from the file system
-	std::unordered_set<std::string>				pathIDSet;
-	const std::vector<gameInfoSearchPath_t>&	searchPaths = gameInfo.GetSearchPaths();
-	for ( uint32 index = 0, count = ( uint32 )searchPaths.size(); index < count; ++index )
+	std::unordered_set<std::string>			 pathIDSet;
+	const std::vector<gameInfoSearchPath_t>& searchPaths = gameInfo.GetSearchPaths();
+	for ( uint32 index = 0, count = (uint32)searchPaths.size(); index < count; ++index )
 	{
-		const gameInfoSearchPath_t&				searchPath = searchPaths[index];
+		const gameInfoSearchPath_t& searchPath = searchPaths[index];
 		pathIDSet.insert( searchPath.id );
 	}
 
@@ -552,7 +547,7 @@ void CSingularityAppSystemGroup::Destroy()
 {
 	// Unload the game dll
 	GameDLL_Unload();
-	CrashDump_SetAppInfo( crashDumpAppInfo_t{NULL, NULL, NULL, NULL} );
+	CrashDump_SetAppInfo( crashDumpAppInfo_t{ NULL, NULL, NULL, NULL } );
 }
 
 /*
@@ -563,7 +558,7 @@ CSingularityAppSystemGroup::OnProcessWindowEvent
 void CSingularityAppSystemGroup::OnProcessWindowEvent( void* pUserData, const windowEvent_t& windowEvent )
 {
 	PROFILE_SCOPE();
-	CSingularityAppSystemGroup*		pSingularityAppGroup = ( CSingularityAppSystemGroup* )pUserData;
+	CSingularityAppSystemGroup* pSingularityAppGroup = (CSingularityAppSystemGroup*)pUserData;
 	switch ( windowEvent.type )
 	{
 		// Focus gained
@@ -602,18 +597,17 @@ void CSingularityAppSystemGroup::OnProcessWindowEvent( void* pUserData, const wi
 	}
 }
 
-
 /*
 ==================
 LauncherMain
 ==================
 */
-extern "C" DLL_EXPORT uint32 LauncherMain( appInstanceHandle_t hInstance, const achar* pDefaultGameDir, const achar* pCommandLine )
+extern "C" DLL_EXPORT uint32 LauncherMain( appInstanceHandle_t hInstance, const char* pDefaultGameDir, const char* pCommandLine )
 {
 	// Enable developer messages if we in debug configuration
 #if DEBUG
 	Logger()->SetGroupActivate( LOG_GROUP_DEVELOPER, true );
-#endif // DEBUG
+#endif	// DEBUG
 
 	// Initialize the main thread
 	Sys_InitMainThread();
@@ -633,10 +627,10 @@ extern "C" DLL_EXPORT uint32 LauncherMain( appInstanceHandle_t hInstance, const 
 	{
 		Sys_SetEnsureAllow( false );
 	}
-#endif // ENABLE_ENSURE
+#endif	// ENABLE_ENSURE
 
 	// Run the application
-	CSingularityAppSystemGroup	singularitySystems( pDefaultGameDir, hInstance );
-	CApplication				application( &singularitySystems, "launcher" );
+	CSingularityAppSystemGroup singularitySystems( pDefaultGameDir, hInstance );
+	CApplication			   application( &singularitySystems, "launcher" );
 	return application.Run();
 }

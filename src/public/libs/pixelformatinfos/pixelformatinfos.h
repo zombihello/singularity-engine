@@ -7,11 +7,11 @@
 //-----------------------------------------------------------------------------
 struct pixelFormatInfo_t
 {
-	const achar*				pName;
-	uint32						blockSizeX;
-	uint32						blockSizeY;
-	uint32						blockSizeZ;
-	uint32						blockBytes;
-	uint32						numComponents;
+	const char* pName;
+	uint32		 blockSizeX;
+	uint32		 blockSizeY;
+	uint32		 blockSizeZ;
+	uint32		 blockBytes;
+	uint32		 numComponents;
 };
-extern pixelFormatInfo_t		g_PixelFormatInfos[STUDIOAPI_PIXEL_NUM_FORMATS];
+extern pixelFormatInfo_t g_PixelFormatInfos[STUDIOAPI_PIXEL_NUM_FORMATS];

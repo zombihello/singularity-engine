@@ -10,22 +10,20 @@
 //-----------------------------------------------------------------------------
 // Handle to a DLL
 //-----------------------------------------------------------------------------
-typedef int32		appModule_t;
+typedef int32 appModule_t;
 enum
 {
-	APP_MODULE_INVALID = ( appModule_t )~0
+	APP_MODULE_INVALID = (appModule_t)~0
 };
-
 
 //-----------------------------------------------------------------------------
 // Specifies a module + interface name for initialization
 //-----------------------------------------------------------------------------
 struct appSystemInfo_t
 {
-	const achar*	pModuleName;
-	const achar*	pInterfaceName;
+	const char* pModuleName;
+	const char* pInterfaceName;
 };
-
 
 //-----------------------------------------------------------------------------
 // The following methods must be implemented in your application
@@ -63,7 +61,6 @@ public:
 	virtual void Destroy() = 0;
 };
 
-
 //-----------------------------------------------------------------------------
 // This class represents a group of app systems that all have the same lifetime
 // that need to be connected/initialized, etc. in a well-defined order
@@ -87,7 +84,7 @@ public:
 		APPSYSTEM_STAGE_DESTRUCTION,
 
 		APPSYSTEM_GROUP_STAGE_COUNT,
-		APPSYSTEM_STAGE_NONE,			// This means no error
+		APPSYSTEM_STAGE_NONE,  // This means no error
 	};
 
 	CAppSystemGroup( CAppSystemGroup* pParentAppSystem = NULL );
@@ -113,34 +110,34 @@ protected:
 	// These methods are meant to be called by derived classes of CAppSystemGroup
 
 	// Methods to load modules
-	appModule_t LoadModule( const achar* pDLLName );
+	appModule_t LoadModule( const char* pDLLName );
 	appModule_t LoadModule( createInterfaceFn_t pFactory );
 
-	// Method to add various global singleton systems  
-	IAppSystem* AddSystem( appModule_t module, const achar* pInterfaceName );
-	void AddSystem( IAppSystem* pAppSystem, const achar* pInterfaceName );
+	// Method to add various global singleton systems
+	IAppSystem* AddSystem( appModule_t module, const char* pInterfaceName );
+	void		AddSystem( IAppSystem* pAppSystem, const char* pInterfaceName );
 
 	// Simpler method of doing the LoadModule/AddSystem thing.
 	// Make sure the last appSystemInfo_t has a NULL module name
 	bool AddSystems( appSystemInfo_t* pAppSystems );
 
 	// Method to look up a particular named system
-	void* FindSystem( const achar* pInterfaceName ) const;
+	void* FindSystem( const char* pInterfaceName ) const;
 
 	// Gets at a class factory for the topmost appsystem group in an appsystem stack
 	static createInterfaceFn_t GetFactory();
 
 private:
-	friend void* AppSystemCreateInterfaceFn( const achar* pName );
+	friend void* AppSystemCreateInterfaceFn( const char* pName );
 	struct module_t
 	{
-		dllHandle_t				handle;
-		createInterfaceFn_t		pFactoryFn;
-		std::string				name;
+		dllHandle_t			handle;
+		createInterfaceFn_t pFactoryFn;
+		std::string			name;
 	};
 
 	int32 Startup();
-	void Shutdown();
+	void  Shutdown();
 
 	void UnloadAllModules();
 	void RemoveAllSystems();
@@ -159,15 +156,14 @@ private:
 	CAppSystemGroup* GetParent() const;
 
 	std::string FindSystemName( int32 index );
-	void ReportFailure( int32 errorStage, int32 sysIndex = -1 );
+	void		ReportFailure( int32 errorStage, int32 sysIndex = -1 );
 
-	std::vector<module_t>						modules;
-	std::vector<IAppSystem*>					systems;
-	std::unordered_map<std::string, uint32>		systemDict;
-	CAppSystemGroup*							pParentAppSystemGroup;
-	appSystemGroupStage_t						currentStage;
+	std::vector<module_t>					modules;
+	std::vector<IAppSystem*>				systems;
+	std::unordered_map<std::string, uint32> systemDict;
+	CAppSystemGroup*						pParentAppSystemGroup;
+	appSystemGroupStage_t					currentStage;
 };
-
 
 //-----------------------------------------------------------------------------
 // Helper empty decorator implementation of an IAppSystemGroup

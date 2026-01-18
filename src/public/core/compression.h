@@ -11,7 +11,6 @@ enum compressionType_t
 	COMPRESSION_ZLIB
 };
 
-
 // Thread-safe abstract compression routine. Compresses memory from uncompressed buffer and writes it to compressed
 // buffer. Updates CompressedSize with size of compressed data. Compression controlled by the passed in flags
 CORE_INTERFACE bool Sys_CompressMemory( compressionType_t compressionType, void* pCompressedBuffer, uint32& compressedSize, const void* pUncompressedBuffer, uint32 uncompressedSize );

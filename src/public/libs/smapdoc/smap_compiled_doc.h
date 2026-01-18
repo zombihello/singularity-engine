@@ -12,18 +12,18 @@ class CSMAPCompiledMapDoc
 public:
 	// Load and save a file
 	// NOTE: For use StdLib must be connected by ConnectStdLib
-	bool LoadFromFile( const achar* pPath );
-	bool SaveFile( const achar* pPath );
+	bool LoadFromFile( const char* pPath );
+	bool SaveFile( const char* pPath );
 
 	void AddEntity( const CSMAPEntity& entity );
 	void RemoveEntity( uint32 index );
 	void Clear();
 
-	uint32 GetNumEntities() const;
+	uint32							GetNumEntities() const;
 	const std::vector<CSMAPEntity>& GetEntities() const;
 
 private:
-	std::vector<CSMAPEntity>	entities;
+	std::vector<CSMAPEntity> entities;
 };
 
 #include "smapdoc/smap_compiled_doc.inl"

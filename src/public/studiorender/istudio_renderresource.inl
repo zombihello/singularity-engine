@@ -87,7 +87,6 @@ FORCEINLINE void Studio_BeginReleaseResourceSafe( TRefPtr<TStudioRenderResourceC
 										} );
 }
 
-
 /*
 ==================
 CStudioGlobalRenderResources::GetResourceList
@@ -95,7 +94,7 @@ CStudioGlobalRenderResources::GetResourceList
 */
 FORCEINLINE std::unordered_set<IStudioRenderResource*>& CStudioGlobalRenderResources::GetResourceList()
 {
-	static std::unordered_set<IStudioRenderResource*>	s_studioGlobalResources;
+	static std::unordered_set<IStudioRenderResource*> s_studioGlobalResources;
 	return s_studioGlobalResources;
 }
 
@@ -106,7 +105,7 @@ CStudioGlobalRenderResources::AddResource
 */
 FORCEINLINE void CStudioGlobalRenderResources::AddResource( IStudioRenderResource* pResource )
 {
-	CScopeLock		scopeLock( GetThreadMutex() );
+	CScopeLock scopeLock( GetThreadMutex() );
 	GetResourceList().insert( pResource );
 }
 
@@ -117,7 +116,7 @@ CStudioGlobalRenderResources::RemoveResource
 */
 FORCEINLINE void CStudioGlobalRenderResources::RemoveResource( IStudioRenderResource* pResource )
 {
-	CScopeLock		scopeLock( GetThreadMutex() );
+	CScopeLock scopeLock( GetThreadMutex() );
 	GetResourceList().erase( pResource );
 }
 
@@ -128,7 +127,7 @@ CStudioGlobalRenderResources::InitResources
 */
 FORCEINLINE void CStudioGlobalRenderResources::InitResources()
 {
-	CScopeLock										scopeLock( GetThreadMutex() );
+	CScopeLock									scopeLock( GetThreadMutex() );
 	std::unordered_set<IStudioRenderResource*>& globalResources = GetResourceList();
 	for ( auto it = globalResources.begin(), itEnd = globalResources.end(); it != itEnd; ++it )
 	{
@@ -143,7 +142,7 @@ CStudioGlobalRenderResources::ReleaseResources
 */
 FORCEINLINE void CStudioGlobalRenderResources::ReleaseResources()
 {
-	CScopeLock										scopeLock( GetThreadMutex() );
+	CScopeLock									scopeLock( GetThreadMutex() );
 	std::unordered_set<IStudioRenderResource*>& globalResources = GetResourceList();
 	for ( auto it = globalResources.begin(), itEnd = globalResources.end(); it != itEnd; ++it )
 	{
@@ -158,10 +157,9 @@ CStudioGlobalRenderResources::GetThreadMutex
 */
 FORCEINLINE CThreadMutex& CStudioGlobalRenderResources::GetThreadMutex()
 {
-	static CThreadMutex		s_globalResourcesMutex;
+	static CThreadMutex s_globalResourcesMutex;
 	return s_globalResourcesMutex;
 }
-
 
 /*
 ==================
@@ -235,7 +233,8 @@ TStudioRenderResource::InitStudioAPI
 */
 template<class TBaseClass, bool bGlobal /*= false*/>
 void TStudioRenderResource<TBaseClass, bGlobal>::InitStudioAPI()
-{}
+{
+}
 
 /*
 ==================
@@ -244,7 +243,8 @@ TStudioRenderResource::ReleaseStudioAPI
 */
 template<class TBaseClass, bool bGlobal /*= false*/>
 void TStudioRenderResource<TBaseClass, bGlobal>::ReleaseStudioAPI()
-{}
+{
+}
 
 /*
 ==================

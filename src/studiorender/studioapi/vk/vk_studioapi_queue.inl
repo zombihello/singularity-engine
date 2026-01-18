@@ -7,9 +7,9 @@ CStudioAPIQueueSharingModeSetupVk::Setup
 */
 FORCEINLINE void CStudioAPIQueueSharingModeSetupVk::Setup( VkSharingMode& vkSharingMode, uint32& queueFamilyIndexCount, const uint32*& pQueueFamilyIndices ) const
 {
-	vkSharingMode = !IsExclusive() ? VK_SHARING_MODE_CONCURRENT : VK_SHARING_MODE_EXCLUSIVE;
+	vkSharingMode		  = !IsExclusive() ? VK_SHARING_MODE_CONCURRENT : VK_SHARING_MODE_EXCLUSIVE;
 	queueFamilyIndexCount = numQueueFamilyIndices;
-	pQueueFamilyIndices = !IsExclusive() ? queueFamilyIndices : NULL;
+	pQueueFamilyIndices	  = !IsExclusive() ? queueFamilyIndices : NULL;
 }
 
 /*
@@ -21,7 +21,6 @@ FORCEINLINE bool CStudioAPIQueueSharingModeSetupVk::IsExclusive() const
 {
 	return numQueueFamilyIndices < 2;
 }
-
 
 /*
 ==================

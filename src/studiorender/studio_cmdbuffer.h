@@ -35,11 +35,11 @@ public:
 	}
 
 private:
-	byte*				pData;
-	byte*				pDataEnd;
-	byte* volatile		pWritePointer;
-	bool				bWriting;				// TRUE if there is an GetAllocation() outstanding for this ring buffer
-	byte* volatile		pReadPointer;
-	uint32				alignment;
-	CThreadEvent		dataWrittenEvent;		// The event used to signal the reader thread when the ring buffer has data to read
+	byte* pData;
+	byte* pDataEnd;
+	byte* volatile pWritePointer;
+	bool bWriting;	// TRUE if there is an GetAllocation() outstanding for this ring buffer
+	byte* volatile pReadPointer;
+	uint32		 alignment;
+	CThreadEvent dataWrittenEvent;	// The event used to signal the reader thread when the ring buffer has data to read
 };

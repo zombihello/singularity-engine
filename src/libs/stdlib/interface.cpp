@@ -2,19 +2,19 @@
 #include "stdlib/interface.h"
 
 // Global list of registered interfaces
-static interfaceReg_t*	s_pInterfaceRegs = NULL;
+static interfaceReg_t* s_pInterfaceRegs = NULL;
 
 /*
 ==================
 interfaceReg_t::interfaceReg_t
 ==================
 */
-interfaceReg_t::interfaceReg_t( instantiateInterfaceFn_t pFunc, const achar* pName )
+interfaceReg_t::interfaceReg_t( instantiateInterfaceFn_t pFunc, const char* pName )
 	: pCreateFn( pFunc )
 	, pName( pName )
 	, pNext( nullptr )
 {
-	pNext = s_pInterfaceRegs;
+	pNext			 = s_pInterfaceRegs;
 	s_pInterfaceRegs = this;
 }
 
@@ -23,7 +23,7 @@ interfaceReg_t::interfaceReg_t( instantiateInterfaceFn_t pFunc, const achar* pNa
 CreateInterface
 ==================
 */
-void* CreateInterface( const achar* pName )
+void* CreateInterface( const char* pName )
 {
 	for ( interfaceReg_t* pInterfaceReg = s_pInterfaceRegs; pInterfaceReg; pInterfaceReg = pInterfaceReg->pNext )
 	{
@@ -44,7 +44,7 @@ createInterfaceFn_t Sys_GetFactory( dllHandle_t dllHandle )
 {
 	if ( dllHandle )
 	{
-		return ( createInterfaceFn_t )Sys_DLL_GetProcAddress( dllHandle, CREATEINTERFACE_FUNCNAME );
+		return (createInterfaceFn_t)Sys_DLL_GetProcAddress( dllHandle, CREATEINTERFACE_FUNCNAME );
 	}
 	return NULL;
 }

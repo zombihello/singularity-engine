@@ -7,24 +7,22 @@
 //-----------------------------------------------------------------------------
 struct resourceToolRenamedMaterial_t
 {
-	const achar*	pOriginalName;
-	const achar*	pNewName;
+	const char* pOriginalName;
+	const char* pNewName;
 };
-
 
 struct resourceToolCompileModelParams_t
 {
-	bool							bCombineModels;			// If it is TRUE, combines all models into a single model
-	axisUp_t						axisUp;
-	const achar*					pMaterialsDir;			// Path to a directory where the model materials should be located
-	const achar*					pSrcPath;
-	const achar*					pDestPath;				// Path to a destination model (without file extension)
-	resourceToolRenamedMaterial_t*	pRenamedMaterials;
-	uint32							numRenamedMaterials;
+	bool						   bCombineModels;	// If it is TRUE, combines all models into a single model
+	axisUp_t					   axisUp;
+	const char*				   pMaterialsDir;  // Path to a directory where the model materials should be located
+	const char*				   pSrcPath;
+	const char*				   pDestPath;  // Path to a destination model (without file extension)
+	resourceToolRenamedMaterial_t* pRenamedMaterials;
+	uint32						   numRenamedMaterials;
 };
 
-
-#define MODEL_TOOL_INTERFACE_VERSION		"SModelTool001"
+#define MODEL_TOOL_INTERFACE_VERSION "SModelTool001"
 class IModelTool : public IAppSystem
 {
 public:

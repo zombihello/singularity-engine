@@ -6,7 +6,8 @@ CSENTEntityDescComponent::CSENTEntityDescComponent
 ==================
 */
 CSENTEntityDescComponent::CSENTEntityDescComponent()
-{}
+{
+}
 
 /*
 ==================
@@ -25,4 +26,5 @@ CSENTEntityDescComponent::~CSENTEntityDescComponent
 ==================
 */
 CSENTEntityDescComponent::~CSENTEntityDescComponent()
-{}
+{
+}

@@ -7,11 +7,12 @@
 CMaterialVar::CMaterialVar
 ==================
 */
-CMaterialVar::CMaterialVar( IMaterial* pMaterial, const achar* pName )
+CMaterialVar::CMaterialVar( IMaterial* pMaterial, const char* pName )
 	: pName( pName )
 	, type( MATERIALVAR_TYPE_UNDEFINED )
-	, pOwningMaterial( ( CMaterial* )pMaterial )
-{}
+	, pOwningMaterial( (CMaterial*)pMaterial )
+{
+}
 
 /*
 ==================
@@ -19,7 +20,8 @@ CMaterialVar::~CMaterialVar
 ==================
 */
 CMaterialVar::~CMaterialVar()
-{}
+{
+}
 
 /*
 ==================
@@ -28,8 +30,8 @@ CMaterialVar::SetBoolValue
 */
 void CMaterialVar::SetBoolValue( bool bValue )
 {
-	boolValue	= bValue;
-	type		= MATERIALVAR_TYPE_BOOL;
+	boolValue = bValue;
+	type	  = MATERIALVAR_TYPE_BOOL;
 	if ( pOwningMaterial )
 	{
 		pOwningMaterial->MarkDirtyBuffers();
@@ -45,10 +47,10 @@ bool CMaterialVar::GetBoolValue() const
 {
 	switch ( type )
 	{
-	case MATERIALVAR_TYPE_BOOL:		return boolValue;
-	case MATERIALVAR_TYPE_INT:		return intValue > 0;
-	case MATERIALVAR_TYPE_FLOAT:	return floatValue > 0.f;
-	default:						return false;
+	case MATERIALVAR_TYPE_BOOL: return boolValue;
+	case MATERIALVAR_TYPE_INT: return intValue > 0;
+	case MATERIALVAR_TYPE_FLOAT: return floatValue > 0.f;
+	default: return false;
 	}
 }
 
@@ -59,8 +61,8 @@ CMaterialVar::SetIntValue
 */
 void CMaterialVar::SetIntValue( int32 value )
 {
-	intValue	= value;
-	type		= MATERIALVAR_TYPE_INT;
+	intValue = value;
+	type	 = MATERIALVAR_TYPE_INT;
 	if ( pOwningMaterial )
 	{
 		pOwningMaterial->MarkDirtyBuffers();
@@ -76,10 +78,10 @@ int32 CMaterialVar::GetIntValue() const
 {
 	switch ( type )
 	{
-	case MATERIALVAR_TYPE_BOOL:		return ( int32 )boolValue;
-	case MATERIALVAR_TYPE_INT:		return intValue;
-	case MATERIALVAR_TYPE_FLOAT:	return ( int32 )floatValue;
-	default:						return 0;
+	case MATERIALVAR_TYPE_BOOL: return (int32)boolValue;
+	case MATERIALVAR_TYPE_INT: return intValue;
+	case MATERIALVAR_TYPE_FLOAT: return (int32)floatValue;
+	default: return 0;
 	}
 }
 
@@ -90,8 +92,8 @@ CMaterialVar::SetFloatValue
 */
 void CMaterialVar::SetFloatValue( float value )
 {
-	floatValue	= value;
-	type		= MATERIALVAR_TYPE_FLOAT;
+	floatValue = value;
+	type	   = MATERIALVAR_TYPE_FLOAT;
 	if ( pOwningMaterial )
 	{
 		pOwningMaterial->MarkDirtyBuffers();
@@ -107,10 +109,10 @@ float CMaterialVar::GetFloatValue() const
 {
 	switch ( type )
 	{
-	case MATERIALVAR_TYPE_BOOL:		return ( float )boolValue;
-	case MATERIALVAR_TYPE_INT:		return ( float )intValue;
-	case MATERIALVAR_TYPE_FLOAT:	return floatValue;
-	default:						return 0.f;
+	case MATERIALVAR_TYPE_BOOL: return (float)boolValue;
+	case MATERIALVAR_TYPE_INT: return (float)intValue;
+	case MATERIALVAR_TYPE_FLOAT: return floatValue;
+	default: return 0.f;
 	}
 }
 
@@ -123,9 +125,9 @@ void CMaterialVar::SetVecValue( const float* pValue, uint32 numComps )
 {
 	switch ( numComps )
 	{
-	case 2: SetVecValue( *( vec2_t* )pValue ); break;
-	case 3: SetVecValue( *( vec3_t* )pValue ); break;
-	case 4: SetVecValue( *( vec4_t* )pValue ); break;
+	case 2: SetVecValue( *(vec2_t*)pValue ); break;
+	case 3: SetVecValue( *(vec3_t*)pValue ); break;
+	case 4: SetVecValue( *(vec4_t*)pValue ); break;
 	default:
 		AssertMsg( false, "A material variable can take only in range from 2 to 4" );
 		break;
@@ -144,8 +146,8 @@ CMaterialVar::SetVecValue
 */
 void CMaterialVar::SetVecValue( const vec2_t& value )
 {
-	vector2DValue	= value;
-	type			= MATERIALVAR_TYPE_VECTOR_2D;
+	vector2DValue = value;
+	type		  = MATERIALVAR_TYPE_VECTOR_2D;
 	if ( pOwningMaterial )
 	{
 		pOwningMaterial->MarkDirtyBuffers();
@@ -159,8 +161,8 @@ CMaterialVar::SetVecValue
 */
 void CMaterialVar::SetVecValue( const vec3_t& value )
 {
-	vector3DValue	= value;
-	type			= MATERIALVAR_TYPE_VECTOR_3D;
+	vector3DValue = value;
+	type		  = MATERIALVAR_TYPE_VECTOR_3D;
 	if ( pOwningMaterial )
 	{
 		pOwningMaterial->MarkDirtyBuffers();
@@ -174,8 +176,8 @@ CMaterialVar::SetVecValue
 */
 void CMaterialVar::SetVecValue( const vec4_t& value )
 {
-	vector4DValue	= value;
-	type			= MATERIALVAR_TYPE_VECTOR_4D;
+	vector4DValue = value;
+	type		  = MATERIALVAR_TYPE_VECTOR_4D;
 	if ( pOwningMaterial )
 	{
 		pOwningMaterial->MarkDirtyBuffers();
@@ -243,7 +245,7 @@ matrix_t CMaterialVar::GetMatrixValue() const
 CMaterialVar::SetStringValue
 ==================
 */
-void CMaterialVar::SetStringValue( const achar* pValue )
+void CMaterialVar::SetStringValue( const char* pValue )
 {
 	stringValue = pValue;
 	type		= MATERIALVAR_TYPE_STRING;
@@ -258,7 +260,7 @@ void CMaterialVar::SetStringValue( const achar* pValue )
 CMaterialVar::GetStringValue
 ==================
 */
-const achar* CMaterialVar::GetStringValue() const
+const char* CMaterialVar::GetStringValue() const
 {
 	return type == MATERIALVAR_TYPE_STRING ? stringValue.c_str() : "";
 }
@@ -270,8 +272,8 @@ CMaterialVar::SetTextureValue
 */
 void CMaterialVar::SetTextureValue( ITexture* pValue )
 {
-	pTextureValue	= pValue;
-	type			= MATERIALVAR_TYPE_TEXTURE;
+	pTextureValue = pValue;
+	type		  = MATERIALVAR_TYPE_TEXTURE;
 	if ( pOwningMaterial )
 	{
 		pOwningMaterial->MarkDirtyBuffers();
@@ -295,8 +297,8 @@ CMaterialVar::SetMaterialValue
 */
 void CMaterialVar::SetMaterialValue( IMaterial* pValue )
 {
-	pMaterialValue	= ( CMaterial* )pValue;
-	type			= MATERIALVAR_TYPE_MATERIAL;
+	pMaterialValue = (CMaterial*)pValue;
+	type		   = MATERIALVAR_TYPE_MATERIAL;
 	if ( pOwningMaterial )
 	{
 		pOwningMaterial->MarkDirtyBuffers();
@@ -342,7 +344,7 @@ void CMaterialVar::SetUndefined()
 CMaterialVar::GetName
 ==================
 */
-const achar* CMaterialVar::GetName() const
+const char* CMaterialVar::GetName() const
 {
 	return pName;
 }

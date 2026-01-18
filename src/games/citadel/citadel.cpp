@@ -32,16 +32,15 @@ public:
 	virtual void Shutdown() override;
 
 	// IGame interfaces
-	virtual const achar* GetGameDescription() const override;
+	virtual const char* GetGameDescription() const override;
 
 private:
-	TRefPtr<IEntity>		pQuadEntity;
-	TRefPtr<IEntity>		pPlayerEntity;
+	TRefPtr<IEntity> pQuadEntity;
+	TRefPtr<IEntity> pPlayerEntity;
 };
 
 EXPOSE_INTERFACE_FN( Game, IGame, GAME_INTERFACE_VERSION );
 EXPOSE_SINGLE_INTERFACE( CGameAppSystems, IGameAppSystems, GAME_APPSYSTEMS_INTERFACE_VERSION );
-
 
 /*
 ==================
@@ -50,10 +49,9 @@ Game
 */
 CGame* Game()
 {
-	static CCitadelGame		s_SandboxGame;
+	static CCitadelGame s_SandboxGame;
 	return &s_SandboxGame;
 }
-
 
 /*
 ==================
@@ -68,7 +66,7 @@ bool CCitadelGame::Connect( createInterfaceFn_t pFactory )
 	}
 
 	// Get StudioAPI
-	g_pStudioAPI = ( IStudioAPI* )pFactory( STUDIOAPI_INTERFACE_VERSION );
+	g_pStudioAPI = (IStudioAPI*)pFactory( STUDIOAPI_INTERFACE_VERSION );
 	if ( !g_pStudioAPI )
 	{
 		return false;
@@ -106,19 +104,16 @@ bool CCitadelGame::Init()
 	public:
 		static void R_InitQuad( CCitadelGame* pGame )
 		{
-			studioSimpleElementVertex_t			quadVerteces[] =
-			{
-				{ { -0.5f, -0.5f, 0.f, 1.f },	{ -1.f, 0.f },	{ 255, 0, 0 } },
-				{ { 0.5f, -0.5f , 0.f, 1.f },	{ 0.f, 0.f },	{ 0, 255, 0 } },
-				{ { 0.5f, 0.5f , 0.f, 1.f },	{ 0.f, 1.f },	{ 0, 0, 255 } },
-				{ { -0.5f, 0.5f , 0.f, 1.f },	{ -1.f, 1.f },	{ 255, 255, 255 } }
-			};
-			uint16		quadIndices[] = { 0, 1, 2, 2, 3, 0 };
+			studioSimpleElementVertex_t quadVerteces[] = { { { -0.5f, -0.5f, 0.f, 1.f }, { -1.f, 0.f }, { 255, 0, 0 } },
+														   { { 0.5f, -0.5f, 0.f, 1.f }, { 0.f, 0.f }, { 0, 255, 0 } },
+														   { { 0.5f, 0.5f, 0.f, 1.f }, { 0.f, 1.f }, { 0, 0, 255 } },
+														   { { -0.5f, 0.5f, 0.f, 1.f }, { -1.f, 1.f }, { 255, 255, 255 } } };
+			uint16						quadIndices[]  = { 0, 1, 2, 2, 3, 0 };
 
-			TResourcePtr<IMaterial>		pMaterial				= g_pResourceSystem->FindOrLoadResource( "materials/nelson", RESOURCE_TYPE_MATERIAL );
-			TRefPtr<IStudioAPIBuffer>	pStudioAPIVertexBuffer	= g_pStudioAPI->CreateBuffer( ( byte* )&quadVerteces[0], ARRAYSIZE( quadVerteces ) * sizeof( studioSimpleElementVertex_t ), sizeof( studioSimpleElementVertex_t ), STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_VERTEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
-			TRefPtr<IStudioAPIBuffer>	pStudioAPIIndexBuffer	= g_pStudioAPI->CreateBuffer( ( byte* )&quadIndices[0], ARRAYSIZE( quadIndices ) * sizeof( uint16 ), sizeof( uint16 ), STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_INDEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
-			Quad().Init(pStudioAPIVertexBuffer, pStudioAPIIndexBuffer, pMaterial);
+			TResourcePtr<IMaterial>	  pMaterial				 = g_pResourceSystem->FindOrLoadResource( "materials/nelson", RESOURCE_TYPE_MATERIAL );
+			TRefPtr<IStudioAPIBuffer> pStudioAPIVertexBuffer = g_pStudioAPI->CreateBuffer( (byte*)&quadVerteces[0], ARRAYSIZE( quadVerteces ) * sizeof( studioSimpleElementVertex_t ), sizeof( studioSimpleElementVertex_t ), STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_VERTEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
+			TRefPtr<IStudioAPIBuffer> pStudioAPIIndexBuffer	 = g_pStudioAPI->CreateBuffer( (byte*)&quadIndices[0], ARRAYSIZE( quadIndices ) * sizeof( uint16 ), sizeof( uint16 ), STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_INDEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
+			Quad().Init( pStudioAPIVertexBuffer, pStudioAPIIndexBuffer, pMaterial );
 		}
 	};
 
@@ -150,8 +145,8 @@ CCitadelGame::Shutdown
 void CCitadelGame::Shutdown()
 {
 	Quad().Shutdown();
-	pQuadEntity			= NULL;
-	pPlayerEntity		= NULL;
+	pQuadEntity	  = NULL;
+	pPlayerEntity = NULL;
 	CGame::Shutdown();
 }
 
@@ -160,11 +155,10 @@ void CCitadelGame::Shutdown()
 CCitadelGame::GetGameDescription
 ==================
 */
-const achar* CCitadelGame::GetGameDescription() const
+const char* CCitadelGame::GetGameDescription() const
 {
 	return "Citadel";
 }
-
 
 /*
 ==================
@@ -173,8 +167,8 @@ CEcsSystemQuadDraw::OnUpdate
 */
 void CEcsSystemQuadInit::OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity, const ecsComponentQuad_t& quad, const ecsResourceStudioRender_t& studioRender )
 {
-	ecsComponentStudioRenderObject_t					studioRenderObjectComponent;
-	studioRenderObjectComponent.pStudioRenderObject		= studioRender.pStudioRender->CreateQuadRenderObject( *quad.pMaterial, quad.pVertexBuffer, quad.pIndexBuffer );
+	ecsComponentStudioRenderObject_t studioRenderObjectComponent;
+	studioRenderObjectComponent.pStudioRenderObject = studioRender.pStudioRender->CreateQuadRenderObject( *quad.pMaterial, quad.pVertexBuffer, quad.pIndexBuffer );
 	studioRender.pStudioRender->RegisterObject( studioRenderObjectComponent.pStudioRenderObject );
 	ecsWorld.SetComponent( entity, std::move( studioRenderObjectComponent ) );
 }

@@ -10,7 +10,6 @@ FORCEINLINE std::size_t CStudioAPIBoundShaderStateKeyVk::boundShaderStateKeyHash
 	return key.GetHash();
 }
 
-
 /*
 ==================
 CStudioAPIBoundShaderStateKeyVk::GetHash
@@ -41,7 +40,6 @@ FORCEINLINE bool CStudioAPIBoundShaderStateKeyVk::operator==( const CStudioAPIBo
 	return hash == other.hash;
 }
 
-
 /*
 ==================
 CStudioAPIBoundShaderStateCacheVk::Add
@@ -59,7 +57,7 @@ CStudioAPIBoundShaderStateCacheVk::Find
 */
 FORCEINLINE CStudioAPIBoundShaderStateVk* CStudioAPIBoundShaderStateCacheVk::Find( const CStudioAPIBoundShaderStateKeyVk& key ) const
 {
-	auto		itBoundShaderState = boundShaderStateDict.find( key );
+	auto itBoundShaderState = boundShaderStateDict.find( key );
 	if ( itBoundShaderState == boundShaderStateDict.end() )
 	{
 		return NULL;

@@ -24,26 +24,24 @@ private:
 			: pViewport( NULL )
 			, pReleaseViewportIndexDelegate( NULL )
 			, pRenderPassUpdatedDelegate( NULL )
-		{}
+		{
+		}
 
-		CStudioViewport*											pViewport;
-		CStudioViewport::COnReleaseViewportIndex::funcDelegate_t*	pReleaseViewportIndexDelegate;
-		CStudioViewport::COnRenderPassUpdated::funcDelegate_t*		pRenderPassUpdatedDelegate;
-		std::vector<TRefPtr<IStudioAPIRenderPipeline>>				studioAPIRenderPipelines;
+		CStudioViewport*										  pViewport;
+		CStudioViewport::COnReleaseViewportIndex::funcDelegate_t* pReleaseViewportIndexDelegate;
+		CStudioViewport::COnRenderPassUpdated::funcDelegate_t*	  pRenderPassUpdatedDelegate;
+		std::vector<TRefPtr<IStudioAPIRenderPipeline>>			  studioAPIRenderPipelines;
 	};
-
 
 	struct dataStorageDrawRenderPasses_t
 	{
-		std::vector<TRefPtr<IStudioAPIRenderPipeline>>		studioAPIRenderPipelines;
+		std::vector<TRefPtr<IStudioAPIRenderPipeline>> studioAPIRenderPipelines;
 	};
-
 
 	struct dataStoragePresentPass_t
 	{
-		std::vector<viewportRenderPipelines_t>				viewports;
+		std::vector<viewportRenderPipelines_t> viewports;
 	};
-
 
 	class CRenderPipelineContainer
 	{
@@ -61,9 +59,9 @@ private:
 		static void OnReleaseViewportIndex( void* pUserData, CStudioViewport* pViewport );
 		static void OnRenderPassUpdated( void* pUserData, CStudioViewport* pViewport );
 
-		studioRenderPassType_t	renderPassType;
-		void*					pDataStorage;
+		studioRenderPassType_t renderPassType;
+		void*				   pDataStorage;
 	};
 
-	CRenderPipelineContainer	renderPipelineContainers[STUDIO_RENDERPASS_NUM_TYPES];
+	CRenderPipelineContainer renderPipelineContainers[STUDIO_RENDERPASS_NUM_TYPES];
 };

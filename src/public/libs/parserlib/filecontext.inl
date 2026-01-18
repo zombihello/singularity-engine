@@ -31,7 +31,7 @@ FORCEINLINE parserFileContext_t& parserFileContext_t::operator=( parserFileConte
 		line			= std::move( other.line );
 		charLineStart	= std::move( other.charLineStart );
 		charPosition	= std::move( other.charPosition );
-		charEndPosition	= std::move( other.charEndPosition );
+		charEndPosition = std::move( other.charEndPosition );
 	}
 	return *this;
 }

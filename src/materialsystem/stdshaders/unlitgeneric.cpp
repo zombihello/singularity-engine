@@ -6,7 +6,7 @@
 
 struct shaderParamsBuffer_t
 {
-	vec4_t		color;
+	vec4_t color;
 };
 
 BEGIN_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
@@ -14,7 +14,7 @@ BEGIN_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 		SHADER_CACHE( "unlitgeneric_vs" )
 		SHADER_CACHE( "unlitgeneric_ps" )
 	END_SHADER_CACHES
-	 
+
 	BEGIN_SHADER_RESOURCES
 		SHADER_BUFFER( RES_BUFFER0, 0, 1, shaderParamsBuffer_t, STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_CONSTANT_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST )
 		SHADER_TEXTURE_SAMPLER( RES_BASETEXTURE, 0, 2 )
@@ -29,25 +29,24 @@ BEGIN_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 	SHADER_INIT_PARAMS
 	{
 		pParams[COLOR]->SetVecValue( vec4_t( 1.f, 1.f, 1.f, 1.f ) );
-		pParams[BASETEXTURE]->SetTextureValue( ( ITexture* )g_pResourceSystem->GetDefaultResource( RESOURCE_TYPE_TEXTURE )->GetData() );
+		pParams[BASETEXTURE]->SetTextureValue( (ITexture*)g_pResourceSystem->GetDefaultResource( RESOURCE_TYPE_TEXTURE )->GetData() );
 	}
 
 	SHADER_UPDATE_BUFFERS
 	{
 		// Initialize buffer data
-		shaderParamsBuffer_t		bufferData = {};
+		shaderParamsBuffer_t bufferData = {};
 		pParams[COLOR]->GetVecValue( &bufferData.color.x, 4 );
 
 		// Update a buffer
-		RES_BUFFER0.UpdateBuffer( pStudioAPICmdContext, ( byte* )&bufferData, pStudioAPIBuffers[RES_BUFFER0] );
+		RES_BUFFER0.UpdateBuffer( pStudioAPICmdContext, (byte*)&bufferData, pStudioAPIBuffers[RES_BUFFER0] );
 	}
 
 	SHADER_BARRIER
 	{
 		// TODO BS yehor.pohuliaka - Add the ability to get the queue type from IStudioAPICmdList
-		ITexture*				pTexture = ( ITexture* )pParams[BASETEXTURE]->GetTextureValue();
-		studioAPIBarrier_t		studioAPIBarriers[] =
-		{
+		ITexture*		   pTexture			   = (ITexture*)pParams[BASETEXTURE]->GetTextureValue();
+		studioAPIBarrier_t studioAPIBarriers[] = {
 			StudioAPI_MakeTextureBarrier( pTexture->GetStudioAPITexture(), STUDIOAPI_TEXTURE_LAYOUT_SHADER_RESOURCE_READONLY, STUDIOAPI_QUEUE_TYPE_GRAPHICS ),
 			StudioAPI_MakeBufferBarrier( pStudioAPIBuffers[RES_BUFFER0], STUDIOAPI_BUFFER_STATE_CONSTANT_BUFFER, STUDIOAPI_QUEUE_TYPE_GRAPHICS )
 		};
@@ -68,7 +67,7 @@ BEGIN_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 
 	SHADER_DRAW
 	{
-		ITexture*	pTexture = pParams[BASETEXTURE]->GetTextureValue();
+		ITexture* pTexture = pParams[BASETEXTURE]->GetTextureValue();
 		RES_BASETEXTURE.SetTexture( pStudioAPICmdList, pTexture->GetStudioAPITexture() );
 		RES_BASESAMPLER.SetSampler( pStudioAPICmdList, pTexture->GetStudioAPISampler() );
 		RES_BUFFER0.SetConstantBuffer( pStudioAPICmdList, pStudioAPIBuffers[RES_BUFFER0] );

@@ -2,57 +2,56 @@
 #include "core/profile.h"
 
 #if ENABLE_PROFILING
-//-----------------------------------------------------------------------------
-// Optick profiler
-//-----------------------------------------------------------------------------
-#include <optick.h>
+	//-----------------------------------------------------------------------------
+	// Optick profiler
+	//-----------------------------------------------------------------------------
+	#include <optick.h>
 
 // Table for convert profileScopeGroup_t to Optick::Category
-static const Optick::Category::Type		s_ProfileGroups[PROFILE_SCOPE_NUM_GROUPS] =
-{
-	OPTICK_MAKE_CATEGORY(	Optick::Filter::None,		Optick::Color::DarkGray		),		// PROFILE_SCOPE_GROUP_NONE
-	OPTICK_MAKE_CATEGORY(	Optick::Filter::AI,			Optick::Color::Purple		),		// PROFILE_SCOPE_GROUP_AI
-	OPTICK_MAKE_CATEGORY(	Optick::Filter::Animation,	Optick::Color::LightSkyBlue	),		// PROFILE_SCOPE_GROUP_ANIMATION
-	OPTICK_MAKE_CATEGORY(	Optick::Filter::Audio,		Optick::Color::HotPink		),		// PROFILE_SCOPE_GROUP_AUDIO
-	OPTICK_MAKE_CATEGORY(	Optick::Filter::Debug,		Optick::Color::Black		),		// PROFILE_SCOPE_GROUP_DEBUG
-	OPTICK_MAKE_CATEGORY(	Optick::Filter::Camera,		Optick::Color::Black		),		// PROFILE_SCOPE_GROUP_CAMERA
-	OPTICK_MAKE_CATEGORY(	Optick::Filter::Cloth,		Optick::Color::DarkGreen	),		// PROFILE_SCOPE_GROUP_CLOTH
-	OPTICK_MAKE_CATEGORY(	Optick::Filter::GameLogic,	Optick::Color::RoyalBlue	),		// PROFILE_SCOPE_GROUP_GAMELOGIC
-	OPTICK_MAKE_CATEGORY(	Optick::Filter::Input,		Optick::Color::Ivory		),		// PROFILE_SCOPE_GROUP_INPUT
-	OPTICK_MAKE_CATEGORY(	Optick::Filter::Navigation, Optick::Color::Magenta		),		// PROFILE_SCOPE_GROUP_NAVIGATION
-	OPTICK_MAKE_CATEGORY(	Optick::Filter::Network,	Optick::Color::Olive		),		// PROFILE_SCOPE_GROUP_NETWORK
-	OPTICK_MAKE_CATEGORY(	Optick::Filter::Physics,	Optick::Color::LawnGreen	),		// PROFILE_SCOPE_GROUP_PHYSICS
-	OPTICK_MAKE_CATEGORY(	Optick::Filter::Rendering,	Optick::Color::BurlyWood	),		// PROFILE_SCOPE_GROUP_RENDERING
-	OPTICK_MAKE_CATEGORY(	Optick::Filter::Scene,		Optick::Color::RoyalBlue	),		// PROFILE_SCOPE_GROUP_SCENE
-	OPTICK_MAKE_CATEGORY(	Optick::Filter::Script,		Optick::Color::Plum			),		// PROFILE_SCOPE_GROUP_SCRIPT
-	OPTICK_MAKE_CATEGORY(	Optick::Filter::Streaming,	Optick::Color::Gold			),		// PROFILE_SCOPE_GROUP_STREAMING
-	OPTICK_MAKE_CATEGORY(	Optick::Filter::UI,			Optick::Color::PaleTurquoise),		// PROFILE_SCOPE_GROUP_UI
-	OPTICK_MAKE_CATEGORY(	Optick::Filter::VFX,		Optick::Color::SaddleBrown	),		// PROFILE_SCOPE_GROUP_VFX
-	OPTICK_MAKE_CATEGORY(	Optick::Filter::Visibility, Optick::Color::Snow			),		// PROFILE_SCOPE_GROUP_VISIBILITY
-	OPTICK_MAKE_CATEGORY(	Optick::Filter::Wait,		Optick::Color::Tomato		),		// PROFILE_SCOPE_GROUP_WAIT
-	OPTICK_MAKE_CATEGORY(	Optick::Filter::IO,			Optick::Color::Khaki		),		// PROFILE_SCOPE_GROUP_IO
+static const Optick::Category::Type s_ProfileGroups[PROFILE_SCOPE_NUM_GROUPS] = {
+	OPTICK_MAKE_CATEGORY( Optick::Filter::None, Optick::Color::DarkGray ),			 // PROFILE_SCOPE_GROUP_NONE
+	OPTICK_MAKE_CATEGORY( Optick::Filter::AI, Optick::Color::Purple ),				 // PROFILE_SCOPE_GROUP_AI
+	OPTICK_MAKE_CATEGORY( Optick::Filter::Animation, Optick::Color::LightSkyBlue ),	 // PROFILE_SCOPE_GROUP_ANIMATION
+	OPTICK_MAKE_CATEGORY( Optick::Filter::Audio, Optick::Color::HotPink ),			 // PROFILE_SCOPE_GROUP_AUDIO
+	OPTICK_MAKE_CATEGORY( Optick::Filter::Debug, Optick::Color::Black ),			 // PROFILE_SCOPE_GROUP_DEBUG
+	OPTICK_MAKE_CATEGORY( Optick::Filter::Camera, Optick::Color::Black ),			 // PROFILE_SCOPE_GROUP_CAMERA
+	OPTICK_MAKE_CATEGORY( Optick::Filter::Cloth, Optick::Color::DarkGreen ),		 // PROFILE_SCOPE_GROUP_CLOTH
+	OPTICK_MAKE_CATEGORY( Optick::Filter::GameLogic, Optick::Color::RoyalBlue ),	 // PROFILE_SCOPE_GROUP_GAMELOGIC
+	OPTICK_MAKE_CATEGORY( Optick::Filter::Input, Optick::Color::Ivory ),			 // PROFILE_SCOPE_GROUP_INPUT
+	OPTICK_MAKE_CATEGORY( Optick::Filter::Navigation, Optick::Color::Magenta ),		 // PROFILE_SCOPE_GROUP_NAVIGATION
+	OPTICK_MAKE_CATEGORY( Optick::Filter::Network, Optick::Color::Olive ),			 // PROFILE_SCOPE_GROUP_NETWORK
+	OPTICK_MAKE_CATEGORY( Optick::Filter::Physics, Optick::Color::LawnGreen ),		 // PROFILE_SCOPE_GROUP_PHYSICS
+	OPTICK_MAKE_CATEGORY( Optick::Filter::Rendering, Optick::Color::BurlyWood ),	 // PROFILE_SCOPE_GROUP_RENDERING
+	OPTICK_MAKE_CATEGORY( Optick::Filter::Scene, Optick::Color::RoyalBlue ),		 // PROFILE_SCOPE_GROUP_SCENE
+	OPTICK_MAKE_CATEGORY( Optick::Filter::Script, Optick::Color::Plum ),			 // PROFILE_SCOPE_GROUP_SCRIPT
+	OPTICK_MAKE_CATEGORY( Optick::Filter::Streaming, Optick::Color::Gold ),			 // PROFILE_SCOPE_GROUP_STREAMING
+	OPTICK_MAKE_CATEGORY( Optick::Filter::UI, Optick::Color::PaleTurquoise ),		 // PROFILE_SCOPE_GROUP_UI
+	OPTICK_MAKE_CATEGORY( Optick::Filter::VFX, Optick::Color::SaddleBrown ),		 // PROFILE_SCOPE_GROUP_VFX
+	OPTICK_MAKE_CATEGORY( Optick::Filter::Visibility, Optick::Color::Snow ),		 // PROFILE_SCOPE_GROUP_VISIBILITY
+	OPTICK_MAKE_CATEGORY( Optick::Filter::Wait, Optick::Color::Tomato ),			 // PROFILE_SCOPE_GROUP_WAIT
+	OPTICK_MAKE_CATEGORY( Optick::Filter::IO, Optick::Color::Khaki ),				 // PROFILE_SCOPE_GROUP_IO
 };
-
 
 class COptickProfile : public IProfile
 {
 public:
 	COptickProfile()
 		: bIsRecord( false )
-	{}
+	{
+	}
 
 	// IProfile interface
 	virtual void Init() override;
 	virtual void Shutdown() override;
 
-	virtual profileDescription_t CreateDescription( const achar* pFunctionName, const achar* pFileName, uint32 fileLine, const achar* pScopeName = NULL, profileScopeGroup_t scopeGroup = PROFILE_SCOPE_GROUP_NONE ) override;
-	virtual profileDescription_t CreateDescription( const achar* pFunctionName, const achar* pFileName, uint32 fileLine, profileScopeGroup_t scopeGroup ) override;
+	virtual profileDescription_t CreateDescription( const char* pFunctionName, const char* pFileName, uint32 fileLine, const char* pScopeName = NULL, profileScopeGroup_t scopeGroup = PROFILE_SCOPE_GROUP_NONE ) override;
+	virtual profileDescription_t CreateDescription( const char* pFunctionName, const char* pFileName, uint32 fileLine, profileScopeGroup_t scopeGroup ) override;
 
-	virtual void StartThreadScope( const achar* pThreadName ) override;
+	virtual void StartThreadScope( const char* pThreadName ) override;
 	virtual void StopThreadScope() override;
 
 	virtual profileScopeData_t BeginScope( profileDescription_t pDescription ) override;
-	virtual void EndScope( profileScopeData_t pScopeData ) override;
+	virtual void			   EndScope( profileScopeData_t pScopeData ) override;
 
 	virtual uint32 NextFrame() override;
 
@@ -61,19 +60,18 @@ public:
 	virtual void AttachTag( profileDescription_t pDescription, uint32 value ) override;
 	virtual void AttachTag( profileDescription_t pDescription, uint64 value ) override;
 	virtual void AttachTag( profileDescription_t pDescription, const vec3_t& value ) override;
-	virtual void AttachTag( profileDescription_t pDescription, const achar* pValue ) override;
-	virtual void AttachTag( profileDescription_t pDescription, const achar* pValue, uint16 length ) override;
+	virtual void AttachTag( profileDescription_t pDescription, const char* pValue ) override;
+	virtual void AttachTag( profileDescription_t pDescription, const char* pValue, uint16 length ) override;
 	virtual void AttachTag( profileDescription_t pDescription, float x, float y, float z ) override;
 
 	virtual profileDescription_t GetFrameDescription() override;
-	virtual bool IsRecord() const override;
+	virtual bool				 IsRecord() const override;
 
 private:
 	static bool StateChangedCallback( Optick::State::Type optickState );
 
-	bool	bIsRecord;
+	bool bIsRecord;
 };
-
 
 /*
  ==================
@@ -100,9 +98,9 @@ void COptickProfile::Shutdown()
  COptickProfile::CreateDescription
  ==================
  */
-profileDescription_t COptickProfile::CreateDescription( const achar* pFunctionName, const achar* pFileName, uint32 fileLine, const achar* pScopeName /*= NULL*/, profileScopeGroup_t scopeGroup /*= PROFILE_SCOPE_GROUP_NONE*/ )
+profileDescription_t COptickProfile::CreateDescription( const char* pFunctionName, const char* pFileName, uint32 fileLine, const char* pScopeName /*= NULL*/, profileScopeGroup_t scopeGroup /*= PROFILE_SCOPE_GROUP_NONE*/ )
 {
-	uint8								flags = pScopeName ? Optick::EventDescription::IS_CUSTOM_NAME : 0;
+	uint8						  flags			= pScopeName ? Optick::EventDescription::IS_CUSTOM_NAME : 0;
 	const Optick::Category::Type& scopeCategory = s_ProfileGroups[scopeGroup];
 	return Optick::EventDescription::Create( pFunctionName, pFileName, fileLine, Optick::Category::GetColor( scopeCategory ), Optick::Category::GetMask( scopeCategory ) );
 }
@@ -112,7 +110,7 @@ profileDescription_t COptickProfile::CreateDescription( const achar* pFunctionNa
  COptickProfile::CreateDescription
  ==================
  */
-profileDescription_t COptickProfile::CreateDescription( const achar* pFunctionName, const achar* pFileName, uint32 fileLine, profileScopeGroup_t scopeGroup )
+profileDescription_t COptickProfile::CreateDescription( const char* pFunctionName, const char* pFileName, uint32 fileLine, profileScopeGroup_t scopeGroup )
 {
 	return CreateDescription( pFunctionName, pFileName, fileLine, NULL, scopeGroup );
 }
@@ -122,7 +120,7 @@ profileDescription_t COptickProfile::CreateDescription( const achar* pFunctionNa
  COptickProfile::StartThreadScope
  ==================
  */
-void COptickProfile::StartThreadScope( const achar* pThreadName )
+void COptickProfile::StartThreadScope( const char* pThreadName )
 {
 	Optick::RegisterThread( pThreadName );
 }
@@ -144,7 +142,7 @@ void COptickProfile::StopThreadScope()
  */
 profileScopeData_t COptickProfile::BeginScope( profileDescription_t pDescription )
 {
-	Optick::EventDescription* pEventDescription = ( Optick::EventDescription* )pDescription;
+	Optick::EventDescription* pEventDescription = (Optick::EventDescription*)pDescription;
 	return Optick::Event::Start( *pEventDescription );
 }
 
@@ -155,7 +153,7 @@ profileScopeData_t COptickProfile::BeginScope( profileDescription_t pDescription
  */
 void COptickProfile::EndScope( profileScopeData_t pScopeData )
 {
-	Optick::EventData* pEventData = ( Optick::EventData* )pScopeData;
+	Optick::EventData* pEventData = (Optick::EventData*)pScopeData;
 	Optick::Event::Stop( *pEventData );
 }
 
@@ -178,7 +176,7 @@ uint32 COptickProfile::NextFrame()
  */
 void COptickProfile::AttachTag( profileDescription_t pDescription, float value )
 {
-	const Optick::EventDescription* pEventDescription = ( Optick::EventDescription* )pDescription;
+	const Optick::EventDescription* pEventDescription = (Optick::EventDescription*)pDescription;
 	Optick::Tag::Attach( *pEventDescription, value );
 }
 
@@ -189,7 +187,7 @@ void COptickProfile::AttachTag( profileDescription_t pDescription, float value )
  */
 void COptickProfile::AttachTag( profileDescription_t pDescription, int32 value )
 {
-	const Optick::EventDescription* pEventDescription = ( Optick::EventDescription* )pDescription;
+	const Optick::EventDescription* pEventDescription = (Optick::EventDescription*)pDescription;
 	Optick::Tag::Attach( *pEventDescription, value );
 }
 
@@ -200,7 +198,7 @@ void COptickProfile::AttachTag( profileDescription_t pDescription, int32 value )
  */
 void COptickProfile::AttachTag( profileDescription_t pDescription, uint32 value )
 {
-	const Optick::EventDescription* pEventDescription = ( Optick::EventDescription* )pDescription;
+	const Optick::EventDescription* pEventDescription = (Optick::EventDescription*)pDescription;
 	Optick::Tag::Attach( *pEventDescription, value );
 }
 
@@ -211,7 +209,7 @@ void COptickProfile::AttachTag( profileDescription_t pDescription, uint32 value 
  */
 void COptickProfile::AttachTag( profileDescription_t pDescription, uint64 value )
 {
-	const Optick::EventDescription* pEventDescription = ( Optick::EventDescription* )pDescription;
+	const Optick::EventDescription* pEventDescription = (Optick::EventDescription*)pDescription;
 	Optick::Tag::Attach( *pEventDescription, value );
 }
 
@@ -222,8 +220,8 @@ void COptickProfile::AttachTag( profileDescription_t pDescription, uint64 value 
  */
 void COptickProfile::AttachTag( profileDescription_t pDescription, const vec3_t& value )
 {
-	const Optick::EventDescription* pEventDescription = ( Optick::EventDescription* )pDescription;
-	float								rawValue[3] = { value.x, value.y, value.z };
+	const Optick::EventDescription* pEventDescription = (Optick::EventDescription*)pDescription;
+	float							rawValue[3]		  = { value.x, value.y, value.z };
 	Optick::Tag::Attach( *pEventDescription, rawValue );
 }
 
@@ -232,9 +230,9 @@ void COptickProfile::AttachTag( profileDescription_t pDescription, const vec3_t&
  COptickProfile::AttachTag
  ==================
  */
-void COptickProfile::AttachTag( profileDescription_t pDescription, const achar* pValue )
+void COptickProfile::AttachTag( profileDescription_t pDescription, const char* pValue )
 {
-	const Optick::EventDescription* pEventDescription = ( Optick::EventDescription* )pDescription;
+	const Optick::EventDescription* pEventDescription = (Optick::EventDescription*)pDescription;
 	Optick::Tag::Attach( *pEventDescription, pValue );
 }
 
@@ -243,9 +241,9 @@ void COptickProfile::AttachTag( profileDescription_t pDescription, const achar* 
  COptickProfile::AttachTag
  ==================
  */
-void COptickProfile::AttachTag( profileDescription_t pDescription, const achar* pValue, uint16 length )
+void COptickProfile::AttachTag( profileDescription_t pDescription, const char* pValue, uint16 length )
 {
-	const Optick::EventDescription* pEventDescription = ( Optick::EventDescription* )pDescription;
+	const Optick::EventDescription* pEventDescription = (Optick::EventDescription*)pDescription;
 	Optick::Tag::Attach( *pEventDescription, pValue, length );
 }
 
@@ -256,7 +254,7 @@ void COptickProfile::AttachTag( profileDescription_t pDescription, const achar* 
  */
 void COptickProfile::AttachTag( profileDescription_t pDescription, float x, float y, float z )
 {
-	vec3_t		value( x, y, z );
+	vec3_t value( x, y, z );
 	AttachTag( pDescription, value );
 }
 
@@ -267,7 +265,7 @@ void COptickProfile::AttachTag( profileDescription_t pDescription, float x, floa
  */
 profileDescription_t COptickProfile::GetFrameDescription()
 {
-	return ( profileDescription_t )Optick::GetFrameDescription();
+	return (profileDescription_t)Optick::GetFrameDescription();
 }
 
 /*
@@ -287,7 +285,7 @@ bool COptickProfile::IsRecord() const
  */
 bool COptickProfile::StateChangedCallback( Optick::State::Type optickState )
 {
-	COptickProfile* pOptickProfile = ( COptickProfile* )Profile();
+	COptickProfile* pOptickProfile = (COptickProfile*)Profile();
 	switch ( optickState )
 	{
 	case Optick::State::START_CAPTURE:
@@ -295,7 +293,6 @@ bool COptickProfile::StateChangedCallback( Optick::State::Type optickState )
 		break;
 
 	case Optick::State::DUMP_CAPTURE:
-
 
 	case Optick::State::CANCEL_CAPTURE:
 		pOptickProfile->bIsRecord = false;
@@ -308,34 +305,33 @@ class CNullProfile : public IProfile
 {
 public:
 	// IProfile interface
-	virtual void Init() override		{}
-	virtual void Shutdown() override	{}
-	virtual profileDescription_t CreateDescription( const achar* pFunctionName, const achar* pFileName, uint32 fileLine, const achar* pScopeName = NULL, profileScopeGroup_t scopeGroup = PROFILE_SCOPE_GROUP_NONE ) override
+	virtual void				 Init() override {}
+	virtual void				 Shutdown() override {}
+	virtual profileDescription_t CreateDescription( const char* pFunctionName, const char* pFileName, uint32 fileLine, const char* pScopeName = NULL, profileScopeGroup_t scopeGroup = PROFILE_SCOPE_GROUP_NONE ) override
 	{
 		return NULL;
 	}
-	virtual profileDescription_t CreateDescription( const achar* pFunctionName, const achar* pFileName, uint32 fileLine, profileScopeGroup_t scopeGroup ) override
+	virtual profileDescription_t CreateDescription( const char* pFunctionName, const char* pFileName, uint32 fileLine, profileScopeGroup_t scopeGroup ) override
 	{
 		return NULL;
 	}
-	virtual void StartThreadScope( const achar* pThreadName ) override											{}
-	virtual void StopThreadScope() override																		{}
-	virtual profileScopeData_t BeginScope( profileDescription_t pDescription ) override							{ return NULL; }
-	virtual void EndScope( profileScopeData_t pScopeData ) override												{}
-	virtual uint32 NextFrame() override																			{ return 0; }
-	virtual void AttachTag( profileDescription_t pDescription, float value ) override							{}
-	virtual void AttachTag( profileDescription_t pDescription, int32 value ) override							{}
-	virtual void AttachTag( profileDescription_t pDescription, uint32 value ) override							{}
-	virtual void AttachTag( profileDescription_t pDescription, uint64 value ) override							{}
-	virtual void AttachTag( profileDescription_t pDescription, const vec3_t& value ) override					{}
-	virtual void AttachTag( profileDescription_t pDescription, const achar* pValue ) override					{}
-	virtual void AttachTag( profileDescription_t pDescription, const achar* pValue, uint16 length ) override	{}
-	virtual void AttachTag( profileDescription_t pDescription, float x, float y, float z ) override				{}
-	virtual profileDescription_t GetFrameDescription() override													{ return NULL; }
-	virtual bool IsRecord() const override																		{ return false; }
+	virtual void				 StartThreadScope( const char* pThreadName ) override {}
+	virtual void				 StopThreadScope() override {}
+	virtual profileScopeData_t	 BeginScope( profileDescription_t pDescription ) override { return NULL; }
+	virtual void				 EndScope( profileScopeData_t pScopeData ) override {}
+	virtual uint32				 NextFrame() override { return 0; }
+	virtual void				 AttachTag( profileDescription_t pDescription, float value ) override {}
+	virtual void				 AttachTag( profileDescription_t pDescription, int32 value ) override {}
+	virtual void				 AttachTag( profileDescription_t pDescription, uint32 value ) override {}
+	virtual void				 AttachTag( profileDescription_t pDescription, uint64 value ) override {}
+	virtual void				 AttachTag( profileDescription_t pDescription, const vec3_t& value ) override {}
+	virtual void				 AttachTag( profileDescription_t pDescription, const char* pValue ) override {}
+	virtual void				 AttachTag( profileDescription_t pDescription, const char* pValue, uint16 length ) override {}
+	virtual void				 AttachTag( profileDescription_t pDescription, float x, float y, float z ) override {}
+	virtual profileDescription_t GetFrameDescription() override { return NULL; }
+	virtual bool				 IsRecord() const override { return false; }
 };
-#endif // ENABLE_PROFILING
-
+#endif	// ENABLE_PROFILING
 
 /*
 ==================
@@ -345,10 +341,10 @@ Profile
 IProfile* Profile()
 {
 #if ENABLE_PROFILING
-	static COptickProfile	s_OptickProfile;
+	static COptickProfile s_OptickProfile;
 	return &s_OptickProfile;
 #else
-	static CNullProfile		s_NullProfile;
+	static CNullProfile s_NullProfile;
 	return &s_NullProfile;
-#endif // ENABLE_PROFILING
+#endif	// ENABLE_PROFILING
 }

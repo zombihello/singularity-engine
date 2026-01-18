@@ -6,12 +6,12 @@
 CShaderCompilerMakeFile::LoadMakeFile
 ==================
 */
-bool CShaderCompilerMakeFile::LoadMakeFile( const achar* pPath, const achar* pBaseDir /* = "" */ )
+bool CShaderCompilerMakeFile::LoadMakeFile( const char* pPath, const char* pBaseDir /* = "" */ )
 {
 	// Load JSON file
-	std::string		absolutePath;
+	std::string absolutePath;
 	S_MakeAbsolutePath( pPath, absolutePath, pBaseDir );
-	CJsonDoc		jsonMakeFile;
+	CJsonDoc jsonMakeFile;
 	if ( !jsonMakeFile.LoadFromFile( absolutePath.c_str() ) )
 	{
 		Error( "ShaderCompiler: Failed to load makefile '%s', maybe wrong JSON syntax or not found", absolutePath.c_str() );
@@ -19,19 +19,19 @@ bool CShaderCompilerMakeFile::LoadMakeFile( const achar* pPath, const achar* pBa
 	}
 
 	// Get path to directory with the main makefile
-	std::string			makeFileDir;
+	std::string makeFileDir;
 	{
-		std::string		tmpBuffer;
+		std::string tmpBuffer;
 		S_GetFilePath( absolutePath.c_str(), tmpBuffer, false );
 		S_MakeAbsolutePath( tmpBuffer, makeFileDir, "", false );
 	}
 
 	// Get include directories
 	{
-		CJsonValue		jsonInclude = jsonMakeFile.GetValue( "include" );
+		CJsonValue jsonInclude = jsonMakeFile.GetValue( "include" );
 		if ( jsonInclude.IsValid() )
 		{
-			std::vector<CJsonValue>		jsonArray = jsonInclude.GetArray();
+			std::vector<CJsonValue> jsonArray = jsonInclude.GetArray();
 			if ( !jsonInclude.IsA( JSONVALUE_TYPE_ARRAY ) )
 			{
 				Error( "ShaderCompiler: Invalid 'include', must be array of strings (file: '%s')", absolutePath.c_str() );
@@ -39,7 +39,7 @@ bool CShaderCompilerMakeFile::LoadMakeFile( const achar* pPath, const achar* pBa
 			}
 			else
 			{
-				for ( uint32 index = 0, count = ( uint32 )jsonArray.size(); index < count; ++index )
+				for ( uint32 index = 0, count = (uint32)jsonArray.size(); index < count; ++index )
 				{
 					const CJsonValue& jsonElement = jsonArray[index];
 					if ( !jsonElement.IsA( JSONVALUE_TYPE_STRING ) )
@@ -56,10 +56,10 @@ bool CShaderCompilerMakeFile::LoadMakeFile( const achar* pPath, const achar* pBa
 
 	// Get shaders to compile
 	{
-		CJsonValue		jsonShaders = jsonMakeFile.GetValue( "shaders" );
+		CJsonValue jsonShaders = jsonMakeFile.GetValue( "shaders" );
 		if ( jsonShaders.IsValid() )
 		{
-			std::vector<CJsonValue>		jsonArray = jsonShaders.GetArray();
+			std::vector<CJsonValue> jsonArray = jsonShaders.GetArray();
 			if ( !jsonShaders.IsA( JSONVALUE_TYPE_ARRAY ) )
 			{
 				Error( "ShaderCompiler: Invalid 'shaders', must be array of strings (file: '%s')", absolutePath.c_str() );
@@ -67,7 +67,7 @@ bool CShaderCompilerMakeFile::LoadMakeFile( const achar* pPath, const achar* pBa
 			}
 			else
 			{
-				for ( uint32 index = 0, count = ( uint32 )jsonArray.size(); index < count; ++index )
+				for ( uint32 index = 0, count = (uint32)jsonArray.size(); index < count; ++index )
 				{
 					const CJsonValue& jsonElement = jsonArray[index];
 					if ( !jsonElement.IsA( JSONVALUE_TYPE_STRING ) )
@@ -76,7 +76,7 @@ bool CShaderCompilerMakeFile::LoadMakeFile( const achar* pPath, const achar* pBa
 						return false;
 					}
 
-					std::string		shaderPath = S_Sprintf( "%s.shader", jsonElement.GetString().c_str() );
+					std::string shaderPath = S_Sprintf( "%s.shader", jsonElement.GetString().c_str() );
 					if ( !LoadShader( shaderPath.c_str(), makeFileDir.c_str() ) )
 					{
 						Error( "ShaderCompiler: Failed to load shader '%s' (file: '%s')", shaderPath.c_str(), absolutePath.c_str() );
@@ -96,13 +96,13 @@ bool CShaderCompilerMakeFile::LoadMakeFile( const achar* pPath, const achar* pBa
 CShaderCompilerMakeFile::LoadShader
 ==================
 */
-bool CShaderCompilerMakeFile::LoadShader( const achar* pPath, const achar* pBaseDir /* = "" */ )
+bool CShaderCompilerMakeFile::LoadShader( const char* pPath, const char* pBaseDir /* = "" */ )
 {
 	// Load JSON file
-	shader_t		shader;
-	std::string		absolutePath;
+	shader_t	shader;
+	std::string absolutePath;
 	S_MakeAbsolutePath( pPath, absolutePath, pBaseDir );
-	CJsonDoc		jsonShader;
+	CJsonDoc jsonShader;
 	if ( !jsonShader.LoadFromFile( absolutePath.c_str() ) )
 	{
 		Error( "ShaderCompiler: Failed to load shader '%s', maybe wrong JSON syntax or not found", absolutePath.c_str() );
@@ -110,7 +110,7 @@ bool CShaderCompilerMakeFile::LoadShader( const achar* pPath, const achar* pBase
 	}
 
 	// Get source file
-	CJsonValue	jsonSource = jsonShader.GetValue( "source" );
+	CJsonValue jsonSource = jsonShader.GetValue( "source" );
 	if ( jsonSource.IsValid() )
 	{
 		if ( !jsonSource.IsA( JSONVALUE_TYPE_STRING ) )
@@ -130,7 +130,7 @@ bool CShaderCompilerMakeFile::LoadShader( const achar* pPath, const achar* pBase
 	}
 
 	// Get main function
-	CJsonValue	jsonMainFunc = jsonShader.GetValue( "main_func" );
+	CJsonValue jsonMainFunc = jsonShader.GetValue( "main_func" );
 	if ( jsonMainFunc.IsValid() )
 	{
 		if ( !jsonMainFunc.IsA( JSONVALUE_TYPE_STRING ) )
@@ -150,7 +150,7 @@ bool CShaderCompilerMakeFile::LoadShader( const achar* pPath, const achar* pBase
 	}
 
 	// Get shader type
-	CJsonValue	jsonType = jsonShader.GetValue( "type" );
+	CJsonValue jsonType = jsonShader.GetValue( "type" );
 	if ( jsonType.IsValid() )
 	{
 		if ( !jsonType.IsA( JSONVALUE_TYPE_STRING ) )
@@ -171,7 +171,7 @@ bool CShaderCompilerMakeFile::LoadShader( const achar* pPath, const achar* pBase
 	}
 
 	// Get flags
-	CJsonValue		jsonFlags = jsonShader.GetValue( "flags" );
+	CJsonValue jsonFlags = jsonShader.GetValue( "flags" );
 	if ( jsonFlags.IsValid() )
 	{
 		if ( !jsonFlags.IsA( JSONVALUE_TYPE_ARRAY ) )
@@ -181,8 +181,8 @@ bool CShaderCompilerMakeFile::LoadShader( const achar* pPath, const achar* pBase
 		}
 		else
 		{
-			const std::vector<CJsonValue>	jsonArray = jsonFlags.GetArray();
-			for ( uint32 index = 0, count = ( uint32 )jsonArray.size(); index < count; ++index )
+			const std::vector<CJsonValue> jsonArray = jsonFlags.GetArray();
+			for ( uint32 index = 0, count = (uint32)jsonArray.size(); index < count; ++index )
 			{
 				const CJsonValue& jsonElement = jsonArray[index];
 				if ( !jsonElement.IsA( JSONVALUE_TYPE_OBJECT ) )
@@ -191,11 +191,11 @@ bool CShaderCompilerMakeFile::LoadShader( const achar* pPath, const achar* pBase
 					return false;
 				}
 
-				CJsonObject		jsonObject = jsonElement.GetObject();
-				shaderFlag_t	flag;
+				CJsonObject	 jsonObject = jsonElement.GetObject();
+				shaderFlag_t flag;
 
 				// Get flag name
-				CJsonValue		jsonName = jsonObject.GetValue( "name" );
+				CJsonValue jsonName = jsonObject.GetValue( "name" );
 				if ( jsonName.IsValid() )
 				{
 					if ( !jsonName.IsA( JSONVALUE_TYPE_STRING ) )
@@ -215,7 +215,7 @@ bool CShaderCompilerMakeFile::LoadShader( const achar* pPath, const achar* pBase
 				}
 
 				// Get minimum value
-				CJsonValue		jsonMin = jsonObject.GetValue( "min" );
+				CJsonValue jsonMin = jsonObject.GetValue( "min" );
 				if ( jsonMin.IsValid() )
 				{
 					if ( !jsonMin.IsA( JSONVALUE_TYPE_INT ) )
@@ -235,7 +235,7 @@ bool CShaderCompilerMakeFile::LoadShader( const achar* pPath, const achar* pBase
 				}
 
 				// Get maximum value
-				CJsonValue		jsonMax = jsonObject.GetValue( "max" );
+				CJsonValue jsonMax = jsonObject.GetValue( "max" );
 				if ( jsonMax.IsValid() )
 				{
 					if ( !jsonMax.IsA( JSONVALUE_TYPE_INT ) )
@@ -255,7 +255,7 @@ bool CShaderCompilerMakeFile::LoadShader( const achar* pPath, const achar* pBase
 				}
 
 				// Get default value
-				CJsonValue		jsonDefault = jsonObject.GetValue( "default" );
+				CJsonValue jsonDefault = jsonObject.GetValue( "default" );
 				if ( jsonDefault.IsValid() )
 				{
 					if ( !jsonDefault.IsA( JSONVALUE_TYPE_INT ) )
@@ -265,7 +265,7 @@ bool CShaderCompilerMakeFile::LoadShader( const achar* pPath, const achar* pBase
 					}
 					else
 					{
-						flag.bSetDefault = true;
+						flag.bSetDefault  = true;
 						flag.defaultValue = jsonDefault.GetInt();
 					}
 				}
@@ -290,7 +290,7 @@ bool CShaderCompilerMakeFile::LoadShader( const achar* pPath, const achar* pBase
 	}
 
 	// Get defines
-	CJsonValue		jsonDefines = jsonShader.GetValue( "defines" );
+	CJsonValue jsonDefines = jsonShader.GetValue( "defines" );
 	if ( jsonDefines.IsValid() )
 	{
 		if ( !jsonDefines.IsA( JSONVALUE_TYPE_ARRAY ) )
@@ -300,21 +300,21 @@ bool CShaderCompilerMakeFile::LoadShader( const achar* pPath, const achar* pBase
 		}
 		else
 		{
-			const std::vector<CJsonValue>	jsonArray = jsonDefines.GetArray();
-			for ( uint32 index = 0, count = ( uint32 )jsonArray.size(); index < count; ++index )
+			const std::vector<CJsonValue> jsonArray = jsonDefines.GetArray();
+			for ( uint32 index = 0, count = (uint32)jsonArray.size(); index < count; ++index )
 			{
-				const CJsonValue&	jsonElement = jsonArray[index];
+				const CJsonValue& jsonElement = jsonArray[index];
 				if ( !jsonElement.IsA( JSONVALUE_TYPE_OBJECT ) )
 				{
 					Error( "ShaderCompiler: Invalid 'defines[%i]', must be object with required fields: 'name' and 'value' (file: '%s')", index, absolutePath.c_str() );
 					return false;
 				}
 
-				CJsonObject		jsonObject = jsonElement.GetObject();
-				shaderDefine_t	define;
+				CJsonObject	   jsonObject = jsonElement.GetObject();
+				shaderDefine_t define;
 
 				// Get define name
-				CJsonValue		jsonName = jsonObject.GetValue( "name" );
+				CJsonValue jsonName = jsonObject.GetValue( "name" );
 				if ( jsonName.IsValid() )
 				{
 					if ( !jsonName.IsA( JSONVALUE_TYPE_STRING ) )
@@ -334,7 +334,7 @@ bool CShaderCompilerMakeFile::LoadShader( const achar* pPath, const achar* pBase
 				}
 
 				// Get define value
-				CJsonValue		jsonValue = jsonObject.GetValue( "value" );
+				CJsonValue jsonValue = jsonObject.GetValue( "value" );
 				if ( jsonValue.IsValid() )
 				{
 					if ( !jsonValue.IsA( JSONVALUE_TYPE_STRING ) )

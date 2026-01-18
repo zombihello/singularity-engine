@@ -14,10 +14,10 @@ void CEcsSystemCameraInit::OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity, con
 	if ( camera.bAutoViewData )
 	{
 		// TODO BS yehor.pohuliaka - Implement handle resize the window
-		uint32		windowWidth;
-		uint32		windowHeight;
+		uint32 windowWidth;
+		uint32 windowHeight;
 		windowMgr.pWindowMgr->GetSize( windowWidth, windowHeight );
-		camera.aspectRatio = ( float )windowWidth / windowHeight;
+		camera.aspectRatio = (float)windowWidth / windowHeight;
 	}
 
 	ecsWorld.AddComponent<ecsComponentCameraInited_t>( entity );
@@ -30,12 +30,12 @@ CEcsSystemUpdateCameraView::OnUpdate
 */
 void CEcsSystemUpdateCameraView::OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity, const ecsComponentTransform_t& transform, const ecsComponentCamera_t& camera, const ecsResourceStudioRender_t& studioRender )
 {
-	studioCameraView_t				studioCameraView = {};
-	studioCameraView.location		= transform.transform.GetLocation();
-	studioCameraView.rotation		= transform.transform.GetRotation();
-	studioCameraView.fieldOfView	= camera.fieldOfView;
-	studioCameraView.nearClipPlane	= camera.nearClipPlane;
-	studioCameraView.farClipPlane	= camera.farClipPlane;
-	studioCameraView.aspectRatio	= camera.aspectRatio;
+	studioCameraView_t studioCameraView = {};
+	studioCameraView.location			= transform.transform.GetLocation();
+	studioCameraView.rotation			= transform.transform.GetRotation();
+	studioCameraView.fieldOfView		= camera.fieldOfView;
+	studioCameraView.nearClipPlane		= camera.nearClipPlane;
+	studioCameraView.farClipPlane		= camera.farClipPlane;
+	studioCameraView.aspectRatio		= camera.aspectRatio;
 	studioRender.pStudioRender->SetCameraView( studioCameraView );
 }

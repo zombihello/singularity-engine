@@ -6,13 +6,12 @@
 #include "stexdoc/stex_compiled_doc.h"
 
 // Singularity texture magic
-static const uint32		s_STEXMagicSize					= 5;
-static const achar		s_STEXMagic[s_STEXMagicSize]	= { 'S', 'T', 'E', 'X', 'C' };		// Singularity Texture Compiled
+static const uint32 s_STEXMagicSize				 = 5;
+static const char	s_STEXMagic[s_STEXMagicSize] = { 'S', 'T', 'E', 'X', 'C' };	 // Singularity Texture Compiled
 static_assert( sizeof( s_STEXMagic ) == s_STEXMagicSize, "Size of s_STEXMagic must be equal to s_STEXMagicSize" );
 
 // Singularity texture version
-static const uint32		s_STEXVersion					= 1;
-
+static const uint32 s_STEXVersion = 1;
 
 /*
 ==================
@@ -28,21 +27,22 @@ CSTEXCompiledTextureDoc::CSTEXCompiledTextureDoc()
 	, addressModeV( STUDIOAPI_SAMPLER_ADDRESS_MODE_WRAP )
 	, addressModeW( STUDIOAPI_SAMPLER_ADDRESS_MODE_WRAP )
 	, filter( STUDIOAPI_SAMPLER_FILTER_POINT )
-{}
+{
+}
 
 /*
 ==================
 CSTEXCompiledTextureDoc::SaveFile
 ==================
 */
-bool CSTEXCompiledTextureDoc::SaveFile( const achar* pPath )
+bool CSTEXCompiledTextureDoc::SaveFile( const char* pPath )
 {
 	// Do nothing if the file system isn't valid
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 	Assert( g_pFileSystem );
-	
+
 	// Try to open a file
-	TRefPtr<IStreamDataWriter>	pFile = g_pFileSystem->CreateFileWriter( pPath );
+	TRefPtr<IStreamDataWriter> pFile = g_pFileSystem->CreateFileWriter( pPath );
 	if ( !pFile )
 	{
 		Error( "STEXDoc: Failed to open file '%s'", pPath );
@@ -50,26 +50,26 @@ bool CSTEXCompiledTextureDoc::SaveFile( const achar* pPath )
 	}
 
 	// Write format magic and version
-	pFile->Write( ( void* )s_STEXMagic, s_STEXMagicSize );
-	pFile->Write( ( void* )&s_STEXVersion, sizeof( uint32 ) );
+	pFile->Write( (void*)s_STEXMagic, s_STEXMagicSize );
+	pFile->Write( (void*)&s_STEXVersion, sizeof( uint32 ) );
 
 	// Write texture header
-	pFile->Write( &type,			sizeof( studioAPITextureType_t ) );
-	pFile->Write( &pixelFormat,		sizeof( studioAPIPixelFormat_t ) );
-	pFile->Write( &numLayers,		sizeof( uint32 ) );
-	pFile->Write( &addressModeU,	sizeof( studioAPISamplerAddressMode_t ) );
-	pFile->Write( &addressModeV,	sizeof( studioAPISamplerAddressMode_t ) );
-	pFile->Write( &addressModeW,	sizeof( studioAPISamplerAddressMode_t ) );
-	pFile->Write( &filter,			sizeof( studioAPISamplerFilter_t ) );
-	pFile->Write( &maxAnisotropy,	sizeof( uint32 ) );
+	pFile->Write( &type, sizeof( studioAPITextureType_t ) );
+	pFile->Write( &pixelFormat, sizeof( studioAPIPixelFormat_t ) );
+	pFile->Write( &numLayers, sizeof( uint32 ) );
+	pFile->Write( &addressModeU, sizeof( studioAPISamplerAddressMode_t ) );
+	pFile->Write( &addressModeV, sizeof( studioAPISamplerAddressMode_t ) );
+	pFile->Write( &addressModeW, sizeof( studioAPISamplerAddressMode_t ) );
+	pFile->Write( &filter, sizeof( studioAPISamplerFilter_t ) );
+	pFile->Write( &maxAnisotropy, sizeof( uint32 ) );
 
 	// Write texture mipmap information
-	uint32		numMipmaps = ( uint32 )mipmaps.size();
+	uint32 numMipmaps = (uint32)mipmaps.size();
 	pFile->Write( &numMipmaps, sizeof( uint32 ) );
 	pFile->Write( mipmaps.data(), numMipmaps * sizeof( stexTextureMipMap_t ) );
 
 	// Write texture data
-	uint32		dataSize = ( uint32 )data.size();
+	uint32 dataSize = (uint32)data.size();
 	pFile->Write( &dataSize, sizeof( uint32 ) );
 	CZLib::Compress( pFile, data.data(), dataSize );
 
@@ -82,14 +82,14 @@ bool CSTEXCompiledTextureDoc::SaveFile( const achar* pPath )
 CSTEXCompiledTextureDoc::LoadFromFile
 ==================
 */
-bool CSTEXCompiledTextureDoc::LoadFromFile( const achar* pPath )
+bool CSTEXCompiledTextureDoc::LoadFromFile( const char* pPath )
 {
 	// Do nothing if the file system isn't valid
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 	Assert( g_pFileSystem );
-	
+
 	// Try to open a file
-	TRefPtr<IStreamDataReader>	pFile = g_pFileSystem->CreateFileReader( pPath );
+	TRefPtr<IStreamDataReader> pFile = g_pFileSystem->CreateFileReader( pPath );
 	if ( !pFile )
 	{
 		Error( "STEXDoc: Failed to open file '%s'", pPath );
@@ -97,8 +97,8 @@ bool CSTEXCompiledTextureDoc::LoadFromFile( const achar* pPath )
 	}
 
 	// Read format magic and version
-	achar	magic[s_STEXMagicSize];
-	uint32	version = 0;
+	char  magic[s_STEXMagicSize];
+	uint32 version = 0;
 	pFile->Read( magic, s_STEXMagicSize );
 	pFile->Read( &version, sizeof( uint32 ) );
 	if ( S_Strncmp( magic, s_STEXMagic, s_STEXMagicSize ) )
@@ -115,17 +115,17 @@ bool CSTEXCompiledTextureDoc::LoadFromFile( const achar* pPath )
 	Clear();
 
 	// Read texture header
-	pFile->Read( &type,				sizeof( studioAPITextureType_t ) );
-	pFile->Read( &pixelFormat,		sizeof( studioAPIPixelFormat_t ) );
-	pFile->Read( &numLayers,		sizeof( uint32 ) );
-	pFile->Read( &addressModeU,		sizeof( studioAPISamplerAddressMode_t ) );
-	pFile->Read( &addressModeV,		sizeof( studioAPISamplerAddressMode_t ) );
-	pFile->Read( &addressModeW,		sizeof( studioAPISamplerAddressMode_t ) );
-	pFile->Read( &filter,			sizeof( studioAPISamplerFilter_t ) );
-	pFile->Read( &maxAnisotropy,	sizeof( uint32 ) );
+	pFile->Read( &type, sizeof( studioAPITextureType_t ) );
+	pFile->Read( &pixelFormat, sizeof( studioAPIPixelFormat_t ) );
+	pFile->Read( &numLayers, sizeof( uint32 ) );
+	pFile->Read( &addressModeU, sizeof( studioAPISamplerAddressMode_t ) );
+	pFile->Read( &addressModeV, sizeof( studioAPISamplerAddressMode_t ) );
+	pFile->Read( &addressModeW, sizeof( studioAPISamplerAddressMode_t ) );
+	pFile->Read( &filter, sizeof( studioAPISamplerFilter_t ) );
+	pFile->Read( &maxAnisotropy, sizeof( uint32 ) );
 
 	// Read texture mipmap information
-	uint32		numMipmaps = 0;
+	uint32 numMipmaps = 0;
 	pFile->Read( &numMipmaps, sizeof( uint32 ) );
 	if ( numMipmaps > 0 )
 	{
@@ -134,7 +134,7 @@ bool CSTEXCompiledTextureDoc::LoadFromFile( const achar* pPath )
 	}
 
 	// Read texture data
-	uint32		dataSize = 0;
+	uint32 dataSize = 0;
 	pFile->Read( &dataSize, sizeof( uint32 ) );
 	if ( dataSize > 0 )
 	{
@@ -154,7 +154,7 @@ CSTEXCompiledTextureDoc::Validate
 void CSTEXCompiledTextureDoc::Validate( studioAPITextureType_t type, uint32 numLayers, const stexTextureMipMaps_t& mipmaps ) const
 {
 	AssertMsg( !mipmaps.empty(), "A texture must have at least one mip level" );
-	const stexTextureMipMap_t&		mipmap0 = mipmaps[0];
+	const stexTextureMipMap_t& mipmap0 = mipmaps[0];
 
 	switch ( type )
 	{

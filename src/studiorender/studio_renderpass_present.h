@@ -10,7 +10,6 @@ class IStudioAPIRenderPipeline;
 class IStudioAPISwapChain;
 class CStudioViewport;
 
-
 //-----------------------------------------------------------------------------
 // Studio present render pass
 //-----------------------------------------------------------------------------
@@ -20,7 +19,7 @@ public:
 	void Init();
 	void Shutdown();
 
-	void R_DrawPass( CStudioViewport* pViewport, CStudioRenderObjectQuad* pQuad );
+	void									 R_DrawPass( CStudioViewport* pViewport, CStudioRenderObjectQuad* pQuad );
 	static TRefPtr<IStudioAPIRenderPipeline> R_CreateStudioAPIRenderPipeline( CStudioViewport* pViewport, IStudioAPIBoundShaderState* pStudioAPIBoundShaderState );
 
 private:

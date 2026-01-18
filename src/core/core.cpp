@@ -3,18 +3,18 @@
 #include "core/core_private.h"
 #include "core/crashdump_private.h"
 
-bool		g_bRequestingExit	= false;
-double		g_SecondsPerCycle	= Sys_GetSecondsPerCycle();
+bool   g_bRequestingExit = false;
+double g_SecondsPerCycle = Sys_GetSecondsPerCycle();
 
 /*
 ==================
 Sys_Error
 ==================
 */
-void Sys_Error( const achar* pFormat, ... )
+void Sys_Error( const char* pFormat, ... )
 {
 	// Don't show message if we already shutdown the game by a critical error
-	static bool		s_bAlreadyHasError = false;
+	static bool s_bAlreadyHasError = false;
 	if ( s_bAlreadyHasError )
 	{
 		return;
@@ -22,9 +22,9 @@ void Sys_Error( const achar* pFormat, ... )
 	s_bAlreadyHasError = true;
 
 	// Get formated string
-	va_list			params;
+	va_list params;
 	va_start( params, pFormat );
-	std::string		message = S_Vsprintf( pFormat, params );
+	std::string message = S_Vsprintf( pFormat, params );
 	va_end( params );
 
 	// Print message and show message box
@@ -47,14 +47,14 @@ void Sys_Error( const achar* pFormat, ... )
 Sys_ShowMessageBox
 ==================
 */
-void Sys_ShowMessageBox( const achar* pTitle, const achar* pMessage, messageBox_t type )
+void Sys_ShowMessageBox( const char* pTitle, const char* pMessage, messageBox_t type )
 {
-	uint32 		sdlFlags = 0;
+	uint32 sdlFlags = 0;
 	switch ( type )
 	{
-	case MESSAGE_BOX_INFO: 		sdlFlags = SDL_MESSAGEBOX_INFORMATION; 	break;
-	case MESSAGE_BOX_WARNING: 	sdlFlags = SDL_MESSAGEBOX_WARNING; 		break;
-	case MESSAGE_BOX_ERROR: 	sdlFlags = SDL_MESSAGEBOX_ERROR; 		break;
+	case MESSAGE_BOX_INFO: sdlFlags = SDL_MESSAGEBOX_INFORMATION; break;
+	case MESSAGE_BOX_WARNING: sdlFlags = SDL_MESSAGEBOX_WARNING; break;
+	case MESSAGE_BOX_ERROR: sdlFlags = SDL_MESSAGEBOX_ERROR; break;
 	default:
 		AssertMsg( false, "Unknown message type" );
 		break;

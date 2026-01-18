@@ -24,29 +24,28 @@ public:
 
 	// IGame interfaces
 	// NOTE: The path to the map in the file system can be without file extension
-	virtual bool MapInit( const achar* pPath ) override;
-	virtual void MapShutdown() override;
-	virtual bool HasActiveMap() const override;
+	virtual bool  MapInit( const char* pPath ) override;
+	virtual void  MapShutdown() override;
+	virtual bool  HasActiveMap() const override;
 	virtual IMap* GetActiveMap() const override;
 
 	// Process one game frame
 	virtual void FrameUpdate() override;
 
 	CGame();
-	CEcsMap* GetActiveEcsMap() const;
+	CEcsMap*			GetActiveEcsMap() const;
 	CEcsComponentTypes& GetEcsComponentTypes();
 
 protected:
-	CEcsComponentTypes			ecsComponentTypes;
-	CEcsMap*					pActiveEcsMap;
+	CEcsComponentTypes ecsComponentTypes;
+	CEcsMap*		   pActiveEcsMap;
 
 private:
-	CEcsEntityDescFactory		ecsEntityDescFactory;
+	CEcsEntityDescFactory ecsEntityDescFactory;
 };
 
 // NOTE: You must implement the function to return a singleton game class
 CGame* Game();
-
 
 //-----------------------------------------------------------------------------
 // Base class of the game IAppSystems
@@ -55,14 +54,14 @@ class CGameAppSystems : public IGameAppSystems
 {
 public:
 	// IGameAppSystems interfaces
-	virtual uint32 GetNum() const override;
+	virtual uint32				GetNum() const override;
 	virtual gameAppSystemInfo_t GetInfo( uint32 index ) const override;
 
 protected:
-	void AddAppSystem( const achar* pModuleName, const achar* pInterfaceName, gameAppSystemOrder_t order );
+	void AddAppSystem( const char* pModuleName, const char* pInterfaceName, gameAppSystemOrder_t order );
 
 private:
-	std::vector<gameAppSystemInfo_t>	appSystems;
+	std::vector<gameAppSystemInfo_t> appSystems;
 };
 
 #include "gameframework/game.inl"

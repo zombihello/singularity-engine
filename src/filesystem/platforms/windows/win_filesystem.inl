@@ -5,8 +5,8 @@
 Plat_MakeDirectory
 ==================
 */
-FORCEINLINE bool Plat_MakeDirectory( const achar* pPath )
-{ 
+FORCEINLINE bool Plat_MakeDirectory( const char* pPath )
+{
 	return CreateDirectoryA( pPath, NULL ) != 0 || GetLastError() == ERROR_ALREADY_EXISTS;
 }
 
@@ -15,7 +15,7 @@ FORCEINLINE bool Plat_MakeDirectory( const achar* pPath )
 Plat_DeleteDirectory
 ==================
 */
-FORCEINLINE bool Plat_DeleteDirectory( const achar* pPath, bool bEvenReadOnly /*= false*/ )
+FORCEINLINE bool Plat_DeleteDirectory( const char* pPath, bool bEvenReadOnly /*= false*/ )
 {
 	return RemoveDirectoryA( pPath );
 }
@@ -25,11 +25,11 @@ FORCEINLINE bool Plat_DeleteDirectory( const achar* pPath, bool bEvenReadOnly /*
 Plat_IsFileExists
 ==================
 */
-FORCEINLINE bool Plat_IsFileExists( const achar* pPath )
+FORCEINLINE bool Plat_IsFileExists( const char* pPath )
 {
 	// Get file attributes at the path
-	DWORD	fileAttributes = GetFileAttributesA( pPath );
-	
+	DWORD fileAttributes = GetFileAttributesA( pPath );
+
 	// If it was not possible to get the file attributes, then the file does not exist
 	if ( fileAttributes == INVALID_FILE_ATTRIBUTES )
 	{
@@ -45,9 +45,9 @@ FORCEINLINE bool Plat_IsFileExists( const achar* pPath )
 Plat_IsFileDirectory
 ==================
 */
-FORCEINLINE bool Plat_IsFileDirectory( const achar* pPath )
+FORCEINLINE bool Plat_IsFileDirectory( const char* pPath )
 {
-	DWORD	fileAttributes = GetFileAttributesA( pPath );
+	DWORD fileAttributes = GetFileAttributesA( pPath );
 	return fileAttributes != INVALID_FILE_ATTRIBUTES && fileAttributes & FILE_ATTRIBUTE_DIRECTORY;
 }
 
@@ -56,8 +56,8 @@ FORCEINLINE bool Plat_IsFileDirectory( const achar* pPath )
 Plat_MoveFile
 ==================
 */
-FORCEINLINE copyMoveResult_t Plat_MoveFile( const achar* pSrcPath, const achar* pDestPath, bool bReplaceExisting /*= false*/, bool bEvenReadOnly /*= false*/ )
+FORCEINLINE copyMoveResult_t Plat_MoveFile( const char* pSrcPath, const char* pDestPath, bool bReplaceExisting /*= false*/, bool bEvenReadOnly /*= false*/ )
 {
-	DWORD	moveFlags = ( bReplaceExisting ? MOVEFILE_REPLACE_EXISTING : 0x0 ) | MOVEFILE_WRITE_THROUGH;
+	DWORD moveFlags = ( bReplaceExisting ? MOVEFILE_REPLACE_EXISTING : 0x0 ) | MOVEFILE_WRITE_THROUGH;
 	return MoveFileExA( pSrcPath, pDestPath, moveFlags ) != 0 ? COPYMOVE_RESULT_OK : COPYMOVE_RESULT_MISC_FAIL;
 }

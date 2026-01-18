@@ -20,7 +20,6 @@ void CEcsWorld::Reset( bool bAutoInit /* = true */ )
 	}
 }
 
-
 /*
 ==================
 EcsInitModules_Gameframework

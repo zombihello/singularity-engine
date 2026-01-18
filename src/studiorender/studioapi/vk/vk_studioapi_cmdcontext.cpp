@@ -12,14 +12,13 @@ FORCEINLINE uint8 StudioAPIVk_TranslateQueueTypeToQueueFlags( studioAPIQueueType
 	switch ( queueType )
 	{
 	case STUDIOAPI_QUEUE_TYPE_GRAPHICS: return STUDIOAPI_VK_QUEUE_FLAG_GRAPHICS;
-	case STUDIOAPI_QUEUE_TYPE_COMPUTE:	return STUDIOAPI_VK_QUEUE_FLAG_COMPUTE;
+	case STUDIOAPI_QUEUE_TYPE_COMPUTE: return STUDIOAPI_VK_QUEUE_FLAG_COMPUTE;
 	case STUDIOAPI_QUEUE_TYPE_TRANSFER: return STUDIOAPI_VK_QUEUE_FLAG_TRANSFER;
 	default:
 		AssertMsg( false, "Unknown StudioAPI queue type 0%X", queueType );
 		return 0;
 	}
 }
-
 
 /*
 ==================
@@ -33,7 +32,8 @@ CStudioAPICmdContextVk::CStudioAPICmdContextVk( CStudioAPIQueueVk& queue, uint8 
 	, cmdBufferPools{ queue, queue, queue }
 	, pPendingRenderState( NULL )
 	, pPendingComputeState( NULL )
-{}
+{
+}
 
 /*
 ==================
@@ -55,12 +55,12 @@ void CStudioAPICmdContextVk::Init()
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 
 	// Initialize groups of pending barriers
-	Mem_Memzero( &pendingBufferBarriers,	sizeof( pendingBufferBarriers ) );
-	Mem_Memzero( &pendingImageBarriers,		sizeof( pendingImageBarriers ) );
-	Mem_Memzero( &pendingMemoryBarriers,	sizeof( pendingMemoryBarriers ) );
+	Mem_Memzero( &pendingBufferBarriers, sizeof( pendingBufferBarriers ) );
+	Mem_Memzero( &pendingImageBarriers, sizeof( pendingImageBarriers ) );
+	Mem_Memzero( &pendingMemoryBarriers, sizeof( pendingMemoryBarriers ) );
 
 	// Create pending state, contains pipeline states such as current shader and etc
-	if ( HasSupportQueueTypes( STUDIOAPI_VK_QUEUE_FLAG_GRAPHICS )  )
+	if ( HasSupportQueueTypes( STUDIOAPI_VK_QUEUE_FLAG_GRAPHICS ) )
 	{
 		pPendingRenderState = new CStudioAPIPendingRenderStateVk( *this );
 	}
@@ -113,9 +113,9 @@ void CStudioAPICmdContextVk::Shutdown()
 	}
 
 	// Clear all groups of pending barriers
-	Mem_Memzero( &pendingBufferBarriers,	sizeof( pendingBufferBarriers ) );
-	Mem_Memzero( &pendingImageBarriers,		sizeof( pendingImageBarriers ) );
-	Mem_Memzero( &pendingMemoryBarriers,	sizeof( pendingMemoryBarriers ) );
+	Mem_Memzero( &pendingBufferBarriers, sizeof( pendingBufferBarriers ) );
+	Mem_Memzero( &pendingImageBarriers, sizeof( pendingImageBarriers ) );
+	Mem_Memzero( &pendingMemoryBarriers, sizeof( pendingMemoryBarriers ) );
 }
 
 /*
@@ -279,15 +279,15 @@ void CStudioAPICmdContextVk::AddPendingBufferBarriers( CStudioAPICmdListVk* pCmd
 	// If the context hasn't support of render commands then unset flags which only for a render pipeline
 	if ( !HasSupportQueueTypes( STUDIOAPI_VK_QUEUE_FLAG_GRAPHICS ) )
 	{
-		const VkPipelineStageFlags	vkPipelineStagesRenderShaders	= VK_PIPELINE_STAGE_VERTEX_SHADER_BIT 
-																	| VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT 
-																	| VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT 
-																	| VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT 
-																	| VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		const VkPipelineStageFlags vkPipelineStagesRenderShaders = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT
+																   | VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT
+																   | VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT
+																   | VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT
+																   | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 
-		const VkPipelineStageFlags	vkPipelineStagesRender			= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT 
-																	| VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT 
-																	| VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		const VkPipelineStageFlags vkPipelineStagesRender = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT
+															| VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT
+															| VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 		vkSrcStageMask &= ~vkPipelineStagesRenderShaders;
 		vkDstStageMask &= ~vkPipelineStagesRenderShaders;
 
@@ -317,10 +317,10 @@ void CStudioAPICmdContextVk::AddPendingBufferBarriers( CStudioAPICmdListVk* pCmd
 	}
 
 	// Otherwise add a new pending barrier
-	pendingBufferBarriers.vkSrcStageMask		|= vkSrcStageMask;
-	pendingBufferBarriers.vkDstStageMask		|= vkDstStageMask;
+	pendingBufferBarriers.vkSrcStageMask |= vkSrcStageMask;
+	pendingBufferBarriers.vkDstStageMask |= vkDstStageMask;
 	Mem_Memcpy( pendingBufferBarriers.vkPendingBarriers + pendingBufferBarriers.numPendingBarriers, pVkBufferMemoryBarriers, sizeof( VkBufferMemoryBarrier ) * numBufferBarriers );
-	pendingBufferBarriers.numPendingBarriers	+= numBufferBarriers;
+	pendingBufferBarriers.numPendingBarriers += numBufferBarriers;
 }
 
 /*
@@ -335,15 +335,15 @@ void CStudioAPICmdContextVk::AddPendingImageBarriers( CStudioAPICmdListVk* pCmdL
 	// If the context hasn't support of render commands then unset flags which only for a render pipeline
 	if ( !HasSupportQueueTypes( STUDIOAPI_VK_QUEUE_FLAG_GRAPHICS ) )
 	{
-		const VkPipelineStageFlags	vkPipelineStagesRenderShaders	= VK_PIPELINE_STAGE_VERTEX_SHADER_BIT 
-																	| VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT 
-																	| VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT 
-																	| VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT 
-																	| VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		const VkPipelineStageFlags vkPipelineStagesRenderShaders = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT
+																   | VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT
+																   | VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT
+																   | VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT
+																   | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 
-		const VkPipelineStageFlags	vkPipelineStagesRender			= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT 
-																	| VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT 
-																	| VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		const VkPipelineStageFlags vkPipelineStagesRender = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT
+															| VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT
+															| VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 		vkSrcStageMask &= ~vkPipelineStagesRenderShaders;
 		vkDstStageMask &= ~vkPipelineStagesRenderShaders;
 
@@ -373,10 +373,10 @@ void CStudioAPICmdContextVk::AddPendingImageBarriers( CStudioAPICmdListVk* pCmdL
 	}
 
 	// Otherwise add a new pending barrier
-	pendingImageBarriers.vkSrcStageMask		|= vkSrcStageMask;
-	pendingImageBarriers.vkDstStageMask		|= vkDstStageMask;
+	pendingImageBarriers.vkSrcStageMask |= vkSrcStageMask;
+	pendingImageBarriers.vkDstStageMask |= vkDstStageMask;
 	Mem_Memcpy( pendingImageBarriers.vkPendingBarriers + pendingImageBarriers.numPendingBarriers, pVkImageMemoryBarrier, sizeof( VkImageMemoryBarrier ) * numImageBarriers );
-	pendingImageBarriers.numPendingBarriers	+= numImageBarriers;
+	pendingImageBarriers.numPendingBarriers += numImageBarriers;
 }
 
 /*
@@ -391,15 +391,15 @@ void CStudioAPICmdContextVk::AddPendingMemoryBarriers( CStudioAPICmdListVk* pCmd
 	// If the context hasn't support of render commands then unset flags which only for a render pipeline
 	if ( !HasSupportQueueTypes( STUDIOAPI_VK_QUEUE_FLAG_GRAPHICS ) )
 	{
-		const VkPipelineStageFlags	vkPipelineStagesRenderShaders	= VK_PIPELINE_STAGE_VERTEX_SHADER_BIT 
-																	| VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT 
-																	| VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT 
-																	| VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT 
-																	| VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		const VkPipelineStageFlags vkPipelineStagesRenderShaders = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT
+																   | VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT
+																   | VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT
+																   | VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT
+																   | VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 
-		const VkPipelineStageFlags	vkPipelineStagesRender			= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT 
-																	| VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT 
-																	| VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		const VkPipelineStageFlags vkPipelineStagesRender = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT
+															| VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT
+															| VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 		vkSrcStageMask &= ~vkPipelineStagesRenderShaders;
 		vkDstStageMask &= ~vkPipelineStagesRenderShaders;
 
@@ -429,10 +429,10 @@ void CStudioAPICmdContextVk::AddPendingMemoryBarriers( CStudioAPICmdListVk* pCmd
 	}
 
 	// Otherwise add a new pending barrier
-	pendingMemoryBarriers.vkSrcStageMask		|= vkSrcStageMask;
-	pendingMemoryBarriers.vkDstStageMask		|= vkDstStageMask;
+	pendingMemoryBarriers.vkSrcStageMask |= vkSrcStageMask;
+	pendingMemoryBarriers.vkDstStageMask |= vkDstStageMask;
 	Mem_Memcpy( pendingMemoryBarriers.vkPendingBarriers + pendingMemoryBarriers.numPendingBarriers, pVkMemoryBarrier, sizeof( VkMemoryBarrier ) * numMemoryBarriers );
-	pendingMemoryBarriers.numPendingBarriers	+= numMemoryBarriers;
+	pendingMemoryBarriers.numPendingBarriers += numMemoryBarriers;
 }
 
 /*
@@ -447,24 +447,24 @@ void CStudioAPICmdContextVk::FlushPendingBarriers( CStudioAPICmdListVk* pCmdList
 	if ( pendingBufferBarriers.numPendingBarriers > 0 || pendingImageBarriers.numPendingBarriers > 0 || pendingMemoryBarriers.numPendingBarriers > 0 )
 	{
 		// Push a pipeline barrier into the command list
-		vkCmdPipelineBarrier( pCmdList->GetCmdBuffer()->GetVkCommandBuffer(), 
-							  pendingBufferBarriers.vkSrcStageMask | pendingImageBarriers.vkSrcStageMask | pendingMemoryBarriers.vkSrcStageMask, 
-							  pendingBufferBarriers.vkDstStageMask | pendingImageBarriers.vkDstStageMask | pendingMemoryBarriers.vkDstStageMask, 
-							  0, 
-							  pendingMemoryBarriers.numPendingBarriers, pendingMemoryBarriers.vkPendingBarriers, 
-							  pendingBufferBarriers.numPendingBarriers, pendingBufferBarriers.vkPendingBarriers, 
+		vkCmdPipelineBarrier( pCmdList->GetCmdBuffer()->GetVkCommandBuffer(),
+							  pendingBufferBarriers.vkSrcStageMask | pendingImageBarriers.vkSrcStageMask | pendingMemoryBarriers.vkSrcStageMask,
+							  pendingBufferBarriers.vkDstStageMask | pendingImageBarriers.vkDstStageMask | pendingMemoryBarriers.vkDstStageMask,
+							  0,
+							  pendingMemoryBarriers.numPendingBarriers, pendingMemoryBarriers.vkPendingBarriers,
+							  pendingBufferBarriers.numPendingBarriers, pendingBufferBarriers.vkPendingBarriers,
 							  pendingImageBarriers.numPendingBarriers, pendingImageBarriers.vkPendingBarriers );
 
 		// Reset pending barriers
-		pendingBufferBarriers.vkSrcStageMask		= VK_PIPELINE_STAGE_NONE;
-		pendingBufferBarriers.vkDstStageMask		= VK_PIPELINE_STAGE_NONE;
-		pendingBufferBarriers.numPendingBarriers	= 0;
-		pendingImageBarriers.vkSrcStageMask			= VK_PIPELINE_STAGE_NONE;
-		pendingImageBarriers.vkDstStageMask			= VK_PIPELINE_STAGE_NONE;
-		pendingImageBarriers.numPendingBarriers		= 0;
-		pendingMemoryBarriers.vkSrcStageMask		= VK_PIPELINE_STAGE_NONE;
-		pendingMemoryBarriers.vkDstStageMask		= VK_PIPELINE_STAGE_NONE;
-		pendingMemoryBarriers.numPendingBarriers	= 0;
+		pendingBufferBarriers.vkSrcStageMask	 = VK_PIPELINE_STAGE_NONE;
+		pendingBufferBarriers.vkDstStageMask	 = VK_PIPELINE_STAGE_NONE;
+		pendingBufferBarriers.numPendingBarriers = 0;
+		pendingImageBarriers.vkSrcStageMask		 = VK_PIPELINE_STAGE_NONE;
+		pendingImageBarriers.vkDstStageMask		 = VK_PIPELINE_STAGE_NONE;
+		pendingImageBarriers.numPendingBarriers	 = 0;
+		pendingMemoryBarriers.vkSrcStageMask	 = VK_PIPELINE_STAGE_NONE;
+		pendingMemoryBarriers.vkDstStageMask	 = VK_PIPELINE_STAGE_NONE;
+		pendingMemoryBarriers.numPendingBarriers = 0;
 	}
 }
 

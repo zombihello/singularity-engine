@@ -27,7 +27,7 @@ CGame::GetActiveEcsMap
 */
 FORCEINLINE CEcsMap* CGame::GetActiveEcsMap() const
 {
-	return ( CEcsMap* )GetActiveMap();
+	return (CEcsMap*)GetActiveMap();
 }
 
 /*
@@ -40,16 +40,15 @@ FORCEINLINE CEcsComponentTypes& CGame::GetEcsComponentTypes()
 	return ecsComponentTypes;
 }
 
-
 /*
 ==================
 CGameAppSystems::AddAppSystem
 ==================
 */
-FORCEINLINE void CGameAppSystems::AddAppSystem( const achar* pModuleName, const achar* pInterfaceName, gameAppSystemOrder_t order )
+FORCEINLINE void CGameAppSystems::AddAppSystem( const char* pModuleName, const char* pInterfaceName, gameAppSystemOrder_t order )
 {
-	gameAppSystemInfo_t&			appSystemInfo = appSystems.emplace_back();
-	appSystemInfo.order				= order;
-	appSystemInfo.pModuleName		= pModuleName;
-	appSystemInfo.pInterfaceName	= pInterfaceName;
+	gameAppSystemInfo_t& appSystemInfo = appSystems.emplace_back();
+	appSystemInfo.order				   = order;
+	appSystemInfo.pModuleName		   = pModuleName;
+	appSystemInfo.pInterfaceName	   = pInterfaceName;
 }

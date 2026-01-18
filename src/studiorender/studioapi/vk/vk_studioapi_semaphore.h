@@ -6,7 +6,6 @@
 //-----------------------------------------------------------------------------
 class CStudioAPISyncMgrVk;
 
-
 //-----------------------------------------------------------------------------
 // Vulkan StudioAPI semaphore
 //-----------------------------------------------------------------------------
@@ -20,8 +19,8 @@ public:
 		, vkSemaphore( VK_NULL_HANDLE )
 	{
 		// Create semaphore
-		VkSemaphoreCreateInfo			vkSemaphoreCreateInfo = {};
-		vkSemaphoreCreateInfo.sType		= VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+		VkSemaphoreCreateInfo vkSemaphoreCreateInfo = {};
+		vkSemaphoreCreateInfo.sType					= VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 		STUDIOAPI_VK_VERIFY_RESULT( vkCreateSemaphore( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), &vkSemaphoreCreateInfo, NULL, &vkSemaphore ) );
 	}
 	~CStudioAPISemaphoreVk()
@@ -33,16 +32,15 @@ public:
 	void Signal();
 	void Unsignal();
 
-	bool IsSignaled() const;
+	bool		IsSignaled() const;
 	VkSemaphore GetVkSemaphore() const;
 
 private:
 	void Destroy();
 
-	bool			bSignaled;
-	VkSemaphore		vkSemaphore;
+	bool		bSignaled;
+	VkSemaphore vkSemaphore;
 };
-
 
 //-----------------------------------------------------------------------------
 // Vulkan StudioAPI named semaphore
@@ -53,21 +51,23 @@ public:
 	friend CStudioAPISyncMgrVk;
 
 	CStudioAPISemaphoreVk* GetCurrentSemaphore() const;
-	const std::string& GetName() const;
+	const std::string&	   GetName() const;
 
-	operator CStudioAPISemaphoreVk* () const;
+						   operator CStudioAPISemaphoreVk*() const;
 	CStudioAPISemaphoreVk* operator->() const;
 
 private:
 	CStudioAPINamedSemaphoreVk()
 		: countReferences( 1 )
-	{}
+	{
+	}
 	~CStudioAPINamedSemaphoreVk()
-	{}
+	{
+	}
 
-	uint32						countReferences;
-	CStudioAPISemaphoreVk*		pSemaphores[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];
-	std::string					name;
+	uint32				   countReferences;
+	CStudioAPISemaphoreVk* pSemaphores[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];
+	std::string			   name;
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_semaphore.inl"

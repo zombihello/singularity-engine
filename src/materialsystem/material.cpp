@@ -15,7 +15,8 @@ CMaterial::CMaterial
 CMaterial::CMaterial()
 	: bDirtyBuffers( false )
 	, pShader( NULL )
-{}
+{
+}
 
 /*
 ==================
@@ -41,7 +42,7 @@ CMaterial::~CMaterial()
 	DestroyBuffers();
 
 	// Free allocated memory for variables
-	for ( uint32 varIdx = 0, numVars = ( uint32 )vars.size(); varIdx < numVars; ++varIdx )
+	for ( uint32 varIdx = 0, numVars = (uint32)vars.size(); varIdx < numVars; ++varIdx )
 	{
 		delete vars[varIdx];
 	}
@@ -58,51 +59,51 @@ void CMaterial::Init( const CSMATCompiledMaterialDoc& smatCompiledDoc )
 	SetShader( smatCompiledDoc.GetShaderName() );
 
 	// Set material variable from the SMAT file
-	const std::vector<CSMATMaterialVar>&		smatMatVars = smatCompiledDoc.GetVars();
-	for ( uint32 varIdx = 0, count = ( uint32 )smatMatVars.size(); varIdx < count; ++varIdx )
+	const std::vector<CSMATMaterialVar>& smatMatVars = smatCompiledDoc.GetVars();
+	for ( uint32 varIdx = 0, count = (uint32)smatMatVars.size(); varIdx < count; ++varIdx )
 	{
-		const CSMATMaterialVar&	smatMatVar	= smatMatVars[varIdx];
-		CMaterialVar*			pVar		= ( CMaterialVar* )FindVar( smatMatVar.GetName() );
+		const CSMATMaterialVar& smatMatVar = smatMatVars[varIdx];
+		CMaterialVar*			pVar	   = (CMaterialVar*)FindVar( smatMatVar.GetName() );
 		if ( pVar )
 		{
 			switch ( smatMatVar.GetType() )
 			{
-			case SMAT_MATERIAL_VAR_TYPE_BOOL:		pVar->SetBoolValue( smatMatVar.GetBoolValue() );		break;
-			case SMAT_MATERIAL_VAR_TYPE_INT:		pVar->SetIntValue( smatMatVar.GetIntValue() );			break;
-			case SMAT_MATERIAL_VAR_TYPE_FLOAT:		pVar->SetFloatValue( smatMatVar.GetFloatValue() );		break;
-			case SMAT_MATERIAL_VAR_TYPE_MATRIX:		pVar->SetMatrixValue( smatMatVar.GetMatrixValue() );	break;
-			case SMAT_MATERIAL_VAR_TYPE_STRING:		pVar->SetStringValue( smatMatVar.GetStringValue() );	break;
+			case SMAT_MATERIAL_VAR_TYPE_BOOL: pVar->SetBoolValue( smatMatVar.GetBoolValue() ); break;
+			case SMAT_MATERIAL_VAR_TYPE_INT: pVar->SetIntValue( smatMatVar.GetIntValue() ); break;
+			case SMAT_MATERIAL_VAR_TYPE_FLOAT: pVar->SetFloatValue( smatMatVar.GetFloatValue() ); break;
+			case SMAT_MATERIAL_VAR_TYPE_MATRIX: pVar->SetMatrixValue( smatMatVar.GetMatrixValue() ); break;
+			case SMAT_MATERIAL_VAR_TYPE_STRING: pVar->SetStringValue( smatMatVar.GetStringValue() ); break;
 			case SMAT_MATERIAL_VAR_TYPE_TEXTURE:
 			{
-				const achar*			pTexturePath	= smatMatVar.GetTextureValue();
-				TResourcePtr<ITexture>	pTexture		= g_pResourceSystem->FindOrLoadResource( pTexturePath, RESOURCE_TYPE_TEXTURE );
+				const char*		   pTexturePath = smatMatVar.GetTextureValue();
+				TResourcePtr<ITexture> pTexture		= g_pResourceSystem->FindOrLoadResource( pTexturePath, RESOURCE_TYPE_TEXTURE );
 				pVar->SetTextureValue( *pTexture );
 				break;
 			}
 			case SMAT_MATERIAL_VAR_TYPE_MATERIAL:
 			{
-				const achar*				pMaterialPath	= smatMatVar.GetMaterialValue();
-				TResourcePtr<IMaterial>		pMaterial		= g_pResourceSystem->FindOrLoadResource( pMaterialPath, RESOURCE_TYPE_MATERIAL );
+				const char*			pMaterialPath = smatMatVar.GetMaterialValue();
+				TResourcePtr<IMaterial> pMaterial	  = g_pResourceSystem->FindOrLoadResource( pMaterialPath, RESOURCE_TYPE_MATERIAL );
 				pVar->SetMaterialValue( *pMaterial );
 				break;
 			}
 			case SMAT_MATERIAL_VAR_TYPE_VECTOR_2D:
 			{
-				vec2_t	value = { 0.f, 0.f };
+				vec2_t value = { 0.f, 0.f };
 				smatMatVar.GetVecValue( &value.x, 2 );
 				pVar->SetVecValue( &value.x, 2 );
 				break;
 			}
 			case SMAT_MATERIAL_VAR_TYPE_VECTOR_3D:
 			{
-				vec3_t	value = { 0.f, 0.f, 0.f };
+				vec3_t value = { 0.f, 0.f, 0.f };
 				smatMatVar.GetVecValue( &value.x, 3 );
 				pVar->SetVecValue( &value.x, 3 );
 				break;
 			}
 			case SMAT_MATERIAL_VAR_TYPE_VECTOR_4D:
 			{
-				vec4_t	value = { 0.f, 0.f, 0.f, 0.f };
+				vec4_t value = { 0.f, 0.f, 0.f, 0.f };
 				smatMatVar.GetVecValue( &value.x, 4 );
 				pVar->SetVecValue( &value.x, 4 );
 				break;
@@ -131,7 +132,7 @@ void CMaterial::Clear()
 	DestroyBuffers();
 
 	// Free allocated memory for variables
-	for ( uint32 varIdx = 0, numVars = ( uint32 )vars.size(); varIdx < numVars; ++varIdx )
+	for ( uint32 varIdx = 0, numVars = (uint32)vars.size(); varIdx < numVars; ++varIdx )
 	{
 		delete vars[varIdx];
 	}
@@ -139,8 +140,8 @@ void CMaterial::Clear()
 	// Clear some fields
 	vars.clear();
 	varsDict.clear();
-	bDirtyBuffers	= false;
-	pShader			= NULL;
+	bDirtyBuffers = false;
+	pShader		  = NULL;
 }
 
 /*
@@ -160,8 +161,8 @@ void CMaterial::R_UpdateBuffers( IStudioAPICmdContext* pCmdContext )
 	}
 
 	// Get a new buffer count
-	uint32	numBuffers = pShader->GetNumBuffers();
-	bDirtyBuffers = false;
+	uint32 numBuffers = pShader->GetNumBuffers();
+	bDirtyBuffers	  = false;
 
 	// Destroy buffers if the shader doesn't use they
 	if ( numBuffers == 0 )
@@ -172,7 +173,7 @@ void CMaterial::R_UpdateBuffers( IStudioAPICmdContext* pCmdContext )
 	studioAPIBuffers.resize( numBuffers );
 
 	// Update all buffers
-	pShader->R_UpdateBuffers( pCmdContext, studioAPIBuffers.data(), ( IMaterialVar** )vars.data() );
+	pShader->R_UpdateBuffers( pCmdContext, studioAPIBuffers.data(), (IMaterialVar**)vars.data() );
 }
 
 /*
@@ -186,10 +187,10 @@ void CMaterial::R_Barrier( IStudioAPICmdList* pStudioAPICmdList )
 	Assert( pShader );
 
 	// Update buffers
-	R_UpdateBuffers( pStudioAPICmdList->GetCmdContext() );	
-	
+	R_UpdateBuffers( pStudioAPICmdList->GetCmdContext() );
+
 	// Place barriers into the list
-	pShader->R_Barrier( pStudioAPICmdList, ( IMaterialVar** )vars.data(), ( IStudioAPIBuffer** )studioAPIBuffers.data() );
+	pShader->R_Barrier( pStudioAPICmdList, (IMaterialVar**)vars.data(), (IStudioAPIBuffer**)studioAPIBuffers.data() );
 }
 
 /*
@@ -206,7 +207,7 @@ void CMaterial::R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, studioRe
 	R_UpdateBuffers( pStudioAPICmdList->GetCmdContext() );
 
 	// Prepare the shader for draw
-	pShader->R_PrepareForDraw( pStudioAPICmdList, renderPassType, ( IMaterialVar** )vars.data(), ( IStudioAPIBuffer** )studioAPIBuffers.data() );
+	pShader->R_PrepareForDraw( pStudioAPICmdList, renderPassType, (IMaterialVar**)vars.data(), (IStudioAPIBuffer**)studioAPIBuffers.data() );
 }
 
 /*
@@ -214,7 +215,7 @@ void CMaterial::R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, studioRe
 CMaterial::SetShader
 ==================
 */
-void CMaterial::SetShader( const achar* pShaderName )
+void CMaterial::SetShader( const char* pShaderName )
 {
 	PROFILE_SCOPE();
 
@@ -222,7 +223,7 @@ void CMaterial::SetShader( const achar* pShaderName )
 	Clear();
 
 	// Keep going until there's no more fallbacks
-	const achar*	pCurrentShaderName = pShaderName;
+	const char* pCurrentShaderName = pShaderName;
 	while ( true )
 	{
 		// Find the shader for this material. Note that this may not be
@@ -232,32 +233,32 @@ void CMaterial::SetShader( const achar* pShaderName )
 		{
 			// Couldn't find the shader we wanted to use, it's not defined
 			Warning( "MaterialSystem: Couldn't find shader '%s'", pCurrentShaderName );
-			pShader	= g_pShaderMgr->FindShader( "wireframe" );
+			pShader = g_pShaderMgr->FindShader( "wireframe" );
 			Assert( pShader );
 		}
 
 		// Free allocated memory for variables
-		for ( uint32 varIdx = 0, numVars = ( uint32 )vars.size(); varIdx < numVars; ++varIdx )
+		for ( uint32 varIdx = 0, numVars = (uint32)vars.size(); varIdx < numVars; ++varIdx )
 		{
 			delete vars[varIdx];
 		}
 
 		// Create undefined vars for all the actual material vars
-		uint32		numParams = pShader->GetNumParams();
+		uint32 numParams = pShader->GetNumParams();
 		vars.resize( numParams );
 		varsDict.clear();
 		for ( uint32 paramIdx = 0; paramIdx < numParams; ++paramIdx )
 		{
-			shaderParam_t				shaderParam = pShader->GetParam( paramIdx );
+			shaderParam_t shaderParam	= pShader->GetParam( paramIdx );
 			vars[paramIdx]				= new CMaterialVar( this, shaderParam.pName );
 			varsDict[shaderParam.pName] = paramIdx;
 		}
 
 		// Make sure we set default values before the fallback is looked for
-		pShader->InitDefaultParams( ( IMaterialVar** )vars.data() );
+		pShader->InitDefaultParams( (IMaterialVar**)vars.data() );
 
 		// Check for a fallback, if isn't we're done
-		const achar*	pFallbackShaderName = pShader->GetFallbackShader();
+		const char* pFallbackShaderName = pShader->GetFallbackShader();
 		if ( !pFallbackShaderName )
 		{
 			break;
@@ -274,9 +275,9 @@ void CMaterial::SetShader( const achar* pShaderName )
 CMaterial::FindVar
 ==================
 */
-IMaterialVar* CMaterial::FindVar( const achar* pName ) const
+IMaterialVar* CMaterial::FindVar( const char* pName ) const
 {
-	auto	it = varsDict.find( pName );
+	auto it = varsDict.find( pName );
 	if ( it != varsDict.end() )
 	{
 		return vars[it->second];
@@ -291,7 +292,7 @@ CMaterial::GetNumVars
 */
 uint32 CMaterial::GetNumVars() const
 {
-	return ( uint32 )vars.size();
+	return (uint32)vars.size();
 }
 
 /*
@@ -301,7 +302,7 @@ CMaterial::GetVars
 */
 IMaterialVar** CMaterial::GetVars() const
 {
-	return ( IMaterialVar** )vars.data();
+	return (IMaterialVar**)vars.data();
 }
 
 /*
@@ -309,7 +310,7 @@ IMaterialVar** CMaterial::GetVars() const
 CMaterial::GetShaderName
 ==================
 */
-const achar* CMaterial::GetShaderName() const
+const char* CMaterial::GetShaderName() const
 {
 	return pShader ? pShader->GetName() : "";
 }

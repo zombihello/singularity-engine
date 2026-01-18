@@ -5,9 +5,9 @@
 #include "filesystem/ifilesystem.h"
 
 #if ENABLE_LOGGING
-#include "core/debug.h"
-#include "core/crashdump.h"
-#include "core/icommandline.h"
+	#include "core/debug.h"
+	#include "core/crashdump.h"
+	#include "core/icommandline.h"
 
 //-----------------------------------------------------------------------------
 // A log output into a file
@@ -17,21 +17,20 @@ class CLogOutputFile : public CBaseLogOutput<ILogOutput>
 {
 public:
 	// ILogOutput interface
-	virtual void Print( logLevel_t level, const achar* pMessage ) override;
+	virtual void Print( logLevel_t level, const char* pMessage ) override;
 
-	CLogOutputFile( const achar* pPath );
+	CLogOutputFile( const char* pPath );
 
 private:
-	TRefPtr<IStreamDataWriter>		pFile;
+	TRefPtr<IStreamDataWriter> pFile;
 };
-
 
 /*
 ==================
 CLogOutputFile::CLogOutputFile
 ==================
 */
-CLogOutputFile::CLogOutputFile( const achar* pPath )
+CLogOutputFile::CLogOutputFile( const char* pPath )
 {
 	Assert( g_pFileSystem );
 	pFile = g_pFileSystem->CreateFileWriter( pPath );
@@ -46,15 +45,14 @@ CLogOutputFile::CLogOutputFile( const achar* pPath )
 CLogOutputFile::Print
 ==================
 */
-void CLogOutputFile::Print( logLevel_t level, const achar* pMessage )
+void CLogOutputFile::Print( logLevel_t level, const char* pMessage )
 {
 	if ( pFile )
 	{
-		pFile->Write( ( void* )pMessage, S_Strlen( pMessage ) * sizeof( achar ) );
+		pFile->Write( (void*)pMessage, S_Strlen( pMessage ) * sizeof( char ) );
 	}
 }
-#endif // ENABLE_LOGGING
-
+#endif	// ENABLE_LOGGING
 
 /*
 ==================
@@ -64,12 +62,11 @@ CApplication::Create
 bool CApplication::Create()
 {
 	// Load base application systems
-	appSystemInfo_t		appSystemInfos[] =
-	{
-		{ "cvar"			DLL_EXT_STRING,		CVAR_QUERY_INTERFACE_VERSION		},	// This one must be first
-		{ "filesystem"		DLL_EXT_STRING,		FILESYSTEM_INTERFACE_VERSION		},
-		{ "cvar"			DLL_EXT_STRING,		CVAR_INTERFACE_VERSION				},
-		{ "", "" }																		// Required to terminate the list
+	appSystemInfo_t appSystemInfos[] = {
+		{ "cvar" DLL_EXT_STRING, CVAR_QUERY_INTERFACE_VERSION },  // This one must be first
+		{ "filesystem" DLL_EXT_STRING, FILESYSTEM_INTERFACE_VERSION },
+		{ "cvar" DLL_EXT_STRING, CVAR_INTERFACE_VERSION },
+		{ "", "" }	// Required to terminate the list
 	};
 
 	// Add all systems from the array
@@ -102,14 +99,14 @@ CApplication::PostInit
 bool CApplication::PostInit()
 {
 #if ENABLE_LOGGING
-	if ( pLogFileName && S_Strlen( pLogFileName ) > 0 && ( DEBUG || CommandLine()->HasParam("log") ) )
+	if ( pLogFileName && S_Strlen( pLogFileName ) > 0 && ( DEBUG || CommandLine()->HasParam( "log" ) ) )
 	{
-		std::string		logFilePath = S_Sprintf( "//BASE_PATH/logs/%s.log", pLogFileName );
-		pLogOutputFile = new CLogOutputFile( logFilePath.c_str() );
+		std::string logFilePath = S_Sprintf( "//BASE_PATH/logs/%s.log", pLogFileName );
+		pLogOutputFile			= new CLogOutputFile( logFilePath.c_str() );
 		CrashDump_AddLogFile( logFilePath.c_str() );
 		Logger()->AddOutput( pLogOutputFile );
 	}
-#endif // ENABLE_LOGGING
+#endif	// ENABLE_LOGGING
 
 	return true;
 }
@@ -141,7 +138,7 @@ void CApplication::PostShutdown()
 		delete pLogOutputFile;
 		pLogOutputFile = NULL;
 	}
-#endif // ENABLE_LOGGING
+#endif	// ENABLE_LOGGING
 
 	DisconnectStdLib();
 }

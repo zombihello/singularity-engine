@@ -13,7 +13,7 @@ static CMemAllocBase* AllocateMemAlloc()
 #if PLATFORM_SUPPORTS_MIMALLOC
 	// Mimalloc default allocator because it has great performance
 	return new CMemAllocMimalloc();
-#endif // PLATFORM_SUPPORTS_MIMALLOC
+#endif	// PLATFORM_SUPPORTS_MIMALLOC
 
 	// Fallback allocator
 	return new CMemAllocStd();
@@ -26,13 +26,13 @@ MemAlloc
 */
 IMemAlloc* MemAlloc()
 {
-	static IMemAlloc*	s_pMemAlloc = NULL;
-	
+	static IMemAlloc* s_pMemAlloc = NULL;
+
 	// If the global memory allocator not created yet then do it now!
 	if ( !s_pMemAlloc )
 	{
 		// Allocate a new memory allocator
-		CMemAllocBase*	pMemAlloc = AllocateMemAlloc();
+		CMemAllocBase* pMemAlloc = AllocateMemAlloc();
 
 		// If the allocator is already thread safe, there is no need for the thread safe proxy
 		if ( !pMemAlloc->IsInternallyThreadSafe() )

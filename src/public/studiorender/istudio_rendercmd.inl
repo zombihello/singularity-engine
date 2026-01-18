@@ -16,8 +16,8 @@ IStudioRenderCmd::operator delete
 ==================
 */
 FORCEINLINE void IStudioRenderCmd::operator delete( void* pPtr, const studioCmdAlloc_t& studioCmdAlloc )
-{}
-
+{
+}
 
 /*
 ==================
@@ -38,7 +38,6 @@ FORCEINLINE uint32 CStudioRenderCmd_Skip::GetSize() const
 {
 	return numSkipBytes;
 }
-
 
 /*
 ==================

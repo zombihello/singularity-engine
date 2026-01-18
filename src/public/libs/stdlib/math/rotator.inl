@@ -7,9 +7,7 @@ CRotator::IsNearlyZero
 */
 FORCEINLINE bool CRotator::IsNearlyZero( float tolerance /*= KINDA_SMALL_NUMBER*/ ) const
 {
-	return	S_Abs( NormalizeAxis( pitch ) ) <= tolerance &&
-			S_Abs( NormalizeAxis( yaw ) ) <= tolerance &&
-			S_Abs( NormalizeAxis( roll ) ) <= tolerance;
+	return S_Abs( NormalizeAxis( pitch ) ) <= tolerance && S_Abs( NormalizeAxis( yaw ) ) <= tolerance && S_Abs( NormalizeAxis( roll ) ) <= tolerance;
 }
 
 /*
@@ -29,9 +27,7 @@ CRotator::Equals
 */
 FORCEINLINE bool CRotator::Equals( const CRotator& other, float tolerance /*= KINDA_SMALL_NUMBER*/ ) const
 {
-	return	S_Abs( NormalizeAxis( pitch - other.pitch ) ) <= tolerance &&
-			S_Abs( NormalizeAxis( yaw - other.yaw ) ) <= tolerance &&
-			S_Abs( NormalizeAxis( roll - other.roll ) ) <= tolerance;
+	return S_Abs( NormalizeAxis( pitch - other.pitch ) ) <= tolerance && S_Abs( NormalizeAxis( yaw - other.yaw ) ) <= tolerance && S_Abs( NormalizeAxis( roll - other.roll ) ) <= tolerance;
 }
 
 /*
@@ -41,9 +37,9 @@ CRotator::Add
 */
 FORCEINLINE CRotator CRotator::Add( float deltaPitch, float deltaYaw, float deltaRoll )
 {
-	pitch	+= deltaPitch;
-	yaw		+= deltaYaw;
-	roll	+= deltaRoll;
+	pitch += deltaPitch;
+	yaw += deltaYaw;
+	roll += deltaRoll;
 	return *this;
 }
 
@@ -104,7 +100,7 @@ CRotator::GetNormalized
 */
 FORCEINLINE CRotator CRotator::GetNormalized() const
 {
-	CRotator	rotator = *this;
+	CRotator rotator = *this;
 	rotator.Normalize();
 	return rotator;
 }
@@ -116,10 +112,10 @@ CRotator::GetDenormalized
 */
 FORCEINLINE CRotator CRotator::GetDenormalized() const
 {
-	CRotator		rotator = *this;
-	rotator.pitch	= ClampAxis( rotator.pitch );
-	rotator.yaw		= ClampAxis( rotator.yaw );
-	rotator.roll	= ClampAxis( rotator.roll );
+	CRotator rotator = *this;
+	rotator.pitch	 = ClampAxis( rotator.pitch );
+	rotator.yaw		 = ClampAxis( rotator.yaw );
+	rotator.roll	 = ClampAxis( rotator.roll );
 	return rotator;
 }
 
@@ -130,9 +126,9 @@ CRotator::Normalize
 */
 FORCEINLINE void CRotator::Normalize()
 {
-	pitch	= NormalizeAxis( pitch );
-	yaw		= NormalizeAxis( yaw );
-	roll	= NormalizeAxis( roll );
+	pitch = NormalizeAxis( pitch );
+	yaw	  = NormalizeAxis( yaw );
+	roll  = NormalizeAxis( roll );
 }
 
 /*
@@ -238,9 +234,9 @@ CRotator::operator+=
 */
 FORCEINLINE CRotator CRotator::operator+=( const CRotator& other )
 {
-	pitch	+= other.pitch;
-	yaw		+= other.yaw;
-	roll	+= other.roll;
+	pitch += other.pitch;
+	yaw += other.yaw;
+	roll += other.roll;
 	return *this;
 }
 
@@ -251,12 +247,11 @@ CRotator::operator-=
 */
 FORCEINLINE CRotator CRotator::operator-=( const CRotator& other )
 {
-	pitch	-= other.pitch;
-	yaw		-= other.yaw;
-	roll	-= other.roll;
+	pitch -= other.pitch;
+	yaw -= other.yaw;
+	roll -= other.roll;
 	return *this;
 }
-
 
 /*
 ==================
@@ -267,8 +262,8 @@ FORCEINLINE quat_t rotationConversionCache_t::RotatorToQuat( const CRotator& rot
 {
 	if ( cachedRotator != rotator )
 	{
-		cachedRotator	= rotator.GetNormalized();
-		cachedQuat		= cachedRotator.AsQuaternion();
+		cachedRotator = rotator.GetNormalized();
+		cachedQuat	  = cachedRotator.AsQuaternion();
 	}
 	return cachedQuat;
 }
@@ -296,8 +291,8 @@ FORCEINLINE CRotator rotationConversionCache_t::QuatToRotator( const quat_t& qua
 {
 	if ( cachedQuat != quat )
 	{
-		cachedQuat		= S_QuaternionNormalize( quat );
-		cachedRotator	= CRotator( S_QuaternionToAngles( cachedQuat ) );
+		cachedQuat	  = S_QuaternionNormalize( quat );
+		cachedRotator = CRotator( S_QuaternionToAngles( cachedQuat ) );
 	}
 	return cachedRotator;
 }
@@ -325,8 +320,8 @@ FORCEINLINE CRotator rotationConversionCache_t::NormalizedQuatToRotator( const q
 {
 	if ( cachedQuat != normalizedQuat )
 	{
-		cachedQuat		= normalizedQuat;
-		cachedRotator	= CRotator( S_QuaternionToAngles( normalizedQuat ) );
+		cachedQuat	  = normalizedQuat;
+		cachedRotator = CRotator( S_QuaternionToAngles( normalizedQuat ) );
 	}
 	return cachedRotator;
 }

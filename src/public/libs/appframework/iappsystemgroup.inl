@@ -16,7 +16,8 @@ CApplication::PreShutdown
 ==================
 */
 FORCEINLINE void CAppSystemGroup::PreShutdown()
-{}
+{
+}
 
 /*
 ==================
@@ -68,7 +69,8 @@ CDefaultAppSystemGroup<CBaseClass>::PreShutdown
 */
 template<class CBaseClass>
 FORCEINLINE void CDefaultAppSystemGroup<CBaseClass>::PreShutdown()
-{}
+{
+}
 
 /*
 ==================
@@ -77,7 +79,8 @@ CDefaultAppSystemGroup<CBaseClass>::PostShutdown
 */
 template<class CBaseClass>
 FORCEINLINE void CDefaultAppSystemGroup<CBaseClass>::PostShutdown()
-{}
+{
+}
 
 /*
 ==================
@@ -86,4 +89,5 @@ CDefaultAppSystemGroup<CBaseClass>::Destroy
 */
 template<class CBaseClass>
 FORCEINLINE void CDefaultAppSystemGroup<CBaseClass>::Destroy()
-{}
+{
+}

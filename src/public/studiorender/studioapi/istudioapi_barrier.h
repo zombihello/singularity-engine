@@ -9,26 +9,23 @@
 class IStudioAPIBuffer;
 class IStudioAPISwapChainImage;
 
-
 //-----------------------------------------------------------------------------
 // Barrier types
 //-----------------------------------------------------------------------------
 enum studioAPIBarrierType_t
 {
-	STUDIOAPI_BARRIER_TYPE_MEMORY,		// UAV accesses
-	STUDIOAPI_BARRIER_TYPE_TEXTURE,		// Texture layout transition
-	STUDIOAPI_BARRIER_TYPE_BUFFER		// Buffer state transition
+	STUDIOAPI_BARRIER_TYPE_MEMORY,	 // UAV accesses
+	STUDIOAPI_BARRIER_TYPE_TEXTURE,	 // Texture layout transition
+	STUDIOAPI_BARRIER_TYPE_BUFFER	 // Buffer state transition
 };
-
 
 //-----------------------------------------------------------------------------
 // Memory barrier
 //-----------------------------------------------------------------------------
 struct studioAPIMemoryBarrier_t
 {
-	IStudioAPIResource*				pResource;
+	IStudioAPIResource* pResource;
 };
-
 
 //-----------------------------------------------------------------------------
 // Texture barrier
@@ -37,42 +34,39 @@ struct studioAPITextureBarrier_t
 {
 	union
 	{
-		IStudioAPITexture*			pTexture;			// StudioAPI texture, used only when bSwapChain is FALSE
-		IStudioAPISwapChainImage*	pImage;				// StudioAPI swap chain image, used only when bSwapChain is TRUE
+		IStudioAPITexture*		  pTexture;	 // StudioAPI texture, used only when bSwapChain is FALSE
+		IStudioAPISwapChainImage* pImage;	 // StudioAPI swap chain image, used only when bSwapChain is TRUE
 	};
-	uint32							mip;
-	uint32							layer;
-	studioAPITextureLayout_t		layout;
-	studioAPIQueueType_t			ownerQueueType;
-	bool							bSwapChain;			// Is the barrier for a swap chain image
+	uint32					 mip;
+	uint32					 layer;
+	studioAPITextureLayout_t layout;
+	studioAPIQueueType_t	 ownerQueueType;
+	bool					 bSwapChain;  // Is the barrier for a swap chain image
 };
-
 
 //-----------------------------------------------------------------------------
 // Buffer barrier
 //-----------------------------------------------------------------------------
 struct studioAPIBufferBarrier_t
 {
-	IStudioAPIBuffer*			pBuffer;
-	studioAPIBufferState_t		state;
-	studioAPIQueueType_t		ownerQueueType;
+	IStudioAPIBuffer*	   pBuffer;
+	studioAPIBufferState_t state;
+	studioAPIQueueType_t   ownerQueueType;
 };
-
 
 //-----------------------------------------------------------------------------
 // StudioAPI barrier to pipeline synchronization
 //-----------------------------------------------------------------------------
 struct studioAPIBarrier_t
 {
-	studioAPIBarrierType_t			type;
+	studioAPIBarrierType_t type;
 	union
 	{
-		studioAPIMemoryBarrier_t	memory;
-		studioAPITextureBarrier_t	texture;
-		studioAPIBufferBarrier_t	buffer;
+		studioAPIMemoryBarrier_t  memory;
+		studioAPITextureBarrier_t texture;
+		studioAPIBufferBarrier_t  buffer;
 	};
 };
-
 
 //-----------------------------------------------------------------------------
 // Functions to make a StudioAPI barrier

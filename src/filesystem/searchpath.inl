@@ -5,9 +5,9 @@
 CSearchPath::SetPathID
 ==================
 */
-FORCEINLINE void CSearchPath::SetPathID( const achar* pNewPathID )
+FORCEINLINE void CSearchPath::SetPathID( const char* pNewPathID )
 {
-    pathID = pNewPathID;
+	pathID = pNewPathID;
 }
 
 /*
@@ -15,9 +15,9 @@ FORCEINLINE void CSearchPath::SetPathID( const achar* pNewPathID )
 CSearchPath::SetPath
 ==================
 */
-FORCEINLINE void CSearchPath::SetPath( const achar* pNewPath )
+FORCEINLINE void CSearchPath::SetPath( const char* pNewPath )
 {
-    path = pNewPath;
+	path = pNewPath;
 }
 
 /*
@@ -27,7 +27,7 @@ CSearchPath::GetPathID
 */
 FORCEINLINE const std::string& CSearchPath::GetPathID() const
 {
-    return pathID;
+	return pathID;
 }
 
 /*
@@ -37,9 +37,8 @@ CSearchPath::GetPath
 */
 FORCEINLINE const std::string& CSearchPath::GetPath() const
 {
-    return path;
+	return path;
 }
-
 
 /*
 ==================
@@ -48,10 +47,10 @@ CSearchPathIterator::operator++
 */
 FORCEINLINE void CSearchPathIterator::operator++()
 {
-    if ( currentIndex + 1 <= searchPaths.size() )
-    {
-        ++currentIndex;
-    }
+	if ( currentIndex + 1 <= searchPaths.size() )
+	{
+		++currentIndex;
+	}
 }
 
 /*
@@ -61,10 +60,10 @@ CSearchPathIterator::operator+=
 */
 FORCEINLINE void CSearchPathIterator::operator+=( uint32 offset )
 {
-    while ( offset-- )
-    {
-        operator++();
-    }
+	while ( offset-- )
+	{
+		operator++();
+	}
 }
 
 /*
@@ -74,7 +73,7 @@ CSearchPathIterator::operator*
 */
 FORCEINLINE CSearchPath* CSearchPathIterator::operator*() const
 {
-    return GetSearchPath();
+	return GetSearchPath();
 }
 
 /*
@@ -84,7 +83,7 @@ CSearchPathIterator::operator->
 */
 FORCEINLINE CSearchPath* CSearchPathIterator::operator->() const
 {
-    return GetSearchPath();
+	return GetSearchPath();
 }
 
 /*
@@ -94,7 +93,7 @@ CSearchPathIterator::operator bool
 */
 FORCEINLINE CSearchPathIterator::operator bool() const
 {
-    return currentIndex < searchPaths.size();
+	return currentIndex < searchPaths.size();
 }
 
 /*
@@ -102,9 +101,9 @@ FORCEINLINE CSearchPathIterator::operator bool() const
 CSearchPathIterator::operator !
 ==================
 */
-FORCEINLINE bool CSearchPathIterator::operator !() const
+FORCEINLINE bool CSearchPathIterator::operator!() const
 {
-    return !operator bool();
+	return !operator bool();
 }
 
 /*
@@ -114,5 +113,5 @@ CSearchPathIterator::GetSearchPath
 */
 FORCEINLINE CSearchPath* CSearchPathIterator::GetSearchPath() const
 {
-    return !searchPaths.empty() ? searchPaths[currentIndex] : NULL;
+	return !searchPaths.empty() ? searchPaths[currentIndex] : NULL;
 }

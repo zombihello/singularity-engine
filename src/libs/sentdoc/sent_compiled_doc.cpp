@@ -4,27 +4,26 @@
 #include "sentdoc/sent_compiled_doc.h"
 
 // Singularity entity magic
-static const uint32		s_SENTMagicSize = 5;
-static const achar		s_SENTMagic[s_SENTMagicSize] = { 'S', 'E', 'N', 'T', 'C' };		// Singularity Entity Descriptor Compiled
+static const uint32 s_SENTMagicSize				 = 5;
+static const char	s_SENTMagic[s_SENTMagicSize] = { 'S', 'E', 'N', 'T', 'C' };	 // Singularity Entity Descriptor Compiled
 static_assert( sizeof( s_SENTMagic ) == s_SENTMagicSize, "Size of s_SENTMagic must be equal to s_SENTMagicSize" );
 
 // Singularity entity version
-static const uint32		s_SENTVersion = 1;
-
+static const uint32 s_SENTVersion = 1;
 
 /*
 ==================
 CSENTCompiledEntityDescDoc::SaveFile
 ==================
 */
-bool CSENTCompiledEntityDescDoc::SaveFile( const achar* pPath )
+bool CSENTCompiledEntityDescDoc::SaveFile( const char* pPath )
 {
 	// Do nothing if the file system isn't valid
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 	Assert( g_pFileSystem );
 
 	// Try to open a file
-	TRefPtr<IStreamDataWriter>	pFile = g_pFileSystem->CreateFileWriter( pPath );
+	TRefPtr<IStreamDataWriter> pFile = g_pFileSystem->CreateFileWriter( pPath );
 	if ( !pFile )
 	{
 		Error( "SENTDoc: Failed to open file '%s'", pPath );
@@ -32,93 +31,93 @@ bool CSENTCompiledEntityDescDoc::SaveFile( const achar* pPath )
 	}
 
 	// Write format magic and version
-	pFile->Write( ( void* ) s_SENTMagic, s_SENTMagicSize );
-	pFile->Write( ( void* ) &s_SENTVersion, sizeof( uint32 ) );
+	pFile->Write( (void*)s_SENTMagic, s_SENTMagicSize );
+	pFile->Write( (void*)&s_SENTVersion, sizeof( uint32 ) );
 
 	// Write components
-	uint32		numComponents = ( uint32 )components.size();
+	uint32 numComponents = (uint32)components.size();
 	pFile->Write( &numComponents, sizeof( uint32 ) );
 	for ( uint32 componentIdx = 0; componentIdx < numComponents; ++componentIdx )
 	{
-		const CSENTEntityDescComponent&		component = components[componentIdx];
+		const CSENTEntityDescComponent& component = components[componentIdx];
 
 		// Write the component type
-		uint32		componentTypeSize = S_Strlen( component.GetType() );
+		uint32 componentTypeSize = S_Strlen( component.GetType() );
 		pFile->Write( &componentTypeSize, sizeof( uint32 ) );
-		pFile->Write( ( void* )component.GetType(), componentTypeSize );
+		pFile->Write( (void*)component.GetType(), componentTypeSize );
 
 		// Write component variables
-		const std::vector<CSENTEntityDescVar>&	vars = component.GetVars();
-		uint32									numVars = ( uint32 ) vars.size();
+		const std::vector<CSENTEntityDescVar>& vars	   = component.GetVars();
+		uint32								   numVars = (uint32)vars.size();
 		pFile->Write( &numVars, sizeof( uint32 ) );
 		for ( uint32 varIdx = 0; varIdx < numVars; ++varIdx )
 		{
-			const CSENTEntityDescVar&		var = vars[varIdx];
+			const CSENTEntityDescVar& var = vars[varIdx];
 
 			// Write the variable name
-			uint32		varNameSize = S_Strlen( var.GetName() );
+			uint32 varNameSize = S_Strlen( var.GetName() );
 			pFile->Write( &varNameSize, sizeof( uint32 ) );
-			pFile->Write( ( void* )var.GetName(), varNameSize );
+			pFile->Write( (void*)var.GetName(), varNameSize );
 
 			// Write the variable value
-			sentEntityDescVarType_t		varType = var.GetType();
+			sentEntityDescVarType_t varType = var.GetType();
 			pFile->Write( &varType, sizeof( sentEntityDescVarType_t ) );
 			switch ( varType )
 			{
 			case SENT_ENTITY_DESC_VAR_TYPE_BOOL:
 			{
-				bool	bValue = var.GetBoolValue();
+				bool bValue = var.GetBoolValue();
 				pFile->Write( &bValue, sizeof( bool ) );
 				break;
 			}
 
 			case SENT_ENTITY_DESC_VAR_TYPE_INT:
 			{
-				int32	value = var.GetIntValue();
+				int32 value = var.GetIntValue();
 				pFile->Write( &value, sizeof( int32 ) );
 				break;
 			}
 
 			case SENT_ENTITY_DESC_VAR_TYPE_FLOAT:
 			{
-				float	value = var.GetFloatValue();
+				float value = var.GetFloatValue();
 				pFile->Write( &value, sizeof( float ) );
 				break;
 			}
 
 			case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_2D:
 			{
-				vec2_t	value = var.GetVec2Value();
+				vec2_t value = var.GetVec2Value();
 				pFile->Write( &value, sizeof( vec2_t ) );
 				break;
 			}
 
 			case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_3D:
 			{
-				vec3_t	value = var.GetVec3Value();
+				vec3_t value = var.GetVec3Value();
 				pFile->Write( &value, sizeof( vec3_t ) );
 				break;
 			}
 
 			case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_4D:
 			{
-				vec4_t	value = var.GetVec4Value();
+				vec4_t value = var.GetVec4Value();
 				pFile->Write( &value, sizeof( vec4_t ) );
 				break;
 			}
 
 			case SENT_ENTITY_DESC_VAR_TYPE_MATRIX:
 			{
-				matrix_t	value = var.GetMatrixValue();
+				matrix_t value = var.GetMatrixValue();
 				pFile->Write( &value, sizeof( matrix_t ) );
 				break;
 			}
 
 			case SENT_ENTITY_DESC_VAR_TYPE_STRING:
 			{
-				uint32		valueStringSize = S_Strlen( var.GetStringValue() );
+				uint32 valueStringSize = S_Strlen( var.GetStringValue() );
 				pFile->Write( &valueStringSize, sizeof( uint32 ) );
-				pFile->Write( ( void* )var.GetStringValue(), valueStringSize );
+				pFile->Write( (void*)var.GetStringValue(), valueStringSize );
 				break;
 			}
 
@@ -138,14 +137,14 @@ bool CSENTCompiledEntityDescDoc::SaveFile( const achar* pPath )
 CSENTCompiledEntityDescDoc::LoadFromFile
 ==================
 */
-bool CSENTCompiledEntityDescDoc::LoadFromFile( const achar* pPath )
+bool CSENTCompiledEntityDescDoc::LoadFromFile( const char* pPath )
 {
 	// Do nothing if the file system isn't valid
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 	Assert( g_pFileSystem );
 
 	// Try to open a file
-	TRefPtr<IStreamDataReader>	pFile = g_pFileSystem->CreateFileReader( pPath );
+	TRefPtr<IStreamDataReader> pFile = g_pFileSystem->CreateFileReader( pPath );
 	if ( !pFile )
 	{
 		Error( "SENTDoc: Failed to open file '%s'", pPath );
@@ -153,8 +152,8 @@ bool CSENTCompiledEntityDescDoc::LoadFromFile( const achar* pPath )
 	}
 
 	// Read format magic and version
-	achar	magic[s_SENTMagicSize];
-	uint32	version = 0;
+	char  magic[s_SENTMagicSize];
+	uint32 version = 0;
 	pFile->Read( magic, s_SENTMagicSize );
 	pFile->Read( &version, sizeof( uint32 ) );
 	if ( S_Strncmp( magic, s_SENTMagic, s_SENTMagicSize ) )
@@ -171,44 +170,44 @@ bool CSENTCompiledEntityDescDoc::LoadFromFile( const achar* pPath )
 	Clear();
 
 	// Read components
-	uint32		numComponents = 0;
+	uint32 numComponents = 0;
 	pFile->Read( &numComponents, sizeof( uint32 ) );
 	components.resize( numComponents );
 	for ( uint32 componentIdx = 0; componentIdx < numComponents; ++componentIdx )
 	{
-		CSENTEntityDescComponent&		component = components[componentIdx];
+		CSENTEntityDescComponent& component = components[componentIdx];
 
 		// Read a component type
-		std::string		componentType;
-		uint32			componentTypeSize = 0;
+		std::string componentType;
+		uint32		componentTypeSize = 0;
 		pFile->Read( &componentTypeSize, sizeof( uint32 ) );
 		componentType.resize( componentTypeSize );
 		pFile->Read( componentType.data(), componentTypeSize );
 		component.SetType( componentType.c_str() );
 
 		// Read component variables
-		uint32		numVars = 0;
+		uint32 numVars = 0;
 		pFile->Read( &numVars, sizeof( uint32 ) );
 		for ( uint32 varIdx = 0; varIdx < numVars; ++varIdx )
 		{
-			CSENTEntityDescVar		var;
+			CSENTEntityDescVar var;
 
 			// Read the variable name
-			std::string		varName;
-			uint32			varNameSize = 0;
+			std::string varName;
+			uint32		varNameSize = 0;
 			pFile->Read( &varNameSize, sizeof( uint32 ) );
 			varName.resize( varNameSize );
 			pFile->Read( varName.data(), varNameSize );
 			var.SetName( varName.c_str() );
 
 			// Read the variable value
-			sentEntityDescVarType_t		varType = SENT_ENTITY_DESC_VAR_TYPE_UNDEFINED;
+			sentEntityDescVarType_t varType = SENT_ENTITY_DESC_VAR_TYPE_UNDEFINED;
 			pFile->Read( &varType, sizeof( sentEntityDescVarType_t ) );
 			switch ( varType )
 			{
 			case SENT_ENTITY_DESC_VAR_TYPE_BOOL:
 			{
-				bool	bValue;
+				bool bValue;
 				pFile->Read( &bValue, sizeof( bool ) );
 				var.SetBoolValue( bValue );
 				break;
@@ -216,7 +215,7 @@ bool CSENTCompiledEntityDescDoc::LoadFromFile( const achar* pPath )
 
 			case SENT_ENTITY_DESC_VAR_TYPE_INT:
 			{
-				int32	value;
+				int32 value;
 				pFile->Read( &value, sizeof( int32 ) );
 				var.SetIntValue( value );
 				break;
@@ -224,7 +223,7 @@ bool CSENTCompiledEntityDescDoc::LoadFromFile( const achar* pPath )
 
 			case SENT_ENTITY_DESC_VAR_TYPE_FLOAT:
 			{
-				float	value;
+				float value;
 				pFile->Read( &value, sizeof( float ) );
 				var.SetFloatValue( value );
 				break;
@@ -232,7 +231,7 @@ bool CSENTCompiledEntityDescDoc::LoadFromFile( const achar* pPath )
 
 			case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_2D:
 			{
-				vec2_t	value;
+				vec2_t value;
 				pFile->Read( &value, sizeof( vec2_t ) );
 				var.SetVec2Value( value );
 				break;
@@ -240,7 +239,7 @@ bool CSENTCompiledEntityDescDoc::LoadFromFile( const achar* pPath )
 
 			case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_3D:
 			{
-				vec3_t	value;
+				vec3_t value;
 				pFile->Read( &value, sizeof( vec3_t ) );
 				var.SetVec3Value( value );
 				break;
@@ -248,7 +247,7 @@ bool CSENTCompiledEntityDescDoc::LoadFromFile( const achar* pPath )
 
 			case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_4D:
 			{
-				vec4_t	value;
+				vec4_t value;
 				pFile->Read( &value, sizeof( vec4_t ) );
 				var.SetVec4Value( value );
 				break;
@@ -256,7 +255,7 @@ bool CSENTCompiledEntityDescDoc::LoadFromFile( const achar* pPath )
 
 			case SENT_ENTITY_DESC_VAR_TYPE_MATRIX:
 			{
-				matrix_t	value;
+				matrix_t value;
 				pFile->Read( &value, sizeof( matrix_t ) );
 				var.SetMatrixValue( value );
 				break;
@@ -264,8 +263,8 @@ bool CSENTCompiledEntityDescDoc::LoadFromFile( const achar* pPath )
 
 			case SENT_ENTITY_DESC_VAR_TYPE_STRING:
 			{
-				std::string		valueString;
-				uint32			valueStringSize;
+				std::string valueString;
+				uint32		valueStringSize;
 				pFile->Read( &valueStringSize, sizeof( uint32 ) );
 				valueString.resize( valueStringSize );
 				pFile->Read( valueString.data(), valueStringSize );

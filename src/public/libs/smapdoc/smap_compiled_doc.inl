@@ -38,7 +38,7 @@ CSMAPCompiledMapDoc::GetNumEntities
 */
 FORCEINLINE uint32 CSMAPCompiledMapDoc::GetNumEntities() const
 {
-	return ( uint32 )entities.size();
+	return (uint32)entities.size();
 }
 
 /*

@@ -43,7 +43,7 @@
 
     struct ecsLexerStateInternal_t : public parserLexerState_t
     {
-         ecsLexerStateInternal_t( const achar* pSourceCode, CParserLexerListener* pLexerListener )
+         ecsLexerStateInternal_t( const char* pSourceCode, CParserLexerListener* pLexerListener )
             : parserLexerState_t( pSourceCode, pLexerListener )
             , lexerScope( ECS_LEXER_SCOPE_DEFAULT )
             , bracketScopeLevel( 0 )
@@ -289,7 +289,7 @@
 .|\n                                            EMIT_ERROR( "Unknown token" );
 %%
 
-void EcsCode_Tokenize( const achar* pSourceCode, CParserLexerListener* pLexerListener )
+void EcsCode_Tokenize( const char* pSourceCode, CParserLexerListener* pLexerListener )
 {
     yyscan_t                    scanner;
     ecsLexerStateInternal_t     lexerState( pSourceCode, pLexerListener );

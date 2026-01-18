@@ -18,7 +18,6 @@ public:
 
 EXPOSE_SINGLE_INTERFACE( CMapTool, IMapTool, MAP_TOOL_INTERFACE_VERSION );
 
-
 /*
 ==================
 CMapTool::Connect
@@ -47,14 +46,14 @@ CMapTool::CompileMap
 bool CMapTool::CompileMap( const resourceToolCompileMapParams_t& compileParams ) const
 {
 	// Convert entities
-	std::string				destPath = S_Sprintf( "%s.smap_c", compileParams.pDestPath );
+	std::string destPath = S_Sprintf( "%s.smap_c", compileParams.pDestPath );
 	Msg( "MapTool: Saving the map to '%s'...", destPath.c_str() );
-	CSMAPCompiledMapDoc		smapCompiledFile;
+	CSMAPCompiledMapDoc smapCompiledFile;
 
 	for ( uint32 entityIdx = 0; entityIdx < compileParams.numEntities; ++entityIdx )
 	{
-		CSMAPEntity							smapEntity;
-		const resourceToolMapEntity_t*		pResourceToolMapEntity = &compileParams.pEntities[entityIdx];
+		CSMAPEntity					   smapEntity;
+		const resourceToolMapEntity_t* pResourceToolMapEntity = &compileParams.pEntities[entityIdx];
 		smapEntity.SetEntityDesc( pResourceToolMapEntity->pEntityDesc );
 		smapEntity.SetName( pResourceToolMapEntity->pName );
 		smapCompiledFile.AddEntity( smapEntity );

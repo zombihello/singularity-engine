@@ -9,18 +9,17 @@
 class IStudioAPICmdList;
 class IMaterialVar;
 
-
 //-----------------------------------------------------------------------------
 // Shader flags and parameter types
 //-----------------------------------------------------------------------------
 enum shaderFlags_t
 {
-	SHADER_NOT_EDITABLE			= 1 << 1
+	SHADER_NOT_EDITABLE = 1 << 1
 };
 
 enum shaderParamFlags_t
 {
-	SHADER_PARAM_NOT_EDITABLE	= 1 << 1
+	SHADER_PARAM_NOT_EDITABLE = 1 << 1
 };
 
 enum shaderParamType_t
@@ -38,29 +37,27 @@ enum shaderParamType_t
 	SHADER_PARAM_TYPE_MATERIAL
 };
 
-
 //-----------------------------------------------------------------------------
 // Shader parameter and cache information
 //-----------------------------------------------------------------------------
 struct shaderParam_t
 {
-	const achar*		pName;
-	shaderParamType_t	type;
-	const achar*		pHelpString;
-	uint32				flags;			// see shaderParamFlags_t
+	const char*	  pName;
+	shaderParamType_t type;
+	const char*	  pHelpString;
+	uint32			  flags;  // see shaderParamFlags_t
 };
 
 struct shaderCacheInfo_t
 {
-	uint64		numCaches;
-	uint64		indexOffset;	// Cache index offset in the shader manager
+	uint64 numCaches;
+	uint64 indexOffset;	 // Cache index offset in the shader manager
 };
 
 struct shaderInitParams_t
 {
-	shaderCacheInfo_t		cacheInfos[STUDIOAPI_SHADER_NUM_DRAW_TYPES];
+	shaderCacheInfo_t cacheInfos[STUDIOAPI_SHADER_NUM_DRAW_TYPES];
 };
-
 
 //-----------------------------------------------------------------------------
 // Shader interface
@@ -70,23 +67,23 @@ class IShader
 public:
 	// Initialize and shutdown
 	virtual void Init( const shaderInitParams_t& shaderInitParams ) = 0;
-	virtual void InitDefaultParams( IMaterialVar** pParams ) const = 0;
-	virtual void Shutdown() = 0;
+	virtual void InitDefaultParams( IMaterialVar** pParams ) const	= 0;
+	virtual void Shutdown()											= 0;
 
 	// NOTE: pStudioAPIBuffers and pParams Must be size equal to shader parameters and buffers count
-	virtual void R_UpdateBuffers( IStudioAPICmdContext* pStudioAPICmdContext, TRefPtr<IStudioAPIBuffer>* pStudioAPIBuffers, IMaterialVar** pParams ) const = 0;
+	virtual void R_UpdateBuffers( IStudioAPICmdContext* pStudioAPICmdContext, TRefPtr<IStudioAPIBuffer>* pStudioAPIBuffers, IMaterialVar** pParams ) const							  = 0;
 	virtual void R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, studioRenderPassType_t renderPassType, IMaterialVar** pParams, IStudioAPIBuffer** pStudioAPIBuffers = NULL ) = 0;
 
 	// Place barriers into a command list
 	virtual void R_Barrier( IStudioAPICmdList* pStudioAPICmdList, IMaterialVar** pParams, IStudioAPIBuffer** pStudioAPIBuffers ) const = 0;
 
-	virtual uint32 GetNumParams() const = 0;
-	virtual shaderParam_t GetParam( uint32 index ) const = 0;
-	virtual uint32 GetNumCacheNames() const = 0;
-	virtual const achar* GetCacheName( uint32 index ) const = 0;
-	virtual uint32 GetNumBuffers() const = 0;
-	virtual uint32 GetFlags() const = 0;
-	virtual const achar* GetName() const = 0;
-	virtual const achar* GetHelp() const = 0;
-	virtual const achar* GetFallbackShader() const = 0;
+	virtual uint32		  GetNumParams() const				 = 0;
+	virtual shaderParam_t GetParam( uint32 index ) const	 = 0;
+	virtual uint32		  GetNumCacheNames() const			 = 0;
+	virtual const char*  GetCacheName( uint32 index ) const = 0;
+	virtual uint32		  GetNumBuffers() const				 = 0;
+	virtual uint32		  GetFlags() const					 = 0;
+	virtual const char*  GetName() const					 = 0;
+	virtual const char*  GetHelp() const					 = 0;
+	virtual const char*  GetFallbackShader() const			 = 0;
 };

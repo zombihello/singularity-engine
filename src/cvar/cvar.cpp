@@ -4,14 +4,13 @@
 #include "cvar/icvar.h"
 #include "stdlib/convar.h"
 
-#define CVAR_CONFIG_NAME				"config"
-#define CVAR_DEFAULT_CONFIG_NAME		"config_default"
+#define CVAR_CONFIG_NAME		 "config"
+#define CVAR_DEFAULT_CONFIG_NAME "config_default"
 
 //-----------------------------------------------------------------------------
 // Cvar delegates
 //-----------------------------------------------------------------------------
 DECLARE_MULTICAST_DELEGATE( COnWriteConCmdsToConfigFile, IStreamDataWriter* /* pStreamData */ );
-
 
 //-----------------------------------------------------------------------------
 // Cvars
@@ -19,14 +18,13 @@ DECLARE_MULTICAST_DELEGATE( COnWriteConCmdsToConfigFile, IStreamDataWriter* /* p
 void CheatsCVarChanged( IConVar* pConVar );
 void DeveloperCVarChanged( IConVar* pConVar );
 
-CConVar		cheats( "cheats", "0", "Allow cheats in the game", FCVAR_NONE, CheatsCVarChanged );
-CConVar		developer( "developer", "0", "Enables developer messages", FCVAR_NONE, DeveloperCVarChanged );
-
+CConVar cheats( "cheats", "0", "Allow cheats in the game", FCVAR_NONE, CheatsCVarChanged );
+CConVar developer( "developer", "0", "Enables developer messages", FCVAR_NONE, DeveloperCVarChanged );
 
 //-----------------------------------------------------------------------------
 // CvarQuery implementation
 //-----------------------------------------------------------------------------
-class CCvarQuery : public CBaseAppSystem<ICvarQuery> 
+class CCvarQuery : public CBaseAppSystem<ICvarQuery>
 {
 public:
 	CCvarQuery();
@@ -38,15 +36,14 @@ public:
 
 	// Here's where systems can access other interfaces implemented by this object
 	// Returns NULL if it doesn't implement the requested interface
-	virtual void* QueryInterface( const achar* pInterfaceName ) override;
+	virtual void* QueryInterface( const char* pInterfaceName ) override;
 
 	// ICvarQuery interface
 	virtual bool AreConVarsLinkable( const IConVar* pChildVar, const IConVar* pParentVar ) override;
 
 private:
-	ICvar*		pCvar;
+	ICvar* pCvar;
 };
-
 
 //-----------------------------------------------------------------------------
 // The console system
@@ -72,15 +69,15 @@ public:
 	virtual void UnregisterCommand( IConCmdBase* pCommand ) override;
 	virtual void UnregisterCommands( cvarDLLIdentifier_t dllIdentifier ) override;
 
-	virtual bool Exec( const achar* pCommand ) override;
+	virtual bool Exec( const char* pCommand ) override;
 
-	virtual IConCmdBase* FindCommandBase( const achar* pName ) const override;
-	virtual IConCmd* FindCommand( const achar* pName ) const override;
-	virtual IConVar* FindVar( const achar* pName ) const override;
+	virtual IConCmdBase* FindCommandBase( const char* pName ) const override;
+	virtual IConCmd*	 FindCommand( const char* pName ) const override;
+	virtual IConVar*	 FindVar( const char* pName ) const override;
 
 	// Read and write a configuration file
-	virtual void ReadConfigFile( const achar* pConfigDir, bool bWriteConfigIfNotExist = true ) override;
-	virtual void WriteConfigFile( const achar* pConfigDir, bool bWriteDefaultConfig = false ) override;
+	virtual void						 ReadConfigFile( const char* pConfigDir, bool bWriteConfigIfNotExist = true ) override;
+	virtual void						 WriteConfigFile( const char* pConfigDir, bool bWriteDefaultConfig = false ) override;
 	virtual IOnWriteConCmdsToConfigFile* OnWriteConCmdsToConfigFile() const override;
 
 	// Override IConVars from a command line
@@ -97,8 +94,8 @@ public:
 	virtual void CallGlobalChangeCallback( IConVar* pConVar ) override;
 
 	virtual void SetConsoleDisplayFunc( IConsoleDisplayFunc* pConsoleDisplayFunc ) override;
-	virtual void ConsolePrintf( const CColor& color, const achar* pFormat, ... ) override;
-	virtual void ConsolePrintf( const achar* pFormat, ... ) override;
+	virtual void ConsolePrintf( const CColor& color, const char* pFormat, ... ) override;
+	virtual void ConsolePrintf( const char* pFormat, ... ) override;
 
 	// Method allowing the engine ICvarQuery interface to take over
 	// A little hacky, owing to the fact the engine is loaded
@@ -109,34 +106,33 @@ public:
 private:
 	enum
 	{
-		COMMAND_MAX_ARGC		= 64,
-		COMMAND_MAX_LENGTH		= 512
+		COMMAND_MAX_ARGC   = 64,
+		COMMAND_MAX_LENGTH = 512
 	};
 
 	// This method parse command and result place into variables:
 	// commandArgc - Here will be count command arguments
 	// pCommandArgv - Here will be command arguments
-	// NOTE: pCommand - After the function is executed, this pointer will point to the beginning 
+	// NOTE: pCommand - After the function is executed, this pointer will point to the beginning
 	// of the next command after the separator, or NULL if there is nothing else left
-	bool ParseCommand( const achar*& pCommand, const achar separator = '$' );
+	bool ParseCommand( const char*& pCommand, const char separator = '$' );
 
-	IConCmdBase*													pConCmdList;
-	ICvarQuery*														pCvarQuery;
-	cvarDLLIdentifier_t												nextDLLIdentifier;
-	conVarChangeCallbackFn_t										pGlobalChangeCallbackFn;
-	IConsoleDisplayFunc*											pConsoleDisplayFunc;
-	achar															commandArgvBuffer[COMMAND_MAX_LENGTH];
-	uint32															commandArgc;
-	const achar*													pCommandArgv[COMMAND_MAX_ARGC];
-	std::unordered_map<cvarDLLIdentifier_t, IConVarsOverrider*>		conVarsOverriderDict;
-	COnWriteConCmdsToConfigFile										onWriteConCmdsToConfigFile;
+	IConCmdBase*												pConCmdList;
+	ICvarQuery*													pCvarQuery;
+	cvarDLLIdentifier_t											nextDLLIdentifier;
+	conVarChangeCallbackFn_t									pGlobalChangeCallbackFn;
+	IConsoleDisplayFunc*										pConsoleDisplayFunc;
+	char														commandArgvBuffer[COMMAND_MAX_LENGTH];
+	uint32														commandArgc;
+	const char*												pCommandArgv[COMMAND_MAX_ARGC];
+	std::unordered_map<cvarDLLIdentifier_t, IConVarsOverrider*> conVarsOverriderDict;
+	COnWriteConCmdsToConfigFile									onWriteConCmdsToConfigFile;
 };
 
-static CCvar		s_Cvar;
-static CCvarQuery	s_CvarQuery;
+static CCvar	  s_Cvar;
+static CCvarQuery s_CvarQuery;
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CCvar, ICvar, CVAR_INTERFACE_VERSION, s_Cvar );
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CCvarQuery, ICvarQuery, CVAR_QUERY_INTERFACE_VERSION, s_CvarQuery );
-
 
 /*
 ==================
@@ -145,7 +141,8 @@ CCvarQuery::CCvarQuery
 */
 CCvarQuery::CCvarQuery()
 	: pCvar( NULL )
-{}
+{
+}
 
 /*
 ==================
@@ -154,7 +151,7 @@ CCvarQuery::Connect
 */
 bool CCvarQuery::Connect( createInterfaceFn_t pFactory )
 {
-	pCvar = ( ICvar* )pFactory( CVAR_INTERFACE_VERSION );
+	pCvar = (ICvar*)pFactory( CVAR_INTERFACE_VERSION );
 	if ( !pCvar )
 	{
 		return false;
@@ -182,11 +179,11 @@ void CCvarQuery::Disconnect()
 CCvarQuery::QueryInterface
 ==================
 */
-void* CCvarQuery::QueryInterface( const achar* pInterfaceName )
+void* CCvarQuery::QueryInterface( const char* pInterfaceName )
 {
 	if ( !S_Stricmp( pInterfaceName, CVAR_QUERY_INTERFACE_VERSION ) )
 	{
-		return ( ICvarQuery* )this;
+		return (ICvarQuery*)this;
 	}
 
 	return NULL;
@@ -202,7 +199,6 @@ bool CCvarQuery::AreConVarsLinkable( const IConVar* pChildVar, const IConVar* pP
 	return true;
 }
 
-
 /*
 ==================
 CCvar::CCvar
@@ -215,7 +211,8 @@ CCvar::CCvar()
 	, pGlobalChangeCallbackFn( NULL )
 	, pConsoleDisplayFunc( NULL )
 	, commandArgc( 0 )
-{}
+{
+}
 
 /*
 ==================
@@ -230,7 +227,7 @@ bool CCvar::Connect( createInterfaceFn_t pFactory )
 	}
 
 	ConVar_Register();
-	
+
 	return true;
 }
 
@@ -300,7 +297,7 @@ void CCvar::RegisterCommand( IConCmdBase* pCommand )
 	pCommand->SetRegistered( true );
 
 	// Do nothing if name isn't valid
-	const achar*	pName = pCommand->GetName();
+	const char* pName = pCommand->GetName();
 	if ( !pName || !pName[0] )
 	{
 		pCommand->SetNext( NULL );
@@ -308,7 +305,7 @@ void CCvar::RegisterCommand( IConCmdBase* pCommand )
 	}
 
 	// If the variable is already defined, then setup the new variable as a proxy to it
-	const IConCmdBase*	pOtherCommand = FindVar( pName );
+	const IConCmdBase* pOtherCommand = FindVar( pName );
 	if ( pOtherCommand )
 	{
 		// We unable link commands, only variables
@@ -320,8 +317,8 @@ void CCvar::RegisterCommand( IConCmdBase* pCommand )
 		else
 		{
 			// This cast is ok because we make sure they're IConVars above
-			IConVar*	pChildVar = ( IConVar* )pCommand;
-			IConVar*	pParentVar = ( IConVar* )pOtherCommand;
+			IConVar* pChildVar	= (IConVar*)pCommand;
+			IConVar* pParentVar = (IConVar*)pOtherCommand;
 
 			// See if it's a valid linkage
 			if ( pCvarQuery->AreConVarsLinkable( pChildVar, pParentVar ) )
@@ -404,7 +401,7 @@ void CCvar::UnregisterCommand( IConCmdBase* pCommand )
 	pCommand->SetRegistered( false );
 
 	// Remove command
-	for ( IConCmdBase* pCurCommand = pConCmdList, *pPrevCommand = NULL; pCurCommand; pCurCommand = pCurCommand->GetNext() )
+	for ( IConCmdBase *pCurCommand = pConCmdList, *pPrevCommand = NULL; pCurCommand; pCurCommand = pCurCommand->GetNext() )
 	{
 		if ( pCurCommand != pCommand )
 		{
@@ -434,8 +431,8 @@ CCvar::UnregisterCommands
 void CCvar::UnregisterCommands( cvarDLLIdentifier_t dllIdentifier )
 {
 	PROFILE_SCOPE();
-	IConCmdBase*	pNewList = NULL;
-	IConCmdBase*	pCurCommand = pConCmdList, *pNextCommand = NULL;
+	IConCmdBase* pNewList	 = NULL;
+	IConCmdBase *pCurCommand = pConCmdList, *pNextCommand = NULL;
 	while ( pCurCommand )
 	{
 		pNextCommand = pCurCommand->GetNext();
@@ -461,13 +458,13 @@ void CCvar::UnregisterCommands( cvarDLLIdentifier_t dllIdentifier )
 CCvar::ParseCommand
 ==================
 */
-bool CCvar::ParseCommand( const achar*& pCommand, const achar separator /*= '$'*/ )
+bool CCvar::ParseCommand( const char*& pCommand, const char separator /*= '$'*/ )
 {
 	PROFILE_SCOPE();
 
 	// Reset command buffers
-	commandArgc				= 0;
-	commandArgvBuffer[0]	= '\0';
+	commandArgc			 = 0;
+	commandArgvBuffer[0] = '\0';
 
 	// Do nothing if the command isn't valid
 	if ( !pCommand || !pCommand[0] )
@@ -482,9 +479,9 @@ bool CCvar::ParseCommand( const achar*& pCommand, const achar separator /*= '$'*
 	}
 
 	// Find the end of the command
-	const achar*	pEndCommand	= pCommand;
+	const char* pEndCommand = pCommand;
 	{
-		bool	bFoundQuote = false;
+		bool bFoundQuote = false;
 		for ( ; *pEndCommand; ++pEndCommand )
 		{
 			// We must ignore a separator in quotes
@@ -503,10 +500,10 @@ bool CCvar::ParseCommand( const achar*& pCommand, const achar separator /*= '$'*
 	}
 
 	// Move pEndCommand to nearest symbol for save buffer size
-	const achar*	pNextCommand = pEndCommand;
+	const char* pNextCommand = pEndCommand;
 	while ( pEndCommand != pCommand && ( S_IsSpace( *pEndCommand ) || *pEndCommand == separator ) )
 	{
-		if ( !S_IsSpace( *( pEndCommand-1 ) ) && *( pEndCommand-1 ) != separator )
+		if ( !S_IsSpace( *( pEndCommand - 1 ) ) && *( pEndCommand - 1 ) != separator )
 		{
 			break;
 		}
@@ -514,7 +511,7 @@ bool CCvar::ParseCommand( const achar*& pCommand, const achar separator /*= '$'*
 	}
 
 	// Copy the current command into commandArgvBuffer
-	uint32		commandLength = ( uint32 )( pEndCommand - pCommand );
+	uint32 commandLength = (uint32)( pEndCommand - pCommand );
 	if ( commandLength >= COMMAND_MAX_LENGTH - 1 )
 	{
 		Warning( "Cvar: Encountered command which overflows the buffer, skipping!" );
@@ -522,14 +519,14 @@ bool CCvar::ParseCommand( const achar*& pCommand, const achar separator /*= '$'*
 	}
 
 	Mem_Memcpy( &commandArgvBuffer[0], pCommand, commandLength );
-	commandArgvBuffer[commandLength]	= '\0';
-	pCommand							= pNextCommand;
+	commandArgvBuffer[commandLength] = '\0';
+	pCommand						 = pNextCommand;
 
 	// Parse the current command into pCommandArgv
-	achar*	pStartArgv		= &commandArgvBuffer[0];
-	achar*	pCurChar		= pStartArgv;
-	bool	bFoundQuote		= false;
-	bool	bEndSubstring	= false;
+	char* pStartArgv	 = &commandArgvBuffer[0];
+	char* pCurChar		 = pStartArgv;
+	bool   bFoundQuote	 = false;
+	bool   bEndSubstring = false;
 	while ( *pCurChar && commandArgc < COMMAND_MAX_ARGC )
 	{
 		// We found a quote
@@ -559,7 +556,7 @@ bool CCvar::ParseCommand( const achar*& pCommand, const achar separator /*= '$'*
 			}
 		}
 		// Otherwise if next will be a space or the end of string then also we found another argv
-		else if ( !bFoundQuote && S_IsSpace( *( pCurChar+1 ) ) || !*( pCurChar+1 ) )
+		else if ( !bFoundQuote && S_IsSpace( *( pCurChar + 1 ) ) || !*( pCurChar + 1 ) )
 		{
 			bEndSubstring = true;
 		}
@@ -567,8 +564,8 @@ bool CCvar::ParseCommand( const achar*& pCommand, const achar separator /*= '$'*
 		// We found substring save pointer into pCommandArgv
 		if ( bEndSubstring )
 		{
-			bEndSubstring				= false;
-			pCommandArgv[commandArgc]	= pStartArgv;
+			bEndSubstring			  = false;
+			pCommandArgv[commandArgc] = pStartArgv;
 			++commandArgc;
 			if ( commandArgc >= COMMAND_MAX_ARGC )
 			{
@@ -576,7 +573,7 @@ bool CCvar::ParseCommand( const achar*& pCommand, const achar separator /*= '$'*
 			}
 
 			// Set in the argv null terminator if it need
-			if ( *( pCurChar+1 ) )
+			if ( *( pCurChar + 1 ) )
 			{
 				++pCurChar;
 				*pCurChar = '\0';
@@ -589,7 +586,6 @@ bool CCvar::ParseCommand( const achar*& pCommand, const achar separator /*= '$'*
 				++pCurChar;
 			}
 			pStartArgv = pCurChar;
-			
 		}
 		else
 		{
@@ -605,7 +601,7 @@ bool CCvar::ParseCommand( const achar*& pCommand, const achar separator /*= '$'*
 CCvar::Exec
 ==================
 */
-bool CCvar::Exec( const achar* pCommand )
+bool CCvar::Exec( const char* pCommand )
 {
 	PROFILE_SCOPE();
 
@@ -616,14 +612,14 @@ bool CCvar::Exec( const achar* pCommand )
 	}
 
 	// Execute the command
-	bool	bResult = false;
+	bool bResult = false;
 	while ( pCommand && *pCommand != '\0' )
 	{
 		// Parse the command
 		if ( ParseCommand( pCommand ) && commandArgc > 0 )
 		{
 			// Find a command
-			IConCmdBase*	pConCmdBase = FindCommandBase( pCommandArgv[0] );
+			IConCmdBase* pConCmdBase = FindCommandBase( pCommandArgv[0] );
 			if ( pConCmdBase )
 			{
 				// Allow cheat commands with 'cheats' on
@@ -636,14 +632,14 @@ bool CCvar::Exec( const achar* pCommand )
 				// Execute if it is command
 				if ( pConCmdBase->IsCommand() )
 				{
-					IConCmd*	pConCmd = ( IConCmd* )pConCmdBase;
+					IConCmd* pConCmd = (IConCmd*)pConCmdBase;
 					pConCmd->Exec( commandArgc - 1, pCommandArgv + 1 );
 				}
 				// Otherwise it's variable
-				else 
+				else
 				{
 					// Change variable if we have enough arguments
-					IConVar*	pConVar = ( IConVar* )pConCmdBase;
+					IConVar* pConVar = (IConVar*)pConCmdBase;
 					if ( commandArgc > 1 )
 					{
 						pConVar->SetString( pCommandArgv[1] );
@@ -663,7 +659,7 @@ bool CCvar::Exec( const achar* pCommand )
 			}
 		}
 	}
-	
+
 	return bResult;
 }
 
@@ -672,7 +668,7 @@ bool CCvar::Exec( const achar* pCommand )
 CCvar::FindCommandBase
 ==================
 */
-IConCmdBase* CCvar::FindCommandBase( const achar* pName ) const
+IConCmdBase* CCvar::FindCommandBase( const char* pName ) const
 {
 	PROFILE_SCOPE();
 	for ( IConCmdBase* pCurCommand = pConCmdList; pCurCommand; pCurCommand = pCurCommand->GetNext() )
@@ -691,16 +687,16 @@ IConCmdBase* CCvar::FindCommandBase( const achar* pName ) const
 CCvar::FindCommand
 ==================
 */
-IConCmd* CCvar::FindCommand( const achar* pName ) const
+IConCmd* CCvar::FindCommand( const char* pName ) const
 {
 	PROFILE_SCOPE();
-	IConCmdBase*	pConCmd = FindCommandBase( pName );
+	IConCmdBase* pConCmd = FindCommandBase( pName );
 	if ( !pConCmd || !pConCmd->IsCommand() )
 	{
 		return NULL;
 	}
 
-	return ( IConCmd* )pConCmd;
+	return (IConCmd*)pConCmd;
 }
 
 /*
@@ -708,16 +704,16 @@ IConCmd* CCvar::FindCommand( const achar* pName ) const
 CCvar::FindVar
 ==================
 */
-IConVar* CCvar::FindVar( const achar* pName ) const
+IConVar* CCvar::FindVar( const char* pName ) const
 {
 	PROFILE_SCOPE();
-	IConCmdBase*	pConVar = FindCommandBase( pName );
+	IConCmdBase* pConVar = FindCommandBase( pName );
 	if ( !pConVar || pConVar->IsCommand() )
 	{
 		return NULL;
 	}
 
-	return ( IConVar* )pConVar;
+	return (IConVar*)pConVar;
 }
 
 /*
@@ -725,10 +721,10 @@ IConVar* CCvar::FindVar( const achar* pName ) const
 CCvar::ReadConfigFile
 ==================
 */
-void CCvar::ReadConfigFile( const achar* pConfigDir, bool bWriteConfigIfNotExist /* = true */ )
+void CCvar::ReadConfigFile( const char* pConfigDir, bool bWriteConfigIfNotExist /* = true */ )
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-	std::string		configPath = S_Sprintf( "%s/" CVAR_CONFIG_NAME ".cfg", pConfigDir );
+	std::string configPath = S_Sprintf( "%s/" CVAR_CONFIG_NAME ".cfg", pConfigDir );
 	if ( g_pFileSystem->IsFileExists( configPath.c_str() ) )
 	{
 		g_pCvar->Exec( S_Sprintf( "exec %s", configPath.c_str() ).c_str() );
@@ -754,13 +750,13 @@ void CCvar::ReadConfigFile( const achar* pConfigDir, bool bWriteConfigIfNotExist
 CCvar::WriteConfigFile
 ==================
 */
-void CCvar::WriteConfigFile( const achar* pConfigDir, bool bWriteDefaultConfig /* = false */ )
+void CCvar::WriteConfigFile( const char* pConfigDir, bool bWriteDefaultConfig /* = false */ )
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 
 	// Open file to write
-	std::string					configPath = S_Sprintf( !bWriteDefaultConfig ? "%s/" CVAR_CONFIG_NAME ".cfg" : "%s/" CVAR_DEFAULT_CONFIG_NAME ".cfg", pConfigDir );
-	TRefPtr<IStreamDataWriter>	pFile = g_pFileSystem->CreateFileWriter( configPath.c_str() );
+	std::string				   configPath = S_Sprintf( !bWriteDefaultConfig ? "%s/" CVAR_CONFIG_NAME ".cfg" : "%s/" CVAR_DEFAULT_CONFIG_NAME ".cfg", pConfigDir );
+	TRefPtr<IStreamDataWriter> pFile	  = g_pFileSystem->CreateFileWriter( configPath.c_str() );
 	if ( !pFile )
 	{
 		Warning( "Cvar: Failed to create file configuration '%s'", configPath.c_str() );
@@ -771,20 +767,21 @@ void CCvar::WriteConfigFile( const achar* pConfigDir, bool bWriteDefaultConfig /
 	onWriteConCmdsToConfigFile.Broadcast( pFile );
 
 	// Write cvars
-	std::string		buffer;
+	std::string buffer;
 	for ( IConCmdBase* pVar = g_pCvar->GetCommands(); pVar; pVar = pVar->GetNext() )
 	{
 		// Skip commands and cvars that not have FCVAR_ARCHIVE
 		if ( pVar->IsCommand() || !pVar->IsFlagSet( FCVAR_ARCHIVE ) )
 		{
-			continue;;
+			continue;
+			;
 		}
 
-		buffer += S_Sprintf( "%s \"%s\"\n", pVar->GetName(), ( ( IConVar* )pVar )->GetString() );
+		buffer += S_Sprintf( "%s \"%s\"\n", pVar->GetName(), ( (IConVar*)pVar )->GetString() );
 	}
 
 	// Write the buffer into the file
-	pFile->Write( buffer.data(), buffer.size() * sizeof( achar ) );
+	pFile->Write( buffer.data(), buffer.size() * sizeof( char ) );
 }
 
 /*
@@ -794,7 +791,7 @@ CCvar::OnWriteConfiguration
 */
 IOnWriteConCmdsToConfigFile* CCvar::OnWriteConCmdsToConfigFile() const
 {
-	return ( IOnWriteConCmdsToConfigFile* )&onWriteConCmdsToConfigFile;
+	return (IOnWriteConCmdsToConfigFile*)&onWriteConCmdsToConfigFile;
 }
 
 /*
@@ -843,7 +840,7 @@ void CCvar::ResetFlaggedVars( uint32 flags )
 		}
 
 		// Do nothing if cvar already have the default value
-		IConVar*	pCvar = ( IConVar* )pCurVar;
+		IConVar* pCvar = (IConVar*)pCurVar;
 		if ( !S_Stricmp( pCvar->GetDefault(), pCvar->GetString() ) )
 		{
 			continue;
@@ -903,11 +900,11 @@ void CCvar::SetConsoleDisplayFunc( IConsoleDisplayFunc* pConsoleDisplayFunc )
 CCvar::ConsolePrintf
 ==================
 */
-void CCvar::ConsolePrintf( const CColor& color, const achar* pFormat, ... )
+void CCvar::ConsolePrintf( const CColor& color, const char* pFormat, ... )
 {
 	if ( pConsoleDisplayFunc )
 	{
-		va_list		params;
+		va_list params;
 		va_start( params, pFormat );
 		pConsoleDisplayFunc->Print( S_Vsprintf( pFormat, params ).c_str(), color );
 		va_end( params );
@@ -919,11 +916,11 @@ void CCvar::ConsolePrintf( const CColor& color, const achar* pFormat, ... )
 CCvar::ConsolePrintf
 ==================
 */
-void CCvar::ConsolePrintf( const achar* pFormat, ... )
+void CCvar::ConsolePrintf( const char* pFormat, ... )
 {
 	if ( pConsoleDisplayFunc )
 	{
-		va_list		params;
+		va_list params;
 		va_start( params, pFormat );
 		pConsoleDisplayFunc->Print( S_Vsprintf( pFormat, params ).c_str() );
 		va_end( params );
@@ -939,7 +936,6 @@ void CCvar::SetCVarQuery( ICvarQuery* pCvarQuery )
 {
 	CCvar::pCvarQuery = pCvarQuery ? pCvarQuery : &s_CvarQuery;
 }
-
 
 /*
 ==================

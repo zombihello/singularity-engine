@@ -5,7 +5,7 @@
 S_IsPathSeparator
 ==================
 */
-FORCEINLINE bool S_IsPathSeparator( achar c )
+FORCEINLINE bool S_IsPathSeparator( char c )
 {
 	return c == '\\' || c == '/';
 }
@@ -71,7 +71,6 @@ FORCEINLINE void S_RemoveDotPathSeparators( std::string& path, bool bRemoveDoubl
 	path.resize( S_Strlen( path.c_str() ) );
 }
 
-
 /*
 ==================
 CFilename::GetExtension
@@ -79,7 +78,7 @@ CFilename::GetExtension
 */
 FORCEINLINE std::string CFilename::GetExtension( bool bIncludeDot /*= false*/ ) const
 {
-    return S_GetFileExtension( path.c_str(), bIncludeDot );
+	return S_GetFileExtension( path.c_str(), bIncludeDot );
 }
 
 /*
@@ -89,7 +88,7 @@ CFilename::GetFullPath
 */
 FORCEINLINE const std::string& CFilename::GetFullPath() const
 {
-    return path;
+	return path;
 }
 
 /*
@@ -99,9 +98,9 @@ CFilename::GetBaseName
 */
 FORCEINLINE std::string CFilename::GetBaseName() const
 {
-    std::string		result;
-    S_GetFileBaseName( path, result );
-    return result;
+	std::string result;
+	S_GetFileBaseName( path, result );
+	return result;
 }
 
 /*
@@ -111,9 +110,9 @@ CFilename::GetFileName
 */
 FORCEINLINE std::string CFilename::GetFileName() const
 {
-    std::string		result;
-    S_GetFileName( path, result );
-    return result;
+	std::string result;
+	S_GetFileName( path, result );
+	return result;
 }
 
 /*
@@ -123,9 +122,9 @@ CFilename::S_RemoveDotPathSeparators
 */
 FORCEINLINE std::string CFilename::GetPath() const
 {
-    std::string		result;
-    S_GetFilePath( path, result );
-    return result;
+	std::string result;
+	S_GetFilePath( path, result );
+	return result;
 }
 
 /*
@@ -135,11 +134,11 @@ CFilename::S_RemoveDotPathSeparators
 */
 FORCEINLINE bool CFilename::IsInDirectory( const std::string& dirPath ) const
 {
-    std::string		absoluteDirPath;
-    std::string		absolutePath;
-    S_MakeAbsolutePath( dirPath, absoluteDirPath );
-    S_MakeAbsolutePath( CFilename::path, absolutePath );
+	std::string absoluteDirPath;
+	std::string absolutePath;
+	S_MakeAbsolutePath( dirPath, absoluteDirPath );
+	S_MakeAbsolutePath( CFilename::path, absolutePath );
 
-    // Compare two string
-    return !S_Strnicmp( absolutePath.c_str(), absoluteDirPath.c_str(), ( uint32 )absoluteDirPath.size() );
+	// Compare two string
+	return !S_Strnicmp( absolutePath.c_str(), absoluteDirPath.c_str(), (uint32)absoluteDirPath.size() );
 }

@@ -4,7 +4,7 @@
 #include "studiorender/studio_vertextypes.h"
 
 //-----------------------------------------------------------------------------
-// Studio vertex declaration for each vertex type 
+// Studio vertex declaration for each vertex type
 //-----------------------------------------------------------------------------
 class CStudioVertexDeclarations : public TStudioRenderResource<IStudioRenderResource, true>
 {
@@ -32,6 +32,6 @@ private:
 	virtual void InitStudioAPI() override;
 	virtual void ReleaseStudioAPI() override;
 
-	TRefPtr<IStudioAPIVertexDeclaration>		pStudioAPIVertexDeclarations[STUDIO_VERTEX_NUM_TYPES];
+	TRefPtr<IStudioAPIVertexDeclaration> pStudioAPIVertexDeclarations[STUDIO_VERTEX_NUM_TYPES];
 };
-extern CStudioVertexDeclarations		g_StudioVertexDeclarations;
+extern CStudioVertexDeclarations g_StudioVertexDeclarations;

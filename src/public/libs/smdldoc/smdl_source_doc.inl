@@ -25,7 +25,7 @@ FORCEINLINE axisUp_t CSMDLSourceModelDoc::GetAxisUp() const
 CSMDLSourceModelDoc::SetSourcePath
 ==================
 */
-FORCEINLINE void CSMDLSourceModelDoc::SetSourcePath( const achar* pSourcePath )
+FORCEINLINE void CSMDLSourceModelDoc::SetSourcePath( const char* pSourcePath )
 {
 	CSMDLSourceModelDoc::sourcePath = pSourcePath;
 }
@@ -45,7 +45,7 @@ FORCEINLINE const std::string& CSMDLSourceModelDoc::GetSourcePath() const
 CSMDLSourceModelDoc::SetMaterialsDir
 ==================
 */
-FORCEINLINE void CSMDLSourceModelDoc::SetMaterialsDir( const achar* pMaterialsDir )
+FORCEINLINE void CSMDLSourceModelDoc::SetMaterialsDir( const char* pMaterialsDir )
 {
 	CSMDLSourceModelDoc::materialsDir = pMaterialsDir;
 }
@@ -65,7 +65,7 @@ FORCEINLINE const std::string& CSMDLSourceModelDoc::GetMaterialsDir() const
 CSMDLSourceModelDoc::SetOutputDir
 ==================
 */
-FORCEINLINE void CSMDLSourceModelDoc::SetOutputDir( const achar* pOutputDir )
+FORCEINLINE void CSMDLSourceModelDoc::SetOutputDir( const char* pOutputDir )
 {
 	CSMDLSourceModelDoc::outputDir = pOutputDir;
 }
@@ -85,7 +85,7 @@ FORCEINLINE const std::string& CSMDLSourceModelDoc::GetOutputDir() const
 CSMDLSourceModelDoc::AddRenamedMaterial
 ==================
 */
-FORCEINLINE void CSMDLSourceModelDoc::AddRenamedMaterial( const achar* pOriginalName, const achar* pNewName )
+FORCEINLINE void CSMDLSourceModelDoc::AddRenamedMaterial( const char* pOriginalName, const char* pNewName )
 {
 	renamedMaterialsDict[pOriginalName] = pNewName;
 }
@@ -95,7 +95,7 @@ FORCEINLINE void CSMDLSourceModelDoc::AddRenamedMaterial( const achar* pOriginal
 CSMDLSourceModelDoc::RemoveRenamedMaterial
 ==================
 */
-FORCEINLINE void CSMDLSourceModelDoc::RemoveRenamedMaterial( const achar* pOriginalName )
+FORCEINLINE void CSMDLSourceModelDoc::RemoveRenamedMaterial( const char* pOriginalName )
 {
 	renamedMaterialsDict.erase( pOriginalName );
 }
@@ -135,7 +135,7 @@ FORCEINLINE void CSMDLSourceModelDoc::SetCombineModels( bool bCombineModels )
 CSMDLSourceModelDoc::IsCombineModels
 ==================
 */
-FORCEINLINE bool CSMDLSourceModelDoc::IsCombineModels()  const
+FORCEINLINE bool CSMDLSourceModelDoc::IsCombineModels() const
 {
 	return bCombineModels;
 }
@@ -147,10 +147,10 @@ CSMDLSourceModelDoc::Clear
 */
 FORCEINLINE void CSMDLSourceModelDoc::Clear()
 {
-	bCombineModels	= false;
-	axisUp			= AXIS_UP_DEFAULT;
-	sourcePath		= "";
-	materialsDir	= "materials/";
-	outputDir		= "";
+	bCombineModels = false;
+	axisUp		   = AXIS_UP_DEFAULT;
+	sourcePath	   = "";
+	materialsDir   = "materials/";
+	outputDir	   = "";
 	renamedMaterialsDict.clear();
 }

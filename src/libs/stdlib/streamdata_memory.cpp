@@ -33,7 +33,6 @@ uint64 CStreamDataMemoryReader::GetSize() const
 	return size;
 }
 
-
 /*
 ==================
 CStreamDataMemoryWriter::Write
@@ -67,5 +66,5 @@ CStreamDataMemoryWriter::GetSize
 */
 uint64 CStreamDataMemoryWriter::GetSize() const
 {
-	return ( uint64 )data.size();
+	return (uint64)data.size();
 }

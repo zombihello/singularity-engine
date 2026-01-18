@@ -5,7 +5,7 @@
 TEcsComponentFactory::TEcsComponentFactory
 ==================
 */
-template<typename TEcsComponent, void( *pParserSENTComponentVarsFunc )( const CSENTEntityDescComponent&, TEcsComponent& )>
+template<typename TEcsComponent, void ( *pParserSENTComponentVarsFunc )( const CSENTEntityDescComponent&, TEcsComponent& )>
 TEcsComponentFactory<TEcsComponent, pParserSENTComponentVarsFunc>::TEcsComponentFactory( const CSENTEntityDescComponent& sentComponent )
 {
 	if ( pParserSENTComponentVarsFunc )
@@ -19,17 +19,18 @@ TEcsComponentFactory<TEcsComponent, pParserSENTComponentVarsFunc>::TEcsComponent
 TEcsComponentFactory::TEcsComponentFactory
 ==================
 */
-template<typename TEcsComponent, void( *pParserSENTComponentVarsFunc )( const CSENTEntityDescComponent&, TEcsComponent& )>
+template<typename TEcsComponent, void ( *pParserSENTComponentVarsFunc )( const CSENTEntityDescComponent&, TEcsComponent& )>
 TEcsComponentFactory<TEcsComponent, pParserSENTComponentVarsFunc>::TEcsComponentFactory( const TEcsComponentFactory& other )
 	: ecsArchetypeComponent( other.ecsArchetypeComponent )
-{}
+{
+}
 
 /*
 ==================
 TEcsComponentFactory::Create
 ==================
 */
-template<typename TEcsComponent, void( *pParserSENTComponentVarsFunc )( const CSENTEntityDescComponent&, TEcsComponent& )>
+template<typename TEcsComponent, void ( *pParserSENTComponentVarsFunc )( const CSENTEntityDescComponent&, TEcsComponent& )>
 void TEcsComponentFactory<TEcsComponent, pParserSENTComponentVarsFunc>::Create( CEcsWorld ecsWorld, ecsEntity_t ecsEntity )
 {
 	PROFILE_SCOPE()
@@ -49,13 +50,12 @@ void TEcsComponentFactory<TEcsComponent, pParserSENTComponentVarsFunc>::Create( 
 	}
 }
 
-
 /*
 ==================
 CEcsComponentTypes::RegisterType
 ==================
 */
-FORCEINLINE void CEcsComponentTypes::RegisterType( const achar* pTypeName, createEcsComponentFactoryFn_t pCreateFunc )
+FORCEINLINE void CEcsComponentTypes::RegisterType( const char* pTypeName, createEcsComponentFactoryFn_t pCreateFunc )
 {
 	// Make sure that we haven't any component by the type name and pCreateFunc is valid
 	PROFILE_SCOPE()
@@ -71,7 +71,7 @@ FORCEINLINE void CEcsComponentTypes::RegisterType( const achar* pTypeName, creat
 CEcsComponentTypes::UnregisterType
 ==================
 */
-FORCEINLINE void CEcsComponentTypes::UnregisterType( const achar* pTypeName )
+FORCEINLINE void CEcsComponentTypes::UnregisterType( const char* pTypeName )
 {
 	PROFILE_SCOPE()
 	componentTypesDict.erase( pTypeName );
@@ -98,8 +98,8 @@ CEcsComponentTypes::CreateFactory
 FORCEINLINE IEcsComponentFactory* CEcsComponentTypes::CreateFactory( const CSENTEntityDescComponent& sentComponent ) const
 {
 	PROFILE_SCOPE()
-	const achar*	pTypeName = sentComponent.GetType();
-	auto			itFind = componentTypesDict.find( pTypeName );
+	const char* pTypeName = sentComponent.GetType();
+	auto		 itFind	   = componentTypesDict.find( pTypeName );
 	if ( itFind == componentTypesDict.end() )
 	{
 		Warning( "Game: Unknown ECS component type '%s'", pTypeName );

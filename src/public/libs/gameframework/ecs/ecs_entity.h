@@ -8,7 +8,6 @@
 //-----------------------------------------------------------------------------
 class CEcsMap;
 
-
 //-----------------------------------------------------------------------------
 // ECS entity
 //-----------------------------------------------------------------------------
@@ -24,10 +23,10 @@ public:
 
 private:
 	static void OnMapResetedOrUnloaded( void* pUserData, IMap* pMap );
-	void DestroyEcsEntity( bool bRemoveEcsMapDelegates = true );
+	void		DestroyEcsEntity( bool bRemoveEcsMapDelegates = true );
 
-	ecsEntity_t							ecsEntity;
-	CEcsMap*							pEcsMap;
-	IOnMapReseted::funcDelegate_t*		pOnMapResetedDelegate;
-	IOnMapUnloaded::funcDelegate_t*		pOnMapUnloadedDelegate;
+	ecsEntity_t						ecsEntity;
+	CEcsMap*						pEcsMap;
+	IOnMapReseted::funcDelegate_t*	pOnMapResetedDelegate;
+	IOnMapUnloaded::funcDelegate_t* pOnMapUnloadedDelegate;
 };

@@ -8,10 +8,10 @@ CSTEXCompiledTextureDoc::SetData
 FORCEINLINE void CSTEXCompiledTextureDoc::SetData( studioAPITextureType_t type, uint32 numLayers, const stexTextureMipMaps_t& mipmaps, const std::vector<byte>& data, studioAPIPixelFormat_t pixelFormat )
 {
 	Validate( type, numLayers, mipmaps );
-	CSTEXCompiledTextureDoc::type = type;
-	CSTEXCompiledTextureDoc::numLayers = numLayers;
-	CSTEXCompiledTextureDoc::mipmaps = mipmaps;
-	CSTEXCompiledTextureDoc::data = data;
+	CSTEXCompiledTextureDoc::type		 = type;
+	CSTEXCompiledTextureDoc::numLayers	 = numLayers;
+	CSTEXCompiledTextureDoc::mipmaps	 = mipmaps;
+	CSTEXCompiledTextureDoc::data		 = data;
 	CSTEXCompiledTextureDoc::pixelFormat = pixelFormat;
 }
 
@@ -23,10 +23,10 @@ CSTEXCompiledTextureDoc::SetData
 FORCEINLINE void CSTEXCompiledTextureDoc::SetData( studioAPITextureType_t type, uint32 numLayers, stexTextureMipMaps_t& mipmaps, std::vector<byte>& data, studioAPIPixelFormat_t pixelFormat )
 {
 	Validate( type, numLayers, mipmaps );
-	CSTEXCompiledTextureDoc::type = type;
-	CSTEXCompiledTextureDoc::numLayers = numLayers;
-	CSTEXCompiledTextureDoc::mipmaps = std::move( mipmaps );
-	CSTEXCompiledTextureDoc::data = std::move( data );
+	CSTEXCompiledTextureDoc::type		 = type;
+	CSTEXCompiledTextureDoc::numLayers	 = numLayers;
+	CSTEXCompiledTextureDoc::mipmaps	 = std::move( mipmaps );
+	CSTEXCompiledTextureDoc::data		 = std::move( data );
 	CSTEXCompiledTextureDoc::pixelFormat = pixelFormat;
 }
 
@@ -157,7 +157,7 @@ CSTEXCompiledTextureDoc::GetNumMips
 */
 FORCEINLINE uint32 CSTEXCompiledTextureDoc::GetNumMips() const
 {
-	return ( uint32 )mipmaps.size();
+	return (uint32)mipmaps.size();
 }
 
 /*
@@ -241,14 +241,14 @@ CSTEXCompiledTextureDoc::Clear
 */
 FORCEINLINE void CSTEXCompiledTextureDoc::Clear()
 {
-	type = STUDIOAPI_TEXTURE_TYPE_1D;
-	pixelFormat = STUDIOAPI_PIXEL_FORMAT_UNKNOWN;
-	numLayers = 0;
+	type		  = STUDIOAPI_TEXTURE_TYPE_1D;
+	pixelFormat	  = STUDIOAPI_PIXEL_FORMAT_UNKNOWN;
+	numLayers	  = 0;
 	maxAnisotropy = 0;
-	addressModeU = STUDIOAPI_SAMPLER_ADDRESS_MODE_WRAP;
-	addressModeV = STUDIOAPI_SAMPLER_ADDRESS_MODE_WRAP;
-	addressModeW = STUDIOAPI_SAMPLER_ADDRESS_MODE_WRAP;
-	filter = STUDIOAPI_SAMPLER_FILTER_POINT;
+	addressModeU  = STUDIOAPI_SAMPLER_ADDRESS_MODE_WRAP;
+	addressModeV  = STUDIOAPI_SAMPLER_ADDRESS_MODE_WRAP;
+	addressModeW  = STUDIOAPI_SAMPLER_ADDRESS_MODE_WRAP;
+	filter		  = STUDIOAPI_SAMPLER_FILTER_POINT;
 	mipmaps.clear();
 	data.clear();
 }

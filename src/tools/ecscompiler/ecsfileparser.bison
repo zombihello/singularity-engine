@@ -68,7 +68,7 @@
     Function for Bison to handle error cases
     ==================
     */
-    static int yyerror_file_thread_safe( const achar* pMessage, void* pParam, YYSTYPE* lvalp )
+    static int yyerror_file_thread_safe( const char* pMessage, void* pParam, YYSTYPE* lvalp )
     {
         ecsGrammarInterface_t*     pGrammarInterface = ( ecsGrammarInterface_t* )pParam;
         pGrammarInterface->EmitError( pMessage, lvalp );

@@ -14,7 +14,8 @@ CStudioAPICmdBufferVk::CStudioAPICmdBufferVk( CStudioAPICmdBufferPoolVk& cmdBuff
 	, vkCommandBuffer( VK_NULL_HANDLE )
 	, cmdBufferPool( cmdBufferPool )
 	, pCurrentDescriptorPoolSetContainer( NULL )
-{}
+{
+}
 
 /*
 ==================
@@ -36,9 +37,9 @@ void CStudioAPICmdBufferVk::Begin()
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 
 	// Begin write into the command buffer
-	VkCommandBufferBeginInfo		vkCommandBufferBeginInfo = {};
-	vkCommandBufferBeginInfo.sType	= VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-	vkCommandBufferBeginInfo.flags	= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+	VkCommandBufferBeginInfo vkCommandBufferBeginInfo = {};
+	vkCommandBufferBeginInfo.sType					  = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	vkCommandBufferBeginInfo.flags					  = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 	STUDIOAPI_VK_VERIFY_RESULT( vkBeginCommandBuffer( vkCommandBuffer, &vkCommandBufferBeginInfo ) );
 }
 
@@ -72,7 +73,7 @@ bool CStudioAPICmdBufferVk::AcquirePoolSetAndDescriptorsIfNeed( const CStudioAPI
 	// Allocate descriptor sets if it need
 	if ( bNeedDescriptorSets )
 	{
-		CStudioAPITypedDescriptorPoolSetVk*		pTypedPoolSet = pCurrentDescriptorPoolSetContainer->AcquireTypedPoolSet( descriptorSetsLayout );
+		CStudioAPITypedDescriptorPoolSetVk* pTypedPoolSet = pCurrentDescriptorPoolSetContainer->AcquireTypedPoolSet( descriptorSetsLayout );
 		return pTypedPoolSet->AllocateDescriptorSets( descriptorSetsLayout, pDestDescriptorSets );
 	}
 
@@ -92,13 +93,13 @@ void CStudioAPICmdBufferVk::AllocMemory()
 	if ( !bIsAllocatedMemory )
 	{
 		Assert( cmdBufferPool.IsValid() );
-		VkCommandBufferAllocateInfo						vkCommandBufferAllocateInfo = {};
-		vkCommandBufferAllocateInfo.sType				= VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-		vkCommandBufferAllocateInfo.level				= VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-		vkCommandBufferAllocateInfo.commandBufferCount	= 1;
-		vkCommandBufferAllocateInfo.commandPool			= cmdBufferPool.GetVkCommandPool();
+		VkCommandBufferAllocateInfo vkCommandBufferAllocateInfo = {};
+		vkCommandBufferAllocateInfo.sType						= VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		vkCommandBufferAllocateInfo.level						= VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		vkCommandBufferAllocateInfo.commandBufferCount			= 1;
+		vkCommandBufferAllocateInfo.commandPool					= cmdBufferPool.GetVkCommandPool();
 		STUDIOAPI_VK_VERIFY_RESULT( vkAllocateCommandBuffers( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), &vkCommandBufferAllocateInfo, &vkCommandBuffer ) );
-		bIsAllocatedMemory								= true;
+		bIsAllocatedMemory = true;
 	}
 }
 
@@ -126,7 +127,7 @@ void CStudioAPICmdBufferVk::FreeMemory()
 		}
 
 		// We are done, change state and clear the handle
-		vkCommandBuffer		= VK_NULL_HANDLE;
-		bIsAllocatedMemory	= false;
+		vkCommandBuffer	   = VK_NULL_HANDLE;
+		bIsAllocatedMemory = false;
 	}
 }

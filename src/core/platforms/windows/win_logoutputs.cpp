@@ -2,25 +2,22 @@
 #include "core/logoutput_console_null.h"
 
 #if ENABLE_LOGGING
-static const uint16 s_LogTextColorsWin32[] =
-{
-	0x7,		// LOG_TEXT_COLOR_DEFAULT
-	0x7,		// LOG_TEXT_COLOR_WHITE
-	0xC,		// LOG_TEXT_COLOR_RED
-	0xE,		// LOG_TEXT_COLOR_YELLOW
-	0x2			// LOG_TEXT_COLOR_GREEN
+static const uint16 s_LogTextColorsWin32[] = {
+	0x7,  // LOG_TEXT_COLOR_DEFAULT
+	0x7,  // LOG_TEXT_COLOR_WHITE
+	0xC,  // LOG_TEXT_COLOR_RED
+	0xE,  // LOG_TEXT_COLOR_YELLOW
+	0x2	  // LOG_TEXT_COLOR_GREEN
 };
 static_assert( ARRAYSIZE( s_LogTextColorsWin32 ) == LOG_TEXT_NUM_COLORS, "Array size 's_LogTextColorsWin32' must be equal to LOG_TEXT_NUM_COLORS" );
-
 
 // A Windows log output to debug (i.g: Output window in Visual Studio).
 class CWindowsLogOutputDebug : public CBaseLogOutput<ILogOutput>
 {
 public:
 	// ILogOutput interface
-	virtual void Print( logLevel_t level, const achar* pMessage ) override;
+	virtual void Print( logLevel_t level, const char* pMessage ) override;
 };
-
 
 // A Windows log output to a console
 class CWindowsLogOutputConsole : public CBaseLogOutput<ILogOutputConsole>
@@ -28,7 +25,7 @@ class CWindowsLogOutputConsole : public CBaseLogOutput<ILogOutputConsole>
 public:
 	// ILogOutput interface
 	virtual void SetTextColor( logTextColor_t textColor ) override;
-	virtual void Print( logLevel_t level, const achar* pMessage ) override;
+	virtual void Print( logLevel_t level, const char* pMessage ) override;
 
 	// ILogOutputConsole interface
 	virtual void Show( bool bShowConsole ) override;
@@ -38,23 +35,21 @@ public:
 	~CWindowsLogOutputConsole();
 
 private:
-	HANDLE		consoleHandle;
+	HANDLE consoleHandle;
 };
-
 
 /*
 ==================
 CWindowsLogOutputDebug::Print
 ==================
 */
-void CWindowsLogOutputDebug::Print( logLevel_t level, const achar* pMessage )
+void CWindowsLogOutputDebug::Print( logLevel_t level, const char* pMessage )
 {
 	if ( Sys_IsDebuggerPresent() )
 	{
 		Sys_DebugMessage( pMessage );
 	}
 }
-
 
 /*
 ==================
@@ -63,7 +58,8 @@ CWindowsLogOutputConsole::CWindowsLogOutputConsole
 */
 CWindowsLogOutputConsole::CWindowsLogOutputConsole()
 	: consoleHandle( NULL )
-{}
+{
+}
 
 /*
 ==================
@@ -118,7 +114,7 @@ void CWindowsLogOutputConsole::SetTextColor( logTextColor_t textColor )
 {
 	if ( consoleHandle && CWindowsLogOutputConsole::textColor != textColor )
 	{
-		SetConsoleTextAttribute( consoleHandle, s_LogTextColorsWin32[( uint32 )textColor] );
+		SetConsoleTextAttribute( consoleHandle, s_LogTextColorsWin32[(uint32)textColor] );
 	}
 	CBaseLogOutput<ILogOutputConsole>::SetTextColor( textColor );
 }
@@ -128,17 +124,17 @@ void CWindowsLogOutputConsole::SetTextColor( logTextColor_t textColor )
 CWindowsLogOutputConsole::Print
 ==================
 */
-void CWindowsLogOutputConsole::Print( logLevel_t level, const achar* pMessage )
+void CWindowsLogOutputConsole::Print( logLevel_t level, const char* pMessage )
 {
 	if ( consoleHandle )
 	{
-		logTextColor_t	originalTextColor	= textColor;
-		bool			bNeedResetColor		= true;
+		logTextColor_t originalTextColor = textColor;
+		bool		   bNeedResetColor	 = true;
 		switch ( level )
 		{
-		case LOG_LEVEL_ERROR:		SetTextColor( LOG_TEXT_COLOR_RED );		break;
-		case LOG_LEVEL_WARNING:		SetTextColor( LOG_TEXT_COLOR_YELLOW );	break;
-		default:					bNeedResetColor = false;				break;
+		case LOG_LEVEL_ERROR: SetTextColor( LOG_TEXT_COLOR_RED ); break;
+		case LOG_LEVEL_WARNING: SetTextColor( LOG_TEXT_COLOR_YELLOW ); break;
+		default: bNeedResetColor = false; break;
 		}
 
 		printf( pMessage );
@@ -148,7 +144,6 @@ void CWindowsLogOutputConsole::Print( logLevel_t level, const achar* pMessage )
 		}
 	}
 }
-
 
 /*
 ==================
@@ -160,7 +155,7 @@ void Sys_SetupDefaultLogOutputs( ILogger* pLogger )
 	pLogger->AddOutput( new CWindowsLogOutputDebug() );
 	pLogger->AddOutput( LogConsoleOS() );
 }
-#endif // ENABLE_LOGGING
+#endif	// ENABLE_LOGGING
 
 /*
 ==================
@@ -170,10 +165,10 @@ LogConsoleOS
 ILogOutputConsole* LogConsoleOS()
 {
 #if ENABLE_LOGGING
-	static CWindowsLogOutputConsole		s_LogOutputConsole;
+	static CWindowsLogOutputConsole s_LogOutputConsole;
 	return &s_LogOutputConsole;
 #else
-	static CNullLogOutputConsole		s_NullLogOutputConsole;
+	static CNullLogOutputConsole s_NullLogOutputConsole;
 	return &s_NullLogOutputConsole;
-#endif // ENABLE_LOGGING
+#endif	// ENABLE_LOGGING
 }

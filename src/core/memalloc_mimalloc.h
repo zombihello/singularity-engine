@@ -15,12 +15,12 @@ public:
 	virtual void* TryMalloc( size_t numBytes, uint32 alignment = DEFAULT_ALIGNMENT ) override;
 	virtual void* Realloc( void* pOriginal, size_t numBytes, uint32 alignment = DEFAULT_ALIGNMENT ) override;
 	virtual void* TryRealloc( void* pOriginal, size_t numBytes, uint32 alignment = DEFAULT_ALIGNMENT ) override;
-	virtual void Free( void* pOriginal ) override;
-	virtual void Trim( bool bTrimThreadCaches ) override;
+	virtual void  Free( void* pOriginal ) override;
+	virtual void  Trim( bool bTrimThreadCaches ) override;
 
 	virtual bool GetAllocationSize( void* pOriginal, size_t& numBytes ) override;
 
 	// CMemAllocBase interface
 	virtual bool IsInternallyThreadSafe() const override;
 };
-#endif // PLATFORM_SUPPORTS_MIMALLOC
+#endif	// PLATFORM_SUPPORTS_MIMALLOC

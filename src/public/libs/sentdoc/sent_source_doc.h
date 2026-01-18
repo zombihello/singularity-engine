@@ -14,17 +14,17 @@ class CSENTSourceEntityDescDoc
 public:
 	// Save and load a entity descriptor document
 	// NOTE: For use StdLib must be connected by ConnectStdLib (except LoadFromBuffer)
-	bool SaveFile( const achar* pPath );
-	bool LoadFromFile( const achar* pPath );
-	bool LoadFromBuffer( const achar* pBuffer );
+	bool SaveFile( const char* pPath );
+	bool LoadFromFile( const char* pPath );
+	bool LoadFromBuffer( const char* pBuffer );
 
-	void SetOutputDir( const achar* pOutputDir );
+	void SetOutputDir( const char* pOutputDir );
 	void AddComponent( const CSENTEntityDescComponent& component );
 	void RemoveComponent( uint32 index );
 	void Clear();
 
-	const achar* GetOutputDir() const;
-	uint32 GetNumComponents() const;
+	const char*								 GetOutputDir() const;
+	uint32										 GetNumComponents() const;
 	const std::vector<CSENTEntityDescComponent>& GetComponents() const;
 
 private:
@@ -38,8 +38,8 @@ private:
 	bool GrabValueAsComponent( const CJsonValue& jsonValue, CSENTEntityDescComponent& component ) const;
 	bool GrabValueAsVar( const CJsonValue& jsonValue, CSENTEntityDescVar& var ) const;
 
-	std::string								outputDir;
-	std::vector<CSENTEntityDescComponent>	components;
+	std::string							  outputDir;
+	std::vector<CSENTEntityDescComponent> components;
 };
 
 #include "sentdoc/sent_source_doc.inl"

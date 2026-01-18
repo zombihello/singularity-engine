@@ -11,4 +11,4 @@ void CrashDump_SetupExceptionHandler();
 void CrashDump_OnThreadRun();
 void CrashDump_OnThreadStop();
 
-void CrashDump_SetMessage( const achar* pMsg );
+void CrashDump_SetMessage( const char* pMsg );

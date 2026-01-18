@@ -155,7 +155,7 @@ FORCEINLINE studioAPITextureType_t CSTEXSourceTextureDoc::GetType() const
 CSTEXSourceTextureDoc::AddSourcePath
 ==================
 */
-FORCEINLINE void CSTEXSourceTextureDoc::AddSourcePath( const achar* pSourcePath )
+FORCEINLINE void CSTEXSourceTextureDoc::AddSourcePath( const char* pSourcePath )
 {
 	sourcePaths.emplace_back( pSourcePath );
 }
@@ -167,7 +167,7 @@ CSTEXSourceTextureDoc::RemoveSourcePath
 */
 FORCEINLINE void CSTEXSourceTextureDoc::RemoveSourcePath( uint32 sourcePathIdx )
 {
-	Assert( sourcePathIdx < ( uint32 )sourcePaths.size() );
+	Assert( sourcePathIdx < (uint32)sourcePaths.size() );
 	sourcePaths.erase( sourcePaths.begin() + sourcePathIdx );
 }
 
@@ -178,7 +178,7 @@ CSTEXSourceTextureDoc::GetNumSourcePaths
 */
 FORCEINLINE uint32 CSTEXSourceTextureDoc::GetNumSourcePaths() const
 {
-	return ( uint32 )sourcePaths.size();
+	return (uint32)sourcePaths.size();
 }
 
 /*
@@ -186,9 +186,9 @@ FORCEINLINE uint32 CSTEXSourceTextureDoc::GetNumSourcePaths() const
 CSTEXSourceTextureDoc::GetSourcePath
 ==================
 */
-FORCEINLINE const achar* CSTEXSourceTextureDoc::GetSourcePath( uint32 sourcePathIdx )
+FORCEINLINE const char* CSTEXSourceTextureDoc::GetSourcePath( uint32 sourcePathIdx )
 {
-	Assert( sourcePathIdx < ( uint32 )sourcePaths.size() );
+	Assert( sourcePathIdx < (uint32)sourcePaths.size() );
 	return sourcePaths[sourcePathIdx].c_str();
 }
 
@@ -227,7 +227,7 @@ FORCEINLINE uint32 CSTEXSourceTextureDoc::GetMaxAnisotropy() const
 CSTEXSourceTextureDoc::SetOutputDir
 ==================
 */
-FORCEINLINE void CSTEXSourceTextureDoc::SetOutputDir( const achar* pOutputDir )
+FORCEINLINE void CSTEXSourceTextureDoc::SetOutputDir( const char* pOutputDir )
 {
 	outputDir = pOutputDir;
 }
@@ -237,7 +237,7 @@ FORCEINLINE void CSTEXSourceTextureDoc::SetOutputDir( const achar* pOutputDir )
 CSTEXSourceTextureDoc::GetOutputDir
 ==================
 */
-FORCEINLINE const achar* CSTEXSourceTextureDoc::GetOutputDir() const
+FORCEINLINE const char* CSTEXSourceTextureDoc::GetOutputDir() const
 {
 	return outputDir.c_str();
 }
@@ -250,14 +250,14 @@ CSTEXSourceTextureDoc::Clear
 FORCEINLINE void CSTEXSourceTextureDoc::Clear()
 {
 	bGenerateMipMaps = false;
-	type = STUDIOAPI_TEXTURE_TYPE_1D;
-	addressModeU = STUDIOAPI_SAMPLER_ADDRESS_MODE_WRAP;
-	addressModeV = STUDIOAPI_SAMPLER_ADDRESS_MODE_WRAP;
-	addressModeW = STUDIOAPI_SAMPLER_ADDRESS_MODE_WRAP;
-	filter = STUDIOAPI_SAMPLER_FILTER_POINT;
-	pixelFormat = STUDIOAPI_PIXEL_FORMAT_UNKNOWN;
-	maxAnisotropy = 0;
-	outputDir = "";
+	type			 = STUDIOAPI_TEXTURE_TYPE_1D;
+	addressModeU	 = STUDIOAPI_SAMPLER_ADDRESS_MODE_WRAP;
+	addressModeV	 = STUDIOAPI_SAMPLER_ADDRESS_MODE_WRAP;
+	addressModeW	 = STUDIOAPI_SAMPLER_ADDRESS_MODE_WRAP;
+	filter			 = STUDIOAPI_SAMPLER_FILTER_POINT;
+	pixelFormat		 = STUDIOAPI_PIXEL_FORMAT_UNKNOWN;
+	maxAnisotropy	 = 0;
+	outputDir		 = "";
 	sourcePaths.clear();
 }
 
@@ -268,7 +268,7 @@ CSTEXSourceTextureDoc::IsValidNumSourcePaths
 */
 FORCEINLINE bool CSTEXSourceTextureDoc::IsValidNumSourcePaths( studioAPITextureType_t type, uint32 numSourcePaths, std::string& validateMsg ) const
 {
-	bool	bResult = true;
+	bool bResult = true;
 	switch ( type )
 	{
 	case STUDIOAPI_TEXTURE_TYPE_1D:

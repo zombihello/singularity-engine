@@ -9,7 +9,8 @@ CStreamDataStdFileReader::CStreamDataStdFileReader
 CStreamDataStdFileReader::CStreamDataStdFileReader( FILE* pFile, const std::string& path )
 	: CBaseStreamDataFileReader( path )
 	, pFile( pFile )
-{}
+{
+}
 
 /*
 ==================
@@ -28,11 +29,11 @@ CStreamDataStdFileReader::GetSize
 */
 uint64 CStreamDataStdFileReader::GetSize() const
 {
-	uint64	currentPosition = Tell();
+	uint64 currentPosition = Tell();
 
 	fseek( pFile, 0, SEEK_END );
-	uint64	sizeFile = Tell();
-	fseek( pFile, ( long )currentPosition, SEEK_SET );
+	uint64 sizeFile = Tell();
+	fseek( pFile, (long)currentPosition, SEEK_SET );
 	return sizeFile;
 }
 
@@ -43,7 +44,7 @@ CStreamDataStdFileReader::Seek
 */
 void CStreamDataStdFileReader::Seek( uint64 position )
 {
-	fseek( pFile, ( long )position, SEEK_SET );
+	fseek( pFile, (long)position, SEEK_SET );
 }
 
 /*
@@ -52,7 +53,8 @@ CStreamDataStdFileReader::Flush
 ==================
 */
 void CStreamDataStdFileReader::Flush()
-{}
+{
+}
 
 /*
 ==================
@@ -92,7 +94,8 @@ CStreamDataStdFileWriter::CStreamDataStdFileWriter
 CStreamDataStdFileWriter::CStreamDataStdFileWriter( FILE* pFile, const std::string& path )
 	: CBaseStreamDataFileWriter( path )
 	, pFile( pFile )
-{}
+{
+}
 
 /*
 ==================
@@ -114,11 +117,11 @@ uint64 CStreamDataStdFileWriter::GetSize() const
 {
 	// Make sure that all data is written before looking at file size
 	const_cast<CStreamDataStdFileWriter*>( this )->Flush();
-	uint64	currentPosition = Tell();
+	uint64 currentPosition = Tell();
 
 	fseek( pFile, 0, SEEK_END );
-	uint64	sizeFile = Tell();
-	fseek( pFile, ( long )currentPosition, SEEK_SET );
+	uint64 sizeFile = Tell();
+	fseek( pFile, (long)currentPosition, SEEK_SET );
 	return sizeFile;
 }
 
@@ -130,7 +133,7 @@ CStreamDataStdFileWriter::Seek
 void CStreamDataStdFileWriter::Seek( uint64 position )
 {
 	Flush();
-	fseek( pFile, ( long )position, SEEK_SET );
+	fseek( pFile, (long)position, SEEK_SET );
 }
 
 /*

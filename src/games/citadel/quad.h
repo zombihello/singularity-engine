@@ -12,14 +12,14 @@ public:
 	void Init( IStudioAPIBuffer* pStudioAPIVertexBuffer, IStudioAPIBuffer* pStudioAPIIndexBuffer, IResource* pMaterial );
 	void Shutdown();
 
-	FORCEINLINE IStudioAPIBuffer* GetStudioAPIVertexBuffer() const		{ return pStudioAPIVertexBuffer; }
-	FORCEINLINE IStudioAPIBuffer* GetStudioAPIIndexBuffer() const		{ return pStudioAPIIndexBuffer; }
-	FORCEINLINE IResource* GetMaterial() const							{ return pMaterial ? pMaterial : NULL; }
+	FORCEINLINE IStudioAPIBuffer* GetStudioAPIVertexBuffer() const { return pStudioAPIVertexBuffer; }
+	FORCEINLINE IStudioAPIBuffer* GetStudioAPIIndexBuffer() const { return pStudioAPIIndexBuffer; }
+	FORCEINLINE IResource* GetMaterial() const { return pMaterial ? pMaterial : NULL; }
 
 private:
-	TRefPtr<IStudioAPIBuffer>	pStudioAPIVertexBuffer;
-	TRefPtr<IStudioAPIBuffer>	pStudioAPIIndexBuffer;
-	TResourcePtr<IMaterial>		pMaterial;
+	TRefPtr<IStudioAPIBuffer> pStudioAPIVertexBuffer;
+	TRefPtr<IStudioAPIBuffer> pStudioAPIIndexBuffer;
+	TResourcePtr<IMaterial>	  pMaterial;
 };
 
 CQuad& Quad();

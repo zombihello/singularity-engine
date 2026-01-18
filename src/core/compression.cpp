@@ -14,11 +14,11 @@ static bool CompressMemoryZLIB( void* pCompressedBuffer, uint32& compressedSize,
 	PROFILE_SCOPE()
 
 	// Zlib wants to use unsigned long.
-	unsigned long	zCompressedSize = compressedSize;
-	unsigned long	zUncompressedSize = uncompressedSize;
+	unsigned long zCompressedSize	= compressedSize;
+	unsigned long zUncompressedSize = uncompressedSize;
 
 	// Compress data
-	bool bResult = compress( ( byte* )pCompressedBuffer, &zCompressedSize, ( const byte* )pUncompressedBuffer, zUncompressedSize ) == Z_OK ? TRUE : FALSE;
+	bool bResult = compress( (byte*)pCompressedBuffer, &zCompressedSize, (const byte*)pUncompressedBuffer, zUncompressedSize ) == Z_OK ? TRUE : FALSE;
 
 	// Propagate compressed size from intermediate variable back into out variable.
 	compressedSize = zCompressedSize;
@@ -35,11 +35,11 @@ static bool UncompressMemoryZLIB( void* pUncompressedBuffer, uint32 uncompressed
 	PROFILE_SCOPE()
 
 	// Zlib wants to use unsigned long.
-	unsigned long	zCompressedSize = compressedSize;
-	unsigned long	zUncompressedSize = uncompressedSize;
+	unsigned long zCompressedSize	= compressedSize;
+	unsigned long zUncompressedSize = uncompressedSize;
 
 	// Uncompress data.
-	bool bResult = uncompress( ( byte* )pUncompressedBuffer, &zUncompressedSize, ( const byte* )pCompressedBuffer, zCompressedSize ) == Z_OK ? TRUE : FALSE;
+	bool bResult = uncompress( (byte*)pUncompressedBuffer, &zUncompressedSize, (const byte*)pCompressedBuffer, zCompressedSize ) == Z_OK ? TRUE : FALSE;
 
 	// Sanity check to make sure we uncompressed as much data as we expected to.
 	Assert( uncompressedSize == zUncompressedSize );
@@ -57,7 +57,7 @@ bool Sys_CompressMemory( compressionType_t compressionType, void* pCompressedBuf
 
 	// Make sure a valid compression scheme was provided
 	Assert( compressionType != COMPRESSION_NONE );
-	bool	bResult = false;
+	bool bResult = false;
 
 	switch ( compressionType )
 	{
@@ -85,7 +85,7 @@ bool Sys_UncompressMemory( compressionType_t compressionType, void* pUncompresse
 
 	// Make sure a valid compression scheme was provided
 	Assert( compressionType != COMPRESSION_NONE );
-	bool	bResult = false;
+	bool bResult = false;
 
 	switch ( compressionType )
 	{

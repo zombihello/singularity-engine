@@ -4,11 +4,10 @@
 //-----------------------------------------------------------------------------
 // Global variables
 //-----------------------------------------------------------------------------
-cvarDLLIdentifier_t		CCvarLocalRegister::s_dllIdentifier		= -1;
-IConCmdBase*			CCvarLocalRegister::s_pConCmdList		= NULL;
-ICvarAccessor*			CCvarLocalRegister::s_pAccessor			= NULL;
-bool					CCvarLocalRegister::s_bCVarsRegistered	= NULL;
-
+cvarDLLIdentifier_t CCvarLocalRegister::s_dllIdentifier	   = -1;
+IConCmdBase*		CCvarLocalRegister::s_pConCmdList	   = NULL;
+ICvarAccessor*		CCvarLocalRegister::s_pAccessor		   = NULL;
+bool				CCvarLocalRegister::s_bCVarsRegistered = NULL;
 
 //-----------------------------------------------------------------------------
 // Default Cvar accessor
@@ -22,8 +21,7 @@ public:
 		g_pCvar->RegisterCommand( pCommand );
 	}
 };
-static CCvarDefaultAccessor		s_CvarDefaultAccessor;
-
+static CCvarDefaultAccessor s_CvarDefaultAccessor;
 
 //-----------------------------------------------------------------------------
 // Register/unregister convars
@@ -41,14 +39,14 @@ void ConVar_Register( uint32 flags /*= FCVAR_NONE*/, IConVarsOverrider* pConVars
 	}
 
 	Assert( CCvarLocalRegister::s_dllIdentifier == -1 );
-	CCvarLocalRegister::s_bCVarsRegistered	= true;
-	CCvarLocalRegister::s_dllIdentifier		= g_pCvar->AllocateDLLIdentifier();
-	CCvarLocalRegister::s_pAccessor			= pAccessor ? pAccessor : &s_CvarDefaultAccessor;
+	CCvarLocalRegister::s_bCVarsRegistered = true;
+	CCvarLocalRegister::s_dllIdentifier	   = g_pCvar->AllocateDLLIdentifier();
+	CCvarLocalRegister::s_pAccessor		   = pAccessor ? pAccessor : &s_CvarDefaultAccessor;
 
-	IConCmdBase*	pCurCommand = CCvarLocalRegister::s_pConCmdList;
+	IConCmdBase* pCurCommand = CCvarLocalRegister::s_pConCmdList;
 	while ( pCurCommand )
 	{
-		IConCmdBase*	pNextCommand = pCurCommand->GetNext();
+		IConCmdBase* pNextCommand = pCurCommand->GetNext();
 		pCurCommand->AddFlags( flags );
 		CCvarLocalRegister::s_pAccessor->RegisterCommand( pCurCommand );
 		pCurCommand = pNextCommand;
@@ -72,28 +70,28 @@ void ConVar_Unregister()
 	g_pCvar->UnregisterCommands( CCvarLocalRegister::s_dllIdentifier );
 	g_pCvar->SetConVarsOverrider( CCvarLocalRegister::s_dllIdentifier, NULL );
 
-	CCvarLocalRegister::s_dllIdentifier		= -1;
-	CCvarLocalRegister::s_bCVarsRegistered	= false;
-	CCvarLocalRegister::s_pAccessor			= NULL;
+	CCvarLocalRegister::s_dllIdentifier	   = -1;
+	CCvarLocalRegister::s_bCVarsRegistered = false;
+	CCvarLocalRegister::s_pAccessor		   = NULL;
 }
-
 
 /*
 ==================
 CConCmd::CConCmd
 ==================
 */
-CConCmd::CConCmd( const achar* pName, conCmdExecFn_t pExecFn, const achar* pHelpText /* = "" */, uint32 flags /* = FCVAR_NONE */ )
+CConCmd::CConCmd( const char* pName, conCmdExecFn_t pExecFn, const char* pHelpText /* = "" */, uint32 flags /* = FCVAR_NONE */ )
 	: TConCmdBase<IConCmd>( pName, pHelpText, flags )
 	, pExecFn( pExecFn )
-{}
+{
+}
 
 /*
 ==================
 CConCmd::Exec
 ==================
 */
-void CConCmd::Exec( uint32 argc, const achar** argv )
+void CConCmd::Exec( uint32 argc, const char** argv )
 {
 	if ( pExecFn )
 	{
@@ -111,13 +109,12 @@ bool CConCmd::IsCommand() const
 	return true;
 }
 
-
 /*
 ==================
 CConVar::CConVar
 ==================
 */
-CConVar::CConVar( const achar* pName, const achar* pDefaultValue, const achar* pHelpText /* = "" */, uint32 flags /* = FCVAR_NONE */, conVarChangeCallbackFn_t pChangeCallbackFn /* = nullptr */ )
+CConVar::CConVar( const char* pName, const char* pDefaultValue, const char* pHelpText /* = "" */, uint32 flags /* = FCVAR_NONE */, conVarChangeCallbackFn_t pChangeCallbackFn /* = nullptr */ )
 	: TConCmdBase<IConVar>( pName, pHelpText, flags )
 	, bHasMin( false )
 	, bHasMax( false )
@@ -138,7 +135,7 @@ CConVar::CConVar( const achar* pName, const achar* pDefaultValue, const achar* p
 CConVar::CConVar
 ==================
 */
-CConVar::CConVar( const achar* pName, const achar* pDefaultValue, bool bHasMin, float min, bool bHasMax, float max, const achar* pHelpText /* = "" */, uint32 flags /* = FCVAR_NONE */, conVarChangeCallbackFn_t pChangeCallbackFn /* = nullptr */ )
+CConVar::CConVar( const char* pName, const char* pDefaultValue, bool bHasMin, float min, bool bHasMax, float max, const char* pHelpText /* = "" */, uint32 flags /* = FCVAR_NONE */, conVarChangeCallbackFn_t pChangeCallbackFn /* = nullptr */ )
 	: TConCmdBase<IConVar>( pName, pHelpText, flags )
 	, bHasMin( bHasMin )
 	, bHasMax( bHasMax )
@@ -161,7 +158,7 @@ CConVar::Reset
 */
 void CConVar::Reset()
 {
-	IConVar*	pVar = ( IConVar* )pParent;
+	IConVar* pVar = (IConVar*)pParent;
 	pVar->SetString( pVar->GetDefault() );
 }
 
@@ -176,10 +173,10 @@ void CConVar::SetInt( int32 value )
 	{
 		if ( value != intValue )
 		{
-			floatValue = ( float )value;
+			floatValue = (float)value;
 			if ( ClampValue( floatValue ) )
 			{
-				intValue = ( int32 )floatValue;
+				intValue = (int32)floatValue;
 			}
 			else
 			{
@@ -206,9 +203,9 @@ void CConVar::SetFloat( float value )
 	{
 		if ( value != floatValue )
 		{
-			floatValue	= value;
+			floatValue = value;
 			ClampValue( floatValue );
-			intValue	= ( int32 )floatValue;
+			intValue	= (int32)floatValue;
 			stringValue = S_Sprintf( "%f", floatValue );
 			OnChangeValue();
 		}
@@ -234,7 +231,7 @@ void CConVar::SetBool( bool value )
 CConVar::SetString
 ==================
 */
-void CConVar::SetString( const achar* pValue )
+void CConVar::SetString( const char* pValue )
 {
 	if ( pParent == this )
 	{
@@ -254,7 +251,7 @@ void CConVar::SetString( const achar* pValue )
 			{
 				stringValue = S_Sprintf( "%f", floatValue );
 			}
-			intValue = ( int32 )floatValue;
+			intValue = (int32)floatValue;
 			OnChangeValue();
 		}
 	}
@@ -349,7 +346,7 @@ bool CConVar::GetBool() const
 CConVar::GetString
 ==================
 */
-const achar* CConVar::GetString() const
+const char* CConVar::GetString() const
 {
 	if ( pParent == this )
 	{
@@ -366,7 +363,7 @@ const achar* CConVar::GetString() const
 CConVar::GetDefault
 ==================
 */
-const achar* CConVar::GetDefault() const
+const char* CConVar::GetDefault() const
 {
 	if ( pParent == this )
 	{
@@ -496,13 +493,12 @@ void CConVar::OnChangeValue()
 	}
 }
 
-
 /*
 ==================
 CConVarRef::Init
 ==================
 */
-void CConVarRef::Init( const achar* pName, bool bIgnoreMissing /* = false */ )
+void CConVarRef::Init( const char* pName, bool bIgnoreMissing /* = false */ )
 {
 	// Try find cvar in the system
 	pConVar = g_pCvar ? g_pCvar->FindVar( pName ) : nullptr;
@@ -510,7 +506,7 @@ void CConVarRef::Init( const achar* pName, bool bIgnoreMissing /* = false */ )
 	// If pConVar isn't found print warning
 	if ( !IsValid() && !bIgnoreMissing )
 	{
-		static bool		s_bFirst = true;
+		static bool s_bFirst = true;
 		if ( s_bFirst )
 		{
 			Warning( "StdLib: CConVarRef %s doesn't point to an existing IConVar", pName );

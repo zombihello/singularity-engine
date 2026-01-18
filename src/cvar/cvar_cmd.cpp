@@ -12,7 +12,7 @@ Version command
 */
 CON_COMMAND( version, "Print version info string", FCVAR_NONE )
 {
-	TBuildNumber<ENGINE_GOLDDATE>	engineBuildNumber;
+	TBuildNumber<ENGINE_GOLDDATE> engineBuildNumber;
 	Msg( "Singularity Engine " ENGINE_VERSION_STRING " build %i (" __DATE__ " " __TIME__ ")", engineBuildNumber.GetBuildNumber() );
 }
 
@@ -41,18 +41,18 @@ CON_COMMAND( exec, "Execute a command file", FCVAR_NONE )
 	}
 
 	// Open a command file
-	TRefPtr<IStreamDataReader>	file = g_pFileSystem->CreateFileReader( argv[0] );
+	TRefPtr<IStreamDataReader> file = g_pFileSystem->CreateFileReader( argv[0] );
 	if ( file )
 	{
 		// Read whole file into buffer
-		std::string		buffer;
-		buffer.resize( file->GetSize() / sizeof( achar ) );
+		std::string buffer;
+		buffer.resize( file->GetSize() / sizeof( char ) );
 		file->Read( buffer.data(), file->GetSize() );
 
 		// Executing a file
 		Msg( "Cvar: exec %s: Executing", argv[0] );
-		std::stringstream	sstream( buffer );
-		std::string			line;
+		std::stringstream sstream( buffer );
+		std::string		  line;
 		while ( std::getline( sstream, line ) )
 		{
 			// We throw away \r

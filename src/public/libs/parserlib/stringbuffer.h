@@ -11,7 +11,8 @@ class TParserStringBuffer
 public:
 	TParserStringBuffer()
 		: pBuffer( NULL )
-	{}
+	{
+	}
 
 	TParserStringBuffer( const TCharType* pString )
 		: pBuffer( NULL )
@@ -50,17 +51,17 @@ public:
 		}
 	}
 
-	void Clear();
-	bool IsEmpty() const;
+	void			 Clear();
+	bool			 IsEmpty() const;
 	const TCharType* AsChar() const;
 
 	TParserStringBuffer& operator=( const TParserStringBuffer& other );
 	TParserStringBuffer& operator=( const TCharContainerType& string );
 	TParserStringBuffer& operator=( const TCharType* pString );
-	bool operator==( const TParserStringBuffer& other ) const;
-	bool operator==( const TCharType* pString ) const;
-	bool operator!=( const TParserStringBuffer& other ) const;
-	bool operator!=( const TCharType* pString ) const;
+	bool				 operator==( const TParserStringBuffer& other ) const;
+	bool				 operator==( const TCharType* pString ) const;
+	bool				 operator!=( const TParserStringBuffer& other ) const;
+	bool				 operator!=( const TCharType* pString ) const;
 
 private:
 	class CBuffer : public TRefCounted<IRefCounted>
@@ -68,23 +69,24 @@ private:
 	public:
 		CBuffer( const TCharContainerType& string )
 			: text( string )
-		{}
+		{
+		}
 
 		CBuffer( const TCharType* pString )
 			: text( pString )
-		{}
+		{
+		}
 
-		TCharContainerType		text;
+		TCharContainerType text;
 	};
 
-	CBuffer*		pBuffer;
+	CBuffer* pBuffer;
 };
-
 
 //-----------------------------------------------------------------------------
 // Default types of ANSI and Unicode string buffer
 //-----------------------------------------------------------------------------
-typedef TParserStringBuffer<achar, std::string>					parserStringBufferANSI_t;
-typedef TParserStringBuffer<wchar, std::wstring>				parserStringBufferWCHAR_t;
+typedef TParserStringBuffer<char, std::string>	 parserStringBufferANSI_t;
+typedef TParserStringBuffer<wchar_t, std::wstring> parserStringBufferWCHAR_t;
 
 #include "parserlib/stringbuffer.inl"

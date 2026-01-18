@@ -17,22 +17,22 @@ FORCEINLINE void TParserStringBuffer<TCharType, TCharContainerType>::Clear()
 
 /*
 ==================
-TParserStringBuffer<achar, std::string>::AsChar
+TParserStringBuffer<char, std::string>::AsChar
 ==================
 */
 template<>
-FORCEINLINE const achar* TParserStringBuffer<achar, std::string>::AsChar() const
+FORCEINLINE const char* TParserStringBuffer<char, std::string>::AsChar() const
 {
 	return pBuffer ? pBuffer->text.c_str() : "";
 }
 
 /*
 ==================
-TParserStringBuffer<wchar, std::wstring>::AsChar
+TParserStringBuffer<wchar_t, std::wstring>::AsChar
 ==================
 */
 template<>
-FORCEINLINE const wchar* TParserStringBuffer<wchar, std::wstring>::AsChar() const
+FORCEINLINE const wchar_t* TParserStringBuffer<wchar_t, std::wstring>::AsChar() const
 {
 	return pBuffer ? pBuffer->text.c_str() : L"";
 }

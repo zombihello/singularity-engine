@@ -7,7 +7,8 @@ CShaderCompilerOutput::CShaderCompilerOutput
 ==================
 */
 CShaderCompilerOutput::CShaderCompilerOutput()
-{}
+{
+}
 
 /*
 ==================
@@ -29,7 +30,7 @@ void CShaderCompilerOutput::SetBytecode( const byte* pData, uint64 size )
 CShaderCompilerOutput::SetErrorMsg
 ==================
 */
-void CShaderCompilerOutput::SetErrorMsg( const achar* pMsg )
+void CShaderCompilerOutput::SetErrorMsg( const char* pMsg )
 {
 	errorMsg = pMsg;
 }

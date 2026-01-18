@@ -6,7 +6,6 @@
 //-----------------------------------------------------------------------------
 class ILogOutput;
 
-
 //-----------------------------------------------------------------------------
 // This class is a helper class used for applications.
 // It loads up the file system in preparation for using it to load other required modules
@@ -14,11 +13,11 @@ class ILogOutput;
 class CApplication : public CDefaultAppSystemGroup<CAppSystemGroup>
 {
 public:
-	// NOTE: 
+	// NOTE:
 	//	* pLogFileName must be static string
 	//	* The class creates a log file if the app was build in debug configuration or started with '-log'
 	//	* The class won't create a log file if the pLogFileName is empty/null/disabled logging
-	CApplication( CAppSystemGroup* pChildAppSystemGroup, const achar* pLogFileName = "" );
+	CApplication( CAppSystemGroup* pChildAppSystemGroup, const char* pLogFileName = "" );
 
 	// IAppSystemGroup interface
 	// An installed application creation function, you should tell the group
@@ -44,11 +43,11 @@ public:
 	virtual void PostShutdown() override;
 
 protected:
-	CAppSystemGroup*	pChildAppSystemGroup;
+	CAppSystemGroup* pChildAppSystemGroup;
 #if ENABLE_LOGGING
-	const achar*		pLogFileName;
-	ILogOutput*			pLogOutputFile;
-#endif // ENABLE_LOGGING
+	const char* pLogFileName;
+	ILogOutput*	 pLogOutputFile;
+#endif	// ENABLE_LOGGING
 };
 
 #include "appframework/appframework.inl"

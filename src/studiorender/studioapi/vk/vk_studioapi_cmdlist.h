@@ -13,7 +13,6 @@ class CStudioAPISwapChainVk;
 class CStudioAPICmdListBatchMgrVk;
 class CStudioAPINamedSemaphoreVk;
 
-
 //-----------------------------------------------------------------------------
 // Vulkan StudioAPI command list
 //-----------------------------------------------------------------------------
@@ -24,7 +23,6 @@ enum studioAPICmdListStateVk_t
 	STUDIOAPI_VK_CMDLIST_STATE_IS_INSIDE_RENDER_PASS,
 	STUDIOAPI_VK_CMDLIST_STATE_HAS_ENDED_RECORD
 };
-
 
 class CStudioAPICmdListVk : public TRefCounted<IStudioAPICmdList>
 {
@@ -67,29 +65,28 @@ public:
 	void MarkHasPipeline();
 	void MarkHasViewport( VkViewport vkViewport );
 	void MarkHasScissor( VkRect2D vkScissor );
-	
+
 	bool IsNeedsDynamicStateSet() const;
 	bool HasPipeline() const;
 	bool HasViewport() const;
 	bool HasScissor() const;
 
-	VkViewport GetVkCurrentViewport() const;
-	VkRect2D GetVkCurrentScissor() const;
+	VkViewport				  GetVkCurrentViewport() const;
+	VkRect2D				  GetVkCurrentScissor() const;
 	studioAPICmdListStateVk_t GetState() const;
-	CStudioAPICmdBufferVk* GetCmdBuffer() const;
+	CStudioAPICmdBufferVk*	  GetCmdBuffer() const;
 
 private:
-	bool								bNeedsDynamicStateSet;
-	bool								bHasPipeline;
-	bool								bHasViewport;
-	bool								bHasScissor;
-	studioAPICmdListStateVk_t			state;
-	VkViewport							vkCurrentViewport;
-	VkRect2D							vkCurrentScissor;
-	TRefPtr<CStudioAPICmdContextVk>		pCmdContext;
-	CStudioAPICmdBufferVk*				pCmdBuffer;
+	bool							bNeedsDynamicStateSet;
+	bool							bHasPipeline;
+	bool							bHasViewport;
+	bool							bHasScissor;
+	studioAPICmdListStateVk_t		state;
+	VkViewport						vkCurrentViewport;
+	VkRect2D						vkCurrentScissor;
+	TRefPtr<CStudioAPICmdContextVk> pCmdContext;
+	CStudioAPICmdBufferVk*			pCmdBuffer;
 };
-
 
 //-----------------------------------------------------------------------------
 // Vulkan StudioAPI command list batch
@@ -108,32 +105,31 @@ public:
 	// Set the synchronization signals
 	// NOTE: Only one signal can be used per a frame, otherwise will be undefined behavior
 	// NOTE: Only one sync with a swap chain can be used per a frame, otherwise will be undefined behavior (globally)
-	virtual void SyncSignal( const achar* pSyncName ) override;
-	virtual void SyncWait( const achar* pSyncName ) override;
+	virtual void SyncSignal( const char* pSyncName ) override;
+	virtual void SyncWait( const char* pSyncName ) override;
 	virtual void SyncSwapChain( IStudioAPISwapChain* pSwapChain, uint8 syncFlags ) override;
 
-	virtual void RemoveSyncSignal( const achar* pSyncName ) override;
-	virtual void RemoveSyncWait( const achar* pSyncName ) override;
+	virtual void RemoveSyncSignal( const char* pSyncName ) override;
+	virtual void RemoveSyncWait( const char* pSyncName ) override;
 	virtual void RemoveAllSyncSignals() override;
 	virtual void RemoveAllSyncWaits() override;
 	virtual void RemoveSyncSwapChain() override;
 
 	virtual IStudioAPICmdContext* GetCmdContext() const override;
-	virtual uint32 GetNumCmdLists() const override;
-	virtual IStudioAPICmdList** GetCmdLists() const override;
+	virtual uint32				  GetNumCmdLists() const override;
+	virtual IStudioAPICmdList**	  GetCmdLists() const override;
 
 	CStudioAPICmdListBatchVk( CStudioAPICmdContextVk* pCmdContext );
 	~CStudioAPICmdListBatchVk();
 
 private:
-	uint8										syncSwapChainFlags;
-	CStudioAPISwapChainVk*						pSyncSwapChain;
-	TRefPtr<CStudioAPICmdContextVk>				pCmdContext;
-	std::list<CStudioAPINamedSemaphoreVk*>		syncSignals;
-	std::list<CStudioAPINamedSemaphoreVk*>		syncWaits;
-	std::vector<TRefPtr<CStudioAPICmdListVk>>	cmdLists;
+	uint8									  syncSwapChainFlags;
+	CStudioAPISwapChainVk*					  pSyncSwapChain;
+	TRefPtr<CStudioAPICmdContextVk>			  pCmdContext;
+	std::list<CStudioAPINamedSemaphoreVk*>	  syncSignals;
+	std::list<CStudioAPINamedSemaphoreVk*>	  syncWaits;
+	std::vector<TRefPtr<CStudioAPICmdListVk>> cmdLists;
 };
-
 
 //-----------------------------------------------------------------------------
 // Vulkan StudioAPI command list batch manager
@@ -152,14 +148,14 @@ public:
 	void ClearSubmittedBatches();
 
 private:
-	typedef std::unordered_map<TRefPtr<CStudioAPICmdListBatchVk>, CStudioAPIFenceVk*, TRefPtr<CStudioAPICmdListBatchVk>::hashFunction_t>	submittedBatchesDict_t;
+	typedef std::unordered_map<TRefPtr<CStudioAPICmdListBatchVk>, CStudioAPIFenceVk*, TRefPtr<CStudioAPICmdListBatchVk>::hashFunction_t> submittedBatchesDict_t;
 
 	void GrabVkSyncSignalsFromBatch( CStudioAPICmdListBatchVk* pCmdListBatch, std::vector<VkSemaphore>& vkSyncSignals ) const;
 	void GrabVkSyncWaitsFromBatch( CStudioAPICmdListBatchVk* pCmdListBatch, std::vector<VkSemaphore>& vkSyncWaits, std::vector<VkPipelineStageFlags>& vkSyncWaitStageMasks ) const;
 	void GrabVkCmdBuffersFromBatch( CStudioAPICmdListBatchVk* pCmdListBatch, std::vector<VkCommandBuffer>& vkCmdBuffers ) const;
 
-	CStudioAPICmdContextVk&		cmdContext;
-	submittedBatchesDict_t		submittedBatchesDict;
+	CStudioAPICmdContextVk& cmdContext;
+	submittedBatchesDict_t	submittedBatchesDict;
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_cmdlist.inl"

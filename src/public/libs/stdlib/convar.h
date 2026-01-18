@@ -7,32 +7,30 @@
 
 //-----------------------------------------------------------------------------
 // Macroses for implement a console command
-// 
+//
 // Usage example:
 // CON_COMMAND( mycommand, "My console command", FCVAR_CHEAT )
 // {
 //		Msg( "It's work!" );
 // }
 //-----------------------------------------------------------------------------
-#define CON_COMMAND( Name, Description, Flags ) \
-	static void ConCmdExec_##Name( uint32 argc, const achar** argv ); \
+#define CON_COMMAND( Name, Description, Flags )                                 \
+	static void	   ConCmdExec_##Name( uint32 argc, const char** argv );        \
 	static CConCmd s_cmd##Name( #Name, ConCmdExec_##Name, Description, Flags ); \
-	static void ConCmdExec_##Name( uint32 argc, const achar** argv )
+	static void	   ConCmdExec_##Name( uint32 argc, const char** argv )
 
-#define CON_COMMAND_EXTERN( Name, FuncName, Description, Flags ) \
-	void FuncName( uint32 argc, const achar** argv ); \
+#define CON_COMMAND_EXTERN( Name, FuncName, Description, Flags )       \
+	void		   FuncName( uint32 argc, const char** argv );        \
 	static CConCmd s_cmd##Name( #Name, FuncName, Description, Flags ); \
-	void FuncName( uint32 argc, const achar** argv )
+	void		   FuncName( uint32 argc, const char** argv )
 
 #define CON_COMMAND_METHOD( Name, MethodName, Description, Flags ) \
 	static CConCmd s_cmd##Name( #Name, MethodName, Description, Flags );
 
-
 //-----------------------------------------------------------------------------
 // Type execute function of a console command
 //-----------------------------------------------------------------------------
-typedef void ( *conCmdExecFn_t )( uint32 argc, const achar** argv );
-
+typedef void ( *conCmdExecFn_t )( uint32 argc, const char** argv );
 
 //-----------------------------------------------------------------------------
 // Any executable that wants to use IConVars/IConCmds need to implement one of these to hook up access to console variables
@@ -43,7 +41,6 @@ public:
 	virtual void RegisterCommand( IConCmdBase* pCommand ) = 0;
 };
 
-
 //-----------------------------------------------------------------------------
 // Register console invoked command/variable in a local module
 //-----------------------------------------------------------------------------
@@ -53,12 +50,11 @@ class CCvarLocalRegister
 	friend void ConVar_Unregister();
 
 protected:
-	static bool					s_bCVarsRegistered;	// Is IConVars and IConCmds registered in the engine's system
-	static cvarDLLIdentifier_t	s_dllIdentifier;
-	static IConCmdBase*			s_pConCmdList;		// Statically constructed list of IConCmdBases, used for registering them with the ICvar interface
-	static ICvarAccessor*		s_pAccessor;		// IConVars and IConCmds in this executable use this 'global' to access values
+	static bool				   s_bCVarsRegistered;	// Is IConVars and IConCmds registered in the engine's system
+	static cvarDLLIdentifier_t s_dllIdentifier;
+	static IConCmdBase*		   s_pConCmdList;  // Statically constructed list of IConCmdBases, used for registering them with the ICvar interface
+	static ICvarAccessor*	   s_pAccessor;	   // IConVars and IConCmds in this executable use this 'global' to access values
 };
-
 
 //-----------------------------------------------------------------------------
 // The base console invoked command/variable
@@ -68,7 +64,7 @@ class TConCmdBase : public TBaseClass, public CCvarLocalRegister
 {
 public:
 	// NOTE: pName and pHelpTest must be static strings
-	TConCmdBase( const achar* pName, const achar* pHelpText = "", uint32 flags = FCVAR_NONE )
+	TConCmdBase( const char* pName, const char* pHelpText = "", uint32 flags = FCVAR_NONE )
 		: bRegistered( false )
 		, flags( flags )
 		, pName( pName )
@@ -78,7 +74,7 @@ public:
 		Assert( pName );
 
 		// Register in the local list
-		pNext = CCvarLocalRegister::s_pConCmdList;
+		pNext							  = CCvarLocalRegister::s_pConCmdList;
 		CCvarLocalRegister::s_pConCmdList = this;
 
 		// If s_pAccessor is already set, register it
@@ -97,18 +93,18 @@ public:
 
 	// IConCmdBase interface
 	// Functions to check/add flags (cvarFlags_t)
-	virtual bool IsFlagSet( uint32 flag ) const override;
+	virtual bool   IsFlagSet( uint32 flag ) const override;
 	virtual uint32 GetFlags() const override;
-	void AddFlags( uint32 flags ) override;
+	void		   AddFlags( uint32 flags ) override;
 
-	virtual bool IsCommand() const override;
-	void SetHelpText( const achar* pHelpText ) override;
-	const achar* GetName() const override;
-	virtual const achar* GetHelpText() const override;
+	virtual bool				IsCommand() const override;
+	void						SetHelpText( const char* pHelpText ) override;
+	const char*				GetName() const override;
+	virtual const char*		GetHelpText() const override;
 	virtual cvarDLLIdentifier_t GetDLLIdentifier() const override;
 
 	// Set/get next cvar in the global list
-	virtual void SetNext( IConCmdBase* pNext ) override;
+	virtual void		 SetNext( IConCmdBase* pNext ) override;
 	virtual IConCmdBase* GetNext() const override;
 
 	// Internal usage only!
@@ -116,13 +112,12 @@ public:
 	virtual bool IsRegistered() const override;
 
 private:
-	bool			bRegistered;
-	uint32			flags;
-	const achar*	pName;
-	const achar*	pHelpText;
-	IConCmdBase*	pNext;		// Next IConVar/IConCmds in a chain
+	bool		 bRegistered;
+	uint32		 flags;
+	const char* pName;
+	const char* pHelpText;
+	IConCmdBase* pNext;	 // Next IConVar/IConCmds in a chain
 };
-
 
 //-----------------------------------------------------------------------------
 // The console invoked command
@@ -130,18 +125,17 @@ private:
 class CConCmd : public TConCmdBase<IConCmd>
 {
 public:
-	CConCmd( const achar* pName, conCmdExecFn_t pExecFn, const achar* pHelpText = "", uint32 flags = FCVAR_NONE );
+	CConCmd( const char* pName, conCmdExecFn_t pExecFn, const char* pHelpText = "", uint32 flags = FCVAR_NONE );
 
 	// IConCmdBase interface
 	virtual bool IsCommand() const override;
 
 	// IConCmd interface
-	virtual void Exec( uint32 argc, const achar** argv ) override;
+	virtual void Exec( uint32 argc, const char** argv ) override;
 
 private:
-	conCmdExecFn_t		pExecFn;
+	conCmdExecFn_t pExecFn;
 };
-
 
 //-----------------------------------------------------------------------------
 // The console variable
@@ -149,8 +143,8 @@ private:
 class CConVar : public TConCmdBase<IConVar>
 {
 public:
-	CConVar( const achar* pName, const achar* pDefaultValue, const achar* pHelpText = "", uint32 flags = FCVAR_NONE, conVarChangeCallbackFn_t pChangeCallbackFn = NULL );
-	CConVar( const achar* pName, const achar* pDefaultValue, bool bHasMin, float min, bool bHasMax, float max, const achar* pHelpText = "", uint32 flags = FCVAR_NONE, conVarChangeCallbackFn_t pChangeCallbackFn = NULL );
+	CConVar( const char* pName, const char* pDefaultValue, const char* pHelpText = "", uint32 flags = FCVAR_NONE, conVarChangeCallbackFn_t pChangeCallbackFn = NULL );
+	CConVar( const char* pName, const char* pDefaultValue, bool bHasMin, float min, bool bHasMax, float max, const char* pHelpText = "", uint32 flags = FCVAR_NONE, conVarChangeCallbackFn_t pChangeCallbackFn = NULL );
 
 	// IConCmdBase interface
 	virtual bool IsCommand() const override;
@@ -161,7 +155,7 @@ public:
 	virtual void SetInt( int32 value ) override;
 	virtual void SetFloat( float value ) override;
 	virtual void SetBool( bool value ) override;
-	virtual void SetString( const achar* pValue ) override;
+	virtual void SetString( const char* pValue ) override;
 	virtual void SetChangeCallback( conVarChangeCallbackFn_t pChangeCallbackFn ) override;
 
 	// Internal usage only!
@@ -169,37 +163,36 @@ public:
 	// This allows IConVars to exist in separate modules, and they all use the first one to be declared
 	//
 	// pParentVar	Parent variable. pParentVar->GetParent() must equal pParentVar (ie: pParentVar must be the root, or original IConVar)
-	virtual void SetParent( IConVar* pParentVar ) override;
+	virtual void	 SetParent( IConVar* pParentVar ) override;
 	virtual IConVar* GetParent() const override;
 
-	virtual int32 GetInt() const override;
-	virtual float GetFloat() const override;
-	virtual bool GetBool() const override;
-	virtual const achar* GetString() const override;
-	virtual const achar* GetDefault() const override;
+	virtual int32		 GetInt() const override;
+	virtual float		 GetFloat() const override;
+	virtual bool		 GetBool() const override;
+	virtual const char* GetString() const override;
+	virtual const char* GetDefault() const override;
 
 	virtual conVarChangeCallbackFn_t GetChangeCallback() const override;
-	virtual bool HasMin() const override;
-	virtual bool HasMax() const override;
-	virtual float GetMin() const override;
-	virtual float GetMax() const override;
+	virtual bool					 HasMin() const override;
+	virtual bool					 HasMax() const override;
+	virtual float					 GetMin() const override;
+	virtual float					 GetMax() const override;
 
 private:
 	bool ClampValue( float& value );
 	void OnChangeValue();
 
-	bool						bHasMin;
-	bool						bHasMax;
-	float						minValue;
-	float						maxValue;
-	int32						intValue;
-	float						floatValue;
-	std::string					stringValue;
-	const achar*				pDefaultValue;
-	IConVar*					pParent;			// This either points to self or it points to the original declaration of a IConVar
-	conVarChangeCallbackFn_t	pChangeCallbackFn;
+	bool					 bHasMin;
+	bool					 bHasMax;
+	float					 minValue;
+	float					 maxValue;
+	int32					 intValue;
+	float					 floatValue;
+	std::string				 stringValue;
+	const char*			 pDefaultValue;
+	IConVar*				 pParent;  // This either points to self or it points to the original declaration of a IConVar
+	conVarChangeCallbackFn_t pChangeCallbackFn;
 };
-
 
 //-----------------------------------------------------------------------------
 // Reference to IConVars that already exist (replaces the FindVar method)
@@ -207,37 +200,37 @@ private:
 class CConVarRef
 {
 public:
-	CConVarRef( const achar* pName, bool bIgnoreMissing = false )
+	CConVarRef( const char* pName, bool bIgnoreMissing = false )
 		: pConVar( NULL )
 	{
 		Init( pName, bIgnoreMissing );
 	}
 	CConVarRef( IConVar* pConVar )
 		: pConVar( pConVar )
-	{}
+	{
+	}
 
-	void Init( const achar* pName, bool bIgnoreMissing = false );
+	void Init( const char* pName, bool bIgnoreMissing = false );
 	bool IsValid() const;
 
-	operator bool() const;
-	operator IConVar* () const;
-	operator IConVar*& ();
+				operator bool() const;
+				operator IConVar*() const;
+				operator IConVar*&();
 	CConVarRef& operator=( IConVar* pConVar );
 	CConVarRef& operator=( const CConVarRef& copy );
-	bool operator==( const CConVarRef& right ) const;
-	bool operator==( IConVar* pRight ) const;
-	bool operator!=( const CConVarRef& right ) const;
-	bool operator!=( IConVar* pRight ) const;
-	IConVar* operator->() const;
+	bool		operator==( const CConVarRef& right ) const;
+	bool		operator==( IConVar* pRight ) const;
+	bool		operator!=( const CConVarRef& right ) const;
+	bool		operator!=( IConVar* pRight ) const;
+	IConVar*	operator->() const;
 
 private:
-	IConVar*	pConVar;
+	IConVar* pConVar;
 };
-
 
 //-----------------------------------------------------------------------------
 // Register and unregister IConVars and IConCmds with the ICvar
-// 
+//
 // flags - Add these flags to IConVars and IConCmds
 // pAccessor - Accessor for register IConVars and IConCmds. If NULL use default accessor
 // pConVarsOverrider - Used by ICvar to override IConVars (i.g for a command line). If NULL isn't be used

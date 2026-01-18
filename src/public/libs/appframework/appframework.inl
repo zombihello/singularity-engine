@@ -5,10 +5,11 @@
 CApplication::CApplication
 ==================
 */
-FORCEINLINE CApplication::CApplication( CAppSystemGroup* pChildAppSystemGroup, const achar* pLogFileName /* = "" */ )
+FORCEINLINE CApplication::CApplication( CAppSystemGroup* pChildAppSystemGroup, const char* pLogFileName /* = "" */ )
 	: pChildAppSystemGroup( pChildAppSystemGroup )
 #if ENABLE_LOGGING
 	, pLogFileName( pLogFileName )
 	, pLogOutputFile( NULL )
-#endif // ENABLE_LOGGING
-{}
+#endif	// ENABLE_LOGGING
+{
+}

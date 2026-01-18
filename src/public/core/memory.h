@@ -16,7 +16,7 @@ void* Mem_Memcpy( void* pDest, const void* pSrc, size_t numBytes );
 void* Mem_Malloc( size_t numBytes, uint32 alignment = DEFAULT_ALIGNMENT );
 void* Mem_MallocZero( size_t numBytes, uint32 alignment = DEFAULT_ALIGNMENT );
 void* Mem_Realloc( void* pOriginal, size_t numBytes, uint32 alignment = DEFAULT_ALIGNMENT );
-void Mem_Free( void* pOriginal );
+void  Mem_Free( void* pOriginal );
 
 // If possible determine the size of the memory allocated at the given address
 size_t Mem_AllocSize( void* pOriginal );
@@ -24,8 +24,7 @@ size_t Mem_AllocSize( void* pOriginal );
 // C style memory allocator that fall back to C runtime
 void* Mem_MallocSystem( size_t numBytes );
 void* Mem_ReallocSystem( void* pOriginal, size_t numBytes );
-void Mem_FreeSystem( void* pOriginal );
-
+void  Mem_FreeSystem( void* pOriginal );
 
 //-----------------------------------------------------------------------------
 // Inherit from CUseSystemMemAllocForNew if you want your objects to be placed in memory
@@ -35,9 +34,9 @@ class CUseSystemMemAllocForNew
 {
 public:
 	void* operator new( size_t numBytes );
-	void operator delete( void* pPtr );
+	void  operator delete( void* pPtr );
 	void* operator new[]( size_t numBytes );
-	void operator delete[]( void* pPtr );
+	void  operator delete[]( void* pPtr );
 };
 
 #include "core/memory.inl"
@@ -45,7 +44,7 @@ public:
 	#include "core/platforms/windows/win_memory.inl"
 #else
 	#error Unknown platform
-#endif // PLATFORM_WINDOWS
+#endif	// PLATFORM_WINDOWS
 
 // Override the global memory allocator
 #include "core/memoverride.h"

@@ -37,7 +37,7 @@ CStudioAPIDeviceVk::GetGraphicsQueue
 */
 FORCEINLINE CStudioAPIQueueVk& CStudioAPIDeviceVk::GetGraphicsQueue() const
 {
-	return ( CStudioAPIQueueVk& )graphicsQueue;
+	return (CStudioAPIQueueVk&)graphicsQueue;
 }
 
 /*
@@ -47,7 +47,7 @@ CStudioAPIDeviceVk::GetPresentQueue
 */
 FORCEINLINE CStudioAPIQueueVk& CStudioAPIDeviceVk::GetPresentQueue() const
 {
-	return ( CStudioAPIQueueVk& )presentQueue;
+	return (CStudioAPIQueueVk&)presentQueue;
 }
 
 /*
@@ -57,7 +57,7 @@ CStudioAPIDeviceVk::GetTransferQueue
 */
 FORCEINLINE CStudioAPIQueueVk& CStudioAPIDeviceVk::GetTransferQueue() const
 {
-	return ( CStudioAPIQueueVk& )transferQueue;
+	return (CStudioAPIQueueVk&)transferQueue;
 }
 
 /*
@@ -67,7 +67,7 @@ CStudioAPIDeviceVk::GetComputeQueue
 */
 FORCEINLINE CStudioAPIQueueVk& CStudioAPIDeviceVk::GetComputeQueue() const
 {
-	return ( CStudioAPIQueueVk& )computeQueue;
+	return (CStudioAPIQueueVk&)computeQueue;
 }
 
 /*
@@ -110,7 +110,6 @@ FORCEINLINE studioAPIGPUVendorId_t CStudioAPIDeviceVk::GetGPUVendorId() const
 	return gpuVendorId;
 }
 
-
 /*
 ==================
 CStudioAPIDeviceVk::queueFamilyIndices_t::Clear
@@ -132,7 +131,7 @@ CStudioAPIDeviceVk::queueFamilyIndices_t::IsValid
 FORCEINLINE bool CStudioAPIDeviceVk::queueFamilyIndices_t::IsValid( uint32 queueFamilyTypes ) const
 {
 	// Check the graphics queue family index
-	bool	bInvalid = false;
+	bool bInvalid = false;
 	if ( queueFamilyTypes & STUDIOAPI_VK_QUEUE_FLAG_GRAPHICS )
 	{
 		bInvalid |= graphicsFamilyIndex == VK_QUEUE_FAMILY_IGNORED;

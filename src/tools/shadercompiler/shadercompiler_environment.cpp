@@ -9,12 +9,12 @@ CShaderCompilerEnvironment::CShaderCompilerEnvironment
 CShaderCompilerEnvironment::CShaderCompilerEnvironment( studioAPIShaderType_t type )
 	: compileFlags( 0x0 )
 {
-	defines.insert( std::make_pair( "VERTEX_SHADER",	type == STUDIOAPI_SHADER_TYPE_VERTEX ? "1" : "0"	) );
-	defines.insert( std::make_pair( "DOMAIN_SHADER",	type == STUDIOAPI_SHADER_TYPE_DOMAIN ? "1" : "0"	) );
-	defines.insert( std::make_pair( "HULL_SHADER",		type == STUDIOAPI_SHADER_TYPE_HULL ? "1" : "0"		) );
-	defines.insert( std::make_pair( "GEOMETRY_SHADER",	type == STUDIOAPI_SHADER_TYPE_GEOMETRY ? "1" : "0" 	) );
-	defines.insert( std::make_pair( "PIXEL_SHADER",		type == STUDIOAPI_SHADER_TYPE_PIXEL ? "1" : "0"		) );
-	defines.insert( std::make_pair( "COMPUTE_SHADER",	type == STUDIOAPI_SHADER_TYPE_COMPUTE ? "1" : "0"	) );
+	defines.insert( std::make_pair( "VERTEX_SHADER", type == STUDIOAPI_SHADER_TYPE_VERTEX ? "1" : "0" ) );
+	defines.insert( std::make_pair( "DOMAIN_SHADER", type == STUDIOAPI_SHADER_TYPE_DOMAIN ? "1" : "0" ) );
+	defines.insert( std::make_pair( "HULL_SHADER", type == STUDIOAPI_SHADER_TYPE_HULL ? "1" : "0" ) );
+	defines.insert( std::make_pair( "GEOMETRY_SHADER", type == STUDIOAPI_SHADER_TYPE_GEOMETRY ? "1" : "0" ) );
+	defines.insert( std::make_pair( "PIXEL_SHADER", type == STUDIOAPI_SHADER_TYPE_PIXEL ? "1" : "0" ) );
+	defines.insert( std::make_pair( "COMPUTE_SHADER", type == STUDIOAPI_SHADER_TYPE_COMPUTE ? "1" : "0" ) );
 }
 
 /*
@@ -26,7 +26,8 @@ CShaderCompilerEnvironment::CShaderCompilerEnvironment( const CShaderCompilerEnv
 	: includeDirs( copy.includeDirs )
 	, defines( copy.defines )
 	, compileFlags( copy.compileFlags )
-{}
+{
+}
 
 /*
 ==================
@@ -45,7 +46,7 @@ CShaderCompilerEnvironment::GetNumIncludeDirs
 */
 uint32 CShaderCompilerEnvironment::GetNumIncludeDirs() const
 {
-	return ( uint32 )includeDirs.size();
+	return (uint32)includeDirs.size();
 }
 
 /*
@@ -55,7 +56,7 @@ CShaderCompilerEnvironment::GetNumDefines
 */
 uint32 CShaderCompilerEnvironment::GetNumDefines() const
 {
-	return ( uint32 )defines.size();
+	return (uint32)defines.size();
 }
 
 /*
@@ -63,9 +64,9 @@ uint32 CShaderCompilerEnvironment::GetNumDefines() const
 CShaderCompilerEnvironment::GetIncludeDir
 ==================
 */
-const achar* CShaderCompilerEnvironment::GetIncludeDir( uint32 index ) const
+const char* CShaderCompilerEnvironment::GetIncludeDir( uint32 index ) const
 {
-	Assert( index >= 0 && index < ( uint32 )includeDirs.size() );
+	Assert( index >= 0 && index < (uint32)includeDirs.size() );
 	return includeDirs[index].c_str();
 }
 
@@ -74,9 +75,9 @@ const achar* CShaderCompilerEnvironment::GetIncludeDir( uint32 index ) const
 CShaderCompilerEnvironment::GetDefine
 ==================
 */
-void CShaderCompilerEnvironment::GetDefine( uint32 index, const achar*& pName, const achar*& pDefine ) const
+void CShaderCompilerEnvironment::GetDefine( uint32 index, const char*& pName, const char*& pDefine ) const
 {
-	Assert( index >= 0 && index < ( uint32 )defines.size() );
+	Assert( index >= 0 && index < (uint32)defines.size() );
 
 	uint32 elementID = 0;
 	for ( auto it = defines.begin(), itEnd = defines.end(); it != itEnd; ++it, ++elementID )

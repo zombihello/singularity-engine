@@ -8,13 +8,13 @@
 class CParserTokenEater
 {
 public:
-	CParserTokenEater( CParserTokenStream& tokens, const achar* pPath );
+	CParserTokenEater( CParserTokenStream& tokens, const char* pPath );
 
-	virtual void OnEmitToken( uint32 line, uint32 tokenID, const achar* pTokenString, uint32 tokenStringSize, uint32 scopeLevel, uint32 charLineStart, uint32 charStart, uint32 charEnd );
-	virtual void OnEmitComment( uint32 line, const achar* pText, uint32 textSize, uint32 scopeLevel, uint32 charLineStart, uint32 charStart, uint32 charEnd );
-	virtual void OnEmitError( uint32 line, const achar* pMessage );
+	virtual void OnEmitToken( uint32 line, uint32 tokenID, const char* pTokenString, uint32 tokenStringSize, uint32 scopeLevel, uint32 charLineStart, uint32 charStart, uint32 charEnd );
+	virtual void OnEmitComment( uint32 line, const char* pText, uint32 textSize, uint32 scopeLevel, uint32 charLineStart, uint32 charStart, uint32 charEnd );
+	virtual void OnEmitError( uint32 line, const char* pMessage );
 
 protected:
-	std::string				path;
-	CParserTokenStream&		tokens;		// Here will be places all of parsed tokens
+	std::string			path;
+	CParserTokenStream& tokens;	 // Here will be places all of parsed tokens
 };

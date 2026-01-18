@@ -42,8 +42,8 @@ CColor::GetUInt32Color
 ==================
 */
 FORCEINLINE uint32& CColor::GetUInt32Color()
-{ 
-	return *( uint32* )this;
+{
+	return *(uint32*)this;
 }
 
 /*
@@ -52,8 +52,8 @@ CColor::GetUInt32Color
 ==================
 */
 FORCEINLINE const uint32& CColor::GetUInt32Color() const
-{ 
-	return *( uint32* )this;
+{
+	return *(uint32*)this;
 }
 
 /*

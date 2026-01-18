@@ -6,16 +6,16 @@
 Sys_CreateProc
 ==================
 */
-void* Sys_CreateProc( const achar* pPathToProcess, const achar* pParams, bool bLaunchDetached, bool bLaunchHidden, int32 priorityModifier, uint64* pProcessId /* = NULL */ )
+void* Sys_CreateProc( const char* pPathToProcess, const char* pParams, bool bLaunchDetached, bool bLaunchHidden, int32 priorityModifier, uint64* pProcessId /* = NULL */ )
 {
-	std::string						commandLine = S_Sprintf( "%s %s", pPathToProcess, pParams );
-	PROCESS_INFORMATION				procInfo;
-	SECURITY_ATTRIBUTES				attributes;
+	std::string			commandLine = S_Sprintf( "%s %s", pPathToProcess, pParams );
+	PROCESS_INFORMATION procInfo;
+	SECURITY_ATTRIBUTES attributes;
 	attributes.nLength				= sizeof( SECURITY_ATTRIBUTES );
-	attributes.lpSecurityDescriptor	= nullptr;
+	attributes.lpSecurityDescriptor = nullptr;
 	attributes.bInheritHandle		= true;
 
-	uint64						createFlags = NORMAL_PRIORITY_CLASS;
+	uint64 createFlags = NORMAL_PRIORITY_CLASS;
 	if ( priorityModifier < 0 )
 	{
 		if ( priorityModifier == -1 )
@@ -38,37 +38,36 @@ void* Sys_CreateProc( const achar* pPathToProcess, const achar* pParams, bool bL
 			createFlags = HIGH_PRIORITY_CLASS;
 		}
 	}
-	
+
 	if ( bLaunchDetached )
 	{
 		createFlags |= DETACHED_PROCESS;
 	}
 
-	uint64			flags = 0;
-	uint32			showWindowFlags = SW_HIDE;
+	uint64 flags		   = 0;
+	uint32 showWindowFlags = SW_HIDE;
 	if ( bLaunchHidden )
 	{
-		flags = STARTF_USESHOWWINDOW;
+		flags			= STARTF_USESHOWWINDOW;
 		showWindowFlags = SW_HIDE;
-		if ( bLaunchDetached )				// If hiding the window, and running detached, create a new console
+		if ( bLaunchDetached )	// If hiding the window, and running detached, create a new console
 		{
 			createFlags = CREATE_NEW_CONSOLE;
 		}
 	}
 
-	STARTUPINFO		startupInfo = 
-	{ 
-		sizeof( STARTUPINFO ),				NULL,						NULL,						NULL,
-		( DWORD )CW_USEDEFAULT,				( DWORD )CW_USEDEFAULT,		( DWORD )CW_USEDEFAULT,		( DWORD )CW_USEDEFAULT,
-		NULL,								NULL,						NULL,						( DWORD )flags,
-		( WORD )showWindowFlags,			NULL,						NULL,						NULL,
-		NULL,								NULL
+	STARTUPINFO startupInfo = {
+		sizeof( STARTUPINFO ), NULL, NULL, NULL,
+		(DWORD)CW_USEDEFAULT, (DWORD)CW_USEDEFAULT, (DWORD)CW_USEDEFAULT, (DWORD)CW_USEDEFAULT,
+		NULL, NULL, NULL, (DWORD)flags,
+		(WORD)showWindowFlags, NULL, NULL, NULL,
+		NULL, NULL
 	};
 
-	achar		path[MAX_PATH];
+	char path[MAX_PATH];
 	GetCurrentDirectoryA( MAX_PATH, path );
 
-	if ( !CreateProcessA( NULL, ( LPSTR )commandLine.c_str(), &attributes, &attributes, TRUE, ( DWORD )createFlags, NULL, ( LPCSTR )path, ( LPSTARTUPINFOA )&startupInfo, &procInfo ) )
+	if ( !CreateProcessA( NULL, (LPSTR)commandLine.c_str(), &attributes, &attributes, TRUE, (DWORD)createFlags, NULL, (LPCSTR)path, (LPSTARTUPINFOA)&startupInfo, &procInfo ) )
 	{
 		if ( pProcessId )
 		{
@@ -82,7 +81,7 @@ void* Sys_CreateProc( const achar* pPathToProcess, const achar* pParams, bool bL
 	{
 		*pProcessId = procInfo.dwProcessId;
 	}
-	return ( void* )procInfo.hProcess;
+	return (void*)procInfo.hProcess;
 }
 
 /*
@@ -92,7 +91,7 @@ Sys_GetProcReturnCode
 */
 bool Sys_GetProcReturnCode( void* pProcHandle, int32* pReturnCode )
 {
-	return GetExitCodeProcess( ( HANDLE )pProcHandle, ( DWORD* )pReturnCode ) && *( ( DWORD* )pReturnCode ) != STILL_ACTIVE;
+	return GetExitCodeProcess( (HANDLE)pProcHandle, (DWORD*)pReturnCode ) && *( (DWORD*)pReturnCode ) != STILL_ACTIVE;
 }
 
 /*
@@ -102,7 +101,7 @@ Sys_IsProcRunning
 */
 bool Sys_IsProcRunning( void* pProcHandle )
 {
-	DWORD	waitResult = WaitForSingleObject( ( HANDLE )pProcHandle, 0 );
+	DWORD waitResult = WaitForSingleObject( (HANDLE)pProcHandle, 0 );
 	return waitResult != WAIT_TIMEOUT ? false : true;
 }
 
@@ -113,7 +112,7 @@ Sys_WaitForProc
 */
 void Sys_WaitForProc( void* pProcHandle )
 {
-	WaitForSingleObject( ( HANDLE )pProcHandle, INFINITE );
+	WaitForSingleObject( (HANDLE)pProcHandle, INFINITE );
 }
 
 /*
@@ -123,7 +122,7 @@ Sys_TerminateProc
 */
 void Sys_TerminateProc( void* pProcHandle )
 {
-	TerminateProcess( ( HANDLE )pProcHandle, 0 );
+	TerminateProcess( (HANDLE)pProcHandle, 0 );
 }
 
 /*
@@ -131,7 +130,7 @@ void Sys_TerminateProc( void* pProcHandle )
 Sys_DLL_LoadModule
 ==================
 */
-dllHandle_t Sys_DLL_LoadModule( const achar* pDLLName )
+dllHandle_t Sys_DLL_LoadModule( const char* pDLLName )
 {
 	return LoadLibraryExA( pDLLName, NULL, LOAD_WITH_ALTERED_SEARCH_PATH );
 }
@@ -154,7 +153,7 @@ void Sys_DLL_UnloadModule( dllHandle_t pDLLHandle )
 Sys_DLL_GetProcAddress
 ==================
 */
-void* Sys_DLL_GetProcAddress( dllHandle_t pDLLHandle, const achar* pFuncName )
+void* Sys_DLL_GetProcAddress( dllHandle_t pDLLHandle, const char* pFuncName )
 {
 	if ( pDLLHandle )
 	{
@@ -188,12 +187,12 @@ void Sys_RequestExit( bool bForce )
 Sys_GetComputerName
 ==================
 */
-const achar* Sys_GetComputerName()
+const char* Sys_GetComputerName()
 {
-	static achar	result[256] = "";
+	static char result[256] = "";
 	if ( !result[0] )
 	{
-		DWORD	size = ARRAYSIZE( result );
+		DWORD size = ARRAYSIZE( result );
 		GetComputerNameA( result, &size );
 	}
 	return result;
@@ -204,12 +203,12 @@ const achar* Sys_GetComputerName()
 Sys_GetUserName
 ==================
 */
-const achar* Sys_GetUserName()
+const char* Sys_GetUserName()
 {
-	static achar	result[256] = "";
+	static char result[256] = "";
 	if ( !result[0] )
 	{
-		DWORD	size = ARRAYSIZE( result );
+		DWORD size = ARRAYSIZE( result );
 		GetUserNameA( result, &size );
 	}
 	return result;
@@ -220,9 +219,9 @@ const achar* Sys_GetUserName()
 Sys_GetExecutablePath
 ==================
 */
-const achar* Sys_GetExecutablePath()
+const char* Sys_GetExecutablePath()
 {
-	static achar	path[MAX_PATH] = "";
+	static char path[MAX_PATH] = "";
 	if ( !path[0] )
 	{
 		GetModuleFileNameA( NULL, path, MAX_PATH );
@@ -237,7 +236,7 @@ Sys_Seconds
 */
 double Sys_Seconds()
 {
-	LARGE_INTEGER		cycles;
+	LARGE_INTEGER cycles;
 	QueryPerformanceCounter( &cycles );
 
 	// Add big number to make bugs apparent where return value is being passed to FLOAT
@@ -251,9 +250,9 @@ Sys_GetSecondsPerCycle
 */
 double Sys_GetSecondsPerCycle()
 {
-	LARGE_INTEGER		frequency;
-	bool				bResult = QueryPerformanceFrequency( &frequency );
-	
+	LARGE_INTEGER frequency;
+	bool		  bResult = QueryPerformanceFrequency( &frequency );
+
 	Assert( bResult );
 	return 1.0 / frequency.QuadPart;
 }
@@ -265,6 +264,6 @@ Sys_InitGuid
 */
 void Sys_InitGuid( CGuid& guid )
 {
-	HRESULT		result = CoCreateGuid( ( GUID* )&guid );
+	HRESULT result = CoCreateGuid( (GUID*)&guid );
 	Assert( result == S_OK );
 }

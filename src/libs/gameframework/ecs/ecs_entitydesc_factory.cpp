@@ -53,9 +53,9 @@ TRefPtr<IRefCounted> CEcsEntityDescFactory::CreateProceduralResource() const
 CEcsEntityDescFactory::LoadResource
 ==================
 */
-TRefPtr<IRefCounted> CEcsEntityDescFactory::LoadResource( const achar* pPath, uint32 loadFlags /* = RESOURCE_LOAD_FLAG_NONE */ ) const
+TRefPtr<IRefCounted> CEcsEntityDescFactory::LoadResource( const char* pPath, uint32 loadFlags /* = RESOURCE_LOAD_FLAG_NONE */ ) const
 {
-	CSENTCompiledEntityDescDoc		sentCompiledEntityDescDoc;
+	CSENTCompiledEntityDescDoc sentCompiledEntityDescDoc;
 	if ( !sentCompiledEntityDescDoc.LoadFromFile( S_GetFileExtension( pPath ) ? pPath : S_Sprintf( "%s.sent_c", pPath ).c_str() ) )
 	{
 		return NULL;
@@ -71,7 +71,7 @@ CEcsEntityDescFactory::UnloadResource
 */
 void CEcsEntityDescFactory::UnloadResource( IRefCounted* pResoruce ) const
 {
-	CEcsEntityDesc*		pEntityDesc = ( CEcsEntityDesc* )pResoruce;
+	CEcsEntityDesc* pEntityDesc = (CEcsEntityDesc*)pResoruce;
 	pEntityDesc->Clear();
 }
 
@@ -90,7 +90,7 @@ TRefPtr<IResource> CEcsEntityDescFactory::GetDefaultResource() const
 CEcsEntityDescFactory::GetFormatType
 ==================
 */
-const achar* CEcsEntityDescFactory::GetFormatType() const
+const char* CEcsEntityDescFactory::GetFormatType() const
 {
 	return "SENT";
 }

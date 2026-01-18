@@ -7,7 +7,7 @@
 EXPOSE_SINGLE_INTERFACE( CMaterialSystem, IMaterialSystem, MATERIALSYSTEM_INTERFACE_VERSION );
 
 // Application systems factory. It used for connect materialsystem's submodules (e.g: stdshaders)
-createInterfaceFn_t	g_pAppSystemFactory = NULL;
+createInterfaceFn_t g_pAppSystemFactory = NULL;
 
 /*
 ==================
@@ -24,28 +24,28 @@ bool CMaterialSystem::Connect( createInterfaceFn_t pFactory )
 	ConVar_Register();
 
 	// Get the StudioAPI
-	g_pStudioAPI = ( IStudioAPI* )pFactory( STUDIOAPI_INTERFACE_VERSION );
+	g_pStudioAPI = (IStudioAPI*)pFactory( STUDIOAPI_INTERFACE_VERSION );
 	if ( !g_pStudioAPI )
 	{
 		return false;
 	}
 
 	// Get the shader manager
-	g_pShaderMgr = ( IShaderMgr* )pFactory( SHADERMGR_INTERFACE_VERSION );
+	g_pShaderMgr = (IShaderMgr*)pFactory( SHADERMGR_INTERFACE_VERSION );
 	if ( !g_pShaderMgr )
 	{
 		return false;
 	}
 
 	// Get the studiorender
-	g_pStudioRender = ( IStudioRender* )pFactory( STUDIORENDER_INTERFACE_VERSION );
+	g_pStudioRender = (IStudioRender*)pFactory( STUDIORENDER_INTERFACE_VERSION );
 	if ( !g_pStudioRender )
 	{
 		return false;
 	}
 
 	// Get the resource system
-	g_pResourceSystem = ( IResourceSystem* )pFactory( RESOURCESYSTEM_INTERFACE_VERSION );
+	g_pResourceSystem = (IResourceSystem*)pFactory( RESOURCESYSTEM_INTERFACE_VERSION );
 	if ( !g_pResourceSystem )
 	{
 		return false;
@@ -77,9 +77,9 @@ void CMaterialSystem::Disconnect()
 CMaterialSystem::QueryInterface
 ==================
 */
-void* CMaterialSystem::QueryInterface( const achar* pInterfaceName )
+void* CMaterialSystem::QueryInterface( const char* pInterfaceName )
 {
-	createInterfaceFn_t		pFactory = Sys_GetFactoryThis();
+	createInterfaceFn_t pFactory = Sys_GetFactoryThis();
 	return pFactory( pInterfaceName );
 }
 

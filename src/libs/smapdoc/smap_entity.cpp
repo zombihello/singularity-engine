@@ -6,7 +6,8 @@ CSMAPEntity::CSMAPEntity
 ==================
 */
 CSMAPEntity::CSMAPEntity()
-{}
+{
+}
 
 /*
 ==================
@@ -26,4 +27,5 @@ CSMAPEntity::~CSMAPEntity
 ==================
 */
 CSMAPEntity::~CSMAPEntity()
-{}
+{
+}

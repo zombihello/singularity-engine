@@ -19,14 +19,14 @@ TBuildNumber::ComputeBuildNumber
 template<uint32 dateOfBeginning>
 void TBuildNumber<dateOfBeginning>::ComputeBuildNumber()
 {
-	const char*		pDate			= __DATE__;
-	const char*		month[12]		= { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-	const char		month_days[12]	= { 31,    28,    31,    30,    31,    30,    31,    31,    30,    31,    30,    31 };
+	const char* pDate		   = __DATE__;
+	const char* month[12]	   = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+	const char	month_days[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-	buildNumber		= 0;
-	uint32	months	= 0;
-	uint32	days	= 0;
-	uint32	years	= 0;
+	buildNumber	  = 0;
+	uint32 months = 0;
+	uint32 days	  = 0;
+	uint32 years  = 0;
 
 	// Compute count days and years
 	for ( months = 0; months < 11; ++months )

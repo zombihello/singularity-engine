@@ -21,7 +21,7 @@ public:
 private:
 	void ComputeBuildNumber();
 
-	uint32		buildNumber;
+	uint32 buildNumber;
 };
 
 #include "stdlib/buildnum.inl"

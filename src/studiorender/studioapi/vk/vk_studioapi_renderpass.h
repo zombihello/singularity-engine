@@ -8,7 +8,7 @@
 class CStudioAPIRenderPassVk : public TRefCounted<IStudioAPIRenderPass>
 {
 public:
-	CStudioAPIRenderPassVk( const studioAPIRenderPassCreateInfo_t& createInfo, const achar* pDebugName = "" );
+	CStudioAPIRenderPassVk( const studioAPIRenderPassCreateInfo_t& createInfo, const char* pDebugName = "" );
 	~CStudioAPIRenderPassVk();
 
 	FORCEINLINE VkRenderPass GetVkRenderPass() const
@@ -19,6 +19,6 @@ public:
 private:
 	static void OnStudioAPIVkShutdown( void* pUserData );
 
-	VkRenderPass								vkRenderPass;
-	COnStudioAPIVkShutdown::funcDelegate_t*		pStudioAPIVkShutdownDelegate;
+	VkRenderPass							vkRenderPass;
+	COnStudioAPIVkShutdown::funcDelegate_t* pStudioAPIVkShutdownDelegate;
 };

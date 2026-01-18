@@ -10,7 +10,8 @@ CEcsEntityDesc::CEcsEntityDesc
 */
 CEcsEntityDesc::CEcsEntityDesc()
 	: lastUsedEcsPrefabIdx( INVALID_INDEX )
-{}
+{
+}
 
 /*
 ==================
@@ -44,11 +45,11 @@ void CEcsEntityDesc::Init( const CSENTCompiledEntityDescDoc& sentCompiledDoc )
 	Clear();
 
 	// Initialize new ECS component factories
-	CEcsComponentTypes&								ecsComponentTypes	= Game()->GetEcsComponentTypes();
-	const std::vector<CSENTEntityDescComponent>&	sentComponents		= sentCompiledDoc.GetComponents();
+	CEcsComponentTypes&							 ecsComponentTypes = Game()->GetEcsComponentTypes();
+	const std::vector<CSENTEntityDescComponent>& sentComponents	   = sentCompiledDoc.GetComponents();
 	for ( uint32 componentIdx = 0, numComponents = sentCompiledDoc.GetNumComponents(); componentIdx < numComponents; ++componentIdx )
 	{
-		TRefPtr<IEcsComponentFactory>	pEcsComponentFactory = ecsComponentTypes.CreateFactory( sentComponents[componentIdx] );
+		TRefPtr<IEcsComponentFactory> pEcsComponentFactory = ecsComponentTypes.CreateFactory( sentComponents[componentIdx] );
 		if ( pEcsComponentFactory )
 		{
 			ecsComponentFactories.emplace_back( pEcsComponentFactory );
@@ -61,21 +62,21 @@ void CEcsEntityDesc::Init( const CSENTCompiledEntityDescDoc& sentCompiledDoc )
 CEcsEntityDesc::CreateEcsPrefab
 ==================
 */
-uint32 CEcsEntityDesc::CreateEcsPrefab( CEcsMap* pEcsMap, const achar* pName, uint32 ecsPrefabIdx /* = INVALID_INDEX */ ) const
+uint32 CEcsEntityDesc::CreateEcsPrefab( CEcsMap* pEcsMap, const char* pName, uint32 ecsPrefabIdx /* = INVALID_INDEX */ ) const
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_SCENE );
 	Assert( pEcsMap );
 	Assert( ecsPrefabIdx == INVALID_INDEX || ecsPrefabIdx < ecsPrefabs.size() );
 
 	// Create a new ECS prefab
-	CEcsWorld&		ecsWorld	= pEcsMap->GetEcsWorld();
-	ecsEntity_t		ecsEntity	= ecsWorld.CreatePrefab( pName );
-	for ( uint32 componentIdx = 0, numComponents = ( uint32 )ecsComponentFactories.size(); componentIdx < numComponents; ++componentIdx )
+	CEcsWorld&	ecsWorld  = pEcsMap->GetEcsWorld();
+	ecsEntity_t ecsEntity = ecsWorld.CreatePrefab( pName );
+	for ( uint32 componentIdx = 0, numComponents = (uint32)ecsComponentFactories.size(); componentIdx < numComponents; ++componentIdx )
 	{
-		IEcsComponentFactory*	pEcsComponentFactory = ecsComponentFactories[componentIdx];
+		IEcsComponentFactory* pEcsComponentFactory = ecsComponentFactories[componentIdx];
 		pEcsComponentFactory->Create( ecsWorld, ecsEntity );
 	}
-	
+
 	// Register it in our array
 	if ( ecsPrefabIdx != INVALID_INDEX )
 	{
@@ -83,13 +84,13 @@ uint32 CEcsEntityDesc::CreateEcsPrefab( CEcsMap* pEcsMap, const achar* pName, ui
 		return ecsPrefabIdx;
 	}
 
-	ecsPrefab_t							ecsPrefab = {};
-	ecsPrefab.pEcsMap					= pEcsMap;
-	ecsPrefab.ecsEntity					= ecsEntity;
-	ecsPrefab.pOnMapResetedDelegate		= pEcsMap->OnMapReseted()->AddFunc( &CEcsEntityDesc::OnMapResetedOrUnloaded, ( void* )this );
-	ecsPrefab.pOnMapUnloadedDelegate	= pEcsMap->OnMapUnloaded()->AddFunc( &CEcsEntityDesc::OnMapResetedOrUnloaded, ( void* )this );
+	ecsPrefab_t ecsPrefab			 = {};
+	ecsPrefab.pEcsMap				 = pEcsMap;
+	ecsPrefab.ecsEntity				 = ecsEntity;
+	ecsPrefab.pOnMapResetedDelegate	 = pEcsMap->OnMapReseted()->AddFunc( &CEcsEntityDesc::OnMapResetedOrUnloaded, (void*)this );
+	ecsPrefab.pOnMapUnloadedDelegate = pEcsMap->OnMapUnloaded()->AddFunc( &CEcsEntityDesc::OnMapResetedOrUnloaded, (void*)this );
 	ecsPrefabs.emplace_back( ecsPrefab );
-	return ( uint32 )ecsPrefabs.size() - 1;
+	return (uint32)ecsPrefabs.size() - 1;
 }
 
 /*
@@ -100,16 +101,16 @@ CEcsEntityDesc::OnMapResetedOrUnloaded
 void CEcsEntityDesc::OnMapResetedOrUnloaded( void* pUserData, IMap* pMap )
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_SCENE )
-	CEcsEntityDesc*		pEcsEntityDesc	= ( CEcsEntityDesc* )pUserData;
-	for ( uint32 ecsPrefabIdx = 0, numEcsPrefabs = ( uint32 )pEcsEntityDesc->ecsPrefabs.size(); ecsPrefabIdx < numEcsPrefabs; ++ecsPrefabIdx )
+	CEcsEntityDesc* pEcsEntityDesc = (CEcsEntityDesc*)pUserData;
+	for ( uint32 ecsPrefabIdx = 0, numEcsPrefabs = (uint32)pEcsEntityDesc->ecsPrefabs.size(); ecsPrefabIdx < numEcsPrefabs; ++ecsPrefabIdx )
 	{
-		ecsPrefab_t&	ecsPrefab = pEcsEntityDesc->ecsPrefabs[ecsPrefabIdx];
+		ecsPrefab_t& ecsPrefab = pEcsEntityDesc->ecsPrefabs[ecsPrefabIdx];
 		if ( ecsPrefab.pEcsMap != pMap )
 		{
 			continue;
 		}
 
-		CEcsWorld&	ecsWorld = ( ( CEcsMap* )pMap )->GetEcsWorld();
+		CEcsWorld& ecsWorld = ( (CEcsMap*)pMap )->GetEcsWorld();
 		if ( ecsWorld.IsValidEntity( ecsPrefab.ecsEntity ) )
 		{
 			ecsWorld.DestroyEntity( ecsPrefab.ecsEntity );
@@ -136,10 +137,10 @@ CEcsEntityDesc::Clear
 void CEcsEntityDesc::Clear()
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_SCENE )
-	for ( uint32 ecsPrefabIdx = 0, numEcsPrefabs = ( uint32 )ecsPrefabs.size(); ecsPrefabIdx < numEcsPrefabs; ++ecsPrefabIdx )
+	for ( uint32 ecsPrefabIdx = 0, numEcsPrefabs = (uint32)ecsPrefabs.size(); ecsPrefabIdx < numEcsPrefabs; ++ecsPrefabIdx )
 	{
-		ecsPrefab_t&	ecsPrefab	= ecsPrefabs[ecsPrefabIdx];
-		CEcsWorld&		ecsWorld	= ecsPrefab.pEcsMap->GetEcsWorld();
+		ecsPrefab_t& ecsPrefab = ecsPrefabs[ecsPrefabIdx];
+		CEcsWorld&	 ecsWorld  = ecsPrefab.pEcsMap->GetEcsWorld();
 		if ( ecsWorld.IsValidEntity( ecsPrefab.ecsEntity ) )
 		{
 			ecsWorld.DestroyEntity( ecsPrefab.ecsEntity );
@@ -165,15 +166,15 @@ ecsEntity_t CEcsEntityDesc::GetEcsPrefab( CEcsMap* pEcsMap )
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_SCENE )
 	Assert( pEcsMap );
-	
-	CEcsWorld&		ecsWorld = pEcsMap->GetEcsWorld();
+
+	CEcsWorld& ecsWorld = pEcsMap->GetEcsWorld();
 	if ( lastUsedEcsPrefabIdx == INVALID_INDEX || ecsPrefabs[lastUsedEcsPrefabIdx].pEcsMap != pEcsMap )
 	{
 		// Try to find an already created prefab
-		uint32	foundEcsPrefabIdx = INVALID_INDEX;
-		for ( uint32 ecsPrefabIdx = 0, numEcsPrefabs = ( uint32 )ecsPrefabs.size(); ecsPrefabIdx < numEcsPrefabs; ++ecsPrefabIdx )
+		uint32 foundEcsPrefabIdx = INVALID_INDEX;
+		for ( uint32 ecsPrefabIdx = 0, numEcsPrefabs = (uint32)ecsPrefabs.size(); ecsPrefabIdx < numEcsPrefabs; ++ecsPrefabIdx )
 		{
-			const ecsPrefab_t&	ecsPrefab = ecsPrefabs[ecsPrefabIdx];
+			const ecsPrefab_t& ecsPrefab = ecsPrefabs[ecsPrefabIdx];
 			if ( ecsPrefab.pEcsMap == pEcsMap )
 			{
 				foundEcsPrefabIdx = ecsPrefabIdx;
