@@ -1,6 +1,6 @@
 #include <cstdlib>
-#include <string>
-#include <vector>
+#include <EASTL/string.h>
+#include <EASTL/vector.h>
 
 #include <flecs.h>
 

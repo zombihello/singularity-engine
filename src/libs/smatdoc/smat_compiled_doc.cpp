@@ -194,7 +194,7 @@ bool CSMATCompiledMaterialDoc::LoadFromFile( const char* pPath )
 		CSMATMaterialVar& var = vars[varIdx];
 
 		// Read the variable name
-		std::string varName;
+		eastl::string varName;
 		uint32		varNameSize = 0;
 		pFile->Read( &varNameSize, sizeof( uint32 ) );
 		varName.resize( varNameSize );
@@ -264,7 +264,7 @@ bool CSMATCompiledMaterialDoc::LoadFromFile( const char* pPath )
 
 		case SMAT_MATERIAL_VAR_TYPE_STRING:
 		{
-			std::string valueString;
+			eastl::string valueString;
 			uint32		valueStringSize;
 			pFile->Read( &valueStringSize, sizeof( uint32 ) );
 			valueString.resize( valueStringSize );
@@ -275,7 +275,7 @@ bool CSMATCompiledMaterialDoc::LoadFromFile( const char* pPath )
 
 		case SMAT_MATERIAL_VAR_TYPE_TEXTURE:
 		{
-			std::string valueTexture;
+			eastl::string valueTexture;
 			uint32		valueTextureSize;
 			pFile->Read( &valueTextureSize, sizeof( uint32 ) );
 			valueTexture.resize( valueTextureSize );
@@ -286,7 +286,7 @@ bool CSMATCompiledMaterialDoc::LoadFromFile( const char* pPath )
 
 		case SMAT_MATERIAL_VAR_TYPE_MATERIAL:
 		{
-			std::string valueMaterial;
+			eastl::string valueMaterial;
 			uint32		valueMaterialSize = S_Strlen( var.GetMaterialValue() );
 			pFile->Read( &valueMaterialSize, sizeof( uint32 ) );
 			valueMaterial.resize( valueMaterialSize );

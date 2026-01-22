@@ -27,7 +27,7 @@ Plat_CreateFileWriter
 */
 TRefPtr<IStreamDataWriter> Plat_CreateFileWriter( const char* pPath, uint32 flags /*= FILE_WRITE_NONE*/ )
 {
-	// Translate flags into std flags
+	// Translate flags into eastl flags
 	char mode[] = "wb";
 	if ( flags & FILE_WRITE_APPEND )
 	{
@@ -51,7 +51,7 @@ TRefPtr<IStreamDataWriter> Plat_CreateFileWriter( const char* pPath, uint32 flag
 Plat_FindFiles
 ==================
 */
-bool Plat_FindFiles( const char* pPath, bool bFiles, bool bDirectories, std::vector<std::string>& foundFiles )
+bool Plat_FindFiles( const char* pPath, bool bFiles, bool bDirectories, eastl::vector<eastl::string>& foundFiles )
 {
 	// Find files in the path
 	bool			 bResult = false;
@@ -65,7 +65,7 @@ bool Plat_FindFiles( const char* pPath, bool bFiles, bool bDirectories, std::vec
 			// Ignore '.', '..' and directories or files if it need
 			if ( S_Strcmp( data.cFileName, "." ) && S_Strcmp( data.cFileName, ".." ) && ( ( data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) ? bDirectories : bFiles ) )
 			{
-				std::string& filePath = foundFiles.emplace_back( pPath );
+				eastl::string& filePath = foundFiles.emplace_back( pPath );
 				S_AppendPathSeparator( filePath );
 				filePath += data.cFileName;
 				bResult = true;

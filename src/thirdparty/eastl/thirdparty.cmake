@@ -1,0 +1,1 @@
+set( CMAKE_MODULE_PATH      "${EASTL_PATH}/cmake/modules/" ${CMAKE_MODULE_PATH} )

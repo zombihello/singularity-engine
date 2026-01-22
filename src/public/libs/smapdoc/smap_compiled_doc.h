@@ -1,5 +1,5 @@
 #pragma once
-#include <vector>
+#include <EASTL/vector.h>
 
 #include "core/core.h"
 #include "smapdoc/smap_entity.h"
@@ -19,11 +19,11 @@ public:
 	void RemoveEntity( uint32 index );
 	void Clear();
 
-	uint32							GetNumEntities() const;
-	const std::vector<CSMAPEntity>& GetEntities() const;
+	uint32							  GetNumEntities() const;
+	const eastl::vector<CSMAPEntity>& GetEntities() const;
 
 private:
-	std::vector<CSMAPEntity> entities;
+	eastl::vector<CSMAPEntity> entities;
 };
 
 #include "smapdoc/smap_compiled_doc.inl"

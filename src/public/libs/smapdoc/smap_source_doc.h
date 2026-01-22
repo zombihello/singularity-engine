@@ -1,6 +1,6 @@
 #pragma once
-#include <vector>
-#include <string>
+#include <EASTL/vector.h>
+#include <EASTL/string.h>
 
 #include "core/core.h"
 #include "smapdoc/smap_entity.h"
@@ -20,16 +20,16 @@ public:
 	void RemoveEntity( uint32 index );
 	void Clear();
 
-	const char*					GetOutputDir() const;
-	uint32							GetNumEntities() const;
-	const std::vector<CSMAPEntity>& GetEntities() const;
+	const char*						  GetOutputDir() const;
+	uint32							  GetNumEntities() const;
+	const eastl::vector<CSMAPEntity>& GetEntities() const;
 
 private:
 	bool GrabData( const CJsonDoc& jsonDoc );
 	bool GrabValueAsEntity( const CJsonValue& jsonValue, CSMAPEntity& entity ) const;
 
-	std::string				 outputDir;
-	std::vector<CSMAPEntity> entities;
+	eastl::string			   outputDir;
+	eastl::vector<CSMAPEntity> entities;
 };
 
 #include "smapdoc/smap_source_doc.inl"

@@ -59,7 +59,7 @@ void CMaterial::Init( const CSMATCompiledMaterialDoc& smatCompiledDoc )
 	SetShader( smatCompiledDoc.GetShaderName() );
 
 	// Set material variable from the SMAT file
-	const std::vector<CSMATMaterialVar>& smatMatVars = smatCompiledDoc.GetVars();
+	const eastl::vector<CSMATMaterialVar>& smatMatVars = smatCompiledDoc.GetVars();
 	for ( uint32 varIdx = 0, count = (uint32)smatMatVars.size(); varIdx < count; ++varIdx )
 	{
 		const CSMATMaterialVar& smatMatVar = smatMatVars[varIdx];

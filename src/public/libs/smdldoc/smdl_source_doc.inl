@@ -35,7 +35,7 @@ FORCEINLINE void CSMDLSourceModelDoc::SetSourcePath( const char* pSourcePath )
 CSMDLSourceModelDoc::GetSourcePath
 ==================
 */
-FORCEINLINE const std::string& CSMDLSourceModelDoc::GetSourcePath() const
+FORCEINLINE const eastl::string& CSMDLSourceModelDoc::GetSourcePath() const
 {
 	return sourcePath;
 }
@@ -55,7 +55,7 @@ FORCEINLINE void CSMDLSourceModelDoc::SetMaterialsDir( const char* pMaterialsDir
 CSMDLSourceModelDoc::GetMaterialsDir
 ==================
 */
-FORCEINLINE const std::string& CSMDLSourceModelDoc::GetMaterialsDir() const
+FORCEINLINE const eastl::string& CSMDLSourceModelDoc::GetMaterialsDir() const
 {
 	return materialsDir;
 }
@@ -75,7 +75,7 @@ FORCEINLINE void CSMDLSourceModelDoc::SetOutputDir( const char* pOutputDir )
 CSMDLSourceModelDoc::GetOutputDir
 ==================
 */
-FORCEINLINE const std::string& CSMDLSourceModelDoc::GetOutputDir() const
+FORCEINLINE const eastl::string& CSMDLSourceModelDoc::GetOutputDir() const
 {
 	return outputDir;
 }
@@ -115,7 +115,7 @@ FORCEINLINE void CSMDLSourceModelDoc::RemoveAllRenamedMaterials()
 CSMDLSourceModelDoc::GetRenamedMaterials
 ==================
 */
-FORCEINLINE const std::unordered_map<std::string, std::string>& CSMDLSourceModelDoc::GetRenamedMaterials() const
+FORCEINLINE const eastl::unordered_map<eastl::string, eastl::string>& CSMDLSourceModelDoc::GetRenamedMaterials() const
 {
 	return renamedMaterialsDict;
 }

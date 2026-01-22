@@ -22,7 +22,7 @@ FORCEINLINE void CStudioAPIMemoryMgrVk::FreeResource( TFreeLambda&& freeLambda )
 	*(uint32*)currentCmdBuffer.pWritePtr = sizeof( TFreeLambda );
 	currentCmdBuffer.pWritePtr += sizeof( uint32 );
 
-	new ( currentCmdBuffer.pWritePtr ) TFreeLambda( std::forward<TFreeLambda>( ( TFreeLambda && ) freeLambda ) );
+	new ( currentCmdBuffer.pWritePtr ) TFreeLambda( eastl::forward<TFreeLambda>( ( TFreeLambda && ) freeLambda ) );
 	currentCmdBuffer.pWritePtr += sizeof( TFreeLambda );
 	++currentCmdBuffer.numCmds;
 }

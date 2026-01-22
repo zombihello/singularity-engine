@@ -261,11 +261,11 @@ FORCEINLINE int32 S_Snprintf( char* pDest, uint32 maxLen, const char* pFormat, .
 S_Sprintf
 ==================
 */
-FORCEINLINE std::string S_Sprintf( const char* pFormat, ... )
+FORCEINLINE eastl::string S_Sprintf( const char* pFormat, ... )
 {
 	va_list params;
 	va_start( params, pFormat );
-	std::string result = S_Vsprintf( pFormat, params );
+	eastl::string result = S_Vsprintf( pFormat, params );
 	va_end( params );
 	return result;
 }
@@ -275,11 +275,11 @@ FORCEINLINE std::string S_Sprintf( const char* pFormat, ... )
 S_Sprintf
 ==================
 */
-FORCEINLINE std::wstring S_Sprintf( const wchar_t* pFormat, ... )
+FORCEINLINE eastl::wstring S_Sprintf( const wchar_t* pFormat, ... )
 {
 	va_list params;
 	va_start( params, pFormat );
-	std::wstring result = S_Vsprintf( pFormat, params );
+	eastl::wstring result = S_Vsprintf( pFormat, params );
 	va_end( params );
 	return result;
 }
@@ -379,7 +379,7 @@ S_IsSpace
 */
 FORCEINLINE bool S_IsSpace( char c )
 {
-	return isspace( c );
+	return isspace( (uint8)c );
 }
 
 /*

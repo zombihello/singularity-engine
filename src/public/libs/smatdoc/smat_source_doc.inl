@@ -58,7 +58,7 @@ FORCEINLINE uint32 CSMATSourceMaterialDoc::GetNumVars() const
 CSMATSourceMaterialDoc::GetVars
 ==================
 */
-FORCEINLINE const std::vector<CSMATMaterialVar>& CSMATSourceMaterialDoc::GetVars() const
+FORCEINLINE const eastl::vector<CSMATMaterialVar>& CSMATSourceMaterialDoc::GetVars() const
 {
 	return vars;
 }

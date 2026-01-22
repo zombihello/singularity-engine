@@ -15,7 +15,7 @@ FORCEINLINE bool CStudioAPIDescriptorSetsLayoutVk::HasInputAttachments() const
 CStudioAPIDescriptorSetsLayoutVk::GetVkDescriptorSetLayouts
 ==================
 */
-FORCEINLINE const std::vector<VkDescriptorSetLayout>& CStudioAPIDescriptorSetsLayoutVk::GetVkDescriptorSetLayouts() const
+FORCEINLINE const eastl::vector<VkDescriptorSetLayout>& CStudioAPIDescriptorSetsLayoutVk::GetVkDescriptorSetLayouts() const
 {
 	return vkDescriptorSetLayouts;
 }
@@ -61,7 +61,7 @@ FORCEINLINE hash_t CStudioAPIDescriptorSetsLayoutVk::GetDescriptorTypesUsageHash
 CStudioAPIDescriptorSetsLayoutVk::GetDescriptorSetInfos
 ==================
 */
-FORCEINLINE const std::vector<studioAPIDescriptorSetInfoVk_t>& CStudioAPIDescriptorSetsLayoutVk::GetDescriptorSetInfos() const
+FORCEINLINE const eastl::vector<studioAPIDescriptorSetInfoVk_t>& CStudioAPIDescriptorSetsLayoutVk::GetDescriptorSetInfos() const
 {
 	return descriptorSetInfos;
 }

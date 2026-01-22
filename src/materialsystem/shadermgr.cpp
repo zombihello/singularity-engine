@@ -11,14 +11,14 @@
 //-----------------------------------------------------------------------------
 struct shaderLibInfo_t
 {
-	typedef std::unordered_map<const char*, IShader*, stlInsensitiveStringHash_t, stlInsensitiveCompareString_t> shadersDict_t;
+	typedef eastl::unordered_map<const char*, IShader*, stlInsensitiveStringHash_t, stlInsensitiveCompareString_t> shadersDict_t;
 
-	std::string							   fileName;
+	eastl::string							   fileName;
 	dllHandle_t							   moduleHandle;
 	IShaderLib*							   pShaderLib;
 	bool								   bGameShaderLib;	// TRUE if this is a game's shader library, in which case it's not allowed to override any existing shader names
 	shadersDict_t						   shadersDict;
-	std::vector<TRefPtr<IStudioAPIShader>> shaderCaches[STUDIOAPI_SHADER_NUM_TYPES];
+	eastl::vector<TRefPtr<IStudioAPIShader>> shaderCaches[STUDIOAPI_SHADER_NUM_TYPES];
 };
 
 //-----------------------------------------------------------------------------
@@ -56,7 +56,7 @@ private:
 	void LoadGameShaderLibs();
 	void UnloadGameShaderLibs();
 
-	std::vector<shaderLibInfo_t> shaderLibs;
+	eastl::vector<shaderLibInfo_t> shaderLibs;
 };
 
 CShaderLib g_ShaderLib( "default" );
@@ -244,7 +244,7 @@ bool CShaderMgr::LoadShaderCaches( uint32 index )
 	shaderLibInfo_t& info			 = shaderLibs[index];
 	const char*	 pShaderPlatform = g_pStudioAPI->GetInfo().pShaderPlatform;
 	Assert( pShaderPlatform && info.pShaderLib );
-	std::string shaderCacheDir = S_Sprintf( "//%s/shaders/%s/%s/", info.bGameShaderLib ? "GAME" : "CORE", info.pShaderLib->GetName(), pShaderPlatform );
+	eastl::string shaderCacheDir = S_Sprintf( "//%s/shaders/%s/%s/", info.bGameShaderLib ? "GAME" : "CORE", info.pShaderLib->GetName(), pShaderPlatform );
 
 	// Load shader caches for each shader
 	uint32 numShaders		= info.pShaderLib->GetNumShaders();
@@ -372,7 +372,7 @@ void CShaderMgr::SetupShaderDictionary( uint32 index )
 			}
 		}
 
-		info.shadersDict.insert( std::make_pair( pShader->GetName(), pShader ) );
+		info.shadersDict.insert( eastl::make_pair( pShader->GetName(), pShader ) );
 	}
 }
 

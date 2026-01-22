@@ -59,7 +59,7 @@ bool CGameInfoDoc::LoadFromFile( const char* pPath )
 	}
 
 	// If all ok grab data from JSON
-	std::string gameinfoPath;
+	eastl::string gameinfoPath;
 	S_GetFilePath( pFile->GetPath(), gameinfoPath, false );
 	bLoaded = GrabData( jsonGameInfo, gameinfoPath.c_str() );
 	return bLoaded;
@@ -169,7 +169,7 @@ bool CGameInfoDoc::GrabData( const CJsonDoc& jsonDoc, const char* pGameInfoPath 
 		{
 			if ( jsonSearchPaths.IsA( JSONVALUE_TYPE_ARRAY ) )
 			{
-				std::vector<CJsonValue> jsonVSearchPaths = jsonSearchPaths.GetArray();
+				eastl::vector<CJsonValue> jsonVSearchPaths = jsonSearchPaths.GetArray();
 				for ( uint32 index = 0, count = (uint32)jsonVSearchPaths.size(); index < count; ++index )
 				{
 					bool			  bInvalidElement = true;
@@ -213,7 +213,7 @@ bool CGameInfoDoc::GrabData( const CJsonDoc& jsonDoc, const char* pGameInfoPath 
 CGameInfoDoc::ReplaceMacros
 ==================
 */
-void CGameInfoDoc::ReplaceMacros( std::string& string, const char* pGameInfoPath )
+void CGameInfoDoc::ReplaceMacros( eastl::string& string, const char* pGameInfoPath )
 {
 	PROFILE_SCOPE();
 	enum gameInfoMacro_t
@@ -249,7 +249,7 @@ void CGameInfoDoc::ReplaceMacros( std::string& string, const char* pGameInfoPath
 		const char* pCurValue = s_pValueMacroTable[macroIndex];
 
 		size_t startPos = 0;
-		while ( ( startPos = string.find( pCurMacro, startPos ) ) != std::string::npos )
+		while ( ( startPos = string.find( pCurMacro, startPos ) ) != eastl::string::npos )
 		{
 			string.replace( startPos, S_Strlen( pCurMacro ), pCurValue );
 			startPos += S_Strlen( pCurValue );

@@ -1,6 +1,6 @@
 #pragma once
-#include <string>
-#include <vector>
+#include <EASTL/string.h>
+#include <EASTL/vector.h>
 
 #include "core/core.h"
 #include "smatdoc/smatvar.h"
@@ -21,13 +21,13 @@ public:
 	void RemoveVar( uint32 index );
 	void Clear();
 
-	uint32								 GetNumVars() const;
-	const std::vector<CSMATMaterialVar>& GetVars() const;
-	const char*						 GetShaderName() const;
+	uint32								   GetNumVars() const;
+	const eastl::vector<CSMATMaterialVar>& GetVars() const;
+	const char*							   GetShaderName() const;
 
 private:
-	std::string					  shaderName;
-	std::vector<CSMATMaterialVar> vars;
+	eastl::string					shaderName;
+	eastl::vector<CSMATMaterialVar> vars;
 };
 
 #include "smatdoc/smat_compiled_doc.inl"

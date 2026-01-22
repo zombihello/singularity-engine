@@ -5,7 +5,7 @@
 CGameInfoDoc::GetGame
 ==================
 */
-FORCEINLINE const std::string& CGameInfoDoc::GetGame() const
+FORCEINLINE const eastl::string& CGameInfoDoc::GetGame() const
 {
 	return game;
 }
@@ -15,7 +15,7 @@ FORCEINLINE const std::string& CGameInfoDoc::GetGame() const
 CGameInfoDoc::GetVersion
 ==================
 */
-FORCEINLINE const std::string& CGameInfoDoc::GetVersion() const
+FORCEINLINE const eastl::string& CGameInfoDoc::GetVersion() const
 {
 	return version;
 }
@@ -25,7 +25,7 @@ FORCEINLINE const std::string& CGameInfoDoc::GetVersion() const
 CGameInfoDoc::GetSupportEmail
 ==================
 */
-FORCEINLINE const std::string& CGameInfoDoc::GetSupportEmail() const
+FORCEINLINE const eastl::string& CGameInfoDoc::GetSupportEmail() const
 {
 	return supportEmail;
 }
@@ -35,7 +35,7 @@ FORCEINLINE const std::string& CGameInfoDoc::GetSupportEmail() const
 CGameInfoDoc::GetSupportURL
 ==================
 */
-FORCEINLINE const std::string& CGameInfoDoc::GetSupportURL() const
+FORCEINLINE const eastl::string& CGameInfoDoc::GetSupportURL() const
 {
 	return supportURL;
 }
@@ -45,7 +45,7 @@ FORCEINLINE const std::string& CGameInfoDoc::GetSupportURL() const
 CGameInfoDoc::GetSearchPaths
 ==================
 */
-FORCEINLINE const std::vector<gameInfoSearchPath_t>& CGameInfoDoc::GetSearchPaths() const
+FORCEINLINE const eastl::vector<gameInfoSearchPath_t>& CGameInfoDoc::GetSearchPaths() const
 {
 	return searchPaths;
 }

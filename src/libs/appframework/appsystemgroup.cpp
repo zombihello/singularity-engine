@@ -508,7 +508,7 @@ CAppSystemGroup* CAppSystemGroup::GetParent() const
 CAppSystemGroup::FindSystemName
 ==================
 */
-std::string CAppSystemGroup::FindSystemName( int32 index )
+eastl::string CAppSystemGroup::FindSystemName( int32 index )
 {
 	PROFILE_SCOPE();
 	for ( auto it = systemDict.begin(), itEnd = systemDict.end(); it != itEnd; ++it )
@@ -537,7 +537,7 @@ void CAppSystemGroup::ReportFailure( int32 errorStage, int32 sysIndex /* = -1 */
 	// Failure happened on some a system
 	if ( sysIndex != -1 )
 	{
-		std::string systemName = FindSystemName( sysIndex );
+		eastl::string systemName = FindSystemName( sysIndex );
 		if ( systemName.empty() )
 		{
 			systemName = "(Unknown)";

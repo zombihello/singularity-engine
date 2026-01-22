@@ -1,5 +1,5 @@
 #pragma once
-#include <string>
+#include <EASTL/string.h>
 #include "core/core.h"
 
 //-----------------------------------------------------------------------------
@@ -12,18 +12,18 @@ public:
 	CSMAPEntity( const CSMAPEntity& other );
 	~CSMAPEntity();
 
-	void		 Copy( const CSMAPEntity& other );
-	void		 SetEntityDesc( const char* pEntityDesc );
-	void		 SetName( const char* pName );
+	void		Copy( const CSMAPEntity& other );
+	void		SetEntityDesc( const char* pEntityDesc );
+	void		SetName( const char* pName );
 	const char* GetEntityDesc() const;
 	const char* GetName() const;
-	void		 Clear();
+	void		Clear();
 
 	CSMAPEntity& operator=( const CSMAPEntity& right );
 
 private:
-	std::string entityDesc;
-	std::string name;
+	eastl::string entityDesc;
+	eastl::string name;
 };
 
 #include "smapdoc/smap_entity.inl"

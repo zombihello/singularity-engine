@@ -52,7 +52,7 @@ private:
 	};
 
 	void				 CreateVkDevice();
-	queueFamilyIndices_t FindQueueFamilyIndices( const VkPhysicalDevice& vkPhysicalDevice, const std::vector<VkQueueFamilyProperties>& vkQueueFamiliesProperties, uint32 queueFamilyTypes ) const;
+	queueFamilyIndices_t FindQueueFamilyIndices( const VkPhysicalDevice& vkPhysicalDevice, const eastl::vector<VkQueueFamilyProperties>& vkQueueFamiliesProperties, uint32 queueFamilyTypes ) const;
 
 	VkInstance						 vkInstance;
 	VkPhysicalDevice				 vkPhysicalDevice;

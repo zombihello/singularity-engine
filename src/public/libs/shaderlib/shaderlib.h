@@ -1,5 +1,5 @@
 #pragma once
-#include <vector>
+#include <EASTL/vector.h>
 
 #include "materialsystem/ishadermgr.h"
 #include "shaderlib/shader_base.h"
@@ -20,16 +20,16 @@ public:
 	virtual void Shutdown() override;
 
 	virtual const char* GetName() const override;
-	virtual uint32		 GetNumShaders() const override;
-	virtual IShader*	 GetShader( uint32 index ) const override;
-	virtual uint32		 GetIndex() const override;
+	virtual uint32		GetNumShaders() const override;
+	virtual IShader*	GetShader( uint32 index ) const override;
+	virtual uint32		GetIndex() const override;
 
 	void InsertShader( CBaseShader* pShader );
 
 private:
-	std::string				  name;
-	uint32					  index;
-	std::vector<CBaseShader*> shaders;
+	eastl::string				name;
+	uint32						index;
+	eastl::vector<CBaseShader*> shaders;
 };
 extern CShaderLib g_ShaderLib;
 

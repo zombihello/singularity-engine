@@ -261,7 +261,7 @@ CStudioAPIRenderPipelineVk::CStudioAPIRenderPipelineVk( const studioAPIRenderPip
 	vkPipelineDepthStencilStateCreateInfo.back.reference						= createInfo.stencilState.back.reference;
 
 	// Color blend state
-	std::vector<VkPipelineColorBlendAttachmentState> vkPipelineColorBlendAttachmentStates( createInfo.colorBlendState.attachmentCount );
+	eastl::vector<VkPipelineColorBlendAttachmentState> vkPipelineColorBlendAttachmentStates( createInfo.colorBlendState.attachmentCount );
 	for ( uint32 index = 0; index < createInfo.colorBlendState.attachmentCount; ++index )
 	{
 		VkPipelineColorBlendAttachmentState&	 vkPipelineColorBlendAttachmentState	= vkPipelineColorBlendAttachmentStates[index];
@@ -298,7 +298,7 @@ CStudioAPIRenderPipelineVk::CStudioAPIRenderPipelineVk( const studioAPIRenderPip
 	pBoundShaderState												= (CStudioAPIBoundShaderStateVk*)createInfo.pBoundShaderState;
 	CStudioAPIRenderPassVk*						 pRenderPass		= (CStudioAPIRenderPassVk*)createInfo.pRenderPass;
 	CStudioAPIVertexDeclarationVk*				 pVertexDeclaration = (CStudioAPIVertexDeclarationVk*)pBoundShaderState->GetVertexDeclaration();
-	std::vector<VkPipelineShaderStageCreateInfo> vkPipelineShaderStageCreateInfos;
+	eastl::vector<VkPipelineShaderStageCreateInfo> vkPipelineShaderStageCreateInfos;
 
 	if ( pBoundShaderState->GetVertexShader() )
 	{

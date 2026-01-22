@@ -1,6 +1,6 @@
 #pragma once
-#include <string>
-#include <unordered_map>
+#include <EASTL/string.h>
+#include <EASTL/unordered_map.h>
 
 #include "stdlib/refcount.h"
 #include "stdlib/stl.h"
@@ -46,8 +46,8 @@ public:
 	IEcsComponentFactory* CreateFactory( const CSENTEntityDescComponent& sentComponent ) const;
 
 private:
-	typedef std::unordered_map<const char*, createEcsComponentFactoryFn_t, stlInsensitiveStringHash_t, stlInsensitiveCompareString_t> componentTypesDict_t;
-	componentTypesDict_t																											   componentTypesDict;
+	typedef eastl::unordered_map<const char*, createEcsComponentFactoryFn_t, stlInsensitiveStringHash_t, stlInsensitiveCompareString_t> componentTypesDict_t;
+	componentTypesDict_t																												componentTypesDict;
 };
 
 #include "gameframework/ecs/ecs_component_factory.inl"

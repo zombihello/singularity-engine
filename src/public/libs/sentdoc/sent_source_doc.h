@@ -1,6 +1,6 @@
 #pragma once
-#include <string>
-#include <vector>
+#include <EASTL/string.h>
+#include <EASTL/vector.h>
 
 #include "core/core.h"
 #include "stdlib/jsondoc.h"
@@ -23,9 +23,9 @@ public:
 	void RemoveComponent( uint32 index );
 	void Clear();
 
-	const char*								 GetOutputDir() const;
-	uint32										 GetNumComponents() const;
-	const std::vector<CSENTEntityDescComponent>& GetComponents() const;
+	const char*									   GetOutputDir() const;
+	uint32										   GetNumComponents() const;
+	const eastl::vector<CSENTEntityDescComponent>& GetComponents() const;
 
 private:
 	bool GrabData( const CJsonDoc& jsonDoc );
@@ -34,12 +34,12 @@ private:
 	bool GrabValueAsVec3( const CJsonValue& jsonValue, vec3_t& value ) const;
 	bool GrabValueAsVec4( const CJsonValue& jsonValue, vec4_t& value ) const;
 	bool GrabValueAsMatrix( const CJsonValue& jsonValue, matrix_t& value ) const;
-	bool GrabValueAsString( const CJsonValue& jsonValue, std::string& value ) const;
+	bool GrabValueAsString( const CJsonValue& jsonValue, eastl::string& value ) const;
 	bool GrabValueAsComponent( const CJsonValue& jsonValue, CSENTEntityDescComponent& component ) const;
 	bool GrabValueAsVar( const CJsonValue& jsonValue, CSENTEntityDescVar& var ) const;
 
-	std::string							  outputDir;
-	std::vector<CSENTEntityDescComponent> components;
+	eastl::string							outputDir;
+	eastl::vector<CSENTEntityDescComponent> components;
 };
 
 #include "sentdoc/sent_source_doc.inl"

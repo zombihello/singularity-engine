@@ -108,7 +108,7 @@ private:
 		{
 		}
 
-		std::string			 sourcePath;
+		eastl::string			 sourcePath;
 		resourceSourceType_t type;
 	};
 
@@ -121,7 +121,7 @@ private:
 	IModelTool*				  pModelTool;
 	IEntityDescTool*		  pEntityDescTool;
 	IMapTool*				  pMapTool;
-	std::list<resourceFile_t> files;
+	eastl::list<resourceFile_t> files;
 };
 
 /*
@@ -241,38 +241,38 @@ int32 CResourceCompilerAppSystemGroup::Main()
 			}
 
 			// Get path to directory with the source file
-			std::string sourceFileDir;
+			eastl::string sourceFileDir;
 			{
-				std::string tmpBuffer;
+				eastl::string tmpBuffer;
 				S_GetFilePath( resourceFile.sourcePath, tmpBuffer, false );
 				S_MakeAbsolutePath( tmpBuffer, sourceFileDir, "", false );
 			}
 
 			// Get a absolute source texture paths
-			std::vector<std::string>  srcPaths;
-			std::vector<const char*> cSrcPaths;
+			eastl::vector<eastl::string>  srcPaths;
+			eastl::vector<const char*> cSrcPaths;
 			{
-				const std::vector<std::string> originalSrcPaths = stexSourceFile.GetSourcePaths();
+				const eastl::vector<eastl::string> originalSrcPaths = stexSourceFile.GetSourcePaths();
 				srcPaths.resize( originalSrcPaths.size() );
 				cSrcPaths.resize( originalSrcPaths.size() );
 				for ( uint32 sourcePathIdx = 0, numSourcePaths = (uint32)originalSrcPaths.size(); sourcePathIdx < numSourcePaths; ++sourcePathIdx )
 				{
-					std::string& srcPath = srcPaths[sourcePathIdx];
+					eastl::string& srcPath = srcPaths[sourcePathIdx];
 					S_MakeAbsolutePath( originalSrcPaths[sourcePathIdx], srcPath, sourceFileDir );
 					cSrcPaths[sourcePathIdx] = srcPath.c_str();
 				}
 			}
 
 			// Get a destination file
-			std::string destPath;
+			eastl::string destPath;
 			{
-				std::string outputDir = stexSourceFile.GetOutputDir();
+				eastl::string outputDir = stexSourceFile.GetOutputDir();
 				if ( !S_IsAbsolutePath( outputDir ) )
 				{
 					S_MakeAbsolutePath( stexSourceFile.GetOutputDir(), outputDir, sourceFileDir );
 				}
 
-				std::string baseFileName;
+				eastl::string baseFileName;
 				S_GetFileBaseName( resourceFile.sourcePath, baseFileName );
 
 				S_AppendPathSeparator( outputDir );
@@ -307,11 +307,11 @@ int32 CResourceCompilerAppSystemGroup::Main()
 			}
 
 			// Get material variables
-			std::vector<resourceToolMaterialVar_t> resourceToolMaterialVars;
+			eastl::vector<resourceToolMaterialVar_t> resourceToolMaterialVars;
 			resourceToolMaterialVars.resize( smatSourceFile.GetNumVars() );
 			{
 				bool								 bMaterialVarsAreVaild	= true;
-				const std::vector<CSMATMaterialVar>& smatSourceMaterialVars = smatSourceFile.GetVars();
+				const eastl::vector<CSMATMaterialVar>& smatSourceMaterialVars = smatSourceFile.GetVars();
 				for ( uint32 varIdx = 0, numVars = smatSourceFile.GetNumVars(); varIdx < numVars; ++varIdx )
 				{
 					const CSMATMaterialVar&	   smatSourceMaterialVar   = smatSourceMaterialVars[varIdx];
@@ -384,23 +384,23 @@ int32 CResourceCompilerAppSystemGroup::Main()
 			}
 
 			// Get path to directory with the source file
-			std::string sourceFileDir;
+			eastl::string sourceFileDir;
 			{
-				std::string tmpBuffer;
+				eastl::string tmpBuffer;
 				S_GetFilePath( resourceFile.sourcePath, tmpBuffer, false );
 				S_MakeAbsolutePath( tmpBuffer, sourceFileDir, "", false );
 			}
 
 			// Get a destination file
-			std::string destPath;
+			eastl::string destPath;
 			{
-				std::string outputDir = smatSourceFile.GetOutputDir();
+				eastl::string outputDir = smatSourceFile.GetOutputDir();
 				if ( !S_IsAbsolutePath( outputDir ) )
 				{
 					S_MakeAbsolutePath( smatSourceFile.GetOutputDir(), outputDir, sourceFileDir );
 				}
 
-				std::string baseFileName;
+				eastl::string baseFileName;
 				S_GetFileBaseName( resourceFile.sourcePath, baseFileName );
 
 				S_AppendPathSeparator( outputDir );
@@ -428,9 +428,9 @@ int32 CResourceCompilerAppSystemGroup::Main()
 			}
 
 			// Convert renamed materials for SMDL tool
-			std::vector<resourceToolRenamedMaterial_t> resourceToolRenamedMaterials;
+			eastl::vector<resourceToolRenamedMaterial_t> resourceToolRenamedMaterials;
 			{
-				const std::unordered_map<std::string, std::string>& renamedMaterialsDict = smdlSourceFile.GetRenamedMaterials();
+				const eastl::unordered_map<eastl::string, eastl::string>& renamedMaterialsDict = smdlSourceFile.GetRenamedMaterials();
 				for ( auto it = renamedMaterialsDict.begin(), itEnd = renamedMaterialsDict.end(); it != itEnd; ++it )
 				{
 					resourceToolRenamedMaterials.emplace_back( resourceToolRenamedMaterial_t{ it->first.c_str(), it->second.c_str() } );
@@ -438,27 +438,27 @@ int32 CResourceCompilerAppSystemGroup::Main()
 			}
 
 			// Get path to directory with the source file
-			std::string sourceFileDir;
+			eastl::string sourceFileDir;
 			{
-				std::string tmpBuffer;
+				eastl::string tmpBuffer;
 				S_GetFilePath( resourceFile.sourcePath, tmpBuffer, false );
 				S_MakeAbsolutePath( tmpBuffer, sourceFileDir, "", false );
 			}
 
 			// Get an absolute source path
-			std::string srcPath;
+			eastl::string srcPath;
 			S_MakeAbsolutePath( smdlSourceFile.GetSourcePath(), srcPath, sourceFileDir );
 
 			// Get a destination file
-			std::string destPath;
+			eastl::string destPath;
 			{
-				std::string outputDir = smdlSourceFile.GetOutputDir();
+				eastl::string outputDir = smdlSourceFile.GetOutputDir();
 				if ( !S_IsAbsolutePath( outputDir ) )
 				{
 					S_MakeAbsolutePath( smdlSourceFile.GetOutputDir(), outputDir, sourceFileDir );
 				}
 
-				std::string baseFileName;
+				eastl::string baseFileName;
 				S_GetFileBaseName( resourceFile.sourcePath, baseFileName );
 
 				S_AppendPathSeparator( outputDir );
@@ -489,17 +489,17 @@ int32 CResourceCompilerAppSystemGroup::Main()
 			}
 
 			// Get entity descriptor components
-			std::vector<resourceToolEntityDescVar_t>	   resourceToolEntityDescVars;
-			std::vector<resourceToolEntityDescComponent_t> resourceToolEntityDescComponents;
+			eastl::vector<resourceToolEntityDescVar_t>	   resourceToolEntityDescVars;
+			eastl::vector<resourceToolEntityDescComponent_t> resourceToolEntityDescComponents;
 			resourceToolEntityDescComponents.resize( sentSourceFile.GetNumComponents() );
 			{
 				bool										 bEntityDescComponentsAreVaild	  = true;
 				uint32										 resourceToolEntityDescVarsOffset = 0;
-				const std::vector<CSENTEntityDescComponent>& sentEntityDescComponents		  = sentSourceFile.GetComponents();
+				const eastl::vector<CSENTEntityDescComponent>& sentEntityDescComponents		  = sentSourceFile.GetComponents();
 				for ( uint32 componentIdx = 0, numComponents = sentSourceFile.GetNumComponents(); componentIdx < numComponents; ++componentIdx )
 				{
 					const CSENTEntityDescComponent&		   sentEntityDescComponent		   = sentEntityDescComponents[componentIdx];
-					const std::vector<CSENTEntityDescVar>& sentEntityDescVars			   = sentEntityDescComponent.GetVars();
+					const eastl::vector<CSENTEntityDescVar>& sentEntityDescVars			   = sentEntityDescComponent.GetVars();
 					resourceToolEntityDescComponent_t&	   resourceToolEntityDescComponent = resourceToolEntityDescComponents[componentIdx];
 					resourceToolEntityDescComponent.pType								   = sentEntityDescComponent.GetType();
 
@@ -575,23 +575,23 @@ int32 CResourceCompilerAppSystemGroup::Main()
 			}
 
 			// Get path to directory with the source file
-			std::string sourceFileDir;
+			eastl::string sourceFileDir;
 			{
-				std::string tmpBuffer;
+				eastl::string tmpBuffer;
 				S_GetFilePath( resourceFile.sourcePath, tmpBuffer, false );
 				S_MakeAbsolutePath( tmpBuffer, sourceFileDir, "", false );
 			}
 
 			// Get a destination file
-			std::string destPath;
+			eastl::string destPath;
 			{
-				std::string outputDir = sentSourceFile.GetOutputDir();
+				eastl::string outputDir = sentSourceFile.GetOutputDir();
 				if ( !S_IsAbsolutePath( outputDir ) )
 				{
 					S_MakeAbsolutePath( sentSourceFile.GetOutputDir(), outputDir, sourceFileDir );
 				}
 
-				std::string baseFileName;
+				eastl::string baseFileName;
 				S_GetFileBaseName( resourceFile.sourcePath, baseFileName );
 
 				S_AppendPathSeparator( outputDir );
@@ -618,10 +618,10 @@ int32 CResourceCompilerAppSystemGroup::Main()
 			}
 
 			// Get entities
-			std::vector<resourceToolMapEntity_t> entities;
+			eastl::vector<resourceToolMapEntity_t> entities;
 			entities.resize( smapSourceFile.GetNumEntities() );
 			{
-				const std::vector<CSMAPEntity>& smapEntities = smapSourceFile.GetEntities();
+				const eastl::vector<CSMAPEntity>& smapEntities = smapSourceFile.GetEntities();
 				for ( uint32 entityIdx = 0, numEntities = (uint32)smapEntities.size(); entityIdx < numEntities; ++entityIdx )
 				{
 					const CSMAPEntity&		 smapEntity			   = smapEntities[entityIdx];
@@ -632,23 +632,23 @@ int32 CResourceCompilerAppSystemGroup::Main()
 			}
 
 			// Get path to directory with the source file
-			std::string sourceFileDir;
+			eastl::string sourceFileDir;
 			{
-				std::string tmpBuffer;
+				eastl::string tmpBuffer;
 				S_GetFilePath( resourceFile.sourcePath, tmpBuffer, false );
 				S_MakeAbsolutePath( tmpBuffer, sourceFileDir, "", false );
 			}
 
 			// Get a destination file
-			std::string destPath;
+			eastl::string destPath;
 			{
-				std::string outputDir = smapSourceFile.GetOutputDir();
+				eastl::string outputDir = smapSourceFile.GetOutputDir();
 				if ( !S_IsAbsolutePath( outputDir ) )
 				{
 					S_MakeAbsolutePath( smapSourceFile.GetOutputDir(), outputDir, sourceFileDir );
 				}
 
-				std::string baseFileName;
+				eastl::string baseFileName;
 				S_GetFileBaseName( resourceFile.sourcePath, baseFileName );
 
 				S_AppendPathSeparator( outputDir );
@@ -723,9 +723,9 @@ bool CResourceCompilerAppSystemGroup::LoadFileList( const char* pPath )
 	bool bResult = true;
 
 	// Get path to directory with the file list
-	std::string fileListDir;
+	eastl::string fileListDir;
 	{
-		std::string tmpBuffer;
+		eastl::string tmpBuffer;
 		S_GetFilePath( pPath, tmpBuffer, false );
 		S_MakeAbsolutePath( tmpBuffer, fileListDir, "", false );
 	}
@@ -734,7 +734,7 @@ bool CResourceCompilerAppSystemGroup::LoadFileList( const char* pPath )
 	CJsonValue jsonResourceList = jsonFileList.GetValue( "resources" );
 	if ( jsonResourceList.IsValid() && jsonResourceList.IsA( JSONVALUE_TYPE_ARRAY ) )
 	{
-		std::vector<CJsonValue> jsonArray = jsonResourceList.GetArray();
+		eastl::vector<CJsonValue> jsonArray = jsonResourceList.GetArray();
 		for ( uint32 index = 0, count = (uint32)jsonArray.size(); index < count; ++index )
 		{
 			const CJsonValue& jsonElement = jsonArray[index];
@@ -770,7 +770,7 @@ CResourceCompilerAppSystemGroup::AddFileToCompile
 bool CResourceCompilerAppSystemGroup::AddFileToCompile( const char* pPath, const char* pWorkDir /* = "" */ )
 {
 	// Convert of the file path to absolute
-	std::string			 absoluteFilePath;
+	eastl::string			 absoluteFilePath;
 	resourceSourceType_t resourceSourceType;
 	S_MakeAbsolutePath( pPath, absoluteFilePath, pWorkDir );
 
@@ -814,7 +814,7 @@ int main( int argc, char** argv )
 
 	// Initialize a command line
 	{
-		std::string arguments;
+		eastl::string arguments;
 		for ( uint32 index = 0; index < (uint32)argc; ++index )
 		{
 			if ( *argv[index] == '-' || *argv[index] == '/' )

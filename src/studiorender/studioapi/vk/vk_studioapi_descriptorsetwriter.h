@@ -16,12 +16,12 @@ struct studioAPITextureSamplerPairVk_t
 
 struct studioAPIDescriptorSetWriteContainerVk_t
 {
-	std::vector<VkWriteDescriptorSet>			 vkWriteDescriptorSets;
-	std::vector<VkDescriptorBufferInfo>			 vkDescriptorBufferInfos;
-	std::vector<VkDescriptorImageInfo>			 vkDescriptorImageInfos;
-	std::vector<TRefPtr<CStudioAPIBufferVk>>	 studioAPIBuffers;
-	std::vector<studioAPITextureSamplerPairVk_t> studioAPITexturesSamplers;
-	std::vector<uint8>							 slotToWriteDescriptorSetMap;
+	eastl::vector<VkWriteDescriptorSet>			 vkWriteDescriptorSets;
+	eastl::vector<VkDescriptorBufferInfo>			 vkDescriptorBufferInfos;
+	eastl::vector<VkDescriptorImageInfo>			 vkDescriptorImageInfos;
+	eastl::vector<TRefPtr<CStudioAPIBufferVk>>	 studioAPIBuffers;
+	eastl::vector<studioAPITextureSamplerPairVk_t> studioAPITexturesSamplers;
+	eastl::vector<uint8>							 slotToWriteDescriptorSetMap;
 };
 
 //-----------------------------------------------------------------------------

@@ -65,7 +65,7 @@ void CStudioRenderPipelineSet::CRenderPipelineContainer::Destroy()
 		{
 			// Remove render pipelines, do it on the render thread to make sure that they will be destroyed at the render thread
 			dataStorageDrawRenderPasses_t* pDataStorageDraw = (dataStorageDrawRenderPasses_t*)pDataStorage;
-			UNIQUE_RENDER_COMMAND_ONEPARAMETER( CRemoveRenderPipelinesCmd, std::vector<TRefPtr<IStudioAPIRenderPipeline>>, studioAPIRenderPipelines, std::move( pDataStorageDraw->studioAPIRenderPipelines ),
+			UNIQUE_RENDER_COMMAND_ONEPARAMETER( CRemoveRenderPipelinesCmd, eastl::vector<TRefPtr<IStudioAPIRenderPipeline>>, studioAPIRenderPipelines, eastl::move( pDataStorageDraw->studioAPIRenderPipelines ),
 												{
 													studioAPIRenderPipelines.clear();
 												} );
@@ -98,7 +98,7 @@ void CStudioRenderPipelineSet::CRenderPipelineContainer::Destroy()
 
 				// Remove render pipelines, do it on the render thread to make sure that they will be destroyed at the render thread
 				viewportRenderPipelines.pViewport = NULL;
-				UNIQUE_RENDER_COMMAND_ONEPARAMETER( CRemoveRenderPipelinesCmd, std::vector<TRefPtr<IStudioAPIRenderPipeline>>, studioAPIRenderPipelines, std::move( viewportRenderPipelines.studioAPIRenderPipelines ),
+				UNIQUE_RENDER_COMMAND_ONEPARAMETER( CRemoveRenderPipelinesCmd, eastl::vector<TRefPtr<IStudioAPIRenderPipeline>>, studioAPIRenderPipelines, eastl::move( viewportRenderPipelines.studioAPIRenderPipelines ),
 													{
 														studioAPIRenderPipelines.clear();
 													} );
@@ -123,7 +123,7 @@ IStudioAPIRenderPipeline* CStudioRenderPipelineSet::CRenderPipelineContainer::R_
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 
 	// For non-present passes we get the array as is
-	std::vector<TRefPtr<IStudioAPIRenderPipeline>>* pStudioAPIRenderPipelines = NULL;
+	eastl::vector<TRefPtr<IStudioAPIRenderPipeline>>* pStudioAPIRenderPipelines = NULL;
 	CStudioViewport*								pActiveViewport			  = CStudioViewport::R_GetActiveViewport();
 	if ( renderPassType != STUDIO_RENDERPASS_TYPE_PRESENT )
 	{
@@ -248,7 +248,7 @@ void CStudioRenderPipelineSet::CRenderPipelineContainer::OnReleaseViewportIndex(
 		viewportRenderPipelines.pViewport = NULL;
 
 		// Remove render pipelines, do it on the render thread to make sure that they will be destroyed at the render thread
-		UNIQUE_RENDER_COMMAND_ONEPARAMETER( CRemoveCachedPipelinesCmd, std::vector<TRefPtr<IStudioAPIRenderPipeline>>, studioAPIRenderPipelines, std::move( viewportRenderPipelines.studioAPIRenderPipelines ),
+		UNIQUE_RENDER_COMMAND_ONEPARAMETER( CRemoveCachedPipelinesCmd, eastl::vector<TRefPtr<IStudioAPIRenderPipeline>>, studioAPIRenderPipelines, eastl::move( viewportRenderPipelines.studioAPIRenderPipelines ),
 											{
 												studioAPIRenderPipelines.clear();
 											} );
@@ -276,7 +276,7 @@ void CStudioRenderPipelineSet::CRenderPipelineContainer::OnRenderPassUpdated( vo
 		// Remove render pipelines, do it on the render thread to make sure that they will be destroyed at the render thread
 		viewportRenderPipelines_t& viewportRenderPipelines = pDataStoragePresent->viewports[viewportIndex];
 		Assert( viewportRenderPipelines.pViewport == pViewport );
-		UNIQUE_RENDER_COMMAND_ONEPARAMETER( CRemoveCachedPipelinesCmd, std::vector<TRefPtr<IStudioAPIRenderPipeline>>, studioAPIRenderPipelines, std::move( viewportRenderPipelines.studioAPIRenderPipelines ),
+		UNIQUE_RENDER_COMMAND_ONEPARAMETER( CRemoveCachedPipelinesCmd, eastl::vector<TRefPtr<IStudioAPIRenderPipeline>>, studioAPIRenderPipelines, eastl::move( viewportRenderPipelines.studioAPIRenderPipelines ),
 											{
 												studioAPIRenderPipelines.clear();
 											} );

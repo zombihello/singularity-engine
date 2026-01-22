@@ -27,18 +27,18 @@ public:
 
 	bool												IsCombineModels() const;
 	axisUp_t											GetAxisUp() const;
-	const std::string&									GetSourcePath() const;
-	const std::string&									GetMaterialsDir() const;
-	const std::string&									GetOutputDir() const;
-	const std::unordered_map<std::string, std::string>& GetRenamedMaterials() const;
+	const eastl::string&									GetSourcePath() const;
+	const eastl::string&									GetMaterialsDir() const;
+	const eastl::string&									GetOutputDir() const;
+	const eastl::unordered_map<eastl::string, eastl::string>& GetRenamedMaterials() const;
 
 private:
 	bool										 bCombineModels;  // If it is TRUE, combines all models into a single model
 	axisUp_t									 axisUp;
-	std::string									 sourcePath;
-	std::string									 materialsDir;	// Path to a directory where the model materials should be located
-	std::string									 outputDir;
-	std::unordered_map<std::string, std::string> renamedMaterialsDict;
+	eastl::string									 sourcePath;
+	eastl::string									 materialsDir;	// Path to a directory where the model materials should be located
+	eastl::string									 outputDir;
+	eastl::unordered_map<eastl::string, eastl::string> renamedMaterialsDict;
 };
 
 #include "smdldoc/smdl_source_doc.inl"

@@ -8,11 +8,11 @@
 class CGuid
 {
 public:
-	// Functions to extract the Guid as a key for std::unordered_map and std::unordered_set
+	// Functions to extract the Guid as a key for eastl::unordered_map and eastl::unordered_set
 	struct keyFunc_t
 	{
-		std::size_t operator()( const CGuid& guid ) const;
-		bool		operator()( const CGuid& a, const CGuid& b ) const;
+		size_t operator()( const CGuid& guid ) const;
+		bool   operator()( const CGuid& a, const CGuid& b ) const;
 	};
 
 	CGuid()
@@ -38,12 +38,12 @@ public:
 	}
 
 	void Set( uint32 a, uint32 b, uint32 c, uint32 d );
-	bool InitFromString( const std::string& string );
+	bool InitFromString( const eastl::string& string );
 	void Invalidate();
 
-	bool		IsValid() const;
-	std::string AsString() const;
-	hash_t		GetHash() const;
+	bool		  IsValid() const;
+	eastl::string AsString() const;
+	hash_t		  GetHash() const;
 
 	friend bool operator==( const CGuid& x, const CGuid& y );
 	friend bool operator!=( const CGuid& x, const CGuid& y );

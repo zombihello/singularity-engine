@@ -48,7 +48,7 @@ void CEcsMap::Init( const CSMAPCompiledMapDoc& smapCompiledDoc )
 	Reset();
 
 	// Create entities
-	const std::vector<CSMAPEntity>& smapEntities = smapCompiledDoc.GetEntities();
+	const eastl::vector<CSMAPEntity>& smapEntities = smapCompiledDoc.GetEntities();
 	for ( uint32 entityIdx = 0, numEntities = (uint32)smapEntities.size(); entityIdx < numEntities; ++entityIdx )
 	{
 		const CSMAPEntity&		  smapEntity  = smapEntities[entityIdx];

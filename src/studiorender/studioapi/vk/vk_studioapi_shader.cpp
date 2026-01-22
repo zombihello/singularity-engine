@@ -217,7 +217,7 @@ CStudioAPIShaderVk::CStudioAPIShaderVk( studioAPIShaderType_t type, const char* 
 	reflectionData.Deserialize( &memoryReader );
 
 	// Parse descriptor set layouts
-	const std::vector<shaderReflectionDescriptorSet_t>& reflectionDescriptorSets = reflectionData.GetDescriptorSets();
+	const eastl::vector<shaderReflectionDescriptorSet_t>& reflectionDescriptorSets = reflectionData.GetDescriptorSets();
 	for ( uint32 index = 0, numDescriptorSets = (uint32)reflectionDescriptorSets.size(); index < numDescriptorSets; ++index )
 	{
 		const shaderReflectionDescriptorSet_t& reflectionDescriptorSet = reflectionDescriptorSets[index];
@@ -242,7 +242,7 @@ CStudioAPIShaderVk::CStudioAPIShaderVk( studioAPIShaderType_t type, const char* 
 			// Initialize descriptor slot info and validation hash
 			VK_InitDescriptorSlotInfo( vkDescriptorSetLayoutBinding.descriptorType, vkDescriptorSetLayoutBinding.binding, descriptorSetLayout.descriptorSetInfo );
 #if !RETAIL
-			descriptorSetLayout.descriptorSlotValidationHashDict.insert( std::make_pair( vkDescriptorSetLayoutBinding.binding, VK_ShaderReflectionCalcHash( it->second ) ) );
+			descriptorSetLayout.descriptorSlotValidationHashDict.insert( eastl::make_pair( vkDescriptorSetLayoutBinding.binding, VK_ShaderReflectionCalcHash( it->second ) ) );
 #endif	// !RETAIL
 		}
 
@@ -261,7 +261,7 @@ CStudioAPIShaderVk::CStudioAPIShaderVk( studioAPIShaderType_t type, const char* 
 			// Initialize descriptor slot info and validation hash
 			VK_InitDescriptorSlotInfo( vkDescriptorSetLayoutBinding.descriptorType, vkDescriptorSetLayoutBinding.binding, descriptorSetLayout.descriptorSetInfo );
 #if !RETAIL
-			descriptorSetLayout.descriptorSlotValidationHashDict.insert( std::make_pair( vkDescriptorSetLayoutBinding.binding, VK_ShaderReflectionCalcHash( it->second ) ) );
+			descriptorSetLayout.descriptorSlotValidationHashDict.insert( eastl::make_pair( vkDescriptorSetLayoutBinding.binding, VK_ShaderReflectionCalcHash( it->second ) ) );
 #endif	// !RETAIL
 		}
 
@@ -280,7 +280,7 @@ CStudioAPIShaderVk::CStudioAPIShaderVk( studioAPIShaderType_t type, const char* 
 			// Initialize descriptor slot info and validation hash
 			VK_InitDescriptorSlotInfo( vkDescriptorSetLayoutBinding.descriptorType, vkDescriptorSetLayoutBinding.binding, descriptorSetLayout.descriptorSetInfo );
 #if !RETAIL
-			descriptorSetLayout.descriptorSlotValidationHashDict.insert( std::make_pair( vkDescriptorSetLayoutBinding.binding, VK_ShaderReflectionCalcHash( it->second ) ) );
+			descriptorSetLayout.descriptorSlotValidationHashDict.insert( eastl::make_pair( vkDescriptorSetLayoutBinding.binding, VK_ShaderReflectionCalcHash( it->second ) ) );
 #endif	// !RETAIL
 		}
 
@@ -299,7 +299,7 @@ CStudioAPIShaderVk::CStudioAPIShaderVk( studioAPIShaderType_t type, const char* 
 			// Initialize descriptor slot info and validation hash
 			VK_InitDescriptorSlotInfo( vkDescriptorSetLayoutBinding.descriptorType, vkDescriptorSetLayoutBinding.binding, descriptorSetLayout.descriptorSetInfo );
 #if !RETAIL
-			descriptorSetLayout.descriptorSlotValidationHashDict.insert( std::make_pair( vkDescriptorSetLayoutBinding.binding, VK_ShaderReflectionCalcHash( it->second ) ) );
+			descriptorSetLayout.descriptorSlotValidationHashDict.insert( eastl::make_pair( vkDescriptorSetLayoutBinding.binding, VK_ShaderReflectionCalcHash( it->second ) ) );
 #endif	// !RETAIL
 		}
 
@@ -318,7 +318,7 @@ CStudioAPIShaderVk::CStudioAPIShaderVk( studioAPIShaderType_t type, const char* 
 			// Initialize descriptor slot info and validation hash
 			VK_InitDescriptorSlotInfo( vkDescriptorSetLayoutBinding.descriptorType, vkDescriptorSetLayoutBinding.binding, descriptorSetLayout.descriptorSetInfo );
 #if !RETAIL
-			descriptorSetLayout.descriptorSlotValidationHashDict.insert( std::make_pair( vkDescriptorSetLayoutBinding.binding, VK_ShaderReflectionCalcHash( it->second ) ) );
+			descriptorSetLayout.descriptorSlotValidationHashDict.insert( eastl::make_pair( vkDescriptorSetLayoutBinding.binding, VK_ShaderReflectionCalcHash( it->second ) ) );
 #endif	// !RETAIL
 		}
 
@@ -337,13 +337,13 @@ CStudioAPIShaderVk::CStudioAPIShaderVk( studioAPIShaderType_t type, const char* 
 			// Initialize descriptor slot info and validation hash
 			VK_InitDescriptorSlotInfo( vkDescriptorSetLayoutBinding.descriptorType, vkDescriptorSetLayoutBinding.binding, descriptorSetLayout.descriptorSetInfo );
 #if !RETAIL
-			descriptorSetLayout.descriptorSlotValidationHashDict.insert( std::make_pair( vkDescriptorSetLayoutBinding.binding, VK_ShaderReflectionCalcHash( it->second ) ) );
+			descriptorSetLayout.descriptorSlotValidationHashDict.insert( eastl::make_pair( vkDescriptorSetLayoutBinding.binding, VK_ShaderReflectionCalcHash( it->second ) ) );
 #endif	// !RETAIL
 		}
 	}
 
 	// Parse push constant ranges
-	const std::vector<shaderReflectionPushConstantRange_t>& reflectionPushConstantRanges = reflectionData.GetPushConstantRanges();
+	const eastl::vector<shaderReflectionPushConstantRange_t>& reflectionPushConstantRanges = reflectionData.GetPushConstantRanges();
 	vkPushConstantRanges.resize( reflectionPushConstantRanges.size() );
 	for ( uint32 index = 0, count = (uint32)reflectionPushConstantRanges.size(); index < count; ++index )
 	{
@@ -430,7 +430,7 @@ CStudioAPIBoundShaderStateVk::CStudioAPIBoundShaderStateVk( const CStudioAPIBoun
 
 	// Grab descriptor set layouts and push constant ranges
 	studioAPIDescriptorSetLayoutVkDict_t descriptorSetLayoutDict;
-	std::vector<VkPushConstantRange>	 vkPushConstantRanges;
+	eastl::vector<VkPushConstantRange>	 vkPushConstantRanges;
 	CStudioAPIShaderVk*					 pShaders[] = { pVertexShader, pHullShader, pDomainShader, pGeometryShader, pPixelShader };
 	for ( uint32 shaderIdx = 0; shaderIdx < ARRAYSIZE( pShaders ); ++shaderIdx )
 	{
@@ -484,7 +484,7 @@ CStudioAPIBoundShaderStateVk::CStudioAPIBoundShaderStateVk( const CStudioAPIBoun
 		}
 
 		// Grab push constant ranges
-		const std::vector<VkPushConstantRange>& shaderVkPushConstantRanges = pShaders[shaderIdx]->GetVkPushConstantRanges();
+		const eastl::vector<VkPushConstantRange>& shaderVkPushConstantRanges = pShaders[shaderIdx]->GetVkPushConstantRanges();
 		if ( !shaderVkPushConstantRanges.empty() )
 		{
 			uint32 srcNumVkPushConstantRanges	  = (uint32)shaderVkPushConstantRanges.size();

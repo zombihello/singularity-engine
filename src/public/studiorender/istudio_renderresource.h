@@ -1,5 +1,5 @@
 #pragma once
-#include <unordered_set>
+#include <EASTL/unordered_set.h>
 
 #include "interfaces/interfaces.h"
 #include "stdlib/defines.h"
@@ -52,7 +52,7 @@ public:
 	static void AddResource( IStudioRenderResource* pResource );
 	static void RemoveResource( IStudioRenderResource* pResource );
 
-	static std::unordered_set<IStudioRenderResource*>& GetResourceList();
+	static eastl::unordered_set<IStudioRenderResource*>& GetResourceList();
 
 private:
 	static CThreadMutex& GetThreadMutex();

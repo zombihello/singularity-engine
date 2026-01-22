@@ -47,7 +47,7 @@ bool CSENTCompiledEntityDescDoc::SaveFile( const char* pPath )
 		pFile->Write( (void*)component.GetType(), componentTypeSize );
 
 		// Write component variables
-		const std::vector<CSENTEntityDescVar>& vars	   = component.GetVars();
+		const eastl::vector<CSENTEntityDescVar>& vars	   = component.GetVars();
 		uint32								   numVars = (uint32)vars.size();
 		pFile->Write( &numVars, sizeof( uint32 ) );
 		for ( uint32 varIdx = 0; varIdx < numVars; ++varIdx )
@@ -178,7 +178,7 @@ bool CSENTCompiledEntityDescDoc::LoadFromFile( const char* pPath )
 		CSENTEntityDescComponent& component = components[componentIdx];
 
 		// Read a component type
-		std::string componentType;
+		eastl::string componentType;
 		uint32		componentTypeSize = 0;
 		pFile->Read( &componentTypeSize, sizeof( uint32 ) );
 		componentType.resize( componentTypeSize );
@@ -193,7 +193,7 @@ bool CSENTCompiledEntityDescDoc::LoadFromFile( const char* pPath )
 			CSENTEntityDescVar var;
 
 			// Read the variable name
-			std::string varName;
+			eastl::string varName;
 			uint32		varNameSize = 0;
 			pFile->Read( &varNameSize, sizeof( uint32 ) );
 			varName.resize( varNameSize );
@@ -263,7 +263,7 @@ bool CSENTCompiledEntityDescDoc::LoadFromFile( const char* pPath )
 
 			case SENT_ENTITY_DESC_VAR_TYPE_STRING:
 			{
-				std::string valueString;
+				eastl::string valueString;
 				uint32		valueStringSize;
 				pFile->Read( &valueStringSize, sizeof( uint32 ) );
 				valueString.resize( valueStringSize );

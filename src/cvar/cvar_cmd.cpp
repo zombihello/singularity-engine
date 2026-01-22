@@ -45,26 +45,64 @@ CON_COMMAND( exec, "Execute a command file", FCVAR_NONE )
 	if ( file )
 	{
 		// Read whole file into buffer
-		std::string buffer;
+		eastl::string buffer;
 		buffer.resize( file->GetSize() / sizeof( char ) );
 		file->Read( buffer.data(), file->GetSize() );
 
 		// Executing a file
 		Msg( "Cvar: exec %s: Executing", argv[0] );
-		std::stringstream sstream( buffer );
-		std::string		  line;
-		while ( std::getline( sstream, line ) )
+		if ( !buffer.empty() )
 		{
-			// We throw away \r
-			if ( !line.empty() && line.back() == '\r' )
-			{
-				line.pop_back();
-			}
+			eastl::string commandBuffer;
+			const char*	  pCfgStartLine = buffer.c_str();
 
-			// We ignore line if it starts with C++ comment (//)
-			if ( line.rfind( "//", 0 ) == std::string::npos )
+			commandBuffer.resize( 1024 );
+			while ( *pCfgStartLine != '\0' )
 			{
-				g_pCvar->Exec( line.c_str() );
+				// Get current line
+				const char* pCfgEndLine = pCfgStartLine;
+				while ( *pCfgEndLine != '\0' && *pCfgEndLine != '\n' )
+				{
+					++pCfgEndLine;
+				}
+
+				uint64 cfgLenghtLine = (uint64)( pCfgEndLine - pCfgStartLine );
+				if ( cfgLenghtLine > 0 && pCfgEndLine[-1] == '\r' )
+				{
+					--cfgLenghtLine;
+				}
+
+				// Remove spaces from beginning of the line
+				while ( cfgLenghtLine > 0 && S_IsSpace( *pCfgStartLine ) )
+				{
+					++pCfgStartLine;
+					--cfgLenghtLine;
+				}
+
+				// Skip empty line or comment
+				if ( cfgLenghtLine == 0 || ( cfgLenghtLine >= 2 && pCfgStartLine[0] == '/' && pCfgStartLine[1] == '/' ) )
+				{
+					// Do nothing
+				}
+				// Otherwise execute the command
+				else
+				{
+					if ( commandBuffer.size() < cfgLenghtLine + 1 )
+					{
+						commandBuffer.resize( cfgLenghtLine + 1 );
+					}
+
+					S_Strncpy( commandBuffer.data(), pCfgStartLine, cfgLenghtLine );
+					commandBuffer[cfgLenghtLine] = '\0';
+					g_pCvar->Exec( commandBuffer.c_str() );
+				}
+
+				// Go to the next line
+				if ( *pCfgEndLine == '\n' )
+				{
+					++pCfgEndLine;
+				}
+				pCfgStartLine = pCfgEndLine;
 			}
 		}
 

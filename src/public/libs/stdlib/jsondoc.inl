@@ -129,7 +129,7 @@ FORCEINLINE void CJsonValue::SetFloat( float value )
 CJsonValue::SetString
 ==================
 */
-FORCEINLINE void CJsonValue::SetString( const std::string& value )
+FORCEINLINE void CJsonValue::SetString( const eastl::string& value )
 {
 	if ( type != JSONVALUE_TYPE_STRING )
 	{
@@ -138,11 +138,11 @@ FORCEINLINE void CJsonValue::SetString( const std::string& value )
 
 	if ( !CJsonValue::pValue )
 	{
-		CJsonValue::pValue = new std::string();
+		CJsonValue::pValue = new eastl::string();
 	}
 
-	( *(std::string*)CJsonValue::pValue ) = value;
-	type								  = JSONVALUE_TYPE_STRING;
+	( *(eastl::string*)CJsonValue::pValue ) = value;
+	type									= JSONVALUE_TYPE_STRING;
 }
 
 /*
@@ -171,7 +171,7 @@ FORCEINLINE void CJsonValue::SetObject( const CJsonObject& value )
 CJsonValue::SetArray
 ==================
 */
-FORCEINLINE void CJsonValue::SetArray( const std::vector<CJsonValue>& value )
+FORCEINLINE void CJsonValue::SetArray( const eastl::vector<CJsonValue>& value )
 {
 	if ( type != JSONVALUE_TYPE_ARRAY )
 	{
@@ -180,11 +180,11 @@ FORCEINLINE void CJsonValue::SetArray( const std::vector<CJsonValue>& value )
 
 	if ( !CJsonValue::pValue )
 	{
-		CJsonValue::pValue = new std::vector<CJsonValue>();
+		CJsonValue::pValue = new eastl::vector<CJsonValue>();
 	}
 
-	( *(std::vector<CJsonValue>*)CJsonValue::pValue ) = value;
-	type											  = JSONVALUE_TYPE_ARRAY;
+	( *(eastl::vector<CJsonValue>*)CJsonValue::pValue ) = value;
+	type												= JSONVALUE_TYPE_ARRAY;
 }
 
 /*
@@ -202,11 +202,11 @@ FORCEINLINE jsonValueType_t CJsonValue::GetType() const
 CJsonValue::GetBool
 ==================
 */
-FORCEINLINE bool CJsonValue::GetBool( bool defaultValue /*= false*/ ) const
+FORCEINLINE bool CJsonValue::GetBool() const
 {
 	if ( type != JSONVALUE_TYPE_BOOL || !pValue )
 	{
-		return defaultValue;
+		return false;
 	}
 
 	return *(bool*)pValue;
@@ -217,11 +217,11 @@ FORCEINLINE bool CJsonValue::GetBool( bool defaultValue /*= false*/ ) const
 CJsonValue::GetNumber
 ==================
 */
-FORCEINLINE float CJsonValue::GetNumber( float defaultValue /*= 0.f*/ ) const
+FORCEINLINE float CJsonValue::GetNumber() const
 {
 	if ( type != JSONVALUE_TYPE_BOOL && type != JSONVALUE_TYPE_INT && type != JSONVALUE_TYPE_FLOAT || !pValue )
 	{
-		return defaultValue;
+		return 0.f;
 	}
 
 	if ( type == JSONVALUE_TYPE_BOOL )
@@ -243,11 +243,11 @@ FORCEINLINE float CJsonValue::GetNumber( float defaultValue /*= 0.f*/ ) const
 CJsonValue::GetInt
 ==================
 */
-FORCEINLINE int32 CJsonValue::GetInt( int32 defaultValue /*= 0*/ ) const
+FORCEINLINE int32 CJsonValue::GetInt() const
 {
 	if ( type != JSONVALUE_TYPE_INT || !pValue )
 	{
-		return defaultValue;
+		return 0;
 	}
 
 	return *(int32*)pValue;
@@ -258,11 +258,11 @@ FORCEINLINE int32 CJsonValue::GetInt( int32 defaultValue /*= 0*/ ) const
 CJsonValue::GetFloat
 ==================
 */
-FORCEINLINE float CJsonValue::GetFloat( float defaultValue /*= 0.f*/ ) const
+FORCEINLINE float CJsonValue::GetFloat() const
 {
 	if ( type != JSONVALUE_TYPE_FLOAT || !pValue )
 	{
-		return defaultValue;
+		return 0.f;
 	}
 
 	return *(float*)pValue;
@@ -273,14 +273,14 @@ FORCEINLINE float CJsonValue::GetFloat( float defaultValue /*= 0.f*/ ) const
 CJsonValue::GetString
 ==================
 */
-FORCEINLINE std::string CJsonValue::GetString( const std::string& defaultValue /*= ""*/ ) const
+FORCEINLINE eastl::string CJsonValue::GetString() const
 {
 	if ( type != JSONVALUE_TYPE_STRING || !pValue )
 	{
-		return defaultValue;
+		return "";
 	}
 
-	return *(std::string*)pValue;
+	return *(eastl::string*)pValue;
 }
 
 /*
@@ -288,11 +288,11 @@ FORCEINLINE std::string CJsonValue::GetString( const std::string& defaultValue /
 CJsonValue::GetObject
 ==================
 */
-FORCEINLINE CJsonObject CJsonValue::GetObject( const CJsonObject& defaultValue /*= CJsonObject()*/ ) const
+FORCEINLINE CJsonObject CJsonValue::GetObject() const
 {
 	if ( type != JSONVALUE_TYPE_OBJECT || !pValue )
 	{
-		return defaultValue;
+		return CJsonObject();
 	}
 
 	return *(CJsonObject*)pValue;
@@ -303,14 +303,14 @@ FORCEINLINE CJsonObject CJsonValue::GetObject( const CJsonObject& defaultValue /
 CJsonValue::GetArray
 ==================
 */
-FORCEINLINE std::vector<CJsonValue> CJsonValue::GetArray( const std::vector<CJsonValue>& defaultValue /*= std::vector<CJsonValue>()*/ ) const
+FORCEINLINE eastl::vector<CJsonValue> CJsonValue::GetArray() const
 {
 	if ( type != JSONVALUE_TYPE_ARRAY || !pValue )
 	{
-		return defaultValue;
+		return eastl::vector<CJsonValue>();
 	}
 
-	return *(std::vector<CJsonValue>*)pValue;
+	return *(eastl::vector<CJsonValue>*)pValue;
 }
 
 /*

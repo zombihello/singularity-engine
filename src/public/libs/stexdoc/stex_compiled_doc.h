@@ -1,5 +1,5 @@
 #pragma once
-#include <vector>
+#include <EASTL/vector.h>
 
 #include "core/core.h"
 #include "studiorender/studioapi/istudioapi_texture.h"
@@ -13,7 +13,7 @@ struct stexTextureMipMap_t
 	uint32 sizeY;
 	uint32 sizeZ;
 };
-typedef std::vector<stexTextureMipMap_t> stexTextureMipMaps_t;
+typedef eastl::vector<stexTextureMipMap_t> stexTextureMipMaps_t;
 
 class CSTEXCompiledTextureDoc
 {
@@ -26,8 +26,8 @@ public:
 	bool SaveFile( const char* pPath );
 	void Clear();
 
-	void SetData( studioAPITextureType_t type, uint32 numLayers, const stexTextureMipMaps_t& mipmaps, const std::vector<byte>& data, studioAPIPixelFormat_t pixelFormat );
-	void SetData( studioAPITextureType_t type, uint32 numLayers, stexTextureMipMaps_t& mipmaps, std::vector<byte>& data, studioAPIPixelFormat_t pixelFormat );
+	void SetData( studioAPITextureType_t type, uint32 numLayers, const stexTextureMipMaps_t& mipmaps, const eastl::vector<byte>& data, studioAPIPixelFormat_t pixelFormat );
+	void SetData( studioAPITextureType_t type, uint32 numLayers, stexTextureMipMaps_t& mipmaps, eastl::vector<byte>& data, studioAPIPixelFormat_t pixelFormat );
 	void SetAddressModeU( studioAPISamplerAddressMode_t addressModeU );
 	void SetAddressModeV( studioAPISamplerAddressMode_t addressModeV );
 	void SetAddressModeW( studioAPISamplerAddressMode_t addressModeW );
@@ -47,7 +47,7 @@ public:
 	uint32						  GetSizeZ( uint32 mipLevel = 0 ) const;
 	const stexTextureMipMap_t&	  GetMip( uint32 mipLevel ) const;
 	const stexTextureMipMaps_t&	  GetMipmaps() const;
-	const std::vector<byte>&	  GetData() const;
+	const eastl::vector<byte>&	  GetData() const;
 	studioAPITextureType_t		  GetType() const;
 
 private:
@@ -63,7 +63,7 @@ private:
 	studioAPISamplerAddressMode_t addressModeW;
 	studioAPISamplerFilter_t	  filter;
 	stexTextureMipMaps_t		  mipmaps;
-	std::vector<byte>			  data;
+	eastl::vector<byte>			  data;
 };
 
 #include "stexdoc/stex_compiled_doc.inl"

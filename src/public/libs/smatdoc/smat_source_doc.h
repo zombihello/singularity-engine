@@ -1,6 +1,6 @@
 #pragma once
-#include <string>
-#include <vector>
+#include <EASTL/string.h>
+#include <EASTL/vector.h>
 
 #include "core/core.h"
 #include "stdlib/jsondoc.h"
@@ -23,11 +23,11 @@ public:
 	void RemoveVar( uint32 index );
 	void Clear();
 
-	uint32								 GetNumVars() const;
-	const std::vector<CSMATMaterialVar>& GetVars() const;
-	const char*						 GetShaderName() const;
+	uint32								   GetNumVars() const;
+	const eastl::vector<CSMATMaterialVar>& GetVars() const;
+	const char*							   GetShaderName() const;
 
-	void		 SetOutputDir( const char* pOutputDir );
+	void		SetOutputDir( const char* pOutputDir );
 	const char* GetOutputDir() const;
 
 private:
@@ -37,11 +37,11 @@ private:
 	bool GrabValueAsVec3( const CJsonValue& jsonValue, vec3_t& value ) const;
 	bool GrabValueAsVec4( const CJsonValue& jsonValue, vec4_t& value ) const;
 	bool GrabValueAsMatrix( const CJsonValue& jsonValue, matrix_t& value ) const;
-	bool GrabValueAsString( const CJsonValue& jsonValue, std::string& value ) const;
+	bool GrabValueAsString( const CJsonValue& jsonValue, eastl::string& value ) const;
 
-	std::string					  outputDir;
-	std::string					  shaderName;
-	std::vector<CSMATMaterialVar> vars;
+	eastl::string					outputDir;
+	eastl::string					shaderName;
+	eastl::vector<CSMATMaterialVar> vars;
 };
 
 #include "smatdoc/smat_source_doc.inl"

@@ -60,7 +60,7 @@ void CResourceSystem::Shutdown()
 	// Remove all resources
 	for ( uint32 resourceTypeIdx = 0; resourceTypeIdx < RESOURCE_NUM_TYPES; ++resourceTypeIdx )
 	{
-		std::unordered_map<std::string, TRefPtr<CResource>>& resourcesDict = resourcesDicts[resourceTypeIdx];
+		eastl::unordered_map<eastl::string, TRefPtr<CResource>>& resourcesDict = resourcesDicts[resourceTypeIdx];
 		AssertMsg( resourcesDict.empty(), "Before shutdown of the resource system all resource factories must be unregistered" );
 	}
 
@@ -109,7 +109,7 @@ bool CResourceSystem::UnRegisterResourceFactory( resourceType_t type )
 		}
 
 		// Unload all resource of the type
-		std::unordered_map<std::string, TRefPtr<CResource>>& resourcesDict = resourcesDicts[type];
+		eastl::unordered_map<eastl::string, TRefPtr<CResource>>& resourcesDict = resourcesDicts[type];
 		for ( auto it = resourcesDict.begin(); it != resourcesDict.end(); ++it )
 		{
 			pResourceFactory->UnloadResource( it->second->GetData() );
@@ -141,7 +141,7 @@ TRefPtr<IResource> CResourceSystem::CreateProceduralResource( const char* pName,
 		return NULL;
 	}
 
-	std::string resourceName = pName;
+	eastl::string resourceName = pName;
 	S_Strlwr( resourceName.data() );
 
 	TRefPtr<CResource> pResource	   = new CResource( "", pResourceFactory->CreateProceduralResource(), type, true );
@@ -160,7 +160,7 @@ TRefPtr<IResource> CResourceSystem::FindOrLoadResource( const char* pPath, resou
 	PROFILE_SCOPE();
 
 	// Get a resource name in lower case
-	std::string resourceName;
+	eastl::string resourceName;
 	S_GetFileBaseName( pPath, resourceName, false );
 	S_Strlwr( resourceName.data() );
 
@@ -217,7 +217,7 @@ void CResourceSystem::RemoveUnusedResources()
 	{
 		IResourceFactory*									 pResourceFactory = pResourceFactories[resourceTypeIdx];
 		IResource*											 pDefaultResource = pResourceFactory->GetDefaultResource();
-		std::unordered_map<std::string, TRefPtr<CResource>>& resourcesDict	  = resourcesDicts[resourceTypeIdx];
+		eastl::unordered_map<eastl::string, TRefPtr<CResource>>& resourcesDict	  = resourcesDicts[resourceTypeIdx];
 		for ( auto it = resourcesDict.begin(); it != resourcesDict.end(); )
 		{
 			// Remove a resource if it hasn't more then 1 reference count and it isn't a default resource

@@ -9,7 +9,7 @@ CShaderCompilerMakeFile::LoadMakeFile
 bool CShaderCompilerMakeFile::LoadMakeFile( const char* pPath, const char* pBaseDir /* = "" */ )
 {
 	// Load JSON file
-	std::string absolutePath;
+	eastl::string absolutePath;
 	S_MakeAbsolutePath( pPath, absolutePath, pBaseDir );
 	CJsonDoc jsonMakeFile;
 	if ( !jsonMakeFile.LoadFromFile( absolutePath.c_str() ) )
@@ -19,9 +19,9 @@ bool CShaderCompilerMakeFile::LoadMakeFile( const char* pPath, const char* pBase
 	}
 
 	// Get path to directory with the main makefile
-	std::string makeFileDir;
+	eastl::string makeFileDir;
 	{
-		std::string tmpBuffer;
+		eastl::string tmpBuffer;
 		S_GetFilePath( absolutePath.c_str(), tmpBuffer, false );
 		S_MakeAbsolutePath( tmpBuffer, makeFileDir, "", false );
 	}
@@ -31,7 +31,7 @@ bool CShaderCompilerMakeFile::LoadMakeFile( const char* pPath, const char* pBase
 		CJsonValue jsonInclude = jsonMakeFile.GetValue( "include" );
 		if ( jsonInclude.IsValid() )
 		{
-			std::vector<CJsonValue> jsonArray = jsonInclude.GetArray();
+			eastl::vector<CJsonValue> jsonArray = jsonInclude.GetArray();
 			if ( !jsonInclude.IsA( JSONVALUE_TYPE_ARRAY ) )
 			{
 				Error( "ShaderCompiler: Invalid 'include', must be array of strings (file: '%s')", absolutePath.c_str() );
@@ -59,7 +59,7 @@ bool CShaderCompilerMakeFile::LoadMakeFile( const char* pPath, const char* pBase
 		CJsonValue jsonShaders = jsonMakeFile.GetValue( "shaders" );
 		if ( jsonShaders.IsValid() )
 		{
-			std::vector<CJsonValue> jsonArray = jsonShaders.GetArray();
+			eastl::vector<CJsonValue> jsonArray = jsonShaders.GetArray();
 			if ( !jsonShaders.IsA( JSONVALUE_TYPE_ARRAY ) )
 			{
 				Error( "ShaderCompiler: Invalid 'shaders', must be array of strings (file: '%s')", absolutePath.c_str() );
@@ -76,7 +76,7 @@ bool CShaderCompilerMakeFile::LoadMakeFile( const char* pPath, const char* pBase
 						return false;
 					}
 
-					std::string shaderPath = S_Sprintf( "%s.shader", jsonElement.GetString().c_str() );
+					eastl::string shaderPath = S_Sprintf( "%s.shader", jsonElement.GetString().c_str() );
 					if ( !LoadShader( shaderPath.c_str(), makeFileDir.c_str() ) )
 					{
 						Error( "ShaderCompiler: Failed to load shader '%s' (file: '%s')", shaderPath.c_str(), absolutePath.c_str() );
@@ -100,7 +100,7 @@ bool CShaderCompilerMakeFile::LoadShader( const char* pPath, const char* pBaseDi
 {
 	// Load JSON file
 	shader_t	shader;
-	std::string absolutePath;
+	eastl::string absolutePath;
 	S_MakeAbsolutePath( pPath, absolutePath, pBaseDir );
 	CJsonDoc jsonShader;
 	if ( !jsonShader.LoadFromFile( absolutePath.c_str() ) )
@@ -181,7 +181,7 @@ bool CShaderCompilerMakeFile::LoadShader( const char* pPath, const char* pBaseDi
 		}
 		else
 		{
-			const std::vector<CJsonValue> jsonArray = jsonFlags.GetArray();
+			const eastl::vector<CJsonValue> jsonArray = jsonFlags.GetArray();
 			for ( uint32 index = 0, count = (uint32)jsonArray.size(); index < count; ++index )
 			{
 				const CJsonValue& jsonElement = jsonArray[index];
@@ -300,7 +300,7 @@ bool CShaderCompilerMakeFile::LoadShader( const char* pPath, const char* pBaseDi
 		}
 		else
 		{
-			const std::vector<CJsonValue> jsonArray = jsonDefines.GetArray();
+			const eastl::vector<CJsonValue> jsonArray = jsonDefines.GetArray();
 			for ( uint32 index = 0, count = (uint32)jsonArray.size(); index < count; ++index )
 			{
 				const CJsonValue& jsonElement = jsonArray[index];

@@ -32,7 +32,7 @@ CSearchPathIterator::CSearchPathIterator( const char* pFilePath, bool bForWrite,
 			for ( int32 index = (int32)pFileSystem->searchPaths.size(); --index >= 0; )
 			{
 				CSearchPath*	  pSearchPath  = &pFileSystem->searchPaths[index];
-				const std::string searchPathID = pSearchPath->GetPathID();
+				const eastl::string searchPathID = pSearchPath->GetPathID();
 				if ( searchPathID.size() == lengthPathID && !S_Strnicmp( searchPathID.c_str(), pPathID, lengthPathID ) )
 				{
 					searchPaths.push_back( pSearchPath );
@@ -56,7 +56,7 @@ CSearchPathIterator::CSearchPathIterator( const char* pFilePath, bool bForWrite,
 						pFirstWriteSearchPath = pSearchPath;
 					}
 
-					const std::string searchPathID = pSearchPath->GetPathID();
+					const eastl::string searchPathID = pSearchPath->GetPathID();
 					if ( searchPathID.size() == lenghtDefaultWritePathID && !S_Strnicmp( searchPathID.c_str(), pDefaultWritePathID, lenghtDefaultWritePathID ) )
 					{
 						searchPaths.push_back( pSearchPath );

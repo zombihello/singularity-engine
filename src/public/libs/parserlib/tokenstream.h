@@ -1,5 +1,5 @@
 #pragma once
-#include <vector>
+#include <EASTL/vector.h>
 #include "parserlib/token.h"
 
 //-----------------------------------------------------------------------------
@@ -8,7 +8,7 @@
 class CParserTokenStream
 {
 public:
-	typedef std::vector<parserToken_t> tokens_t;
+	typedef eastl::vector<parserToken_t> tokens_t;
 
 	CParserTokenStream();
 	CParserTokenStream( const CParserTokenStream& other );

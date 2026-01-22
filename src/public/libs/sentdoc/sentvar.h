@@ -58,9 +58,9 @@ public:
 	CSENTEntityDescVar& operator=( const CSENTEntityDescVar& right );
 
 private:
-	std::string				name;
+	eastl::string				name;
 	sentEntityDescVarType_t type;
-	std::string				stringValue;
+	eastl::string				stringValue;
 	union
 	{
 		bool		 boolValue;

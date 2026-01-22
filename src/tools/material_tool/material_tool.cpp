@@ -46,7 +46,7 @@ CMaterialTool::CompileMaterial
 bool CMaterialTool::CompileMaterial( const resourceToolCompileMaterialParams_t& compileParams ) const
 {
 	// Convert material variables
-	std::string destPath = S_Sprintf( "%s.smat_c", compileParams.pDestPath );
+	eastl::string destPath = S_Sprintf( "%s.smat_c", compileParams.pDestPath );
 	Msg( "MaterialTool: Saving the material to '%s'...", destPath.c_str() );
 	CSMATCompiledMaterialDoc smatCompiledFile;
 	smatCompiledFile.SetShaderName( compileParams.pShaderName );

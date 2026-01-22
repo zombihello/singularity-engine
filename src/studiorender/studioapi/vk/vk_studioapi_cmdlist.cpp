@@ -583,7 +583,7 @@ void CStudioAPICmdListBatchVk::AddCmdList( IStudioAPICmdList* pCmdList )
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 	CStudioAPICmdListVk* pStudioAPICmdList = (CStudioAPICmdListVk*)pCmdList;
 	Assert( pStudioAPICmdList->GetCmdContext() == pCmdContext );
-	Assert( std::find( cmdLists.begin(), cmdLists.end(), pStudioAPICmdList ) == cmdLists.end() );
+	Assert( eastl::find( cmdLists.begin(), cmdLists.end(), pStudioAPICmdList ) == cmdLists.end() );
 	cmdLists.emplace_back( pStudioAPICmdList );
 }
 
@@ -829,10 +829,10 @@ void CStudioAPICmdListBatchMgrVk::Submit( CStudioAPICmdListBatchVk* pCmdListBatc
 	Assert( pCmdListBatch->GetCmdContext() == &cmdContext );
 
 	// Grab from the batch all synchronization signals, waits and command buffers
-	std::vector<VkSemaphore>		  vkSignalSemaphores;
-	std::vector<VkSemaphore>		  vkWaitSemaphores;
-	std::vector<VkPipelineStageFlags> vkWaitStageMasks;
-	std::vector<VkCommandBuffer>	  vkCommandBuffers;
+	eastl::vector<VkSemaphore>		  vkSignalSemaphores;
+	eastl::vector<VkSemaphore>		  vkWaitSemaphores;
+	eastl::vector<VkPipelineStageFlags> vkWaitStageMasks;
+	eastl::vector<VkCommandBuffer>	  vkCommandBuffers;
 	GrabVkSyncSignalsFromBatch( pCmdListBatch, vkSignalSemaphores );
 	GrabVkSyncWaitsFromBatch( pCmdListBatch, vkWaitSemaphores, vkWaitStageMasks );
 	GrabVkCmdBuffersFromBatch( pCmdListBatch, vkCommandBuffers );
@@ -873,7 +873,7 @@ void CStudioAPICmdListBatchMgrVk::Submit( CStudioAPICmdListBatchVk* pCmdListBatc
 		}
 
 		// Add the fence into the dictionary
-		submittedBatchesDict.insert( std::make_pair( pCmdListBatch, pFence ) );
+		submittedBatchesDict.insert( eastl::make_pair( pCmdListBatch, pFence ) );
 	}
 }
 
@@ -921,7 +921,7 @@ void CStudioAPICmdListBatchMgrVk::ClearSubmittedBatches()
 CStudioAPICmdListBatchMgrVk::GrabVkSyncSignalsFromBatch
 ==================
 */
-void CStudioAPICmdListBatchMgrVk::GrabVkSyncSignalsFromBatch( CStudioAPICmdListBatchVk* pCmdListBatch, std::vector<VkSemaphore>& vkSyncSignals ) const
+void CStudioAPICmdListBatchMgrVk::GrabVkSyncSignalsFromBatch( CStudioAPICmdListBatchVk* pCmdListBatch, eastl::vector<VkSemaphore>& vkSyncSignals ) const
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 
@@ -949,7 +949,7 @@ void CStudioAPICmdListBatchMgrVk::GrabVkSyncSignalsFromBatch( CStudioAPICmdListB
 CStudioAPICmdListBatchMgrVk::GrabVkSyncWaitsFromBatch
 ==================
 */
-void CStudioAPICmdListBatchMgrVk::GrabVkSyncWaitsFromBatch( CStudioAPICmdListBatchVk* pCmdListBatch, std::vector<VkSemaphore>& vkSyncWaits, std::vector<VkPipelineStageFlags>& vkSyncWaitStageMasks ) const
+void CStudioAPICmdListBatchMgrVk::GrabVkSyncWaitsFromBatch( CStudioAPICmdListBatchVk* pCmdListBatch, eastl::vector<VkSemaphore>& vkSyncWaits, eastl::vector<VkPipelineStageFlags>& vkSyncWaitStageMasks ) const
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 
@@ -979,7 +979,7 @@ void CStudioAPICmdListBatchMgrVk::GrabVkSyncWaitsFromBatch( CStudioAPICmdListBat
 CStudioAPICmdListBatchMgrVk::GrabVkCmdBuffersFromBatch
 ==================
 */
-void CStudioAPICmdListBatchMgrVk::GrabVkCmdBuffersFromBatch( CStudioAPICmdListBatchVk* pCmdListBatch, std::vector<VkCommandBuffer>& vkCmdBuffers ) const
+void CStudioAPICmdListBatchMgrVk::GrabVkCmdBuffersFromBatch( CStudioAPICmdListBatchVk* pCmdListBatch, eastl::vector<VkCommandBuffer>& vkCmdBuffers ) const
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 

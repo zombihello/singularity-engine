@@ -119,7 +119,7 @@ void CStudioAPIDeviceVk::Init( uint32 engineMajorVersion, uint32 engineMinorVers
 	vkInstanceCreateInfo.pApplicationInfo	  = &vkAppInfo;
 
 	// Create list of required instance extensions
-	std::vector<const char*> extensionsRequired;
+	eastl::vector<const char*> extensionsRequired;
 	for ( uint32 index = 0, count = ARRAYSIZE( s_pInstanceExtensions ); index < count; ++index )
 	{
 		extensionsRequired.push_back( s_pInstanceExtensions[index] );
@@ -253,7 +253,7 @@ void CStudioAPIDeviceVk::CreateVkDevice()
 	queueFamilyIndices_t	   queueFamilyIndices;
 
 	// Get all list of physical devices
-	std::vector<VkPhysicalDevice> physicalDevices( physicalDevicesCount );
+	eastl::vector<VkPhysicalDevice> physicalDevices( physicalDevicesCount );
 	vkEnumeratePhysicalDevices( vkInstance, &physicalDevicesCount, physicalDevices.data() );
 
 	Msg( "StudioAPIVk: Have %u devices:", physicalDevicesCount );
@@ -281,7 +281,7 @@ void CStudioAPIDeviceVk::CreateVkDevice()
 		// Find queue family indices that us need
 		uint32 queueFamilyCount = 0;
 		vkGetPhysicalDeviceQueueFamilyProperties( vkPhysicalDevice, &queueFamilyCount, NULL );
-		std::vector<VkQueueFamilyProperties> vkQueueFamiliesProperties( queueFamilyCount );
+		eastl::vector<VkQueueFamilyProperties> vkQueueFamiliesProperties( queueFamilyCount );
 		vkGetPhysicalDeviceQueueFamilyProperties( vkPhysicalDevice, &queueFamilyCount, vkQueueFamiliesProperties.data() );
 		queueFamilyIndices = FindQueueFamilyIndices( vkPhysicalDevice, vkQueueFamiliesProperties,
 													 STUDIOAPI_VK_QUEUE_FLAG_GRAPHICS | STUDIOAPI_VK_QUEUE_FLAG_PRESENT | STUDIOAPI_VK_QUEUE_FLAG_TRANSFER | STUDIOAPI_VK_QUEUE_FLAG_COMPUTE );
@@ -314,7 +314,7 @@ void CStudioAPIDeviceVk::CreateVkDevice()
 		{
 			uint32 deviceExtensionCount = 0;
 			vkEnumerateDeviceExtensionProperties( vkPhysicalDevice, NULL, &deviceExtensionCount, NULL );
-			std::vector<VkExtensionProperties> deviceExtensions( deviceExtensionCount );
+			eastl::vector<VkExtensionProperties> deviceExtensions( deviceExtensionCount );
 			vkEnumerateDeviceExtensionProperties( vkPhysicalDevice, NULL, &deviceExtensionCount, deviceExtensions.data() );
 
 			Msg( "StudioAPIVk:\t\tSupported device extensions: %u", deviceExtensionCount );
@@ -365,8 +365,8 @@ void CStudioAPIDeviceVk::CreateVkDevice()
 
 	// Otherwise we found physical device and try create logical device
 	// Init descriptor device queue infos
-	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-	std::set<uint32>					 uniqueQueueFamilies = {
+	eastl::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+	eastl::set<uint32>					 uniqueQueueFamilies = {
 		queueFamilyIndices.graphicsFamilyIndex,
 		queueFamilyIndices.presentFamilyIndex,
 		queueFamilyIndices.transferFamilyIndex,
@@ -436,7 +436,7 @@ void CStudioAPIDeviceVk::CreateVkDevice()
 CStudioAPIDeviceVk::FindQueueFamilyIndices
 ==================
 */
-CStudioAPIDeviceVk::queueFamilyIndices_t CStudioAPIDeviceVk::FindQueueFamilyIndices( const VkPhysicalDevice& vkPhysicalDevice, const std::vector<VkQueueFamilyProperties>& vkQueueFamiliesProperties, uint32 queueFamilyTypes ) const
+CStudioAPIDeviceVk::queueFamilyIndices_t CStudioAPIDeviceVk::FindQueueFamilyIndices( const VkPhysicalDevice& vkPhysicalDevice, const eastl::vector<VkQueueFamilyProperties>& vkQueueFamiliesProperties, uint32 queueFamilyTypes ) const
 {
 	// Dedicated queue for compute
 	// Try to find a queue family index that supports compute but not graphics

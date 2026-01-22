@@ -21,7 +21,7 @@ public:
 
 private:
 	void PrintUsageHelp();
-	bool ParseEcsFiles( const std::string& dir, const std::string rootDir, CEcsSystemStub& stubs );
+	bool ParseEcsFiles( const eastl::string& dir, const eastl::string rootDir, CEcsSystemStub& stubs );
 	bool ParseEcsFile( const char* pPath, CEcsSystemStub& stubs );
 	bool GenerateCppFiles( const char* pRootDir, const char* pOutputDir, const CEcsSystemStub& stubs, ecsCppFileType_t cppFileType );
 };
@@ -99,7 +99,7 @@ int32 CEcsCompilerAppSystemGroup::Main()
 CEcsCompilerAppSystemGroup::ParseEcsFiles
 ==================
 */
-bool CEcsCompilerAppSystemGroup::ParseEcsFiles( const std::string& dir, const std::string rootDir, CEcsSystemStub& stubs )
+bool CEcsCompilerAppSystemGroup::ParseEcsFiles( const eastl::string& dir, const eastl::string rootDir, CEcsSystemStub& stubs )
 {
 	bool					  bResult = true;
 	TRefPtr<IPathArrayResult> pFiles  = g_pFileSystem->FindFiles( dir.c_str(), true, true );
@@ -139,7 +139,7 @@ bool CEcsCompilerAppSystemGroup::ParseEcsFile( const char* pPath, CEcsSystemStub
 		return false;
 	}
 
-	std::string buffer;
+	eastl::string buffer;
 	buffer.resize( pFileReader->GetSize() );
 	pFileReader->Read( buffer.data(), buffer.size() );
 	pFileReader = NULL;
@@ -161,7 +161,7 @@ CEcsCompilerAppSystemGroup::GenerateCppFiles
 */
 bool CEcsCompilerAppSystemGroup::GenerateCppFiles( const char* pRootDir, const char* pOutputDir, const CEcsSystemStub& stubs, ecsCppFileType_t cppFileType )
 {
-	const std::vector<TRefPtr<CEcsStubModule>>& ecsStubModules = stubs.GetModules();
+	const eastl::vector<TRefPtr<CEcsStubModule>>& ecsStubModules = stubs.GetModules();
 	CEcsCppGenerator							ecsCppGenerator;
 
 	// Get file extension and type name
@@ -185,8 +185,8 @@ bool CEcsCompilerAppSystemGroup::GenerateCppFiles( const char* pRootDir, const c
 	}
 
 	// Convert the root and the output directory into absolute path
-	std::string rootDir	  = pRootDir;
-	std::string outputDir = pOutputDir;
+	eastl::string rootDir	  = pRootDir;
+	eastl::string outputDir = pOutputDir;
 	if ( !S_IsAbsolutePath( pRootDir ) )
 	{
 		S_MakeAbsolutePath( pRootDir, rootDir );
@@ -206,10 +206,10 @@ bool CEcsCompilerAppSystemGroup::GenerateCppFiles( const char* pRootDir, const c
 		{
 			return false;
 		}
-		const std::string& buffer = ecsCppGenerator.GetBuffer();
+		const eastl::string& buffer = ecsCppGenerator.GetBuffer();
 
 		// Make sub directories if we use 'dir' command
-		std::string subDir;
+		eastl::string subDir;
 		if ( !rootDir.empty() )
 		{
 			S_GetFilePath( pEcsStubModule->GetContext().file.AsChar() + rootDir.size(), subDir, false );
@@ -217,9 +217,9 @@ bool CEcsCompilerAppSystemGroup::GenerateCppFiles( const char* pRootDir, const c
 		}
 
 		// Generate file path from the module name
-		std::string filePath;
+		eastl::string filePath;
 		{
-			std::string moduleNameLower = pEcsStubModule->GetName();
+			eastl::string moduleNameLower = pEcsStubModule->GetName();
 			S_Strlwr( moduleNameLower.data() );
 			filePath = S_Sprintf( "%s/%secs_%s.gen.%s", outputDir.c_str(), subDir.c_str(), moduleNameLower.c_str(), pCppFileExtension );
 		}
@@ -285,7 +285,7 @@ int main( int argc, char** argv )
 
 	// Initialize a command line
 	{
-		std::string arguments;
+		eastl::string arguments;
 		for ( uint32 index = 0; index < (uint32)argc; ++index )
 		{
 			if ( *argv[index] == '-' || *argv[index] == '/' )

@@ -34,4 +34,6 @@ set( FULL_SRC_FILES                                     ${SRC_FILES} ${PUBLIC_SR
 add_library( interfaces STATIC 	                      	${FULL_SRC_FILES} )
 set_target_properties( interfaces PROPERTIES FOLDER     Engine/Libraries )
 set_target_properties( interfaces PROPERTIES PREFIX 	"" )
+
+target_link_libraries( interfaces PRIVATE 				stdlib )
 add_common_target_defines( interfaces )

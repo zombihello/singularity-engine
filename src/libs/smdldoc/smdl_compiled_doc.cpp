@@ -49,7 +49,7 @@ bool CSMDLCompiledModelDoc::SaveFile( const char* pPath )
 	pFile->Write( &numMaterials, sizeof( uint32 ) );
 	for ( uint32 materialIdx = 0; materialIdx < numMaterials; ++materialIdx )
 	{
-		const std::string& material	  = materials[materialIdx];
+		const eastl::string& material	  = materials[materialIdx];
 		uint32			   sizeString = (uint32)material.size();
 		pFile->Write( &sizeString, sizeof( uint32 ) );
 		pFile->Write( (char*)material.data(), sizeString * sizeof( char ) );
@@ -117,7 +117,7 @@ bool CSMDLCompiledModelDoc::LoadFromFile( const char* pPath )
 	materials.resize( numMaterials );
 	for ( uint32 materialIdx = 0; materialIdx < numMaterials; ++materialIdx )
 	{
-		std::string& material	= materials[materialIdx];
+		eastl::string& material	= materials[materialIdx];
 		uint32		 sizeString = 0;
 		pFile->Read( &sizeString, sizeof( uint32 ) );
 		material.resize( sizeString );

@@ -1,19 +1,9 @@
 #include "pch_stdlib.h"
-
 #include "core/compression.h"
 #include "stdlib/compression/zlib.h"
 
-/**
- * @ingroup stdlib
- * @brief Size of chunk for uncompress compressed data
- */
 #define UNCOMPRESS_CHUNK_SIZE 131072
-
-/**
- * @ingroup stdlib
- * @brief Size of chunk for compress data
- */
-#define COMPRESS_CHUNK_SIZE UNCOMPRESS_CHUNK_SIZE
+#define COMPRESS_CHUNK_SIZE	  UNCOMPRESS_CHUNK_SIZE
 
 /**
  * @ingroup stdlib

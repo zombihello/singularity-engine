@@ -16,14 +16,14 @@ void CShaderCompilerCppGenerator::Generate( const shader_t& shader )
 	buffer += "//\n\n";
 
 	// Generate class name from base name of shader source file and the one type
-	std::string className;
+	eastl::string className;
 	{
 		// Convert shader type to string
 		const char* pShaderTypeName = "";
 		ConvShaderTypeToString( shader.type, pShaderTypeName );
 
 		// Get base name from shader source file
-		std::string fileBaseName;
+		eastl::string fileBaseName;
 		S_GetFileBaseName( shader.source, fileBaseName, false );
 
 		// Get class name

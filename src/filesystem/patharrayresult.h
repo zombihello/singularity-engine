@@ -1,6 +1,6 @@
 #pragma once
-#include <vector>
-#include <string>
+#include <EASTL/vector.h>
+#include <EASTL/string.h>
 
 #include "filesystem/ifilesystem.h"
 
@@ -10,13 +10,13 @@
 class CPathArrayResult : public TRefCounted<IPathArrayResult>
 {
 public:
-	CPathArrayResult( const std::vector<std::string>& pathArray );
+	CPathArrayResult( const eastl::vector<eastl::string>& pathArray );
 
 	// IPathArrayResult interface
 	virtual const char* GetPath( uint32 index ) const override;
-	virtual uint32		 GetNum() const override;
-	virtual bool		 IsEmpty() const override;
+	virtual uint32		GetNum() const override;
+	virtual bool		IsEmpty() const override;
 
 private:
-	std::vector<std::string> pathArray;
+	eastl::vector<eastl::string> pathArray;
 };

@@ -101,7 +101,7 @@ bool CSMDLSourceModelDoc::LoadFromFile( const char* pPath )
 		{
 			if ( jsonAxisUp.IsA( JSONVALUE_TYPE_STRING ) )
 			{
-				std::string axisUp = jsonAxisUp.GetString();
+				eastl::string axisUp = jsonAxisUp.GetString();
 				if ( axisUp.empty() )
 				{
 					Error( "SMDLDoc: Invalid 'axis-up', an axis up can't be empty" );
@@ -129,7 +129,7 @@ bool CSMDLSourceModelDoc::LoadFromFile( const char* pPath )
 		{
 			if ( jsonSourcePath.IsA( JSONVALUE_TYPE_STRING ) )
 			{
-				std::string sourcePath = jsonSourcePath.GetString();
+				eastl::string sourcePath = jsonSourcePath.GetString();
 				if ( sourcePath.empty() )
 				{
 					Error( "SMDLDoc: Invalid 'source', an source path can't be empty" );
@@ -158,7 +158,7 @@ bool CSMDLSourceModelDoc::LoadFromFile( const char* pPath )
 		{
 			if ( jsonMaterialsDir.IsA( JSONVALUE_TYPE_STRING ) )
 			{
-				std::string materialsDir = jsonMaterialsDir.GetString();
+				eastl::string materialsDir = jsonMaterialsDir.GetString();
 				if ( materialsDir.empty() )
 				{
 					Error( "SMDLDoc: Invalid 'materials-dir', an materials directory can't be empty" );
@@ -186,7 +186,7 @@ bool CSMDLSourceModelDoc::LoadFromFile( const char* pPath )
 		{
 			if ( jsonOutputDir.IsA( JSONVALUE_TYPE_STRING ) )
 			{
-				std::string outputDir = jsonOutputDir.GetString();
+				eastl::string outputDir = jsonOutputDir.GetString();
 				if ( outputDir.empty() )
 				{
 					Error( "SMDLDoc: Invalid 'output-dir', an output directory can't be empty" );
@@ -215,15 +215,15 @@ bool CSMDLSourceModelDoc::LoadFromFile( const char* pPath )
 		{
 			if ( jsonRenamedMaterialsVar.IsA( JSONVALUE_TYPE_ARRAY ) )
 			{
-				std::vector<CJsonValue> jsonRenamedMaterialsArray = jsonRenamedMaterialsVar.GetArray();
+				eastl::vector<CJsonValue> jsonRenamedMaterialsArray = jsonRenamedMaterialsVar.GetArray();
 				for ( uint32 renamedMaterialIdx = 0, count = (uint32)jsonRenamedMaterialsArray.size(); renamedMaterialIdx < count; ++renamedMaterialIdx )
 				{
 					const CJsonValue& jsonValue = jsonRenamedMaterialsArray[renamedMaterialIdx];
 					if ( jsonValue.IsValid() && jsonValue.IsA( JSONVALUE_TYPE_OBJECT ) )
 					{
 						CJsonObject jsonObject	 = jsonValue.GetObject();
-						std::string originalName = jsonObject.GetValue( "original" ).GetString();
-						std::string newName		 = jsonObject.GetValue( "new" ).GetString();
+						eastl::string originalName = jsonObject.GetValue( "original" ).GetString();
+						eastl::string newName		 = jsonObject.GetValue( "new" ).GetString();
 						if ( originalName.empty() )
 						{
 							Error( "SMDLDoc: Invalid 'original' at renamed material id '%i'", renamedMaterialIdx );
@@ -276,7 +276,7 @@ bool CSMDLSourceModelDoc::SaveFile( const char* pPath )
 		return false;
 	}
 
-	std::string buffer;
+	eastl::string buffer;
 	buffer += "{\n";
 
 	// Write is need combine models, axis up, source path, materials directory and output directory
@@ -293,7 +293,7 @@ bool CSMDLSourceModelDoc::SaveFile( const char* pPath )
 		buffer += S_Sprintf( "\t\t\t\"new\": \"%s\"\n", it->second.c_str() );
 		buffer += "\t\t}";
 
-		if ( std::next( it, 1 ) != itEnd )
+		if ( eastl::next( it, 1 ) != itEnd )
 		{
 			buffer += ",";
 		}

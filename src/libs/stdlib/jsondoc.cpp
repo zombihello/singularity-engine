@@ -1,5 +1,4 @@
 #include "pch_stdlib.h"
-#include <sstream>
 
 #include "stdlib/stdlib.h"
 #include "stdlib/jsondoc.h"
@@ -11,33 +10,30 @@
 CJsonObject::AsJson
 ==================
 */
-std::string CJsonObject::AsJson( uint32 countTabs /* = 0 */ ) const
+eastl::string CJsonObject::AsJson( uint32 countTabs /* = 0 */ ) const
 {
 	// Print tabs
-	std::stringstream strStream;
-	std::string		  tabs;
+	eastl::string buffer;
+	eastl::string tabs;
 	for ( uint32 index = 0; index < countTabs; ++index )
 	{
 		tabs += "\t";
 	}
 
 	// Print content
-	strStream << "{" << LINE_TERMINATOR;
+	buffer += "{" LINE_TERMINATOR_STRING;
 	for ( auto itValue = valuesDict.begin(), itValueEnd = valuesDict.end(); itValue != itValueEnd; ++itValue )
 	{
-		strStream << tabs << "\t\"" << itValue->first << "\": " << itValue->second.AsJson( countTabs );
-		if ( std::next( itValue ) != itValueEnd )
+		buffer += S_Sprintf( "%s\t\"%s\": %s", tabs.c_str(), itValue->first.c_str(), itValue->second.AsJson( countTabs ).c_str() );
+		if ( eastl::next( itValue ) != itValueEnd )
 		{
-			strStream << "," << LINE_TERMINATOR;
+			buffer += ",";
 		}
-		else
-		{
-			strStream << LINE_TERMINATOR;
-		}
+		buffer += LINE_TERMINATOR_STRING;
 	}
 
-	strStream << tabs << "}";
-	return strStream.str();
+	buffer += S_Sprintf( "%s}", tabs.c_str() );
+	return buffer;
 }
 
 /*
@@ -51,7 +47,7 @@ void CJsonObject::Set( const rapidjson::Value& value )
 	for ( auto itValue = value.MemberBegin(), itValueEnd = value.MemberEnd(); itValue != itValueEnd; ++itValue )
 	{
 		const char* pValueName = itValue->name.GetString();
-		CJsonValue	 value;
+		CJsonValue	value;
 
 		value.Set( itValue->value );
 		valuesDict[pValueName] = value;
@@ -103,9 +99,9 @@ void CJsonValue::Clear()
 	case JSONVALUE_TYPE_BOOL: delete ( (bool*)pValue ); break;
 	case JSONVALUE_TYPE_INT: delete ( (int32*)pValue ); break;
 	case JSONVALUE_TYPE_FLOAT: delete ( (float*)pValue ); break;
-	case JSONVALUE_TYPE_STRING: delete ( (std::string*)pValue ); break;
+	case JSONVALUE_TYPE_STRING: delete ( (eastl::string*)pValue ); break;
 	case JSONVALUE_TYPE_OBJECT: delete ( (CJsonObject*)pValue ); break;
-	case JSONVALUE_TYPE_ARRAY: delete ( (std::vector<CJsonValue>*)pValue ); break;
+	case JSONVALUE_TYPE_ARRAY: delete ( (eastl::vector<CJsonValue>*)pValue ); break;
 	}
 
 	pValue = nullptr;
@@ -140,21 +136,49 @@ void CJsonValue::Copy( const CJsonValue& copy )
 CJsonValue::AsJson
 ==================
 */
-std::string CJsonValue::AsJson( uint32 countTabs /* = 0 */ ) const
+eastl::string CJsonValue::AsJson( uint32 countTabs /* = 0 */ ) const
 {
-	// Convert JSON value to string
-	std::stringstream strStream;
+	eastl::string buffer;
 	switch ( type )
 	{
-	case JSONVALUE_TYPE_BOOL: strStream << GetBool() ? "true" : "false"; break;
-	case JSONVALUE_TYPE_FLOAT: strStream << GetFloat(); break;
-	case JSONVALUE_TYPE_INT: strStream << GetInt(); break;
-	case JSONVALUE_TYPE_STRING: strStream << "\"" << GetString() << "\""; break;
-	case JSONVALUE_TYPE_OBJECT: strStream << GetObject().AsJson( countTabs + 1 ); break;
-	default: strStream << "null"; break;
+	case JSONVALUE_TYPE_UNKNOWN: buffer = "null"; break;
+	case JSONVALUE_TYPE_BOOL: buffer = GetBool() ? "true" : "false"; break;
+	case JSONVALUE_TYPE_FLOAT: buffer = S_Sprintf( "%f", GetFloat() ); break;
+	case JSONVALUE_TYPE_INT: buffer = S_Sprintf( "%i", GetInt() ); break;
+	case JSONVALUE_TYPE_STRING: buffer = S_Sprintf( "\"%s\"", GetString().c_str() ); break;
+	case JSONVALUE_TYPE_OBJECT: buffer = GetObject().AsJson( countTabs + 1 ); break;
+	case JSONVALUE_TYPE_ARRAY:
+	{
+		buffer += "[";
+		eastl::vector<CJsonValue> jsonArray = GetArray();
+		for ( uint32 index = 0, count = (uint32)jsonArray.size(); index < count; ++index )
+		{
+			const CJsonValue& curJsonValue = jsonArray[index];
+			bool			  bNewLine	   = curJsonValue.IsA( JSONVALUE_TYPE_STRING ) || curJsonValue.IsA( JSONVALUE_TYPE_OBJECT ) || curJsonValue.IsA( JSONVALUE_TYPE_ARRAY );
+			if ( index != 0 )
+			{
+				buffer += ", ";
+			}
+			if ( bNewLine )
+			{
+				buffer += "\n";
+				for ( uint32 curTab = 0; curTab < countTabs; ++curTab )
+				{
+					buffer += "\t";
+				}
+			}
+
+			buffer += curJsonValue.AsJson( bNewLine ? countTabs + 1 : countTabs );
+		}
+		buffer += "]";
+		break;
+	}
+	default:
+		AssertMsg( false, "Unknown JSON value type 0x%X", type );
+		break;
 	}
 
-	return strStream.str();
+	return buffer;
 }
 
 /*
@@ -199,8 +223,8 @@ void CJsonValue::Set( const rapidjson::Value& value )
 	// Array value
 	else if ( value.IsArray() )
 	{
-		auto					array = value.GetArray();
-		std::vector<CJsonValue> jsonValues;
+		auto					  array = value.GetArray();
+		eastl::vector<CJsonValue> jsonValues;
 		for ( uint32 index = 0, count = array.Size(); index < count; ++index )
 		{
 			jsonValues.emplace_back().Set( array[index] );
@@ -279,7 +303,7 @@ bool CJsonDoc::LoadFromBuffer( const char* pBuffer )
 	for ( auto itValue = jsonDocument.MemberBegin(), itValueEnd = jsonDocument.MemberEnd(); itValue != itValueEnd; ++itValue )
 	{
 		const char* pValueName = itValue->name.GetString();
-		CJsonValue*	 pJsonValue = &valuesDict.insert( std::make_pair( pValueName, CJsonValue() ) ).first->second;
+		CJsonValue* pJsonValue = &valuesDict.insert( eastl::make_pair( pValueName, CJsonValue() ) ).first->second;
 		pJsonValue->Set( itValue->value );
 	}
 
@@ -303,7 +327,7 @@ bool CJsonDoc::SaveToFile( const char* path )
 	}
 
 	// Save data to buffer
-	std::string buffer;
+	eastl::string buffer;
 	if ( !SaveToBuffer( buffer ) )
 	{
 		Warning( "StdLib: Failed to save JSON document into buffer" );
@@ -328,22 +352,17 @@ bool CJsonDoc::SaveToFile( const char* path )
 CJsonDoc::SaveToBuffer
 ==================
 */
-bool CJsonDoc::SaveToBuffer( std::string& buffer )
+bool CJsonDoc::SaveToBuffer( eastl::string& buffer )
 {
-	buffer += "{";
-	buffer += LINE_TERMINATOR;
+	buffer += "{" LINE_TERMINATOR_STRING;
 	for ( valuesDict_t::const_iterator itValue = valuesDict.begin(), itValueEnd = valuesDict.end(); itValue != itValueEnd; ++itValue )
 	{
 		buffer += S_Sprintf( "\t\"%s\": %s", itValue->first.c_str(), itValue->second.AsJson( 0 ).c_str() );
-		if ( std::next( itValue ) != itValueEnd )
+		if ( eastl::next( itValue ) != itValueEnd )
 		{
 			buffer += ",";
-			buffer += LINE_TERMINATOR;
 		}
-		else
-		{
-			buffer += LINE_TERMINATOR;
-		}
+		buffer += LINE_TERMINATOR_STRING;
 	}
 
 	buffer += "}";

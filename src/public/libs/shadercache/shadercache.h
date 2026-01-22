@@ -1,5 +1,5 @@
 #pragma once
-#include <vector>
+#include <EASTL/vector.h>
 
 #include "stdlib/defines.h"
 #include "stdlib/types.h"
@@ -18,7 +18,7 @@ public:
 		{
 		}
 
-		shaderCache_t( const std::string& entryPointName, const std::vector<byte>& reflectionData, const std::vector<byte>& bytecode )
+		shaderCache_t( const eastl::string& entryPointName, const eastl::vector<byte>& reflectionData, const eastl::vector<byte>& bytecode )
 			: entryPointName( entryPointName )
 			, reflectionData( reflectionData )
 			, bytecode( bytecode )
@@ -28,9 +28,9 @@ public:
 		void Serialize( IStreamDataWriter* pStreamWriter );
 		void Deserialize( IStreamDataReader* pStreamReader );
 
-		std::string		  entryPointName;
-		std::vector<byte> reflectionData;
-		std::vector<byte> bytecode;
+		eastl::string		entryPointName;
+		eastl::vector<byte> reflectionData;
+		eastl::vector<byte> bytecode;
 	};
 
 	CShaderCacheDoc();
@@ -46,13 +46,13 @@ public:
 	studioAPIShaderType_t GetType() const;
 
 	// Add and get a shader cache
-	void				 AddCache( const std::string& entryPointName, const std::vector<byte>& reflectionData, const std::vector<byte>& bytecode );
+	void				 AddCache( const eastl::string& entryPointName, const eastl::vector<byte>& reflectionData, const eastl::vector<byte>& bytecode );
 	uint64				 GetNumCaches() const;
 	const shaderCache_t& GetCache( uint64 cacheId ) const;
 
 private:
-	studioAPIShaderType_t	   type;
-	std::vector<shaderCache_t> caches;
+	studioAPIShaderType_t		 type;
+	eastl::vector<shaderCache_t> caches;
 };
 
 #include "shadercache/shadercache.inl"

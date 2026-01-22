@@ -1,7 +1,7 @@
 #pragma once
-#include <vector>
-#include <unordered_set>
-#include <unordered_map>
+#include <EASTL/vector.h>
+#include <EASTL/unordered_set.h>
+#include <EASTL/unordered_map.h>
 
 #include "stdlib/defines.h"
 #include "studiorender/studioapi/vk/vk_studioapi_fence.h"

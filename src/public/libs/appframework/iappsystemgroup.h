@@ -1,7 +1,7 @@
 #pragma once
-#include <string>
-#include <vector>
-#include <unordered_map>
+#include <EASTL/string.h>
+#include <EASTL/vector.h>
+#include <EASTL/unordered_map.h>
 
 #include "core/core.h"
 #include "appframework/iappsystem.h"
@@ -133,7 +133,7 @@ private:
 	{
 		dllHandle_t			handle;
 		createInterfaceFn_t pFactoryFn;
-		std::string			name;
+		eastl::string		name;
 	};
 
 	int32 Startup();
@@ -155,14 +155,14 @@ private:
 	// Gets at the parent appsystem group
 	CAppSystemGroup* GetParent() const;
 
-	std::string FindSystemName( int32 index );
-	void		ReportFailure( int32 errorStage, int32 sysIndex = -1 );
+	eastl::string FindSystemName( int32 index );
+	void		  ReportFailure( int32 errorStage, int32 sysIndex = -1 );
 
-	std::vector<module_t>					modules;
-	std::vector<IAppSystem*>				systems;
-	std::unordered_map<std::string, uint32> systemDict;
-	CAppSystemGroup*						pParentAppSystemGroup;
-	appSystemGroupStage_t					currentStage;
+	eastl::vector<module_t>						modules;
+	eastl::vector<IAppSystem*>					systems;
+	eastl::unordered_map<eastl::string, uint32> systemDict;
+	CAppSystemGroup*							pParentAppSystemGroup;
+	appSystemGroupStage_t						currentStage;
 };
 
 //-----------------------------------------------------------------------------

@@ -16,7 +16,7 @@
 
     /* C++ Section */
 %{
-    #include <stack>
+    #include <EASTL/stack.h>
 
     #include "ecsfileparser_bison.cpp.h"
     #include "core/debug.h"
@@ -73,7 +73,7 @@
         }
 
         uint32                      bracketScopeLevel;
-        std::stack<uint32>          flexStateStack;
+        eastl::stack<uint32>          flexStateStack;
 
     private:
         ecsLexerScope_t             lexerScope;
@@ -83,7 +83,7 @@
     /* C++ Top Section */
 %top {
     #include <stdint.h>
-    #include <string>
+    #include <EASTL/string.h>
 
     #include "stdlib/defines.h"
 

@@ -36,5 +36,5 @@ public:
 protected:
 	bool			   bHasError;
 	CParserTokenEater& parserListener;
-	std::string		   path;
+	eastl::string		   path;
 };

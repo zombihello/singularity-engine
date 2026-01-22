@@ -6,7 +6,7 @@
 S_Vsprintf
 ==================
 */
-std::string S_Vsprintf( const char* pFormat, va_list params )
+eastl::string S_Vsprintf( const char* pFormat, va_list params )
 {
 	int32  bufferSize = 1024;
 	char* pBuffer	  = nullptr;
@@ -28,7 +28,7 @@ std::string S_Vsprintf( const char* pFormat, va_list params )
 	}
 	pBuffer[result] = 0;
 
-	std::string formatedString = pBuffer;
+	eastl::string formatedString = pBuffer;
 	free( pBuffer );
 	return formatedString;
 }
@@ -38,7 +38,7 @@ std::string S_Vsprintf( const char* pFormat, va_list params )
 S_Vsprintf
 ==================
 */
-std::wstring S_Vsprintf( const wchar_t* pFormat, va_list params )
+eastl::wstring S_Vsprintf( const wchar_t* pFormat, va_list params )
 {
 	int32  bufferSize = 1024;
 	wchar_t* pBuffer	  = nullptr;
@@ -60,7 +60,7 @@ std::wstring S_Vsprintf( const wchar_t* pFormat, va_list params )
 	}
 	pBuffer[result] = 0;
 
-	std::wstring formatedString = pBuffer;
+	eastl::wstring formatedString = pBuffer;
 	free( pBuffer );
 	return formatedString;
 }

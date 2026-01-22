@@ -5,15 +5,15 @@
 #include "stdlib/hashing/fasthash.h"
 
 //-----------------------------------------------------------------------------
-// Calculate a hash for a string to use it in std::unordered_map
+// Calculate a hash for a string to use it in eastl::unordered_map
 //-----------------------------------------------------------------------------
 struct stlInsensitiveStringHash_t
 {
-	std::size_t operator()( const char* pString ) const;
+	size_t operator()( const char* pString ) const;
 };
 
 //-----------------------------------------------------------------------------
-// Comparator for std::unordered_map to insensitive compre strings
+// Comparator for eastl::unordered_map to insensitive compre strings
 //-----------------------------------------------------------------------------
 struct stlInsensitiveCompareString_t
 {

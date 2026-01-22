@@ -1,6 +1,6 @@
-#include <string>
-#include <vector>
-#include <unordered_map>
+#include <EASTL/string.h>
+#include <EASTL/vector.h>
+#include <EASTL/unordered_map.h>
 
 #include "interfaces/interfaces.h"
 #include "stdlib/convar.h"

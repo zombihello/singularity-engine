@@ -38,17 +38,17 @@ struct parserFileContext_t
 	}
 
 	parserFileContext_t( parserFileContext_t&& other )
-		: file( std::move( other.file ) )
-		, line( std::move( other.line ) )
-		, charLineStart( std::move( other.charLineStart ) )
-		, charPosition( std::move( other.charPosition ) )
-		, charEndPosition( std::move( other.charEndPosition ) )
+		: file( eastl::move( other.file ) )
+		, line( eastl::move( other.line ) )
+		, charLineStart( eastl::move( other.charLineStart ) )
+		, charPosition( eastl::move( other.charPosition ) )
+		, charEndPosition( eastl::move( other.charEndPosition ) )
 	{
 	}
 
 	parserFileContext_t& operator=( const parserFileContext_t& other );
 	parserFileContext_t& operator=( parserFileContext_t&& other );
-	std::string			 ToString() const;
+	eastl::string			 ToString() const;
 
 	parserStringBufferANSI_t file;			   // Referenced file
 	int32					 line;			   // Line this context starts on

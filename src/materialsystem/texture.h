@@ -34,6 +34,6 @@ private:
 	uint32						 numLayers;
 	TRefPtr<IStudioAPITexture>	 pStudioAPITexture;
 	TRefPtr<IStudioAPISampler>	 pStudioAPISampler;
-	std::vector<textureMipMap_t> mipmaps;
-	std::vector<byte>			 data;
+	eastl::vector<textureMipMap_t> mipmaps;
+	eastl::vector<byte>			 data;
 };

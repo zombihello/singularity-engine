@@ -5,12 +5,12 @@
 #include "filesystem/file_base.h"
 
 //-----------------------------------------------------------------------------
-// The class for reading from a std file
+// The class for reading from a eastl file
 //-----------------------------------------------------------------------------
 class CStreamDataStdFileReader : public CBaseStreamDataFileReader
 {
 public:
-	CStreamDataStdFileReader( FILE* pFile, const std::string& path );
+	CStreamDataStdFileReader( FILE* pFile, const eastl::string& path );
 	virtual ~CStreamDataStdFileReader();
 
 	// IStreamData interface
@@ -34,12 +34,12 @@ private:
 };
 
 //-----------------------------------------------------------------------------
-// The class for write to the std file
+// The class for write to the eastl file
 //-----------------------------------------------------------------------------
 class CStreamDataStdFileWriter : public CBaseStreamDataFileWriter
 {
 public:
-	CStreamDataStdFileWriter( FILE* pFile, const std::string& path );
+	CStreamDataStdFileWriter( FILE* pFile, const eastl::string& path );
 	virtual ~CStreamDataStdFileWriter();
 
 	// IStreamData interface

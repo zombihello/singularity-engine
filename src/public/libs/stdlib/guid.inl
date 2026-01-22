@@ -5,7 +5,7 @@
 CGuid::keyFunc_t::operator()
 ==================
 */
-FORCEINLINE std::size_t CGuid::keyFunc_t::operator()( const CGuid& guid ) const
+FORCEINLINE size_t CGuid::keyFunc_t::operator()( const CGuid& guid ) const
 {
 	return guid.GetHash();
 }
@@ -104,7 +104,7 @@ FORCEINLINE void CGuid::Set( uint32 a, uint32 b, uint32 c, uint32 d )
 CGuid::AsString
 ==================
 */
-FORCEINLINE std::string CGuid::AsString() const
+FORCEINLINE eastl::string CGuid::AsString() const
 {
 	return S_Sprintf( "%08X%08X%08X%08X", a, b, c, d );
 }
@@ -114,7 +114,7 @@ FORCEINLINE std::string CGuid::AsString() const
 CGuid::InitFromString
 ==================
 */
-FORCEINLINE bool CGuid::InitFromString( const std::string& string )
+FORCEINLINE bool CGuid::InitFromString( const eastl::string& string )
 {
 	// Size matches, try to parse it
 	bool bSuccessful = false;

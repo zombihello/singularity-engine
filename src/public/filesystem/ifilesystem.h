@@ -36,8 +36,8 @@ class IPathArrayResult : public IRefCounted
 {
 public:
 	virtual const char* GetPath( uint32 index ) const = 0;
-	virtual uint32		 GetNum() const				   = 0;
-	virtual bool		 IsEmpty() const			   = 0;
+	virtual uint32		GetNum() const				  = 0;
+	virtual bool		IsEmpty() const				  = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -95,8 +95,8 @@ public:
 
 	// Functions to work with search paths
 	virtual void					  AddSearchPath( const char* pSearchPath, const char* pPathID ) = 0;
-	virtual void					  RemoveAllSearchPaths()										  = 0;
-	virtual void					  RemoveSearchPath( const char* pPathID )						  = 0;
-	virtual TRefPtr<IPathArrayResult> GetSearchPath( const char* pPathID ) const					  = 0;
-	virtual uint32					  GetNumSearchPaths() const										  = 0;
+	virtual void					  RemoveAllSearchPaths()										= 0;
+	virtual void					  RemoveSearchPath( const char* pPathID )						= 0;
+	virtual TRefPtr<IPathArrayResult> GetSearchPath( const char* pPathID ) const					= 0;
+	virtual uint32					  GetNumSearchPaths() const										= 0;
 };

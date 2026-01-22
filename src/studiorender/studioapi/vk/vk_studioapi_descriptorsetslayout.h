@@ -1,6 +1,6 @@
 #pragma once
-#include <vector>
-#include <unordered_map>
+#include <EASTL/vector.h>
+#include <EASTL/unordered_map.h>
 
 #include "stdlib/hashing/fasthash.h"
 #include "studiorender/studioapi/vk/vk_studioapi_device.h"
@@ -17,22 +17,22 @@ struct studioAPIDescriptorSetInfoVk_t
 	{
 	}
 
-	uint16						  numBufferInfos;
-	uint16						  numImageInfos;
-	std::vector<VkDescriptorType> vkDescriptorTypes;
-	std::vector<uint8>			  slotToDescriptorTypeIndexMap;
+	uint16							numBufferInfos;
+	uint16							numImageInfos;
+	eastl::vector<VkDescriptorType> vkDescriptorTypes;
+	eastl::vector<uint8>			slotToDescriptorTypeIndexMap;
 };
 
 struct studioAPIDescriptorSetLayoutVk_t
 {
-	std::vector<VkDescriptorSetLayoutBinding> vkLayoutBindings;
-	studioAPIDescriptorSetInfoVk_t			  descriptorSetInfo;
+	eastl::vector<VkDescriptorSetLayoutBinding> vkLayoutBindings;
+	studioAPIDescriptorSetInfoVk_t				descriptorSetInfo;
 #if !RETAIL
-	std::unordered_map<uint8, hash_t> descriptorSlotValidationHashDict;
+	eastl::unordered_map<uint8, hash_t> descriptorSlotValidationHashDict;
 #endif	// !RETAIL
 };
 
-typedef std::unordered_map<uint32, studioAPIDescriptorSetLayoutVk_t> studioAPIDescriptorSetLayoutVkDict_t;
+typedef eastl::unordered_map<uint32, studioAPIDescriptorSetLayoutVk_t> studioAPIDescriptorSetLayoutVkDict_t;
 
 //-----------------------------------------------------------------------------
 // Vulkan Studio API descriptor set layouts
@@ -43,26 +43,26 @@ public:
 	CStudioAPIDescriptorSetsLayoutVk();
 	~CStudioAPIDescriptorSetsLayoutVk();
 
-	void Init( const studioAPIDescriptorSetLayoutVkDict_t& descriptorSetLayoutDict, const std::vector<VkPushConstantRange>& vkPushConstantRanges );
+	void Init( const studioAPIDescriptorSetLayoutVkDict_t& descriptorSetLayoutDict, const eastl::vector<VkPushConstantRange>& vkPushConstantRanges );
 	void Destroy();
 
 	COnStudioAPIDescriptorSetsLayoutDeletedVk& OnDescriptorSetsLayoutDeleted() const;
 
-	bool											   HasInputAttachments() const;
-	const std::vector<VkDescriptorSetLayout>&		   GetVkDescriptorSetLayouts() const;
-	uint32											   GetNumUsedDescriptorTypes( VkDescriptorType vkDescriptorType ) const;
-	uint32											   GetNumDescriptorSets() const;
-	hash_t											   GetDescriptorTypesUsageHash() const;
-	const std::vector<studioAPIDescriptorSetInfoVk_t>& GetDescriptorSetInfos() const;
-	VkPipelineLayout								   GetVkPipelineLayout() const;
-	VkDescriptorSetAllocateInfo						   GetVkAllocateInfo() const;
+	bool												 HasInputAttachments() const;
+	const eastl::vector<VkDescriptorSetLayout>&			 GetVkDescriptorSetLayouts() const;
+	uint32												 GetNumUsedDescriptorTypes( VkDescriptorType vkDescriptorType ) const;
+	uint32												 GetNumDescriptorSets() const;
+	hash_t												 GetDescriptorTypesUsageHash() const;
+	const eastl::vector<studioAPIDescriptorSetInfoVk_t>& GetDescriptorSetInfos() const;
+	VkPipelineLayout									 GetVkPipelineLayout() const;
+	VkDescriptorSetAllocateInfo							 GetVkAllocateInfo() const;
 
 private:
 	uint32											  numDescriptorSets;
 	hash_t											  descriptorTypesUsageHash;
-	std::unordered_map<VkDescriptorType, uint32>	  numUsedDescriptorTypesDict;
-	std::vector<VkDescriptorSetLayout>				  vkDescriptorSetLayouts;
-	std::vector<studioAPIDescriptorSetInfoVk_t>		  descriptorSetInfos;
+	eastl::unordered_map<VkDescriptorType, uint32>	  numUsedDescriptorTypesDict;
+	eastl::vector<VkDescriptorSetLayout>			  vkDescriptorSetLayouts;
+	eastl::vector<studioAPIDescriptorSetInfoVk_t>	  descriptorSetInfos;
 	VkPipelineLayout								  vkPipelineLayout;
 	VkDescriptorSetAllocateInfo						  vkDescriptorSetAllocateInfo;
 	mutable COnStudioAPIDescriptorSetsLayoutDeletedVk onDescriptorSetsLayoutDeleted;

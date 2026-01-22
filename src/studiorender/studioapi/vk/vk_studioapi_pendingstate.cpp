@@ -187,7 +187,7 @@ bool CStudioAPIPendingRenderStateVk::SetRenderPipeline( CStudioAPIRenderPipeline
 			descriptorStateCache.pRenderDescriptorState			= new CStudioAPIDescriptorStateRenderVk( cmdContext, pRenderPipeline );
 			descriptorStateCache.pRenderPipelineDeletedDelegate = pRenderPipeline->OnRenderPipelineDeleted().AddFunc( &CStudioAPIPendingRenderStateVk::OndRenderPipelineDeleted, this );
 			pCurrentRenderDescriptorState						= descriptorStateCache.pRenderDescriptorState;
-			descriptorStatesDict.insert( std::make_pair( pRenderPipeline, descriptorStateCache ) );
+			descriptorStatesDict.insert( eastl::make_pair( pRenderPipeline, descriptorStateCache ) );
 		}
 
 		// Pipeline was changed

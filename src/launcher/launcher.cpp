@@ -1,5 +1,5 @@
-#include <string>
-#include <unordered_set>
+#include <EASTL/string.h>
+#include <EASTL/unordered_set.h>
 
 #include "appframework/iappsystemgroup.h"
 #include "appframework/iwindowmgr.h"
@@ -89,7 +89,7 @@ private:
 
 	bool								   bInFocus;
 	appInstanceHandle_t					   hInstance;
-	const char*						   pDefaultGameDir;
+	const char*							   pDefaultGameDir;
 	CGameInfoDoc						   gameInfo;
 	CGameViewportClient					   gameViewportClient;
 	dllHandle_t							   gameDLLHandle;
@@ -205,8 +205,8 @@ bool CSingularityAppSystemGroup::AddGameSystems()
 	IGameAppSystems* pGameAppSystems = (IGameAppSystems*)pGameFactory( GAME_APPSYSTEMS_INTERFACE_VERSION );
 	if ( pGameAppSystems )
 	{
-		std::vector<appSystemInfo_t> appSystems_before;
-		std::vector<appSystemInfo_t> appSystems_after;
+		eastl::vector<appSystemInfo_t> appSystems_before;
+		eastl::vector<appSystemInfo_t> appSystems_after;
 		for ( uint32 index = 0, count = pGameAppSystems->GetNum(); index < count; ++index )
 		{
 			gameAppSystemInfo_t gameAppSystem = pGameAppSystems->GetInfo( index );
@@ -323,7 +323,7 @@ bool CSingularityAppSystemGroup::Create()
 	}
 
 	// Initialize the file system for the game
-	const std::vector<gameInfoSearchPath_t>& searchPaths = gameInfo.GetSearchPaths();
+	const eastl::vector<gameInfoSearchPath_t>& searchPaths = gameInfo.GetSearchPaths();
 	for ( uint32 index = 0, count = (uint32)searchPaths.size(); index < count; ++index )
 	{
 		const gameInfoSearchPath_t& searchPath = searchPaths[index];
@@ -520,8 +520,8 @@ void CSingularityAppSystemGroup::PostShutdown()
 
 	// Otherwise we look for search paths in gameinfo.txt and
 	// remove they from the file system
-	std::unordered_set<std::string>			 pathIDSet;
-	const std::vector<gameInfoSearchPath_t>& searchPaths = gameInfo.GetSearchPaths();
+	eastl::unordered_set<eastl::string>		   pathIDSet;
+	const eastl::vector<gameInfoSearchPath_t>& searchPaths = gameInfo.GetSearchPaths();
 	for ( uint32 index = 0, count = (uint32)searchPaths.size(); index < count; ++index )
 	{
 		const gameInfoSearchPath_t& searchPath = searchPaths[index];

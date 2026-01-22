@@ -1,6 +1,7 @@
 #include <cstdlib>
-#include <string>
-#include <vector>
+#include <EASTL/string.h>
+#include <EASTL/vector.h>
+#include <EASTL/unordered_map.h>
 
 #include "stdlib/builddefines.h"
 #include "stdlib/types.h"

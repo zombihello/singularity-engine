@@ -1,5 +1,5 @@
 #pragma once
-#include <vector>
+#include <EASTL/vector.h>
 
 #include "studiorender/studioapi/vk/vk_studioapi_renderpipeline.h"
 #include "studiorender/studioapi/vk/vk_studioapi_cmdbuffer.h"
@@ -31,12 +31,12 @@ public:
 protected:
 	void InitDescriptorWriteInfos();
 
-	bool										 bDirtyDescriptorSets;
-	CStudioAPICmdContextVk&						 cmdContext;
-	const CStudioAPIDescriptorSetsLayoutVk*		 pDescriptorSetsLayout;
-	studioAPIDescriptorSetWriteContainerVk_t	 descriptorSetWriteContainer;
-	std::vector<CStudioAPIDescriptorSetWriterVk> descriptorSetWriters;
-	std::vector<VkDescriptorSet>				 vkDescriptorSets;
+	bool										   bDirtyDescriptorSets;
+	CStudioAPICmdContextVk&						   cmdContext;
+	const CStudioAPIDescriptorSetsLayoutVk*		   pDescriptorSetsLayout;
+	studioAPIDescriptorSetWriteContainerVk_t	   descriptorSetWriteContainer;
+	eastl::vector<CStudioAPIDescriptorSetWriterVk> descriptorSetWriters;
+	eastl::vector<VkDescriptorSet>				   vkDescriptorSets;
 };
 
 //-----------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 #pragma once
-#include <string>
+#include <EASTL/string.h>
 
 #include "interfaces/interfaces.h"
 #include "core/debug.h"
@@ -15,12 +15,12 @@
 // }
 //-----------------------------------------------------------------------------
 #define CON_COMMAND( Name, Description, Flags )                                 \
-	static void	   ConCmdExec_##Name( uint32 argc, const char** argv );        \
+	static void	   ConCmdExec_##Name( uint32 argc, const char** argv );         \
 	static CConCmd s_cmd##Name( #Name, ConCmdExec_##Name, Description, Flags ); \
 	static void	   ConCmdExec_##Name( uint32 argc, const char** argv )
 
 #define CON_COMMAND_EXTERN( Name, FuncName, Description, Flags )       \
-	void		   FuncName( uint32 argc, const char** argv );        \
+	void		   FuncName( uint32 argc, const char** argv );         \
 	static CConCmd s_cmd##Name( #Name, FuncName, Description, Flags ); \
 	void		   FuncName( uint32 argc, const char** argv )
 
@@ -99,8 +99,8 @@ public:
 
 	virtual bool				IsCommand() const override;
 	void						SetHelpText( const char* pHelpText ) override;
-	const char*				GetName() const override;
-	virtual const char*		GetHelpText() const override;
+	const char*					GetName() const override;
+	virtual const char*			GetHelpText() const override;
 	virtual cvarDLLIdentifier_t GetDLLIdentifier() const override;
 
 	// Set/get next cvar in the global list
@@ -114,8 +114,8 @@ public:
 private:
 	bool		 bRegistered;
 	uint32		 flags;
-	const char* pName;
-	const char* pHelpText;
+	const char*	 pName;
+	const char*	 pHelpText;
 	IConCmdBase* pNext;	 // Next IConVar/IConCmds in a chain
 };
 
@@ -166,9 +166,9 @@ public:
 	virtual void	 SetParent( IConVar* pParentVar ) override;
 	virtual IConVar* GetParent() const override;
 
-	virtual int32		 GetInt() const override;
-	virtual float		 GetFloat() const override;
-	virtual bool		 GetBool() const override;
+	virtual int32		GetInt() const override;
+	virtual float		GetFloat() const override;
+	virtual bool		GetBool() const override;
 	virtual const char* GetString() const override;
 	virtual const char* GetDefault() const override;
 
@@ -188,8 +188,8 @@ private:
 	float					 maxValue;
 	int32					 intValue;
 	float					 floatValue;
-	std::string				 stringValue;
-	const char*			 pDefaultValue;
+	eastl::string			 stringValue;
+	const char*				 pDefaultValue;
 	IConVar*				 pParent;  // This either points to self or it points to the original declaration of a IConVar
 	conVarChangeCallbackFn_t pChangeCallbackFn;
 };

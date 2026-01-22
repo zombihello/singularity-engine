@@ -8,7 +8,7 @@
 TRefPtr<CStudioViewport> CStudioViewport::s_pActiveViewport;
 CThreadMutex			 CStudioViewport::s_ViewportIndexMutex;
 uint32					 CStudioViewport::s_LastViewportIndex = (uint32)-1;
-std::list<uint32>		 CStudioViewport::s_FreeViewportIndices;
+eastl::list<uint32>		 CStudioViewport::s_FreeViewportIndices;
 
 /*
 ==================

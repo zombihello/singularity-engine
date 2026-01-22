@@ -1,5 +1,5 @@
 #pragma once
-#include <vector>
+#include <EASTL/vector.h>
 
 #include "core/core.h"
 #include "studiorender/studio_vertextypes.h"
@@ -35,19 +35,19 @@ public:
 	bool SaveFile( const char* pPath );
 	void Clear();
 
-	void SetData( const std::vector<smdlVertex_t>& vertices, const std::vector<uint32>& indices, const std::vector<smdlSurface_t>& surfaces, const std::vector<std::string>& materials );
-	void SetData( std::vector<smdlVertex_t>& vertices, std::vector<uint32>& indices, std::vector<smdlSurface_t>& surfaces, std::vector<std::string>& materials );
+	void SetData( const eastl::vector<smdlVertex_t>& vertices, const eastl::vector<uint32>& indices, const eastl::vector<smdlSurface_t>& surfaces, const eastl::vector<eastl::string>& materials );
+	void SetData( eastl::vector<smdlVertex_t>& vertices, eastl::vector<uint32>& indices, eastl::vector<smdlSurface_t>& surfaces, eastl::vector<eastl::string>& materials );
 
-	const std::vector<smdlVertex_t>&  GetVertices() const;
-	const std::vector<uint32>&		  GetIndices() const;
-	const std::vector<smdlSurface_t>& GetSurfaces() const;
-	const std::vector<std::string>&	  GetMaterials() const;
+	const eastl::vector<smdlVertex_t>&	GetVertices() const;
+	const eastl::vector<uint32>&		GetIndices() const;
+	const eastl::vector<smdlSurface_t>& GetSurfaces() const;
+	const eastl::vector<eastl::string>& GetMaterials() const;
 
 private:
-	std::vector<smdlVertex_t>  vertices;
-	std::vector<uint32>		   indices;
-	std::vector<smdlSurface_t> surfaces;
-	std::vector<std::string>   materials;
+	eastl::vector<smdlVertex_t>	 vertices;
+	eastl::vector<uint32>		 indices;
+	eastl::vector<smdlSurface_t> surfaces;
+	eastl::vector<eastl::string> materials;
 };
 
 #include "smdldoc/smdl_compiled_doc.inl"

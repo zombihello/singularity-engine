@@ -6,7 +6,7 @@
 CPathArrayResult::CPathArrayResult
 ==================
 */
-CPathArrayResult::CPathArrayResult( const std::vector<std::string>& pathArray )
+CPathArrayResult::CPathArrayResult( const eastl::vector<eastl::string>& pathArray )
 	: pathArray( pathArray )
 {
 }

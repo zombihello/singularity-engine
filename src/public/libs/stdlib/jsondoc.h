@@ -1,7 +1,7 @@
 #pragma once
-#include <string>
-#include <unordered_map>
-#include <vector>
+#include <EASTL/string.h>
+#include <EASTL/vector.h>
+#include <EASTL/unordered_map.h>
 #include <rapidjson/document.h>
 
 #include "stdlib/defines.h"
@@ -10,10 +10,10 @@
 //-----------------------------------------------------------------------------
 // Forward delcarations
 //-----------------------------------------------------------------------------
-class CJsonValue;
+class CJsonObject;
 
 //-----------------------------------------------------------------------------
-// JSON object
+// JSON value
 //-----------------------------------------------------------------------------
 enum jsonValueType_t
 {
@@ -26,38 +26,6 @@ enum jsonValueType_t
 	JSONVALUE_TYPE_ARRAY
 };
 
-class CJsonObject
-{
-public:
-	CJsonObject()
-	{
-	}
-	CJsonObject( const CJsonObject& copy )
-		: valuesDict( copy.valuesDict )
-	{
-	}
-	~CJsonObject()
-	{
-		Clear();
-	}
-
-	void Clear();
-	void Copy( const CJsonObject& copy );
-
-	void		Set( const rapidjson::Value& value );
-	void		SetValue( const char* pName, const CJsonValue& value );
-	std::string AsJson( uint32 countTabs = 0 ) const;
-	CJsonValue	GetValue( const char* pName ) const;
-
-	CJsonObject& operator=( const CJsonObject& copy );
-
-private:
-	std::unordered_map<std::string, class CJsonValue> valuesDict;
-};
-
-//-----------------------------------------------------------------------------
-// JSON value
-//-----------------------------------------------------------------------------
 class CJsonValue
 {
 public:
@@ -84,28 +52,60 @@ public:
 	void SetBool( bool value );
 	void SetInt( int32 value );
 	void SetFloat( float value );
-	void SetString( const std::string& value );
+	void SetString( const eastl::string& value );
 	void SetObject( const CJsonObject& value );
-	void SetArray( const std::vector<CJsonValue>& value );
+	void SetArray( const eastl::vector<CJsonValue>& value );
 
-	bool					IsValid() const;
-	bool					IsA( jsonValueType_t type ) const;
-	bool					IsNumber() const;
-	std::string				AsJson( uint32 countTabs = 0 ) const;
-	jsonValueType_t			GetType() const;
-	bool					GetBool( bool defaultValue = false ) const;
-	float					GetNumber( float defaultValue = 0.f ) const;
-	int32					GetInt( int32 defaultValue = 0 ) const;
-	float					GetFloat( float defaultValue = 0.f ) const;
-	std::string				GetString( const std::string& defaultValue = "" ) const;
-	CJsonObject				GetObject( const CJsonObject& defaultValue = CJsonObject() ) const;
-	std::vector<CJsonValue> GetArray( const std::vector<CJsonValue>& defaultValue = std::vector<CJsonValue>() ) const;
+	bool					  IsValid() const;
+	bool					  IsA( jsonValueType_t type ) const;
+	bool					  IsNumber() const;
+	eastl::string			  AsJson( uint32 countTabs = 0 ) const;
+	jsonValueType_t			  GetType() const;
+	bool					  GetBool() const;
+	float					  GetNumber() const;
+	int32					  GetInt() const;
+	float					  GetFloat() const;
+	eastl::string			  GetString() const;
+	CJsonObject				  GetObject() const;
+	eastl::vector<CJsonValue> GetArray() const;
 
 	CJsonValue& operator=( const CJsonValue& copy );
 
 private:
 	jsonValueType_t type;
 	void*			pValue;
+};
+
+//-----------------------------------------------------------------------------
+// JSON object
+//-----------------------------------------------------------------------------
+class CJsonObject
+{
+public:
+	CJsonObject()
+	{
+	}
+	CJsonObject( const CJsonObject& copy )
+		: valuesDict( copy.valuesDict )
+	{
+	}
+	~CJsonObject()
+	{
+		Clear();
+	}
+
+	void Clear();
+	void Copy( const CJsonObject& copy );
+
+	void		  Set( const rapidjson::Value& value );
+	void		  SetValue( const char* pName, const CJsonValue& value );
+	eastl::string AsJson( uint32 countTabs = 0 ) const;
+	CJsonValue	  GetValue( const char* pName ) const;
+
+	CJsonObject& operator=( const CJsonObject& copy );
+
+private:
+	eastl::unordered_map<eastl::string, CJsonValue> valuesDict;
 };
 
 //-----------------------------------------------------------------------------
@@ -119,14 +119,14 @@ public:
 	bool LoadFromFile( const char* pPath );
 	bool LoadFromBuffer( const char* pBuffer );
 	bool SaveToFile( const char* pPath );
-	bool SaveToBuffer( std::string& buffer );
+	bool SaveToBuffer( eastl::string& buffer );
 
 	void	   SetValue( const char* pName, const CJsonValue& value );
 	CJsonValue GetValue( const char* pName ) const;
 
 private:
-	typedef std::unordered_map<std::string, CJsonValue> valuesDict_t;
-	valuesDict_t										valuesDict;
+	typedef eastl::unordered_map<eastl::string, CJsonValue> valuesDict_t;
+	valuesDict_t											valuesDict;
 };
 
 #include "stdlib/jsondoc.inl"

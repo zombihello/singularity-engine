@@ -5,7 +5,7 @@
 CMaterial::insensitiveStringHash_t::operator()
 ==================
 */
-FORCEINLINE std::size_t CMaterial::insensitiveStringHash_t::operator()( const char* pString ) const
+FORCEINLINE size_t CMaterial::insensitiveStringHash_t::operator()( const char* pString ) const
 {
 	return FastHashFromString( pString );
 }
@@ -33,7 +33,7 @@ FORCEINLINE void CMaterial::DestroyBuffers()
 	if ( !studioAPIBuffers.empty() )
 	{
 		UNIQUE_RENDER_COMMAND_ONEPARAMETER( CRemoveStudioAPIBuffersCmd,
-											std::vector<TRefPtr<IStudioAPIBuffer>>, studioAPIBuffers, std::move( studioAPIBuffers ),
+											eastl::vector<TRefPtr<IStudioAPIBuffer>>, studioAPIBuffers, eastl::move( studioAPIBuffers ),
 											{
 												studioAPIBuffers.clear();
 											} );

@@ -57,6 +57,6 @@ inherit_install_files( resourcecompiler									TARGETS core filesystem cvar tex
 install_files( resourcecompiler TARGETS RUNTIME resourcecompiler 		DESTINATION     bin/${PLATFORM_BIN_DIR}/ )
 
 # Setup install the target
-if ( INSTALL_TOOLS )
+if ( INSTALL_SDK_TOOLS )
 	install_target( resourcecompiler									DESTINATION		game )
 endif()

@@ -125,7 +125,7 @@ private:
 	char														commandArgvBuffer[COMMAND_MAX_LENGTH];
 	uint32														commandArgc;
 	const char*												pCommandArgv[COMMAND_MAX_ARGC];
-	std::unordered_map<cvarDLLIdentifier_t, IConVarsOverrider*> conVarsOverriderDict;
+	eastl::unordered_map<cvarDLLIdentifier_t, IConVarsOverrider*> conVarsOverriderDict;
 	COnWriteConCmdsToConfigFile									onWriteConCmdsToConfigFile;
 };
 
@@ -724,7 +724,7 @@ CCvar::ReadConfigFile
 void CCvar::ReadConfigFile( const char* pConfigDir, bool bWriteConfigIfNotExist /* = true */ )
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-	std::string configPath = S_Sprintf( "%s/" CVAR_CONFIG_NAME ".cfg", pConfigDir );
+	eastl::string configPath = S_Sprintf( "%s/" CVAR_CONFIG_NAME ".cfg", pConfigDir );
 	if ( g_pFileSystem->IsFileExists( configPath.c_str() ) )
 	{
 		g_pCvar->Exec( S_Sprintf( "exec %s", configPath.c_str() ).c_str() );
@@ -755,7 +755,7 @@ void CCvar::WriteConfigFile( const char* pConfigDir, bool bWriteDefaultConfig /*
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 
 	// Open file to write
-	std::string				   configPath = S_Sprintf( !bWriteDefaultConfig ? "%s/" CVAR_CONFIG_NAME ".cfg" : "%s/" CVAR_DEFAULT_CONFIG_NAME ".cfg", pConfigDir );
+	eastl::string				   configPath = S_Sprintf( !bWriteDefaultConfig ? "%s/" CVAR_CONFIG_NAME ".cfg" : "%s/" CVAR_DEFAULT_CONFIG_NAME ".cfg", pConfigDir );
 	TRefPtr<IStreamDataWriter> pFile	  = g_pFileSystem->CreateFileWriter( configPath.c_str() );
 	if ( !pFile )
 	{
@@ -767,7 +767,7 @@ void CCvar::WriteConfigFile( const char* pConfigDir, bool bWriteDefaultConfig /*
 	onWriteConCmdsToConfigFile.Broadcast( pFile );
 
 	// Write cvars
-	std::string buffer;
+	eastl::string buffer;
 	for ( IConCmdBase* pVar = g_pCvar->GetCommands(); pVar; pVar = pVar->GetNext() )
 	{
 		// Skip commands and cvars that not have FCVAR_ARCHIVE

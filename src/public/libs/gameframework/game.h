@@ -61,7 +61,7 @@ protected:
 	void AddAppSystem( const char* pModuleName, const char* pInterfaceName, gameAppSystemOrder_t order );
 
 private:
-	std::vector<gameAppSystemInfo_t> appSystems;
+	eastl::vector<gameAppSystemInfo_t> appSystems;
 };
 
 #include "gameframework/game.inl"
