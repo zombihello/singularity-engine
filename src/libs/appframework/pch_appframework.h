@@ -1,4 +1,4 @@
-#include <string>
+#include <EASTL/string.h>
 
 #include "stdlib/template.h"
 #include "stdlib/strtools.h"

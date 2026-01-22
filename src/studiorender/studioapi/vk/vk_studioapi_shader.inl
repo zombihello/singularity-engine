@@ -35,7 +35,7 @@ FORCEINLINE const VkPipelineShaderStageCreateInfo& CStudioAPIShaderVk::GetVkPipe
 CStudioAPIShaderVk::GetEntryPointName
 ==================
 */
-FORCEINLINE const std::string& CStudioAPIShaderVk::GetEntryPointName() const
+FORCEINLINE const eastl::string& CStudioAPIShaderVk::GetEntryPointName() const
 {
 	return entryPointName;
 }
@@ -55,7 +55,7 @@ FORCEINLINE const studioAPIDescriptorSetLayoutVkDict_t& CStudioAPIShaderVk::GetD
 CStudioAPIShaderVk::GetVkPushConstantRanges
 ==================
 */
-FORCEINLINE const std::vector<VkPushConstantRange>& CStudioAPIShaderVk::GetVkPushConstantRanges() const
+FORCEINLINE const eastl::vector<VkPushConstantRange>& CStudioAPIShaderVk::GetVkPushConstantRanges() const
 {
 	return vkPushConstantRanges;
 }

@@ -29,7 +29,7 @@ ConvTextToSENTEntityVarType
 */
 static sentEntityDescVarType_t ConvTextToSENTEntityVarType( const char* pText )
 {
-	std::string normalizedText = pText;
+	eastl::string normalizedText = pText;
 	S_Strlwr( (char*)normalizedText.c_str() );
 
 	for ( uint32 index = 0; index < ARRAYSIZE( s_pVarTypeNames ); ++index )
@@ -71,7 +71,7 @@ bool CSENTSourceEntityDescDoc::SaveFile( const char* pPath )
 		return false;
 	}
 
-	std::string buffer;
+	eastl::string buffer;
 	buffer += "{\n";
 
 	// Write an output directory
@@ -84,7 +84,7 @@ bool CSENTSourceEntityDescDoc::SaveFile( const char* pPath )
 		for ( uint32 componentIdx = 0, numComponents = (uint32)components.size(); componentIdx < numComponents; ++componentIdx )
 		{
 			const CSENTEntityDescComponent&		   component = components[componentIdx];
-			const std::vector<CSENTEntityDescVar>& vars		 = component.GetVars();
+			const eastl::vector<CSENTEntityDescVar>& vars		 = component.GetVars();
 
 			buffer += "\t\t{\n";
 			buffer += S_Sprintf( "\t\t\t\"type\": \"%s\",\n", component.GetType() );
@@ -263,7 +263,7 @@ bool CSENTSourceEntityDescDoc::GrabData( const CJsonDoc& jsonDoc )
 		{
 			if ( jsonOutputDir.IsA( JSONVALUE_TYPE_STRING ) )
 			{
-				std::string outputDir = jsonOutputDir.GetString();
+				eastl::string outputDir = jsonOutputDir.GetString();
 				if ( outputDir.empty() )
 				{
 					Error( "SENTDoc: Invalid 'output-dir', an output directory can't be empty" );
@@ -292,7 +292,7 @@ bool CSENTSourceEntityDescDoc::GrabData( const CJsonDoc& jsonDoc )
 		{
 			if ( jsonComponentsVar.IsA( JSONVALUE_TYPE_ARRAY ) )
 			{
-				std::vector<CJsonValue> jsonComponentsArray = jsonComponentsVar.GetArray();
+				eastl::vector<CJsonValue> jsonComponentsArray = jsonComponentsVar.GetArray();
 				for ( uint32 componentIdx = 0, numComponents = (uint32)jsonComponentsArray.size(); componentIdx < numComponents; ++componentIdx )
 				{
 					const CJsonValue&		 jsonComponentVar = jsonComponentsArray[componentIdx];
@@ -436,7 +436,7 @@ bool CSENTSourceEntityDescDoc::GrabValueAsMatrix( const CJsonValue& jsonValue, m
 CSENTSourceEntityDescDoc::GrabValueAsString
 ==================
 */
-bool CSENTSourceEntityDescDoc::GrabValueAsString( const CJsonValue& jsonValue, std::string& value ) const
+bool CSENTSourceEntityDescDoc::GrabValueAsString( const CJsonValue& jsonValue, eastl::string& value ) const
 {
 	if ( !jsonValue.IsValid() || !jsonValue.IsA( JSONVALUE_TYPE_STRING ) )
 	{
@@ -461,7 +461,7 @@ bool CSENTSourceEntityDescDoc::GrabValueAsComponent( const CJsonValue& jsonValue
 
 	bool		bResult	   = true;
 	CJsonObject jsonObject = jsonValue.GetObject();
-	std::string type	   = jsonObject.GetValue( "type" ).GetString();
+	eastl::string type	   = jsonObject.GetValue( "type" ).GetString();
 	if ( type.empty() )
 	{
 		Error( "SENTDoc: Invalid 'type' in a component" );
@@ -474,7 +474,7 @@ bool CSENTSourceEntityDescDoc::GrabValueAsComponent( const CJsonValue& jsonValue
 	{
 		if ( jsonVars.IsA( JSONVALUE_TYPE_ARRAY ) )
 		{
-			std::vector<CJsonValue> jsonArray = jsonVars.GetArray();
+			eastl::vector<CJsonValue> jsonArray = jsonVars.GetArray();
 			for ( uint32 varIdx = 0, numVars = (uint32)jsonArray.size(); varIdx < numVars; ++varIdx )
 			{
 				const CJsonValue&  jsonVar = jsonArray[varIdx];
@@ -513,8 +513,8 @@ bool CSENTSourceEntityDescDoc::GrabValueAsVar( const CJsonValue& jsonValue, CSEN
 
 	bool		bResult	   = true;
 	CJsonObject jsonObject = jsonValue.GetObject();
-	std::string name	   = jsonObject.GetValue( "name" ).GetString();
-	std::string type	   = jsonObject.GetValue( "type" ).GetString();
+	eastl::string name	   = jsonObject.GetValue( "name" ).GetString();
+	eastl::string type	   = jsonObject.GetValue( "type" ).GetString();
 	if ( name.empty() )
 	{
 		Error( "SENTDoc: Invalid 'name' in a variable" );
@@ -631,7 +631,7 @@ bool CSENTSourceEntityDescDoc::GrabValueAsVar( const CJsonValue& jsonValue, CSEN
 
 	case SENT_ENTITY_DESC_VAR_TYPE_STRING:
 	{
-		std::string value;
+		eastl::string value;
 		if ( !GrabValueAsString( jsonObject.GetValue( "value" ), value ) )
 		{
 			Error( "SENTDoc: Invalid value in '%s', must be string type", name.c_str() );

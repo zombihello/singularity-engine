@@ -94,7 +94,7 @@ EcsReadData
 ==================
 */
 template<>
-FORCEINLINE void EcsReadData<std::string>( std::string& data, const CSENTEntityDescVar& sentVar, const std::string& defaultValue /*= ""*/ )
+FORCEINLINE void EcsReadData<eastl::string>( eastl::string& data, const CSENTEntityDescVar& sentVar, const eastl::string& defaultValue /*= ""*/ )
 {
 	data = sentVar.GetStringValue( defaultValue.c_str() );
 }

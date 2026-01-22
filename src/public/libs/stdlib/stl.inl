@@ -5,7 +5,7 @@
 stlInsensitiveStringHash_t::operator()
 ==================
 */
-FORCEINLINE std::size_t stlInsensitiveStringHash_t::operator()( const char* pString ) const
+FORCEINLINE size_t stlInsensitiveStringHash_t::operator()( const char* pString ) const
 {
 	return FastHashFromString( pString );
 }

@@ -95,7 +95,7 @@ FORCEINLINE CStudioAPISemaphoreVk* CStudioAPINamedSemaphoreVk::GetCurrentSemapho
 CStudioAPINamedSemaphoreVk::GetName
 ==================
 */
-FORCEINLINE const std::string& CStudioAPINamedSemaphoreVk::GetName() const
+FORCEINLINE const eastl::string& CStudioAPINamedSemaphoreVk::GetName() const
 {
 	return name;
 }

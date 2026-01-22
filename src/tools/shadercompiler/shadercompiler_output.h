@@ -1,7 +1,7 @@
 #pragma once
-#include <string>
-#include <vector>
-#include <unordered_map>
+#include <EASTL/string.h>
+#include <EASTL/vector.h>
+#include <EASTL/unordered_map.h>
 
 #include "tools/shadercompiler/ishadercompiler_backend.h"
 #include "shadercache/shadercache.h"
@@ -19,12 +19,12 @@ public:
 
 	CShaderCompilerOutput();
 
-	FORCEINLINE const std::vector<byte>& GetBytecode() const { return bytecode; }
-	FORCEINLINE const std::string& GetErrorMsg() const { return errorMsg; }
-	FORCEINLINE const std::vector<byte>& GetReflectionData() const { return reflectionData; }
+	FORCEINLINE const eastl::vector<byte>& GetBytecode() const { return bytecode; }
+	FORCEINLINE const eastl::string& GetErrorMsg() const { return errorMsg; }
+	FORCEINLINE const eastl::vector<byte>& GetReflectionData() const { return reflectionData; }
 
 private:
-	std::vector<byte> bytecode;
-	std::string		  errorMsg;
-	std::vector<byte> reflectionData;
+	eastl::vector<byte> bytecode;
+	eastl::string		errorMsg;
+	eastl::vector<byte> reflectionData;
 };

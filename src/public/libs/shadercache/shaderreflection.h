@@ -1,7 +1,7 @@
 #pragma once
-#include <string>
-#include <vector>
-#include <unordered_map>
+#include <EASTL/string.h>
+#include <EASTL/vector.h>
+#include <EASTL/unordered_map.h>
 
 #include "stdlib/types.h"
 #include "stdlib/istreamdata.h"
@@ -32,7 +32,7 @@ struct shaderReflectionVar_t
 	void Serialize( IStreamDataWriter* pStreamWriter );
 	void Deserialize( IStreamDataReader* pStreamReader );
 
-	std::string				  name;
+	eastl::string			  name;
 	shaderReflectionVarType_t type;
 	uint32					  size;
 	uint64					  offset;
@@ -43,10 +43,10 @@ struct shaderReflectionConstantBuffer_t
 	void Serialize( IStreamDataWriter* pStreamWriter );
 	void Deserialize( IStreamDataReader* pStreamReader );
 
-	std::string						   name;
-	uint64							   size;
-	uint32							   bindingIndex;
-	std::vector<shaderReflectionVar_t> vars;
+	eastl::string						 name;
+	uint64								 size;
+	uint32								 bindingIndex;
+	eastl::vector<shaderReflectionVar_t> vars;
 };
 
 struct shaderReflectionPushConstantBuffer_t
@@ -54,9 +54,9 @@ struct shaderReflectionPushConstantBuffer_t
 	void Serialize( IStreamDataWriter* pStreamWriter );
 	void Deserialize( IStreamDataReader* pStreamReader );
 
-	std::string						   name;
-	uint64							   size;
-	std::vector<shaderReflectionVar_t> vars;
+	eastl::string						 name;
+	uint64								 size;
+	eastl::vector<shaderReflectionVar_t> vars;
 };
 
 struct shaderReflectionPushConstantRange_t
@@ -70,9 +70,9 @@ struct shaderReflectionStorageBuffer_t
 	void Serialize( IStreamDataWriter* pStreamWriter );
 	void Deserialize( IStreamDataReader* pStreamReader );
 
-	std::string name;
-	uint64		size;
-	uint32		bindingIndex;
+	eastl::string name;
+	uint64		  size;
+	uint32		  bindingIndex;
 };
 
 struct shaderReflectionImageSampler_t
@@ -80,7 +80,7 @@ struct shaderReflectionImageSampler_t
 	void Serialize( IStreamDataWriter* pStreamWriter );
 	void Deserialize( IStreamDataReader* pStreamReader );
 
-	std::string					   name;
+	eastl::string				   name;
 	uint32						   bindingIndex;
 	studioAPIShaderDimensionType_t dimensionType;
 	uint32						   arraySize;
@@ -92,12 +92,12 @@ struct shaderReflectionDescriptorSet_t
 	void Deserialize( IStreamDataReader* pStreamReader );
 	bool IsEmpty() const;
 
-	std::unordered_map<uint32, shaderReflectionConstantBuffer_t> constantBuffersDict;
-	std::unordered_map<uint32, shaderReflectionStorageBuffer_t>	 storageBuffersDict;
-	std::unordered_map<uint32, shaderReflectionImageSampler_t>	 sampledImagesDict;
-	std::unordered_map<uint32, shaderReflectionImageSampler_t>	 storageImagesDict;
-	std::unordered_map<uint32, shaderReflectionImageSampler_t>	 separateTexturesDict;
-	std::unordered_map<uint32, shaderReflectionImageSampler_t>	 separateSamplersDict;
+	eastl::unordered_map<uint32, shaderReflectionConstantBuffer_t> constantBuffersDict;
+	eastl::unordered_map<uint32, shaderReflectionStorageBuffer_t>  storageBuffersDict;
+	eastl::unordered_map<uint32, shaderReflectionImageSampler_t>   sampledImagesDict;
+	eastl::unordered_map<uint32, shaderReflectionImageSampler_t>   storageImagesDict;
+	eastl::unordered_map<uint32, shaderReflectionImageSampler_t>   separateTexturesDict;
+	eastl::unordered_map<uint32, shaderReflectionImageSampler_t>   separateSamplersDict;
 };
 
 //-----------------------------------------------------------------------------
@@ -118,15 +118,15 @@ public:
 	void AddSeparateSampler( const char* pName, uint32 bindingIndex, uint32 descriptorSetIndex, studioAPIShaderDimensionType_t dimensionType, uint32 arraySize );
 	void AddStorageImage( const char* pName, uint32 bindingIndex, uint32 descriptorSetIndex, studioAPIShaderDimensionType_t dimensionType, uint32 arraySize );
 
-	bool													 IsFreeBindingIndex( uint32 bindingIndex, uint32 descriptorSetIndex ) const;
-	const std::vector<shaderReflectionDescriptorSet_t>&		 GetDescriptorSets() const;
-	const std::vector<shaderReflectionPushConstantBuffer_t>& GetPushConstantBuffers() const;
-	const std::vector<shaderReflectionPushConstantRange_t>&	 GetPushConstantRanges() const;
+	bool													   IsFreeBindingIndex( uint32 bindingIndex, uint32 descriptorSetIndex ) const;
+	const eastl::vector<shaderReflectionDescriptorSet_t>&	   GetDescriptorSets() const;
+	const eastl::vector<shaderReflectionPushConstantBuffer_t>& GetPushConstantBuffers() const;
+	const eastl::vector<shaderReflectionPushConstantRange_t>&  GetPushConstantRanges() const;
 
 private:
-	std::vector<shaderReflectionDescriptorSet_t>	  descriptorSets;
-	std::vector<shaderReflectionPushConstantBuffer_t> pushConstantBuffers;
-	std::vector<shaderReflectionPushConstantRange_t>  pushConstantRanges;
+	eastl::vector<shaderReflectionDescriptorSet_t>		descriptorSets;
+	eastl::vector<shaderReflectionPushConstantBuffer_t> pushConstantBuffers;
+	eastl::vector<shaderReflectionPushConstantRange_t>	pushConstantRanges;
 };
 
 #include "shadercache/shaderreflection.inl"

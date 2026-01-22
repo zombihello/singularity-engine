@@ -152,7 +152,7 @@ bool CStudioAPISwapChainVk::Create( windowHandle_t windowHandle, uint32 width, u
 			bool   bSurfaceFormatFound = false;
 			uint32 surfaceFormatCount  = 0;
 			vkGetPhysicalDeviceSurfaceFormatsKHR( g_StudioAPIVk.GetDevice().GetVkPhysicalDevice(), vkSurface, &surfaceFormatCount, NULL );
-			std::vector<VkSurfaceFormatKHR> availableSurfaceFormats( surfaceFormatCount );
+			eastl::vector<VkSurfaceFormatKHR> availableSurfaceFormats( surfaceFormatCount );
 			vkGetPhysicalDeviceSurfaceFormatsKHR( g_StudioAPIVk.GetDevice().GetVkPhysicalDevice(), vkSurface, &surfaceFormatCount, availableSurfaceFormats.data() );
 
 			// If exist in array only one item with format VK_FORMAT_UNDEFINED, it mean what we can select any format (we are lucky!)
@@ -246,7 +246,7 @@ bool CStudioAPISwapChainVk::Create( windowHandle_t windowHandle, uint32 width, u
 	{
 		uint32 presentModeCount = 0;
 		vkGetPhysicalDeviceSurfacePresentModesKHR( g_StudioAPIVk.GetDevice().GetVkPhysicalDevice(), vkSurface, &presentModeCount, NULL );
-		std::vector<VkPresentModeKHR> availablePresentModes( presentModeCount );
+		eastl::vector<VkPresentModeKHR> availablePresentModes( presentModeCount );
 		vkGetPhysicalDeviceSurfacePresentModesKHR( g_StudioAPIVk.GetDevice().GetVkPhysicalDevice(), vkSurface, &presentModeCount, availablePresentModes.data() );
 
 		// Try to find supported present mode 'VK_PRESENT_MODE_MAILBOX_KHR'
@@ -344,7 +344,7 @@ bool CStudioAPISwapChainVk::Create( windowHandle_t windowHandle, uint32 width, u
 
 	// Initialize all swap chain images
 	uint32				 numImages = 0;
-	std::vector<VkImage> vkImages;
+	eastl::vector<VkImage> vkImages;
 	vkGetSwapchainImagesKHR( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), vkSwapChain, &numImages, NULL );
 	vkImages.resize( numImages );
 	vkGetSwapchainImagesKHR( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), vkSwapChain, &numImages, vkImages.data() );

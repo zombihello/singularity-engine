@@ -55,7 +55,7 @@ private:
 		vec3_t			   vector3DValue;
 		vec4_t			   vector4DValue;
 		matrix_t		   matrixValue;
-		std::string		   stringValue;
+		eastl::string		   stringValue;
 		ITexture*		   pTextureValue;
 		TRefPtr<CMaterial> pMaterialValue;
 	};

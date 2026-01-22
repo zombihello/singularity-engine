@@ -38,7 +38,8 @@ set_source_files_properties( PUBLIC_FILES PROPERTIES    SKIP_PRECOMPILE_HEADERS 
 #
 # Options
 #
-option( INSTALL_TOOLS                                   "Install tools" ON )
+option( INSTALL_SDK_TOOLS                               "Install sdk tools" ON )
+option( INSTALL_DEV_TOOLS                               "Install dev tools" ON )
 option( INSTALL_THIRDPARTY_TOOLS                        "Install third-party tools" ON )
 
 

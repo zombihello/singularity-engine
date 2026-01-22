@@ -5,8 +5,11 @@ cmake_minimum_required( VERSION 3.19 )
 #
 find_package( RapidJson REQUIRED )
 find_package( GLM REQUIRED )
+find_package( EASTL REQUIRED )
 
-set( THIRDPARTY_INCLUDES		${RAPIDJSON_INCLUDE} ${GLM_INCLUDE} )
+set( THIRDPARTY_INCLUDES		${RAPIDJSON_INCLUDE} ${GLM_INCLUDE} ${EASTL_INCLUDE} )
+set( THIRDPARTY_LIBS			${EASTL_LIBS} )
+set( THIRDPARTY_VISUALIZERS		${EASTL_VISUALIZERS} )
 
 
 #
@@ -34,18 +37,20 @@ filter_platform_files( GENERATED_FILES 	${PLATFORM_SRC_DIR} )
 #
 # Source groups
 #
+source_group( "visualizers"										FILES	${THIRDPARTY_VISUALIZERS} )
 source_group( TREE "${SRC_DIR}"         PREFIX "src"            FILES   ${SRC_FILES} )
 source_group( TREE "${PUBLIC_SRC_DIR}"  PREFIX "public"         FILES   ${PUBLIC_SRC_FILES} )
 source_group( TREE "${GENERATED_DIR}"   PREFIX "generated"      FILES   ${GENERATED_FILES} )
 
 
-set( FULL_SRC_FILES                                         ${SRC_FILES} ${PUBLIC_SRC_FILES} ${GENERATED_FILES} )
+set( FULL_SRC_FILES                                         ${SRC_FILES} ${PUBLIC_SRC_FILES} ${GENERATED_FILES} ${THIRDPARTY_VISUALIZERS} )
 add_library( stdlib STATIC 	                      	        ${FULL_SRC_FILES} )
 target_precompile_headers( stdlib PRIVATE 				    pch_stdlib.h )
 set_target_properties( stdlib PROPERTIES FOLDER             Engine/Libraries )
 set_target_properties( stdlib PROPERTIES PREFIX 		    "" )
 
 target_include_directories( stdlib PUBLIC					${THIRDPARTY_INCLUDES} )
+target_link_libraries( stdlib PUBLIC 						${THIRDPARTY_LIBS} )
 add_common_target_defines( stdlib )
 
 
@@ -55,3 +60,4 @@ add_common_target_defines( stdlib )
 # Linceses
 install_files( stdlib FILES ${RAPIDJSON_INSTALL_LICENSES}    DESTINATION 	licenses/rapidjson/ )
 install_files( stdlib FILES ${GLM_INSTALL_LICENSES}          DESTINATION 	licenses/glm/ )
+install_files( stdlib FILES ${EASTL_INSTALL_LICENSES}         DESTINATION 	licenses/eastl/ )

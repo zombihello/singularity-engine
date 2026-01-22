@@ -170,5 +170,5 @@ void CEcsSystemQuadInit::OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity, const
 	ecsComponentStudioRenderObject_t studioRenderObjectComponent;
 	studioRenderObjectComponent.pStudioRenderObject = studioRender.pStudioRender->CreateQuadRenderObject( *quad.pMaterial, quad.pVertexBuffer, quad.pIndexBuffer );
 	studioRender.pStudioRender->RegisterObject( studioRenderObjectComponent.pStudioRenderObject );
-	ecsWorld.SetComponent( entity, std::move( studioRenderObjectComponent ) );
+	ecsWorld.SetComponent( entity, eastl::move( studioRenderObjectComponent ) );
 }

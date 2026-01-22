@@ -1,6 +1,6 @@
 #pragma once
-#include <string>
-#include <vector>
+#include <EASTL/string.h>
+#include <EASTL/vector.h>
 
 #include "filesystem/ifilesystem.h"
 #include "filesystem/searchpath.h"
@@ -88,7 +88,7 @@ private:
 	// So if it finds //GAME/cfg/config.cfg, set pointer pFilePath to the begin of file path, set pointer pPathID
 	// to the begin of path ID and set length of pPathID into lengthPathID
 	void ParsePathID( const char* pPath, const char*& pFilePath, const char*& pPathID, uint32& lengthPathID ) const;
-	void ComputeFullPath( const char* pFilePath, const CSearchPath* pSearchPath, std::string& destPath ) const;
+	void ComputeFullPath( const char* pFilePath, const CSearchPath* pSearchPath, eastl::string& destPath ) const;
 
-	std::vector<CSearchPath> searchPaths;
+	eastl::vector<CSearchPath> searchPaths;
 };

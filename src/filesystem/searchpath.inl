@@ -25,7 +25,7 @@ FORCEINLINE void CSearchPath::SetPath( const char* pNewPath )
 CSearchPath::GetPathID
 ==================
 */
-FORCEINLINE const std::string& CSearchPath::GetPathID() const
+FORCEINLINE const eastl::string& CSearchPath::GetPathID() const
 {
 	return pathID;
 }
@@ -35,7 +35,7 @@ FORCEINLINE const std::string& CSearchPath::GetPathID() const
 CSearchPath::GetPath
 ==================
 */
-FORCEINLINE const std::string& CSearchPath::GetPath() const
+FORCEINLINE const eastl::string& CSearchPath::GetPath() const
 {
 	return path;
 }

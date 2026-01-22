@@ -1,5 +1,5 @@
 #pragma once
-#include <unordered_map>
+#include <EASTL/unordered_map.h>
 
 #include "studiorender/studioapi/vk/vk_studioapi_delegates.h"
 #include "studiorender/studioapi/vk/vk_studioapi_cmdcontext.h"
@@ -85,17 +85,17 @@ private:
 
 	static void OndRenderPipelineDeleted( void* pUserData, CStudioAPIRenderPipelineVk* pRenderPipeline );
 
-	bool																	bScissorEnabled;
-	bool																	bDirtyVertexBuffers;
-	bool																	bDirtyIndexBuffer;
-	VkViewport																vkViewport;
-	VkRect2D																vkScissor;
-	CStudioAPICmdContextVk&													cmdContext;
-	TRefPtr<CStudioAPIRenderPipelineVk>										pCurrentRenderPipeline;
-	CStudioAPIDescriptorStateRenderVk*										pCurrentRenderDescriptorState;
-	indexBuffer_t															indexBuffer;
-	vertexBuffer_t															vertexBuffers[STUDIOAPI_VK_MAX_VERTEX_ELEMENT_COUNT];
-	std::unordered_map<CStudioAPIRenderPipelineVk*, descriptorStateCache_t> descriptorStatesDict;
+	bool																	  bScissorEnabled;
+	bool																	  bDirtyVertexBuffers;
+	bool																	  bDirtyIndexBuffer;
+	VkViewport																  vkViewport;
+	VkRect2D																  vkScissor;
+	CStudioAPICmdContextVk&													  cmdContext;
+	TRefPtr<CStudioAPIRenderPipelineVk>										  pCurrentRenderPipeline;
+	CStudioAPIDescriptorStateRenderVk*										  pCurrentRenderDescriptorState;
+	indexBuffer_t															  indexBuffer;
+	vertexBuffer_t															  vertexBuffers[STUDIOAPI_VK_MAX_VERTEX_ELEMENT_COUNT];
+	eastl::unordered_map<CStudioAPIRenderPipelineVk*, descriptorStateCache_t> descriptorStatesDict;
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_pendingstate.inl"

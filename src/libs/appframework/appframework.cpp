@@ -101,7 +101,7 @@ bool CApplication::PostInit()
 #if ENABLE_LOGGING
 	if ( pLogFileName && S_Strlen( pLogFileName ) > 0 && ( DEBUG || CommandLine()->HasParam( "log" ) ) )
 	{
-		std::string logFilePath = S_Sprintf( "//BASE_PATH/logs/%s.log", pLogFileName );
+		eastl::string logFilePath = S_Sprintf( "//BASE_PATH/logs/%s.log", pLogFileName );
 		pLogOutputFile			= new CLogOutputFile( logFilePath.c_str() );
 		CrashDump_AddLogFile( logFilePath.c_str() );
 		Logger()->AddOutput( pLogOutputFile );

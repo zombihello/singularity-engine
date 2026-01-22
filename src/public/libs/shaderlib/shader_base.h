@@ -16,7 +16,7 @@
 		static const char*				  s_pName		= #Name;                                                                                  \
 		static uint32					  s_Flags		= Flags;                                                                                  \
 		static uint32					  s_NumBuffers	= 0;                                                                                      \
-		static std::vector<shaderParam_t> s_ShaderParams;                                                                                         \
+		static eastl::vector<shaderParam_t> s_ShaderParams;                                                                                         \
 		class CShaderParam                                                                                                                        \
 		{                                                                                                                                         \
 		public:                                                                                                                                   \

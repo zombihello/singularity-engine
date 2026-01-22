@@ -224,7 +224,7 @@ void CStudioAPISyncMgrVk::WaitFrameInFlight( uint32 indexFrameInFlight )
 	PROFILE_TAG( "Frame In Flight", indexFrameInFlight )
 
 	// Wait until the current frame in-flight will be available
-	std::list<CStudioAPIFenceVk*>& currentFrameInFlightFences = frameInFlightFences[indexFrameInFlight];
+	eastl::list<CStudioAPIFenceVk*>& currentFrameInFlightFences = frameInFlightFences[indexFrameInFlight];
 	for ( auto it = currentFrameInFlightFences.begin(), itEnd = currentFrameInFlightFences.end(); it != itEnd; ++it )
 	{
 		// Wait a fence if it isn't signaled
@@ -241,7 +241,7 @@ void CStudioAPISyncMgrVk::WaitFrameInFlight( uint32 indexFrameInFlight )
 	currentFrameInFlightFences.clear();
 
 	// Free all pending fences
-	std::list<CStudioAPIFenceVk*>& currentPendingFreeFences = pendingFreeFences[indexFrameInFlight];
+	eastl::list<CStudioAPIFenceVk*>& currentPendingFreeFences = pendingFreeFences[indexFrameInFlight];
 	for ( auto it = currentPendingFreeFences.begin(), itEnd = currentPendingFreeFences.end(); it != itEnd; ++it )
 	{
 		// Reset a fence and add the one into the list of free fences
@@ -252,7 +252,7 @@ void CStudioAPISyncMgrVk::WaitFrameInFlight( uint32 indexFrameInFlight )
 	currentPendingFreeFences.clear();
 
 	// Free all pending semaphores
-	std::list<CStudioAPISemaphoreVk*>& currentPendingFreeSemaphores = pendingFreeSemaphores[indexFrameInFlight];
+	eastl::list<CStudioAPISemaphoreVk*>& currentPendingFreeSemaphores = pendingFreeSemaphores[indexFrameInFlight];
 	for ( auto it = currentPendingFreeSemaphores.begin(), itEnd = currentPendingFreeSemaphores.end(); it != itEnd; ++it )
 	{
 		// Reset a semaphore and add the one into the list of free semaphores

@@ -32,7 +32,7 @@ bool CParserTokenStream::PopToken( parserToken_t& token )
 	// Get token
 	if ( readPosition < tokens.size() )
 	{
-		token = std::forward<parserToken_t>( tokens[readPosition] );
+		token = eastl::forward<parserToken_t>( tokens[readPosition] );
 		++readPosition;
 		return true;
 	}
@@ -94,7 +94,7 @@ bool CParserTokenStream::ExtractBodyTokens( CParserTokenStream& stream, char ope
 		}
 
 		// Push token to output stream
-		stream.PushToken( std::forward<parserToken_t>( token ) );
+		stream.PushToken( eastl::forward<parserToken_t>( token ) );
 	}
 
 	// Error, not able to extract code from current block
@@ -144,7 +144,7 @@ bool CParserTokenStream::ExtractInitTokens( CParserTokenStream& stream, char ini
 
 		// Push token to output stream
 		tokenID = token.tokenID;
-		stream.PushToken( std::forward<parserToken_t>( token ) );
+		stream.PushToken( eastl::forward<parserToken_t>( token ) );
 
 	} while ( tokenID != delimiterToken );
 

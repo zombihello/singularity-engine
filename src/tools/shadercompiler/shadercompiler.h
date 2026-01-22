@@ -1,6 +1,6 @@
 #pragma once
-#include <string>
-#include <vector>
+#include <EASTL/string.h>
+#include <EASTL/vector.h>
 
 #include "stdlib/types.h"
 #include "core/memory.h"
@@ -25,29 +25,29 @@ struct shaderFlag_t
 	{
 	}
 
-	std::string name;
-	int32		minValue;
-	int32		maxValue;
-	bool		bSetDefault;
-	int32		defaultValue;
+	eastl::string name;
+	int32		  minValue;
+	int32		  maxValue;
+	bool		  bSetDefault;
+	int32		  defaultValue;
 };
 
 struct shaderDefine_t
 {
-	std::string name;
-	std::string value;
+	eastl::string name;
+	eastl::string value;
 };
 
 struct shader_t
 {
 	void CalcNumFlagCombos();
 
-	uint32						numFlagCombos;
-	studioAPIShaderType_t		type;
-	std::string					source;
-	std::string					mainFunc;
-	std::vector<shaderFlag_t>	flags;
-	std::vector<shaderDefine_t> defines;
+	uint32						  numFlagCombos;
+	studioAPIShaderType_t		  type;
+	eastl::string				  source;
+	eastl::string				  mainFunc;
+	eastl::vector<shaderFlag_t>	  flags;
+	eastl::vector<shaderDefine_t> defines;
 };
 
 //-----------------------------------------------------------------------------

@@ -76,7 +76,7 @@ private:
 
 #if STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
 	mutable uint64												memoryUsage;
-	mutable std::unordered_map<VmaAllocation, allocationInfo_t> allocationDict;
+	mutable eastl::unordered_map<VmaAllocation, allocationInfo_t> allocationDict;
 #endif	// STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
 	VmaAllocator		vmaAllocator;
 	mutable cmdBuffer_t pendingFreeCmdBuffers[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];

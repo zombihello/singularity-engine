@@ -22,7 +22,7 @@ public:
 	}
 
 	FORCEINLINE bool  HasError() const { return bHasError; }
-	FORCEINLINE const std::string& GetBuffer() const { return buffer; }
+	FORCEINLINE const eastl::string& GetBuffer() const { return buffer; }
 
 private:
 	enum ecsStructType_t
@@ -33,18 +33,18 @@ private:
 
 	void		GenerateHeader( CEcsStubModule* pEcsStubModule );
 	void		GenerateSource( CEcsStubModule* pEcsStubModule );
-	void		GenerateUsings( const std::vector<TRefPtr<CEcsStubUsing>>& ecsStubUsings );
-	void		GenerateStructs( const std::vector<TRefPtr<CEcsStubDataType>>& ecsStubDataTypes, ecsStructType_t structsType );
-	void		GenerateSystems( const std::vector<TRefPtr<CEcsStubSystem>>& ecsStubSystems );
+	void		GenerateUsings( const eastl::vector<TRefPtr<CEcsStubUsing>>& ecsStubUsings );
+	void		GenerateStructs( const eastl::vector<TRefPtr<CEcsStubDataType>>& ecsStubDataTypes, ecsStructType_t structsType );
+	void		GenerateSystems( const eastl::vector<TRefPtr<CEcsStubSystem>>& ecsStubSystems );
 	void		GenerateRegistrar( CEcsStubModule* pEcsStubModule );
-	std::string GenerateRegistrarConstructor( CEcsStubModule* pEcsStubModule );
-	std::string GenerateRegistrarDestructor( CEcsStubModule* pEcsStubModule );
+	eastl::string GenerateRegistrarConstructor( CEcsStubModule* pEcsStubModule );
+	eastl::string GenerateRegistrarDestructor( CEcsStubModule* pEcsStubModule );
 	void		GenerateImplementationEcsReadDataFuncs( CEcsStubModule* pEcsStubModule );
 	void		GenerateImplementationEcsFactories( CEcsStubModule* pEcsStubModule );
 	void		GenerateImplementationEcsReflection( CEcsStubModule* pEcsStubModule );
-	FORCEINLINE std::string GetStringWithUpperFirstChar( const char* pString ) const
+	FORCEINLINE eastl::string GetStringWithUpperFirstChar( const char* pString ) const
 	{
-		std::string result = pString;
+		eastl::string result = pString;
 		if ( !result.empty() )
 		{
 			result[0] = S_ToUpper( result[0] );
@@ -53,5 +53,5 @@ private:
 	}
 
 	bool		bHasError;
-	std::string buffer;
+	eastl::string buffer;
 };

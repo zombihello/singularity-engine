@@ -40,13 +40,13 @@ public:
 	studioAPITextureType_t			GetType() const;
 	uint32							GetNumSourcePaths() const;
 	const char*					GetSourcePath( uint32 sourcePathIdx );
-	const std::vector<std::string>& GetSourcePaths() const;
+	const eastl::vector<eastl::string>& GetSourcePaths() const;
 	uint32							GetMaxAnisotropy() const;
 	const char*					GetOutputDir() const;
 
 private:
 	// Is valid source paths number for a texture type
-	bool IsValidNumSourcePaths( studioAPITextureType_t type, uint32 numSourcePaths, std::string& validateMsg ) const;
+	bool IsValidNumSourcePaths( studioAPITextureType_t type, uint32 numSourcePaths, eastl::string& validateMsg ) const;
 
 	bool						  bGenerateMipMaps;
 	studioAPITextureType_t		  type;
@@ -56,8 +56,8 @@ private:
 	studioAPISamplerFilter_t	  filter;
 	studioAPIPixelFormat_t		  pixelFormat;
 	uint32						  maxAnisotropy;
-	std::string					  outputDir;
-	std::vector<std::string>	  sourcePaths;
+	eastl::string					  outputDir;
+	eastl::vector<eastl::string>	  sourcePaths;
 	static studioAPIPixelFormat_t defaultPixelFormat;
 };
 

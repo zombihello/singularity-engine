@@ -63,7 +63,7 @@ CrashDump_AddLogFile
 */
 void CrashDump_AddLogFile( const char* pPath )
 {
-	std::string absolutePath;
+	eastl::string absolutePath;
 	S_MakeAbsolutePath( pPath, absolutePath, "", false );
 	BT_AddLogFile( absolutePath.c_str() );
 }

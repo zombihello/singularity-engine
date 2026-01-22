@@ -284,7 +284,7 @@ studioAPIMemoryStatsVk_t CStudioAPIMemoryMgrVk::GetStats() const
 #if STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
 	// Get heap budgets
 	const VkPhysicalDeviceMemoryProperties& vkPhysicalDeviceMemoryProperties = g_StudioAPIVk.GetDevice().GetVkMemoryInfo();
-	std::vector<VmaBudget>					vmaBudgets( vkPhysicalDeviceMemoryProperties.memoryHeapCount );
+	eastl::vector<VmaBudget>					vmaBudgets( vkPhysicalDeviceMemoryProperties.memoryHeapCount );
 	vmaGetHeapBudgets( vmaAllocator, vmaBudgets.data() );
 
 	// Calculate total budget

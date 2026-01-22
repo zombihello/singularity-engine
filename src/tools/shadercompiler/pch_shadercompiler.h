@@ -1,5 +1,5 @@
-#include <string>
-#include <vector>
+#include <EASTL/string.h>
+#include <EASTL/vector.h>
 
 #include "interfaces/interfaces.h"
 #include "stdlib/stdlib.h"

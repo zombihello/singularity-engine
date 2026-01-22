@@ -37,17 +37,17 @@ struct parserToken_t
 	}
 
 	parserToken_t( parserToken_t&& other )
-		: tokenString( std::move( other.tokenString ) )
-		, tokenID( std::move( other.tokenID ) )
-		, scopeLevel( std::move( other.scopeLevel ) )
-		, context( std::move( other.context ) )
+		: tokenString( eastl::move( other.tokenString ) )
+		, tokenID( eastl::move( other.tokenID ) )
+		, scopeLevel( eastl::move( other.scopeLevel ) )
+		, context( eastl::move( other.context ) )
 	{
 	}
 
 	parserToken_t& operator=( const parserToken_t& other );
-	std::string	   ToString() const;
+	eastl::string	   ToString() const;
 
-	std::string			tokenString;
+	eastl::string			tokenString;
 	int32				tokenID;
 	int32				scopeLevel;	 // Scope level (bracket level)
 	parserFileContext_t context;

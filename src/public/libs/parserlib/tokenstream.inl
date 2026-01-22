@@ -27,7 +27,7 @@ CParserTokenStream::PushToken
 */
 FORCEINLINE void CParserTokenStream::PushToken( parserToken_t&& token )
 {
-	tokens.emplace_back( std::move( token ) );
+	tokens.emplace_back( eastl::move( token ) );
 }
 
 /*

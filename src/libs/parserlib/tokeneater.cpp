@@ -28,7 +28,7 @@ void CParserTokenEater::OnEmitToken( uint32 line, uint32 tokenID, const char* pT
 {
 	// Setup context information
 	parserFileContext_t context( path, line, charLineStart, charStart, charEnd );
-	tokens.PushToken( std::forward<parserToken_t>( parserToken_t( pTokenString, tokenStringSize, tokenID, scopeLevel, context ) ) );
+	tokens.PushToken( eastl::forward<parserToken_t>( parserToken_t( pTokenString, tokenStringSize, tokenID, scopeLevel, context ) ) );
 }
 
 /*

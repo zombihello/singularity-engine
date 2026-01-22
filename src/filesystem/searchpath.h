@@ -1,7 +1,7 @@
 #pragma once
-#include <string>
-#include <vector>
-#include <algorithm>
+#include <EASTL/string.h>
+#include <EASTL/vector.h>
+#include <EASTL/algorithm.h>
 
 #include "stdlib/defines.h"
 #include "stdlib/types.h"
@@ -26,14 +26,14 @@ public:
 		S_RemoveDotPathSeparators( path );
 	}
 
-	void			   SetPathID( const char* pNewPathID );
-	void			   SetPath( const char* pNewPath );
-	const std::string& GetPathID() const;
-	const std::string& GetPath() const;
+	void				 SetPathID( const char* pNewPathID );
+	void				 SetPath( const char* pNewPath );
+	const eastl::string& GetPathID() const;
+	const eastl::string& GetPath() const;
 
 private:
-	std::string pathID;
-	std::string path;
+	eastl::string pathID;
+	eastl::string path;
 };
 
 //-----------------------------------------------------------------------------
@@ -56,8 +56,8 @@ public:
 protected:
 	CSearchPath* GetSearchPath() const;
 
-	uint32					  currentIndex;
-	std::vector<CSearchPath*> searchPaths;
+	uint32						currentIndex;
+	eastl::vector<CSearchPath*> searchPaths;
 };
 
 //-----------------------------------------------------------------------------
@@ -71,7 +71,7 @@ public:
 	CSearchPathReverseIterator( const char* pFilePath, bool bForWrite, const char* pPathID = NULL, uint32 lengthPathID = 0 )
 		: CSearchPathIterator( pFilePath, bForWrite, pPathID, lengthPathID )
 	{
-		std::reverse( std::begin( searchPaths ), std::end( searchPaths ) );
+		eastl::reverse( eastl::begin( searchPaths ), eastl::end( searchPaths ) );
 	}
 };
 

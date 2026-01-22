@@ -145,7 +145,7 @@ public:
 	virtual bool Connect( createInterfaceFn_t pFactory ) override;
 	virtual void Disconnect() override;
 
-	virtual bool		 CompileShader( const char* pSrcFileName, const char* pFunctionName, studioAPIShaderType_t type, IShaderCompilerEnvironment* pEnvironment, IShaderCompilerOutput* pOutput ) override;
+	virtual bool		CompileShader( const char* pSrcFileName, const char* pFunctionName, studioAPIShaderType_t type, IShaderCompilerEnvironment* pEnvironment, IShaderCompilerOutput* pOutput ) override;
 	virtual const char* GetShaderPlatform() const override;
 
 private:
@@ -187,7 +187,7 @@ public:
 			for ( uint32 index = 0, count = pEnvironment->GetNumIncludeDirs(); index < count; ++index )
 			{
 				// Compute the full file path
-				std::string fullPath = S_Sprintf( "%s/%s", pEnvironment->GetIncludeDir( index ), pRequestedSource );
+				eastl::string fullPath = S_Sprintf( "%s/%s", pEnvironment->GetIncludeDir( index ), pRequestedSource );
 
 				// We are found file!
 				if ( g_pFileSystem->IsFileExists( fullPath.c_str() ) )
@@ -319,7 +319,7 @@ bool CShaderCompilerBackendVk::CompileShader( const char* pSrcFileName, const ch
 	// Initialize environment's defines
 	for ( uint32 index = 0, count = pEnvironment->GetNumDefines(); index < count; ++index )
 	{
-		const char* pName	= NULL;
+		const char* pName  = NULL;
 		const char* pValue = NULL;
 		pEnvironment->GetDefine( index, pName, pValue );
 		shadercCompileOptions.AddMacroDefinition( pName, pValue );
@@ -419,12 +419,12 @@ bool CShaderCompilerBackendVk::GrabReflect( const shaderc::SpvCompilationResult&
 			continue;
 		}
 
-		std::vector<shaderReflectionVar_t> vars;
-		const spirv_cross::SPIRType&	   spirvCrossBufferType = spirvCrossCompiler.get_type( spirvCrossResource.base_type_id );
+		eastl::vector<shaderReflectionVar_t> vars;
+		const spirv_cross::SPIRType&		 spirvCrossBufferType = spirvCrossCompiler.get_type( spirvCrossResource.base_type_id );
 		for ( uint32 index = 0, numMembers = (uint32)spirvCrossBufferType.member_types.size(); index < numMembers; ++index )
 		{
 			shaderReflectionVar_t& var = vars.emplace_back();
-			var.name				   = spirvCrossCompiler.get_member_name( spirvCrossBufferType.self, index );
+			var.name				   = spirvCrossCompiler.get_member_name( spirvCrossBufferType.self, index ).c_str();
 			var.size				   = (uint32)spirvCrossCompiler.get_declared_struct_member_size( spirvCrossBufferType, index );
 			var.offset				   = spirvCrossCompiler.type_struct_member_offset( spirvCrossBufferType, index );
 			var.type				   = VK_TranslateShaderVarType( spirvCrossCompiler.get_type( spirvCrossBufferType.member_types[index] ) );
@@ -478,13 +478,13 @@ bool CShaderCompilerBackendVk::GrabReflect( const shaderc::SpvCompilationResult&
 	// Push constant buffers
 	for ( uint32 pushConstantBufferIdx = 0, numPushConstantBuffers = (uint32)spirvCrossShaderResources.push_constant_buffers.size(); pushConstantBufferIdx < numPushConstantBuffers; ++pushConstantBufferIdx )
 	{
-		const spirv_cross::Resource&	   spirvCrossResource	= spirvCrossShaderResources.push_constant_buffers[pushConstantBufferIdx];
-		const spirv_cross::SPIRType&	   spirvCrossBufferType = spirvCrossCompiler.get_type( spirvCrossResource.base_type_id );
-		std::vector<shaderReflectionVar_t> vars;
+		const spirv_cross::Resource&		 spirvCrossResource	  = spirvCrossShaderResources.push_constant_buffers[pushConstantBufferIdx];
+		const spirv_cross::SPIRType&		 spirvCrossBufferType = spirvCrossCompiler.get_type( spirvCrossResource.base_type_id );
+		eastl::vector<shaderReflectionVar_t> vars;
 		for ( uint32 index = 0, numMembers = (uint32)spirvCrossBufferType.member_types.size(); index < numMembers; ++index )
 		{
 			shaderReflectionVar_t& var = vars.emplace_back();
-			var.name				   = spirvCrossCompiler.get_member_name( spirvCrossBufferType.self, index );
+			var.name				   = spirvCrossCompiler.get_member_name( spirvCrossBufferType.self, index ).c_str();
 			var.size				   = (uint32)spirvCrossCompiler.get_declared_struct_member_size( spirvCrossBufferType, index );
 			var.offset				   = spirvCrossCompiler.type_struct_member_offset( spirvCrossBufferType, index );
 			var.type				   = VK_TranslateShaderVarType( spirvCrossCompiler.get_type( spirvCrossBufferType.member_types[index] ) );
@@ -585,7 +585,7 @@ bool CShaderCompilerBackendVk::GrabReflect( const shaderc::SpvCompilationResult&
 	}
 
 	// Serialize reflection data
-	std::vector<byte>		reflectionData;
+	eastl::vector<byte>		reflectionData;
 	CStreamDataMemoryWriter streamMemoryWriter( reflectionData );
 	shaderReflection.Serialize( &streamMemoryWriter );
 	pOutput->SetReflectionData( reflectionData.data(), (uint64)reflectionData.size() );

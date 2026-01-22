@@ -1,6 +1,6 @@
 #pragma once
-#include <string>
-#include <vector>
+#include <EASTL/string.h>
+#include <EASTL/vector.h>
 
 #include "stdlib/types.h"
 #include "stdlib/istreamdata.h"
@@ -25,7 +25,7 @@ public:
 	virtual bool			 IsEndOfStream() const override;
 	virtual bool			 IsReader() const override;
 	virtual bool			 IsWriter() const override;
-	virtual const char*	 GetPath() const override;
+	virtual const char*		 GetPath() const override;
 	virtual streamDataType_t GetType() const override;
 
 protected:
@@ -60,7 +60,7 @@ private:
 class CStreamDataMemoryWriter : public CBaseStreamDataMemory<IStreamDataWriter>
 {
 public:
-	CStreamDataMemoryWriter( std::vector<byte>& data )
+	CStreamDataMemoryWriter( eastl::vector<byte>& data )
 		: data( data )
 	{
 	}
@@ -71,7 +71,7 @@ public:
 	virtual uint64 GetSize() const override;
 
 private:
-	std::vector<byte>& data;
+	eastl::vector<byte>& data;
 };
 
 #include "stdlib/streamdata_memory.inl"

@@ -1,5 +1,5 @@
 #pragma once
-#include <vector>
+#include <EASTL/vector.h>
 
 #include "studiorender/istudio_renderpipelineset.h"
 #include "studiorender/studio_viewport.h"
@@ -30,17 +30,17 @@ private:
 		CStudioViewport*										  pViewport;
 		CStudioViewport::COnReleaseViewportIndex::funcDelegate_t* pReleaseViewportIndexDelegate;
 		CStudioViewport::COnRenderPassUpdated::funcDelegate_t*	  pRenderPassUpdatedDelegate;
-		std::vector<TRefPtr<IStudioAPIRenderPipeline>>			  studioAPIRenderPipelines;
+		eastl::vector<TRefPtr<IStudioAPIRenderPipeline>>		  studioAPIRenderPipelines;
 	};
 
 	struct dataStorageDrawRenderPasses_t
 	{
-		std::vector<TRefPtr<IStudioAPIRenderPipeline>> studioAPIRenderPipelines;
+		eastl::vector<TRefPtr<IStudioAPIRenderPipeline>> studioAPIRenderPipelines;
 	};
 
 	struct dataStoragePresentPass_t
 	{
-		std::vector<viewportRenderPipelines_t> viewports;
+		eastl::vector<viewportRenderPipelines_t> viewports;
 	};
 
 	class CRenderPipelineContainer

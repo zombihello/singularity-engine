@@ -24,7 +24,7 @@ void Sys_Error( const char* pFormat, ... )
 	// Get formated string
 	va_list params;
 	va_start( params, pFormat );
-	std::string message = S_Vsprintf( pFormat, params );
+	eastl::string message = S_Vsprintf( pFormat, params );
 	va_end( params );
 
 	// Print message and show message box

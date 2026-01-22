@@ -21,7 +21,7 @@ public:
 	CLogger();
 
 private:
-	std::vector<ILogOutput*> outputs;
+	eastl::vector<ILogOutput*> outputs;
 	bool					 bActiveGroups[LOG_NUM_GROUPS];
 	logTextColor_t			 textColor;
 };
@@ -129,7 +129,7 @@ void CLogger::VPrintf( logGroup_t group, logLevel_t level, const char* pFormat, 
 	if ( IsGroupActive( group ) )
 	{
 		Assert( level < LOG_NUM_LEVELS );
-		std::string message = S_Sprintf( "%s: %s\n", s_pLogLevelNames[level], S_Vsprintf( pFormat, params ).c_str() );
+		eastl::string message = S_Sprintf( "%s: %s\n", s_pLogLevelNames[level], S_Vsprintf( pFormat, params ).c_str() );
 		for ( uint32 index = 0, count = (uint32)outputs.size(); index < count; ++index )
 		{
 			outputs[index]->Print( level, message.c_str() );
@@ -292,7 +292,7 @@ bool Sys_AssertFailed( const char* pExpr, const char* pFile, int32 line, const c
 	// Get the message
 	va_list params;
 	va_start( params, pFormat );
-	std::string message = S_Strlen( pFormat ) > 0 ? S_Vsprintf( pFormat, params ) : "<None>";
+	eastl::string message = S_Strlen( pFormat ) > 0 ? S_Vsprintf( pFormat, params ) : "<None>";
 	va_end( params );
 
 	// Print the message and show message box
@@ -308,7 +308,7 @@ bool Sys_AssertFailed( const char* pExpr, const char* pFile, int32 line, const c
 	{
 		Sys_DebugBreak();
 	}
-	std::string fullMessage = S_Sprintf( "Expression: %s\nMessage: %s\n\nFile: %s\nLine: %i", pExpr, message.c_str(), pFile, line );
+	eastl::string fullMessage = S_Sprintf( "Expression: %s\nMessage: %s\n\nFile: %s\nLine: %i", pExpr, message.c_str(), pFile, line );
 	Sys_ShowMessageBox( "Singularity Error", fullMessage.c_str(), MESSAGE_BOX_ERROR );
 
 	// Set crash dump message
@@ -335,7 +335,7 @@ bool Sys_EnsureFailed( const char* pExpr, const char* pFile, int32 line, bool bA
 		// Get the final message
 		va_list params;
 		va_start( params, pFormat );
-		std::string message = S_Strlen( pFormat ) > 0 ? S_Vsprintf( pFormat, params ) : "<None>";
+		eastl::string message = S_Strlen( pFormat ) > 0 ? S_Vsprintf( pFormat, params ) : "<None>";
 		va_end( params );
 
 		// Print the message

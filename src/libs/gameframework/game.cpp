@@ -118,7 +118,7 @@ bool CGame::MapInit( const char* pPath )
 
 	// Load a new map
 	CSMAPCompiledMapDoc smapCompiledMapDoc;
-	std::string			mapPath = S_GetFileExtension( pPath ) ? pPath : S_Sprintf( "%s.smap_c", pPath );
+	eastl::string			mapPath = S_GetFileExtension( pPath ) ? pPath : S_Sprintf( "%s.smap_c", pPath );
 	if ( !smapCompiledMapDoc.LoadFromFile( mapPath.c_str() ) )
 	{
 		Warning( "Game: Failed to load map '%s'", mapPath.c_str() );

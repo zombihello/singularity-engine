@@ -1,5 +1,5 @@
 #pragma once
-#include <string>
+#include <EASTL/string.h>
 
 #include "core/core.h"
 #include "core/debug.h"
@@ -48,32 +48,32 @@ public:
 	void SetMaterialValue( const char* pValue );
 
 	bool				  IsDefined() const;
-	const char*		  GetName() const;
+	const char*			  GetName() const;
 	smatMaterialVarType_t GetType() const;
 	bool				  GetBoolValue() const;
 	int32				  GetIntValue() const;
 	float				  GetFloatValue() const;
 	void				  GetVecValue( float* pValue, uint32 numComps ) const;
 	matrix_t			  GetMatrixValue() const;
-	const char*		  GetStringValue() const;
-	const char*		  GetTextureValue() const;
-	const char*		  GetMaterialValue() const;
+	const char*			  GetStringValue() const;
+	const char*			  GetTextureValue() const;
+	const char*			  GetMaterialValue() const;
 
 	CSMATMaterialVar& operator=( const CSMATMaterialVar& right );
 
 private:
-	std::string			  name;
+	eastl::string		  name;
 	smatMaterialVarType_t type;
-	std::string			  stringValue;
+	eastl::string		  stringValue;
 	union
 	{
-		bool		 boolValue;
-		int32		 intValue;
-		float		 floatValue;
-		vec2_t		 vector2DValue;
-		vec3_t		 vector3DValue;
-		vec4_t		 vector4DValue;
-		matrix_t	 matrixValue;
+		bool		boolValue;
+		int32		intValue;
+		float		floatValue;
+		vec2_t		vector2DValue;
+		vec3_t		vector3DValue;
+		vec4_t		vector4DValue;
+		matrix_t	matrixValue;
 		const char* pStringValue;
 		const char* pTextureValue;
 		const char* pMaterialValue;

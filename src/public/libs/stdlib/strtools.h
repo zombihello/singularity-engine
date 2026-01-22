@@ -1,5 +1,5 @@
 #pragma once
-#include <string>
+#include <EASTL/string.h>
 
 #include "stdlib/defines.h"
 #include "stdlib/types.h"
@@ -12,48 +12,48 @@ enum
 	COPY_ALL_CHARACTERS = -1  // Used in S_Strncat for copy all characters from source string
 };
 
-int32		 S_Vsnprintf( wchar_t* pDest, uint32 maxLen, const wchar_t* pFormat, va_list params );
-int32		 S_Vsnprintf( char* pDest, uint32 maxLen, const char* pFormat, va_list params );
-int32		 S_Vsscanf( const wchar_t* pString, const wchar_t* pFormat, va_list params );
-int32		 S_Sscanf( const wchar_t* pString, const wchar_t* pFormat, ... );
-int32		 S_Vsscanf( const char* pString, const char* pFormat, va_list params );
-int32		 S_Sscanf( const char* pString, const char* pFormat, ... );
-uint32		 S_Strlen( const char* pString );
-uint32		 S_Strlen( const wchar_t* pString );
-void		 S_Strcpy( char* pDest, const char* pSrc );
-void		 S_Strcpy( wchar_t* pDest, const wchar_t* pSrc );
-void		 S_Strncpy( char* pDest, const char* pSrc, uint32 maxLen );
-void		 S_Strncpy( wchar_t* pDest, const wchar_t* pSrc, uint32 maxLen );
-char*		 S_Strstr( const char* pString, const char* pFind );
-wchar_t*	 S_Strstr( const wchar_t* pString, const wchar_t* pFind );
-uint32		 S_Strcmp( const char* pString1, const char* pString2 );
-uint32		 S_Strcmp( const wchar_t* pString1, const wchar_t* pString2 );
-uint32		 S_Strncmp( const char* pString1, const char* pString2, uint32 count );
-uint32		 S_Strncmp( const wchar_t* pString1, const wchar_t* pString2, uint32 count );
-uint32		 S_Stricmp( const char* pString1, const char* pString2 );
-uint32		 S_Stricmp( const wchar_t* pString1, const wchar_t* pString2 );
-uint32		 S_Strnicmp( const char* pString1, const char* pString2, uint32 count );
-uint32		 S_Strnicmp( const wchar_t* pString1, const wchar_t* pString2, uint32 count );
-char*		 S_Strncat( char* pDest, const char* pSrc, uint32 destBufferSize, int32 maxCharsToCopy = COPY_ALL_CHARACTERS );
-wchar_t*	 S_Strncat( wchar_t* pDest, const wchar_t* pSrc, uint32 destBufferSize, int32 maxCharsToCopy = COPY_ALL_CHARACTERS );
-int32		 S_Atoi( const char* pString );
-int32		 S_Atoi( const wchar_t* pString );
-float		 S_Atof( const char* pString );
-float		 S_Atof( const wchar_t* pString );
-int32		 S_Snprintf( wchar_t* pDest, uint32 maxLen, const wchar_t* pFormat, ... );
-int32		 S_Snprintf( char* pDest, uint32 maxLen, const char* pFormat, ... );
-std::string	 S_Vsprintf( const char* pFormat, va_list params );
-std::string	 S_Sprintf( const char* pFormat, ... );
-std::wstring S_Vsprintf( const wchar_t* pFormat, va_list params );
-std::wstring S_Sprintf( const wchar_t* pFormat, ... );
-int32		 S_ToUpper( int32 ch );
-int32		 S_ToLower( int32 ch );
-char*		 S_Strupr( char* pString );
-char*		 S_Strlwr( char* pString );
-wchar_t*	 S_Strupr( wchar_t* pString );
-wchar_t*	 S_Strlwr( wchar_t* pString );
-bool		 S_IsSpace( char c );
-bool		 S_IsSpace( wchar_t c );
+int32		   S_Vsnprintf( wchar_t* pDest, uint32 maxLen, const wchar_t* pFormat, va_list params );
+int32		   S_Vsnprintf( char* pDest, uint32 maxLen, const char* pFormat, va_list params );
+int32		   S_Vsscanf( const wchar_t* pString, const wchar_t* pFormat, va_list params );
+int32		   S_Sscanf( const wchar_t* pString, const wchar_t* pFormat, ... );
+int32		   S_Vsscanf( const char* pString, const char* pFormat, va_list params );
+int32		   S_Sscanf( const char* pString, const char* pFormat, ... );
+uint32		   S_Strlen( const char* pString );
+uint32		   S_Strlen( const wchar_t* pString );
+void		   S_Strcpy( char* pDest, const char* pSrc );
+void		   S_Strcpy( wchar_t* pDest, const wchar_t* pSrc );
+void		   S_Strncpy( char* pDest, const char* pSrc, uint32 maxLen );
+void		   S_Strncpy( wchar_t* pDest, const wchar_t* pSrc, uint32 maxLen );
+char*		   S_Strstr( const char* pString, const char* pFind );
+wchar_t*	   S_Strstr( const wchar_t* pString, const wchar_t* pFind );
+uint32		   S_Strcmp( const char* pString1, const char* pString2 );
+uint32		   S_Strcmp( const wchar_t* pString1, const wchar_t* pString2 );
+uint32		   S_Strncmp( const char* pString1, const char* pString2, uint32 count );
+uint32		   S_Strncmp( const wchar_t* pString1, const wchar_t* pString2, uint32 count );
+uint32		   S_Stricmp( const char* pString1, const char* pString2 );
+uint32		   S_Stricmp( const wchar_t* pString1, const wchar_t* pString2 );
+uint32		   S_Strnicmp( const char* pString1, const char* pString2, uint32 count );
+uint32		   S_Strnicmp( const wchar_t* pString1, const wchar_t* pString2, uint32 count );
+char*		   S_Strncat( char* pDest, const char* pSrc, uint32 destBufferSize, int32 maxCharsToCopy = COPY_ALL_CHARACTERS );
+wchar_t*	   S_Strncat( wchar_t* pDest, const wchar_t* pSrc, uint32 destBufferSize, int32 maxCharsToCopy = COPY_ALL_CHARACTERS );
+int32		   S_Atoi( const char* pString );
+int32		   S_Atoi( const wchar_t* pString );
+float		   S_Atof( const char* pString );
+float		   S_Atof( const wchar_t* pString );
+int32		   S_Snprintf( wchar_t* pDest, uint32 maxLen, const wchar_t* pFormat, ... );
+int32		   S_Snprintf( char* pDest, uint32 maxLen, const char* pFormat, ... );
+eastl::string  S_Vsprintf( const char* pFormat, va_list params );
+eastl::string  S_Sprintf( const char* pFormat, ... );
+eastl::wstring S_Vsprintf( const wchar_t* pFormat, va_list params );
+eastl::wstring S_Sprintf( const wchar_t* pFormat, ... );
+int32		   S_ToUpper( int32 ch );
+int32		   S_ToLower( int32 ch );
+char*		   S_Strupr( char* pString );
+char*		   S_Strlwr( char* pString );
+wchar_t*	   S_Strupr( wchar_t* pString );
+wchar_t*	   S_Strlwr( wchar_t* pString );
+bool		   S_IsSpace( char c );
+bool		   S_IsSpace( wchar_t c );
 
 //-----------------------------------------------------------------------------
 // Class that handles the ANSI to WCHAR conversion

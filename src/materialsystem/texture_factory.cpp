@@ -80,8 +80,8 @@ TRefPtr<IRefCounted> CTextureFactory::LoadResource( const char* pPath, uint32 lo
 	}
 
 	// Convert STX mipmap information to the engine format
-	std::vector<textureMipMap_t> mipmaps;
-	const std::vector<byte>&	 data = stexCompiledTextureDoc.GetData();
+	eastl::vector<textureMipMap_t> mipmaps;
+	const eastl::vector<byte>&	 data = stexCompiledTextureDoc.GetData();
 	mipmaps.resize( stexCompiledTextureDoc.GetNumMips() );
 	for ( uint32 mipIdx = 0, numMips = stexCompiledTextureDoc.GetNumMips(); mipIdx < numMips; ++mipIdx )
 	{

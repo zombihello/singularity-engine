@@ -7,7 +7,7 @@
 S_GetCurrentDirectory
 ==================
 */
-void S_GetCurrentDirectory( std::string& destStr, bool bShrinkToFit /*= true*/ )
+void S_GetCurrentDirectory( eastl::string& destStr, bool bShrinkToFit /*= true*/ )
 {
 	// Pre-allocate memory for current directory
 	destStr.resize( 1024 );
@@ -147,7 +147,7 @@ bool S_MakeAbsolutePath( const char* pSrcPath, char* pDestPath, uint32 maxLen, c
 S_MakeAbsolutePath
 ==================
 */
-void S_MakeAbsolutePath( const std::string& srcPath, std::string& destPath, const std::string& startingDir /*= ""*/, bool bShrinkToFit /*= true*/ )
+void S_MakeAbsolutePath( const eastl::string& srcPath, eastl::string& destPath, const eastl::string& startingDir /*= ""*/, bool bShrinkToFit /*= true*/ )
 {
 	// Pre-allocate memory for an absolute path
 	destPath.resize( 1024 );
@@ -293,7 +293,7 @@ int32 S_MakeRelativePath( const char* pFullPath, const char* pDirPath, char* pRe
 S_MakeRelativePath
 ==================
 */
-bool S_MakeRelativePath( const std::string& fullPath, const std::string& dirPath, std::string& relativePath, bool bShrinkToFit /*= true*/ )
+bool S_MakeRelativePath( const eastl::string& fullPath, const eastl::string& dirPath, eastl::string& relativePath, bool bShrinkToFit /*= true*/ )
 {
 	// Pre-allocate memory for an relative path
 	relativePath.resize( 1024 );
@@ -359,7 +359,7 @@ bool S_AppendPathSeparator( char* pStr, uint32 strSize )
 S_AppendPathSeparator
 ==================
 */
-void S_AppendPathSeparator( std::string& str )
+void S_AppendPathSeparator( eastl::string& str )
 {
 	if ( str.empty() || !S_IsPathSeparator( str[str.size() - 1] ) )
 	{
@@ -496,7 +496,7 @@ bool S_GetFileBaseName( const char* pPath, char* pFileName, uint32 maxLen )
 S_GetFileBaseName
 ==================
 */
-void S_GetFileBaseName( const std::string& path, std::string& fileName, bool bShrinkToFit /*= true*/ )
+void S_GetFileBaseName( const eastl::string& path, eastl::string& fileName, bool bShrinkToFit /*= true*/ )
 {
 	// Pre-allocate memory for filename
 	fileName.resize( 1024 );
@@ -582,7 +582,7 @@ bool S_GetFilePath( const char* pSrcPath, char* pDestPath, uint32 maxLen )
 S_GetFilePath
 ==================
 */
-void S_GetFilePath( const std::string& srcPath, std::string& destPath, bool bShrinkToFit /*= true*/ )
+void S_GetFilePath( const eastl::string& srcPath, eastl::string& destPath, bool bShrinkToFit /*= true*/ )
 {
 	// Pre-allocate memory for a new string
 	destPath.resize( 1024 );
@@ -703,7 +703,7 @@ CFilename::CFilename()
 CFilename::CFilename
 ==================
 */
-CFilename::CFilename( const std::string& path )
+CFilename::CFilename( const eastl::string& path )
 	: path( path )
 {
 	S_FixPathSeparators( CFilename::path );

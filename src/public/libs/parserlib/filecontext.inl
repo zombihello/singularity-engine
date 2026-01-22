@@ -27,11 +27,11 @@ FORCEINLINE parserFileContext_t& parserFileContext_t::operator=( parserFileConte
 {
 	if ( this != &other )
 	{
-		file			= std::move( other.file );
-		line			= std::move( other.line );
-		charLineStart	= std::move( other.charLineStart );
-		charPosition	= std::move( other.charPosition );
-		charEndPosition = std::move( other.charEndPosition );
+		file			= eastl::move( other.file );
+		line			= eastl::move( other.line );
+		charLineStart	= eastl::move( other.charLineStart );
+		charPosition	= eastl::move( other.charPosition );
+		charEndPosition = eastl::move( other.charEndPosition );
 	}
 	return *this;
 }
@@ -41,7 +41,7 @@ FORCEINLINE parserFileContext_t& parserFileContext_t::operator=( parserFileConte
 parserFileContext_t::ToString
 ==================
 */
-FORCEINLINE std::string parserFileContext_t::ToString() const
+FORCEINLINE eastl::string parserFileContext_t::ToString() const
 {
 	if ( line != -1 )
 	{

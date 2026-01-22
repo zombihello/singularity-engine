@@ -88,7 +88,7 @@ FORCEINLINE uint32 CSENTEntityDescComponent::GetNumVars() const
 CSENTEntityDescComponent::GetVars
 ==================
 */
-FORCEINLINE const std::vector<CSENTEntityDescVar>& CSENTEntityDescComponent::GetVars() const
+FORCEINLINE const eastl::vector<CSENTEntityDescVar>& CSENTEntityDescComponent::GetVars() const
 {
 	return vars;
 }

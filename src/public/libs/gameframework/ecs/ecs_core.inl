@@ -179,7 +179,7 @@ template<typename TEcsResource>
 FORCEINLINE void CEcsWorld::SetResource( TEcsResource&& ecsResource )
 {
 	AssertMsg( !flecs::is_empty<TEcsResource>::value, "To set a resource the one must have at least one field" );
-	flecsWorld.set<TEcsResource>( std::forward<TEcsResource>( ecsResource ) );
+	flecsWorld.set<TEcsResource>( eastl::forward<TEcsResource>( ecsResource ) );
 }
 
 /*
@@ -267,7 +267,7 @@ FORCEINLINE void CEcsWorld::SetComponent( ecsEntity_t& ecsEntity, TEcsComponent&
 {
 	AssertMsg( IsValidEntity( ecsEntity ), "Entity must be valid" );
 	AssertMsg( !flecs::is_empty<TEcsComponent>::value, "To set a component the one must have at least one field" );
-	ecsEntity.flecsEntity.set<TEcsComponent>( std::forward<TEcsComponent>( ecsComponent ) );
+	ecsEntity.flecsEntity.set<TEcsComponent>( eastl::forward<TEcsComponent>( ecsComponent ) );
 }
 
 /*

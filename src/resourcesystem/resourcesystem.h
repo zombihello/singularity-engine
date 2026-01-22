@@ -1,5 +1,5 @@
 #pragma once
-#include <unordered_map>
+#include <EASTL/unordered_map.h>
 
 #include "resourcesystem/iresourcesystem.h"
 #include "resourcesystem/resource.h"
@@ -39,7 +39,7 @@ public:
 	virtual IResourceFactory* GetResourceFactory( resourceType_t type ) const override;
 
 private:
-	IResourceFactory*									pResourceFactories[RESOURCE_NUM_TYPES];
-	std::unordered_map<std::string, TRefPtr<CResource>> resourcesDicts[RESOURCE_NUM_TYPES];
+	IResourceFactory*										pResourceFactories[RESOURCE_NUM_TYPES];
+	eastl::unordered_map<eastl::string, TRefPtr<CResource>> resourcesDicts[RESOURCE_NUM_TYPES];
 };
 extern CResourceSystem g_ResourceSystem;

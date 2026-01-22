@@ -67,11 +67,11 @@ private:
 	IStudioAPISwapChain::IOnReCreated::funcDelegate_t* pSwapChainReCreatedDelegate;
 	mutable COnReleaseViewportIndex					   onReleaseViewportIndex;
 	mutable COnRenderPassUpdated					   onRenderPassUpdated;
-	std::vector<TRefPtr<IStudioAPIFrameBuffer>>		   studioAPIFrameBuffers;
+	eastl::vector<TRefPtr<IStudioAPIFrameBuffer>>	   studioAPIFrameBuffers;
 	static TRefPtr<CStudioViewport>					   s_pActiveViewport;
 	static CThreadMutex								   s_ViewportIndexMutex;
 	static uint32									   s_LastViewportIndex;
-	static std::list<uint32>						   s_FreeViewportIndices;
+	static eastl::list<uint32>						   s_FreeViewportIndices;
 };
 
 #include "studiorender/studio_viewport.inl"

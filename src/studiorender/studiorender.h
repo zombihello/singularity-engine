@@ -60,6 +60,6 @@ public:
 private:
 	CStudioRenderPassPresent				  presentRenderPass;
 	studioSceneView_t						  sceneView;
-	std::vector<TRefPtr<IStudioRenderObject>> renderObjects;
+	eastl::vector<TRefPtr<IStudioRenderObject>> renderObjects;
 };
 extern CStudioRender g_StudioRender;

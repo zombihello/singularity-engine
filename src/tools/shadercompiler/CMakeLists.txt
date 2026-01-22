@@ -61,6 +61,6 @@ inherit_install_files( shadercompiler								TARGETS core stdlib appframework in
 install_files( shadercompiler TARGETS RUNTIME shadercompiler 		DESTINATION     bin/${PLATFORM_BIN_DIR}/ )
 
 # Setup install the target
-if ( INSTALL_TOOLS )
+if ( INSTALL_DEV_TOOLS )
 	install_target( shadercompiler									DESTINATION		src/devtools/shadercompiler/ )
 endif()

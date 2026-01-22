@@ -29,6 +29,6 @@ public:
 private:
 	VkCommandPool					  vkCommandPool;
 	CStudioAPIQueueVk&				  queue;
-	std::list<CStudioAPICmdBufferVk*> cmdBuffers;
-	std::list<CStudioAPICmdBufferVk*> freeCmdBuffers;
+	eastl::list<CStudioAPICmdBufferVk*> cmdBuffers;
+	eastl::list<CStudioAPICmdBufferVk*> freeCmdBuffers;
 };

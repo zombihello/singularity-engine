@@ -6,7 +6,7 @@
 CStreamDataStdFileReader::CStreamDataStdFileReader
 ==================
 */
-CStreamDataStdFileReader::CStreamDataStdFileReader( FILE* pFile, const std::string& path )
+CStreamDataStdFileReader::CStreamDataStdFileReader( FILE* pFile, const eastl::string& path )
 	: CBaseStreamDataFileReader( path )
 	, pFile( pFile )
 {
@@ -91,7 +91,7 @@ bool CStreamDataStdFileReader::IsEndOfStream() const
 CStreamDataStdFileWriter::CStreamDataStdFileWriter
 ==================
 */
-CStreamDataStdFileWriter::CStreamDataStdFileWriter( FILE* pFile, const std::string& path )
+CStreamDataStdFileWriter::CStreamDataStdFileWriter( FILE* pFile, const eastl::string& path )
 	: CBaseStreamDataFileWriter( path )
 	, pFile( pFile )
 {

@@ -50,7 +50,7 @@ FORCEINLINE bool CShaderReflection::IsFreeBindingIndex( uint32 bindingIndex, uin
 CShaderReflection::GetDescriptorSets
 ==================
 */
-FORCEINLINE const std::vector<shaderReflectionDescriptorSet_t>& CShaderReflection::GetDescriptorSets() const
+FORCEINLINE const eastl::vector<shaderReflectionDescriptorSet_t>& CShaderReflection::GetDescriptorSets() const
 {
 	return descriptorSets;
 }
@@ -60,7 +60,7 @@ FORCEINLINE const std::vector<shaderReflectionDescriptorSet_t>& CShaderReflectio
 CShaderReflection::GetPushConstantBuffers
 ==================
 */
-FORCEINLINE const std::vector<shaderReflectionPushConstantBuffer_t>& CShaderReflection::GetPushConstantBuffers() const
+FORCEINLINE const eastl::vector<shaderReflectionPushConstantBuffer_t>& CShaderReflection::GetPushConstantBuffers() const
 {
 	return pushConstantBuffers;
 }
@@ -70,7 +70,7 @@ FORCEINLINE const std::vector<shaderReflectionPushConstantBuffer_t>& CShaderRefl
 CShaderReflection::GetPushConstantRanges
 ==================
 */
-FORCEINLINE const std::vector<shaderReflectionPushConstantRange_t>& CShaderReflection::GetPushConstantRanges() const
+FORCEINLINE const eastl::vector<shaderReflectionPushConstantRange_t>& CShaderReflection::GetPushConstantRanges() const
 {
 	return pushConstantRanges;
 }

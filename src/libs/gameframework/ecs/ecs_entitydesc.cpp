@@ -45,8 +45,8 @@ void CEcsEntityDesc::Init( const CSENTCompiledEntityDescDoc& sentCompiledDoc )
 	Clear();
 
 	// Initialize new ECS component factories
-	CEcsComponentTypes&							 ecsComponentTypes = Game()->GetEcsComponentTypes();
-	const std::vector<CSENTEntityDescComponent>& sentComponents	   = sentCompiledDoc.GetComponents();
+	CEcsComponentTypes&							   ecsComponentTypes = Game()->GetEcsComponentTypes();
+	const eastl::vector<CSENTEntityDescComponent>& sentComponents	 = sentCompiledDoc.GetComponents();
 	for ( uint32 componentIdx = 0, numComponents = sentCompiledDoc.GetNumComponents(); componentIdx < numComponents; ++componentIdx )
 	{
 		TRefPtr<IEcsComponentFactory> pEcsComponentFactory = ecsComponentTypes.CreateFactory( sentComponents[componentIdx] );

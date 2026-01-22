@@ -73,8 +73,8 @@ CStudioAPIRenderPassVk::CStudioAPIRenderPassVk( const studioAPIRenderPassCreateI
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 
 	// Fill information about attachments (render targets)
-	std::vector<VkAttachmentDescription> vkAttachments;
-	std::vector<VkAttachmentReference>	 vkColorAttachmentReferences;
+	eastl::vector<VkAttachmentDescription> vkAttachments;
+	eastl::vector<VkAttachmentReference>	 vkColorAttachmentReferences;
 	VkAttachmentReference				 vkDepthStencilAttachmentReference = {};
 	bool								 bHasDepthStencilAttachment		   = false;
 	bool								 bHasColorAttachments			   = false;
@@ -125,8 +125,8 @@ CStudioAPIRenderPassVk::CStudioAPIRenderPassVk( const studioAPIRenderPassCreateI
 	}
 
 	// Fill information about main sub-pass
-	std::vector<VkSubpassDescription> vkSubpassDescriptions;
-	std::vector<VkSubpassDependency>  vkSubpassDependencies;
+	eastl::vector<VkSubpassDescription> vkSubpassDescriptions;
+	eastl::vector<VkSubpassDependency>  vkSubpassDependencies;
 	{
 		VkSubpassDescription& vkSubpassDescription	 = vkSubpassDescriptions.emplace_back();
 		vkSubpassDescription.pipelineBindPoint		 = VK_PIPELINE_BIND_POINT_GRAPHICS;

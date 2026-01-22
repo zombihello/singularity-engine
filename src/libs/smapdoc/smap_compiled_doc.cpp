@@ -103,7 +103,7 @@ bool CSMAPCompiledMapDoc::LoadFromFile( const char* pPath )
 		CSMAPEntity& entity = entities[entityIdx];
 
 		// Read an entity descriptor
-		std::string entityDesc;
+		eastl::string entityDesc;
 		uint32		entityDescSize = 0;
 		pFile->Read( &entityDescSize, sizeof( uint32 ) );
 		entityDesc.resize( entityDescSize );
@@ -111,7 +111,7 @@ bool CSMAPCompiledMapDoc::LoadFromFile( const char* pPath )
 		entity.SetEntityDesc( entityDesc.c_str() );
 
 		// Read a name
-		std::string name;
+		eastl::string name;
 		uint32		nameSize = S_Strlen( entity.GetName() );
 		pFile->Read( &nameSize, sizeof( uint32 ) );
 		name.resize( nameSize );

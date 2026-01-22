@@ -1,6 +1,6 @@
 #pragma once
-#include <string>
-#include <vector>
+#include <EASTL/string.h>
+#include <EASTL/vector.h>
 
 #include "core/core.h"
 #include "sentdoc/sent_component.h"
@@ -20,11 +20,11 @@ public:
 	void RemoveComponent( uint32 index );
 	void Clear();
 
-	uint32										 GetNumComponents() const;
-	const std::vector<CSENTEntityDescComponent>& GetComponents() const;
+	uint32										   GetNumComponents() const;
+	const eastl::vector<CSENTEntityDescComponent>& GetComponents() const;
 
 private:
-	std::vector<CSENTEntityDescComponent> components;
+	eastl::vector<CSENTEntityDescComponent> components;
 };
 
 #include "sentdoc/sent_compiled_doc.inl"

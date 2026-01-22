@@ -58,7 +58,7 @@ FORCEINLINE hash_t FastHashFromString( const wchar_t* pString, hash_t hash /*= 0
 FastHashFromString
 ==================
 */
-FORCEINLINE hash_t FastHashFromString( const std::wstring& string, hash_t hash /*= 0*/ )
+FORCEINLINE hash_t FastHashFromString( const eastl::wstring& string, hash_t hash /*= 0*/ )
 {
 	return FastHashFromString( string.data(), (uint64)string.size() * sizeof( wchar_t ), hash );
 }
@@ -78,7 +78,7 @@ FORCEINLINE hash_t FastHashFromString( const char* pString, hash_t hash /*= 0*/ 
 FastHashFromString
 ==================
 */
-FORCEINLINE hash_t FastHashFromString( const std::string& string, hash_t hash /*= 0*/ )
+FORCEINLINE hash_t FastHashFromString( const eastl::string& string, hash_t hash /*= 0*/ )
 {
 	return FastHashFromString( string.data(), (uint64)string.size() * sizeof( char ), hash );
 }

@@ -32,7 +32,7 @@ FORCEINLINE CStudioAPITypedDescriptorPoolSetVk* CStudioAPIDescriptorPoolSetConta
 	auto   it	= typedDescriptorPoolsDict.find( hash );
 	if ( it == typedDescriptorPoolsDict.end() )
 	{
-		it = typedDescriptorPoolsDict.insert( std::make_pair( hash, new CStudioAPITypedDescriptorPoolSetVk( descriptorSetsLayout ) ) ).first;
+		it = typedDescriptorPoolsDict.insert( eastl::make_pair( hash, new CStudioAPITypedDescriptorPoolSetVk( descriptorSetsLayout ) ) ).first;
 	}
 	return it->second;
 }

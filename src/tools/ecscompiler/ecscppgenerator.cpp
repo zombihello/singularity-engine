@@ -2,7 +2,7 @@
 #include "tools/ecscompiler/ecscppgenerator.h"
 
 // Table for convert ecsSystemStage_t to text
-static std::pair<const char*, const char*> s_pEcsSystemStageNames[] = {
+static eastl::pair<const char*, const char*> s_pEcsSystemStageNames[] = {
 	{ "on_start", "OnStart" },		  // ECS_SYSTEM_STAGE_ONSTART
 	{ "on_load", "OnLoad" },		  // ECS_SYSTEM_STAGE_ONLOAD
 	{ "post_load", "PostLoad" },	  // ECS_SYSTEM_STAGE_POSTLOAD
@@ -16,7 +16,7 @@ static std::pair<const char*, const char*> s_pEcsSystemStageNames[] = {
 static_assert( ARRAYSIZE( s_pEcsSystemStageNames ) == ECS_SYSTEM_NUM_STAGES, "Size of s_pEcsSystemStageNames must be equal to ECS_SYSTEM_NUM_STAGES" );
 
 // Table for convert profiler group to profileScopeGroup_t
-static std::pair<const char*, const char*> s_pProfilerScopeGroupNames[] = {
+static eastl::pair<const char*, const char*> s_pProfilerScopeGroupNames[] = {
 	{ "none", "PROFILE_SCOPE_GROUP_NONE" },				 // PROFILE_SCOPE_GROUP_NONE
 	{ "ai", "PROFILE_SCOPE_GROUP_AI" },					 // PROFILE_SCOPE_GROUP_AI
 	{ "animation", "PROFILE_SCOPE_GROUP_ANIMATION" },	 // PROFILE_SCOPE_GROUP_ANIMATION
@@ -159,7 +159,7 @@ void CEcsCppGenerator::GenerateSource( CEcsStubModule* pEcsStubModule )
 CEcsCppGenerator::GenerateUsings
 ==================
 */
-void CEcsCppGenerator::GenerateUsings( const std::vector<TRefPtr<CEcsStubUsing>>& ecsStubUsings )
+void CEcsCppGenerator::GenerateUsings( const eastl::vector<TRefPtr<CEcsStubUsing>>& ecsStubUsings )
 {
 	if ( !ecsStubUsings.empty() )
 	{
@@ -178,7 +178,7 @@ void CEcsCppGenerator::GenerateUsings( const std::vector<TRefPtr<CEcsStubUsing>>
 CEcsCppGenerator::GenerateComponents
 ==================
 */
-void CEcsCppGenerator::GenerateStructs( const std::vector<TRefPtr<CEcsStubDataType>>& ecsStubDataTypes, ecsStructType_t structsType )
+void CEcsCppGenerator::GenerateStructs( const eastl::vector<TRefPtr<CEcsStubDataType>>& ecsStubDataTypes, ecsStructType_t structsType )
 {
 	const char* pCppComment	   = NULL;
 	const char* pStructPrefix	   = NULL;
@@ -207,11 +207,11 @@ void CEcsCppGenerator::GenerateStructs( const std::vector<TRefPtr<CEcsStubDataTy
 		for ( uint32 dataTypeIdx = 0, numDataTypes = (uint32)ecsStubDataTypes.size(); dataTypeIdx < numDataTypes; ++dataTypeIdx )
 		{
 			CEcsStubDataType*									   pEcsStubDataType				= ecsStubDataTypes[dataTypeIdx];
-			const std::vector<TRefPtr<CEcsStubDefaultFieldValue>>& ecsStubDefaultFieldValues	= pEcsStubDataType->GetDefaultFieldValues();
-			const std::vector<TRefPtr<CEcsStubField>>&			   ecsStubFields				= pEcsStubDataType->GetFields();
+			const eastl::vector<TRefPtr<CEcsStubDefaultFieldValue>>& ecsStubDefaultFieldValues	= pEcsStubDataType->GetDefaultFieldValues();
+			const eastl::vector<TRefPtr<CEcsStubField>>&			   ecsStubFields				= pEcsStubDataType->GetFields();
 			CEcsStubMetadata*									   pEcsStubDataTypeMetadata		= pEcsStubDataType->GetMetadata();
 			CEcsStubMetadataValue*								   pEcsStubDataTypeNameMetadata = pEcsStubDataTypeMetadata ? pEcsStubDataTypeMetadata->GetValue( ECS_METADATA_TYPE_NAME ) : NULL;
-			std::string											   ecsDataTypeName				= pEcsStubDataTypeNameMetadata && pEcsStubDataTypeNameMetadata->HasValue() ? pEcsStubDataTypeNameMetadata->GetValue() : pEcsStubDataType->GetName();
+			eastl::string											   ecsDataTypeName				= pEcsStubDataTypeNameMetadata && pEcsStubDataTypeNameMetadata->HasValue() ? pEcsStubDataTypeNameMetadata->GetValue() : pEcsStubDataType->GetName();
 			buffer += S_Sprintf( "struct ecs%s%s_t\n{\n"
 								 "\tECS_%s_BODY( \"%s\" )",
 								 pStructPrefix, pEcsStubDataType->GetName(),
@@ -261,7 +261,7 @@ void CEcsCppGenerator::GenerateStructs( const std::vector<TRefPtr<CEcsStubDataTy
 CEcsCppGenerator::GenerateSystems
 ==================
 */
-void CEcsCppGenerator::GenerateSystems( const std::vector<TRefPtr<CEcsStubSystem>>& ecsStubSystems )
+void CEcsCppGenerator::GenerateSystems( const eastl::vector<TRefPtr<CEcsStubSystem>>& ecsStubSystems )
 {
 	if ( !ecsStubSystems.empty() )
 	{
@@ -271,12 +271,12 @@ void CEcsCppGenerator::GenerateSystems( const std::vector<TRefPtr<CEcsStubSystem
 			CEcsStubSystem*		   pEcsStubSystem			  = ecsStubSystems[systemIdx];
 			CEcsStubMetadata*	   pEcsStubSystemMetadata	  = pEcsStubSystem->GetMetadata();
 			CEcsStubMetadataValue* pEcsStubSystemNameMetadata = pEcsStubSystemMetadata ? pEcsStubSystemMetadata->GetValue( ECS_METADATA_TYPE_NAME ) : NULL;
-			std::string			   ecsSystemName			  = pEcsStubSystemNameMetadata && pEcsStubSystemNameMetadata->HasValue() ? pEcsStubSystemNameMetadata->GetValue() : pEcsStubSystem->GetName();
+			eastl::string			   ecsSystemName			  = pEcsStubSystemNameMetadata && pEcsStubSystemNameMetadata->HasValue() ? pEcsStubSystemNameMetadata->GetValue() : pEcsStubSystem->GetName();
 
-			std::string updateParams;
+			eastl::string updateParams;
 			for ( uint32 fieldAccessType = 0; fieldAccessType < ECS_FIELD_NUM_ACCESS_TYPES; ++fieldAccessType )
 			{
-				const std::vector<TRefPtr<CEcsStubField>>& fields = pEcsStubSystem->GetFields( (ecsFieldAccessType_t)fieldAccessType );
+				const eastl::vector<TRefPtr<CEcsStubField>>& fields = pEcsStubSystem->GetFields( (ecsFieldAccessType_t)fieldAccessType );
 				if ( fieldAccessType != 0 && !fields.empty() && !updateParams.empty() )
 				{
 					updateParams += ", ";
@@ -347,12 +347,12 @@ void CEcsCppGenerator::GenerateRegistrar( CEcsStubModule* pEcsStubModule )
 CEcsCppGenerator::GenerateRegistrarConstructor
 ==================
 */
-std::string CEcsCppGenerator::GenerateRegistrarConstructor( CEcsStubModule* pEcsStubModule )
+eastl::string CEcsCppGenerator::GenerateRegistrarConstructor( CEcsStubModule* pEcsStubModule )
 {
-	std::string									  result;
-	const std::vector<TRefPtr<CEcsStubDataType>>& ecsStubComponents = pEcsStubModule->GetComponents();
-	const std::vector<TRefPtr<CEcsStubDataType>>& ecsStubResources	= pEcsStubModule->GetResources();
-	const std::vector<TRefPtr<CEcsStubSystem>>&	  ecsStubSystems	= pEcsStubModule->GetSystems();
+	eastl::string									  result;
+	const eastl::vector<TRefPtr<CEcsStubDataType>>& ecsStubComponents = pEcsStubModule->GetComponents();
+	const eastl::vector<TRefPtr<CEcsStubDataType>>& ecsStubResources	= pEcsStubModule->GetResources();
+	const eastl::vector<TRefPtr<CEcsStubSystem>>&	  ecsStubSystems	= pEcsStubModule->GetSystems();
 
 	// Write the constructor header
 	result += S_Sprintf( "\tecsModule%s_t( flecs::world& flecsWorld )\n"
@@ -388,16 +388,16 @@ std::string CEcsCppGenerator::GenerateRegistrarConstructor( CEcsStubModule* pEcs
 		for ( uint32 systemIdx = 0, numSystems = (uint32)ecsStubSystems.size(); systemIdx < numSystems; ++systemIdx )
 		{
 			CEcsStubSystem* pEcsStubSystem = ecsStubSystems[systemIdx];
-			std::string		templateParams;
-			std::string		readWriteFuncs;
-			std::string		filterFuncs;
-			std::string		updateParams;
-			std::string		callUpdateParams;
+			eastl::string		templateParams;
+			eastl::string		readWriteFuncs;
+			eastl::string		filterFuncs;
+			eastl::string		updateParams;
+			eastl::string		callUpdateParams;
 
 			// Write template params and Flecs read/write functions
 			for ( uint32 fieldAccessType = 0, globalFieldIdx = 0; fieldAccessType < ECS_FIELD_NUM_ACCESS_TYPES; ++fieldAccessType )
 			{
-				const std::vector<TRefPtr<CEcsStubField>>& fields = pEcsStubSystem->GetFields( (ecsFieldAccessType_t)fieldAccessType );
+				const eastl::vector<TRefPtr<CEcsStubField>>& fields = pEcsStubSystem->GetFields( (ecsFieldAccessType_t)fieldAccessType );
 				if ( fieldAccessType != 0 && !fields.empty() && !updateParams.empty() )
 				{
 					templateParams += ", ";
@@ -420,7 +420,7 @@ std::string CEcsCppGenerator::GenerateRegistrarConstructor( CEcsStubModule* pEcs
 
 					case ECS_FIELD_ACCESS_TYPE_READ_OPTIONAL:
 					{
-						std::string fieldName = GetStringWithUpperFirstChar( pField->GetName() );
+						eastl::string fieldName = GetStringWithUpperFirstChar( pField->GetName() );
 						updateParams += S_Sprintf( "const ecsComponent%s_t* p%s", pField->GetType(), fieldName.c_str() );
 						templateParams += S_Sprintf( "const ecsComponent%s_t*", pField->GetType() );
 						readWriteFuncs += S_Sprintf( "\t\t\t.read<ecsComponent%s_t*>()", pField->GetType() );
@@ -446,7 +446,7 @@ std::string CEcsCppGenerator::GenerateRegistrarConstructor( CEcsStubModule* pEcs
 
 					case ECS_FIELD_ACCESS_TYPE_WRITE_OPTIONAL:
 					{
-						std::string fieldName = GetStringWithUpperFirstChar( pField->GetName() );
+						eastl::string fieldName = GetStringWithUpperFirstChar( pField->GetName() );
 						updateParams += S_Sprintf( "ecsComponent%s_t* p%s", pField->GetType(), fieldName.c_str() );
 						templateParams += S_Sprintf( "ecsComponent%s_t*", pField->GetType() );
 						readWriteFuncs += S_Sprintf( "\t\t\t.write<ecsComponent%s_t*>()", pField->GetType() );
@@ -485,7 +485,7 @@ std::string CEcsCppGenerator::GenerateRegistrarConstructor( CEcsStubModule* pEcs
 			// Write Flecs filters
 			for ( uint32 systemFilterType = 0; systemFilterType < ECS_SYSTEM_NUM_FILTER_TYPES; ++systemFilterType )
 			{
-				const std::vector<TRefPtr<CEcsStubSystemFilter>>& filters = pEcsStubSystem->GetFilters( (ecsSystemFilterType_t)systemFilterType );
+				const eastl::vector<TRefPtr<CEcsStubSystemFilter>>& filters = pEcsStubSystem->GetFilters( (ecsSystemFilterType_t)systemFilterType );
 				if ( systemFilterType != 0 && !filters.empty() && !filterFuncs.empty() )
 				{
 					filterFuncs += "\n";
@@ -570,12 +570,12 @@ std::string CEcsCppGenerator::GenerateRegistrarConstructor( CEcsStubModule* pEcs
 CEcsCppGenerator::GenerateRegistrarDestructor
 ==================
 */
-std::string CEcsCppGenerator::GenerateRegistrarDestructor( CEcsStubModule* pEcsStubModule )
+eastl::string CEcsCppGenerator::GenerateRegistrarDestructor( CEcsStubModule* pEcsStubModule )
 {
-	std::string									  result;
-	const std::vector<TRefPtr<CEcsStubDataType>>& ecsStubComponents = pEcsStubModule->GetComponents();
-	const std::vector<TRefPtr<CEcsStubDataType>>& ecsStubResources	= pEcsStubModule->GetResources();
-	const std::vector<TRefPtr<CEcsStubSystem>>&	  ecsStubSystems	= pEcsStubModule->GetSystems();
+	eastl::string									  result;
+	const eastl::vector<TRefPtr<CEcsStubDataType>>& ecsStubComponents = pEcsStubModule->GetComponents();
+	const eastl::vector<TRefPtr<CEcsStubDataType>>& ecsStubResources	= pEcsStubModule->GetResources();
+	const eastl::vector<TRefPtr<CEcsStubSystem>>&	  ecsStubSystems	= pEcsStubModule->GetSystems();
 
 	// Write the destructor header
 	result += S_Sprintf( "\t~ecsModule%s_t()\n"
@@ -594,12 +594,12 @@ CEcsCppGenerator::GenerateImplementationEcsReadDataFuncs
 */
 void CEcsCppGenerator::GenerateImplementationEcsReadDataFuncs( CEcsStubModule* pEcsStubModule )
 {
-	const std::vector<TRefPtr<CEcsStubDataType>>& ecsStubComponents = pEcsStubModule->GetComponents();
+	const eastl::vector<TRefPtr<CEcsStubDataType>>& ecsStubComponents = pEcsStubModule->GetComponents();
 	for ( uint32 componentIdx = 0, numComponents = (uint32)ecsStubComponents.size(); componentIdx < numComponents; ++componentIdx )
 	{
-		std::string								   sentReadDataFields;
+		eastl::string								   sentReadDataFields;
 		CEcsStubDataType*						   pEcsStubComponent = ecsStubComponents[componentIdx];
-		const std::vector<TRefPtr<CEcsStubField>>& ecsStubFields	 = pEcsStubComponent->GetFields();
+		const eastl::vector<TRefPtr<CEcsStubField>>& ecsStubFields	 = pEcsStubComponent->GetFields();
 		for ( uint32 varIdx = 0, numVars = (uint32)ecsStubFields.size(); varIdx < numVars; ++varIdx )
 		{
 			CEcsStubField*	  pEcsStubField			= ecsStubFields[varIdx];
@@ -608,7 +608,7 @@ void CEcsCppGenerator::GenerateImplementationEcsReadDataFuncs( CEcsStubModule* p
 			{
 				CEcsStubDefaultFieldValue* pEcsStubDefaultFieldValue = pEcsStubComponent->FindDefaultFieldValue( pEcsStubField->GetName() );
 				CEcsStubMetadataValue*	   pEcsStubFieldNameMetadata = pEcsStubFieldMetadata->GetValue( ECS_METADATA_TYPE_NAME );
-				std::string				   fieldName				 = pEcsStubFieldNameMetadata && pEcsStubFieldNameMetadata->HasValue() ? pEcsStubFieldNameMetadata->GetValue() : "";
+				eastl::string				   fieldName				 = pEcsStubFieldNameMetadata && pEcsStubFieldNameMetadata->HasValue() ? pEcsStubFieldNameMetadata->GetValue() : "";
 				if ( fieldName.empty() )
 				{
 					fieldName = pEcsStubField->GetName();
@@ -660,12 +660,12 @@ CEcsCppGenerator::GenerateImplementationEcsFactories
 */
 void CEcsCppGenerator::GenerateImplementationEcsFactories( CEcsStubModule* pEcsStubModule )
 {
-	const std::vector<TRefPtr<CEcsStubDataType>>& ecsStubComponents = pEcsStubModule->GetComponents();
+	const eastl::vector<TRefPtr<CEcsStubDataType>>& ecsStubComponents = pEcsStubModule->GetComponents();
 	for ( uint32 componentIdx = 0, numComponents = (uint32)ecsStubComponents.size(); componentIdx < numComponents; ++componentIdx )
 	{
 		bool									   bHasSerializableField = false;
 		CEcsStubDataType*						   pEcsStubComponent	 = ecsStubComponents[componentIdx];
-		const std::vector<TRefPtr<CEcsStubField>>& ecsStubFields		 = pEcsStubComponent->GetFields();
+		const eastl::vector<TRefPtr<CEcsStubField>>& ecsStubFields		 = pEcsStubComponent->GetFields();
 		for ( uint32 varIdx = 0, numVars = (uint32)ecsStubFields.size(); varIdx < numVars; ++varIdx )
 		{
 			CEcsStubField*	  pEcsStubField			= ecsStubFields[varIdx];
@@ -704,7 +704,7 @@ void CEcsCppGenerator::GenerateImplementationEcsReflection( CEcsStubModule* pEcs
 	buffer += "*/\n";
 	buffer += S_Sprintf( "void EcsInitReflection_%s()\n{", pEcsStubModule->GetName() );
 
-	const std::vector<TRefPtr<CEcsStubDataType>>& ecsStubComponents = pEcsStubModule->GetComponents();
+	const eastl::vector<TRefPtr<CEcsStubDataType>>& ecsStubComponents = pEcsStubModule->GetComponents();
 	if ( !ecsStubComponents.empty() )
 	{
 		buffer += "\n\t// Register component types\n";

@@ -62,6 +62,6 @@ inherit_install_files( ecscompiler								TARGETS core stdlib appframework inter
 install_files( ecscompiler TARGETS RUNTIME ecscompiler 			DESTINATION     bin/${PLATFORM_BIN_DIR}/ )
 
 # Setup install the target
-if ( INSTALL_TOOLS )
+if ( INSTALL_DEV_TOOLS )
 	install_target( ecscompiler									DESTINATION		src/devtools/ecscompiler )
 endif()

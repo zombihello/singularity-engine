@@ -16,8 +16,8 @@ public:
 
 private:
 	VkPipelineVertexInputStateCreateInfo		   vkPipelineVertexInputStateInfo;
-	std::vector<VkVertexInputBindingDescription>   vkVertexInputBindingDescriptions;
-	std::vector<VkVertexInputAttributeDescription> vkVertexInputAttributeDescriptions;
+	eastl::vector<VkVertexInputBindingDescription>   vkVertexInputBindingDescriptions;
+	eastl::vector<VkVertexInputAttributeDescription> vkVertexInputAttributeDescriptions;
 };
 
 //-----------------------------------------------------------------------------
@@ -34,9 +34,9 @@ public:
 
 	VkShaderModule								GetVkShaderModule() const;
 	const VkPipelineShaderStageCreateInfo&		GetVkPipelineShaderStageInfo() const;
-	const std::string&							GetEntryPointName() const;
+	const eastl::string&							GetEntryPointName() const;
 	const studioAPIDescriptorSetLayoutVkDict_t& GetDescriptorSetLayoutDict() const;
-	const std::vector<VkPushConstantRange>&		GetVkPushConstantRanges() const;
+	const eastl::vector<VkPushConstantRange>&		GetVkPushConstantRanges() const;
 
 private:
 	static void OnStudioAPIVkShutdown( void* pUserData );
@@ -45,9 +45,9 @@ private:
 	VkShaderModule							vkShaderModule;
 	VkPipelineShaderStageCreateInfo			vkPipelineShaderStageInfo;
 	COnStudioAPIVkShutdown::funcDelegate_t* pStudioAPIVkShutdownDelegate;
-	std::string								entryPointName;
+	eastl::string								entryPointName;
 	studioAPIDescriptorSetLayoutVkDict_t	descriptorSetLayoutDict;
-	std::vector<VkPushConstantRange>		vkPushConstantRanges;
+	eastl::vector<VkPushConstantRange>		vkPushConstantRanges;
 };
 
 //-----------------------------------------------------------------------------

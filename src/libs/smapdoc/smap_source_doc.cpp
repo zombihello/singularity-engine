@@ -43,7 +43,7 @@ bool CSMAPSourceMapDoc::GrabData( const CJsonDoc& jsonDoc )
 		{
 			if ( jsonOutputDir.IsA( JSONVALUE_TYPE_STRING ) )
 			{
-				std::string outputDir = jsonOutputDir.GetString();
+				eastl::string outputDir = jsonOutputDir.GetString();
 				if ( outputDir.empty() )
 				{
 					Error( "SMAPDoc: Invalid 'output-dir', an output directory can't be empty" );
@@ -72,7 +72,7 @@ bool CSMAPSourceMapDoc::GrabData( const CJsonDoc& jsonDoc )
 		{
 			if ( jsonEntitiesVar.IsA( JSONVALUE_TYPE_ARRAY ) )
 			{
-				std::vector<CJsonValue> jsonEntitiesArray = jsonEntitiesVar.GetArray();
+				eastl::vector<CJsonValue> jsonEntitiesArray = jsonEntitiesVar.GetArray();
 				for ( uint32 entityIdx = 0, numEntities = (uint32)jsonEntitiesArray.size(); entityIdx < numEntities; ++entityIdx )
 				{
 					const CJsonValue& jsonEntityVar = jsonEntitiesArray[entityIdx];
@@ -120,7 +120,7 @@ bool CSMAPSourceMapDoc::GrabValueAsEntity( const CJsonValue& jsonValue, CSMAPEnt
 		{
 			if ( jsonEntityDesc.IsA( JSONVALUE_TYPE_STRING ) )
 			{
-				std::string entityDesc = jsonEntityDesc.GetString();
+				eastl::string entityDesc = jsonEntityDesc.GetString();
 				if ( entityDesc.empty() )
 				{
 					Error( "SMAPDoc: Invalid 'entity-desc', an entity descriptor can't be empty" );
@@ -180,7 +180,7 @@ bool CSMAPSourceMapDoc::SaveFile( const char* pPath )
 		return false;
 	}
 
-	std::string buffer;
+	eastl::string buffer;
 	buffer += "{\n";
 
 	// Write an output directory

@@ -197,7 +197,7 @@ FORCEINLINE const char* CSTEXSourceTextureDoc::GetSourcePath( uint32 sourcePathI
 CSTEXSourceTextureDoc::GetSourcePaths
 ==================
 */
-FORCEINLINE const std::vector<std::string>& CSTEXSourceTextureDoc::GetSourcePaths() const
+FORCEINLINE const eastl::vector<eastl::string>& CSTEXSourceTextureDoc::GetSourcePaths() const
 {
 	return sourcePaths;
 }
@@ -266,7 +266,7 @@ FORCEINLINE void CSTEXSourceTextureDoc::Clear()
 CSTEXSourceTextureDoc::IsValidNumSourcePaths
 ==================
 */
-FORCEINLINE bool CSTEXSourceTextureDoc::IsValidNumSourcePaths( studioAPITextureType_t type, uint32 numSourcePaths, std::string& validateMsg ) const
+FORCEINLINE bool CSTEXSourceTextureDoc::IsValidNumSourcePaths( studioAPITextureType_t type, uint32 numSourcePaths, eastl::string& validateMsg ) const
 {
 	bool bResult = true;
 	switch ( type )

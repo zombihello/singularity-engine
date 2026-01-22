@@ -46,7 +46,7 @@ CEntityDescTool::CompileEntityDesc
 bool CEntityDescTool::CompileEntityDesc( const resourceToolCompileEntityDescParams_t& compileParams ) const
 {
 	// Convert entity variables
-	std::string destPath = S_Sprintf( "%s.sent_c", compileParams.pDestPath );
+	eastl::string destPath = S_Sprintf( "%s.sent_c", compileParams.pDestPath );
 	Msg( "EntityDescTool: Saving the entity descriptor to '%s'...", destPath.c_str() );
 	CSENTCompiledEntityDescDoc sentCompiledFile;
 

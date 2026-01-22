@@ -36,7 +36,7 @@ CStudioAPIDescriptorSetsLayoutVk::~CStudioAPIDescriptorSetsLayoutVk()
 CStudioAPIDescriptorSetsLayoutVk::Init
 ==================
 */
-void CStudioAPIDescriptorSetsLayoutVk::Init( const studioAPIDescriptorSetLayoutVkDict_t& descriptorSetLayoutDict, const std::vector<VkPushConstantRange>& vkPushConstantRanges )
+void CStudioAPIDescriptorSetsLayoutVk::Init( const studioAPIDescriptorSetLayoutVkDict_t& descriptorSetLayoutDict, const eastl::vector<VkPushConstantRange>& vkPushConstantRanges )
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 

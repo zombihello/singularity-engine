@@ -55,12 +55,12 @@ CFileSystem::Init
 bool CFileSystem::Init()
 {
 	// Get the executable path and append at the end path separator if it need
-	std::string exePath;
+	eastl::string exePath;
 	S_GetFilePath( Sys_GetExecutablePath(), exePath, false );
 	S_AppendPathSeparator( exePath );
 
 	// Get base directory from command line if it set
-	std::string baseDir;
+	eastl::string baseDir;
 	if ( CommandLine()->HasParam( "basedir" ) )
 	{
 		baseDir = CommandLine()->GetFirstValue( "basedir" );
@@ -74,7 +74,7 @@ bool CFileSystem::Init()
 	// Make absolute path to the base directory (if it need)
 	if ( !S_IsAbsolutePath( baseDir ) )
 	{
-		std::string oldBaseDir = baseDir;
+		eastl::string oldBaseDir = baseDir;
 		S_MakeAbsolutePath( oldBaseDir, baseDir, exePath, false );
 	}
 
@@ -100,7 +100,7 @@ CFileSystem::Shutdown
 void CFileSystem::Shutdown()
 {
 	// Reset default current directory
-	std::string exePath;
+	eastl::string exePath;
 	S_GetFilePath( Sys_GetExecutablePath(), exePath, false );
 	S_SetCurrentDirectory( exePath );
 	searchPaths.clear();
@@ -122,7 +122,7 @@ TRefPtr<IStreamDataReader> CFileSystem::CreateFileReader( const char* pPath, uin
 	ParsePathID( pPath, pFilePath, pPathID, lengthPathID );
 
 	// Try open a file
-	std::string finalPath;
+	eastl::string finalPath;
 	for ( CSearchPathIterator it( pFilePath, false, pPathID, lengthPathID ); it; ++it )
 	{
 		// Compute a full path
@@ -162,8 +162,8 @@ TRefPtr<IStreamDataWriter> CFileSystem::CreateFileWriter( const char* pPath, uin
 	ParsePathID( pPath, pFilePath, pPathID, lengthPathID );
 
 	// Try create a file
-	std::string finalPath;
-	std::string pathToFile;
+	eastl::string finalPath;
+	eastl::string pathToFile;
 	for ( CSearchPathIterator it( pFilePath, true, pPathID, lengthPathID ); it; ++it )
 	{
 		// Compute a full write path
@@ -211,8 +211,8 @@ TRefPtr<IPathArrayResult> CFileSystem::FindFiles( const char* pPath, bool bFiles
 	ParsePathID( pPath, pFilePath, pPathID, lengthPathID );
 
 	// Find files in all search paths
-	std::string				 finalPath;
-	std::vector<std::string> result;
+	eastl::string				 finalPath;
+	eastl::vector<eastl::string> result;
 	for ( CSearchPathIterator it( pFilePath, false, pPathID, lengthPathID ); it; ++it )
 	{
 		// Compute a full path and find files in the full path
@@ -246,7 +246,7 @@ dllHandle_t CFileSystem::LoadModule( const char* pDLLName )
 	ParsePathID( pDLLName, pModulePath, pPathID, lengthPathID );
 
 	// Try open a file
-	std::string finalPath;
+	eastl::string finalPath;
 	for ( CSearchPathIterator it( pModulePath, false, pPathID, lengthPathID ); it; ++it )
 	{
 		// Compute a full path
@@ -296,7 +296,7 @@ bool CFileSystem::DeleteFile( const char* pPath, bool bDeleteAllPathIDs /* = fal
 
 	// Try delete a file
 	bool		bResult = false;
-	std::string finalPath;
+	eastl::string finalPath;
 	for ( CSearchPathIterator it( pFilePath, true, pPathID, lengthPathID ); it; ++it )
 	{
 		// Compute a full path
@@ -338,7 +338,7 @@ bool CFileSystem::MakeDirectory( const char* pPath )
 	ParsePathID( pPath, pFilePath, pPathID, lengthPathID );
 
 	// Try to make a directory
-	std::string finalPath;
+	eastl::string finalPath;
 	for ( CSearchPathIterator it( pFilePath, true, pPathID, lengthPathID ); it; ++it )
 	{
 		// Compute a full write path
@@ -372,7 +372,7 @@ bool CFileSystem::DeleteDirectory( const char* pPath, bool bDeleteAllPathIDs /* 
 	ParsePathID( pPath, pFilePath, pPathID, lengthPathID );
 
 	// Try to delete a directory
-	std::string finalPath;
+	eastl::string finalPath;
 	bool		bResult = false;
 	for ( CSearchPathIterator it( pFilePath, true, pPathID, lengthPathID ); it; ++it )
 	{
@@ -421,7 +421,7 @@ copyMoveResult_t CFileSystem::CopyFile( const char* pSrcPath, const char* pDestP
 	ParsePathID( pDestPath, pDestFilePath, pDestPathID, lengthDestPathID );
 
 	// Try find a file and copy it
-	std::string		 finalSrcPath;
+	eastl::string		 finalSrcPath;
 	copyMoveResult_t result = COPYMOVE_RESULT_MISC_FAIL;
 	for ( CSearchPathIterator srcIt( pSrcFilePath, false, pSrcPathID, lengthSrcPathID ); srcIt; ++srcIt )
 	{
@@ -432,8 +432,8 @@ copyMoveResult_t CFileSystem::CopyFile( const char* pSrcPath, const char* pDestP
 		if ( Plat_IsFileExists( finalSrcPath.c_str() ) && !Plat_IsFileDirectory( finalSrcPath.c_str() ) )
 		{
 			// Try copy the file
-			std::string finalDestPath;
-			std::string pathToFile;
+			eastl::string finalDestPath;
+			eastl::string pathToFile;
 			for ( CSearchPathIterator destIt( pDestFilePath, true, pDestPathID, lengthDestPathID ); destIt && result != COPYMOVE_RESULT_OK && result != COPYMOVE_RESULT_CANCELED; ++destIt )
 			{
 				// Compute a full destination path
@@ -481,9 +481,9 @@ copyMoveResult_t CFileSystem::CopyDirectory( const char* pSrcPath, const char* p
 	ParsePathID( pSrcPath, pSrcFilePath, pSrcPathID, lengthSrcPathID );
 
 	// Grab all directories to copy
-	std::vector<std::string> srcPaths;
+	eastl::vector<eastl::string> srcPaths;
 	{
-		std::string finalSrcPath;
+		eastl::string finalSrcPath;
 		for ( CSearchPathIterator srcIt( pSrcFilePath, false, pSrcPathID, lengthSrcPathID ); srcIt; ++srcIt )
 		{
 			// Compute a full source path
@@ -510,7 +510,7 @@ copyMoveResult_t CFileSystem::CopyDirectory( const char* pSrcPath, const char* p
 	ParsePathID( pDestPath, pDestFilePath, pDestPathID, lengthDestPathID );
 
 	// Copy directories
-	std::string		 finalDestPath;
+	eastl::string		 finalDestPath;
 	copyMoveResult_t result = COPYMOVE_RESULT_MISC_FAIL;
 	for ( CSearchPathIterator destIt( pDestFilePath, true, pDestPathID, lengthDestPathID ); destIt && result != COPYMOVE_RESULT_OK && result != COPYMOVE_RESULT_CANCELED; ++destIt )
 	{
@@ -562,7 +562,7 @@ copyMoveResult_t CFileSystem::MoveFile( const char* pSrcPath, const char* pDestP
 	ParsePathID( pDestPath, pDestFilePath, pDestPathID, lengthDestPathID );
 
 	// Try find a file and move it
-	std::string		 finalSrcPath;
+	eastl::string		 finalSrcPath;
 	copyMoveResult_t result = COPYMOVE_RESULT_MISC_FAIL;
 	for ( CSearchPathIterator srcIt( pSrcFilePath, false, pSrcPathID, lengthSrcPathID ); srcIt; ++srcIt )
 	{
@@ -573,8 +573,8 @@ copyMoveResult_t CFileSystem::MoveFile( const char* pSrcPath, const char* pDestP
 		if ( Plat_IsFileExists( finalSrcPath.c_str() ) && !Plat_IsFileDirectory( finalSrcPath.c_str() ) )
 		{
 			// Try move the file
-			std::string finalDestPath;
-			std::string pathToFile;
+			eastl::string finalDestPath;
+			eastl::string pathToFile;
 			for ( CSearchPathIterator destIt( pDestFilePath, true, pDestPathID, lengthDestPathID ); destIt && result != COPYMOVE_RESULT_OK && result != COPYMOVE_RESULT_CANCELED; ++destIt )
 			{
 				// Compute a full destination path
@@ -622,9 +622,9 @@ copyMoveResult_t CFileSystem::MoveDirectory( const char* pSrcPath, const char* p
 	ParsePathID( pSrcPath, pSrcFilePath, pSrcPathID, lengthSrcPathID );
 
 	// Grab all directories to move
-	std::vector<std::string> srcPaths;
+	eastl::vector<eastl::string> srcPaths;
 	{
-		std::string finalSrcPath;
+		eastl::string finalSrcPath;
 		for ( CSearchPathIterator srcIt( pSrcFilePath, true, pSrcPathID, lengthSrcPathID ); srcIt; ++srcIt )
 		{
 			// Compute a full source path
@@ -651,7 +651,7 @@ copyMoveResult_t CFileSystem::MoveDirectory( const char* pSrcPath, const char* p
 	ParsePathID( pDestPath, pDestFilePath, pDestPathID, lengthDestPathID );
 
 	// Move directories
-	std::string		 finalDestPath;
+	eastl::string		 finalDestPath;
 	copyMoveResult_t result = COPYMOVE_RESULT_MISC_FAIL;
 	for ( CSearchPathIterator destIt( pDestFilePath, true, pDestPathID, lengthDestPathID ); destIt && result != COPYMOVE_RESULT_OK && result != COPYMOVE_RESULT_CANCELED; ++destIt )
 	{
@@ -697,7 +697,7 @@ bool CFileSystem::IsFileExists( const char* pPath ) const
 	ParsePathID( pPath, pFilePath, pPathID, lengthPathID );
 
 	// Check on existing a file
-	std::string finalPath;
+	eastl::string finalPath;
 	for ( CSearchPathIterator it( pFilePath, false, pPathID, lengthPathID ); it; ++it )
 	{
 		// Compute a full path
@@ -730,7 +730,7 @@ bool CFileSystem::IsFileDirectory( const char* pPath ) const
 	ParsePathID( pPath, pFilePath, pPathID, lengthPathID );
 
 	// Check a directory
-	std::string finalPath;
+	eastl::string finalPath;
 	for ( CSearchPathIterator it( pFilePath, false, pPathID, lengthPathID ); it; ++it )
 	{
 		// Compute a full path
@@ -763,7 +763,7 @@ bool CFileSystem::MakeDirectoryInternal( const char* pPath )
 	}
 
 	// Preallocate memory for string
-	std::string fullPath;
+	eastl::string fullPath;
 	fullPath.resize( S_Strlen( pPath ) );
 
 	// Try make directory tree
@@ -798,7 +798,7 @@ bool CFileSystem::DeleteDirectoryInternal( const char* pPath, bool bEvenReadOnly
 	}
 
 	// Delete all files
-	std::vector<std::string> paths;
+	eastl::vector<eastl::string> paths;
 	Plat_FindFiles( pPath, true, false, paths );
 	for ( uint32 index = 0, count = (uint32)paths.size(); index < count; ++index )
 	{
@@ -844,12 +844,12 @@ copyMoveResult_t CFileSystem::CopyDirectoryInternal( const char* pSrcPath, const
 	}
 
 	// Copy files
-	std::vector<std::string> paths;
+	eastl::vector<eastl::string> paths;
 	Plat_FindFiles( pSrcPath, true, false, paths );
 	for ( uint32 index = 0, count = (uint32)paths.size(); index < count; ++index )
 	{
 		// Get a full destination path
-		std::string destPath = S_Sprintf( "%s/%s", pDestPath, S_GetFileName( paths[index].c_str() ) );
+		eastl::string destPath = S_Sprintf( "%s/%s", pDestPath, S_GetFileName( paths[index].c_str() ) );
 		S_FixPathSeparators( destPath );
 
 		// Copy a file
@@ -866,7 +866,7 @@ copyMoveResult_t CFileSystem::CopyDirectoryInternal( const char* pSrcPath, const
 	for ( uint32 index = 0, count = (uint32)paths.size(); index < count; ++index )
 	{
 		// Get a full destination path
-		std::string destPath = S_Sprintf( "%s/%s", pDestPath, S_GetFileName( paths[index].c_str() ) );
+		eastl::string destPath = S_Sprintf( "%s/%s", pDestPath, S_GetFileName( paths[index].c_str() ) );
 		S_FixPathSeparators( destPath );
 
 		// Copy a directory
@@ -902,12 +902,12 @@ copyMoveResult_t CFileSystem::MoveDirectoryInternal( const char* pSrcPath, const
 	}
 
 	// Move files
-	std::vector<std::string> paths;
+	eastl::vector<eastl::string> paths;
 	Plat_FindFiles( pSrcPath, true, false, paths );
 	for ( uint32 index = 0, count = (uint32)paths.size(); index < count; ++index )
 	{
 		// Get a full destination path
-		std::string destPath = S_Sprintf( "%s/%s", pDestPath, S_GetFileName( paths[index].c_str() ) );
+		eastl::string destPath = S_Sprintf( "%s/%s", pDestPath, S_GetFileName( paths[index].c_str() ) );
 		S_FixPathSeparators( destPath );
 
 		// Move a file
@@ -924,7 +924,7 @@ copyMoveResult_t CFileSystem::MoveDirectoryInternal( const char* pSrcPath, const
 	for ( uint32 index = 0, count = (uint32)paths.size(); index < count; ++index )
 	{
 		// Get a full destination path
-		std::string destPath = S_Sprintf( "%s/%s", pDestPath, S_GetFileName( paths[index].c_str() ) );
+		eastl::string destPath = S_Sprintf( "%s/%s", pDestPath, S_GetFileName( paths[index].c_str() ) );
 		S_FixPathSeparators( destPath );
 
 		// Move a directory
@@ -989,7 +989,7 @@ CFileSystem::GetSearchPath
 */
 TRefPtr<IPathArrayResult> CFileSystem::GetSearchPath( const char* pPathID ) const
 {
-	std::vector<std::string> result;
+	eastl::vector<eastl::string> result;
 	for ( uint32 index = 0, count = (uint32)searchPaths.size(); index < count; ++index )
 	{
 		const CSearchPath& searchPath = searchPaths[index];
@@ -1061,7 +1061,7 @@ void CFileSystem::ParsePathID( const char* pPath, const char*& pFilePath, const 
 CFileSystem::ComputeFullPath
 ==================
 */
-void CFileSystem::ComputeFullPath( const char* pFilePath, const CSearchPath* pSearchPath, std::string& destPath ) const
+void CFileSystem::ComputeFullPath( const char* pFilePath, const CSearchPath* pSearchPath, eastl::string& destPath ) const
 {
 	destPath.clear();
 	Assert( pSearchPath );

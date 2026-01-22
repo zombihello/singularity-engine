@@ -200,10 +200,10 @@ private:
 	void	  GenerateMipmaps( CMP_MipSet& cmpMipSet, stexTextureMipMaps_t& mipmaps ) const;
 
 	// The function convert the texture data into a new pixel format and copy it into output array
-	CMP_ERROR ConvertMipsData( CMP_MipSet& cmpMipSet, CMP_FORMAT cmpNewFormat, const stexTextureMipMaps_t& mipmaps, std::vector<byte>& data, uint32 dataOffset = 0 ) const;
+	CMP_ERROR ConvertMipsData( CMP_MipSet& cmpMipSet, CMP_FORMAT cmpNewFormat, const stexTextureMipMaps_t& mipmaps, eastl::vector<byte>& data, uint32 dataOffset = 0 ) const;
 
 	// Copy a texture data as is
-	void CopyMipsData( CMP_MipSet& cmpMipSet, std::vector<byte>& data, uint32 dataOffset = 0 ) const;
+	void CopyMipsData( CMP_MipSet& cmpMipSet, eastl::vector<byte>& data, uint32 dataOffset = 0 ) const;
 };
 
 EXPOSE_SINGLE_INTERFACE( CTextureTool, ITextureTool, TEXTURE_TOOL_INTERFACE_VERSION );
@@ -273,7 +273,7 @@ bool CTextureTool::CompileTexture( const resourceToolCompileTextureParams_t& com
 
 	// Compile each texture layer
 	stexTextureMipMaps_t mipmaps;
-	std::vector<byte>	 data;
+	eastl::vector<byte>	 data;
 	for ( uint32 sourcePathIdx = 0; sourcePathIdx < compileParams.numSrcPaths; ++sourcePathIdx )
 	{
 		Msg( "TextureTool: Compiling texture layer %i...", sourcePathIdx );
@@ -341,7 +341,7 @@ bool CTextureTool::CompileTexture( const resourceToolCompileTextureParams_t& com
 	}
 
 	// Save texture to compiled STEX format
-	std::string destPath = S_Sprintf( "%s.stex_c", compileParams.pDestPath );
+	eastl::string destPath = S_Sprintf( "%s.stex_c", compileParams.pDestPath );
 	Msg( "TextureTool: Saving the texture to '%s'...", destPath.c_str() );
 	CSTEXCompiledTextureDoc stexCompiledFile;
 	stexCompiledFile.SetData( compileParams.type, compileParams.numSrcPaths, mipmaps, data, compileParams.pixelFormat );
@@ -430,7 +430,7 @@ void CTextureTool::GenerateMipmaps( CMP_MipSet& cmpMipSet, stexTextureMipMaps_t&
 CTextureTool::ConvertMipsData
 ==================
 */
-CMP_ERROR CTextureTool::ConvertMipsData( CMP_MipSet& cmpMipSet, CMP_FORMAT cmpNewFormat, const stexTextureMipMaps_t& mipmaps, std::vector<byte>& data, uint32 dataOffset /* = 0 */ ) const
+CMP_ERROR CTextureTool::ConvertMipsData( CMP_MipSet& cmpMipSet, CMP_FORMAT cmpNewFormat, const stexTextureMipMaps_t& mipmaps, eastl::vector<byte>& data, uint32 dataOffset /* = 0 */ ) const
 {
 	// Set compression options
 	CMP_CompressOptions cmpCompressOptions = {};
@@ -531,7 +531,7 @@ CMP_ERROR CTextureTool::ConvertMipsData( CMP_MipSet& cmpMipSet, CMP_FORMAT cmpNe
 CTextureTool::CopyMipsData
 ==================
 */
-void CTextureTool::CopyMipsData( CMP_MipSet& cmpMipSet, std::vector<byte>& data, uint32 dataOffset /* = 0 */ ) const
+void CTextureTool::CopyMipsData( CMP_MipSet& cmpMipSet, eastl::vector<byte>& data, uint32 dataOffset /* = 0 */ ) const
 {
 	// Copy a data from CMP_MipLevel to own data
 	Assert( data.empty() );

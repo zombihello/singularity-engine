@@ -46,7 +46,7 @@ FORCEINLINE uint32 CSENTCompiledEntityDescDoc::GetNumComponents() const
 CSENTCompiledEntityDescDoc::GetComponents
 ==================
 */
-FORCEINLINE const std::vector<CSENTEntityDescComponent>& CSENTCompiledEntityDescDoc::GetComponents() const
+FORCEINLINE const eastl::vector<CSENTEntityDescComponent>& CSENTCompiledEntityDescDoc::GetComponents() const
 {
 	return components;
 }

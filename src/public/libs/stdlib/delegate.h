@@ -1,5 +1,5 @@
 #pragma once
-#include <list>
+#include <EASTL/list.h>
 
 #include "stdlib/defines.h"
 #include "core/threading.h"
@@ -64,8 +64,8 @@ public:
 	virtual void			Broadcast( TParamTypes... params ) const override;
 
 private:
-	std::list<funcDelegate_t> funcDelegates;
-	mutable CThreadMutex	  mutex;
+	eastl::list<funcDelegate_t> funcDelegates;
+	mutable CThreadMutex		mutex;
 };
 
 template<typename... TParamTypes>

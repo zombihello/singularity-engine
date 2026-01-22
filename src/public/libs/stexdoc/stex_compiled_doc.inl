@@ -5,7 +5,7 @@
 CSTEXCompiledTextureDoc::SetData
 ==================
 */
-FORCEINLINE void CSTEXCompiledTextureDoc::SetData( studioAPITextureType_t type, uint32 numLayers, const stexTextureMipMaps_t& mipmaps, const std::vector<byte>& data, studioAPIPixelFormat_t pixelFormat )
+FORCEINLINE void CSTEXCompiledTextureDoc::SetData( studioAPITextureType_t type, uint32 numLayers, const stexTextureMipMaps_t& mipmaps, const eastl::vector<byte>& data, studioAPIPixelFormat_t pixelFormat )
 {
 	Validate( type, numLayers, mipmaps );
 	CSTEXCompiledTextureDoc::type		 = type;
@@ -20,13 +20,13 @@ FORCEINLINE void CSTEXCompiledTextureDoc::SetData( studioAPITextureType_t type, 
 CSTEXCompiledTextureDoc::SetData
 ==================
 */
-FORCEINLINE void CSTEXCompiledTextureDoc::SetData( studioAPITextureType_t type, uint32 numLayers, stexTextureMipMaps_t& mipmaps, std::vector<byte>& data, studioAPIPixelFormat_t pixelFormat )
+FORCEINLINE void CSTEXCompiledTextureDoc::SetData( studioAPITextureType_t type, uint32 numLayers, stexTextureMipMaps_t& mipmaps, eastl::vector<byte>& data, studioAPIPixelFormat_t pixelFormat )
 {
 	Validate( type, numLayers, mipmaps );
 	CSTEXCompiledTextureDoc::type		 = type;
 	CSTEXCompiledTextureDoc::numLayers	 = numLayers;
-	CSTEXCompiledTextureDoc::mipmaps	 = std::move( mipmaps );
-	CSTEXCompiledTextureDoc::data		 = std::move( data );
+	CSTEXCompiledTextureDoc::mipmaps	 = eastl::move( mipmaps );
+	CSTEXCompiledTextureDoc::data		 = eastl::move( data );
 	CSTEXCompiledTextureDoc::pixelFormat = pixelFormat;
 }
 
@@ -219,7 +219,7 @@ FORCEINLINE const stexTextureMipMaps_t& CSTEXCompiledTextureDoc::GetMipmaps() co
 CSTEXCompiledTextureDoc::GetData
 ==================
 */
-FORCEINLINE const std::vector<byte>& CSTEXCompiledTextureDoc::GetData() const
+FORCEINLINE const eastl::vector<byte>& CSTEXCompiledTextureDoc::GetData() const
 {
 	return data;
 }

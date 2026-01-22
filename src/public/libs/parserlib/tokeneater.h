@@ -15,6 +15,6 @@ public:
 	virtual void OnEmitError( uint32 line, const char* pMessage );
 
 protected:
-	std::string			path;
+	eastl::string			path;
 	CParserTokenStream& tokens;	 // Here will be places all of parsed tokens
 };

@@ -21,7 +21,7 @@ VK_CheckInstanceExtensionsSupported
 bool VK_CheckInstanceExtensionsSupported( const char** pInstanceExtensionNames, uint32 instanceExtensionNum )
 {
 	// Get all available extensions
-	std::vector<VkExtensionProperties> availableExtensions;
+	eastl::vector<VkExtensionProperties> availableExtensions;
 	uint32							   instanceExtensionCount = 0;
 	vkEnumerateInstanceExtensionProperties( NULL, &instanceExtensionCount, NULL );
 
@@ -68,7 +68,7 @@ VK_CheckValidationLayersSupported
 bool VK_CheckValidationLayersSupported( const char** pValidationLayerNames, uint32 validationLayerNum )
 {
 	// Get all available layers
-	std::vector<VkLayerProperties> availableLayers;
+	eastl::vector<VkLayerProperties> availableLayers;
 	uint32						   layersCount = 0;
 	vkEnumerateInstanceLayerProperties( &layersCount, NULL );
 
@@ -125,7 +125,7 @@ bool VK_CheckDeviceExtensionsSupported( VkPhysicalDevice vkPhysicalDevice, const
 	}
 
 	// Otherwise we get all supported layers and check they
-	std::vector<VkExtensionProperties> availableDeviceExtensions( availableDeviceExtCount );
+	eastl::vector<VkExtensionProperties> availableDeviceExtensions( availableDeviceExtCount );
 	vkEnumerateDeviceExtensionProperties( vkPhysicalDevice, NULL, &availableDeviceExtCount, availableDeviceExtensions.data() );
 
 	for ( uint32 index = 0; index < deviceExtensionNum; ++index )

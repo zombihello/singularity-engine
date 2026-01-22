@@ -31,7 +31,7 @@ ConvTextToSMTMaterialVarType
 */
 static smatMaterialVarType_t ConvTextToSMTMaterialVarType( const char* pText )
 {
-	std::string normalizedText = pText;
+	eastl::string normalizedText = pText;
 	S_Strlwr( (char*)normalizedText.c_str() );
 
 	for ( uint32 index = 0; index < ARRAYSIZE( s_pVarTypeNames ); ++index )
@@ -132,7 +132,7 @@ bool CSMATSourceMaterialDoc::GrabData( const CJsonDoc& jsonDoc )
 		{
 			if ( jsonOutputDir.IsA( JSONVALUE_TYPE_STRING ) )
 			{
-				std::string outputDir = jsonOutputDir.GetString();
+				eastl::string outputDir = jsonOutputDir.GetString();
 				if ( outputDir.empty() )
 				{
 					Error( "SMATDoc: Invalid 'output-dir', an output directory can't be empty" );
@@ -183,15 +183,15 @@ bool CSMATSourceMaterialDoc::GrabData( const CJsonDoc& jsonDoc )
 		{
 			if ( jsonParametersVar.IsA( JSONVALUE_TYPE_ARRAY ) )
 			{
-				std::vector<CJsonValue> jsonParametersArray = jsonParametersVar.GetArray();
+				eastl::vector<CJsonValue> jsonParametersArray = jsonParametersVar.GetArray();
 				for ( uint32 varIdx = 0, count = (uint32)jsonParametersArray.size(); varIdx < count; ++varIdx )
 				{
 					const CJsonValue& jsonValue = jsonParametersArray[varIdx];
 					if ( jsonValue.IsValid() && jsonValue.IsA( JSONVALUE_TYPE_OBJECT ) )
 					{
 						CJsonObject jsonObject = jsonValue.GetObject();
-						std::string name	   = jsonObject.GetValue( "name" ).GetString();
-						std::string type	   = jsonObject.GetValue( "type" ).GetString();
+						eastl::string name	   = jsonObject.GetValue( "name" ).GetString();
+						eastl::string type	   = jsonObject.GetValue( "type" ).GetString();
 						if ( name.empty() )
 						{
 							Error( "SMATDoc: Invalid 'name' at parameter id '%i'", varIdx );
@@ -311,7 +311,7 @@ bool CSMATSourceMaterialDoc::GrabData( const CJsonDoc& jsonDoc )
 
 						case SMAT_MATERIAL_VAR_TYPE_STRING:
 						{
-							std::string value;
+							eastl::string value;
 							if ( !GrabValueAsString( jsonObject.GetValue( "value" ), value ) )
 							{
 								Error( "SMATDoc: Invalid value in '%s', must be string type (parameter id: %i)", name.c_str(), varIdx );
@@ -325,7 +325,7 @@ bool CSMATSourceMaterialDoc::GrabData( const CJsonDoc& jsonDoc )
 
 						case SMAT_MATERIAL_VAR_TYPE_TEXTURE:
 						{
-							std::string value;
+							eastl::string value;
 							if ( !GrabValueAsString( jsonObject.GetValue( "value" ), value ) )
 							{
 								Error( "SMATDoc: Invalid value in '%s', must be string type (parameter id: %i)", name.c_str(), varIdx );
@@ -339,7 +339,7 @@ bool CSMATSourceMaterialDoc::GrabData( const CJsonDoc& jsonDoc )
 
 						case SMAT_MATERIAL_VAR_TYPE_MATERIAL:
 						{
-							std::string value;
+							eastl::string value;
 							if ( !GrabValueAsString( jsonObject.GetValue( "value" ), value ) )
 							{
 								Error( "SMATDoc: Invalid value in '%s', must be string type (parameter id: %i)", name.c_str(), varIdx );
@@ -495,7 +495,7 @@ bool CSMATSourceMaterialDoc::GrabValueAsMatrix( const CJsonValue& jsonValue, mat
 CSMATSourceMaterialDoc::GrabValueAsString
 ==================
 */
-bool CSMATSourceMaterialDoc::GrabValueAsString( const CJsonValue& jsonValue, std::string& value ) const
+bool CSMATSourceMaterialDoc::GrabValueAsString( const CJsonValue& jsonValue, eastl::string& value ) const
 {
 	if ( !jsonValue.IsValid() || !jsonValue.IsA( JSONVALUE_TYPE_STRING ) )
 	{
@@ -525,7 +525,7 @@ bool CSMATSourceMaterialDoc::SaveFile( const char* pPath )
 		return false;
 	}
 
-	std::string buffer;
+	eastl::string buffer;
 	buffer += "{\n";
 
 	// Write an output directory and the shader name

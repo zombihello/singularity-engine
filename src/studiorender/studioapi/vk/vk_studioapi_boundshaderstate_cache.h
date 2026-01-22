@@ -18,10 +18,10 @@ class CStudioAPIBoundShaderStateVk;
 class CStudioAPIBoundShaderStateKeyVk
 {
 public:
-	// Key hasher for using CStudioAPIBoundShaderStateKeyVk in std::unordered_map
+	// Key hasher for using CStudioAPIBoundShaderStateKeyVk in eastl::unordered_map
 	struct boundShaderStateKeyHasher_t
 	{
-		std::size_t operator()( const CStudioAPIBoundShaderStateKeyVk& key ) const;
+		size_t operator()( const CStudioAPIBoundShaderStateKeyVk& key ) const;
 	};
 
 	CStudioAPIBoundShaderStateKeyVk( CStudioAPIVertexDeclarationVk* pVertexDeclaration, CStudioAPIVertexShaderVk* pVertexShader, CStudioAPIPixelShaderVk* pPixelShader, CStudioAPIHullShaderVk* pHullShader = NULL, CStudioAPIDomainShaderVk* pDomainShader = NULL, CStudioAPIGeometryShaderVk* pGeometryShader = NULL );
@@ -46,7 +46,7 @@ public:
 	void						  RemoveAll();
 
 private:
-	std::unordered_map<CStudioAPIBoundShaderStateKeyVk, CStudioAPIBoundShaderStateVk*, CStudioAPIBoundShaderStateKeyVk::boundShaderStateKeyHasher_t> boundShaderStateDict;
+	eastl::unordered_map<CStudioAPIBoundShaderStateKeyVk, CStudioAPIBoundShaderStateVk*, CStudioAPIBoundShaderStateKeyVk::boundShaderStateKeyHasher_t> boundShaderStateDict;
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_boundshaderstate_cache.inl"

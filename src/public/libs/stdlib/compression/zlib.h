@@ -1,6 +1,4 @@
 #pragma once
-#include <vector>
-
 #include "stdlib/defines.h"
 #include "stdlib/types.h"
 #include "stdlib/istreamdata.h"

@@ -1,4 +1,5 @@
-#include <string>
+#include <EASTL/string.h>
+
 #include "interfaces/interfaces.h"
 #include "stdlib/stdlib.h"
 #include "core/core.h"

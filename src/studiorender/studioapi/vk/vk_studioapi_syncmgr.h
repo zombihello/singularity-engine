@@ -133,14 +133,14 @@ public:
 	void ReleaseNamedSemaphore( CStudioAPINamedSemaphoreVk*& pNamedSemaphore );
 
 private:
-	std::list<CStudioAPIFenceVk*>									  fences;
-	std::list<CStudioAPISemaphoreVk*>								  semaphores;
-	std::list<CStudioAPIFenceVk*>									  frameInFlightFences[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];
-	std::list<CStudioAPIFenceVk*>									  pendingFreeFences[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];
-	std::list<CStudioAPISemaphoreVk*>								  pendingFreeSemaphores[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];
-	std::list<CStudioAPIFenceVk*>									  freeFences;
-	std::list<CStudioAPISemaphoreVk*>								  freeSemaphores;
-	std::unordered_map<std::string_view, CStudioAPINamedSemaphoreVk*> namedSemaphoresDict;
+	eastl::list<CStudioAPIFenceVk*>									  fences;
+	eastl::list<CStudioAPISemaphoreVk*>								  semaphores;
+	eastl::list<CStudioAPIFenceVk*>									  frameInFlightFences[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];
+	eastl::list<CStudioAPIFenceVk*>									  pendingFreeFences[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];
+	eastl::list<CStudioAPISemaphoreVk*>								  pendingFreeSemaphores[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];
+	eastl::list<CStudioAPIFenceVk*>									  freeFences;
+	eastl::list<CStudioAPISemaphoreVk*>								  freeSemaphores;
+	eastl::unordered_map<eastl::string_view, CStudioAPINamedSemaphoreVk*> namedSemaphoresDict;
 };
 
 //-----------------------------------------------------------------------------

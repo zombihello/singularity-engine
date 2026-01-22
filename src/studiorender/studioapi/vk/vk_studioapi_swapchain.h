@@ -101,8 +101,8 @@ private:
 	COnStudioAPIVkShutdown::funcDelegate_t*	 pStudioAPIVkShutdownDelegate;
 	COnReCreated							 onReCreated;
 	CStudioAPISemaphoreVk*					 pImageAvailableSemaphores[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];
-	std::vector<CStudioAPISemaphoreVk*>		 renderFinishedSemaphores;
-	std::vector<CStudioAPISwapChainImageVk*> swapChainImages;
+	eastl::vector<CStudioAPISemaphoreVk*>		 renderFinishedSemaphores;
+	eastl::vector<CStudioAPISwapChainImageVk*> swapChainImages;
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_swapchain.inl"

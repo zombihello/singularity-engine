@@ -46,7 +46,7 @@ FORCEINLINE uint32 CSMAPCompiledMapDoc::GetNumEntities() const
 CSMAPCompiledMapDoc::GetEntities
 ==================
 */
-FORCEINLINE const std::vector<CSMAPEntity>& CSMAPCompiledMapDoc::GetEntities() const
+FORCEINLINE const eastl::vector<CSMAPEntity>& CSMAPCompiledMapDoc::GetEntities() const
 {
 	return entities;
 }

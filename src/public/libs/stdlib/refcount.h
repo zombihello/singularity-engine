@@ -49,7 +49,7 @@ public:
 	// Hash function for STL containers
 	struct hashFunction_t
 	{
-		std::size_t operator()( const TRefPtr& refPtr ) const;
+		size_t operator()( const TRefPtr& refPtr ) const;
 	};
 
 	TRefPtr()

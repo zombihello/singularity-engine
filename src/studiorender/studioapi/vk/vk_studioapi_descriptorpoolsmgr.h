@@ -1,6 +1,6 @@
 #pragma once
-#include <vector>
-#include <list>
+#include <EASTL/vector.h>
+#include <EASTL/list.h>
 
 #include "Volk/volk.h"
 #include "studiorender/studioapi/vk/vk_studioapi_delegates.h"
@@ -40,9 +40,9 @@ private:
 	CStudioAPIDescriptorPoolVk* GetFreePool( bool bForceNewPool );
 	CStudioAPIDescriptorPoolVk* PushNewPool();
 
-	const CStudioAPIDescriptorSetsLayoutVk&			 descriptorSetsLayout;
-	std::list<CStudioAPIDescriptorPoolVk*>::iterator poolCurrentIt;
-	std::list<CStudioAPIDescriptorPoolVk*>			 poolList;
+	const CStudioAPIDescriptorSetsLayoutVk&			   descriptorSetsLayout;
+	eastl::list<CStudioAPIDescriptorPoolVk*>::iterator poolCurrentIt;
+	eastl::list<CStudioAPIDescriptorPoolVk*>		   poolList;
 };
 
 //-----------------------------------------------------------------------------
@@ -62,9 +62,9 @@ public:
 	uint64 GetLastFrameUsed() const;
 
 private:
-	bool															bUsed;
-	uint64															lastFrameUsed;
-	std::unordered_map<hash_t, CStudioAPITypedDescriptorPoolSetVk*> typedDescriptorPoolsDict;
+	bool															  bUsed;
+	uint64															  lastFrameUsed;
+	eastl::unordered_map<hash_t, CStudioAPITypedDescriptorPoolSetVk*> typedDescriptorPoolsDict;
 };
 
 //-----------------------------------------------------------------------------
@@ -86,8 +86,8 @@ public:
 private:
 	static void OnStudioAPIVkShutdown( void* pUserData );
 
-	std::list<CStudioAPIDescriptorPoolSetContainerVk*> poolSets;
-	COnStudioAPIVkShutdown::funcDelegate_t*			   pStudioAPIVkShutdownDelegate;
+	eastl::list<CStudioAPIDescriptorPoolSetContainerVk*> poolSets;
+	COnStudioAPIVkShutdown::funcDelegate_t*				 pStudioAPIVkShutdownDelegate;
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_descriptorpoolsmgr.inl"

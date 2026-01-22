@@ -243,7 +243,7 @@ bool CSTEXSourceTextureDoc::LoadFromFile( const char* pPath )
 		{
 			if ( jsonType.IsA( JSONVALUE_TYPE_STRING ) )
 			{
-				std::string typeName = jsonType.GetString();
+				eastl::string typeName = jsonType.GetString();
 				if ( !ConvTextToTextureType( typeName.c_str(), type ) )
 				{
 					Error( "STEXDoc: Invalid 'type', unknown or unsupported texture type '%s'", typeName.c_str() );
@@ -291,7 +291,7 @@ bool CSTEXSourceTextureDoc::LoadFromFile( const char* pPath )
 		{
 			if ( jsonAddressModeU.IsA( JSONVALUE_TYPE_STRING ) )
 			{
-				std::string addressModeUName = jsonAddressModeU.GetString();
+				eastl::string addressModeUName = jsonAddressModeU.GetString();
 				if ( !ConvTextToSamplerAddressMode( addressModeUName.c_str(), addressModeU ) )
 				{
 					Error( "STEXDoc: Invalid 'address-mode-u', unknown or unsupported sampler address mode '%s'", addressModeUName.c_str() );
@@ -317,7 +317,7 @@ bool CSTEXSourceTextureDoc::LoadFromFile( const char* pPath )
 		{
 			if ( jsonAddressModeV.IsA( JSONVALUE_TYPE_STRING ) )
 			{
-				std::string addressModeVName = jsonAddressModeV.GetString();
+				eastl::string addressModeVName = jsonAddressModeV.GetString();
 				if ( !ConvTextToSamplerAddressMode( addressModeVName.c_str(), addressModeV ) )
 				{
 					Error( "STEXDoc: Invalid 'address-mode-v', unknown or unsupported sampler address mode '%s'", addressModeVName.c_str() );
@@ -343,7 +343,7 @@ bool CSTEXSourceTextureDoc::LoadFromFile( const char* pPath )
 		{
 			if ( jsonAddressModeW.IsA( JSONVALUE_TYPE_STRING ) )
 			{
-				std::string addressModeWName = jsonAddressModeW.GetString();
+				eastl::string addressModeWName = jsonAddressModeW.GetString();
 				if ( !ConvTextToSamplerAddressMode( addressModeWName.c_str(), addressModeW ) )
 				{
 					Error( "STEXDoc: Invalid 'address-mode-w', unknown or unsupported sampler address mode '%s'", addressModeWName.c_str() );
@@ -369,7 +369,7 @@ bool CSTEXSourceTextureDoc::LoadFromFile( const char* pPath )
 		{
 			if ( jsonFilter.IsA( JSONVALUE_TYPE_STRING ) )
 			{
-				std::string filterName = jsonFilter.GetString();
+				eastl::string filterName = jsonFilter.GetString();
 				if ( !ConvTextToSamplerFilter( filterName.c_str(), filter ) )
 				{
 					Error( "STEXDoc: Invalid 'filter', unknown or unsupported sampler filter '%s'", filterName.c_str() );
@@ -395,7 +395,7 @@ bool CSTEXSourceTextureDoc::LoadFromFile( const char* pPath )
 		{
 			if ( jsonPixelFormat.IsA( JSONVALUE_TYPE_STRING ) )
 			{
-				std::string pixelFormatName = jsonPixelFormat.GetString();
+				eastl::string pixelFormatName = jsonPixelFormat.GetString();
 				if ( !ConvTextToPixelFormat( pixelFormatName.c_str(), pixelFormat ) )
 				{
 					Error( "STEXDoc: Invalid 'format', unknown or unsupported pixel format '%s'", pixelFormatName.c_str() );
@@ -421,8 +421,8 @@ bool CSTEXSourceTextureDoc::LoadFromFile( const char* pPath )
 		{
 			if ( jsonSources.IsA( JSONVALUE_TYPE_ARRAY ) )
 			{
-				std::string				validateMsg;
-				std::vector<CJsonValue> jsonArray = jsonSources.GetArray();
+				eastl::string				validateMsg;
+				eastl::vector<CJsonValue> jsonArray = jsonSources.GetArray();
 				if ( !IsValidNumSourcePaths( type, (uint32)jsonArray.size(), validateMsg ) )
 				{
 					Error( "STEXDoc: Invalid 'sources', %s", validateMsg.c_str() );
@@ -434,7 +434,7 @@ bool CSTEXSourceTextureDoc::LoadFromFile( const char* pPath )
 					const CJsonValue& jsonSource = jsonArray[index];
 					if ( jsonSource.IsValid() && jsonSource.IsA( JSONVALUE_TYPE_STRING ) )
 					{
-						std::string sourcePath = jsonSource.GetString();
+						eastl::string sourcePath = jsonSource.GetString();
 						if ( sourcePath.empty() )
 						{
 							Error( "STEXDoc: Invalid 'sources[%i]', a source file can't be empty", index );
@@ -471,7 +471,7 @@ bool CSTEXSourceTextureDoc::LoadFromFile( const char* pPath )
 		{
 			if ( jsonOutputDir.IsA( JSONVALUE_TYPE_STRING ) )
 			{
-				std::string outputDir = jsonOutputDir.GetString();
+				eastl::string outputDir = jsonOutputDir.GetString();
 				if ( outputDir.empty() )
 				{
 					Error( "STEXDoc: Invalid 'output-dir', an output directory can't be empty" );
@@ -536,7 +536,7 @@ bool CSTEXSourceTextureDoc::SaveFile( const char* pPath )
 	}
 
 	// Validate source paths number
-	std::string validateMsg;
+	eastl::string validateMsg;
 	if ( !IsValidNumSourcePaths( type, (uint32)sourcePaths.size(), validateMsg ) )
 	{
 		Error( "STEXDoc: %s", validateMsg.c_str() );
@@ -544,14 +544,14 @@ bool CSTEXSourceTextureDoc::SaveFile( const char* pPath )
 	}
 
 	// Combine all source paths to one string
-	std::string sources;
+	eastl::string sources;
 	for ( uint32 index = 0, count = (uint32)sourcePaths.size(); index < count; ++index )
 	{
 		sources += S_Sprintf( "\"%s\"%s", sourcePaths[index].c_str(), index + 1 < count ? ", " : "" );
 	}
 
 	// Write the JSON file
-	std::string buffer;
+	eastl::string buffer;
 	buffer += "{\n";
 	buffer += S_Sprintf( "\t\"type\":\t%s,\n", ConvTextureTypeToText( type ) );
 	buffer += S_Sprintf( "\t\"sources\":\t[ %s ],\n", sources.c_str() );

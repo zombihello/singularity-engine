@@ -25,7 +25,7 @@ FORCEINLINE studioAPIShaderType_t CShaderCacheDoc::GetType() const
 CShaderCacheDoc::AddCache
 ==================
 */
-FORCEINLINE void CShaderCacheDoc::AddCache( const std::string& entryPointName, const std::vector<byte>& reflectionData, const std::vector<byte>& bytecode )
+FORCEINLINE void CShaderCacheDoc::AddCache( const eastl::string& entryPointName, const eastl::vector<byte>& reflectionData, const eastl::vector<byte>& bytecode )
 {
 	caches.emplace_back( entryPointName, reflectionData, bytecode );
 }

@@ -86,7 +86,7 @@ private:
 //-----------------------------------------------------------------------------
 // Default types of ANSI and Unicode string buffer
 //-----------------------------------------------------------------------------
-typedef TParserStringBuffer<char, std::string>	 parserStringBufferANSI_t;
-typedef TParserStringBuffer<wchar_t, std::wstring> parserStringBufferWCHAR_t;
+typedef TParserStringBuffer<char, eastl::string>	 parserStringBufferANSI_t;
+typedef TParserStringBuffer<wchar_t, eastl::wstring> parserStringBufferWCHAR_t;
 
 #include "parserlib/stringbuffer.inl"

@@ -51,7 +51,7 @@ public:
 	friend CStudioAPISyncMgrVk;
 
 	CStudioAPISemaphoreVk* GetCurrentSemaphore() const;
-	const std::string&	   GetName() const;
+	const eastl::string&	   GetName() const;
 
 						   operator CStudioAPISemaphoreVk*() const;
 	CStudioAPISemaphoreVk* operator->() const;
@@ -67,7 +67,7 @@ private:
 
 	uint32				   countReferences;
 	CStudioAPISemaphoreVk* pSemaphores[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];
-	std::string			   name;
+	eastl::string			   name;
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_semaphore.inl"

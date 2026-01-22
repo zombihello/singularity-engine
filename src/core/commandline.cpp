@@ -1,7 +1,4 @@
 #include "pch_core.h"
-#include <vector>
-#include <unordered_map>
-
 #include "core/debug.h"
 #include "core/icommandline.h"
 
@@ -14,14 +11,14 @@ public:
 	virtual void Init( const char* pCommandLine ) override;
 	virtual void Shutdown() override;
 
-	virtual bool		  HasParam( const char* pParam ) const override;
-	virtual bool		  HasParam( const char* pParam, const char* pValue ) const override;
-	virtual const char*  GetFirstValue( const char* pParam ) const override;
+	virtual bool		 HasParam( const char* pParam ) const override;
+	virtual bool		 HasParam( const char* pParam, const char* pValue ) const override;
+	virtual const char*	 GetFirstValue( const char* pParam ) const override;
 	virtual const char** GetValues( const char* pParam, uint32& size ) const override;
 
 private:
-	typedef std::vector<const char*>				  values_t;
-	typedef std::unordered_map<std::string, values_t> paramDict_t;
+	typedef eastl::vector<const char*>					  values_t;
+	typedef eastl::unordered_map<eastl::string, values_t> paramDict_t;
 
 	void Parse( const char* pCommandLine );
 
@@ -44,7 +41,7 @@ ICommandLine* CommandLine()
 ParseToken
 ==================
 */
-static bool ParseToken( const char*& pStr, std::string& result, bool bUseEscape )
+static bool ParseToken( const char*& pStr, eastl::string& result, bool bUseEscape )
 {
 	//
 	// Grab the next space-delimited string from the input stream.
@@ -171,7 +168,7 @@ CCommandLine::Parse
 */
 void CCommandLine::Parse( const char* pCommandLine )
 {
-	std::string			  nextToken;
+	eastl::string		  nextToken;
 	paramDict_t::iterator itCurrentParam = paramsDict.end();
 
 	while ( ParseToken( pCommandLine, nextToken, false ) )
@@ -179,17 +176,17 @@ void CCommandLine::Parse( const char* pCommandLine )
 		S_Strlwr( nextToken.data() );
 		if ( nextToken[0] == '-' || nextToken[0] == '/' )
 		{
-			std::string token( &nextToken[1], nextToken.size() - 1 );
+			eastl::string token( &nextToken[1], nextToken.size() - 1 );
 			itCurrentParam = paramsDict.find( token );
 			if ( itCurrentParam == paramsDict.end() )
 			{
-				itCurrentParam = paramsDict.insert( std::make_pair( token, values_t() ) ).first;
+				itCurrentParam = paramsDict.insert( eastl::make_pair( token, values_t() ) ).first;
 			}
 		}
 		else if ( itCurrentParam != paramsDict.end() )
 		{
 			uint32 size	 = (uint32)nextToken.size();
-			char* pData = (char*)Mem_Malloc( ( size + 1 ) * sizeof( char ) );
+			char*  pData = (char*)Mem_Malloc( ( size + 1 ) * sizeof( char ) );
 			S_Strcpy( pData, nextToken.data() );
 			pData[size] = '\0';
 			itCurrentParam->second.push_back( pData );
@@ -204,7 +201,7 @@ CCommandLine::HasParam
 */
 bool CCommandLine::HasParam( const char* pParam ) const
 {
-	std::string param = pParam;
+	eastl::string param = pParam;
 	S_Strlwr( param.data() );
 	return paramsDict.find( param ) != paramsDict.end();
 }
@@ -216,7 +213,7 @@ CCommandLine::HasParam
 */
 bool CCommandLine::HasParam( const char* pParam, const char* pValue ) const
 {
-	std::string param = pParam;
+	eastl::string param = pParam;
 	S_Strlwr( param.data() );
 	paramDict_t::const_iterator itParam = paramsDict.find( param );
 	if ( itParam == paramsDict.end() )
@@ -224,7 +221,7 @@ bool CCommandLine::HasParam( const char* pParam, const char* pValue ) const
 		return false;
 	}
 
-	std::string value = pValue;
+	eastl::string value = pValue;
 	S_Strlwr( value.data() );
 	bool			bResult	   = false;
 	const values_t& valueArray = itParam->second;
@@ -247,7 +244,7 @@ CCommandLine::GetFirstValue
 */
 const char* CCommandLine::GetFirstValue( const char* pParam ) const
 {
-	std::string param = pParam;
+	eastl::string param = pParam;
 	S_Strlwr( param.data() );
 	paramDict_t::const_iterator itParam = paramsDict.find( param );
 	if ( itParam == paramsDict.end() || itParam->second.empty() )
@@ -265,7 +262,7 @@ CCommandLine::GetValues
 */
 const char** CCommandLine::GetValues( const char* pParam, uint32& size ) const
 {
-	std::string param = pParam;
+	eastl::string param = pParam;
 	S_Strlwr( param.data() );
 	paramDict_t::const_iterator itParam = paramsDict.find( param );
 	if ( itParam == paramsDict.end() )

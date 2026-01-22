@@ -104,7 +104,7 @@ void CStudioAPIDescriptorStateCommonVk::InitDescriptorWriteInfos()
 
 	// Initialize descriptor set write container
 	Assert( pDescriptorSetsLayout );
-	const std::vector<studioAPIDescriptorSetInfoVk_t>& descriptorSetInfos = pDescriptorSetsLayout->GetDescriptorSetInfos();
+	const eastl::vector<studioAPIDescriptorSetInfoVk_t>& descriptorSetInfos = pDescriptorSetsLayout->GetDescriptorSetInfos();
 	uint32											   numDescriptorSets  = (uint32)descriptorSetInfos.size();
 	for ( uint32 set = 0; set < numDescriptorSets; ++set )
 	{

@@ -21,7 +21,7 @@ public:
 private:
 	bool				 bProcedural;
 	resourceType_t		 type;
-	std::string			 path;
+	eastl::string			 path;
 	TRefPtr<IRefCounted> pData;
 };
 

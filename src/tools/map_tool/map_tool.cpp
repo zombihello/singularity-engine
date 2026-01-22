@@ -46,7 +46,7 @@ CMapTool::CompileMap
 bool CMapTool::CompileMap( const resourceToolCompileMapParams_t& compileParams ) const
 {
 	// Convert entities
-	std::string destPath = S_Sprintf( "%s.smap_c", compileParams.pDestPath );
+	eastl::string destPath = S_Sprintf( "%s.smap_c", compileParams.pDestPath );
 	Msg( "MapTool: Saving the map to '%s'...", destPath.c_str() );
 	CSMAPCompiledMapDoc smapCompiledFile;
 

@@ -124,7 +124,7 @@ private:
 	dllHandle_t				backendHandle;
 	IShaderCompilerBackend* pShaderCompileBackend;
 	CShaderCompilerMakeFile makefile;
-	std::string				outputPath;
+	eastl::string				outputPath;
 };
 
 /*
@@ -287,18 +287,18 @@ bool CShaderCompilerAppSystemGroup::GenerateShaderCppClass()
 {
 	bool						 bResult = true;
 	CShaderCompilerCppGenerator	 cppGenerator;
-	const std::vector<shader_t>& shaders = makefile.GetShaders();
+	const eastl::vector<shader_t>& shaders = makefile.GetShaders();
 	for ( uint32 index = 0, count = (uint32)shaders.size(); index < count; ++index )
 	{
 		// Generate C++ class for this shader
 		const shader_t& shader = shaders[index];
 		cppGenerator.Reset();
 		cppGenerator.Generate( shader );
-		const std::string& buffer = cppGenerator.GetBuffer();
+		const eastl::string& buffer = cppGenerator.GetBuffer();
 
 		// Generate file path from base name of shader source file and the one type
-		std::string shaderName;
-		std::string filePath;
+		eastl::string shaderName;
+		eastl::string filePath;
 		{
 			// Convert shader type to string
 			const char* pShaderTypeName;
@@ -338,7 +338,7 @@ bool CShaderCompilerAppSystemGroup::CompileShaders()
 {
 	// Iterate over shaders and each the one compile for all flag combination
 	bool						 bResult = true;
-	const std::vector<shader_t>& shaders = makefile.GetShaders();
+	const eastl::vector<shader_t>& shaders = makefile.GetShaders();
 	for ( uint32 index = 0, count = (uint32)shaders.size(); index < count; ++index )
 	{
 		const shader_t& shader = shaders[index];
@@ -354,9 +354,9 @@ bool CShaderCompilerAppSystemGroup::CompileShaders()
 		}
 
 		// Save shader cache
-		std::string shaderFileName;
+		eastl::string shaderFileName;
 		S_GetFileBaseName( shader.source, shaderFileName, false );
-		std::string outputFile = S_Sprintf( "%s/%s/%s.ssc", outputPath.c_str(), pShaderCompileBackend->GetShaderPlatform(), shaderFileName.c_str() );
+		eastl::string outputFile = S_Sprintf( "%s/%s/%s.ssc", outputPath.c_str(), pShaderCompileBackend->GetShaderPlatform(), shaderFileName.c_str() );
 		if ( !shaderCacheDoc.SaveFile( outputFile.c_str() ) )
 		{
 			bResult = false;
@@ -374,7 +374,7 @@ CShaderCompilerAppSystemGroup::CompileShader
 */
 bool CShaderCompilerAppSystemGroup::CompileShader( const shader_t& shader, CShaderCacheDoc& shaderCacheDoc )
 {
-	std::vector<int32> flagVarSlots( shader.flags.size() );
+	eastl::vector<int32> flagVarSlots( shader.flags.size() );
 
 	// Set all the variables to min values
 	int32*		  pFlagVarSlotBegin = flagVarSlots.data();
@@ -388,7 +388,7 @@ bool CShaderCompilerAppSystemGroup::CompileShader( const shader_t& shader, CShad
 	}
 
 	bool							bResult		 = true;
-	const std::vector<std::string>& includeDirs	 = makefile.GetIncludeDirs();
+	const eastl::vector<eastl::string>& includeDirs	 = makefile.GetIncludeDirs();
 	uint32							currentCombo = 0;
 	while ( currentCombo < shader.numFlagCombos )
 	{
@@ -512,7 +512,7 @@ bool CShaderCompilerAppSystemGroup::LoadBackend()
 	}
 
 	// Get path to backend
-	std::string backendPath = S_Sprintf( "//ENGINEBIN/%s" DLL_EXT_STRING, pBackendName );
+	eastl::string backendPath = S_Sprintf( "//ENGINEBIN/%s" DLL_EXT_STRING, pBackendName );
 
 	// Load module
 	dllHandle_t backendHandle = g_pFileSystem->LoadModule( backendPath.c_str() );
@@ -630,7 +630,7 @@ int main( int argc, char** argv )
 
 	// Initialize command line
 	{
-		std::string arguments;
+		eastl::string arguments;
 		for ( uint32 index = 0; index < (uint32)argc; ++index )
 		{
 			if ( *argv[index] == '-' || *argv[index] == '/' )

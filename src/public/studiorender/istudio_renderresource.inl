@@ -92,9 +92,9 @@ FORCEINLINE void Studio_BeginReleaseResourceSafe( TRefPtr<TStudioRenderResourceC
 CStudioGlobalRenderResources::GetResourceList
 ==================
 */
-FORCEINLINE std::unordered_set<IStudioRenderResource*>& CStudioGlobalRenderResources::GetResourceList()
+FORCEINLINE eastl::unordered_set<IStudioRenderResource*>& CStudioGlobalRenderResources::GetResourceList()
 {
-	static std::unordered_set<IStudioRenderResource*> s_studioGlobalResources;
+	static eastl::unordered_set<IStudioRenderResource*> s_studioGlobalResources;
 	return s_studioGlobalResources;
 }
 
@@ -128,7 +128,7 @@ CStudioGlobalRenderResources::InitResources
 FORCEINLINE void CStudioGlobalRenderResources::InitResources()
 {
 	CScopeLock									scopeLock( GetThreadMutex() );
-	std::unordered_set<IStudioRenderResource*>& globalResources = GetResourceList();
+	eastl::unordered_set<IStudioRenderResource*>& globalResources = GetResourceList();
 	for ( auto it = globalResources.begin(), itEnd = globalResources.end(); it != itEnd; ++it )
 	{
 		Studio_BeginInitResource( *it );
@@ -143,7 +143,7 @@ CStudioGlobalRenderResources::ReleaseResources
 FORCEINLINE void CStudioGlobalRenderResources::ReleaseResources()
 {
 	CScopeLock									scopeLock( GetThreadMutex() );
-	std::unordered_set<IStudioRenderResource*>& globalResources = GetResourceList();
+	eastl::unordered_set<IStudioRenderResource*>& globalResources = GetResourceList();
 	for ( auto it = globalResources.begin(), itEnd = globalResources.end(); it != itEnd; ++it )
 	{
 		Studio_BeginReleaseResource( *it );

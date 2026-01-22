@@ -194,7 +194,7 @@ private:
 	buttonEvent_t								 buttonEvents[BUTTON_CODE_COUNT];
 	vec2_t										 mouseLocation;
 	vec2_t										 mouseOffset;
-	std::string									 binds[BUTTON_CODE_COUNT];
+	eastl::string									 binds[BUTTON_CODE_COUNT];
 };
 
 // Input system singleton
@@ -409,7 +409,7 @@ void CInputSystem::WriteConCmdsToConfigFile( void* pUserData, IStreamDataWriter*
 	Assert( pUserData );
 	CInputSystem* pInputSystem = (CInputSystem*)pUserData;
 
-	std::string buffer;
+	eastl::string buffer;
 	buffer += "unbindall\n";
 	for ( uint32 index = 0; index < BUTTON_CODE_COUNT; ++index )
 	{

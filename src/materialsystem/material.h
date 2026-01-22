@@ -38,19 +38,19 @@ public:
 	}
 
 private:
-	// Calculate a hash for a string to use it in std::unordered_map
+	// Calculate a hash for a string to use it in eastl::unordered_map
 	struct insensitiveStringHash_t
 	{
-		std::size_t operator()( const char* pString ) const;
+		size_t operator()( const char* pString ) const;
 	};
 
-	// Comparator for std::unordered_map to insensitive compre strings
+	// Comparator for eastl::unordered_map to insensitive compre strings
 	struct insensitiveCompareString_t
 	{
 		bool operator()( const char* pLeft, const char* pRight ) const;
 	};
 
-	typedef std::unordered_map<const char*, uint32, insensitiveStringHash_t, insensitiveCompareString_t> materialVarsDict_t;
+	typedef eastl::unordered_map<const char*, uint32, insensitiveStringHash_t, insensitiveCompareString_t> materialVarsDict_t;
 
 	void Init( const CSMATCompiledMaterialDoc& smatCompiledDoc );
 	void R_UpdateBuffers( IStudioAPICmdContext* pCmdContext );
@@ -58,9 +58,9 @@ private:
 
 	bool								   bDirtyBuffers;
 	IShader*							   pShader;
-	std::vector<CMaterialVar*>			   vars;
+	eastl::vector<CMaterialVar*>			   vars;
 	materialVarsDict_t					   varsDict;
-	std::vector<TRefPtr<IStudioAPIBuffer>> studioAPIBuffers;
+	eastl::vector<TRefPtr<IStudioAPIBuffer>> studioAPIBuffers;
 };
 
 #include "materialsystem/material.inl"

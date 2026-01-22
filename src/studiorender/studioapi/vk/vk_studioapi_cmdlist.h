@@ -126,9 +126,9 @@ private:
 	uint8									  syncSwapChainFlags;
 	CStudioAPISwapChainVk*					  pSyncSwapChain;
 	TRefPtr<CStudioAPICmdContextVk>			  pCmdContext;
-	std::list<CStudioAPINamedSemaphoreVk*>	  syncSignals;
-	std::list<CStudioAPINamedSemaphoreVk*>	  syncWaits;
-	std::vector<TRefPtr<CStudioAPICmdListVk>> cmdLists;
+	eastl::list<CStudioAPINamedSemaphoreVk*>	  syncSignals;
+	eastl::list<CStudioAPINamedSemaphoreVk*>	  syncWaits;
+	eastl::vector<TRefPtr<CStudioAPICmdListVk>> cmdLists;
 };
 
 //-----------------------------------------------------------------------------
@@ -148,11 +148,11 @@ public:
 	void ClearSubmittedBatches();
 
 private:
-	typedef std::unordered_map<TRefPtr<CStudioAPICmdListBatchVk>, CStudioAPIFenceVk*, TRefPtr<CStudioAPICmdListBatchVk>::hashFunction_t> submittedBatchesDict_t;
+	typedef eastl::unordered_map<TRefPtr<CStudioAPICmdListBatchVk>, CStudioAPIFenceVk*, TRefPtr<CStudioAPICmdListBatchVk>::hashFunction_t> submittedBatchesDict_t;
 
-	void GrabVkSyncSignalsFromBatch( CStudioAPICmdListBatchVk* pCmdListBatch, std::vector<VkSemaphore>& vkSyncSignals ) const;
-	void GrabVkSyncWaitsFromBatch( CStudioAPICmdListBatchVk* pCmdListBatch, std::vector<VkSemaphore>& vkSyncWaits, std::vector<VkPipelineStageFlags>& vkSyncWaitStageMasks ) const;
-	void GrabVkCmdBuffersFromBatch( CStudioAPICmdListBatchVk* pCmdListBatch, std::vector<VkCommandBuffer>& vkCmdBuffers ) const;
+	void GrabVkSyncSignalsFromBatch( CStudioAPICmdListBatchVk* pCmdListBatch, eastl::vector<VkSemaphore>& vkSyncSignals ) const;
+	void GrabVkSyncWaitsFromBatch( CStudioAPICmdListBatchVk* pCmdListBatch, eastl::vector<VkSemaphore>& vkSyncWaits, eastl::vector<VkPipelineStageFlags>& vkSyncWaitStageMasks ) const;
+	void GrabVkCmdBuffersFromBatch( CStudioAPICmdListBatchVk* pCmdListBatch, eastl::vector<VkCommandBuffer>& vkCmdBuffers ) const;
 
 	CStudioAPICmdContextVk& cmdContext;
 	submittedBatchesDict_t	submittedBatchesDict;

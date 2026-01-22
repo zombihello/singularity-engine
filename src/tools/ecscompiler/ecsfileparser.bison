@@ -23,9 +23,9 @@
             , string( other.string )
         {}
          yystypeFile_t( yystypeFile_t&& other )
-            : pContext( std::move( other.pContext ) )
-            , token( std::move( other.token ) )
-            , string( std::move( other.string ) )
+            : pContext( eastl::move( other.pContext ) )
+            , token( eastl::move( other.token ) )
+            , string( eastl::move( other.string ) )
         {}
         ~yystypeFile_t()
         {}
@@ -45,16 +45,16 @@
 	    {
 	    	if ( this != &other )
 	    	{
-	    		pContext    = std::move( other.pContext );
-	    		token       = std::move( other.token );
-                string      = std::move( other.string );
+	    		pContext    = eastl::move( other.pContext );
+	    		token       = eastl::move( other.token );
+                string      = eastl::move( other.string );
 	    	}
 	    	return *this;
 	    }
 
         parserFileContext_t*    pContext;
-        std::string_view        token;
-        std::string             string;
+        eastl::string_view        token;
+        eastl::string             string;
     };
 
     typedef TGrammarInterface<CEcsFileParser, yystypeFile_t>        ecsGrammarInterface_t;

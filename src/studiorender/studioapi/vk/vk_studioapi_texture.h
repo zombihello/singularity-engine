@@ -138,8 +138,8 @@ private:
 	VkImage									 vkImage;
 	VmaAllocation							 vmaAllocation;
 	COnStudioAPIVkShutdown::funcDelegate_t*	 pStudioAPIVkShutdownDelegate;
-	std::vector<studioAPISyncStateImageVk_t> syncStates;
-	std::vector<VkImageView>				 vkImageViews;
+	eastl::vector<studioAPISyncStateImageVk_t> syncStates;
+	eastl::vector<VkImageView>				 vkImageViews;
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_texture.inl"

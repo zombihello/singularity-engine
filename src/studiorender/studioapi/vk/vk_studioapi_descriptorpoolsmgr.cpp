@@ -12,7 +12,7 @@ CStudioAPIDescriptorPoolVk::CStudioAPIDescriptorPoolVk( const CStudioAPIDescript
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
 
 	// When we're hashing pools with types usage hash the descriptor pool can be used for different layouts so the initial layout does not make much sense
-	std::vector<VkDescriptorPoolSize> vkDescriptorPoolSizes;
+	eastl::vector<VkDescriptorPoolSize> vkDescriptorPoolSizes;
 	for ( uint32 index = STUDIOAPI_VK_DESCRIPTOR_TYPE_BEGIN_RANGE; index <= STUDIOAPI_VK_DESCRIPTOR_TYPE_END_RANGE; ++index )
 	{
 		VkDescriptorType vkDescriptorType		= (VkDescriptorType)index;
@@ -155,7 +155,7 @@ CStudioAPIDescriptorPoolVk* CStudioAPITypedDescriptorPoolSetVk::GetFreePool( boo
 		return *poolCurrentIt;
 	}
 
-	std::list<CStudioAPIDescriptorPoolVk*>::iterator nextPoolIt = std::next( poolCurrentIt, 1 );
+	eastl::list<CStudioAPIDescriptorPoolVk*>::iterator nextPoolIt = eastl::next( poolCurrentIt, 1 );
 	if ( nextPoolIt != poolList.end() )
 	{
 		poolCurrentIt = nextPoolIt;
@@ -329,7 +329,7 @@ void CStudioAPIDescriptorPoolsMgrVk::FreeUnusedPoolSets()
 		if ( !pPoolSet->IsUsed() && g_StudioAPIVk.GetFrameNumber() - pPoolSet->GetLastFrameUsed() > STUDIOAPI_VK_NUM_FRAMES_TO_WAIT_BEFORE_RELEASING_TO_OS )
 		{
 			delete pPoolSet;
-			poolSets.erase( std::next( it ).base() );
+			poolSets.erase( eastl::next( it ).base() );
 			break;
 		}
 	}

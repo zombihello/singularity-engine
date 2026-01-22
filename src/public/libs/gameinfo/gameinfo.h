@@ -1,6 +1,6 @@
 #pragma once
-#include <string>
-#include <vector>
+#include <EASTL/string.h>
+#include <EASTL/vector.h>
 
 #include "stdlib/defines.h"
 #include "stdlib/types.h"
@@ -11,8 +11,8 @@
 //-----------------------------------------------------------------------------
 struct gameInfoSearchPath_t
 {
-	std::string id;
-	std::string path;
+	eastl::string id;
+	eastl::string path;
 };
 
 class CGameInfoDoc
@@ -26,23 +26,23 @@ public:
 	bool LoadFromBuffer( const char* pBuffer, const char* pGameInfoPath );
 	void Clear();
 
-	const std::string&						 GetGame() const;
-	const std::string&						 GetVersion() const;
-	const std::string&						 GetSupportEmail() const;
-	const std::string&						 GetSupportURL() const;
-	const std::vector<gameInfoSearchPath_t>& GetSearchPaths() const;
-	bool									 IsLoaded() const;
+	const eastl::string&					   GetGame() const;
+	const eastl::string&					   GetVersion() const;
+	const eastl::string&					   GetSupportEmail() const;
+	const eastl::string&					   GetSupportURL() const;
+	const eastl::vector<gameInfoSearchPath_t>& GetSearchPaths() const;
+	bool									   IsLoaded() const;
 
 private:
 	bool GrabData( const CJsonDoc& jsonDoc, const char* pGameInfoPath );
-	void ReplaceMacros( std::string& string, const char* pGameInfoPath );
+	void ReplaceMacros( eastl::string& string, const char* pGameInfoPath );
 
-	bool							  bLoaded;
-	std::string						  game;
-	std::string						  version;
-	std::string						  supportEmail;
-	std::string						  supportURL;
-	std::vector<gameInfoSearchPath_t> searchPaths;
+	bool								bLoaded;
+	eastl::string						game;
+	eastl::string						version;
+	eastl::string						supportEmail;
+	eastl::string						supportURL;
+	eastl::vector<gameInfoSearchPath_t> searchPaths;
 };
 
 #include "gameinfo/gameinfo.inl"

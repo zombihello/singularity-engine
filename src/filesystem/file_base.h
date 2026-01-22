@@ -1,5 +1,5 @@
 #pragma once
-#include <string>
+#include <EASTL/string.h>
 #include "stdlib/istreamdata.h"
 
 //-----------------------------------------------------------------------------
@@ -9,7 +9,7 @@ template<class TBaseClass>
 class CBaseStreamDataFile : public TRefCounted<TBaseClass>
 {
 public:
-	CBaseStreamDataFile( const std::string& path )
+	CBaseStreamDataFile( const eastl::string& path )
 		: path( path )
 	{
 	}
@@ -17,11 +17,11 @@ public:
 	// IStreamData interface
 	virtual bool			 IsReader() const override;
 	virtual bool			 IsWriter() const override;
-	virtual const char*	 GetPath() const override;
+	virtual const char*		 GetPath() const override;
 	virtual streamDataType_t GetType() const override;
 
 private:
-	std::string path;
+	eastl::string path;
 };
 
 //-----------------------------------------------------------------------------
@@ -30,7 +30,7 @@ private:
 class CBaseStreamDataFileReader : public CBaseStreamDataFile<IStreamDataReader>
 {
 public:
-	CBaseStreamDataFileReader( const std::string& path )
+	CBaseStreamDataFileReader( const eastl::string& path )
 		: CBaseStreamDataFile<IStreamDataReader>( path )
 	{
 	}
@@ -45,7 +45,7 @@ public:
 class CBaseStreamDataFileWriter : public CBaseStreamDataFile<IStreamDataWriter>
 {
 public:
-	CBaseStreamDataFileWriter( const std::string& path )
+	CBaseStreamDataFileWriter( const eastl::string& path )
 		: CBaseStreamDataFile<IStreamDataWriter>( path )
 	{
 	}
