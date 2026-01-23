@@ -149,7 +149,6 @@ add_compile_definitions( GIT_COMMIT="${GIT_COMMIT}" )
 #
 # Add project
 #
-# Engine
 add_subdirectory( utils/gameinfo )
 add_subdirectory( utils/interfaces )
 add_subdirectory( utils/parserlib )
@@ -166,7 +165,7 @@ add_subdirectory( core )
 add_subdirectory( filesystem )
 add_subdirectory( cvar )
 add_subdirectory( inputsystem )
-add_subdirectory( studiorender/studioapi/vk )
+add_subdirectory( studiorender/studioapi_vk )
 add_subdirectory( studiorender )
 add_subdirectory( materialsystem/shaderlib )
 add_subdirectory( materialsystem/stdshaders )
@@ -174,13 +173,10 @@ add_subdirectory( materialsystem )
 add_subdirectory( resourcesystem )
 add_subdirectory( appframework )
 add_subdirectory( launcher )
-add_subdirectory( gameframework )
+add_subdirectory( game/shared )
+add_subdirectory( game/citadel )
+add_subdirectory( launcher_main/citadel )
 
-# Games
-add_subdirectory( games/citadel )
-add_subdirectory( games/citadel_launcher )
-
-# Tools
 add_subdirectory( tools/ecscompiler )
 add_subdirectory( tools/entitydesc_tool )
 add_subdirectory( tools/map_tool )

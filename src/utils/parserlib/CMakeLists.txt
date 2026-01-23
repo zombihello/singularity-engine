@@ -33,7 +33,7 @@ source_group( TREE "${GENERATED_DIR}"   PREFIX "generated"      FILES   ${GENERA
 set( FULL_SRC_FILES                                     ${SRC_FILES} ${PUBLIC_SRC_FILES} ${GENERATED_FILES} )
 add_library( parserlib STATIC 	                      	${FULL_SRC_FILES} )
 target_precompile_headers( parserlib PRIVATE 			pch_parserlib.h )
-set_target_properties( parserlib PROPERTIES FOLDER      Engine/Libraries )
+set_target_properties( parserlib PROPERTIES FOLDER      Engine/Utils )
 set_target_properties( parserlib PROPERTIES PREFIX 		"" )
 
 target_link_libraries( parserlib PUBLIC 				stdlib )

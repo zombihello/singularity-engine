@@ -33,7 +33,7 @@ source_group( TREE "${GENERATED_DIR}"   PREFIX "generated"      FILES   ${GENERA
 set( FULL_SRC_FILES                                     ${SRC_FILES} ${PUBLIC_SRC_FILES} ${GENERATED_FILES} )
 add_library( shaderlib STATIC 	                      	${FULL_SRC_FILES} )
 target_precompile_headers( shaderlib PRIVATE 			pch_shaderlib.h )
-set_target_properties( shaderlib PROPERTIES FOLDER      Engine/Libraries )
+set_target_properties( shaderlib PROPERTIES FOLDER      Engine/Shaders )
 set_target_properties( shaderlib PROPERTIES PREFIX 		"" )
 
 target_link_libraries( shaderlib PUBLIC 				stdlib )

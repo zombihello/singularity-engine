@@ -44,7 +44,7 @@ source_group( TREE "${GENERATED_DIR}"   PREFIX "generated"      FILES   ${GENERA
 set( FULL_SRC_FILES                                         ${SRC_FILES} ${PUBLIC_SRC_FILES} ${GENERATED_FILES} )
 add_library( appframework STATIC 	                      	${FULL_SRC_FILES} )
 target_precompile_headers( appframework PRIVATE 			pch_appframework.h )
-set_target_properties( appframework PROPERTIES FOLDER       Engine/Libraries )
+set_target_properties( appframework PROPERTIES FOLDER       Engine )
 set_target_properties( appframework PROPERTIES PREFIX 		"" )
 
 target_link_libraries( appframework PUBLIC 					stdlib )

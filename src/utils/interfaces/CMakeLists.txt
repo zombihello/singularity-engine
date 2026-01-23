@@ -32,7 +32,7 @@ source_group( TREE "${GENERATED_DIR}"   PREFIX "generated"      FILES   ${GENERA
 
 set( FULL_SRC_FILES                                     ${SRC_FILES} ${PUBLIC_SRC_FILES} ${GENERATED_FILES} )
 add_library( interfaces STATIC 	                      	${FULL_SRC_FILES} )
-set_target_properties( interfaces PROPERTIES FOLDER     Engine/Libraries )
+set_target_properties( interfaces PROPERTIES FOLDER     Engine/Utils )
 set_target_properties( interfaces PROPERTIES PREFIX 	"" )
 
 target_link_libraries( interfaces PRIVATE 				stdlib )

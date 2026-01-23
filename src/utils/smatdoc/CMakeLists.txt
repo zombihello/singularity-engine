@@ -32,7 +32,7 @@ source_group( TREE "${GENERATED_DIR}"   PREFIX "generated"      FILES   ${GENERA
 
 set( FULL_SRC_FILES                                     ${SRC_FILES} ${PUBLIC_SRC_FILES} ${GENERATED_FILES} )
 add_library( smatdoc STATIC 	                      	${FULL_SRC_FILES} )
-set_target_properties( smatdoc PROPERTIES FOLDER        "Engine/Libraries/Data Formats" )
+set_target_properties( smatdoc PROPERTIES FOLDER        "Engine/Utils/Data Formats" )
 set_target_properties( smatdoc PROPERTIES PREFIX 		"" )
 
 target_link_libraries( smatdoc PUBLIC 					stdlib )

@@ -46,7 +46,7 @@ source_group( TREE "${GENERATED_DIR}"   PREFIX "generated"      FILES   ${GENERA
 set( FULL_SRC_FILES                                         ${SRC_FILES} ${PUBLIC_SRC_FILES} ${GENERATED_FILES} ${THIRDPARTY_VISUALIZERS} )
 add_library( stdlib STATIC 	                      	        ${FULL_SRC_FILES} )
 target_precompile_headers( stdlib PRIVATE 				    pch_stdlib.h )
-set_target_properties( stdlib PROPERTIES FOLDER             Engine/Libraries )
+set_target_properties( stdlib PROPERTIES FOLDER             Engine )
 set_target_properties( stdlib PROPERTIES PREFIX 		    "" )
 
 target_include_directories( stdlib PUBLIC					${THIRDPARTY_INCLUDES} )

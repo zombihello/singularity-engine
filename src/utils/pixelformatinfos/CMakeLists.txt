@@ -32,7 +32,7 @@ source_group( TREE "${GENERATED_DIR}"   PREFIX "generated"      FILES   ${GENERA
 
 set( FULL_SRC_FILES                                         ${SRC_FILES} ${PUBLIC_SRC_FILES} ${GENERATED_FILES} )
 add_library( pixelformatinfos STATIC                        ${FULL_SRC_FILES} )
-set_target_properties( pixelformatinfos PROPERTIES FOLDER   Engine/Libraries )
+set_target_properties( pixelformatinfos PROPERTIES FOLDER   Engine/Utils )
 set_target_properties( pixelformatinfos PROPERTIES PREFIX   "" )
 
 target_link_libraries( pixelformatinfos PUBLIC 				stdlib )

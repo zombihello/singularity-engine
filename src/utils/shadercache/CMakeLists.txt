@@ -32,7 +32,7 @@ source_group( TREE "${GENERATED_DIR}"   PREFIX "generated"      FILES   ${GENERA
 
 set( FULL_SRC_FILES                                     ${SRC_FILES} ${PUBLIC_SRC_FILES} ${GENERATED_FILES} )
 add_library( shadercache STATIC 	                    ${FULL_SRC_FILES} )
-set_target_properties( shadercache PROPERTIES FOLDER    "Engine/Libraries/Data Formats" )
+set_target_properties( shadercache PROPERTIES FOLDER    "Engine/Utils/Data Formats" )
 set_target_properties( shadercache PROPERTIES PREFIX 	"" )
 
 target_link_libraries( shadercache PUBLIC 				stdlib )

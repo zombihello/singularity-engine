@@ -32,7 +32,7 @@ source_group( TREE "${GENERATED_DIR}"   PREFIX "generated"      FILES   ${GENERA
 
 set( FULL_SRC_FILES                                     ${SRC_FILES} ${PUBLIC_SRC_FILES} ${GENERATED_FILES} )
 add_library( stexdoc STATIC 	                      	${FULL_SRC_FILES} )
-set_target_properties( stexdoc PROPERTIES FOLDER        "Engine/Libraries/Data Formats" )
+set_target_properties( stexdoc PROPERTIES FOLDER        "Engine/Utils/Data Formats" )
 set_target_properties( stexdoc PROPERTIES PREFIX 		"" )
 
 target_link_libraries( stexdoc PUBLIC 					stdlib )

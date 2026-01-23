@@ -24,7 +24,7 @@ file( GLOB_RECURSE PUBLIC_SRC_FILES CONFIGURE_DEPENDS           ${PUBLIC_SRC_PAT
 file( GLOB_RECURSE GENERATED_FILES  CONFIGURE_DEPENDS           ${GENERATED_SRC_PATTERNS} )
 
 # Filter out all unnecessary files
-list( FILTER SRC_FILES 					EXCLUDE REGEX "/studioapi/" )
+list( FILTER SRC_FILES 					EXCLUDE REGEX "/studioapi_vk/" )
 list( FILTER PUBLIC_SRC_FILES 			EXCLUDE REGEX "/studioapi/" )
 
 filter_platform_files( SRC_FILES        ${PLATFORM_SRC_DIR} )
