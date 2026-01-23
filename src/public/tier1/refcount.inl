@@ -8,7 +8,8 @@ TRefCounted::AddRef
 template<class TBaseClass>
 void TRefCounted<TBaseClass>::AddRef()
 {
-	Sys_InterlockedIncrement( (int32*)&countReferences );
+	// Reference increment does not require synchronization with other data, relaxed is enough
+	countReferences.fetch_add( 1, eastl::memory_order_relaxed );
 }
 
 /*
@@ -19,8 +20,12 @@ TRefCounted::ReleaseRef
 template<class TBaseClass>
 void TRefCounted<TBaseClass>::ReleaseRef()
 {
-	if ( !countReferences || !Sys_InterlockedDecrement( (int32*)&countReferences ) )
+	// Release on decrement publishes all records made by ref holders.
+	// If we are the last owner, before delete do acquire-fence
+	uint32 prevCountReferences = countReferences.fetch_sub( 1, eastl::memory_order_release );
+	if ( prevCountReferences <= 1 )
 	{
+		eastl::atomic_thread_fence( eastl::memory_order_acquire );
 		delete this;
 	}
 }
@@ -33,7 +38,7 @@ TRefCounted::GetRefCount
 template<class TBaseClass>
 uint32 TRefCounted<TBaseClass>::GetRefCount() const
 {
-	return countReferences;
+	return countReferences.load( eastl::memory_order_relaxed );
 }
 
 /*

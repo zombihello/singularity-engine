@@ -2,7 +2,7 @@
 #include "tier0/profile.h"
 #include "filesystem/ifilesystem.h"
 #include "utils/shadercache/shadercache.h"
-#include "tier1/compression/zlib.h"
+#include "tier1/compression.h"
 
 // Shader cache magic
 #define SSC_MAGIC ( ( 'C' << 16 ) + ( 'S' << 8 ) + 'S' )  // Singularity Shader Cache
@@ -27,12 +27,12 @@ void CShaderCacheDoc::shaderCache_t::Serialize( IStreamDataWriter* pStreamWriter
 	// Save the byte code
 	uint64 bytecodeSize = (uint64)bytecode.size();
 	pStreamWriter->Write( &bytecodeSize, sizeof( uint64 ) );
-	CZLib::Compress( pStreamWriter, bytecode.data(), bytecodeSize );
+	CompressStreamData( COMPRESSION_ZLIB, pStreamWriter, bytecode.data(), bytecodeSize );
 
 	// Save the reflection data
 	uint64 reflectionDataSize = (uint64)reflectionData.size();
 	pStreamWriter->Write( &reflectionDataSize, sizeof( uint64 ) );
-	CZLib::Compress( pStreamWriter, reflectionData.data(), reflectionDataSize );
+	CompressStreamData( COMPRESSION_ZLIB, pStreamWriter, reflectionData.data(), reflectionDataSize );
 }
 
 /*
@@ -54,13 +54,13 @@ void CShaderCacheDoc::shaderCache_t::Deserialize( IStreamDataReader* pStreamRead
 	uint64 bytecodeSize = 0;
 	pStreamReader->Read( &bytecodeSize, sizeof( uint64 ) );
 	bytecode.resize( bytecodeSize );
-	CZLib::Uncompress( pStreamReader, bytecode.data(), bytecodeSize );
+	UncompressStreamData( COMPRESSION_ZLIB, pStreamReader, bytecode.data(), bytecodeSize );
 
 	// Load the reflection data
 	uint64 reflectionDataSize = 0;
 	pStreamReader->Read( &reflectionDataSize, sizeof( uint64 ) );
 	reflectionData.resize( reflectionDataSize );
-	CZLib::Uncompress( pStreamReader, reflectionData.data(), reflectionDataSize );
+	UncompressStreamData( COMPRESSION_ZLIB, pStreamReader, reflectionData.data(), reflectionDataSize );
 }
 
 /*

@@ -1,13 +1,40 @@
 #pragma once
 
 //-----------------------------------------------------------------------------
+// Build specific macros
+//-----------------------------------------------------------------------------
+#ifndef PLATFORM_32BIT
+	#define PLATFORM_32BIT 0
+#endif	// !PLATFORM_32BIT
+
+#ifndef PLATFORM_64BIT
+	#define PLATFORM_64BIT 0
+#endif	// !PLATFORM_64BIT
+
+#ifndef ENABLE_ASSERT
+	#define ENABLE_ASSERT !RETAIL
+#endif	// !ENABLE_ASSERT
+
+#ifndef ENABLE_ENSURE
+	#define ENABLE_ENSURE !RETAIL
+#endif	// !ENABLE_ENSURE
+
+#ifndef ENABLE_LOGGING
+	#define ENABLE_LOGGING 1
+#endif	// !ENABLE_LOGGING
+
+#ifndef ENABLE_PROFILING
+	#define ENABLE_PROFILING !RETAIL
+#endif	// !ENABLE_PROFILING
+
+//-----------------------------------------------------------------------------
 // Platform specific macros
 //-----------------------------------------------------------------------------
 // By default all defines PLATFORM_XXX are 0
 #define PLATFORM_WINDOWS 0
 
 #if _WIN32 || _WIN64  // Windows platform
-	#include "tier1/platforms/windows/win_defines.h"
+	#include "tier0/platforms/windows/win_defines.h"
 #else  // Unknown platform
 	#error Unknown platform
 #endif	// _WIN32 || _WIN64

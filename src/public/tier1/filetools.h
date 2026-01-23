@@ -1,8 +1,8 @@
 #pragma once
 #include <EASTL/string.h>
 
-#include "tier1/defines.h"
-#include "tier1/types.h"
+#include "tier0/defines.h"
+#include "tier0/types.h"
 
 //-----------------------------------------------------------------------------
 // File tools

@@ -1,8 +1,10 @@
 #pragma once
+#include <EASTL/atomic.h>
+
+#include "tier0/defines.h"
+#include "tier0/types.h"
 #include "tier1/hashing/fasthash.h"
-#include "tier1/defines.h"
-#include "tier1/types.h"
-#include "tier0/threading.h"
+#include "tier1/threading.h"
 
 //-----------------------------------------------------------------------------
 // Standard reference counted interface
@@ -23,12 +25,12 @@ class TRefCounted : public TBaseClass
 {
 public:
 	TRefCounted()
-		: countReferences( 0 )
 	{
+		countReferences.store( 0, eastl::memory_order_release );
 	}
 	virtual ~TRefCounted()
 	{
-		Assert( !countReferences );
+		Assert( GetRefCount() == 0 );
 	}
 
 	virtual void   AddRef() override;
@@ -36,7 +38,7 @@ public:
 	virtual uint32 GetRefCount() const override;
 
 private:
-	uint32 countReferences;
+	eastl::atomic<uint32> countReferences;
 };
 
 //-----------------------------------------------------------------------------

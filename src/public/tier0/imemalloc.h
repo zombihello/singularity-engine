@@ -1,6 +1,6 @@
 #pragma once
 #include "tier0/tier0_api.h"
-#include "tier1/types.h"
+#include "tier0/types.h"
 
 //-----------------------------------------------------------------------------
 // The memory allocator's interface

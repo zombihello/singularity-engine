@@ -2,7 +2,7 @@
 #include <EASTL/string.h>
 #include <EASTL/vector.h>
 
-#include "tier1/types.h"
+#include "tier0/types.h"
 #include "tier1/istreamdata.h"
 
 //-----------------------------------------------------------------------------

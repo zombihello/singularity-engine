@@ -1,5 +1,5 @@
 #include "pch_tier0.h"
-#include "tier0/crashdump_private.h"
+#include "tier0/crashdump_internal.h"
 
 #if ENABLE_LOGGING
 class CLogger : public ILogger

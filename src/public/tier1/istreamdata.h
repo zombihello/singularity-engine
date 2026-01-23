@@ -1,5 +1,5 @@
 #pragma once
-#include "tier1/types.h"
+#include "tier0/types.h"
 #include "tier1/refcount.h"
 
 //-----------------------------------------------------------------------------
@@ -22,7 +22,7 @@ public:
 	virtual bool			 IsReader() const	   = 0;
 	virtual bool			 IsEndOfStream() const = 0;
 	virtual uint64			 GetSize() const	   = 0;
-	virtual const char*	 GetPath() const	   = 0;
+	virtual const char*		 GetPath() const	   = 0;
 	virtual streamDataType_t GetType() const	   = 0;
 };
 

@@ -1,59 +1,6 @@
-#include "pch_tier0.h"
-#include "tier0/crashdump_private.h"
-
-//-----------------------------------------------------------------------------
-// Code setting the thread name for use in the debugger
-// http://msdn.microsoft.com/en-us/library/xcb2z8hs.aspx
-//-----------------------------------------------------------------------------
-#define MS_VC_EXCEPTION 0x406D1388
-
-#pragma pack( push, 8 )
-typedef struct tagTHREADNAME_INFO
-{
-	DWORD  dwType;		// Must be 0x1000.
-	LPCSTR szName;		// Pointer to name (in user addr space).
-	DWORD  dwThreadID;	// Thread ID (-1=caller thread).
-	DWORD  dwFlags;		// Reserved for future use, must be zero.
-} THREADNAME_INFO;
-#pragma pack( pop )
-
-/*
-==================
-Sys_SetThreadPriority
-==================
-*/
-void Sys_SetThreadPriority( threadHandle_t threadHandle, threadPriority_t threadPriority )
-{
-	Assert( threadPriority == THREAD_PRIOR_NORMAL || threadPriority == THREAD_PRIOR_LOW || threadPriority == THREAD_PRIOR_ABOVE_NORMAL || threadPriority == THREAD_PRIOR_BELOW_NORMAL || threadPriority == THREAD_PRIOR_HIGH || threadPriority == THREAD_PRIOR_REALTIME );
-	SetThreadPriority( threadHandle,
-					   threadPriority == THREAD_PRIOR_LOW ? THREAD_PRIORITY_LOWEST : threadPriority == THREAD_PRIOR_BELOW_NORMAL ? THREAD_PRIORITY_BELOW_NORMAL
-																				 : threadPriority == THREAD_PRIOR_ABOVE_NORMAL	 ? THREAD_PRIORITY_NORMAL
-																				 : threadPriority == THREAD_PRIOR_HIGH			 ? THREAD_PRIORITY_ABOVE_NORMAL
-																				 : threadPriority == THREAD_PRIOR_REALTIME		 ? THREAD_PRIORITY_HIGHEST
-																																 : THREAD_PRIORITY_NORMAL );
-}
-
-/*
-==================
-Sys_SetThreadName
-==================
-*/
-void Sys_SetThreadName( threadHandle_t threadHandle, const char* pThreadName )
-{
-	THREADNAME_INFO threadNameInfo;
-	threadNameInfo.dwType	  = 0x1000;
-	threadNameInfo.szName	  = pThreadName;
-	threadNameInfo.dwThreadID = GetThreadId( threadHandle );
-	threadNameInfo.dwFlags	  = 0;
-
-	__try
-	{
-		RaiseException( MS_VC_EXCEPTION, 0, sizeof( threadNameInfo ) / sizeof( ULONG_PTR ), (ULONG_PTR*)&threadNameInfo );
-	}
-	__except ( EXCEPTION_EXECUTE_HANDLER )
-	{
-	}
-}
+#include "pch_tier1.h"
+#include "tier0/crashdump.h"
+#include "tier1/threading.h"
 
 /*
 ==================
@@ -429,7 +376,7 @@ void CWindowsThread::SetName( const char* pName )
 	name[sizeof( name ) - 1] = '\0';
 	if ( IsAlive() )
 	{
-		Sys_SetThreadName( handle, name );
+		Thread_SetName( handle, name );
 	}
 }
 
@@ -459,7 +406,7 @@ void CWindowsThread::SetPriority( threadPriority_t priority )
 	threadPriority = priority;
 	if ( IsAlive() )
 	{
-		Sys_SetThreadPriority( handle, priority );
+		Thread_SetPriority( handle, priority );
 	}
 }
 
@@ -542,8 +489,8 @@ DWORD STDCALL CWindowsThread::ThreadMain( LPVOID pThis )
 
 	// Notify the crash dumper about thread startup, set thread priority and debug name
 	CrashDump_OnThreadRun();
-	Sys_SetThreadPriority( theThread->handle, theThread->threadPriority );
-	Sys_SetThreadName( theThread->handle, theThread->GetName() );
+	Thread_SetPriority( theThread->handle, theThread->threadPriority );
+	Thread_SetName( theThread->handle, theThread->GetName() );
 
 	// Initialize the thread
 	theThread->exitCode = -1;
@@ -556,7 +503,7 @@ DWORD STDCALL CWindowsThread::ThreadMain( LPVOID pThis )
 	// If the thread has not been initialized, close the thread
 	if ( !bInitResult )
 	{
-		Warning( "Tier0: Thread '%s' failed to initialize", theThread->GetName() );
+		Warning( "Tier1: Thread '%s' failed to initialize", theThread->GetName() );
 		return theThread->exitCode;
 	}
 

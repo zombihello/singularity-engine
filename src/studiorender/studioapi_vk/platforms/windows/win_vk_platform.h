@@ -6,8 +6,8 @@
 #ifndef WIN_VK_PLATFORM_H
 #define WIN_VK_PLATFORM_H
 
-#include "tier1/defines.h"
-#include "tier1/types.h"
+#include "tier0/defines.h"
+#include "tier0/types.h"
 #include "tier1/template.h"
 #include "Volk/volk.h"
 

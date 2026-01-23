@@ -1,6 +1,6 @@
 #pragma once
 #include "tier0/memalloc_base.h"
-#include "tier0/defines.h"
+#include "tier0/defines_internal.h"
 
 //-----------------------------------------------------------------------------
 // Mimalloc memory allocator

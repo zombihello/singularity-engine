@@ -1,7 +1,7 @@
 #pragma once
 #include "utils/interfaces/interfaces.h"
-#include "tier1/defines.h"
-#include "tier1/types.h"
+#include "tier0/defines.h"
+#include "tier0/types.h"
 #include "studiorender/istudio_cmdbuffer.h"
 #include "studiorender/istudiorender.h"
 

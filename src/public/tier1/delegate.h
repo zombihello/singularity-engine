@@ -1,9 +1,9 @@
 #pragma once
 #include <EASTL/list.h>
 
-#include "tier1/defines.h"
-#include "tier0/threading.h"
+#include "tier0/defines.h"
 #include "tier0/profile.h"
+#include "tier1/threading.h"
 
 //-----------------------------------------------------------------------------
 // Helper macros to declare delegates

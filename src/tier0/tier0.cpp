@@ -1,10 +1,12 @@
 #include "pch_tier0.h"
 #include <SDL2/SDL.h>
-#include "tier0/tier0_private.h"
-#include "tier0/crashdump_private.h"
+#include "tier0/tier0_internal.h"
+#include "tier0/crashdump_internal.h"
+#include "tier1/threading.h"
 
-bool   g_bRequestingExit = false;
-double g_SecondsPerCycle = Sys_GetSecondsPerCycle();
+bool			  g_bRequestingExit = false;
+double			  g_SecondsPerCycle = Sys_GetSecondsPerCycle();
+static threadId_t s_MainThreadId	= INVALID_THREAD_ID;
 
 /*
 ==================
@@ -71,4 +73,27 @@ Sys_IsRequestingExit
 bool Sys_IsRequestingExit()
 {
 	return g_bRequestingExit;
+}
+
+/*
+ ==================
+ Sys_InitMainThread
+ ==================
+ */
+void Sys_InitMainThread()
+{
+	CrashDump_OnThreadRun();
+	CrashDump_SetupExceptionHandler();
+	Thread_SetName( Thread_GetCurrentThreadHandle(), "Main Thread" );
+	s_MainThreadId = Thread_GetCurrentThreadId();
+}
+
+/*
+ ==================
+ Sys_IsInMainThread
+ ==================
+ */
+bool Sys_IsInMainThread()
+{
+	return s_MainThreadId == INVALID_THREAD_ID || s_MainThreadId == Thread_GetCurrentThreadId();
 }

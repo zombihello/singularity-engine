@@ -14,3 +14,7 @@ struct crashDumpAppInfo_t
 
 TIER0_INTERFACE void CrashDump_SetAppInfo( const crashDumpAppInfo_t& appInfo );
 TIER0_INTERFACE void CrashDump_AddLogFile( const char* pPath );
+
+// NOTE: Those functions must be called from every thread (except IThread, there already they are uses)
+TIER0_INTERFACE void CrashDump_OnThreadRun();
+TIER0_INTERFACE void CrashDump_OnThreadStop();

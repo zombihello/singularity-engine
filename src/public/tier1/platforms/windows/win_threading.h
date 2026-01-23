@@ -3,7 +3,7 @@
 //-----------------------------------------------------------------------------
 // Windows version of a thread mutex
 //-----------------------------------------------------------------------------
-class TIER0_CLASS CWindowsThreadMutex : public IThreadMutex
+class CWindowsThreadMutex : public IThreadMutex
 {
 public:
 	CWindowsThreadMutex();
@@ -21,7 +21,7 @@ private:
 //-----------------------------------------------------------------------------
 // Windows version of a thread event
 //-----------------------------------------------------------------------------
-class TIER0_CLASS CWindowsThreadEvent : public IThreadEvent
+class CWindowsThreadEvent : public IThreadEvent
 {
 public:
 	CWindowsThreadEvent( bool bManualReset = false, const char* pName = NULL );
@@ -39,7 +39,7 @@ private:
 //-----------------------------------------------------------------------------
 // Windows version of a thread semaphore
 //-----------------------------------------------------------------------------
-class TIER0_CLASS CWindowsThreadSemaphore : public IThreadSemaphore
+class CWindowsThreadSemaphore : public IThreadSemaphore
 {
 public:
 	CWindowsThreadSemaphore( uint32 initialValue, uint32 maxValue, const char* pName = NULL );
@@ -58,7 +58,7 @@ private:
 //-----------------------------------------------------------------------------
 // Windows version of a base thread class
 //-----------------------------------------------------------------------------
-class TIER0_CLASS CWindowsThread : public IThread
+class CWindowsThread : public IThread
 {
 public:
 	CWindowsThread();
@@ -73,7 +73,7 @@ public:
 	virtual void SetPriority( threadPriority_t priority ) override;
 
 	virtual bool			 IsAlive() const override;
-	virtual const char*	 GetName() const override;
+	virtual const char*		 GetName() const override;
 	virtual threadPriority_t GetPriority() const override;
 	virtual threadHandle_t	 GetThreadHandle() const override;
 	virtual threadId_t		 GetThreadId() const override;

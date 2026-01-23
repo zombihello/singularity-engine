@@ -6,10 +6,13 @@ cmake_minimum_required( VERSION 3.19 )
 find_package( RapidJson REQUIRED )
 find_package( GLM REQUIRED )
 find_package( EASTL REQUIRED )
+find_package( Zlib REQUIRED )
 
-set( THIRDPARTY_INCLUDES		${RAPIDJSON_INCLUDE} ${GLM_INCLUDE} ${EASTL_INCLUDE} )
-set( THIRDPARTY_LIBS			${EASTL_LIBS} )
-set( THIRDPARTY_VISUALIZERS		${EASTL_VISUALIZERS} )
+set( THIRDPARTY_INCLUDES					${RAPIDJSON_INCLUDE} ${GLM_INCLUDE} ${EASTL_INCLUDE} ${ZLIB_INCLUDE} )
+set( THIRDPARTY_LIBS						${EASTL_LIBS} ${ZLIB_LIBS} )
+set( THIRDPARTY_INSTALL_DEBUG_DLLS			${ZLIB_INSTALL_DLLS_DEBUG} )
+set( THIRDPARTY_INSTALL_RELEASE_DLLS		${ZLIB_INSTALL_DLLS_RELEASE} )
+set( THIRDPARTY_VISUALIZERS					${EASTL_VISUALIZERS} )
 
 
 #
@@ -57,7 +60,12 @@ add_common_target_defines( tier1 )
 #
 # Install
 #
+# Binaries
+install_files( tier1 FILES ${THIRDPARTY_INSTALL_DEBUG_DLLS}		DESTINATION		bin/${PLATFORM_BIN_DIR}/	CONFIGURATIONS 	Debug )
+install_files( tier1 FILES ${THIRDPARTY_INSTALL_RELEASE_DLLS}	DESTINATION		bin/${PLATFORM_BIN_DIR}/	CONFIGURATIONS 	Release Retail )
+
 # Linceses
-install_files( tier1 FILES ${RAPIDJSON_INSTALL_LICENSES}    DESTINATION 	licenses/rapidjson/ )
-install_files( tier1 FILES ${GLM_INSTALL_LICENSES}          DESTINATION 	licenses/glm/ )
-install_files( tier1 FILES ${EASTL_INSTALL_LICENSES}        DESTINATION 	licenses/eastl/ )
+install_files( tier1 FILES ${RAPIDJSON_INSTALL_LICENSES}		DESTINATION 	licenses/rapidjson/ )
+install_files( tier1 FILES ${GLM_INSTALL_LICENSES}				DESTINATION 	licenses/glm/ )
+install_files( tier1 FILES ${EASTL_INSTALL_LICENSES}			DESTINATION 	licenses/eastl/ )
+install_files( tier1 FILES ${ZLIB_INSTALL_LICENSES}				DESTINATION 	licenses/zlib/ )

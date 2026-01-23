@@ -85,7 +85,7 @@
     #include <stdint.h>
     #include <EASTL/string.h>
 
-    #include "tier1/defines.h"
+    #include "tier0/defines.h"
 
     #if PLATFORM_WINDOWS
         #include <io.h>         // For fix error with unknown 'isatty'

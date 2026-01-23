@@ -1,6 +1,6 @@
 #pragma once
-#include "tier1/defines.h"
-#include "tier1/types.h"
+#include "tier0/defines.h"
+#include "tier0/types.h"
 
 //-----------------------------------------------------------------------------
 // Interface system
@@ -16,7 +16,7 @@ struct interfaceReg_t
 	interfaceReg_t( instantiateInterfaceFn_t pFunc, const char* pName );
 
 	instantiateInterfaceFn_t pCreateFn;
-	const char*			 pName;
+	const char*				 pName;
 	interfaceReg_t*			 pNext;
 };
 

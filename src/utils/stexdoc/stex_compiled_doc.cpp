@@ -1,7 +1,7 @@
 #include "utils/interfaces/interfaces.h"
 #include "tier0/profile.h"
 #include "filesystem/ifilesystem.h"
-#include "tier1/compression/zlib.h"
+#include "tier1/compression.h"
 #include "utils/stexdoc/stex_types.h"
 #include "utils/stexdoc/stex_compiled_doc.h"
 
@@ -71,7 +71,7 @@ bool CSTEXCompiledTextureDoc::SaveFile( const char* pPath )
 	// Write texture data
 	uint32 dataSize = (uint32)data.size();
 	pFile->Write( &dataSize, sizeof( uint32 ) );
-	CZLib::Compress( pFile, data.data(), dataSize );
+	CompressStreamData( COMPRESSION_ZLIB, pFile, data.data(), dataSize );
 
 	// We are done
 	return true;
@@ -139,7 +139,7 @@ bool CSTEXCompiledTextureDoc::LoadFromFile( const char* pPath )
 	if ( dataSize > 0 )
 	{
 		data.resize( dataSize );
-		CZLib::Uncompress( pFile, data.data(), dataSize );
+		UncompressStreamData( COMPRESSION_ZLIB, pFile, data.data(), dataSize );
 	}
 
 	// We are done

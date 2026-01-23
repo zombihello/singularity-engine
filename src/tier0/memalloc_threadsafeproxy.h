@@ -1,6 +1,6 @@
 #pragma once
 #include "tier0/memalloc_base.h"
-#include "tier0/threading.h"
+#include "tier1/threading.h"
 
 //-----------------------------------------------------------------------------
 // A memory allocator proxy that synchronizes access, making the used the one thread safe

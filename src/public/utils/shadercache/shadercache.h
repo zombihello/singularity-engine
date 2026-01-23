@@ -1,8 +1,8 @@
 #pragma once
 #include <EASTL/vector.h>
 
-#include "tier1/defines.h"
-#include "tier1/types.h"
+#include "tier0/defines.h"
+#include "tier0/types.h"
 #include "tier1/istreamdata.h"
 #include "studiorender/studioapi/istudioapi_shader.h"
 

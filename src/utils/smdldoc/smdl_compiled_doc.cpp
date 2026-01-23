@@ -1,7 +1,7 @@
 #include "utils/interfaces/interfaces.h"
 #include "tier0/profile.h"
 #include "filesystem/ifilesystem.h"
-#include "tier1/compression/zlib.h"
+#include "tier1/compression.h"
 #include "utils/smdldoc/smdl_compiled_doc.h"
 
 // Singularity model magic
@@ -58,12 +58,12 @@ bool CSMDLCompiledModelDoc::SaveFile( const char* pPath )
 	// Write vertices
 	uint32 numVertices = (uint32)vertices.size();
 	pFile->Write( &numVertices, sizeof( uint32 ) );
-	CZLib::Compress( pFile, (byte*)vertices.data(), numVertices * sizeof( smdlVertex_t ) );
+	CompressStreamData( COMPRESSION_ZLIB, pFile, (byte*)vertices.data(), numVertices * sizeof( smdlVertex_t ) );
 
 	// Write indices
 	uint32 numIndices = (uint32)indices.size();
 	pFile->Write( &numIndices, sizeof( uint32 ) );
-	CZLib::Compress( pFile, (byte*)indices.data(), numIndices * sizeof( uint32 ) );
+	CompressStreamData( COMPRESSION_ZLIB, pFile, (byte*)indices.data(), numIndices * sizeof( uint32 ) );
 
 	// Write surfaces
 	uint32 numSurfaces = (uint32)surfaces.size();
@@ -128,13 +128,13 @@ bool CSMDLCompiledModelDoc::LoadFromFile( const char* pPath )
 	uint32 numVertices = 0;
 	pFile->Read( &numVertices, sizeof( uint32 ) );
 	vertices.resize( numVertices );
-	CZLib::Uncompress( pFile, (byte*)vertices.data(), numVertices * sizeof( smdlVertex_t ) );
+	UncompressStreamData( COMPRESSION_ZLIB, pFile, (byte*)vertices.data(), numVertices * sizeof( smdlVertex_t ) );
 
 	// Write indices
 	uint32 numIndices = 0;
 	pFile->Read( &numIndices, sizeof( uint32 ) );
 	indices.resize( numIndices );
-	CZLib::Uncompress( pFile, (byte*)indices.data(), numIndices * sizeof( uint32 ) );
+	UncompressStreamData( COMPRESSION_ZLIB, pFile, (byte*)indices.data(), numIndices * sizeof( uint32 ) );
 
 	// Write surfaces
 	uint32 numSurfaces = 0;

@@ -1,5 +1,5 @@
 #pragma once
-#include "tier1/types.h"
+#include "tier0/types.h"
 #include "utils/parserlib/filecontext.h"
 #include "tools/ecscompiler/ecsfieldstubs.h"
 

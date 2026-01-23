@@ -1,5 +1,5 @@
 #pragma once
-#include "tier1/types.h"
+#include "tier0/types.h"
 #include "appframework/iappsystem.h"
 #include "tier1/refcount.h"
 #include "tier1/istreamdata.h"

@@ -16,29 +16,19 @@ enum threadPriority_t
 };
 
 //-----------------------------------------------------------------------------
-// Atomic operations
+// Thread functions
 //-----------------------------------------------------------------------------
-int32		   Sys_InterlockedIncrement( volatile int32* pValue );
-int32		   Sys_InterlockedDecrement( volatile int32* pValue );
-int32		   Sys_InterlockedAdd( volatile int32* pValue, int32 amount );
-int32		   Sys_InterlockedExchange( volatile int32* pValue, int32 exchange );
-int64		   Sys_InterlockedExchange64( volatile int64* pValue, int64 exchange );
-int32		   Sys_InterlockedCompareExchange( volatile int32* pDest, int32 exchange, int32 comperand );
-int64		   Sys_InterlockedCompareExchange64( volatile int64* pDest, int64 exchange, int64 comperand );
-void*		   Sys_InterlockedCompareExchangePointer( void** pDest, void* pExchange, void* pComperand );
-int32		   Sys_InterlockedOr( volatile int32* pDest, int32 value );
-threadHandle_t Sys_GetCurrentThreadHandle();
-threadId_t	   Sys_GetCurrentThreadId();
-void		   Sys_Yield();
-void		   Sys_Sleep( float seconds );
-
-TIER0_INTERFACE void Sys_InitMainThread();
-TIER0_INTERFACE bool Sys_IsInMainThread();
+void		   Thread_SetPriority( threadHandle_t threadHandle, threadPriority_t threadPriority );
+void		   Thread_SetName( threadHandle_t threadHandle, const char* pThreadName );
+threadHandle_t Thread_GetCurrentThreadHandle();
+threadId_t	   Thread_GetCurrentThreadId();
+void		   Thread_Yield();
+void		   Thread_Sleep( float seconds );
 
 //-----------------------------------------------------------------------------
 // Thread mutex interface
 //-----------------------------------------------------------------------------
-class TIER0_CLASS IThreadMutex
+class IThreadMutex
 {
 public:
 	virtual ~IThreadMutex() {}
@@ -52,7 +42,7 @@ public:
 //-----------------------------------------------------------------------------
 // Thread event interface
 //-----------------------------------------------------------------------------
-class TIER0_CLASS IThreadEvent
+class IThreadEvent
 {
 public:
 	virtual ~IThreadEvent() {}
@@ -66,7 +56,7 @@ public:
 //-----------------------------------------------------------------------------
 // Thread semaphore interface
 //-----------------------------------------------------------------------------
-class TIER0_CLASS IThreadSemaphore
+class IThreadSemaphore
 {
 public:
 	virtual ~IThreadSemaphore() {}
@@ -81,7 +71,7 @@ public:
 //-----------------------------------------------------------------------------
 // Thread interface
 //-----------------------------------------------------------------------------
-class TIER0_CLASS IThread
+class IThread
 {
 public:
 	virtual ~IThread() {}
@@ -95,7 +85,7 @@ public:
 	virtual void SetPriority( threadPriority_t priority ) = 0;
 
 	virtual bool			 IsAlive() const		 = 0;
-	virtual const char*	 GetName() const		 = 0;
+	virtual const char*		 GetName() const		 = 0;
 	virtual threadPriority_t GetPriority() const	 = 0;
 	virtual threadHandle_t	 GetThreadHandle() const = 0;
 	virtual threadId_t		 GetThreadId() const	 = 0;
@@ -110,7 +100,7 @@ protected:
 
 // Include platform specific implementation of interfaces
 #if PLATFORM_WINDOWS
-	#include "tier0/platforms/windows/win_threading.h"
+	#include "tier1/platforms/windows/win_threading.h"
 
 typedef CWindowsThreadMutex		CThreadMutex;
 typedef CWindowsThreadEvent		CThreadEvent;
@@ -163,7 +153,7 @@ private:
 };
 
 #if PLATFORM_WINDOWS
-	#include "tier0/platforms/windows/win_threading.inl"
+	#include "tier1/platforms/windows/win_threading.inl"
 #else
 	#error Unknown platform
 #endif	// PLATFORM_WINDOWS

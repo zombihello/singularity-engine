@@ -2,8 +2,8 @@
 #include <list>
 
 #include "Volk/volk.h"
-#include "tier1/defines.h"
-#include "tier1/types.h"
+#include "tier0/defines.h"
+#include "tier0/types.h"
 #include "studiorender/studioapi_vk/vk_helpers.h"
 
 //-----------------------------------------------------------------------------

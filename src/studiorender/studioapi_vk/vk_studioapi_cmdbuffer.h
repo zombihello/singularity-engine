@@ -3,7 +3,7 @@
 #include <EASTL/unordered_set.h>
 #include <EASTL/unordered_map.h>
 
-#include "tier1/defines.h"
+#include "tier0/defines.h"
 #include "studiorender/studioapi_vk/vk_studioapi_fence.h"
 #include "studiorender/studioapi_vk/vk_studioapi_semaphore.h"
 #include "studiorender/studioapi_vk/vk_studioapi_descriptorpoolsmgr.h"

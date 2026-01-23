@@ -1,6 +1,6 @@
 #pragma once
 #include "tier0/tier0_api.h"
-#include "tier1/types.h"
+#include "tier0/types.h"
 #include "tier0/memory.h"
 #include "tier1/template.h"
 #include "tier1/strtools.h"
@@ -15,6 +15,10 @@ enum messageBox_t
 	MESSAGE_BOX_WARNING,
 	MESSAGE_BOX_ERROR
 };
+
+// Functions to initialize the main thread
+TIER0_INTERFACE void Sys_InitMainThread();
+TIER0_INTERFACE bool Sys_IsInMainThread();
 
 // Functions to work with a process
 TIER0_INTERFACE void* Sys_CreateProc( const char* pPathToProcess, const char* pParams, bool bLaunchDetached, bool bLaunchHidden, int32 priorityModifier, uint64* pProcessId = nullptr );

@@ -2,9 +2,9 @@
 #include <EASTL/unordered_set.h>
 
 #include "utils/interfaces/interfaces.h"
-#include "tier1/defines.h"
-#include "tier1/types.h"
-#include "tier0/threading.h"
+#include "tier0/defines.h"
+#include "tier0/types.h"
+#include "tier1/threading.h"
 #include "studiorender/istudio_rendercmd.h"
 #include "studiorender/istudiorender.h"
 

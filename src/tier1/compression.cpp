@@ -1,41 +1,134 @@
 #include "pch_tier1.h"
-#include "tier0/compression.h"
-#include "tier1/compression/zlib.h"
+#include <zlib.h>
+
+#include "tier0/debug.h"
+#include "tier1/compression.h"
 
 #define UNCOMPRESS_CHUNK_SIZE 131072
 #define COMPRESS_CHUNK_SIZE	  UNCOMPRESS_CHUNK_SIZE
 
-/**
- * @ingroup tier1
- * @brief Header of compressed chunks
- */
+// Header of compressed chunks
 struct compressedChunkSummary_t
 {
-	uint64 compressedSize;	 /**< Full compressed size of data */
-	uint64 uncompressedSize; /**< Full uncompresses size of data */
+	uint64 compressedSize;	  // Full compressed data size
+	uint64 uncompressedSize;  // Full uncompresses data size
 };
 
-/**
- * @ingroup tier1
- * @brief Helper structure for compression support, containing information on compressed
- * and uncompressed size of a chunk of data
- */
+// Helper structure for compression support, containing information on compressed
+// and uncompressed size of a chunk of data
 struct compressedChunkInfo_t
 {
-	uint32 compressedSize;	 /**< Compressed size of data */
-	uint32 uncompressedSize; /**< Uncompresses size of data */
+	uint32 compressedSize;	  // Compressed data size
+	uint32 uncompressedSize;  // Uncompresses data size
 };
 
 /*
 ==================
-CZLib::Compress
+CompressMemoryZLIB
 ==================
 */
-void CZLib::Compress( IStreamDataWriter* pStreamWriter, byte* pSrcBuffer, uint64 srcSize )
+static bool CompressMemoryZLIB( void* pCompressedBuffer, uint32& compressedSize, const void* pUncompressedBuffer, uint32 uncompressedSize )
 {
-	PROFILE_SCOPE();
+	PROFILE_SCOPE()
 
+	// Zlib wants to use unsigned long.
+	unsigned long zCompressedSize	= compressedSize;
+	unsigned long zUncompressedSize = uncompressedSize;
+
+	// Compress data
+	bool bResult = compress( (byte*)pCompressedBuffer, &zCompressedSize, (const byte*)pUncompressedBuffer, zUncompressedSize ) == Z_OK ? TRUE : FALSE;
+
+	// Propagate compressed size from intermediate variable back into out variable.
+	compressedSize = zCompressedSize;
+	return bResult;
+}
+
+/*
+==================
+UncompressMemoryZLIB
+==================
+*/
+static bool UncompressMemoryZLIB( void* pUncompressedBuffer, uint32 uncompressedSize, const void* pCompressedBuffer, uint32 compressedSize )
+{
+	PROFILE_SCOPE()
+
+	// Zlib wants to use unsigned long.
+	unsigned long zCompressedSize	= compressedSize;
+	unsigned long zUncompressedSize = uncompressedSize;
+
+	// Uncompress data.
+	bool bResult = uncompress( (byte*)pUncompressedBuffer, &zUncompressedSize, (const byte*)pCompressedBuffer, zCompressedSize ) == Z_OK ? TRUE : FALSE;
+
+	// Sanity check to make sure we uncompressed as much data as we expected to.
+	Assert( uncompressedSize == zUncompressedSize );
+	return bResult;
+}
+
+/*
+==================
+CompressMemory
+==================
+*/
+bool CompressMemory( compressionType_t compressionType, void* pCompressedBuffer, uint32& compressedSize, const void* pUncompressedBuffer, uint32 uncompressedSize )
+{
+	PROFILE_SCOPE()
+
+	// Make sure a valid compression scheme was provided
+	Assert( compressionType != COMPRESSION_NONE );
+	bool bResult = false;
+
+	switch ( compressionType )
+	{
+	case COMPRESSION_ZLIB:
+		bResult = CompressMemoryZLIB( pCompressedBuffer, compressedSize, pUncompressedBuffer, uncompressedSize );
+		break;
+
+	default:
+		Warning( "Tier1: Compression type (0x%X) is not supported", compressionType );
+		bResult = false;
+		break;
+	}
+
+	return bResult;
+}
+
+/*
+==================
+UncompressMemory
+==================
+*/
+bool UncompressMemory( compressionType_t compressionType, void* pUncompressedBuffer, uint32 uncompressedSize, const void* pCompressedBuffer, uint32 compressedSize )
+{
+	PROFILE_SCOPE()
+
+	// Make sure a valid compression scheme was provided
+	Assert( compressionType != COMPRESSION_NONE );
+	bool bResult = false;
+
+	switch ( compressionType )
+	{
+	case COMPRESSION_ZLIB:
+		bResult = UncompressMemoryZLIB( pUncompressedBuffer, uncompressedSize, pCompressedBuffer, compressedSize );
+		break;
+
+	default:
+		Warning( "Tier1: Compression type (0x%X) is not supported", compressionType );
+		bResult = false;
+		break;
+	}
+
+	return bResult;
+}
+
+/*
+==================
+CompressStreamData
+==================
+*/
+void CompressStreamData( compressionType_t compressionType, IStreamDataWriter* pStreamWriter, byte* pSrcBuffer, uint64 srcSize )
+{
 	// Do nothing if source size is zero
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 	if ( srcSize <= 0 )
 	{
 		return;
@@ -73,7 +166,7 @@ void CZLib::Compress( IStreamDataWriter* pStreamWriter, byte* pSrcBuffer, uint64
 	{
 		uint32 bytesToCompress = Min<uint32>( (uint32)bytesRemaining, COMPRESS_CHUNK_SIZE );
 		uint32 compressedSize  = compressedBufferSize;
-		bool   bResult		   = Sys_CompressMemory( COMPRESSION_ZLIB, pCompressedBuffer, compressedSize, pSrc, bytesToCompress );
+		bool   bResult		   = CompressMemory( compressionType, pCompressedBuffer, compressedSize, pSrc, bytesToCompress );
 		Assert( bResult );
 
 		// Move to next chunk
@@ -120,14 +213,13 @@ void CZLib::Compress( IStreamDataWriter* pStreamWriter, byte* pSrcBuffer, uint64
 
 /*
 ==================
-CZLib::Uncompress
+UncompressStreamData
 ==================
 */
-void CZLib::Uncompress( IStreamDataReader* pStreamReader, byte* pDestBuffer, uint64 destSize )
+void UncompressStreamData( compressionType_t compressionType, IStreamDataReader* pStreamReader, byte* pDestBuffer, uint64 destSize )
 {
-	PROFILE_SCOPE();
-
 	// Do nothing if destination size is zero
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 	if ( destSize <= 0 )
 	{
 		return;
@@ -164,7 +256,7 @@ void CZLib::Uncompress( IStreamDataReader* pStreamReader, byte* pDestBuffer, uin
 
 		// Read compressed data and decompress into pDest pointer directly
 		pStreamReader->Read( pCompressedBuffer, chunk.compressedSize );
-		bool bResult = Sys_UncompressMemory( COMPRESSION_ZLIB, pDest, chunk.uncompressedSize, pCompressedBuffer, chunk.compressedSize );
+		bool bResult = UncompressMemory( compressionType, pDest, chunk.uncompressedSize, pCompressedBuffer, chunk.compressedSize );
 		Assert( bResult );
 
 		// And advance it by read amount

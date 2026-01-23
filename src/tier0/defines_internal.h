@@ -7,7 +7,7 @@
 
 // Platform specific definitions
 #if PLATFORM_WINDOWS  // Windows platform
-	#include "tier0/platforms/windows/win_defines.h"
+	#include "tier0/platforms/windows/win_defines_internal.h"
 #else  // Unknown platform
 	#error Unknown platform
 #endif	// _WIN32 || _WIN64

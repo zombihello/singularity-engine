@@ -1,5 +1,5 @@
 #pragma once
-#include "tier1/builddefines.h"
+#include "tier0/defines.h"
 
 //-----------------------------------------------------------------------------
 // Types

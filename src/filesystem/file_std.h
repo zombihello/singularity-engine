@@ -1,7 +1,7 @@
 #pragma once
 #include <stdio.h>
 
-#include "tier1/defines.h"
+#include "tier0/defines.h"
 #include "filesystem/file_base.h"
 
 //-----------------------------------------------------------------------------

@@ -2,7 +2,7 @@
 #include "tier1/filetools.h"
 #include "tier1/buildnum.h"
 #include "tier0/version.h"
-#include "tier0/crashdump_private.h"
+#include "tier0/crashdump_internal.h"
 
 #include <BugTrap.h>
 #include <minidumpapiset.h>

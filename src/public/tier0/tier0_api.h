@@ -1,6 +1,5 @@
 #pragma once
-#include "tier1/builddefines.h"
-#include "tier1/defines.h"
+#include "tier0/defines.h"
 
 #if !defined( BUILD_STATIC_LIB )
 	#ifdef TIER0_DLL_EXPORT

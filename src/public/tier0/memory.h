@@ -2,7 +2,7 @@
 #include <cstdlib>
 
 #include "tier0/tier0_api.h"
-#include "tier1/defines.h"
+#include "tier0/defines.h"
 #include "tier0/imemalloc.h"
 
 //-----------------------------------------------------------------------------

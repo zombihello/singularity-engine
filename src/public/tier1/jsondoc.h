@@ -4,8 +4,8 @@
 #include <EASTL/unordered_map.h>
 #include <rapidjson/document.h>
 
-#include "tier1/defines.h"
-#include "tier1/types.h"
+#include "tier0/defines.h"
+#include "tier0/types.h"
 
 //-----------------------------------------------------------------------------
 // Forward delcarations
