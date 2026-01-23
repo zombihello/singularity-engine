@@ -1,6 +1,6 @@
 #include "pch_studioapi_vk.h"
-#include "core/debug.h"
-#include "stdlib/math/math.h"
+#include "tier0/debug.h"
+#include "tier1/math/math.h"
 #include "studiorender/studioapi_vk/vk_studioapi_renderpipeline.h"
 #include "studiorender/studioapi_vk/vk_studioapi_shader.h"
 #include "studiorender/studioapi_vk/vk_studioapi_framebuffer.h"

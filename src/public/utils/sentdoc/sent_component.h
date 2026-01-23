@@ -2,7 +2,7 @@
 #include <EASTL/vector.h>
 #include <EASTL/unordered_map.h>
 
-#include "stdlib/stl.h"
+#include "tier1/stl.h"
 #include "utils/sentdoc/sentvar.h"
 
 //-----------------------------------------------------------------------------

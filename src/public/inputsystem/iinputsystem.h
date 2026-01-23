@@ -1,5 +1,5 @@
 #pragma once
-#include "stdlib/math/math.h"
+#include "tier1/math/math.h"
 #include "appframework/iappsystem.h"
 #include "appframework/iwindowmgr.h"
 #include "inputsystem/buttoncode.h"

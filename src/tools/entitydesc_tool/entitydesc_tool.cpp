@@ -25,7 +25,7 @@ CEntityDescTool::Connect
 */
 bool CEntityDescTool::Connect( createInterfaceFn_t pFactory )
 {
-	return ConnectStdLib( pFactory );
+	return ConnectTier1( pFactory );
 }
 
 /*
@@ -35,7 +35,7 @@ CEntityDescTool::Disconnect
 */
 void CEntityDescTool::Disconnect()
 {
-	DisconnectStdLib();
+	DisconnectTier1();
 }
 
 /*

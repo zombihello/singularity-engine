@@ -1,5 +1,5 @@
 #pragma once
-#include "stdlib/refcount.h"
+#include "tier1/refcount.h"
 
 //-----------------------------------------------------------------------------
 // StudioAPI base resource interface

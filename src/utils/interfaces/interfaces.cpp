@@ -1,4 +1,4 @@
-#include "core/core.h"
+#include "tier0/tier0.h"
 #include "utils/interfaces/interfaces.h"
 
 IFileSystem*	 g_pFileSystem	   = NULL;

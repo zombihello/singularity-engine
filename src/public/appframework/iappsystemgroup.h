@@ -3,9 +3,9 @@
 #include <EASTL/vector.h>
 #include <EASTL/unordered_map.h>
 
-#include "core/core.h"
+#include "tier0/tier0.h"
 #include "appframework/iappsystem.h"
-#include "stdlib/interface.h"
+#include "tier1/interface.h"
 
 //-----------------------------------------------------------------------------
 // Handle to a DLL

@@ -1,5 +1,5 @@
 #pragma once
-#include "core/threading.h"
+#include "tier0/threading.h"
 #include "studiorender/istudio_cmdbuffer.h"
 
 //-----------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 #include "utils/interfaces/interfaces.h"
-#include "core/profile.h"
+#include "tier0/profile.h"
 #include "filesystem/ifilesystem.h"
 #include "utils/smatdoc/smat_compiled_doc.h"
 

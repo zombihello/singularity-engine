@@ -1,5 +1,5 @@
 #include "pch_parserlib.h"
-#include "stdlib/filetools.h"
+#include "tier1/filetools.h"
 #include "utils/parserlib/tokeneater.h"
 
 /*

@@ -24,8 +24,8 @@ CShaderLib::Connect
 */
 bool CShaderLib::Connect( createInterfaceFn_t pFactory )
 {
-	// Connect StdLib
-	if ( !ConnectStdLib( pFactory ) )
+	// Connect Tier1
+	if ( !ConnectTier1( pFactory ) )
 	{
 		return false;
 	}
@@ -68,8 +68,8 @@ CShaderLib::Disconnect
 */
 void CShaderLib::Disconnect()
 {
-	// Disconnect StdLib
-	DisconnectStdLib();
+	// Disconnect Tier1
+	DisconnectTier1();
 	g_pStudioAPI	= NULL;
 	g_pStudioRender = NULL;
 	g_pShaderMgr	= NULL;

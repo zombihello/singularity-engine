@@ -18,7 +18,7 @@ set( GENERATED_DIR						${CMAKE_CURRENT_BINARY_DIR} )
 
 set( SRC_PATTERNS						"${SRC_DIR}/*.h" "${SRC_DIR}/*.inl" "${SRC_DIR}/*.cpp" )
 set( PUBLIC_SRC_PATTERNS				"${PUBLIC_SRC_DIR}/tools/resource_tools/*.h" "${PUBLIC_SRC_DIR}/tools/resource_tools/*.inl" "${PUBLIC_SRC_DIR}/tools/resource_tools/*.cpp" 
-										"${PUBLIC_SRC_DIR}/core/*.cpp" )
+										"${PUBLIC_SRC_DIR}/tier0/*.cpp" )
 set( GENERATED_SRC_PATTERNS				"${GENERATED_DIR}/*.h" "${GENERATED_DIR}/*.inl" "${GENERATED_DIR}/*.cpp"
 										"${GENERATED_DIR}/*.hxx" "${GENERATED_DIR}/*.cxx" )
 
@@ -54,14 +54,14 @@ set_target_properties( texture_tool PROPERTIES FOLDER         				"Tools/Resourc
 set_target_properties( texture_tool PROPERTIES PREFIX 						"" )
 
 target_include_directories( texture_tool PRIVATE             				${THIRDPARTY_INCLUDES} )
-target_link_libraries( texture_tool PRIVATE									core stdlib interfaces stexdoc ${THIRDPARTY_LIBS} ${CMAKE_DL_LIBS} )
+target_link_libraries( texture_tool PRIVATE									tier0 tier1 interfaces stexdoc ${THIRDPARTY_LIBS} ${CMAKE_DL_LIBS} )
 add_common_target_defines( texture_tool )
 
 
 #
 # Install
 #
-inherit_install_files( texture_tool												TARGETS core stdlib interfaces stexdoc )
+inherit_install_files( texture_tool												TARGETS tier0 tier1 interfaces stexdoc )
 
 # Binaries
 install_files( texture_tool TARGETS RUNTIME texture_tool 						DESTINATION     bin/${PLATFORM_BIN_DIR}/ )

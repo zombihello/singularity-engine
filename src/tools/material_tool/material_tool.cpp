@@ -25,7 +25,7 @@ CMaterialTool::Connect
 */
 bool CMaterialTool::Connect( createInterfaceFn_t pFactory )
 {
-	return ConnectStdLib( pFactory );
+	return ConnectTier1( pFactory );
 }
 
 /*
@@ -35,7 +35,7 @@ CMaterialTool::Disconnect
 */
 void CMaterialTool::Disconnect()
 {
-	DisconnectStdLib();
+	DisconnectTier1();
 }
 
 /*

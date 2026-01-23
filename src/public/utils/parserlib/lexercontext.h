@@ -1,6 +1,6 @@
 #pragma once
-#include "stdlib/defines.h"
-#include "stdlib/types.h"
+#include "tier1/defines.h"
+#include "tier1/types.h"
 
 //-----------------------------------------------------------------------------
 // Parser lexer context

@@ -25,7 +25,7 @@ CMapTool::Connect
 */
 bool CMapTool::Connect( createInterfaceFn_t pFactory )
 {
-	return ConnectStdLib( pFactory );
+	return ConnectTier1( pFactory );
 }
 
 /*
@@ -35,7 +35,7 @@ CMapTool::Disconnect
 */
 void CMapTool::Disconnect()
 {
-	DisconnectStdLib();
+	DisconnectTier1();
 }
 
 /*

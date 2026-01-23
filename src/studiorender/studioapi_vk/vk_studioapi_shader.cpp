@@ -1,6 +1,6 @@
 #include "pch_studioapi_vk.h"
-#include "stdlib/hashing/fasthash.h"
-#include "stdlib/streamdata_memory.h"
+#include "tier1/hashing/fasthash.h"
+#include "tier1/streamdata_memory.h"
 #include "utils/shadercache/shaderreflection.h"
 #include "studiorender/studioapi_vk/vk_studioapi_shader.h"
 

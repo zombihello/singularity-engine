@@ -1,5 +1,5 @@
 #pragma once
-#include "stdlib/defines.h"
+#include "tier1/defines.h"
 
 //-----------------------------------------------------------------------------
 // Windows

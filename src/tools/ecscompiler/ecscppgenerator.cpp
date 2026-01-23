@@ -1,4 +1,4 @@
-#include "core/profile.h"
+#include "tier0/profile.h"
 #include "tools/ecscompiler/ecscppgenerator.h"
 
 // Table for convert ecsSystemStage_t to text

@@ -2,7 +2,7 @@
 #include <EASTL/vector.h>
 #include <EASTL/unordered_map.h>
 
-#include "stdlib/refcount.h"
+#include "tier1/refcount.h"
 #include "utils/parserlib/filecontext.h"
 
 //-----------------------------------------------------------------------------

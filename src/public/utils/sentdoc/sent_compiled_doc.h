@@ -2,7 +2,7 @@
 #include <EASTL/string.h>
 #include <EASTL/vector.h>
 
-#include "core/core.h"
+#include "tier0/tier0.h"
 #include "utils/sentdoc/sent_component.h"
 
 //-----------------------------------------------------------------------------
@@ -12,7 +12,7 @@ class CSENTCompiledEntityDescDoc
 {
 public:
 	// Save and load a entity descriptor document
-	// NOTE: For use StdLib must be connected by ConnectStdLib
+	// NOTE: For use Tier1 must be connected by ConnectTier1
 	bool SaveFile( const char* pPath );
 	bool LoadFromFile( const char* pPath );
 

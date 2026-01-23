@@ -1,5 +1,5 @@
 #pragma once
-#include "stdlib/delegate.h"
+#include "tier1/delegate.h"
 #include "appframework/iappsystem.h"
 #include "appframework/windowevent.h"
 #include "inputsystem/inputevent.h"

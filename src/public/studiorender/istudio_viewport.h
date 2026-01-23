@@ -1,6 +1,6 @@
 #pragma once
-#include "stdlib/refcount.h"
-#include "stdlib/math/math.h"
+#include "tier1/refcount.h"
+#include "tier1/math/math.h"
 #include "studiorender/studioapi/istudioapi_swapchain.h"
 #include "studiorender/istudio_renderresource.h"
 #include "studiorender/istudio_viewportclient.h"

@@ -6,9 +6,9 @@
 #ifndef WIN_VK_PLATFORM_H
 #define WIN_VK_PLATFORM_H
 
-#include "stdlib/defines.h"
-#include "stdlib/types.h"
-#include "stdlib/template.h"
+#include "tier1/defines.h"
+#include "tier1/types.h"
+#include "tier1/template.h"
 #include "Volk/volk.h"
 
 /**

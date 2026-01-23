@@ -1,5 +1,5 @@
 #pragma once
-#include "core/core.h"
+#include "tier0/tier0.h"
 
 //-----------------------------------------------------------------------------
 // Helper for work with source SMDL (Singularity Model) files
@@ -10,7 +10,7 @@ public:
 	CSMDLSourceModelDoc();
 
 	// Load and save a file
-	// NOTE: For use StdLib must be connected by ConnectStdLib
+	// NOTE: For use Tier1 must be connected by ConnectTier1
 	bool LoadFromFile( const char* pPath );
 	bool SaveFile( const char* pPath );
 	void Clear();

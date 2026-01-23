@@ -1,7 +1,7 @@
 #include "pch_shadercompiler.h"
-#include "stdlib/jsondoc.h"
-#include "core/icommandline.h"
-#include "core/crashdump.h"
+#include "tier1/jsondoc.h"
+#include "tier0/icommandline.h"
+#include "tier0/crashdump.h"
 #include "cvar/icvar.h"
 #include "appframework/appframework.h"
 #include "utils/shadercache/shadercache.h"
@@ -589,7 +589,7 @@ CShaderCompilerAppSystemGroup::PostShutdown
 void CShaderCompilerAppSystemGroup::PostShutdown()
 {
 	UnloadBackend();
-	DisconnectStdLib();
+	DisconnectTier1();
 }
 
 /*

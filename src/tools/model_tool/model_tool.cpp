@@ -100,7 +100,7 @@ CModelTool::Connect
 */
 bool CModelTool::Connect( createInterfaceFn_t pFactory )
 {
-	return ConnectStdLib( pFactory );
+	return ConnectTier1( pFactory );
 }
 
 /*
@@ -110,7 +110,7 @@ CModelTool::Disconnect
 */
 void CModelTool::Disconnect()
 {
-	DisconnectStdLib();
+	DisconnectTier1();
 }
 
 /*

@@ -1,5 +1,5 @@
 #pragma once
-#include "stdlib/interface.h"
+#include "tier1/interface.h"
 
 //-----------------------------------------------------------------------------
 // Client systems are singleton objects in the client codebase responsible for

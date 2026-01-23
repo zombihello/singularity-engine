@@ -1,17 +1,17 @@
 #include "pch_appframework.h"
 #include "appframework/appframework.h"
-#include "stdlib/convar.h"
+#include "tier1/convar.h"
 #include "cvar/icvar.h"
 #include "filesystem/ifilesystem.h"
 
 #if ENABLE_LOGGING
-	#include "core/debug.h"
-	#include "core/crashdump.h"
-	#include "core/icommandline.h"
+	#include "tier0/debug.h"
+	#include "tier0/crashdump.h"
+	#include "tier0/icommandline.h"
 
 //-----------------------------------------------------------------------------
 // A log output into a file
-// NOTE: For use must be connected StdLib
+// NOTE: For use must be connected Tier1
 //-----------------------------------------------------------------------------
 class CLogOutputFile : public CBaseLogOutput<ILogOutput>
 {
@@ -84,7 +84,7 @@ CApplication::PreInit
 */
 bool CApplication::PreInit()
 {
-	if ( !ConnectStdLib( GetFactory() ) )
+	if ( !ConnectTier1( GetFactory() ) )
 	{
 		return false;
 	}
@@ -102,7 +102,7 @@ bool CApplication::PostInit()
 	if ( pLogFileName && S_Strlen( pLogFileName ) > 0 && ( DEBUG || CommandLine()->HasParam( "log" ) ) )
 	{
 		eastl::string logFilePath = S_Sprintf( "//BASE_PATH/logs/%s.log", pLogFileName );
-		pLogOutputFile			= new CLogOutputFile( logFilePath.c_str() );
+		pLogOutputFile			  = new CLogOutputFile( logFilePath.c_str() );
 		CrashDump_AddLogFile( logFilePath.c_str() );
 		Logger()->AddOutput( pLogOutputFile );
 	}
@@ -140,5 +140,5 @@ void CApplication::PostShutdown()
 	}
 #endif	// ENABLE_LOGGING
 
-	DisconnectStdLib();
+	DisconnectTier1();
 }

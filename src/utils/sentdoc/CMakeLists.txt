@@ -35,5 +35,5 @@ add_library( sentdoc STATIC 	                      	${FULL_SRC_FILES} )
 set_target_properties( sentdoc PROPERTIES FOLDER        "Engine/Utils/Data Formats" )
 set_target_properties( sentdoc PROPERTIES PREFIX 		"" )
 
-target_link_libraries( sentdoc PUBLIC 					stdlib )
+target_link_libraries( sentdoc PUBLIC 					tier1 )
 add_common_target_defines( sentdoc )

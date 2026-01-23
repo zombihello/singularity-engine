@@ -27,8 +27,8 @@ CGame::Connect
 */
 bool CGame::Connect( createInterfaceFn_t pFactory )
 {
-	// Connect StdLib and register cvars
-	if ( !ConnectStdLib( pFactory ) )
+	// Connect Tier1 and register cvars
+	if ( !ConnectTier1( pFactory ) )
 	{
 		return false;
 	}
@@ -66,7 +66,7 @@ CGame::Disconnect
 void CGame::Disconnect()
 {
 	ConVar_Unregister();
-	DisconnectStdLib();
+	DisconnectTier1();
 
 	g_pWindowMgr	  = NULL;
 	g_pStudioRender	  = NULL;

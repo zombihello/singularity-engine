@@ -47,7 +47,7 @@ target_precompile_headers( appframework PRIVATE 			pch_appframework.h )
 set_target_properties( appframework PROPERTIES FOLDER       Engine )
 set_target_properties( appframework PROPERTIES PREFIX 		"" )
 
-target_link_libraries( appframework PUBLIC 					stdlib )
+target_link_libraries( appframework PUBLIC 					tier1 )
 target_include_directories( appframework PRIVATE            ${THIRDPARTY_INCLUDES} )
 target_link_libraries( appframework PRIVATE					${THIRDPARTY_LIBS} )
 add_common_target_defines( appframework )

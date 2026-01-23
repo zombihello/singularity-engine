@@ -1,7 +1,7 @@
 #include "pch_studioapi_vk.h"
-#include "core/icommandline.h"
-#include "stdlib/buildnum.h"
-#include "core/version.h"
+#include "tier0/icommandline.h"
+#include "tier1/buildnum.h"
+#include "tier0/version.h"
 #include "studiorender/studioapi_vk/vk_studioapi_swapchain.h"
 #include "studiorender/studioapi_vk/vk_studioapi.h"
 #include "studiorender/studioapi_vk/vk_studioapi_cmdcontext.h"
@@ -39,8 +39,8 @@ CStudioAPIVk::Connect
 */
 bool CStudioAPIVk::Connect( createInterfaceFn_t pFactory )
 {
-	// Connect StdLib and register cvars
-	if ( !ConnectStdLib( pFactory ) )
+	// Connect Tier1 and register cvars
+	if ( !ConnectTier1( pFactory ) )
 	{
 		return false;
 	}
@@ -55,9 +55,9 @@ CStudioAPIVk::Disconnect
 */
 void CStudioAPIVk::Disconnect()
 {
-	// Unregister cvars and disconnect StdLib
+	// Unregister cvars and disconnect Tier1
 	ConVar_Unregister();
-	DisconnectStdLib();
+	DisconnectTier1();
 }
 
 /*

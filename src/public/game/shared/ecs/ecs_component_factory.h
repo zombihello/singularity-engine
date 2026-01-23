@@ -2,8 +2,8 @@
 #include <EASTL/string.h>
 #include <EASTL/unordered_map.h>
 
-#include "stdlib/refcount.h"
-#include "stdlib/stl.h"
+#include "tier1/refcount.h"
+#include "tier1/stl.h"
 #include "utils/sentdoc/sent_compiled_doc.h"
 #include "game/shared/ecs/ecs_core.h"
 

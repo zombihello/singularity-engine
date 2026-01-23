@@ -1,7 +1,7 @@
 #include "utils/interfaces/interfaces.h"
-#include "core/profile.h"
+#include "tier0/profile.h"
 #include "filesystem/ifilesystem.h"
-#include "stdlib/compression/zlib.h"
+#include "tier1/compression/zlib.h"
 #include "utils/stexdoc/stex_types.h"
 #include "utils/stexdoc/stex_compiled_doc.h"
 

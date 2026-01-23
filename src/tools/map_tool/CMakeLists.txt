@@ -8,7 +8,7 @@ set( GENERATED_DIR						${CMAKE_CURRENT_BINARY_DIR} )
 
 set( SRC_PATTERNS						"${SRC_DIR}/*.h" "${SRC_DIR}/*.inl" "${SRC_DIR}/*.cpp" )
 set( PUBLIC_SRC_PATTERNS				"${PUBLIC_SRC_DIR}/tools/resource_tools/*.h" "${PUBLIC_SRC_DIR}/tools/resource_tools/*.inl" "${PUBLIC_SRC_DIR}/tools/resource_tools/*.cpp" 
-										"${PUBLIC_SRC_DIR}/core/*.cpp" )
+										"${PUBLIC_SRC_DIR}/tier0/*.cpp" )
 set( GENERATED_SRC_PATTERNS				"${GENERATED_DIR}/*.h" "${GENERATED_DIR}/*.inl" "${GENERATED_DIR}/*.cpp"
 										"${GENERATED_DIR}/*.hxx" "${GENERATED_DIR}/*.cxx" )
 
@@ -43,14 +43,14 @@ target_precompile_headers( map_tool PRIVATE 							pch_map_tool.h )
 set_target_properties( map_tool PROPERTIES FOLDER         				"Tools/Resource Compiler" )
 set_target_properties( map_tool PROPERTIES PREFIX 						"" )
 
-target_link_libraries( map_tool PRIVATE									core stdlib interfaces smapdoc ${CMAKE_DL_LIBS} )
+target_link_libraries( map_tool PRIVATE									tier0 tier1 interfaces smapdoc ${CMAKE_DL_LIBS} )
 add_common_target_defines( map_tool )
 
 
 #
 # Install
 #
-inherit_install_files( map_tool									TARGETS core stdlib interfaces smapdoc )
+inherit_install_files( map_tool									TARGETS tier0 tier1 interfaces smapdoc )
 
 # Binaries
 install_files( map_tool TARGETS RUNTIME map_tool 				DESTINATION bin/${PLATFORM_BIN_DIR}/ )

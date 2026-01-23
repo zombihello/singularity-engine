@@ -35,5 +35,5 @@ add_library( pixelformatinfos STATIC                        ${FULL_SRC_FILES} )
 set_target_properties( pixelformatinfos PROPERTIES FOLDER   Engine/Utils )
 set_target_properties( pixelformatinfos PROPERTIES PREFIX   "" )
 
-target_link_libraries( pixelformatinfos PUBLIC 				stdlib )
+target_link_libraries( pixelformatinfos PUBLIC 				tier1 )
 add_common_target_defines( pixelformatinfos )

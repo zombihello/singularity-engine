@@ -1,6 +1,6 @@
 #pragma once
 #include <EASTL/string.h>
-#include "core/core.h"
+#include "tier0/tier0.h"
 
 //-----------------------------------------------------------------------------
 // SMAP entity

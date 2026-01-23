@@ -18,7 +18,7 @@ set( GENERATED_DIR						${CMAKE_CURRENT_BINARY_DIR} )
 
 set( SRC_PATTERNS						"${SRC_DIR}/*.h" "${SRC_DIR}/*.inl" "${SRC_DIR}/*.cpp" )
 set( PUBLIC_SRC_PATTERNS				"${PUBLIC_SRC_DIR}/studiorender/studioapi/*.h" "${PUBLIC_SRC_DIR}/studiorender/studioapi/*.inl" "${PUBLIC_SRC_DIR}/studiorender/studioapi/*.cpp" 
-										"${PUBLIC_SRC_DIR}/core/*.cpp" )
+										"${PUBLIC_SRC_DIR}/tier0/*.cpp" )
 set( GENERATED_SRC_PATTERNS				"${GENERATED_DIR}/*.h" "${GENERATED_DIR}/*.inl" "${GENERATED_DIR}/*.cpp"
 										"${GENERATED_DIR}/*.hxx" "${GENERATED_DIR}/*.cxx" )
 
@@ -54,14 +54,14 @@ set_target_properties( studioapi_vk PROPERTIES PREFIX 						"" )
 
 target_include_directories( studioapi_vk PRIVATE             				${SHARED_SRC_DIR} ${THIRDPARTY_INCLUDES} )
 target_compile_definitions( studioapi_vk PRIVATE							VK_NO_PROTOTYPES ${THIRDPARTY_DEFINES} )
-target_link_libraries( studioapi_vk PRIVATE									core stdlib interfaces shadercache pixelformatinfos ${THIRDPARTY_LIBS} ${CMAKE_DL_LIBS} )
+target_link_libraries( studioapi_vk PRIVATE									tier0 tier1 interfaces shadercache pixelformatinfos ${THIRDPARTY_LIBS} ${CMAKE_DL_LIBS} )
 add_common_target_defines( studioapi_vk )
 
 
 #
 # Install
 #
-inherit_install_files( studioapi_vk									TARGETS core stdlib interfaces shadercache pixelformatinfos )
+inherit_install_files( studioapi_vk									TARGETS tier0 tier1 interfaces shadercache pixelformatinfos )
 
 # Binaries
 install_files( studioapi_vk TARGETS RUNTIME studioapi_vk 			DESTINATION bin/${PLATFORM_BIN_DIR}/ )

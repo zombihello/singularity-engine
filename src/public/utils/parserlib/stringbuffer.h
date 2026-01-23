@@ -1,6 +1,6 @@
 #pragma once
-#include "core/core.h"
-#include "stdlib/refcount.h"
+#include "tier0/tier0.h"
+#include "tier1/refcount.h"
 
 //-----------------------------------------------------------------------------
 // Parser string buffer (shared string)

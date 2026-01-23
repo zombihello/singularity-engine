@@ -35,5 +35,5 @@ add_library( smatdoc STATIC 	                      	${FULL_SRC_FILES} )
 set_target_properties( smatdoc PROPERTIES FOLDER        "Engine/Utils/Data Formats" )
 set_target_properties( smatdoc PROPERTIES PREFIX 		"" )
 
-target_link_libraries( smatdoc PUBLIC 					stdlib )
+target_link_libraries( smatdoc PUBLIC 					tier1 )
 add_common_target_defines( smatdoc )

@@ -8,7 +8,7 @@ set( GENERATED_DIR						${CMAKE_CURRENT_BINARY_DIR} )
 
 set( SRC_PATTERNS						"${SRC_DIR}/*.h" "${SRC_DIR}/*.inl" "${SRC_DIR}/*.cpp" )
 set( PUBLIC_SRC_PATTERNS				"${PUBLIC_SRC_DIR}/launcher/*.h" "${PUBLIC_SRC_DIR}/launcher/*.inl" "${PUBLIC_SRC_DIR}/launcher/*.cpp" 
-										"${PUBLIC_SRC_DIR}/core/*.cpp" )
+										"${PUBLIC_SRC_DIR}/tier0/*.cpp" )
 set( GENERATED_SRC_PATTERNS				"${GENERATED_DIR}/*.h" "${GENERATED_DIR}/*.inl" "${GENERATED_DIR}/*.cpp"
 										"${GENERATED_DIR}/*.hxx" "${GENERATED_DIR}/*.cxx" )
 
@@ -42,7 +42,7 @@ add_library( launcher SHARED 	                      	    		${FULL_SRC_FILES} )
 set_target_properties( launcher PROPERTIES FOLDER         			Engine )
 set_target_properties( launcher PROPERTIES PREFIX 					"" )
 
-target_link_libraries( launcher PRIVATE								core stdlib appframework interfaces gameinfo ${CMAKE_DL_LIBS} )
+target_link_libraries( launcher PRIVATE								tier0 tier1 appframework interfaces gameinfo ${CMAKE_DL_LIBS} )
 add_common_target_defines( launcher )
 add_dependencies( launcher											inputsystem filesystem cvar studiorender materialsystem resourcesystem )
 
@@ -50,7 +50,7 @@ add_dependencies( launcher											inputsystem filesystem cvar studiorender ma
 #
 # Install
 #
-inherit_install_files( launcher							TARGETS core stdlib appframework interfaces gameinfo inputsystem filesystem cvar studiorender materialsystem resourcesystem )
+inherit_install_files( launcher							TARGETS tier0 tier1 appframework interfaces gameinfo inputsystem filesystem cvar studiorender materialsystem resourcesystem )
 
 # Binaries
 install_files( launcher TARGETS RUNTIME launcher 		DESTINATION bin/${PLATFORM_BIN_DIR}/ )

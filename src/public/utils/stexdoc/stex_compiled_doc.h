@@ -1,7 +1,7 @@
 #pragma once
 #include <EASTL/vector.h>
 
-#include "core/core.h"
+#include "tier0/tier0.h"
 #include "studiorender/studioapi/istudioapi_texture.h"
 
 //-----------------------------------------------------------------------------
@@ -21,7 +21,7 @@ public:
 	CSTEXCompiledTextureDoc();
 
 	// Load and save a texture document
-	// NOTE: For use StdLib must be connected by ConnectStdLib
+	// NOTE: For use Tier1 must be connected by ConnectTier1
 	bool LoadFromFile( const char* pPath );
 	bool SaveFile( const char* pPath );
 	void Clear();

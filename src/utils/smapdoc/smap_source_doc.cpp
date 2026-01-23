@@ -1,6 +1,6 @@
 #include "utils/interfaces/interfaces.h"
-#include "core/profile.h"
-#include "stdlib/jsondoc.h"
+#include "tier0/profile.h"
+#include "tier1/jsondoc.h"
 #include "filesystem/ifilesystem.h"
 #include "utils/smapdoc/smap_source_doc.h"
 

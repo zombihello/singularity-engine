@@ -1,6 +1,6 @@
 #pragma once
-#include "stdlib/refcount.h"
-#include "stdlib/delegate.h"
+#include "tier1/refcount.h"
+#include "tier1/delegate.h"
 
 //-----------------------------------------------------------------------------
 // Forward declarations

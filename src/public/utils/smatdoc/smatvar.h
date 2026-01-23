@@ -1,9 +1,9 @@
 #pragma once
 #include <EASTL/string.h>
 
-#include "core/core.h"
-#include "core/debug.h"
-#include "stdlib/math/math.h"
+#include "tier0/tier0.h"
+#include "tier0/debug.h"
+#include "tier1/math/math.h"
 
 //-----------------------------------------------------------------------------
 // SMAT material variable

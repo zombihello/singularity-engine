@@ -1,5 +1,5 @@
 #include "pch_studioapi_vk.h"
-#include "core/debug.h"
+#include "tier0/debug.h"
 #include "utils/pixelformatinfos/pixelformatinfos.h"
 #include "studiorender/studioapi_vk/vk_helpers.h"
 

@@ -1,9 +1,9 @@
 #pragma once
 #include <EASTL/vector.h>
 
-#include "stdlib/defines.h"
-#include "stdlib/types.h"
-#include "stdlib/istreamdata.h"
+#include "tier1/defines.h"
+#include "tier1/types.h"
+#include "tier1/istreamdata.h"
 #include "studiorender/studioapi/istudioapi_shader.h"
 
 //-----------------------------------------------------------------------------
@@ -36,7 +36,7 @@ public:
 	CShaderCacheDoc();
 
 	// Save, load and clear a shader cache document
-	// NOTE: For use save and load functions StdLib must be connected
+	// NOTE: For use save and load functions Tier1 must be connected
 	bool SaveFile( const char* pPath );
 	bool LoadFromFile( const char* pPath );
 	void Clear();

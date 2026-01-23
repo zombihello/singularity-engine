@@ -1,8 +1,8 @@
 #include "utils/interfaces/interfaces.h"
-#include "core/profile.h"
+#include "tier0/profile.h"
 #include "filesystem/ifilesystem.h"
 #include "utils/shadercache/shadercache.h"
-#include "stdlib/compression/zlib.h"
+#include "tier1/compression/zlib.h"
 
 // Shader cache magic
 #define SSC_MAGIC ( ( 'C' << 16 ) + ( 'S' << 8 ) + 'S' )  // Singularity Shader Cache
@@ -87,7 +87,7 @@ bool CShaderCacheDoc::SaveFile( const char* pPath )
 	Assert( g_pFileSystem );
 	if ( !g_pFileSystem )
 	{
-		Error( "ShaderCacheDoc: For use CShaderCacheDoc::SaveFile StdLib must be connected by ConnectStdLib" );
+		Error( "ShaderCacheDoc: For use CShaderCacheDoc::SaveFile Tier1 must be connected by ConnectTier1" );
 		return false;
 	}
 

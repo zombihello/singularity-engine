@@ -1,5 +1,5 @@
 #include "pch_studiorender.h"
-#include "core/debug.h"
+#include "tier0/debug.h"
 #include "studiorender/studio_viewport.h"
 #include "studiorender/istudio_rendercmd.h"
 #include "studiorender/studiorender.h"

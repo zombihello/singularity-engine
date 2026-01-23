@@ -8,7 +8,7 @@ set( GENERATED_DIR						${CMAKE_CURRENT_BINARY_DIR} )
 
 set( SRC_PATTERNS						"${SRC_DIR}/*.h" "${SRC_DIR}/*.inl" "${SRC_DIR}/*.cpp" )
 set( PUBLIC_SRC_PATTERNS				"${PUBLIC_SRC_DIR}/tools/resource_tools/*.h" "${PUBLIC_SRC_DIR}/tools/resource_tools/*.inl" "${PUBLIC_SRC_DIR}/tools/resource_tools/*.cpp" 
-										"${PUBLIC_SRC_DIR}/core/*.cpp" )
+										"${PUBLIC_SRC_DIR}/tier0/*.cpp" )
 set( GENERATED_SRC_PATTERNS				"${GENERATED_DIR}/*.h" "${GENERATED_DIR}/*.inl" "${GENERATED_DIR}/*.cpp"
 										"${GENERATED_DIR}/*.hxx" "${GENERATED_DIR}/*.cxx" )
 
@@ -43,14 +43,14 @@ target_precompile_headers( material_tool PRIVATE 							pch_material_tool.h )
 set_target_properties( material_tool PROPERTIES FOLDER         				"Tools/Resource Compiler" )
 set_target_properties( material_tool PROPERTIES PREFIX 						"" )
 
-target_link_libraries( material_tool PRIVATE								core stdlib interfaces smatdoc ${CMAKE_DL_LIBS} )
+target_link_libraries( material_tool PRIVATE								tier0 tier1 interfaces smatdoc ${CMAKE_DL_LIBS} )
 add_common_target_defines( material_tool )
 
 
 #
 # Install
 #
-inherit_install_files( material_tool								TARGETS core stdlib interfaces smatdoc )
+inherit_install_files( material_tool								TARGETS tier0 tier1 interfaces smatdoc )
 
 # Binaries
 install_files( material_tool TARGETS RUNTIME material_tool 			DESTINATION bin/${PLATFORM_BIN_DIR}/ )

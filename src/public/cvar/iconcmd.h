@@ -1,5 +1,5 @@
 #pragma once
-#include "stdlib/types.h"
+#include "tier1/types.h"
 
 //-----------------------------------------------------------------------------
 // IConVars/IConCmds are marked as having a particular DLL identifier

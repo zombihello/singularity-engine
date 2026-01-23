@@ -2,8 +2,8 @@
 #include "appframework/iappsystem.h"
 #include "cvar/iconcmd.h"
 #include "cvar/iconvar.h"
-#include "stdlib/delegate.h"
-#include "stdlib/math/color.h"
+#include "tier1/delegate.h"
+#include "tier1/math/color.h"
 
 //-----------------------------------------------------------------------------
 // Forward declarations

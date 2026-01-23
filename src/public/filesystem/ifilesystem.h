@@ -1,8 +1,8 @@
 #pragma once
-#include "stdlib/types.h"
+#include "tier1/types.h"
 #include "appframework/iappsystem.h"
-#include "stdlib/refcount.h"
-#include "stdlib/istreamdata.h"
+#include "tier1/refcount.h"
+#include "tier1/istreamdata.h"
 
 //-----------------------------------------------------------------------------
 // File modes and result types

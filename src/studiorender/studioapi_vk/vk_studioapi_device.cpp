@@ -1,5 +1,5 @@
 #include "pch_studioapi_vk.h"
-#include "core/icommandline.h"
+#include "tier0/icommandline.h"
 #include "studiorender/studioapi_vk/vk_studioapi_device.h"
 #include "studiorender/studioapi_vk/vk_helpers.h"
 

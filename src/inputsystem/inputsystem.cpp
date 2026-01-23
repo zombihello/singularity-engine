@@ -1,6 +1,6 @@
 #include "pch_inputsystem.h"
-#include "stdlib/convar.h"
-#include "stdlib/istreamdata.h"
+#include "tier1/convar.h"
+#include "tier1/istreamdata.h"
 #include "cvar/icvar.h"
 #include "inputsystem/inputsystem_private.h"
 #include "inputsystem/iinputsystem.h"
@@ -235,7 +235,7 @@ CInputSystem::Connect
 */
 bool CInputSystem::Connect( createInterfaceFn_t pFactory )
 {
-	if ( !ConnectStdLib( pFactory ) )
+	if ( !ConnectTier1( pFactory ) )
 	{
 		return false;
 	}
@@ -260,7 +260,7 @@ void CInputSystem::Disconnect()
 	}
 
 	ConVar_Unregister();
-	DisconnectStdLib();
+	DisconnectTier1();
 }
 
 /*

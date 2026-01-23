@@ -1,8 +1,8 @@
 #include "pch_cvar.h"
-#include "core/icommandline.h"
+#include "tier0/icommandline.h"
 #include "filesystem/ifilesystem.h"
 #include "cvar/icvar.h"
-#include "stdlib/convar.h"
+#include "tier1/convar.h"
 
 #define CVAR_CONFIG_NAME		 "config"
 #define CVAR_DEFAULT_CONFIG_NAME "config_default"
@@ -221,7 +221,7 @@ CCvar::Connect
 */
 bool CCvar::Connect( createInterfaceFn_t pFactory )
 {
-	if ( !ConnectStdLib( pFactory ) )
+	if ( !ConnectTier1( pFactory ) )
 	{
 		return false;
 	}
@@ -239,7 +239,7 @@ CCvar::Disconnect
 void CCvar::Disconnect()
 {
 	ConVar_Unregister();
-	DisconnectStdLib();
+	DisconnectTier1();
 }
 
 /*

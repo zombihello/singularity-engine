@@ -36,5 +36,5 @@ target_precompile_headers( shaderlib PRIVATE 			pch_shaderlib.h )
 set_target_properties( shaderlib PROPERTIES FOLDER      Engine/Shaders )
 set_target_properties( shaderlib PROPERTIES PREFIX 		"" )
 
-target_link_libraries( shaderlib PUBLIC 				stdlib )
+target_link_libraries( shaderlib PUBLIC 				tier1 )
 add_common_target_defines( shaderlib )

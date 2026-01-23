@@ -35,5 +35,5 @@ add_library( smdldoc STATIC 	                      	${FULL_SRC_FILES} )
 set_target_properties( smdldoc PROPERTIES FOLDER        "Engine/Utils/Data Formats" )
 set_target_properties( smdldoc PROPERTIES PREFIX 		"" )
 
-target_link_libraries( smdldoc PUBLIC 					stdlib )
+target_link_libraries( smdldoc PUBLIC 					tier1 )
 add_common_target_defines( smdldoc )

@@ -19,7 +19,7 @@
     #include <EASTL/stack.h>
 
     #include "ecsfileparser_bison.cpp.h"
-    #include "core/debug.h"
+    #include "tier0/debug.h"
     #include "utils/parserlib/lexerstate.h"
     #include "utils/parserlib/lexerlistener.h"
 
@@ -85,7 +85,7 @@
     #include <stdint.h>
     #include <EASTL/string.h>
 
-    #include "stdlib/defines.h"
+    #include "tier1/defines.h"
 
     #if PLATFORM_WINDOWS
         #include <io.h>         // For fix error with unknown 'isatty'

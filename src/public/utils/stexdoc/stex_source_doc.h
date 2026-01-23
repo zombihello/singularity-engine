@@ -13,7 +13,7 @@ public:
 	static void SetDefaultPixelFormat( studioAPIPixelFormat_t pixelFormat );
 
 	// Load and save a texture document
-	// NOTE: For use StdLib must be connected by ConnectStdLib
+	// NOTE: For use Tier1 must be connected by ConnectTier1
 	bool LoadFromFile( const char* pPath );
 	bool SaveFile( const char* pPath );
 	void Clear();

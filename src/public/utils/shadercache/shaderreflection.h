@@ -3,8 +3,8 @@
 #include <EASTL/vector.h>
 #include <EASTL/unordered_map.h>
 
-#include "stdlib/types.h"
-#include "stdlib/istreamdata.h"
+#include "tier1/types.h"
+#include "tier1/istreamdata.h"
 #include "studiorender/studioapi/istudioapi_shader.h"
 
 //-----------------------------------------------------------------------------

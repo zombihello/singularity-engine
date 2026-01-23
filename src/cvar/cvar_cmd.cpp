@@ -1,8 +1,8 @@
 #include "pch_cvar.h"
 #include <sstream>
 
-#include "stdlib/buildnum.h"
-#include "core/version.h"
+#include "tier1/buildnum.h"
+#include "tier0/version.h"
 #include "filesystem/ifilesystem.h"
 
 /*

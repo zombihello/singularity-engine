@@ -8,7 +8,7 @@ set( GENERATED_DIR						${CMAKE_CURRENT_BINARY_DIR} )
 
 set( SRC_PATTERNS						"${SRC_DIR}/*.h" "${SRC_DIR}/*.inl" "${SRC_DIR}/*.cpp" )
 set( PUBLIC_SRC_PATTERNS				"${PUBLIC_SRC_DIR}/studiorender/*.h" "${PUBLIC_SRC_DIR}/studiorender/*.inl" "${PUBLIC_SRC_DIR}/studiorender/*.cpp" 
-										"${PUBLIC_SRC_DIR}/core/*.cpp" )
+										"${PUBLIC_SRC_DIR}/tier0/*.cpp" )
 set( GENERATED_SRC_PATTERNS				"${GENERATED_DIR}/*.h" "${GENERATED_DIR}/*.inl" "${GENERATED_DIR}/*.cpp"
 										"${GENERATED_DIR}/*.hxx" "${GENERATED_DIR}/*.cxx" )
 
@@ -46,7 +46,7 @@ target_precompile_headers( studiorender PRIVATE 							pch_studiorender.h )
 set_target_properties( studiorender PROPERTIES FOLDER         				Engine )
 set_target_properties( studiorender PROPERTIES PREFIX 						"" )
 
-target_link_libraries( studiorender PRIVATE									core stdlib interfaces shadercache ${CMAKE_DL_LIBS} )
+target_link_libraries( studiorender PRIVATE									tier0 tier1 interfaces shadercache ${CMAKE_DL_LIBS} )
 add_common_target_defines( studiorender )
 add_dependencies( studiorender												studioapi_vk )
 
@@ -54,7 +54,7 @@ add_dependencies( studiorender												studioapi_vk )
 #
 # Install
 #
-inherit_install_files( studiorender								TARGETS core stdlib interfaces shadercache studioapi_vk )
+inherit_install_files( studiorender								TARGETS tier0 tier1 interfaces shadercache studioapi_vk )
 
 # Binaries
 install_files( studiorender TARGETS RUNTIME studiorender 		DESTINATION bin/${PLATFORM_BIN_DIR}/ )

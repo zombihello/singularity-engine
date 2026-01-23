@@ -2,8 +2,8 @@
 #include <EASTL/string.h>
 #include <EASTL/vector.h>
 
-#include "core/core.h"
-#include "stdlib/jsondoc.h"
+#include "tier0/tier0.h"
+#include "tier1/jsondoc.h"
 #include "utils/smatdoc/smatvar.h"
 
 //-----------------------------------------------------------------------------
@@ -13,7 +13,7 @@ class CSMATSourceMaterialDoc
 {
 public:
 	// Save and load a material document
-	// NOTE: For use StdLib must be connected by ConnectStdLib (except LoadFromBuffer)
+	// NOTE: For use Tier1 must be connected by ConnectTier1 (except LoadFromBuffer)
 	bool SaveFile( const char* pPath );
 	bool LoadFromFile( const char* pPath );
 	bool LoadFromBuffer( const char* pBuffer );

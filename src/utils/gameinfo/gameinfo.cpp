@@ -1,8 +1,8 @@
 #include "utils/interfaces/interfaces.h"
-#include "stdlib/template.h"
-#include "stdlib/filetools.h"
-#include "core/debug.h"
-#include "core/profile.h"
+#include "tier1/template.h"
+#include "tier1/filetools.h"
+#include "tier0/debug.h"
+#include "tier0/profile.h"
 #include "filesystem/ifilesystem.h"
 #include "utils/gameinfo/gameinfo.h"
 

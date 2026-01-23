@@ -2,9 +2,9 @@
 #include <EASTL/string.h>
 #include <EASTL/vector.h>
 
-#include "stdlib/defines.h"
-#include "stdlib/types.h"
-#include "stdlib/jsondoc.h"
+#include "tier1/defines.h"
+#include "tier1/types.h"
+#include "tier1/jsondoc.h"
 
 //-----------------------------------------------------------------------------
 // Helper for work with gameinfo.txt files
@@ -21,7 +21,7 @@ public:
 	CGameInfoDoc();
 
 	// Methods for load from file/buffer and clear the document
-	// NOTE: For LoadFromFile must be connected StdLib
+	// NOTE: For LoadFromFile must be connected Tier1
 	bool LoadFromFile( const char* pPath );
 	bool LoadFromBuffer( const char* pBuffer, const char* pGameInfoPath );
 	void Clear();

@@ -36,5 +36,5 @@ target_precompile_headers( parserlib PRIVATE 			pch_parserlib.h )
 set_target_properties( parserlib PROPERTIES FOLDER      Engine/Utils )
 set_target_properties( parserlib PROPERTIES PREFIX 		"" )
 
-target_link_libraries( parserlib PUBLIC 				stdlib )
+target_link_libraries( parserlib PUBLIC 				tier1 )
 add_common_target_defines( parserlib )

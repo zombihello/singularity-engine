@@ -7,7 +7,7 @@ set( SRC_DIR							${CMAKE_CURRENT_SOURCE_DIR} )
 set( GENERATED_DIR						${CMAKE_CURRENT_BINARY_DIR} )
 
 set( SRC_PATTERNS						"${SRC_DIR}/*.h" "${SRC_DIR}/*.inl" "${SRC_DIR}/*.cpp" "${SRC_DIR}/*.ecs" )
-set( PUBLIC_SRC_PATTERNS				"${PUBLIC_SRC_DIR}/core/*.cpp" )
+set( PUBLIC_SRC_PATTERNS				"${PUBLIC_SRC_DIR}/tier0/*.cpp" )
 set( GENERATED_SRC_PATTERNS				"${GENERATED_DIR}/*.h" "${GENERATED_DIR}/*.inl" "${GENERATED_DIR}/*.cpp"
 										"${GENERATED_DIR}/*.hxx" "${GENERATED_DIR}/*.cxx" )
 
@@ -49,14 +49,14 @@ set_target_properties( citadel PROPERTIES FOLDER         				Game )
 set_target_properties( citadel PROPERTIES PREFIX 						"" )
 set_target_properties( citadel PROPERTIES OUTPUT_NAME					game )
 
-target_link_libraries( citadel PRIVATE									core stdlib interfaces game_shared sentdoc smapdoc ${CMAKE_DL_LIBS} )
+target_link_libraries( citadel PRIVATE									tier0 tier1 interfaces game_shared sentdoc smapdoc ${CMAKE_DL_LIBS} )
 add_common_target_defines( citadel )
 
 
 #
 # Install
 #
-inherit_install_files( citadel											TARGETS core stdlib interfaces sentdoc smapdoc )
+inherit_install_files( citadel											TARGETS tier0 tier1 interfaces sentdoc smapdoc )
 inherit_install_files( citadel											TARGETS game_shared								DESTINATION citadel )
 
 # Binaries

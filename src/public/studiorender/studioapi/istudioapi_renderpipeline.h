@@ -1,5 +1,5 @@
 #pragma once
-#include "stdlib/math/math.h"
+#include "tier1/math/math.h"
 #include "studiorender/studioapi/istudioapi_resource.h"
 
 //-----------------------------------------------------------------------------

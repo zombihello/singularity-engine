@@ -19,7 +19,7 @@ set( GENERATED_DIR						${CMAKE_CURRENT_BINARY_DIR} )
 
 set( SRC_PATTERNS						"${SRC_DIR}/*.h" "${SRC_DIR}/*.inl" "${SRC_DIR}/*.cpp" )
 set( PUBLIC_SRC_PATTERNS				"${PUBLIC_SRC_DIR}/tools/resource_tools/*.h" "${PUBLIC_SRC_DIR}/tools/resource_tools/*.inl" "${PUBLIC_SRC_DIR}/tools/resource_tools/*.cpp" 
-										"${PUBLIC_SRC_DIR}/core/*.cpp" )
+										"${PUBLIC_SRC_DIR}/tier0/*.cpp" )
 set( GENERATED_SRC_PATTERNS				"${GENERATED_DIR}/*.h" "${GENERATED_DIR}/*.inl" "${GENERATED_DIR}/*.cpp"
 										"${GENERATED_DIR}/*.hxx" "${GENERATED_DIR}/*.cxx" )
 
@@ -55,14 +55,14 @@ set_target_properties( model_tool PROPERTIES FOLDER         			"Tools/Resource C
 set_target_properties( model_tool PROPERTIES PREFIX 					"" )
 
 target_include_directories( model_tool PRIVATE             				${THIRDPARTY_INCLUDES} )
-target_link_libraries( model_tool PRIVATE								core stdlib interfaces smdldoc ${THIRDPARTY_LIBS} ${CMAKE_DL_LIBS} )
+target_link_libraries( model_tool PRIVATE								tier0 tier1 interfaces smdldoc ${THIRDPARTY_LIBS} ${CMAKE_DL_LIBS} )
 add_common_target_defines( model_tool )
 
 
 #
 # Install
 #
-inherit_install_files( model_tool									TARGETS core stdlib interfaces smdldoc )
+inherit_install_files( model_tool									TARGETS tier0 tier1 interfaces smdldoc )
 
 # Binaries
 install_files( model_tool TARGETS RUNTIME model_tool 				DESTINATION     bin/${PLATFORM_BIN_DIR}/ )

@@ -8,7 +8,7 @@ set( GENERATED_DIR						${CMAKE_CURRENT_BINARY_DIR} )
 
 set( SRC_PATTERNS						"${SRC_DIR}/*.h" "${SRC_DIR}/*.inl" "${SRC_DIR}/*.cpp" )
 set( PUBLIC_SRC_PATTERNS				"${PUBLIC_SRC_DIR}/resourcesystem/*.h" "${PUBLIC_SRC_DIR}/resourcesystem/*.inl" "${PUBLIC_SRC_DIR}/resourcesystem/*.cpp" 
-										"${PUBLIC_SRC_DIR}/core/*.cpp" )
+										"${PUBLIC_SRC_DIR}/tier0/*.cpp" )
 set( GENERATED_SRC_PATTERNS				"${GENERATED_DIR}/*.h" "${GENERATED_DIR}/*.inl" "${GENERATED_DIR}/*.cpp"
 										"${GENERATED_DIR}/*.hxx" "${GENERATED_DIR}/*.cxx" )
 
@@ -43,14 +43,14 @@ target_precompile_headers( resourcesystem PRIVATE 							pch_resourcesystem.h )
 set_target_properties( resourcesystem PROPERTIES FOLDER         			Engine )
 set_target_properties( resourcesystem PROPERTIES PREFIX 					"" )
 
-target_link_libraries( resourcesystem PRIVATE								core stdlib interfaces ${CMAKE_DL_LIBS} )
+target_link_libraries( resourcesystem PRIVATE								tier0 tier1 interfaces ${CMAKE_DL_LIBS} )
 add_common_target_defines( resourcesystem )
 
 
 #
 # Install
 #
-inherit_install_files( resourcesystem							TARGETS core stdlib interfaces )
+inherit_install_files( resourcesystem							TARGETS tier0 tier1 interfaces )
 
 # Binaries
 install_files( resourcesystem TARGETS RUNTIME resourcesystem 	DESTINATION bin/${PLATFORM_BIN_DIR}/ )

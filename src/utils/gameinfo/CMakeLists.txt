@@ -35,5 +35,5 @@ add_library( gameinfo STATIC 	                      	${FULL_SRC_FILES} )
 set_target_properties( gameinfo PROPERTIES FOLDER       "Engine/Utils/Data Formats" )
 set_target_properties( gameinfo PROPERTIES PREFIX 		"" )
 
-target_link_libraries( gameinfo PUBLIC 					stdlib )
+target_link_libraries( gameinfo PUBLIC 					tier1 )
 add_common_target_defines( gameinfo )

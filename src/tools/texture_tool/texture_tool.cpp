@@ -1,5 +1,5 @@
 #include "pch_texture_tool.h"
-#include "stdlib/math/math.h"
+#include "tier1/math/math.h"
 #include "studiorender/studioapi/istudioapi_texture.h"
 #include "utils/stexdoc/stex_compiled_doc.h"
 #include "tools/resource_tools/itexture_tool.h"
@@ -215,7 +215,7 @@ CTextureTool::Connect
 */
 bool CTextureTool::Connect( createInterfaceFn_t pFactory )
 {
-	return ConnectStdLib( pFactory );
+	return ConnectTier1( pFactory );
 }
 
 /*
@@ -254,7 +254,7 @@ CTextureTool::Disconnect
 */
 void CTextureTool::Disconnect()
 {
-	DisconnectStdLib();
+	DisconnectTier1();
 }
 
 /*

@@ -3,8 +3,8 @@
 #include <EASTL/vector.h>
 
 #include "utils/interfaces/interfaces.h"
-#include "stdlib/stdlib.h"
-#include "stdlib/filetools.h"
-#include "core/debug.h"
-#include "core/profile.h"
+#include "tier1/tier1.h"
+#include "tier1/filetools.h"
+#include "tier0/debug.h"
+#include "tier0/profile.h"
 #include "filesystem/ifilesystem.h"

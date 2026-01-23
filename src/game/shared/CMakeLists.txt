@@ -58,7 +58,7 @@ set_target_properties( game_shared PROPERTIES PREFIX 			"" )
 
 target_compile_definitions( game_shared PUBLIC					${THIRDPARTY_DEFINES} )
 target_include_directories( game_shared PUBLIC					${THIRDPARTY_INCLUDES} )
-target_link_libraries( game_shared PUBLIC 						stdlib ${THIRDPARTY_LIBS} )
+target_link_libraries( game_shared PUBLIC 						tier1 ${THIRDPARTY_LIBS} )
 add_common_target_defines( game_shared )
 
 

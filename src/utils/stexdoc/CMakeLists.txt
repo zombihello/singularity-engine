@@ -35,5 +35,5 @@ add_library( stexdoc STATIC 	                      	${FULL_SRC_FILES} )
 set_target_properties( stexdoc PROPERTIES FOLDER        "Engine/Utils/Data Formats" )
 set_target_properties( stexdoc PROPERTIES PREFIX 		"" )
 
-target_link_libraries( stexdoc PUBLIC 					stdlib )
+target_link_libraries( stexdoc PUBLIC 					tier1 )
 add_common_target_defines( stexdoc )

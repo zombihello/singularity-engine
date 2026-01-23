@@ -1,8 +1,8 @@
 #pragma once
-#include "stdlib/defines.h"
-#include "stdlib/types.h"
-#include "stdlib/math/math.h"
-#include "stdlib/math/color.h"
+#include "tier1/defines.h"
+#include "tier1/types.h"
+#include "tier1/math/math.h"
+#include "tier1/math/color.h"
 
 //-----------------------------------------------------------------------------
 // Studio vertex types

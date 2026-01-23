@@ -5,8 +5,8 @@
 #include <flecs.h>
 
 #include "utils/interfaces/interfaces.h"
-#include "stdlib/stdlib.h"
-#include "stdlib/convar.h"
-#include "core/debug.h"
-#include "core/profile.h"
+#include "tier1/tier1.h"
+#include "tier1/convar.h"
+#include "tier0/debug.h"
+#include "tier0/profile.h"
 #include "game/shared/game.h"
