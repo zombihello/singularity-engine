@@ -1,7 +1,7 @@
 #include <EASTL/vector.h>
 #include <EASTL/string.h>
 
-#include "interfaces/interfaces.h"
+#include "utils/interfaces/interfaces.h"
 #include "stdlib/stdlib.h"
 #include "stdlib/convar.h"
 #include "core/core.h"

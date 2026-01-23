@@ -1,6 +1,6 @@
 #include "pch_materialsystem.h"
 #include "stdlib/filetools.h"
-#include "stexdoc/stex_compiled_doc.h"
+#include "utils/stexdoc/stex_compiled_doc.h"
 #include "resourcesystem/iresourcesystem.h"
 #include "materialsystem/texture.h"
 #include "materialsystem/texture_factory.h"
@@ -81,7 +81,7 @@ TRefPtr<IRefCounted> CTextureFactory::LoadResource( const char* pPath, uint32 lo
 
 	// Convert STX mipmap information to the engine format
 	eastl::vector<textureMipMap_t> mipmaps;
-	const eastl::vector<byte>&	 data = stexCompiledTextureDoc.GetData();
+	const eastl::vector<byte>&	   data = stexCompiledTextureDoc.GetData();
 	mipmaps.resize( stexCompiledTextureDoc.GetNumMips() );
 	for ( uint32 mipIdx = 0, numMips = stexCompiledTextureDoc.GetNumMips(); mipIdx < numMips; ++mipIdx )
 	{

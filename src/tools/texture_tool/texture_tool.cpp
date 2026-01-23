@@ -1,7 +1,7 @@
 #include "pch_texture_tool.h"
 #include "stdlib/math/math.h"
 #include "studiorender/studioapi/istudioapi_texture.h"
-#include "stexdoc/stex_compiled_doc.h"
+#include "utils/stexdoc/stex_compiled_doc.h"
 #include "tools/resource_tools/itexture_tool.h"
 
 #include <compressonator.h>

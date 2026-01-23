@@ -55,9 +55,7 @@ set( GENERATED_ROOT_DIR     ${CMAKE_BINARY_DIR} )
 
 include_directories( ${CMAKE_SOURCE_DIR} )
 include_directories( ${CMAKE_SOURCE_DIR}/public )
-include_directories( ${CMAKE_SOURCE_DIR}/public/libs )
 include_directories( ${CMAKE_BINARY_DIR} )
-include_directories( ${CMAKE_BINARY_DIR}/libs )
 
 
 #
@@ -151,33 +149,32 @@ add_compile_definitions( GIT_COMMIT="${GIT_COMMIT}" )
 #
 # Add project
 #
-# Libraries
-add_subdirectory( libs/appframework )
-add_subdirectory( libs/gameframework )
-add_subdirectory( libs/gameinfo )
-add_subdirectory( libs/interfaces )
-add_subdirectory( libs/parserlib )
-add_subdirectory( libs/pixelformatinfos )
-add_subdirectory( libs/sentdoc )
-add_subdirectory( libs/shadercache )
-add_subdirectory( libs/shaderlib )
-add_subdirectory( libs/smapdoc )
-add_subdirectory( libs/smatdoc )
-add_subdirectory( libs/smdldoc )
-add_subdirectory( libs/stexdoc )
-add_subdirectory( libs/stdlib )
+# Engine
+add_subdirectory( utils/gameinfo )
+add_subdirectory( utils/interfaces )
+add_subdirectory( utils/parserlib )
+add_subdirectory( utils/pixelformatinfos )
+add_subdirectory( utils/sentdoc )
+add_subdirectory( utils/shadercache )
+add_subdirectory( utils/smapdoc )
+add_subdirectory( utils/smatdoc )
+add_subdirectory( utils/smdldoc )
+add_subdirectory( utils/stexdoc )
 
-# Modules
+add_subdirectory( stdlib )
 add_subdirectory( core )
 add_subdirectory( filesystem )
 add_subdirectory( cvar )
 add_subdirectory( inputsystem )
 add_subdirectory( studiorender/studioapi/vk )
 add_subdirectory( studiorender )
+add_subdirectory( materialsystem/shaderlib )
 add_subdirectory( materialsystem/stdshaders )
 add_subdirectory( materialsystem )
 add_subdirectory( resourcesystem )
+add_subdirectory( appframework )
 add_subdirectory( launcher )
+add_subdirectory( gameframework )
 
 # Games
 add_subdirectory( games/citadel )

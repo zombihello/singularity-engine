@@ -3,7 +3,7 @@
 #include <EASTL/vector.h>
 #include <EASTL/unordered_map.h>
 
-#include "interfaces/interfaces.h"
+#include "utils/interfaces/interfaces.h"
 #include "stdlib/stdlib.h"
 #include "stdlib/filetools.h"
 #include "core/debug.h"

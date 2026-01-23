@@ -1,5 +1,5 @@
 #include "pch_model_tool.h"
-#include "smdldoc/smdl_compiled_doc.h"
+#include "utils/smdldoc/smdl_compiled_doc.h"
 #include "tools/resource_tools/imodel_tool.h"
 
 #include <assimp/Importer.hpp>
@@ -33,11 +33,11 @@ typedef eastl::unordered_map<uint32, eastl::vector<modelToolAiMesh_t>> modelTool
 
 struct modelToolMeshData_t
 {
-	eastl::string				  name;
+	eastl::string				name;
 	eastl::vector<smdlVertex_t> vertices;
-	eastl::vector<uint32>		  indices;
-	smdlSurface_t			  surface;
-	uint32					  materialID;
+	eastl::vector<uint32>		indices;
+	smdlSurface_t				surface;
+	uint32						materialID;
 };
 
 /*
@@ -122,7 +122,7 @@ bool CModelTool::CompileModel( const resourceToolCompileModelParams_t& compilePa
 {
 	// Parse model data from a file
 	eastl::vector<modelToolMeshData_t> parsedMeshes;
-	eastl::vector<eastl::string>		 parsedMaterials;
+	eastl::vector<eastl::string>	   parsedMaterials;
 
 	Msg( "ModelTool: Loading models from '%s'..", compileParams.pSrcPath );
 	if ( !ParseModels( compileParams, parsedMeshes, parsedMaterials ) )
@@ -155,8 +155,8 @@ bool CModelTool::CompileModel( const resourceToolCompileModelParams_t& compilePa
 		}
 
 		// Combine meshes
-		eastl::vector<smdlVertex_t>  smdlVertices;
-		eastl::vector<uint32>		   indices;
+		eastl::vector<smdlVertex_t>	 smdlVertices;
+		eastl::vector<uint32>		 indices;
 		eastl::vector<smdlSurface_t> smdlSurfaces;
 		for ( auto itMaterial = parsedMeshesDict.begin(), itMaterialEnd = parsedMeshesDict.end(); itMaterial != itMaterialEnd; ++itMaterial )
 		{
@@ -194,10 +194,10 @@ bool CModelTool::CompileModel( const resourceToolCompileModelParams_t& compilePa
 	{
 		for ( uint32 modelIdx = 0, numModels = (uint32)parsedMeshes.size(); modelIdx < numModels; ++modelIdx )
 		{
-			CSMDLCompiledModelDoc&	   smdlCompiledFile	 = smdlCompiledFiles.emplace_back();
-			modelToolMeshData_t&	   modelToolMeshData = parsedMeshes[modelIdx];
+			CSMDLCompiledModelDoc&		 smdlCompiledFile  = smdlCompiledFiles.emplace_back();
+			modelToolMeshData_t&		 modelToolMeshData = parsedMeshes[modelIdx];
 			eastl::vector<smdlSurface_t> smdlSurfaces;
-			eastl::vector<eastl::string>   materials;
+			eastl::vector<eastl::string> materials;
 
 			smdlSurfaces.emplace_back( modelToolMeshData.surface );
 			materials.emplace_back( parsedMaterials[modelToolMeshData.materialID] );
@@ -212,7 +212,7 @@ bool CModelTool::CompileModel( const resourceToolCompileModelParams_t& compilePa
 	{
 		CSMDLCompiledModelDoc&	   smdlCompiledFile	 = smdlCompiledFiles[modelIdx];
 		const modelToolMeshData_t& modelToolMeshData = parsedMeshes[modelIdx];
-		eastl::string				   destFilePath		 = S_Sprintf( "%s%s.smdl_c", compileParams.pDestPath, smdlCompiledFiles.size() > 1 ? S_Sprintf( "_%i", modelIdx ).c_str() : "" );
+		eastl::string			   destFilePath		 = S_Sprintf( "%s%s.smdl_c", compileParams.pDestPath, smdlCompiledFiles.size() > 1 ? S_Sprintf( "_%i", modelIdx ).c_str() : "" );
 		if ( !smdlCompiledFile.SaveFile( destFilePath.c_str() ) )
 		{
 			Error( "ModelTool: Failed to save model '%s' to '%s'", modelToolMeshData.name.c_str(), destFilePath.c_str() );
@@ -380,8 +380,8 @@ bool CModelTool::ParseModels( const resourceToolCompileModelParams_t& compilePar
 		pMaterial->Get( AI_MATKEY_NAME, aiMaterialName );
 
 		// Rename material if it need
-		eastl::string materialName	  = aiMaterialName.C_Str();
-		auto		itRenamedMaterial = renamedMaterialsDict.find( materialName );
+		eastl::string materialName		= aiMaterialName.C_Str();
+		auto		  itRenamedMaterial = renamedMaterialsDict.find( materialName );
 		if ( itRenamedMaterial != renamedMaterialsDict.end() )
 		{
 			materialName = itRenamedMaterial->second;
@@ -406,12 +406,12 @@ void CModelTool::OptimizeModel( modelToolMeshData_t& meshData ) const
 
 	// Create a remap table
 	eastl::vector<uint32> meshoptVertexRemap( numIndices );
-	uint32				optimizedNumVertices = (uint32)meshopt_generateVertexRemap( meshoptVertexRemap.data(),
-																		meshData.indices.data(), numIndices,
-																		meshData.vertices.data(), numVertices, sizeof( smdlVertex_t ) );
+	uint32				  optimizedNumVertices = (uint32)meshopt_generateVertexRemap( meshoptVertexRemap.data(),
+																					  meshData.indices.data(), numIndices,
+																					  meshData.vertices.data(), numVertices, sizeof( smdlVertex_t ) );
 
 	// Allocate memory for optimized vertices and indices
-	eastl::vector<uint32>		  optimizedIndices( numIndices );
+	eastl::vector<uint32>		optimizedIndices( numIndices );
 	eastl::vector<smdlVertex_t> optimizedVertices( optimizedNumVertices );
 
 	// Remove duplicate vertices

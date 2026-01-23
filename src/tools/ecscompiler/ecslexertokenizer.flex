@@ -20,8 +20,8 @@
 
     #include "ecsfileparser_bison.cpp.h"
     #include "core/debug.h"
-    #include "parserlib/lexerstate.h"
-    #include "parserlib/lexerlistener.h"
+    #include "utils/parserlib/lexerstate.h"
+    #include "utils/parserlib/lexerlistener.h"
 
     #define YY_FATAL_ERROR( Message )           { yyguts_t* yyg = ( struct yyguts_t* )yyscanner; yyextra->EmitError( Message ); }
     #define YY_USER_ACTION                      yyextra->StoreTokenStart(); yyextra->UpdateContext( yytext, yyleng );

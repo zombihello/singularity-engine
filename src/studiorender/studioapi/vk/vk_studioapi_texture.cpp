@@ -1,5 +1,5 @@
 #include "pch_studioapi.h"
-#include "pixelformatinfos/pixelformatinfos.h"
+#include "utils/pixelformatinfos/pixelformatinfos.h"
 #include "studiorender/studioapi/vk/vk_studioapi_cmdcontext.h"
 #include "studiorender/studioapi/vk/vk_studioapi_cmdbuffer.h"
 #include "studiorender/studioapi/vk/vk_studioapi_texture.h"
@@ -252,9 +252,8 @@ CStudioAPISamplerVk::~CStudioAPISamplerVk()
 	// Destroy the sampler
 	if ( vkSampler != VK_NULL_HANDLE )
 	{
-		g_StudioAPIVk.GetMemoryMgr().FreeResource( [vkSampler = vkSampler]() {
-			vkDestroySampler( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), vkSampler, NULL );
-		} );
+		g_StudioAPIVk.GetMemoryMgr().FreeResource( [vkSampler = vkSampler]()
+												   { vkDestroySampler( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), vkSampler, NULL ); } );
 		vkSampler = VK_NULL_HANDLE;
 	}
 
@@ -444,13 +443,13 @@ CStudioAPITextureVk::~CStudioAPITextureVk()
 	// Destroy the image
 	if ( vkImage != VK_NULL_HANDLE )
 	{
-		g_StudioAPIVk.GetMemoryMgr().FreeResource( [vkImageViews = vkImageViews, vkImage = vkImage, vmaAllocation = vmaAllocation]() {
+		g_StudioAPIVk.GetMemoryMgr().FreeResource( [vkImageViews = vkImageViews, vkImage = vkImage, vmaAllocation = vmaAllocation]()
+												   {
 			for ( uint32 imageViewIdx = 0, numImageViews = (uint32)vkImageViews.size(); imageViewIdx < numImageViews; ++imageViewIdx )
 			{
 				vkDestroyImageView( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), vkImageViews[imageViewIdx], NULL );
 			}
-			g_StudioAPIVk.GetMemoryMgr().DestroyImage( vkImage, vmaAllocation );
-		} );
+			g_StudioAPIVk.GetMemoryMgr().DestroyImage( vkImage, vmaAllocation ); } );
 		vkImage		  = VK_NULL_HANDLE;
 		vmaAllocation = VK_NULL_HANDLE;
 		vkImageViews.clear();
@@ -523,7 +522,8 @@ void CStudioAPITextureVk::UpdateData( IStudioAPICmdContext* pCmdContext, byte* p
 			uploadState.currentMip	  = layerIdx == startLayer ? startMip : 0;
 			uint64 dataSizeToUpload	  = layerSize - GetMipOffset( uploadState.currentMip );
 			dataUploader.Upload( dataSizeToUpload, bufferOffsetAlignment,
-								 [this, &vkImageMemoryBarrier, &uploadState, bNeedOwnershipTransfer, pStudioAPICmdContext, pTransferCmdContext, startOffset, pData, dataSizeToUpload]( const CStudioAPIDataUploaderVk::uploadParams_t& uploadParams ) {
+								 [this, &vkImageMemoryBarrier, &uploadState, bNeedOwnershipTransfer, pStudioAPICmdContext, pTransferCmdContext, startOffset, pData, dataSizeToUpload]( const CStudioAPIDataUploaderVk::uploadParams_t& uploadParams )
+								 {
 									 // Make a barrier if it need
 									 if ( uploadState.currentLayer == 0 && uploadParams.remainSizeToUpload == dataSizeToUpload )
 									 {

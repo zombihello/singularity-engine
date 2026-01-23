@@ -1,6 +1,6 @@
 #include "pch_materialsystem.h"
 #include "studiorender/studioapi/istudioapi_cmdlist.h"
-#include "shaderlib/shader_base.h"
+#include "materialsystem/shaderlib/shader_base.h"
 #include "materialsystem/imaterialvar.h"
 #include "materialsystem/wireframe_vs_vertex.gen.h"
 #include "materialsystem/wireframe_ps_pixel.gen.h"

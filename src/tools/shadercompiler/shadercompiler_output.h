@@ -4,7 +4,7 @@
 #include <EASTL/unordered_map.h>
 
 #include "tools/shadercompiler/ishadercompiler_backend.h"
-#include "shadercache/shadercache.h"
+#include "utils/shadercache/shadercache.h"
 
 //-----------------------------------------------------------------------------
 // The output of the shader compile

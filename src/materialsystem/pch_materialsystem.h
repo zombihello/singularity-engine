@@ -2,7 +2,7 @@
 #include <EASTL/vector.h>
 #include <EASTL/unordered_map.h>
 
-#include "interfaces/interfaces.h"
+#include "utils/interfaces/interfaces.h"
 #include "stdlib/convar.h"
 #include "stdlib/stl.h"
 #include "core/core.h"

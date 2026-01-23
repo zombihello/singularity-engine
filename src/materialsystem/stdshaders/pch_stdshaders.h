@@ -1,7 +1,7 @@
 #include <EASTL/string.h>
 
-#include "interfaces/interfaces.h"
-#include "shaderlib/shaderlib.h"
-#include "shaderlib/shader_base.h"
+#include "utils/interfaces/interfaces.h"
+#include "materialsystem/shaderlib/shaderlib.h"
+#include "materialsystem/shaderlib/shader_base.h"
 #include "core/core.h"
 #include "core/debug.h"

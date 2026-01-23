@@ -1,7 +1,7 @@
 #include "pch_studioapi.h"
 #include "stdlib/hashing/fasthash.h"
 #include "stdlib/streamdata_memory.h"
-#include "shadercache/shaderreflection.h"
+#include "utils/shadercache/shaderreflection.h"
 #include "studiorender/studioapi/vk/vk_studioapi_shader.h"
 
 /*
@@ -370,9 +370,8 @@ CStudioAPIShaderVk::~CStudioAPIShaderVk()
 	// Destroy the shader module
 	if ( vkShaderModule != VK_NULL_HANDLE )
 	{
-		g_StudioAPIVk.GetMemoryMgr().FreeResource( [vkShaderModule = vkShaderModule]() {
-			vkDestroyShaderModule( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), vkShaderModule, NULL );
-		} );
+		g_StudioAPIVk.GetMemoryMgr().FreeResource( [vkShaderModule = vkShaderModule]()
+												   { vkDestroyShaderModule( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), vkShaderModule, NULL ); } );
 		vkShaderModule = VK_NULL_HANDLE;
 	}
 

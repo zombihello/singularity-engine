@@ -26,6 +26,8 @@ file( GLOB_RECURSE GENERATED_FILES  CONFIGURE_DEPENDS           ${GENERATED_SRC_
 # Filter out all unnecessary files
 list( FILTER SRC_FILES 					EXCLUDE REGEX "/stdshaders/" )
 list( FILTER PUBLIC_SRC_FILES 			EXCLUDE REGEX "/stdshaders/" )
+list( FILTER SRC_FILES 					EXCLUDE REGEX "/shaderlib/" )
+list( FILTER PUBLIC_SRC_FILES 			EXCLUDE REGEX "/shaderlib/" )
 
 filter_platform_files( SRC_FILES        ${PLATFORM_SRC_DIR} )
 filter_platform_files( PUBLIC_SRC_FILES ${PLATFORM_SRC_DIR} )

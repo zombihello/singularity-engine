@@ -3,7 +3,7 @@
 #include <EASTL/unordered_map.h>
 
 #include "stdlib/refcount.h"
-#include "parserlib/filecontext.h"
+#include "utils/parserlib/filecontext.h"
 
 //-----------------------------------------------------------------------------
 // ECS stubs

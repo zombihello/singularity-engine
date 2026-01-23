@@ -4,7 +4,7 @@
 #include "core/crashdump.h"
 #include "cvar/icvar.h"
 #include "appframework/appframework.h"
-#include "shadercache/shadercache.h"
+#include "utils/shadercache/shadercache.h"
 #include "tools/shadercompiler/shadercompiler_cppgenerator.h"
 #include "tools/shadercompiler/shadercompiler.h"
 #include "tools/shadercompiler/shadercompiler_makefile.h"
@@ -124,7 +124,7 @@ private:
 	dllHandle_t				backendHandle;
 	IShaderCompilerBackend* pShaderCompileBackend;
 	CShaderCompilerMakeFile makefile;
-	eastl::string				outputPath;
+	eastl::string			outputPath;
 };
 
 /*
@@ -214,8 +214,8 @@ int32 CShaderCompilerAppSystemGroup::Main()
 		bDebugConfiguration = CommandLine()->HasParam( "debug" );
 
 		// Add extra include paths from the command line
-		uint32		  numIncludes = 0;
-		const char** pIncludes	  = CommandLine()->GetValues( "include", numIncludes );
+		uint32		 numIncludes = 0;
+		const char** pIncludes	 = CommandLine()->GetValues( "include", numIncludes );
 		if ( numIncludes > 0 )
 		{
 			for ( uint32 index = 0; index < numIncludes; ++index )
@@ -285,8 +285,8 @@ CShaderCompilerAppSystemGroup::GenerateShaderCppClass
 */
 bool CShaderCompilerAppSystemGroup::GenerateShaderCppClass()
 {
-	bool						 bResult = true;
-	CShaderCompilerCppGenerator	 cppGenerator;
+	bool						   bResult = true;
+	CShaderCompilerCppGenerator	   cppGenerator;
 	const eastl::vector<shader_t>& shaders = makefile.GetShaders();
 	for ( uint32 index = 0, count = (uint32)shaders.size(); index < count; ++index )
 	{
@@ -337,7 +337,7 @@ CShaderCompilerAppSystemGroup::CompileShaders
 bool CShaderCompilerAppSystemGroup::CompileShaders()
 {
 	// Iterate over shaders and each the one compile for all flag combination
-	bool						 bResult = true;
+	bool						   bResult = true;
 	const eastl::vector<shader_t>& shaders = makefile.GetShaders();
 	for ( uint32 index = 0, count = (uint32)shaders.size(); index < count; ++index )
 	{
@@ -387,9 +387,9 @@ bool CShaderCompilerAppSystemGroup::CompileShader( const shader_t& shader, CShad
 		*pSetFlagVar = pSetFlag->minValue;
 	}
 
-	bool							bResult		 = true;
+	bool								bResult		 = true;
 	const eastl::vector<eastl::string>& includeDirs	 = makefile.GetIncludeDirs();
-	uint32							currentCombo = 0;
+	uint32								currentCombo = 0;
 	while ( currentCombo < shader.numFlagCombos )
 	{
 		++currentCombo;
@@ -451,7 +451,7 @@ bool CShaderCompilerAppSystemGroup::CompileShader( const shader_t& shader, CShad
 			Error( "ShaderCompiler: Defines:" );
 			for ( uint32 defineIdx = 0, numDefines = shaderCompileEnvironment.GetNumDefines(); defineIdx < numDefines; ++defineIdx )
 			{
-				const char* pDefineName  = NULL;
+				const char* pDefineName	 = NULL;
 				const char* pDefineValue = NULL;
 				shaderCompileEnvironment.GetDefine( defineIdx, pDefineName, pDefineValue );
 				Error( "ShaderCompiler:\t %s: %s", pDefineName, pDefineValue );

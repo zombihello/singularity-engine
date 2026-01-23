@@ -1,5 +1,5 @@
 #include "pch_material_tool.h"
-#include "smatdoc/smat_compiled_doc.h"
+#include "utils/smatdoc/smat_compiled_doc.h"
 #include "tools/resource_tools/imaterial_tool.h"
 
 //-----------------------------------------------------------------------------

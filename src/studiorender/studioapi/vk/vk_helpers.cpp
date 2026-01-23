@@ -1,6 +1,6 @@
 #include "pch_studioapi.h"
 #include "core/debug.h"
-#include "pixelformatinfos/pixelformatinfos.h"
+#include "utils/pixelformatinfos/pixelformatinfos.h"
 #include "studiorender/studioapi/vk/vk_helpers.h"
 
 /*
@@ -22,7 +22,7 @@ bool VK_CheckInstanceExtensionsSupported( const char** pInstanceExtensionNames, 
 {
 	// Get all available extensions
 	eastl::vector<VkExtensionProperties> availableExtensions;
-	uint32							   instanceExtensionCount = 0;
+	uint32								 instanceExtensionCount = 0;
 	vkEnumerateInstanceExtensionProperties( NULL, &instanceExtensionCount, NULL );
 
 	// If we nothing is supported, exit from function with false value
@@ -38,7 +38,7 @@ bool VK_CheckInstanceExtensionsSupported( const char** pInstanceExtensionNames, 
 	// Check is supported extensions who we got in function's arguments
 	for ( uint32 index = 0, count = instanceExtensionNum; index < count; ++index )
 	{
-		bool		 bFound			  = false;
+		bool		bFound			 = false;
 		const char* pRequiredExtName = pInstanceExtensionNames[index];
 
 		for ( uint32 idxSupportedExt = 0, countSuportedExts = (uint32)availableExtensions.size(); idxSupportedExt < countSuportedExts; ++idxSupportedExt )
@@ -69,7 +69,7 @@ bool VK_CheckValidationLayersSupported( const char** pValidationLayerNames, uint
 {
 	// Get all available layers
 	eastl::vector<VkLayerProperties> availableLayers;
-	uint32						   layersCount = 0;
+	uint32							 layersCount = 0;
 	vkEnumerateInstanceLayerProperties( &layersCount, NULL );
 
 	// If we nothing is supported, exit from function with false value
@@ -85,7 +85,7 @@ bool VK_CheckValidationLayersSupported( const char** pValidationLayerNames, uint
 	// Check is supported layers who we got in function's arguments
 	for ( uint32 index = 0, count = validationLayerNum; index < count; ++index )
 	{
-		bool		 bFound				= false;
+		bool		bFound			   = false;
 		const char* pRequiredLayerName = pValidationLayerNames[index];
 
 		for ( uint32 idxSupportedLayer = 0, countSuportedLayers = (uint32)availableLayers.size(); idxSupportedLayer < countSuportedLayers; ++idxSupportedLayer )
@@ -130,7 +130,7 @@ bool VK_CheckDeviceExtensionsSupported( VkPhysicalDevice vkPhysicalDevice, const
 
 	for ( uint32 index = 0; index < deviceExtensionNum; ++index )
 	{
-		bool		 bFound			  = false;
+		bool		bFound			 = false;
 		const char* pRequiredExtName = pDeviceExtensionNames[index];
 
 		for ( uint32 idxSupportedExt = 0; idxSupportedExt < availableDeviceExtCount; ++idxSupportedExt )

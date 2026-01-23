@@ -1,5 +1,5 @@
 #pragma once
-#include "pixelformatinfos/pixelformatinfos.h"
+#include "utils/pixelformatinfos/pixelformatinfos.h"
 #include "studiorender/studioapi/istudioapi_texture.h"
 
 //-----------------------------------------------------------------------------
@@ -125,21 +125,21 @@ private:
 	uint32		GetSyncStateIndex( uint32 mip, uint32 layer ) const;
 	static void OnStudioAPIVkShutdown( void* pUserData );
 
-	uint32									 usageFlags;
-	uint8									 memoryFlags;
-	studioAPITextureType_t					 type;
-	studioAPIPixelFormat_t					 pixelFormat;
-	VkImageAspectFlags						 vkImageAspectFlags;
-	uint32									 sizeX;
-	uint32									 sizeY;
-	uint32									 sizeZ;
-	uint32									 numLayers;
-	uint32									 numMips;
-	VkImage									 vkImage;
-	VmaAllocation							 vmaAllocation;
-	COnStudioAPIVkShutdown::funcDelegate_t*	 pStudioAPIVkShutdownDelegate;
+	uint32									   usageFlags;
+	uint8									   memoryFlags;
+	studioAPITextureType_t					   type;
+	studioAPIPixelFormat_t					   pixelFormat;
+	VkImageAspectFlags						   vkImageAspectFlags;
+	uint32									   sizeX;
+	uint32									   sizeY;
+	uint32									   sizeZ;
+	uint32									   numLayers;
+	uint32									   numMips;
+	VkImage									   vkImage;
+	VmaAllocation							   vmaAllocation;
+	COnStudioAPIVkShutdown::funcDelegate_t*	   pStudioAPIVkShutdownDelegate;
 	eastl::vector<studioAPISyncStateImageVk_t> syncStates;
-	eastl::vector<VkImageView>				 vkImageViews;
+	eastl::vector<VkImageView>				   vkImageViews;
 };
 
 #include "studiorender/studioapi/vk/vk_studioapi_texture.inl"

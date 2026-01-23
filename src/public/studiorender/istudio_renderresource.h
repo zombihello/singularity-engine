@@ -1,7 +1,7 @@
 #pragma once
 #include <EASTL/unordered_set.h>
 
-#include "interfaces/interfaces.h"
+#include "utils/interfaces/interfaces.h"
 #include "stdlib/defines.h"
 #include "stdlib/types.h"
 #include "core/threading.h"

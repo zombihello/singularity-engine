@@ -15,7 +15,7 @@
 #include "materialsystem/imaterialsystem.h"
 #include "resourcesystem/iresourcesystem.h"
 #include "gameframework/igame.h"
-#include "gameinfo/gameinfo.h"
+#include "utils/gameinfo/gameinfo.h"
 
 CConVar window_width( "window_width", "1280", "Window width", FCVAR_ARCHIVE );
 CConVar window_height( "window_height", "720", "Window height", FCVAR_ARCHIVE );

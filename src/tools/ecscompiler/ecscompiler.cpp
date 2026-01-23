@@ -1,7 +1,7 @@
 #include "core/crashdump.h"
 #include "core/icommandline.h"
 #include "stdlib/filetools.h"
-#include "interfaces/interfaces.h"
+#include "utils/interfaces/interfaces.h"
 #include "filesystem/ifilesystem.h"
 #include "cvar/icvar.h"
 #include "appframework/appframework.h"
@@ -37,14 +37,14 @@ int32 CEcsCompilerAppSystemGroup::Main()
 	bool bPrintHelpUsage = CommandLine()->HasParam( "h" ) || CommandLine()->HasParam( "help" ) || CommandLine()->HasParam( "?" );
 
 	// Get a path to source ECS file or directory
-	const char* pEcsFile			 = CommandLine()->GetFirstValue( "file" );
-	const char* pEcsDir			 = CommandLine()->GetFirstValue( "dir" );
-	bool		 bInvalidEcsFilePath = !pEcsFile || pEcsFile[0] == '\0';
-	bool		 bInvalidEcsDir		 = !pEcsDir || pEcsDir[0] == '\0';
+	const char* pEcsFile			= CommandLine()->GetFirstValue( "file" );
+	const char* pEcsDir				= CommandLine()->GetFirstValue( "dir" );
+	bool		bInvalidEcsFilePath = !pEcsFile || pEcsFile[0] == '\0';
+	bool		bInvalidEcsDir		= !pEcsDir || pEcsDir[0] == '\0';
 
 	// Get an output directory for C++ file
-	const char* pCppFileDir		= CommandLine()->GetFirstValue( "output" );
-	bool		 bInvalidCppFileDir = !pCppFileDir || pCppFileDir[0] == '\0';
+	const char* pCppFileDir		   = CommandLine()->GetFirstValue( "output" );
+	bool		bInvalidCppFileDir = !pCppFileDir || pCppFileDir[0] == '\0';
 
 	// Print help of usage if it need or some parameters aren't set
 	if ( bPrintHelpUsage || ( bInvalidEcsFilePath && bInvalidEcsDir ) || bInvalidCppFileDir )
@@ -162,7 +162,7 @@ CEcsCompilerAppSystemGroup::GenerateCppFiles
 bool CEcsCompilerAppSystemGroup::GenerateCppFiles( const char* pRootDir, const char* pOutputDir, const CEcsSystemStub& stubs, ecsCppFileType_t cppFileType )
 {
 	const eastl::vector<TRefPtr<CEcsStubModule>>& ecsStubModules = stubs.GetModules();
-	CEcsCppGenerator							ecsCppGenerator;
+	CEcsCppGenerator							  ecsCppGenerator;
 
 	// Get file extension and type name
 	const char* pCppFileExtension;
@@ -185,7 +185,7 @@ bool CEcsCompilerAppSystemGroup::GenerateCppFiles( const char* pRootDir, const c
 	}
 
 	// Convert the root and the output directory into absolute path
-	eastl::string rootDir	  = pRootDir;
+	eastl::string rootDir	= pRootDir;
 	eastl::string outputDir = pOutputDir;
 	if ( !S_IsAbsolutePath( pRootDir ) )
 	{

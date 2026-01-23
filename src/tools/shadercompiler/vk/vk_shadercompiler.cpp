@@ -2,14 +2,14 @@
 #include "spirv_cross/spirv_cross.hpp"
 #include "spirv-tools/optimizer.hpp"
 
-#include "interfaces/interfaces.h"
+#include "utils/interfaces/interfaces.h"
 #include "stdlib/stdlib.h"
 #include "stdlib/strtools.h"
 #include "stdlib/filetools.h"
 #include "stdlib/streamdata_memory.h"
 #include "core/debug.h"
 #include "filesystem/ifilesystem.h"
-#include "shadercache/shaderreflection.h"
+#include "utils/shadercache/shaderreflection.h"
 #include "tools/shadercompiler/ishadercompiler_backend.h"
 
 /*

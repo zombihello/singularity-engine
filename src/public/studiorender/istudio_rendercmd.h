@@ -1,5 +1,5 @@
 #pragma once
-#include "interfaces/interfaces.h"
+#include "utils/interfaces/interfaces.h"
 #include "stdlib/defines.h"
 #include "stdlib/types.h"
 #include "studiorender/istudio_cmdbuffer.h"

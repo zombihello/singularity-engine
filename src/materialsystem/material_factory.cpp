@@ -1,6 +1,6 @@
 #include "pch_materialsystem.h"
 #include "stdlib/filetools.h"
-#include "smatdoc/smat_compiled_doc.h"
+#include "utils/smatdoc/smat_compiled_doc.h"
 #include "resourcesystem/iresourcesystem.h"
 #include "materialsystem/material.h"
 #include "materialsystem/material_factory.h"

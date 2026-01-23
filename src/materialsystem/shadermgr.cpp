@@ -1,7 +1,7 @@
 #include "pch_materialsystem.h"
 #include "filesystem/ifilesystem.h"
-#include "shadercache/shadercache.h"
-#include "shaderlib/shaderlib.h"
+#include "utils/shadercache/shadercache.h"
+#include "materialsystem/shaderlib/shaderlib.h"
 #include "materialsystem/ishadermgr.h"
 #include "materialsystem/ishader.h"
 #include "materialsystem/materialsystem.h"
@@ -13,11 +13,11 @@ struct shaderLibInfo_t
 {
 	typedef eastl::unordered_map<const char*, IShader*, stlInsensitiveStringHash_t, stlInsensitiveCompareString_t> shadersDict_t;
 
-	eastl::string							   fileName;
-	dllHandle_t							   moduleHandle;
-	IShaderLib*							   pShaderLib;
-	bool								   bGameShaderLib;	// TRUE if this is a game's shader library, in which case it's not allowed to override any existing shader names
-	shadersDict_t						   shadersDict;
+	eastl::string							 fileName;
+	dllHandle_t								 moduleHandle;
+	IShaderLib*								 pShaderLib;
+	bool									 bGameShaderLib;  // TRUE if this is a game's shader library, in which case it's not allowed to override any existing shader names
+	shadersDict_t							 shadersDict;
 	eastl::vector<TRefPtr<IStudioAPIShader>> shaderCaches[STUDIOAPI_SHADER_NUM_TYPES];
 };
 
@@ -242,7 +242,7 @@ bool CShaderMgr::LoadShaderCaches( uint32 index )
 	// Get a shader library info and shader platform name
 	Assert( index != INVALID_INDEX );
 	shaderLibInfo_t& info			 = shaderLibs[index];
-	const char*	 pShaderPlatform = g_pStudioAPI->GetInfo().pShaderPlatform;
+	const char*		 pShaderPlatform = g_pStudioAPI->GetInfo().pShaderPlatform;
 	Assert( pShaderPlatform && info.pShaderLib );
 	eastl::string shaderCacheDir = S_Sprintf( "//%s/shaders/%s/%s/", info.bGameShaderLib ? "GAME" : "CORE", info.pShaderLib->GetName(), pShaderPlatform );
 
@@ -259,7 +259,7 @@ bool CShaderMgr::LoadShaderCaches( uint32 index )
 		for ( uint32 cacheNameIdx = 0; cacheNameIdx < numCacheNames && bOk; ++cacheNameIdx )
 		{
 			// Load shader cache file for the shader
-			const char*	pCacheName = pShader->GetCacheName( cacheNameIdx );
+			const char*		pCacheName = pShader->GetCacheName( cacheNameIdx );
 			CShaderCacheDoc shaderCacheDoc;
 			if ( !shaderCacheDoc.LoadFromFile( S_Sprintf( "%s/%s.ssc", shaderCacheDir.c_str(), pCacheName ).c_str() ) )
 			{
