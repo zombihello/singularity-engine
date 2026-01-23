@@ -1,8 +1,8 @@
 %{
     #include "ecsfileparser_bison.cpp.h"
-    #include "core/core.h"
-    #include "parserlib/tokenstream.h"
-    #include "parserlib/grammarinterface.h"
+    #include "tier0/tier0.h"
+    #include "utils/parserlib/tokenstream.h"
+    #include "utils/parserlib/grammarinterface.h"
     #include "tools/ecscompiler/ecsfileparser.h"
 
     // Some Bison defines

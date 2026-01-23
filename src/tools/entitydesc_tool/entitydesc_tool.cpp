@@ -1,5 +1,5 @@
 #include "pch_entitydesc_tool.h"
-#include "sentdoc/sent_compiled_doc.h"
+#include "utils/sentdoc/sent_compiled_doc.h"
 #include "tools/resource_tools/ientitydesc_tool.h"
 
 //-----------------------------------------------------------------------------
@@ -25,7 +25,7 @@ CEntityDescTool::Connect
 */
 bool CEntityDescTool::Connect( createInterfaceFn_t pFactory )
 {
-	return ConnectStdLib( pFactory );
+	return ConnectTier1( pFactory );
 }
 
 /*
@@ -35,7 +35,7 @@ CEntityDescTool::Disconnect
 */
 void CEntityDescTool::Disconnect()
 {
-	DisconnectStdLib();
+	DisconnectTier1();
 }
 
 /*

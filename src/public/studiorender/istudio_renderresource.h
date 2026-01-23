@@ -1,10 +1,10 @@
 #pragma once
 #include <EASTL/unordered_set.h>
 
-#include "interfaces/interfaces.h"
-#include "stdlib/defines.h"
-#include "stdlib/types.h"
-#include "core/threading.h"
+#include "utils/interfaces/interfaces.h"
+#include "tier0/defines.h"
+#include "tier0/types.h"
+#include "tier1/threading.h"
 #include "studiorender/istudio_rendercmd.h"
 #include "studiorender/istudiorender.h"
 

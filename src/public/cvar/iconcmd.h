@@ -1,5 +1,5 @@
 #pragma once
-#include "stdlib/types.h"
+#include "tier0/types.h"
 
 //-----------------------------------------------------------------------------
 // IConVars/IConCmds are marked as having a particular DLL identifier
@@ -26,11 +26,11 @@ public:
 	virtual uint32 GetFlags() const				  = 0;
 	virtual void   AddFlags( uint32 flags )		  = 0;
 
-	virtual bool				IsCommand() const					  = 0;
+	virtual bool				IsCommand() const					 = 0;
 	virtual void				SetHelpText( const char* pHelpText ) = 0;
-	virtual const char*		GetName() const						  = 0;
-	virtual const char*		GetHelpText() const					  = 0;
-	virtual cvarDLLIdentifier_t GetDLLIdentifier() const			  = 0;
+	virtual const char*			GetName() const						 = 0;
+	virtual const char*			GetHelpText() const					 = 0;
+	virtual cvarDLLIdentifier_t GetDLLIdentifier() const			 = 0;
 
 	// Set/get next cvar in the global list
 	virtual void		 SetNext( IConCmdBase* pNext ) = 0;

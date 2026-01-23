@@ -1,6 +1,6 @@
 #pragma once
-#include "stdlib/types.h"
-#include "stdlib/interface.h"
+#include "tier0/types.h"
+#include "tier1/interface.h"
 #include "studiorender/studioapi/istudioapi_shader.h"
 
 //-----------------------------------------------------------------------------

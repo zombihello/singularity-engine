@@ -1,6 +1,6 @@
 #pragma once
-#include "stdlib/math/math.h"
-#include "stdlib/math/color.h"
+#include "tier1/math/math.h"
+#include "tier1/math/color.h"
 #include "studiorender/studioapi/istudioapi_renderpass.h"
 
 //-----------------------------------------------------------------------------

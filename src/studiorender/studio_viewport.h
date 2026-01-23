@@ -1,5 +1,5 @@
 #pragma once
-#include "stdlib/delegate.h"
+#include "tier1/delegate.h"
 #include "studiorender/istudio_viewport.h"
 #include "studiorender/studio_renderthread.h"
 #include "studiorender/istudio_renderresource.h"

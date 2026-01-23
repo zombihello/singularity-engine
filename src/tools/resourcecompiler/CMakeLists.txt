@@ -8,7 +8,7 @@ set( GENERATED_DIR						${CMAKE_CURRENT_BINARY_DIR} )
 
 set( SRC_PATTERNS						"${SRC_DIR}/*.h" "${SRC_DIR}/*.inl" "${SRC_DIR}/*.cpp" )
 set( PUBLIC_SRC_PATTERNS				"${PUBLIC_SRC_DIR}/tools/resource_tools/*.h" "${PUBLIC_SRC_DIR}/tools/resource_tools/*.inl" "${PUBLIC_SRC_DIR}/tools/resource_tools/*.cpp" 
-										"${PUBLIC_SRC_DIR}/core/*.cpp" )
+										"${PUBLIC_SRC_DIR}/tier0/*.cpp" )
 set( GENERATED_SRC_PATTERNS				"${GENERATED_DIR}/*.h" "${GENERATED_DIR}/*.inl" "${GENERATED_DIR}/*.cpp"
 										"${GENERATED_DIR}/*.hxx" "${GENERATED_DIR}/*.cxx" )
 
@@ -43,7 +43,7 @@ target_precompile_headers( resourcecompiler PRIVATE 							pch_resourcecompiler.
 set_target_properties( resourcecompiler PROPERTIES FOLDER         				"Tools/Resource Compiler" )
 set_target_properties( resourcecompiler PROPERTIES PREFIX 						"" )
 
-target_link_libraries( resourcecompiler PRIVATE									core stdlib appframework interfaces stexdoc smatdoc smdldoc sentdoc smapdoc ${CMAKE_DL_LIBS} )
+target_link_libraries( resourcecompiler PRIVATE									tier0 tier1 appframework interfaces stexdoc smatdoc smdldoc sentdoc smapdoc ${CMAKE_DL_LIBS} )
 add_common_target_defines( resourcecompiler )
 add_dependencies( resourcecompiler 												filesystem cvar texture_tool material_tool model_tool entitydesc_tool map_tool )
 
@@ -51,7 +51,7 @@ add_dependencies( resourcecompiler 												filesystem cvar texture_tool mate
 #
 # Install
 #
-inherit_install_files( resourcecompiler									TARGETS core filesystem cvar texture_tool material_tool model_tool entitydesc_tool map_tool stdlib appframework interfaces stexdoc smatdoc smdldoc sentdoc smapdoc )
+inherit_install_files( resourcecompiler									TARGETS tier0 filesystem cvar texture_tool material_tool model_tool entitydesc_tool map_tool tier1 appframework interfaces stexdoc smatdoc smdldoc sentdoc smapdoc )
 
 # Binaries
 install_files( resourcecompiler TARGETS RUNTIME resourcecompiler 		DESTINATION     bin/${PLATFORM_BIN_DIR}/ )

@@ -1,6 +1,6 @@
 #include "pch_stdshaders.h"
 #include "materialsystem/itexture.h"
-#include "shaderlib/shader_base.h"
+#include "materialsystem/shaderlib/shader_base.h"
 #include "materialsystem/stdshaders/unlitgeneric_vs_vertex.gen.h"
 #include "materialsystem/stdshaders/unlitgeneric_ps_pixel.gen.h"
 

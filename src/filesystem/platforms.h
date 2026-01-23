@@ -2,8 +2,8 @@
 #include <EASTL/string.h>
 #include <EASTL/vector.h>
 
-#include "stdlib/defines.h"
-#include "stdlib/types.h"
+#include "tier0/defines.h"
+#include "tier0/types.h"
 #include "filesystem/ifilesystem.h"
 
 //-----------------------------------------------------------------------------

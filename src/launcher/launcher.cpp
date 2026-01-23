@@ -4,9 +4,9 @@
 #include "appframework/iappsystemgroup.h"
 #include "appframework/iwindowmgr.h"
 #include "appframework/appframework.h"
-#include "stdlib/convar.h"
-#include "core/icommandline.h"
-#include "core/crashdump.h"
+#include "tier1/convar.h"
+#include "tier0/icommandline.h"
+#include "tier0/crashdump.h"
 #include "inputsystem/iinputsystem.h"
 #include "filesystem/ifilesystem.h"
 #include "studiorender/studioapi/istudioapi.h"
@@ -14,8 +14,8 @@
 #include "studiorender/istudio_viewport.h"
 #include "materialsystem/imaterialsystem.h"
 #include "resourcesystem/iresourcesystem.h"
-#include "gameframework/igame.h"
-#include "gameinfo/gameinfo.h"
+#include "game/igame.h"
+#include "utils/gameinfo/gameinfo.h"
 
 CConVar window_width( "window_width", "1280", "Window width", FCVAR_ARCHIVE );
 CConVar window_height( "window_height", "720", "Window height", FCVAR_ARCHIVE );

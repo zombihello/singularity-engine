@@ -2,8 +2,8 @@
 #include <EASTL/string.h>
 #include <EASTL/vector.h>
 
-#include "stdlib/types.h"
-#include "core/memory.h"
+#include "tier0/types.h"
+#include "tier0/memory.h"
 
 //-----------------------------------------------------------------------------
 // Shader compiler structs

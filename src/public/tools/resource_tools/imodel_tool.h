@@ -1,6 +1,6 @@
 #pragma once
 #include "appframework/iappsystem.h"
-#include "stdlib/math/axis.h"
+#include "tier1/math/axis.h"
 
 //-----------------------------------------------------------------------------
 // Model tool interface

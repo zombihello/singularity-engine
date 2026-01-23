@@ -1,5 +1,5 @@
 #pragma once
-#include "stdlib/refcount.h"
+#include "tier1/refcount.h"
 #include "appframework/iappsystem.h"
 #include "resourcesystem/iresource.h"
 #include "resourcesystem/iresourcefactory.h"

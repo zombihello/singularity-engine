@@ -20,8 +20,8 @@ CStudioRender::Connect
 */
 bool CStudioRender::Connect( createInterfaceFn_t pFactory )
 {
-	// Connect StdLib
-	if ( !ConnectStdLib( pFactory ) )
+	// Connect Tier1
+	if ( !ConnectTier1( pFactory ) )
 	{
 		return false;
 	}
@@ -52,9 +52,9 @@ CStudioRender::Disconnect
 */
 void CStudioRender::Disconnect()
 {
-	// Disconnect StdLib
+	// Disconnect Tier1
 	ConVar_Unregister();
-	DisconnectStdLib();
+	DisconnectTier1();
 
 	g_pStudioAPI	= NULL;
 	g_pStudioRender = NULL;

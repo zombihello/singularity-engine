@@ -1,6 +1,6 @@
 #pragma once
-#include "stdlib/defines.h"
-#include "stdlib/types.h"
+#include "tier0/defines.h"
+#include "tier0/types.h"
 
 //-----------------------------------------------------------------------------
 // Engine launcher interface

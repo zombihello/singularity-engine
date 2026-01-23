@@ -8,7 +8,7 @@ set( GENERATED_DIR						${CMAKE_CURRENT_BINARY_DIR} )
 
 set( SRC_PATTERNS						"${SRC_DIR}/*.h" "${SRC_DIR}/*.inl" "${SRC_DIR}/*.cpp" )
 set( PUBLIC_SRC_PATTERNS				"${PUBLIC_SRC_DIR}/tools/shadercompiler/*.h" "${PUBLIC_SRC_DIR}/tools/shadercompiler/*.inl" "${PUBLIC_SRC_DIR}/tools/shadercompiler/*.cpp" 
-										"${PUBLIC_SRC_DIR}/core/*.cpp" )
+										"${PUBLIC_SRC_DIR}/tier0/*.cpp" )
 set( GENERATED_SRC_PATTERNS				"${GENERATED_DIR}/*.h" "${GENERATED_DIR}/*.inl" "${GENERATED_DIR}/*.cpp"
 										"${GENERATED_DIR}/*.hxx" "${GENERATED_DIR}/*.cxx" )
 
@@ -47,7 +47,7 @@ target_precompile_headers( shadercompiler PRIVATE 							pch_shadercompiler.h )
 set_target_properties( shadercompiler PROPERTIES FOLDER         			"Tools/Shader Compiler" )
 set_target_properties( shadercompiler PROPERTIES PREFIX 					"" )
 
-target_link_libraries( shadercompiler PRIVATE								core stdlib appframework interfaces shadercache ${CMAKE_DL_LIBS} )
+target_link_libraries( shadercompiler PRIVATE								tier0 tier1 appframework interfaces shadercache ${CMAKE_DL_LIBS} )
 add_common_target_defines( shadercompiler )
 add_dependencies( shadercompiler 											filesystem cvar shadercompiler_vk )
 
@@ -55,7 +55,7 @@ add_dependencies( shadercompiler 											filesystem cvar shadercompiler_vk )
 #
 # Install
 #
-inherit_install_files( shadercompiler								TARGETS core stdlib appframework interfaces shadercache filesystem cvar shadercompiler_vk )
+inherit_install_files( shadercompiler								TARGETS tier0 tier1 appframework interfaces shadercache filesystem cvar shadercompiler_vk )
 
 # Binaries
 install_files( shadercompiler TARGETS RUNTIME shadercompiler 		DESTINATION     bin/${PLATFORM_BIN_DIR}/ )

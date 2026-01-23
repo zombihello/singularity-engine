@@ -19,7 +19,7 @@ set( GENERATED_DIR						${CMAKE_CURRENT_BINARY_DIR} )
 
 set( SRC_PATTERNS						"${SRC_DIR}/*.h" "${SRC_DIR}/*.inl" "${SRC_DIR}/*.cpp" )
 set( PUBLIC_SRC_PATTERNS				"${PUBLIC_SRC_DIR}/inputsystem/*.h" "${PUBLIC_SRC_DIR}/inputsystem/*.inl" "${PUBLIC_SRC_DIR}/inputsystem/*.cpp" 
-										"${PUBLIC_SRC_DIR}/core/*.cpp" )
+										"${PUBLIC_SRC_DIR}/tier0/*.cpp" )
 set( GENERATED_SRC_PATTERNS				"${GENERATED_DIR}/*.h" "${GENERATED_DIR}/*.inl" "${GENERATED_DIR}/*.cpp"
 										"${GENERATED_DIR}/*.hxx" "${GENERATED_DIR}/*.cxx" )
 
@@ -55,14 +55,14 @@ set_target_properties( inputsystem PROPERTIES FOLDER         				Engine )
 set_target_properties( inputsystem PROPERTIES PREFIX 						"" )
 
 target_include_directories( inputsystem PRIVATE             				${THIRDPARTY_INCLUDES} )
-target_link_libraries( inputsystem PRIVATE									core stdlib interfaces ${THIRDPARTY_LIBS} ${CMAKE_DL_LIBS} )
+target_link_libraries( inputsystem PRIVATE									tier0 tier1 interfaces ${THIRDPARTY_LIBS} ${CMAKE_DL_LIBS} )
 add_common_target_defines( inputsystem )
 
 
 #
 # Install
 #
-inherit_install_files( inputsystem										TARGETS core stdlib interfaces )
+inherit_install_files( inputsystem										TARGETS tier0 tier1 interfaces )
 
 # Binaries
 install_files( inputsystem TARGETS RUNTIME inputsystem 					DESTINATION     bin/${PLATFORM_BIN_DIR}/ )

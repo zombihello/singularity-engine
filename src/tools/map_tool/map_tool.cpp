@@ -1,5 +1,5 @@
 #include "pch_map_tool.h"
-#include "smapdoc/smap_compiled_doc.h"
+#include "utils/smapdoc/smap_compiled_doc.h"
 #include "tools/resource_tools/imap_tool.h"
 
 //-----------------------------------------------------------------------------
@@ -25,7 +25,7 @@ CMapTool::Connect
 */
 bool CMapTool::Connect( createInterfaceFn_t pFactory )
 {
-	return ConnectStdLib( pFactory );
+	return ConnectTier1( pFactory );
 }
 
 /*
@@ -35,7 +35,7 @@ CMapTool::Disconnect
 */
 void CMapTool::Disconnect()
 {
-	DisconnectStdLib();
+	DisconnectTier1();
 }
 
 /*

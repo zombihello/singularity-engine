@@ -1,6 +1,6 @@
 #pragma once
-#include "stdlib/types.h"
-#include "stdlib/math/math.h"
+#include "tier0/types.h"
+#include "tier1/math/math.h"
 
 //-----------------------------------------------------------------------------
 // Forward declarations

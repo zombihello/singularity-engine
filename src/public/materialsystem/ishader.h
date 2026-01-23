@@ -1,5 +1,5 @@
 #pragma once
-#include "stdlib/types.h"
+#include "tier0/types.h"
 #include "studiorender/studioapi/istudioapi_shader.h"
 #include "studiorender/studio_renderpasstypes.h"
 

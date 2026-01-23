@@ -1,6 +1,6 @@
 #include "pch_resourcesystem.h"
-#include "stdlib/filetools.h"
-#include "stdlib/convar.h"
+#include "tier1/filetools.h"
+#include "tier1/convar.h"
 #include "resourcesystem/resource.h"
 #include "resourcesystem/resourcesystem.h"
 #include "resourcesystem/iresourcefactory.h"
@@ -15,8 +15,8 @@ CResourceSystem::Connect
 */
 bool CResourceSystem::Connect( createInterfaceFn_t pFactory )
 {
-	// Connect StdLib
-	if ( !ConnectStdLib( pFactory ) )
+	// Connect Tier1
+	if ( !ConnectTier1( pFactory ) )
 	{
 		return false;
 	}
@@ -34,7 +34,7 @@ CResourceSystem::Disconnect
 void CResourceSystem::Disconnect()
 {
 	ConVar_Unregister();
-	DisconnectStdLib();
+	DisconnectTier1();
 	g_pResourceSystem = NULL;
 }
 

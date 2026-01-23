@@ -3,9 +3,9 @@
 #include <EASTL/vector.h>
 #include <EASTL/algorithm.h>
 
-#include "stdlib/defines.h"
-#include "stdlib/types.h"
-#include "stdlib/filetools.h"
+#include "tier0/defines.h"
+#include "tier0/types.h"
+#include "tier1/filetools.h"
 
 //-----------------------------------------------------------------------------
 // Search path

@@ -1,0 +1,24 @@
+module TestDraw;
+using "game/citadel/quad.h";
+using "game/shared/ecs/ecs_render.gen.h";
+
+component Quad
+{
+	defaults:
+		pVertexBuffer( Quad().GetStudioAPIVertexBuffer() ),
+		pIndexBuffer( Quad().GetStudioAPIIndexBuffer() ),
+		pMaterial( Quad().GetMaterial() );
+		
+	TRefPtr<IStudioAPIBuffer>		pVertexBuffer;
+	TRefPtr<IStudioAPIBuffer>		pIndexBuffer;
+	[serialize][name="Material"] 
+	TResourcePtr<IMaterial>			pMaterial;
+}
+
+[stage="on_update", profiler_group="scene"]
+system QuadInit
+{
+	read: 				Quad quad;
+	read_resource:		StudioRender	studioRender;
+	exclude: 			StudioRenderObject;
+}

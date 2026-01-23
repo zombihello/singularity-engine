@@ -1,6 +1,6 @@
 #pragma once
-#include "stdlib/math/math.h"
-#include "stdlib/delegate.h"
+#include "tier1/math/math.h"
+#include "tier1/delegate.h"
 #include "studiorender/studioapi/istudioapi_framebuffer.h"
 #include "studiorender/studioapi/istudioapi_renderpass.h"
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "stdlib/jsondoc.h"
+#include "tier1/jsondoc.h"
 #include "tools/shadercompiler/shadercompiler.h"
 
 //-----------------------------------------------------------------------------

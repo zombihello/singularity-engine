@@ -1,0 +1,7 @@
+module Movement;
+using "tier1/math/transform.h";
+
+component Transform
+{
+	CTransform		transform;
+}

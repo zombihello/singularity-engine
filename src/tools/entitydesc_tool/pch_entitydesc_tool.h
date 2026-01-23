@@ -2,6 +2,6 @@
 #include <EASTL/string.h>
 #include <EASTL/vector.h>
 
-#include "interfaces/interfaces.h"
-#include "stdlib/stdlib.h"
-#include "core/debug.h"
+#include "utils/interfaces/interfaces.h"
+#include "tier1/tier1.h"
+#include "tier0/debug.h"

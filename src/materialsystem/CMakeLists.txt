@@ -8,7 +8,7 @@ set( GENERATED_DIR						${CMAKE_CURRENT_BINARY_DIR} )
 
 set( SRC_PATTERNS						"${SRC_DIR}/*.h" "${SRC_DIR}/*.inl" "${SRC_DIR}/*.cpp" "${SRC_DIR}/*.makefile" "${SRC_DIR}/*.shader" "${SRC_DIR}/*.hlsl" )
 set( PUBLIC_SRC_PATTERNS				"${PUBLIC_SRC_DIR}/materialsystem/*.h" "${PUBLIC_SRC_DIR}/materialsystem/*.inl" "${PUBLIC_SRC_DIR}/materialsystem/*.cpp" 
-										"${PUBLIC_SRC_DIR}/materialsystem/*.hlsl" "${PUBLIC_SRC_DIR}/core/*.cpp" )
+										"${PUBLIC_SRC_DIR}/materialsystem/*.hlsl" "${PUBLIC_SRC_DIR}/tier0/*.cpp" )
 set( GENERATED_SRC_PATTERNS				"${GENERATED_DIR}/*.h" "${GENERATED_DIR}/*.inl" "${GENERATED_DIR}/*.cpp"
 										"${GENERATED_DIR}/*.hxx" "${GENERATED_DIR}/*.cxx" )
 
@@ -26,6 +26,8 @@ file( GLOB_RECURSE GENERATED_FILES  CONFIGURE_DEPENDS           ${GENERATED_SRC_
 # Filter out all unnecessary files
 list( FILTER SRC_FILES 					EXCLUDE REGEX "/stdshaders/" )
 list( FILTER PUBLIC_SRC_FILES 			EXCLUDE REGEX "/stdshaders/" )
+list( FILTER SRC_FILES 					EXCLUDE REGEX "/shaderlib/" )
+list( FILTER PUBLIC_SRC_FILES 			EXCLUDE REGEX "/shaderlib/" )
 
 filter_platform_files( SRC_FILES        ${PLATFORM_SRC_DIR} )
 filter_platform_files( PUBLIC_SRC_FILES ${PLATFORM_SRC_DIR} )
@@ -52,7 +54,7 @@ target_precompile_headers( materialsystem PRIVATE 							pch_materialsystem.h )
 set_target_properties( materialsystem PROPERTIES FOLDER         			Engine )
 set_target_properties( materialsystem PROPERTIES PREFIX 					"" )
 
-target_link_libraries( materialsystem PRIVATE								core stdlib interfaces shaderlib shadercache smatdoc stexdoc ${CMAKE_DL_LIBS} )
+target_link_libraries( materialsystem PRIVATE								tier0 tier1 interfaces shaderlib shadercache smatdoc stexdoc ${CMAKE_DL_LIBS} )
 add_common_target_defines( materialsystem )
 add_dependencies( materialsystem											stdshaders studiorender )
 
@@ -60,7 +62,7 @@ add_dependencies( materialsystem											stdshaders studiorender )
 #
 # Install
 #
-inherit_install_files( materialsystem							TARGETS core stdlib interfaces shaderlib shadercache smatdoc stexdoc stdshaders studiorender )
+inherit_install_files( materialsystem							TARGETS tier0 tier1 interfaces shaderlib shadercache smatdoc stexdoc stdshaders studiorender )
 
 # Binaries
 install_files( materialsystem TARGETS RUNTIME materialsystem 	DESTINATION bin/${PLATFORM_BIN_DIR}/ )

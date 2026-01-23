@@ -16,8 +16,8 @@ CMaterialSystem::Connect
 */
 bool CMaterialSystem::Connect( createInterfaceFn_t pFactory )
 {
-	// Connect StdLib
-	if ( !ConnectStdLib( pFactory ) )
+	// Connect Tier1
+	if ( !ConnectTier1( pFactory ) )
 	{
 		return false;
 	}
@@ -69,7 +69,7 @@ void CMaterialSystem::Disconnect()
 	g_pAppSystemFactory = NULL;
 
 	ConVar_Unregister();
-	DisconnectStdLib();
+	DisconnectTier1();
 }
 
 /*

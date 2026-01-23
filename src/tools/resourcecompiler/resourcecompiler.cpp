@@ -1,12 +1,12 @@
 #include "pch_resourcecompiler.h"
-#include "core/icommandline.h"
-#include "core/crashdump.h"
-#include "stdlib/jsondoc.h"
-#include "stexdoc/stex_source_doc.h"
-#include "smatdoc/smat_source_doc.h"
-#include "smdldoc/smdl_source_doc.h"
-#include "sentdoc/sent_source_doc.h"
-#include "smapdoc/smap_source_doc.h"
+#include "tier0/icommandline.h"
+#include "tier0/crashdump.h"
+#include "tier1/jsondoc.h"
+#include "utils/stexdoc/stex_source_doc.h"
+#include "utils/smatdoc/smat_source_doc.h"
+#include "utils/smdldoc/smdl_source_doc.h"
+#include "utils/sentdoc/sent_source_doc.h"
+#include "utils/smapdoc/smap_source_doc.h"
 #include "filesystem/ifilesystem.h"
 #include "cvar/icvar.h"
 #include "tools/resource_tools/itexture_tool.h"
@@ -696,11 +696,11 @@ void CResourceCompilerAppSystemGroup::PrintUsageHelp()
 	Msg( "Usage resourcecompiler -filelist <path>" );
 	Msg( "" );
 	Msg( "The compiler supports next resource types: texture (*.stex), material (*.smat), model (*.smdl), entity (*.sent) and map (*.smap)" );
-	Msg( "For syntax example see 'content/core/meterials/default_tex.stex', 'content/core/meterials/default_mat.smat'" );
+	Msg( "For syntax example see 'content/tier0/meterials/default_tex.stex', 'content/tier0/meterials/default_mat.smat'" );
 	Msg( "" );
 	Msg( "Launch arguments:" );
 	Msg( "file\tSpecify a JSON file containing settings to compile the resource" );
-	Msg( "filelist\tSpecify a JSON file containing a list of files to be processed as inputs. For syntax example see 'content/core/resourcelist.txt'" );
+	Msg( "filelist\tSpecify a JSON file containing a list of files to be processed as inputs. For syntax example see 'content/tier0/resourcelist.txt'" );
 	Msg( "" );
 }
 

@@ -1,5 +1,5 @@
 #include "pch_materialsystem.h"
-#include "stdlib/filetools.h"
+#include "tier1/filetools.h"
 #include "resourcesystem/iresourcesystem.h"
 #include "studiorender/studioapi/istudioapi_barrier.h"
 #include "materialsystem/ishader.h"

@@ -2,14 +2,14 @@
 #include "spirv_cross/spirv_cross.hpp"
 #include "spirv-tools/optimizer.hpp"
 
-#include "interfaces/interfaces.h"
-#include "stdlib/stdlib.h"
-#include "stdlib/strtools.h"
-#include "stdlib/filetools.h"
-#include "stdlib/streamdata_memory.h"
-#include "core/debug.h"
+#include "utils/interfaces/interfaces.h"
+#include "tier1/tier1.h"
+#include "tier1/strtools.h"
+#include "tier1/filetools.h"
+#include "tier1/streamdata_memory.h"
+#include "tier0/debug.h"
 #include "filesystem/ifilesystem.h"
-#include "shadercache/shaderreflection.h"
+#include "utils/shadercache/shaderreflection.h"
 #include "tools/shadercompiler/ishadercompiler_backend.h"
 
 /*
@@ -253,7 +253,7 @@ CShaderCompilerBackendVk::Connect
 */
 bool CShaderCompilerBackendVk::Connect( createInterfaceFn_t pFactory )
 {
-	return ConnectStdLib( pFactory );
+	return ConnectTier1( pFactory );
 }
 
 /*
@@ -263,7 +263,7 @@ CShaderCompilerBackendVk::Disconnect
 */
 void CShaderCompilerBackendVk::Disconnect()
 {
-	DisconnectStdLib();
+	DisconnectTier1();
 }
 
 /*

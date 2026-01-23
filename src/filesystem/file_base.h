@@ -1,6 +1,6 @@
 #pragma once
 #include <EASTL/string.h>
-#include "stdlib/istreamdata.h"
+#include "tier1/istreamdata.h"
 
 //-----------------------------------------------------------------------------
 // The base class for file stream data
