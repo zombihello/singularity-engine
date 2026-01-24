@@ -125,8 +125,8 @@ bool CCitadelGame::Init()
 	Studio_FlushRenderCommands();
 
 	// Initialize the ECS world
-	extern void EcsInitModules_Sandbox();
-	EcsInitModules_Sandbox();
+	extern void EcsInitModules_Citadel();
+	EcsInitModules_Citadel();
 
 	// Load a map
 	if ( !MapInit( "maps/test" ) )

@@ -9,7 +9,12 @@
 //-----------------------------------------------------------------------------
 struct stlInsensitiveStringHash_t
 {
-	size_t operator()( const char* pString ) const;
+	template<typename TType>
+	size_t operator()( const TType* pString ) const;
+	template<typename TType>
+	size_t operator()( const eastl::basic_string<TType>& string ) const;
+	template<typename TType>
+	size_t operator()( const eastl::basic_string_view<TType>& string ) const;
 };
 
 //-----------------------------------------------------------------------------
@@ -17,7 +22,12 @@ struct stlInsensitiveStringHash_t
 //-----------------------------------------------------------------------------
 struct stlInsensitiveCompareString_t
 {
-	bool operator()( const char* pLeft, const char* pRight ) const;
+	template<typename TType>
+	bool operator()( const TType* pLeft, const TType* pRight ) const;
+	template<typename TType>
+	bool operator()( const eastl::basic_string<TType>& left, const eastl::basic_string<TType>& right ) const;
+	template<typename TType>
+	bool operator()( const eastl::basic_string_view<TType>& left, const eastl::basic_string_view<TType>& right ) const;
 };
 
 #include "tier1/stl.inl"

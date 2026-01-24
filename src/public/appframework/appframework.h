@@ -46,7 +46,7 @@ protected:
 	CAppSystemGroup* pChildAppSystemGroup;
 #if ENABLE_LOGGING
 	const char* pLogFileName;
-	ILogOutput*	 pLogOutputFile;
+	ILogOutput* pLogOutputFile;
 #endif	// ENABLE_LOGGING
 };
 

@@ -3,10 +3,10 @@
 
 /*
 ==================
-EcsInitModules_Sandbox
+EcsInitModules_Citadel
 ==================
 */
-void EcsInitModules_Sandbox()
+void EcsInitModules_Citadel()
 {
 	EcsInitReflection_TestDraw();
 }
