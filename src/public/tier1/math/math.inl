@@ -315,6 +315,50 @@ FORCEINLINE void S_GridSnap( const vec4_t& value, float grid, vec4_t& resultValu
 
 /*
 ==================
+S_MinValue
+==================
+*/
+template<typename TType>
+constexpr FORCEINLINE TType S_MinValue()
+{
+	return eastl::numeric_limits<TType>::min();
+}
+
+/*
+==================
+S_MaxValue
+==================
+*/
+template<typename TType>
+constexpr FORCEINLINE TType S_MaxValue()
+{
+	return eastl::numeric_limits<TType>::max();
+}
+
+/*
+==================
+S_Digits10
+==================
+*/
+template<typename TType>
+constexpr FORCEINLINE TType S_Digits10()
+{
+	return eastl::numeric_limits<TType>::digits10;
+}
+
+/*
+==================
+S_MaxDigits10
+==================
+*/
+template<typename TType>
+constexpr FORCEINLINE TType S_MaxDigits10()
+{
+	return eastl::numeric_limits<TType>::max_digits10;
+}
+
+/*
+==================
 S_VectorDotProduct
 ==================
 */

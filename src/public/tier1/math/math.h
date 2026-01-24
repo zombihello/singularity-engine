@@ -85,6 +85,15 @@ void   S_GridSnap( const vec3_t& value, float grid, vec3_t& resultValue );
 vec4_t S_GridSnap( const vec4_t& value, float grid );
 void   S_GridSnap( const vec4_t& value, float grid, vec4_t& resultValue );
 
+template<typename TType>
+constexpr TType S_MinValue();
+template<typename TType>
+constexpr TType S_MaxValue();
+template<typename TType>
+constexpr TType S_Digits10();
+template<typename TType>
+constexpr TType S_MaxDigits10();
+
 //-----------------------------------------------------------------------------
 // Vector functions
 //-----------------------------------------------------------------------------
