@@ -341,7 +341,7 @@ S_Digits10
 ==================
 */
 template<typename TType>
-constexpr FORCEINLINE TType S_Digits10()
+constexpr FORCEINLINE int32 S_Digits10()
 {
 	return eastl::numeric_limits<TType>::digits10;
 }
@@ -352,9 +352,20 @@ S_MaxDigits10
 ==================
 */
 template<typename TType>
-constexpr FORCEINLINE TType S_MaxDigits10()
+constexpr FORCEINLINE int32 S_MaxDigits10()
 {
 	return eastl::numeric_limits<TType>::max_digits10;
+}
+
+/*
+==================
+S_IsFinite
+==================
+*/
+template<typename TType>
+constexpr FORCEINLINE bool S_IsFinite( const TType& value )
+{
+	return glm::isfinite( value );
 }
 
 /*

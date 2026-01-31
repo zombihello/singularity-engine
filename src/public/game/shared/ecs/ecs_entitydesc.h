@@ -1,5 +1,6 @@
 #pragma once
 #include "utils/sentdoc/sent_compiled_doc.h"
+#include "tier1/guid.h"
 #include "game/shared/ecs/ecs_core.h"
 #include "game/shared/ecs/ecs_component_factory.h"
 #include "game/shared/ecs/ecs_map.h"

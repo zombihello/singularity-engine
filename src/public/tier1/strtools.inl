@@ -193,9 +193,9 @@ FORCEINLINE uint32 S_Strncmp( const wchar_t* pString1, const wchar_t* pString2, 
 S_Atoi
 ==================
 */
-FORCEINLINE int32 S_Atoi( const char* pString )
+FORCEINLINE int32 S_Atoi( const char* pString, char** pEndPtr /*= NULL*/ )
 {
-	return atoi( pString );
+	return (int32)strtol( pString, pEndPtr, 10 );
 }
 
 /*
@@ -203,9 +203,29 @@ FORCEINLINE int32 S_Atoi( const char* pString )
 S_Atoi
 ==================
 */
-FORCEINLINE int32 S_Atoi( const wchar_t* pString )
+FORCEINLINE int32 S_Atoi( const wchar_t* pString, wchar_t** pEndPtr /*= NULL */ )
 {
-	return (int32)wcstoul( pString, 0, 10 );
+	return (int32)wcstol( pString, pEndPtr, 10 );
+}
+
+/*
+==================
+S_Atoi64
+==================
+*/
+FORCEINLINE int64 S_Atoi64( const char* pString, char** pEndPtr /*= NULL*/ )
+{
+	return (int64)strtoll( pString, pEndPtr, 10 );
+}
+
+/*
+==================
+S_Atoi64
+==================
+*/
+FORCEINLINE int64 S_Atoi64( const wchar_t* pString, wchar_t** pEndPtr /*= NULL */ )
+{
+	return (int64)wcstoll( pString, pEndPtr, 10 );
 }
 
 /*
@@ -213,9 +233,9 @@ FORCEINLINE int32 S_Atoi( const wchar_t* pString )
 S_Atof
 ==================
 */
-FORCEINLINE float S_Atof( const char* pString )
+FORCEINLINE float S_Atof( const char* pString, char** pEndPtr /*= NULL*/ )
 {
-	return (float)atof( pString );
+	return strtof( pString, pEndPtr );
 }
 
 /*
@@ -223,9 +243,29 @@ FORCEINLINE float S_Atof( const char* pString )
 S_Atof
 ==================
 */
-FORCEINLINE float S_Atof( const wchar_t* pString )
+FORCEINLINE float S_Atof( const wchar_t* pString, wchar_t** pEndPtr /*= NULL */ )
 {
-	return wcstof( pString, 0 );
+	return wcstof( pString, pEndPtr );
+}
+
+/*
+==================
+S_Atod
+==================
+*/
+FORCEINLINE double S_Atod( const char* pString, char** pEndPtr /*= NULL*/ )
+{
+	return strtod( pString, pEndPtr );
+}
+
+/*
+==================
+S_Atod
+==================
+*/
+FORCEINLINE double S_Atod( const wchar_t* pString, wchar_t** pEndPtr /*= NULL */ )
+{
+	return wcstod( pString, pEndPtr );
 }
 
 /*
@@ -289,9 +329,9 @@ FORCEINLINE eastl::wstring S_Sprintf( const wchar_t* pFormat, ... )
 S_ToUpper
 ==================
 */
-FORCEINLINE int32 S_ToUpper( int32 ch )
+FORCEINLINE char S_ToUpper( char c )
 {
-	return toupper( ch );
+	return (char)toupper( c );
 }
 
 /*
@@ -299,9 +339,29 @@ FORCEINLINE int32 S_ToUpper( int32 ch )
 S_ToLower
 ==================
 */
-FORCEINLINE int32 S_ToLower( int32 ch )
+FORCEINLINE char S_ToLower( char c )
 {
-	return tolower( ch );
+	return (char)tolower( c );
+}
+
+/*
+==================
+S_ToUpper
+==================
+*/
+FORCEINLINE wchar_t S_ToUpper( wchar_t c )
+{
+	return (wchar_t)towupper( c );
+}
+
+/*
+==================
+S_ToLower
+==================
+*/
+FORCEINLINE wchar_t S_ToLower( wchar_t c )
+{
+	return (wchar_t)towlower( c );
 }
 
 /*
@@ -309,7 +369,7 @@ FORCEINLINE int32 S_ToLower( int32 ch )
 S_Strupr
 ==================
 */
-FORCEINLINE char* S_Strupr( char* pString )
+FORCEINLINE void S_Strupr( char* pString )
 {
 	char* pStr = pString;
 	while ( *pStr )
@@ -317,25 +377,6 @@ FORCEINLINE char* S_Strupr( char* pString )
 		*pStr = S_ToUpper( *pStr );
 		++pStr;
 	}
-
-	return pString;
-}
-
-/*
-==================
-S_Strlwr
-==================
-*/
-FORCEINLINE char* S_Strlwr( char* pString )
-{
-	char* pStr = pString;
-	while ( *pStr )
-	{
-		*pStr = S_ToLower( *pStr );
-		++pStr;
-	}
-
-	return pString;
 }
 
 /*
@@ -343,16 +384,9 @@ FORCEINLINE char* S_Strlwr( char* pString )
 S_Strupr
 ==================
 */
-FORCEINLINE wchar_t* S_Strupr( wchar_t* pString )
+FORCEINLINE void S_Strupr( eastl::string& string )
 {
-	wchar_t* pStr = pString;
-	while ( *pStr )
-	{
-		*pStr = S_ToUpper( *pStr );
-		++pStr;
-	}
-
-	return pString;
+	S_Strupr( string.data() );
 }
 
 /*
@@ -360,7 +394,57 @@ FORCEINLINE wchar_t* S_Strupr( wchar_t* pString )
 S_Strlwr
 ==================
 */
-FORCEINLINE wchar_t* S_Strlwr( wchar_t* pString )
+FORCEINLINE void S_Strlwr( char* pString )
+{
+	char* pStr = pString;
+	while ( *pStr )
+	{
+		*pStr = S_ToLower( *pStr );
+		++pStr;
+	}
+}
+
+/*
+==================
+S_Strlwr
+==================
+*/
+FORCEINLINE void S_Strlwr( eastl::string& string )
+{
+	S_Strlwr( string.data() );
+}
+
+/*
+==================
+S_Strupr
+==================
+*/
+FORCEINLINE void S_Strupr( wchar_t* pString )
+{
+	wchar_t* pStr = pString;
+	while ( *pStr )
+	{
+		*pStr = S_ToUpper( *pStr );
+		++pStr;
+	}
+}
+
+/*
+==================
+S_Strupr
+==================
+*/
+FORCEINLINE void S_Strupr( eastl::wstring& string )
+{
+	S_Strupr( string.data() );
+}
+
+/*
+==================
+S_Strlwr
+==================
+*/
+FORCEINLINE void S_Strlwr( wchar_t* pString )
 {
 	wchar_t* pStr = pString;
 	while ( *pStr )
@@ -368,8 +452,16 @@ FORCEINLINE wchar_t* S_Strlwr( wchar_t* pString )
 		*pStr = S_ToLower( *pStr );
 		++pStr;
 	}
+}
 
-	return pString;
+/*
+==================
+S_Strlwr
+==================
+*/
+FORCEINLINE void S_Strlwr( eastl::wstring& string )
+{
+	S_Strlwr( string.data() );
 }
 
 /*
@@ -390,6 +482,79 @@ S_IsSpace
 FORCEINLINE bool S_IsSpace( wchar_t c )
 {
 	return iswspace( c );
+}
+
+/*
+==================
+S_IsDigit
+==================
+*/
+FORCEINLINE bool S_IsDigit( char c )
+{
+	return isdigit( (uint8)c );
+}
+
+/*
+==================
+S_IsDigit
+==================
+*/
+FORCEINLINE bool S_IsDigit( wchar_t c )
+{
+	return iswdigit( c );
+}
+
+/*
+==================
+S_Utf8_CharSize
+==================
+*/
+FORCEINLINE uint32 S_Utf8_CharSize( byte b )
+{
+	// 0xxxxxxx
+	if ( ( b & 0x80 ) == 0x00 )
+	{
+		return 1;
+	}
+
+	// 110xxxxx
+	if ( ( b & 0xE0 ) == 0xC0 )
+	{
+		return 2;
+	}
+
+	// 1110xxxx
+	if ( ( b & 0xF0 ) == 0xE0 )
+	{
+		return 3;
+	}
+
+	// 11110xxx
+	if ( ( b & 0xF8 ) == 0xF0 )
+	{
+		return 4;
+	}
+
+	// Continuation (10xxxxxx) or prohibited 11111xxx
+	return 0;
+}
+
+/*
+==================
+S_Utf8_Strlen
+==================
+*/
+FORCEINLINE uint32 S_Utf8_Strlen( const char* pString, uint32 size )
+{
+	uint32 length = 0;
+	for ( uint32 index = 0; index < size; ++length )
+	{
+		uint32 charSize = S_Utf8_CharSize( pString[index] );
+		Assert( charSize > 0 );
+		index += charSize;
+	}
+
+	return length;
 }
 
 /*
@@ -485,4 +650,94 @@ template<typename TConverTo, typename TConvertFrom, typename TBaseConverter, uin
 FORCEINLINE uint32 TStringConversion<TConverTo, TConvertFrom, TBaseConverter, defaultConversionSize>::GetLength() const
 {
 	return pConvertedString ? TBaseConverter::GetLength( pConvertedString ) : 0;
+}
+
+/*
+==================
+CBoolToString::Convert
+==================
+*/
+template<typename TCharType>
+FORCEINLINE const TCharType* CBoolToString::Convert( bool bValue )
+{
+	static_assert( false, "Unknown TCharType" );
+	return nullptr;
+}
+
+/*
+==================
+CBoolToString::Convert
+==================
+*/
+template<>
+FORCEINLINE const char* CBoolToString::Convert<char>( bool bValue )
+{
+	return bValue ? "true" : "false";
+}
+
+/*
+==================
+CBoolToString::Convert
+==================
+*/
+template<>
+FORCEINLINE const wchar_t* CBoolToString::Convert<wchar_t>( bool bValue )
+{
+	return bValue ? L"true" : L"false";
+}
+
+/*
+==================
+CStringToBool::Convert
+==================
+*/
+template<typename TCharType>
+FORCEINLINE bool CStringToBool::Convert( const TCharType* pValue )
+{
+	static_assert( false, "Unknown TCharType" );
+	return false;
+}
+
+/*
+==================
+CStringToBool::Convert
+==================
+*/
+template<>
+FORCEINLINE bool CStringToBool::Convert<char>( const char* pValue )
+{
+	if ( !S_Stricmp( pValue, "true" ) || !S_Stricmp( pValue, "yes" ) || !S_Stricmp( pValue, "on" ) )
+	{
+		return true;
+	}
+	else if ( !S_Stricmp( pValue, "false" ) || !S_Stricmp( pValue, "no" ) || !S_Stricmp( pValue, "off" ) )
+	{
+		return false;
+	}
+	else
+	{
+		return S_Atoi( pValue ) ? true : false;
+	}
+}
+
+/*
+==================
+CStringToBool::Convert
+==================
+*/
+template<>
+FORCEINLINE bool CStringToBool::Convert<wchar_t>( const wchar_t* pValue )
+{
+	if ( !S_Stricmp( pValue, L"true" ) || !S_Stricmp( pValue, L"yes" ) || !S_Stricmp( pValue, L"on" ) )
+	{
+		return true;
+	}
+	else if ( !S_Stricmp( pValue, L"false" ) || !S_Stricmp( pValue, L"no" ) || !S_Stricmp( pValue, L"off" ) )
+	{
+		return false;
+	}
+	else
+	{
+		return S_Atoi( pValue ) ? true : false;
+	}
 }

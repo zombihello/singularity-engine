@@ -37,6 +37,9 @@ public:
 	{
 	}
 
+	static CGuid Generate();
+	static void	 Generate( CGuid& guid );
+
 	void Set( uint32 a, uint32 b, uint32 c, uint32 d );
 	bool InitFromString( const eastl::string& string );
 	void Invalidate();

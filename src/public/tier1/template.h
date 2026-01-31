@@ -41,9 +41,10 @@ private:
 template<typename TType>
 class TGuardValue : private CNonCopyable
 {
+public:
 	TGuardValue( TType& refValue, const TType& newValue )
 		: value( refValue )
-		, oldValue( newValue )
+		, oldValue( refValue )
 	{
 		value = newValue;
 	}

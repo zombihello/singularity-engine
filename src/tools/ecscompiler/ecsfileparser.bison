@@ -10,27 +10,27 @@
     #define YYERROR_VERBOSE         1
     #define YYPARSE_PARAM           param 
     #define YYLEX_PARAM             param 
-    #define YYSTYPE                 yystypeFile_t
-
-    struct yystypeFile_t
+    #define YYSTYPE                 ecsTypeFile_t
+    
+    struct ecsTypeFile_t
     {
-        yystypeFile_t()
+        ecsTypeFile_t()
             : pContext( NULL )
         {}
-        yystypeFile_t( const yystypeFile_t& other )
+        ecsTypeFile_t( const ecsTypeFile_t& other )
             : pContext( other.pContext )
             , token( other.token )
             , string( other.string )
         {}
-         yystypeFile_t( yystypeFile_t&& other )
+         ecsTypeFile_t( ecsTypeFile_t&& other )
             : pContext( eastl::move( other.pContext ) )
             , token( eastl::move( other.token ) )
             , string( eastl::move( other.string ) )
         {}
-        ~yystypeFile_t()
+        ~ecsTypeFile_t()
         {}
 
-        FORCEINLINE yystypeFile_t& operator=( const yystypeFile_t& other )
+        FORCEINLINE ecsTypeFile_t& operator=( const ecsTypeFile_t& other )
 	    {
 	    	if ( this != &other )
 	    	{
@@ -41,7 +41,7 @@
 	    	return *this;
 	    }
 
-        FORCEINLINE yystypeFile_t& operator=( yystypeFile_t&& other )
+        FORCEINLINE ecsTypeFile_t& operator=( ecsTypeFile_t&& other )
 	    {
 	    	if ( this != &other )
 	    	{
@@ -53,22 +53,22 @@
 	    }
 
         parserFileContext_t*    pContext;
-        eastl::string_view        token;
-        eastl::string             string;
+        eastl::string_view      token;
+        eastl::string           string;
     };
 
-    typedef TGrammarInterface<CEcsFileParser, yystypeFile_t>        ecsGrammarInterface_t;
+    typedef TGrammarInterface<CEcsFileParser, ecsTypeFile_t>        ecsGrammarInterface_t;
     #define g_pFileContext                                          ( ( ecsGrammarInterface_t* )param )
     #define g_pFileParser                                           ( ( ( ecsGrammarInterface_t* )param )->GetFileParser() )
 
     // Some Bison functions
     /*
     ==================
-    yyerror_file_thread_safe
+    ecs_error_file_thread_safe
     Function for Bison to handle error cases
     ==================
     */
-    static int yyerror_file_thread_safe( const char* pMessage, void* pParam, YYSTYPE* lvalp )
+    static int ecs_error_file_thread_safe( const char* pMessage, void* pParam, YYSTYPE* lvalp )
     {
         ecsGrammarInterface_t*     pGrammarInterface = ( ecsGrammarInterface_t* )pParam;
         pGrammarInterface->EmitError( pMessage, lvalp );
@@ -77,24 +77,23 @@
 
     /*
     ==================
-    yylex_file_thread_safe
+    ecs_lex_file_thread_safe
     Function for Bison to take tokens
     ==================
     */    
-    static int yylex_file_thread_safe( YYSTYPE* lvalp, void* pParam )
+    static int ecs_lex_file_thread_safe( YYSTYPE* lvalp, void* pParam )
     {
         ecsGrammarInterface_t*     pGrammarInterface = ( ecsGrammarInterface_t* )pParam;
         return ( int )pGrammarInterface->GetNextToken( lvalp );	
     }
 
     // Redefine some Bison functions
-    #define yyparse                 yyparse_file
-    #define yydebug                 yydebug_file
-    #define yylex                   yylex_file_thread_safe
-    #define yyerror( Message )      yyerror_file_thread_safe( Message, YYPARSE_PARAM, &yylval )
+    #define ecs_lex                   ecs_lex_file_thread_safe
+    #define ecs_error( Message )      ecs_error_file_thread_safe( Message, YYPARSE_PARAM, &yylval )
 %}
 
 %define api.pure
+%name-prefix "ecs_"
 
 /* ------------------------------------------------------------------
    Token Definitions

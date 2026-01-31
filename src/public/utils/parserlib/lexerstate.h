@@ -1,7 +1,6 @@
 #pragma once
 #include "utils/parserlib/lexercontext.h"
 #include "utils/parserlib/lexerlistener.h"
-#include "utils/parserlib/utils.h"
 
 //-----------------------------------------------------------------------------
 // Used to manage the state of the lexer internally

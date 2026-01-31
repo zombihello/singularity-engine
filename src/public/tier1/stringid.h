@@ -4,29 +4,28 @@
 //-----------------------------------------------------------------------------
 // String ID
 //-----------------------------------------------------------------------------
-template<typename TIdType, TStringPool<TIdType>& ( *GetStringPool )()>
-class TStringId
+class CStringID
 {
 public:
 	// Functions to extract the string ID as a key for eastl::unordered_map and eastl::unordered_set
 	struct keyFunc_t
 	{
-		size_t operator()( const TStringId& stringID ) const;
-		bool   operator()( const TStringId& a, const TStringId& b ) const;
+		size_t operator()( const CStringID& stringID ) const;
+		bool   operator()( const CStringID& a, const CStringID& b ) const;
 	};
 
-	TStringId();
-	TStringId( const char* pString );
-	TStringId( const char* pString, uint64 length );
-	TStringId( const eastl::string& string );
-	TStringId( const eastl::string_view& string );
-	TStringId( const TStringId& copy );
+	CStringID();
+	CStringID( const char* pString );
+	CStringID( const char* pString, uint64 length );
+	CStringID( const eastl::string& string );
+	CStringID( const eastl::string_view& string );
+	CStringID( const CStringID& copy );
 
-	static TStringId Make( const char* pString );
-	static TStringId Make( const char* pString, uint64 length );
-	static TStringId Make( const eastl::string& string );
-	static TStringId Make( const eastl::string_view& string );
-	static TStringId Make( const TStringId& stringId );
+	static CStringID Make( const char* pString );
+	static CStringID Make( const char* pString, uint64 length );
+	static CStringID Make( const eastl::string& string );
+	static CStringID Make( const eastl::string_view& string );
+	static CStringID Make( const CStringID& stringId );
 
 	void		Clear();
 	const char* ToString() const;
@@ -37,21 +36,21 @@ public:
 	bool operator==( const char* pString ) const;
 	bool operator==( const eastl::string& string ) const;
 	bool operator==( const eastl::string_view& string ) const;
-	bool operator==( const TStringId& stringId ) const;
+	bool operator==( const CStringID& stringId ) const;
 	bool operator!=( const char* pString ) const;
 	bool operator!=( const eastl::string& string ) const;
 	bool operator!=( const eastl::string_view& string ) const;
-	bool operator!=( const TStringId& stringId ) const;
+	bool operator!=( const CStringID& stringId ) const;
 
-	TStringId& operator=( const char* pString );
-	TStringId& operator=( const eastl::string& string );
-	TStringId& operator=( const eastl::string_view& string );
-	TStringId& operator=( const TStringId& stringId );
+	CStringID& operator=( const char* pString );
+	CStringID& operator=( const eastl::string& string );
+	CStringID& operator=( const eastl::string_view& string );
+	CStringID& operator=( const CStringID& stringId );
 
 private:
-	TIdType id;
+	typedef uint16			  id_t;
+	static TStringPool<id_t>& GetStringPool();
+	id_t					  id;
 };
-
-typedef TStringId<uint16, GetGlobalStringPool> CStringId;
 
 #include "tier1/stringid.inl"

@@ -3,6 +3,7 @@
 
 #include "tier0/defines.h"
 #include "tier0/types.h"
+#include "tier1/strtools.h"
 
 //-----------------------------------------------------------------------------
 // File tools

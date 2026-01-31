@@ -154,7 +154,7 @@ void CEcsEntityDesc::Clear()
 	ecsComponentFactories.clear();
 	ecsPrefabs.clear();
 	lastUsedEcsPrefabIdx = INVALID_INDEX;
-	Sys_InitGuid( guid );
+	CGuid::Generate( guid );
 }
 
 /*

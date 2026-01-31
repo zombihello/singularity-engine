@@ -3,6 +3,7 @@
 
 #include "tier0/defines.h"
 #include "tier0/types.h"
+#include "tier0/debug.h"
 
 //-----------------------------------------------------------------------------
 // String tools
@@ -36,24 +37,42 @@ uint32		   S_Strnicmp( const char* pString1, const char* pString2, uint32 count 
 uint32		   S_Strnicmp( const wchar_t* pString1, const wchar_t* pString2, uint32 count );
 char*		   S_Strncat( char* pDest, const char* pSrc, uint32 destBufferSize, int32 maxCharsToCopy = COPY_ALL_CHARACTERS );
 wchar_t*	   S_Strncat( wchar_t* pDest, const wchar_t* pSrc, uint32 destBufferSize, int32 maxCharsToCopy = COPY_ALL_CHARACTERS );
-int32		   S_Atoi( const char* pString );
-int32		   S_Atoi( const wchar_t* pString );
-float		   S_Atof( const char* pString );
-float		   S_Atof( const wchar_t* pString );
+int32		   S_Atoi( const char* pString, char** pEndPtr = NULL );
+int32		   S_Atoi( const wchar_t* pString, wchar_t** pEndPtr = NULL );
+int64		   S_Atoi64( const char* pString, char** pEndPtr = NULL );
+int64		   S_Atoi64( const wchar_t* pString, wchar_t** pEndPtr = NULL );
+float		   S_Atof( const char* pString, char** pEndPtr = NULL );
+float		   S_Atof( const wchar_t* pString, wchar_t** pEndPtr = NULL );
+double		   S_Atod( const char* pString, char** pEndPtr = NULL );
+double		   S_Atod( const wchar_t* pString, wchar_t** pEndPtr = NULL );
 int32		   S_Snprintf( wchar_t* pDest, uint32 maxLen, const wchar_t* pFormat, ... );
 int32		   S_Snprintf( char* pDest, uint32 maxLen, const char* pFormat, ... );
 eastl::string  S_Vsprintf( const char* pFormat, va_list params );
 eastl::string  S_Sprintf( const char* pFormat, ... );
 eastl::wstring S_Vsprintf( const wchar_t* pFormat, va_list params );
 eastl::wstring S_Sprintf( const wchar_t* pFormat, ... );
-int32		   S_ToUpper( int32 ch );
-int32		   S_ToLower( int32 ch );
-char*		   S_Strupr( char* pString );
-char*		   S_Strlwr( char* pString );
-wchar_t*	   S_Strupr( wchar_t* pString );
-wchar_t*	   S_Strlwr( wchar_t* pString );
+char		   S_ToUpper( char c );
+char		   S_ToLower( char c );
+wchar_t		   S_ToUpper( wchar_t c );
+wchar_t		   S_ToLower( wchar_t c );
+void		   S_Strupr( char* pString );
+void		   S_Strupr( eastl::string& string );
+void		   S_Strlwr( char* pString );
+void		   S_Strlwr( eastl::string& string );
+void		   S_Strupr( wchar_t* pString );
+void		   S_Strupr( eastl::wstring& string );
+void		   S_Strlwr( wchar_t* pString );
+void		   S_Strlwr( eastl::wstring& string );
 bool		   S_IsSpace( char c );
 bool		   S_IsSpace( wchar_t c );
+bool		   S_IsDigit( char c );
+bool		   S_IsDigit( wchar_t c );
+
+//-----------------------------------------------------------------------------
+// UTF-8 tools
+//-----------------------------------------------------------------------------
+uint32 S_Utf8_CharSize( byte b );
+uint32 S_Utf8_Strlen( const char* pString, uint32 size );
 
 //-----------------------------------------------------------------------------
 // Class that handles the ANSI to WCHAR conversion
@@ -125,6 +144,26 @@ private:
 
 	TConverTo  buffer[defaultConversionSize];  // Holds the converted data if the size is large enough
 	TConverTo* pConvertedString;			   // Points to the converted data. If this pointer doesn't match Buffer, then memory was allocated and needs to be freed
+};
+
+//-----------------------------------------------------------------------------
+// Class converts bool to string
+//-----------------------------------------------------------------------------
+class CBoolToString
+{
+public:
+	template<typename TCharType>
+	static const TCharType* Convert( bool bValue );
+};
+
+//-----------------------------------------------------------------------------
+// Class converts string to bool
+//-----------------------------------------------------------------------------
+class CStringToBool
+{
+public:
+	template<typename TCharType>
+	static bool Convert( const TCharType* pValue );
 };
 
 //-----------------------------------------------------------------------------
