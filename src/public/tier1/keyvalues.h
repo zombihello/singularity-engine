@@ -36,6 +36,8 @@ public:
 	void RemoveAllSubKeys( bool bDelete = true );
 	void Clear();
 
+	CKeyValues* FindKey( const char* pName, bool bCreate = false );
+
 	void SetName( const char* pName );
 	void SetName( const char* pName, uint32 length );
 	void SetBool( bool value );

@@ -29,6 +29,61 @@ void CKeyValues::RemoveAllSubKeys( bool bDelete /* = true */ )
 
 /*
 ==================
+CKeyValues::FindKey
+==================
+*/
+CKeyValues* CKeyValues::FindKey( const char* pName, bool bCreate /* = false */ )
+{
+	// Return the current key if a NULL subkey is asked for
+	if ( !pName || !pName[0] )
+	{
+		return this;
+	}
+
+	// Look for '/' characters delimiting sub fields
+	const char* pSubStr	   = S_Strchr( pName, '/' );
+	uint64		nameLength = pSubStr ? (uint64)( pSubStr - pName ) : S_Strlen( pName );
+
+	// Find the searchStr in the current subKeys
+	nameID_t	searchNameID = pNamePool->Find( pName, nameLength );
+	CKeyValues* pKeyValues	 = NULL;
+	if ( searchNameID != (uint16)INVALID_INDEX )
+	{
+		for ( auto it = subKeys.begin(), itEnd = subKeys.end(); it != itEnd; ++it )
+		{
+			CKeyValues* pCurKeyValues = *it;
+			if ( pCurKeyValues->nameID == searchNameID )
+			{
+				pKeyValues = pCurKeyValues;
+				break;
+			}
+		}
+	}
+
+	// Make sure a key was found
+	if ( !pKeyValues )
+	{
+		if ( bCreate )
+		{
+			pKeyValues = new CKeyValues( pName, nameLength, this );
+		}
+		else
+		{
+			return NULL;
+		}
+	}
+
+	// If we have still got a pSubStr we need to keep looking deeper in the tree
+	if ( pSubStr )
+	{
+		// Recursively chain down through the paths in the string
+		return pKeyValues->FindKey( pSubStr + 1, bCreate );
+	}
+	return pKeyValues;
+}
+
+/*
+==================
 CKeyValues::SetParent
 ==================
 */

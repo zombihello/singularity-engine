@@ -130,12 +130,22 @@ FORCEINLINE void S_Strncpy( wchar_t* pDest, const wchar_t* pSrc, uint32 maxLen )
 
 /*
 ==================
-S_Strstr
+S_Strchr
 ==================
 */
-FORCEINLINE char* S_Strstr( const char* pString, const char* pFind )
+FORCEINLINE const char* S_Strchr( const char* pString, char c )
 {
-	return (char*)strstr( pString, pFind );
+	return strchr( pString, c );
+}
+
+/*
+==================
+S_Strchr
+==================
+*/
+FORCEINLINE const wchar_t* S_Strchr( const wchar_t* pString, wchar_t c )
+{
+	return wcschr( pString, c );
 }
 
 /*
@@ -143,9 +153,19 @@ FORCEINLINE char* S_Strstr( const char* pString, const char* pFind )
 S_Strstr
 ==================
 */
-FORCEINLINE wchar_t* S_Strstr( const wchar_t* pString, const wchar_t* pFind )
+FORCEINLINE const char* S_Strstr( const char* pString, const char* pFind )
 {
-	return (wchar_t*)wcsstr( pString, pFind );
+	return strstr( pString, pFind );
+}
+
+/*
+==================
+S_Strstr
+==================
+*/
+FORCEINLINE const wchar_t* S_Strstr( const wchar_t* pString, const wchar_t* pFind )
+{
+	return wcsstr( pString, pFind );
 }
 
 /*
