@@ -292,3 +292,31 @@ bool CKeyValues::SaveToBuffer( eastl::string& buffer ) const
 	AssertUnimplemented();
 	return false;
 }
+
+/*
+==================
+CKeyValuesSubKeysIterator::CKeyValuesSubKeysIterator
+==================
+*/
+CKeyValuesSubKeysIterator::CKeyValuesSubKeysIterator( CKeyValues* pKeyValues, bool bWithValues /* = true */, bool bWithSubKeys /* = false */ )
+	: currentIndex( INVALID_INDEX )
+{
+	// We iterate over all subkeys and filter out only the required ones
+	PROFILE_SCOPE();
+	Assert( pKeyValues );
+	const eastl::list<CKeyValues*>& subKeys = pKeyValues->GetSubKeys();
+	for ( auto it = subKeys.begin(), itEnd = subKeys.end(); it != itEnd; ++it )
+	{
+		CKeyValues* pSubKey = *it;
+		if ( ( pSubKey->HasData() && bWithValues ) || ( pSubKey->HasSubKeys() && bWithSubKeys ) )
+		{
+			keyValues.emplace_back( pSubKey );
+		}
+	}
+
+	// Initialize the current index if key values aren't empty
+	if ( !subKeys.empty() )
+	{
+		currentIndex = 0;
+	}
+}

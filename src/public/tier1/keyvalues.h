@@ -48,6 +48,8 @@ public:
 	void SetString( const char* pValue );
 	void SetString( const char* pValue, uint32 length );
 
+	bool							HasData() const;
+	bool							HasSubKeys() const;
 	const char*						GetName() const;
 	bool							GetBool( bool defaultValue = false ) const;
 	int32							GetInt( int32 defaultValue = 0 ) const;
@@ -81,6 +83,41 @@ private:
 	CKeyValues*				 pParentKey;
 	namePool_t*				 pNamePool;
 	eastl::list<CKeyValues*> subKeys;
+};
+
+//-----------------------------------------------------------------------------
+// Class for iterate over all subkeys in a key value
+//-----------------------------------------------------------------------------
+class CKeyValuesSubKeysIterator
+{
+public:
+	CKeyValuesSubKeysIterator( CKeyValues* pKeyValues, bool bWithValues = true, bool bWithSubKeys = false );
+
+	void		operator++();
+	void		operator+=( uint32 offset );
+	CKeyValues* operator*() const;
+	CKeyValues* operator->() const;
+				operator bool() const;
+	bool		operator!() const;
+
+protected:
+	CKeyValues* GetKeyValues() const;
+
+	uint32					   currentIndex;
+	eastl::vector<CKeyValues*> keyValues;
+};
+
+//-----------------------------------------------------------------------------
+// Class for reverse iterate over all subkeys in a key value
+//-----------------------------------------------------------------------------
+class CKeyValuesSubKeysReverseIterator : public CKeyValuesSubKeysIterator
+{
+public:
+	CKeyValuesSubKeysReverseIterator( CKeyValues* pKeyValues, bool bWithValues = true, bool bWithSubKeys = false )
+		: CKeyValuesSubKeysIterator( pKeyValues, bWithValues, bWithSubKeys )
+	{
+		eastl::reverse( eastl::begin( keyValues ), eastl::end( keyValues ) );
+	}
 };
 
 #include "tier1/keyvalues.inl"

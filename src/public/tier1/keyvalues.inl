@@ -223,6 +223,26 @@ FORCEINLINE void CKeyValues::SetString( const char* pValue, uint32 length )
 
 /*
 ==================
+CKeyValues::HasData
+==================
+*/
+FORCEINLINE bool CKeyValues::HasData() const
+{
+	return dataType != KEYVALUES_DATA_TYPE_NONE;
+}
+
+/*
+==================
+CKeyValues::HasSubKeys
+==================
+*/
+FORCEINLINE bool CKeyValues::HasSubKeys() const
+{
+	return !subKeys.empty();
+}
+
+/*
+==================
 CKeyValues::GetName
 ==================
 */
@@ -370,4 +390,80 @@ CKeyValues::GetSubKeys
 FORCEINLINE const eastl::list<CKeyValues*>& CKeyValues::GetSubKeys() const
 {
 	return subKeys;
+}
+
+/*
+==================
+CKeyValuesSubKeysIterator::operator++
+==================
+*/
+FORCEINLINE void CKeyValuesSubKeysIterator::operator++()
+{
+	if ( currentIndex + 1 <= keyValues.size() )
+	{
+		++currentIndex;
+	}
+}
+
+/*
+==================
+CKeyValuesSubKeysIterator::operator+=
+==================
+*/
+FORCEINLINE void CKeyValuesSubKeysIterator::operator+=( uint32 offset )
+{
+	while ( offset-- )
+	{
+		operator++();
+	}
+}
+
+/*
+==================
+CKeyValuesSubKeysIterator::operator*
+==================
+*/
+FORCEINLINE CKeyValues* CKeyValuesSubKeysIterator::operator*() const
+{
+	return GetKeyValues();
+}
+
+/*
+==================
+CKeyValuesSubKeysIterator::operator->
+==================
+*/
+FORCEINLINE CKeyValues* CKeyValuesSubKeysIterator::operator->() const
+{
+	return GetKeyValues();
+}
+
+/*
+==================
+CKeyValuesSubKeysIterator::operator bool
+==================
+*/
+FORCEINLINE CKeyValuesSubKeysIterator::operator bool() const
+{
+	return currentIndex < keyValues.size();
+}
+
+/*
+==================
+CKeyValuesSubKeysIterator::operator !
+==================
+*/
+FORCEINLINE bool CKeyValuesSubKeysIterator::operator!() const
+{
+	return !operator bool();
+}
+
+/*
+==================
+CKeyValuesSubKeysIterator::GetKeyValues
+==================
+*/
+FORCEINLINE CKeyValues* CKeyValuesSubKeysIterator::GetKeyValues() const
+{
+	return !keyValues.empty() ? keyValues[currentIndex] : NULL;
 }
