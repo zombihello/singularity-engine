@@ -214,7 +214,7 @@ bool CKeyValues::LoadFromFile( const char* pPath )
 	keyValuesParser.Parse( pPath, this, (char*)pBuffer, fileSize );
 	if ( keyValuesParser.HasErrors() )
 	{
-		const eastl::vector<eastl::string> errorMsgs = keyValuesParser.GetErrorMsgs();
+		const eastl::vector<eastl::string>& errorMsgs = keyValuesParser.GetErrorMsgs();
 		Error( "KeyValues: Failed to load '%s', %i error(s)", pPath, errorMsgs.size() );
 		for ( uint32 index = 0, count = (uint32)errorMsgs.size(); index < count; ++index )
 		{
@@ -238,7 +238,7 @@ bool CKeyValues::LoadFromBuffer( const char* pBuffer, uint64 size )
 	keyValuesParser.Parse( "<buffer>", this, pBuffer, size );
 	if ( keyValuesParser.HasErrors() )
 	{
-		const eastl::vector<eastl::string> errorMsgs = keyValuesParser.GetErrorMsgs();
+		const eastl::vector<eastl::string>& errorMsgs = keyValuesParser.GetErrorMsgs();
 		Error( "KeyValues: Failed to load from buffer, %i error(s)", errorMsgs.size() );
 		Error( "KeyValues:\n%.*s", size, pBuffer );
 		Error( "KeyValues:" );

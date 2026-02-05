@@ -1,4 +1,6 @@
 #include "pch_tier1.h"
+#include "utils/interfaces/interfaces.h"
+#include "cvar/icvar.h"
 #include "tier1/keyvalues_parser.h"
 
 /*
@@ -36,6 +38,7 @@ CKeyValuesParser::Parse
 */
 void CKeyValuesParser::Parse( const char* pFile, CKeyValues* pRootKeyValue, const char* pBuffer, uint64 size )
 {
+	PROFILE_SCOPE();
 	Assert( pRootKeyValue );
 	Setup( pFile, pBuffer, size );
 	ReadKeyValues( pRootKeyValue );
@@ -49,6 +52,7 @@ CKeyValuesParser::ReadKeyValue
 bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValue )
 {
 	// Keep parsing until we hit the end of the buffer or a parse error
+	PROFILE_SCOPE();
 	eastl::string valueBuffer;
 	uint32		  blockScopeLevel = scopeLevel;
 	while ( !IsEndOfBuffer( pCurPtr ) )
@@ -79,14 +83,6 @@ bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValue )
 				break;
 			}
 
-			// Read conditional block
-			if ( *token.data() == '[' )
-			{
-				// TODO BS yehor.pohuliaka - [<CONDITION>]
-				AssertUnimplemented();
-				break;
-			}
-
 			// Read special macroses
 			if ( *token.data() == '#' )
 			{
@@ -106,7 +102,15 @@ bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValue )
 		}
 
 		// Create a new sub key
-		CKeyValues* pSubKey = new CKeyValues( name.data(), name.size(), pKeyValue );
+		bool		bAccepted = true;
+		CKeyValues* pSubKey	  = new CKeyValues( name.data(), name.size(), pKeyValue );
+
+		// Read conditional block if exists
+		if ( !ReadConditionalBlock( bAccepted ) )
+		{
+			delete pSubKey;
+			break;
+		}
 
 		// The next token it is a value
 		token = ReadToken( bQuotedToken );
@@ -114,6 +118,7 @@ bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValue )
 		// If the token it is '{' then read sub key-values
 		if ( *token.data() == '{' )
 		{
+			// Read sub key-values
 			++scopeLevel;
 			if ( !ReadKeyValues( pSubKey ) )
 			{
@@ -226,14 +231,155 @@ bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValue )
 			{
 				pSubKey->SetString( valueBuffer.c_str() );
 			}
+
+			// Read conditional block if exists
+			if ( !ReadConditionalBlock( bAccepted ) )
+			{
+				delete pSubKey;
+				break;
+			}
+		}
+
+		// Delete the subKey if it isn't accepted
+		if ( !bAccepted )
+		{
+			delete pSubKey;
 		}
 	}
 
 	// All sub scopes must be closed
-	if ( scopeLevel > 0 && scopeLevel >= blockScopeLevel && !HasErrors() )
+	if ( scopeLevel > 0 && scopeLevel >= blockScopeLevel )
 	{
 		EmitError( pCurPtr, "Got EOF instead of '}'" );
 	}
+	return !HasErrors();
+}
+
+/*
+==================
+CKeyValuesParser::ReadConditionalBlock
+==================
+*/
+bool CKeyValuesParser::ReadConditionalBlock( bool& bAccepted )
+{
+	PROFILE_SCOPE();
+	Assert( g_pCvar );
+	static eastl::pair<const char*, bool> s_constantVars[] = {
+		eastl::make_pair( "$WINDOWS", PLATFORM_WINDOWS )
+	};
+
+	bAccepted						= true;
+	bool			   bQuotedToken = false;
+	const char*		   pPrevPtr		= pCurPtr;
+	eastl::string_view token		= ReadToken( bQuotedToken );
+	if ( !bQuotedToken && *token.data() == '[' )
+	{
+		bAccepted				  = false;
+		bool bExpectVar			  = true;
+		bool bEndConditionalBlock = false;
+
+		eastl::vector<bool> bConditionalGroups;
+		uint32				curConditionalGroupId = 0;
+		bConditionalGroups.emplace_back( true );
+		while ( !IsEndOfBuffer( pCurPtr ) )
+		{
+			// Skip whitespaces and comments
+			SkipSpacesAndComments();
+			if ( IsEndOfBuffer( pCurPtr ) )
+			{
+				break;
+			}
+
+			// Read current token
+			token = ReadToken( bQuotedToken );
+			if ( token.empty() )
+			{
+				EmitError( token.data(), "Got empty token" );
+				break;
+			}
+
+			if ( !bQuotedToken )
+			{
+				// Check if we reach end of the conditional block
+				if ( *token.data() == ']' )
+				{
+					bEndConditionalBlock = true;
+					break;
+				}
+
+				// Should we go to a new conditional group
+				if ( *token.data() == '|' )
+				{
+					bExpectVar = true;
+					++curConditionalGroupId;
+					bConditionalGroups.emplace_back( true );
+					continue;
+				}
+			}
+
+			// Evaluate the conditional variable
+			bExpectVar		= false;
+			bool bEvaluated = false;
+			bool bNot		= false;  // Should we negate this command?
+			if ( *token.data() == '!' )
+			{
+				token = eastl::string_view( token.data() + 1, token.size() - 1 );
+				bNot  = true;
+			}
+
+			// First, let's see if it's a constant variable
+			for ( uint32 index = 0, count = ARRAYSIZE( s_constantVars ); index < count; ++index )
+			{
+				const eastl::pair<const char*, bool>& constantVar			= s_constantVars[index];
+				uint32								  constantVarNameLength = S_Strlen( constantVar.first );
+				if ( token.size() == constantVarNameLength && !S_Strnicmp( token.data(), constantVar.first, constantVarNameLength ) )
+				{
+					bEvaluated = true;
+					bConditionalGroups[curConditionalGroupId] &= constantVar.second ^ bNot;
+					break;
+				}
+			}
+
+			// Otherwise, it must be a cvar
+			if ( !bEvaluated )
+			{
+				IConVar* pConVar = g_pCvar->FindVar( token.data(), token.size() );
+				if ( pConVar )
+				{
+					bEvaluated = true;
+					bConditionalGroups[curConditionalGroupId] &= pConVar->GetBool() ^ bNot;
+				}
+				else
+				{
+					EmitError( token.data(), "Unknown cvar '%.*s'", token.size(), token.data() );
+				}
+			}
+		}
+
+		// A conditional block must be closed by ']'
+		if ( !bEndConditionalBlock )
+		{
+			EmitError( pCurPtr, "Got EOF instead of ']'" );
+		}
+		// A conditional block must have a var
+		else if ( bExpectVar )
+		{
+			EmitError( pCurPtr, "Got ']' instead of a var" );
+		}
+		// Otherwise everything is ok, we calculate the final result of the condition
+		else
+		{
+			for ( uint32 index = 0, count = (uint32)bConditionalGroups.size(); index < count && !bAccepted; ++index )
+			{
+				bAccepted = bConditionalGroups[index];
+			}
+		}
+	}
+	else
+	{
+		pCurPtr = pPrevPtr;
+	}
+
 	return !HasErrors();
 }
 
@@ -244,6 +390,7 @@ CKeyValuesParser::SkipSpacesAndComments
 */
 void CKeyValuesParser::SkipSpacesAndComments()
 {
+	PROFILE_SCOPE();
 	while ( !IsEndOfBuffer( pCurPtr ) )
 	{
 		// Skip spaces
@@ -298,6 +445,7 @@ CKeyValuesParser::ReadToken
 eastl::string_view CKeyValuesParser::ReadToken( bool& bQuoted )
 {
 	// Before read skip whitespaces and comments
+	PROFILE_SCOPE();
 	SkipSpacesAndComments();
 	if ( IsEndOfBuffer( pCurPtr ) )
 	{

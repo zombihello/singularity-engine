@@ -71,8 +71,11 @@ public:
 
 	virtual bool Exec( const char* pCommand ) override;
 
+	virtual IConCmdBase* FindCommandBase( const char* pName, uint32 length ) const override;
 	virtual IConCmdBase* FindCommandBase( const char* pName ) const override;
+	virtual IConCmd*	 FindCommand( const char* pName, uint32 length ) const override;
 	virtual IConCmd*	 FindCommand( const char* pName ) const override;
+	virtual IConVar*	 FindVar( const char* pName, uint32 length ) const override;
 	virtual IConVar*	 FindVar( const char* pName ) const override;
 
 	// Read and write a configuration file
@@ -117,16 +120,16 @@ private:
 	// of the next command after the separator, or NULL if there is nothing else left
 	bool ParseCommand( const char*& pCommand, const char separator = '$' );
 
-	IConCmdBase*												pConCmdList;
-	ICvarQuery*													pCvarQuery;
-	cvarDLLIdentifier_t											nextDLLIdentifier;
-	conVarChangeCallbackFn_t									pGlobalChangeCallbackFn;
-	IConsoleDisplayFunc*										pConsoleDisplayFunc;
-	char														commandArgvBuffer[COMMAND_MAX_LENGTH];
-	uint32														commandArgc;
-	const char*												pCommandArgv[COMMAND_MAX_ARGC];
+	IConCmdBase*												  pConCmdList;
+	ICvarQuery*													  pCvarQuery;
+	cvarDLLIdentifier_t											  nextDLLIdentifier;
+	conVarChangeCallbackFn_t									  pGlobalChangeCallbackFn;
+	IConsoleDisplayFunc*										  pConsoleDisplayFunc;
+	char														  commandArgvBuffer[COMMAND_MAX_LENGTH];
+	uint32														  commandArgc;
+	const char*													  pCommandArgv[COMMAND_MAX_ARGC];
 	eastl::unordered_map<cvarDLLIdentifier_t, IConVarsOverrider*> conVarsOverriderDict;
-	COnWriteConCmdsToConfigFile									onWriteConCmdsToConfigFile;
+	COnWriteConCmdsToConfigFile									  onWriteConCmdsToConfigFile;
 };
 
 static CCvar	  s_Cvar;
@@ -523,10 +526,10 @@ bool CCvar::ParseCommand( const char*& pCommand, const char separator /*= '$'*/ 
 	pCommand						 = pNextCommand;
 
 	// Parse the current command into pCommandArgv
-	char* pStartArgv	 = &commandArgvBuffer[0];
-	char* pCurChar		 = pStartArgv;
-	bool   bFoundQuote	 = false;
-	bool   bEndSubstring = false;
+	char* pStartArgv	= &commandArgvBuffer[0];
+	char* pCurChar		= pStartArgv;
+	bool  bFoundQuote	= false;
+	bool  bEndSubstring = false;
 	while ( *pCurChar && commandArgc < COMMAND_MAX_ARGC )
 	{
 		// We found a quote
@@ -668,12 +671,14 @@ bool CCvar::Exec( const char* pCommand )
 CCvar::FindCommandBase
 ==================
 */
-IConCmdBase* CCvar::FindCommandBase( const char* pName ) const
+IConCmdBase* CCvar::FindCommandBase( const char* pName, uint32 length ) const
 {
 	PROFILE_SCOPE();
 	for ( IConCmdBase* pCurCommand = pConCmdList; pCurCommand; pCurCommand = pCurCommand->GetNext() )
 	{
-		if ( !S_Stricmp( pName, pCurCommand->GetName() ) )
+		const char* pCommandName	  = pCurCommand->GetName();
+		uint32		commandNameLength = S_Strlen( pCommandName );
+		if ( length == commandNameLength && !S_Strnicmp( pName, pCommandName, length ) )
 		{
 			return pCurCommand;
 		}
@@ -684,13 +689,23 @@ IConCmdBase* CCvar::FindCommandBase( const char* pName ) const
 
 /*
 ==================
+CCvar::FindCommandBase
+==================
+*/
+IConCmdBase* CCvar::FindCommandBase( const char* pName ) const
+{
+	return FindCommandBase( pName, S_Strlen( pName ) );
+}
+
+/*
+==================
 CCvar::FindCommand
 ==================
 */
-IConCmd* CCvar::FindCommand( const char* pName ) const
+IConCmd* CCvar::FindCommand( const char* pName, uint32 length ) const
 {
 	PROFILE_SCOPE();
-	IConCmdBase* pConCmd = FindCommandBase( pName );
+	IConCmdBase* pConCmd = FindCommandBase( pName, length );
 	if ( !pConCmd || !pConCmd->IsCommand() )
 	{
 		return NULL;
@@ -701,19 +716,39 @@ IConCmd* CCvar::FindCommand( const char* pName ) const
 
 /*
 ==================
+CCvar::FindCommand
+==================
+*/
+IConCmd* CCvar::FindCommand( const char* pName ) const
+{
+	return FindCommand( pName, S_Strlen( pName ) );
+}
+
+/*
+==================
 CCvar::FindVar
 ==================
 */
-IConVar* CCvar::FindVar( const char* pName ) const
+IConVar* CCvar::FindVar( const char* pName, uint32 length ) const
 {
 	PROFILE_SCOPE();
-	IConCmdBase* pConVar = FindCommandBase( pName );
+	IConCmdBase* pConVar = FindCommandBase( pName, length );
 	if ( !pConVar || pConVar->IsCommand() )
 	{
 		return NULL;
 	}
 
 	return (IConVar*)pConVar;
+}
+
+/*
+==================
+CCvar::FindVar
+==================
+*/
+IConVar* CCvar::FindVar( const char* pName ) const
+{
+	return FindVar( pName, S_Strlen( pName ) );
 }
 
 /*
@@ -755,7 +790,7 @@ void CCvar::WriteConfigFile( const char* pConfigDir, bool bWriteDefaultConfig /*
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 
 	// Open file to write
-	eastl::string				   configPath = S_Sprintf( !bWriteDefaultConfig ? "%s/" CVAR_CONFIG_NAME ".cfg" : "%s/" CVAR_DEFAULT_CONFIG_NAME ".cfg", pConfigDir );
+	eastl::string			   configPath = S_Sprintf( !bWriteDefaultConfig ? "%s/" CVAR_CONFIG_NAME ".cfg" : "%s/" CVAR_DEFAULT_CONFIG_NAME ".cfg", pConfigDir );
 	TRefPtr<IStreamDataWriter> pFile	  = g_pFileSystem->CreateFileWriter( configPath.c_str() );
 	if ( !pFile )
 	{

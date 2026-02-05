@@ -82,7 +82,7 @@ CKeyValuesParser::IsControlSymbol
 */
 FORCEINLINE bool CKeyValuesParser::IsControlSymbol( const char* pPtr ) const
 {
-	return !IsEndOfBuffer( pPtr ) && ( IsBeginComment( pPtr ) || IsEndComment( pPtr, true ) || *pPtr == '{' || *pPtr == '}' || *pPtr == '[' || *pPtr == ']' || *pPtr == '"' );
+	return !IsEndOfBuffer( pPtr ) && ( IsBeginComment( pPtr ) || IsEndComment( pPtr, true ) || *pPtr == '{' || *pPtr == '}' || *pPtr == '[' || *pPtr == ']' || *pPtr == '"' || *pPtr == '|' );
 }
 
 /*

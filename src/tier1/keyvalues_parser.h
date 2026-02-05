@@ -17,6 +17,7 @@ public:
 
 private:
 	bool			   ReadKeyValues( CKeyValues* pKeyValue );
+	bool			   ReadConditionalBlock( bool& bAccepted );
 	void			   SkipSpacesAndComments();
 	eastl::string_view ReadToken( bool& bQuoted );
 
