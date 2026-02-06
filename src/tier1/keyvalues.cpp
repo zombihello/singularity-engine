@@ -45,8 +45,8 @@ CKeyValues* CKeyValues::FindKey( const char* pName, bool bCreate /* = false */ )
 	uint64		nameLength = pSubStr ? (uint64)( pSubStr - pName ) : S_Strlen( pName );
 
 	// Find the searchStr in the current subKeys
-	nameID_t	searchNameID = pNamePool->Find( pName, nameLength );
-	CKeyValues* pKeyValues	 = NULL;
+	nameID_t				   searchNameID = pNamePool->Find( pName, nameLength );
+	eastl::vector<CKeyValues*> keyValues;
 	if ( searchNameID != (uint16)INVALID_INDEX )
 	{
 		for ( auto it = subKeys.begin(), itEnd = subKeys.end(); it != itEnd; ++it )
@@ -54,18 +54,21 @@ CKeyValues* CKeyValues::FindKey( const char* pName, bool bCreate /* = false */ )
 			CKeyValues* pCurKeyValues = *it;
 			if ( pCurKeyValues->nameID == searchNameID )
 			{
-				pKeyValues = pCurKeyValues;
-				break;
+				keyValues.emplace_back( pCurKeyValues );
+				if ( !pSubStr )
+				{
+					break;
+				}
 			}
 		}
 	}
 
 	// Make sure a key was found
-	if ( !pKeyValues )
+	if ( keyValues.empty() )
 	{
 		if ( bCreate )
 		{
-			pKeyValues = new CKeyValues( pName, nameLength, this );
+			keyValues.emplace_back( new CKeyValues( pName, nameLength, this ) );
 		}
 		else
 		{
@@ -77,9 +80,15 @@ CKeyValues* CKeyValues::FindKey( const char* pName, bool bCreate /* = false */ )
 	if ( pSubStr )
 	{
 		// Recursively chain down through the paths in the string
-		return pKeyValues->FindKey( pSubStr + 1, bCreate );
+		CKeyValues* pKeyValues = NULL;
+		for ( uint32 index = 0, count = (uint32)keyValues.size(); index < count && !pKeyValues; ++index )
+		{
+			pKeyValues = keyValues[index]->FindKey( pSubStr + 1, bCreate );
+		}
+
+		return pKeyValues;
 	}
-	return pKeyValues;
+	return !keyValues.empty() ? keyValues[0] : NULL;
 }
 
 /*
