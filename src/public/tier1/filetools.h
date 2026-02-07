@@ -1,9 +1,12 @@
 #pragma once
 #include <EASTL/string.h>
+#include <EASTL/vector.h>
 
 #include "tier0/defines.h"
 #include "tier0/types.h"
 #include "tier1/strtools.h"
+#include "filesystem/ifilesystem.h"
+#include "utils/interfaces/interfaces.h"
 
 //-----------------------------------------------------------------------------
 // File tools
@@ -36,6 +39,11 @@ const char* S_GetFileName( const char* pPath );
 void		S_GetFileName( const eastl::string& path, eastl::string& fileName );
 bool		S_GetFilePath( const char* pSrcPath, char* pDestPath, uint32 maxLen );
 void		S_GetFilePath( const eastl::string& srcPath, eastl::string& destPath, bool bShrinkToFit = true );
+
+bool S_LoadFileToArray( const char* pPath, eastl::vector<byte>& result, uint32 flags = FILE_READ_NONE );
+bool S_LoadFileToString( const char* pPath, eastl::string& result, uint32 flags = FILE_READ_NONE );
+bool S_SaveArrayToFile( const char* pPath, const eastl::vector<byte>& data, uint32 flags = FILE_WRITE_NONE );
+bool S_SaveStringToFile( const char* pPath, const eastl::string& data, uint32 flags = FILE_WRITE_NONE );
 
 //-----------------------------------------------------------------------------
 // Utility class for quick inquiries against filenames

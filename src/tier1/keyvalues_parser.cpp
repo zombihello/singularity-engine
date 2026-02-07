@@ -1,5 +1,6 @@
 #include "pch_tier1.h"
 #include "utils/interfaces/interfaces.h"
+#include "tier1/filetools.h"
 #include "cvar/icvar.h"
 #include "tier1/keyvalues_parser.h"
 
@@ -53,8 +54,10 @@ bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValue )
 {
 	// Keep parsing until we hit the end of the buffer or a parse error
 	PROFILE_SCOPE();
-	eastl::string valueBuffer;
-	uint32		  blockScopeLevel = scopeLevel;
+	eastl::string			   valueBuffer;
+	eastl::vector<CKeyValues*> includedKeys;
+	eastl::vector<CKeyValues*> baseKeys;
+	uint32					   blockScopeLevel = scopeLevel;
 	while ( !IsEndOfBuffer( pCurPtr ) )
 	{
 		// Skip whitespaces and comments
@@ -86,9 +89,30 @@ bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValue )
 			// Read special macroses
 			if ( *token.data() == '#' )
 			{
-				// TODO BS yehor.pohuliaka - #include <path> and #base <path>
-				AssertUnimplemented();
-				break;
+				// Include macro
+				if ( token == "#include" )
+				{
+					if ( !ReadIncludeKeys( includedKeys ) )
+					{
+						break;
+					}
+				}
+				// Base macro
+				else if ( token == "#base" )
+				{
+					if ( !ReadIncludeKeys( baseKeys ) )
+					{
+						break;
+					}
+				}
+				// Otherwise it is an unknown macros
+				else
+				{
+					EmitError( token.data(), "Unknown macros '%.*s'", token.size(), token.data() );
+					break;
+				}
+
+				continue;
 			}
 		}
 
@@ -252,6 +276,23 @@ bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValue )
 	{
 		EmitError( pCurPtr, "Got EOF instead of '}'" );
 	}
+
+	// Append include keys into the key values
+	for ( uint32 index = 0, count = (uint32)includedKeys.size(); index < count; ++index )
+	{
+		CKeyValues* pIncludedKeyValues = includedKeys[index];
+		AppendIncludedKeys( pKeyValue, pIncludedKeyValues );
+		delete pIncludedKeyValues;
+	}
+
+	// Merge base keys
+	for ( uint32 index = 0, count = (uint32)baseKeys.size(); index < count; ++index )
+	{
+		CKeyValues* pBaseKeyValues = baseKeys[index];
+		MergeBaseKeys( pKeyValue, pBaseKeyValues );
+		delete pBaseKeyValues;
+	}
+
 	return !HasErrors();
 }
 
@@ -266,6 +307,8 @@ bool CKeyValuesParser::ReadConditionalBlock( bool& bAccepted )
 	Assert( g_pCvar );
 	static eastl::pair<const char*, bool> s_constantVars[] = {
 		eastl::make_pair( "$WINDOWS", PLATFORM_WINDOWS )
+
+		// Here you can add your constant variables
 	};
 
 	bAccepted						= true;
@@ -381,6 +424,93 @@ bool CKeyValuesParser::ReadConditionalBlock( bool& bAccepted )
 	}
 
 	return !HasErrors();
+}
+
+/*
+==================
+CKeyValuesParser::ReadIncludeKeys
+==================
+*/
+bool CKeyValuesParser::ReadIncludeKeys( eastl::vector<CKeyValues*>& includedKeys )
+{
+	// Read a file path
+	PROFILE_SCOPE();
+	bool			   bQuotedToken = false;
+	eastl::string_view token		= ReadToken( bQuotedToken );
+	if ( token.empty() )
+	{
+		EmitError( token.data(), "Got empty token" );
+		return false;
+	}
+
+	// Get relative subdirectory
+	eastl::string fullPath;
+	S_GetFilePath( pCurFile, fullPath, false );
+	size_t offset = fullPath.size();
+	fullPath.resize( fullPath.size() + token.size() );
+	Mem_Memcpy( fullPath.data() + offset, token.data(), token.size() );
+
+	// Load the file
+	eastl::string buffer;
+	if ( !S_LoadFileToString( fullPath.c_str(), buffer ) )
+	{
+		EmitError( token.data(), "Failed to load keyvalue file '%s'", fullPath.c_str() );
+		return false;
+	}
+
+	// Create a new key values and parse it
+	CKeyValues*		 pKeyValues = new CKeyValues( fullPath.c_str() );
+	CKeyValuesParser keyValuesParser;
+	keyValuesParser.Parse( fullPath.c_str(), pKeyValues, buffer.c_str(), buffer.size() );
+	if ( keyValuesParser.HasErrors() )
+	{
+		const eastl::vector<eastl::string>& errorMsgs = keyValuesParser.GetErrorMsgs();
+		CKeyValuesParser::errorMsgs.reserve( CKeyValuesParser::errorMsgs.size() + errorMsgs.size() );
+		CKeyValuesParser::errorMsgs.insert( CKeyValuesParser::errorMsgs.end(), errorMsgs.begin(), errorMsgs.end() );
+
+		delete pKeyValues;
+		return false;
+	}
+
+	includedKeys.emplace_back( pKeyValues );
+	return true;
+}
+
+/*
+==================
+CKeyValuesParser::MergeBaseKeys
+==================
+*/
+void CKeyValuesParser::MergeBaseKeys( CKeyValues* pNewKeyValues, CKeyValues* pBaseKeyValues )
+{
+	PROFILE_SCOPE();
+	Assert( pNewKeyValues );
+	Assert( pBaseKeyValues );
+
+	// Merge ourselves
+	// We always want to keep our value in the new key values, so nothing to do here
+
+	// Now merge base children
+	eastl::list<CKeyValues*> unmergedBaseChildren;
+	for ( CKeyValuesSubKeysIterator baseIt( pBaseKeyValues, true, true ); baseIt; ++baseIt )
+	{
+		CKeyValues* pBaseChild = *baseIt;
+		CKeyValues* pNewChild  = pNewKeyValues->FindKey( pBaseChild->GetName() );
+		if ( pNewChild )
+		{
+			MergeBaseKeys( pNewChild, pBaseChild );
+		}
+		else
+		{
+			unmergedBaseChildren.emplace_back( pBaseChild );
+		}
+	}
+
+	// Append unmerged base children
+	for ( auto it = unmergedBaseChildren.begin(), itEnd = unmergedBaseChildren.end(); it != itEnd; ++it )
+	{
+		pNewKeyValues->AddSubKey( *it );
+	}
 }
 
 /*

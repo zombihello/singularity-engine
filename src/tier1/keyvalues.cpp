@@ -3,6 +3,7 @@
 
 #include "filesystem/ifilesystem.h"
 #include "utils/interfaces/interfaces.h"
+#include "tier1/filetools.h"
 #include "tier1/keyvalues_parser.h"
 #include "tier1/keyvalues.h"
 
@@ -13,6 +14,7 @@ CKeyValues::RemoveAllSubKeys
 */
 void CKeyValues::RemoveAllSubKeys( bool bDelete /* = true */ )
 {
+	PROFILE_SCOPE();
 	if ( bDelete )
 	{
 		for ( auto it = subKeys.begin(), itEnd = subKeys.end(); it != itEnd; ++it )
@@ -35,6 +37,7 @@ CKeyValues::FindKey
 CKeyValues* CKeyValues::FindKey( const char* pName, bool bCreate /* = false */ )
 {
 	// Return the current key if a NULL subkey is asked for
+	PROFILE_SCOPE();
 	if ( !pName || !pName[0] )
 	{
 		return this;
@@ -99,6 +102,7 @@ CKeyValues::SetParent
 void CKeyValues::SetParent( CKeyValues* pParentKey )
 {
 	// Do nothing if we already have the parent
+	PROFILE_SCOPE();
 	if ( CKeyValues::pParentKey == pParentKey )
 	{
 		return;
@@ -168,6 +172,7 @@ CKeyValues::MigrateNamePool
 void CKeyValues::MigrateNamePool( namePool_t* pNamePool )
 {
 	// We don't do anything if it's the same pool
+	PROFILE_SCOPE();
 	Assert( pNamePool );
 	if ( CKeyValues::pNamePool == pNamePool )
 	{

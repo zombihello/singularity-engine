@@ -52,6 +52,21 @@ FORCEINLINE void CKeyValuesParser::EmitError( const char* pToken, const char* pF
 
 /*
 ==================
+CKeyValuesParser::AppendIncludedKeys
+==================
+*/
+FORCEINLINE void CKeyValuesParser::AppendIncludedKeys( CKeyValues* pKeyValues, CKeyValues* pIncludedKeyValues )
+{
+	Assert( pKeyValues );
+	Assert( pIncludedKeyValues );
+	for ( CKeyValuesSubKeysIterator it( pIncludedKeyValues, true, true ); it; ++it )
+	{
+		pKeyValues->AddSubKey( *it );
+	}
+}
+
+/*
+==================
 CKeyValuesParser::IsBeginComment
 ==================
 */

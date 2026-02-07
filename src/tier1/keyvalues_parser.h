@@ -18,11 +18,14 @@ public:
 private:
 	bool			   ReadKeyValues( CKeyValues* pKeyValue );
 	bool			   ReadConditionalBlock( bool& bAccepted );
+	bool			   ReadIncludeKeys( eastl::vector<CKeyValues*>& includedKeys );
 	void			   SkipSpacesAndComments();
 	eastl::string_view ReadToken( bool& bQuoted );
 
 	void Setup( const char* pFile, const char* pBuffer, uint64 size );
 	void EmitError( const char* pToken, const char* pFormat, ... );
+	void AppendIncludedKeys( CKeyValues* pKeyValues, CKeyValues* pIncludedKeyValues );
+	void MergeBaseKeys( CKeyValues* pNewKeyValues, CKeyValues* pBaseKeyValues );  // Merge in another CKeyValues, keeping "our" settings
 
 	bool   IsBeginComment( const char* pPtr ) const;
 	bool   IsEndComment( const char* pPtr, bool bMultiLine = false ) const;
