@@ -579,6 +579,46 @@ FORCEINLINE uint32 S_Utf8_Strlen( const char* pString, uint32 size )
 
 /*
 ==================
+S_ConvertEscapeToUnescapeSymbols
+==================
+*/
+FORCEINLINE void S_ConvertEscapeToUnescapeSymbols( eastl::string& dest, const char* pSrc )
+{
+	S_ConvertEscapeToUnescapeSymbols( dest, pSrc, S_Strlen( pSrc ) );
+}
+
+/*
+==================
+S_ConvertEscapeToUnescapeSymbols
+==================
+*/
+FORCEINLINE void S_ConvertEscapeToUnescapeSymbols( eastl::wstring& dest, const wchar_t* pSrc )
+{
+	S_ConvertEscapeToUnescapeSymbols( dest, pSrc, S_Strlen( pSrc ) );
+}
+
+/*
+==================
+S_ConvertUnescapeToEscapeSymbols
+==================
+*/
+FORCEINLINE void S_ConvertUnescapeToEscapeSymbols( eastl::string& dest, const char* pSrc )
+{
+	S_ConvertUnescapeToEscapeSymbols( dest, pSrc, S_Strlen( pSrc ) );
+}
+
+/*
+==================
+S_ConvertUnescapeToEscapeSymbols
+==================
+*/
+FORCEINLINE void S_ConvertUnescapeToEscapeSymbols( eastl::wstring& dest, const wchar_t* pSrc )
+{
+	S_ConvertUnescapeToEscapeSymbols( dest, pSrc, S_Strlen( pSrc ) );
+}
+
+/*
+==================
 CANSIToWCHAR_Convert::Convert
 ==================
 */

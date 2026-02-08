@@ -5,6 +5,7 @@
 #include "utils/interfaces/interfaces.h"
 #include "tier1/filetools.h"
 #include "tier1/keyvalues_parser.h"
+#include "tier1/keyvalues_writer.h"
 #include "tier1/keyvalues.h"
 
 /*
@@ -277,11 +278,7 @@ bool CKeyValues::SaveToFile( const char* pPath ) const
 
 	// Save data to buffer
 	eastl::string buffer;
-	if ( !SaveToBuffer( buffer ) )
-	{
-		Warning( "KeyValues: Failed to save KeyValues into buffer" );
-		return false;
-	}
+	SaveToBuffer( buffer );
 
 	// Try open file for save
 	TRefPtr<IStreamDataWriter> pFile = g_pFileSystem->CreateFileWriter( pPath );
@@ -301,10 +298,11 @@ bool CKeyValues::SaveToFile( const char* pPath ) const
 CKeyValues::SaveToBuffer
 ==================
 */
-bool CKeyValues::SaveToBuffer( eastl::string& buffer ) const
+void CKeyValues::SaveToBuffer( eastl::string& buffer ) const
 {
-	AssertUnimplemented();
-	return false;
+	PROFILE_SCOPE();
+	CKeyValuesWriter keyValuesWriter;
+	keyValuesWriter.Write( (CKeyValues*)this, buffer );
 }
 
 /*
@@ -312,7 +310,7 @@ bool CKeyValues::SaveToBuffer( eastl::string& buffer ) const
 CKeyValuesSubKeysIterator::CKeyValuesSubKeysIterator
 ==================
 */
-CKeyValuesSubKeysIterator::CKeyValuesSubKeysIterator( CKeyValues* pKeyValues, bool bWithValues /* = true */, bool bWithSubKeys /* = false */ )
+CKeyValuesSubKeysIterator::CKeyValuesSubKeysIterator( CKeyValues* pKeyValues, bool bAllowValues /* = true */, bool bAllowSubKeys /* = false */, bool bAllowEmpty /* = false */ )
 	: currentIndex( INVALID_INDEX )
 {
 	// We iterate over all subkeys and filter out only the required ones
@@ -322,7 +320,7 @@ CKeyValuesSubKeysIterator::CKeyValuesSubKeysIterator( CKeyValues* pKeyValues, bo
 	for ( auto it = subKeys.begin(), itEnd = subKeys.end(); it != itEnd; ++it )
 	{
 		CKeyValues* pSubKey = *it;
-		if ( ( pSubKey->HasData() && bWithValues ) || ( pSubKey->HasSubKeys() && bWithSubKeys ) )
+		if ( ( bAllowValues && pSubKey->HasData() ) || ( bAllowSubKeys && pSubKey->HasSubKeys() ) || ( bAllowEmpty && pSubKey->IsEmpty() ) )
 		{
 			keyValues.emplace_back( pSubKey );
 		}

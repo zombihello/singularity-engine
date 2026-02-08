@@ -37,12 +37,12 @@ void CKeyValuesParser::Setup( const char* pFile, const char* pBuffer, uint64 siz
 CKeyValuesParser::Parse
 ==================
 */
-void CKeyValuesParser::Parse( const char* pFile, CKeyValues* pRootKeyValue, const char* pBuffer, uint64 size )
+void CKeyValuesParser::Parse( const char* pFile, CKeyValues* pKeyValues, const char* pBuffer, uint64 size )
 {
 	PROFILE_SCOPE();
-	Assert( pRootKeyValue );
+	Assert( pKeyValues );
 	Setup( pFile, pBuffer, size );
-	ReadKeyValues( pRootKeyValue );
+	ReadKeyValues( pKeyValues );
 }
 
 /*
@@ -50,7 +50,7 @@ void CKeyValuesParser::Parse( const char* pFile, CKeyValues* pRootKeyValue, cons
 CKeyValuesParser::ReadKeyValue
 ==================
 */
-bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValue )
+bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValues )
 {
 	// Keep parsing until we hit the end of the buffer or a parse error
 	PROFILE_SCOPE();
@@ -127,7 +127,7 @@ bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValue )
 
 		// Create a new sub key
 		bool		bAccepted = true;
-		CKeyValues* pSubKey	  = new CKeyValues( name.data(), name.size(), pKeyValue );
+		CKeyValues* pSubKey	  = new CKeyValues( name.data(), name.size(), pKeyValues );
 
 		// Read conditional block if exists
 		if ( !ReadConditionalBlock( bAccepted ) )
@@ -253,7 +253,9 @@ bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValue )
 			// Otherwise set as string
 			else
 			{
-				pSubKey->SetString( valueBuffer.c_str() );
+				eastl::string convertedValueBuffer;
+				S_ConvertUnescapeToEscapeSymbols( convertedValueBuffer, valueBuffer.c_str() );
+				pSubKey->SetString( convertedValueBuffer.c_str() );
 			}
 
 			// Read conditional block if exists
@@ -281,7 +283,7 @@ bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValue )
 	for ( uint32 index = 0, count = (uint32)includedKeys.size(); index < count; ++index )
 	{
 		CKeyValues* pIncludedKeyValues = includedKeys[index];
-		AppendIncludedKeys( pKeyValue, pIncludedKeyValues );
+		AppendIncludedKeys( pKeyValues, pIncludedKeyValues );
 		delete pIncludedKeyValues;
 	}
 
@@ -289,7 +291,7 @@ bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValue )
 	for ( uint32 index = 0, count = (uint32)baseKeys.size(); index < count; ++index )
 	{
 		CKeyValues* pBaseKeyValues = baseKeys[index];
-		MergeBaseKeys( pKeyValue, pBaseKeyValues );
+		MergeBaseKeys( pKeyValues, pBaseKeyValues );
 		delete pBaseKeyValues;
 	}
 
@@ -616,8 +618,10 @@ eastl::string_view CKeyValuesParser::ReadToken( bool& bQuoted )
 	else
 	{
 		// Advance the end pointer until whitespaces or control tokens
-		while ( !IsEndOfBuffer( pEndToken ) && !IsControlSymbol( pEndToken ) && !S_IsSpace( *pEndToken ) )
+		bool bIsEscapeSymbol = false;
+		while ( !IsEndOfBuffer( pEndToken ) && ( bIsEscapeSymbol || !IsControlSymbol( pEndToken ) ) && !S_IsSpace( *pEndToken ) )
 		{
+			bIsEscapeSymbol = *pEndToken == '\\';
 			++pEndToken;
 		}
 	}

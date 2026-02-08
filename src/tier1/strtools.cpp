@@ -8,9 +8,9 @@ S_Vsprintf
 */
 eastl::string S_Vsprintf( const char* pFormat, va_list params )
 {
-	int32  bufferSize = 1024;
-	char* pBuffer	  = nullptr;
-	int	   result	  = -1;
+	int32 bufferSize = 1024;
+	char* pBuffer	 = nullptr;
+	int	  result	 = -1;
 
 	while ( result == -1 )
 	{
@@ -40,9 +40,9 @@ S_Vsprintf
 */
 eastl::wstring S_Vsprintf( const wchar_t* pFormat, va_list params )
 {
-	int32  bufferSize = 1024;
-	wchar_t* pBuffer	  = nullptr;
-	int	   result	  = -1;
+	int32	 bufferSize = 1024;
+	wchar_t* pBuffer	= nullptr;
+	int		 result		= -1;
 
 	while ( result == -1 )
 	{
@@ -145,4 +145,124 @@ wchar_t* S_Strncat( wchar_t* pDest, const wchar_t* pSrc, uint32 destBufferSize, 
 
 	// Copy pSrc to pDest
 	return wcsncat( pDest, pSrc, charsToCopy );
+}
+
+/*
+==================
+S_ConvertEscapeToUnescapeSymbols
+==================
+*/
+void S_ConvertEscapeToUnescapeSymbols( eastl::string& dest, const char* pSrc, uint32 srcLength )
+{
+	dest.reserve( srcLength );
+	for ( uint32 index = 0; index < srcLength; ++index )
+	{
+		const char& c = pSrc[index];
+		switch ( c )
+		{
+		case '\n': dest += "\\n"; break;
+		case '\r': dest += "\\r"; break;
+		case '\t': dest += "\\t"; break;
+		default: dest += c; break;
+		}
+	}
+}
+
+/*
+==================
+S_ConvertEscapeToUnescapeSymbols
+==================
+*/
+void S_ConvertEscapeToUnescapeSymbols( eastl::wstring& dest, const wchar_t* pSrc, uint32 srcLength )
+{
+	dest.reserve( srcLength );
+	for ( uint32 index = 0; index < srcLength; ++index )
+	{
+		const wchar_t& c = pSrc[index];
+		switch ( c )
+		{
+		case L'\n': dest += L"\\n"; break;
+		case L'\r': dest += L"\\r"; break;
+		case L'\t': dest += L"\\t"; break;
+		default: dest += c; break;
+		}
+	}
+}
+
+/*
+==================
+S_ConvertUnescapeToEscapeSymbols
+==================
+*/
+void S_ConvertUnescapeToEscapeSymbols( eastl::string& dest, const char* pSrc, uint32 srcLength )
+{
+	dest.reserve( srcLength );
+	const char* pSrcData = pSrc;
+	const char* pEndData = pSrcData + srcLength;
+	while ( pSrcData != pEndData )
+	{
+		// Convert unescaped symbols to escaped symbols (i.g: "\n" -> '\n')
+		if ( *pSrcData == '\\' )
+		{
+			++pSrcData;
+			if ( pSrcData == pEndData )
+			{
+				dest += '\\';
+				break;
+			}
+
+			switch ( *pSrcData )
+			{
+			case 'n': dest += '\n'; break;
+			case 'r': dest += '\r'; break;
+			case 't': dest += '\t'; break;
+			default: dest += *pSrcData; break;
+			}
+
+			++pSrcData;
+			continue;
+		}
+
+		// Regular symbol
+		dest += *pSrcData++;
+	}
+}
+
+/*
+==================
+S_ConvertUnescapeToEscapeSymbols
+==================
+*/
+void S_ConvertUnescapeToEscapeSymbols( eastl::wstring& dest, const wchar_t* pSrc, uint32 srcLength )
+{
+	dest.reserve( srcLength );
+	const wchar_t* pSrcData = pSrc;
+	const wchar_t* pEndData = pSrcData + srcLength;
+	while ( pSrcData != pEndData )
+	{
+		// Convert unescaped symbols to escaped symbols (i.g: "\n" -> '\n')
+		if ( *pSrcData == L'\\' )
+		{
+			++pSrcData;
+			if ( pSrcData == pEndData )
+			{
+				dest += L'\\';
+				break;
+			}
+
+			switch ( *pSrcData )
+			{
+			case L'n': dest += L'\n'; break;
+			case L'r': dest += L'\r'; break;
+			case L't': dest += L'\t'; break;
+			default: dest += *pSrcData; break;
+			}
+
+			++pSrcData;
+			continue;
+		}
+
+		// Regular symbol
+		dest += *pSrcData++;
+	}
 }

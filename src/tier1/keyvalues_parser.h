@@ -11,12 +11,12 @@ class CKeyValuesParser
 {
 public:
 	CKeyValuesParser();
-	void								Parse( const char* pFile, CKeyValues* pRootKeyValue, const char* pBuffer, uint64 size );
+	void								Parse( const char* pFile, CKeyValues* pKeyValues, const char* pBuffer, uint64 size );
 	bool								HasErrors() const;
 	const eastl::vector<eastl::string>& GetErrorMsgs() const;
 
 private:
-	bool			   ReadKeyValues( CKeyValues* pKeyValue );
+	bool			   ReadKeyValues( CKeyValues* pKeyValues );
 	bool			   ReadConditionalBlock( bool& bAccepted );
 	bool			   ReadIncludeKeys( eastl::vector<CKeyValues*>& includedKeys );
 	void			   SkipSpacesAndComments();

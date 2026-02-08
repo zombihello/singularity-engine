@@ -188,10 +188,10 @@ int32 S_MakeRelativePath( const char* pFullPath, const char* pDirPath, char* pRe
 
 	// Strip out common parts of the path
 	const char* pLastCommonPath = nullptr;
-	const char* pLastCommonDir	 = nullptr;
+	const char* pLastCommonDir	= nullptr;
 	{
 		const char* pCurPath = pFullPath;
-		const char* pCurDir  = pDirPath;
+		const char* pCurDir	 = pDirPath;
 		while ( *pCurPath && ( S_ToLower( *pCurPath ) == S_ToLower( *pCurDir ) || ( S_IsPathSeparator( *pCurPath ) && ( S_IsPathSeparator( *pCurDir ) || ( *pCurDir == 0 ) ) ) ) )
 		{
 			if ( S_IsPathSeparator( *pCurPath ) )
@@ -552,8 +552,8 @@ bool S_GetFilePath( const char* pSrcPath, char* pDestPath, uint32 maxLen )
 	}
 
 	// Get string length
-	uint32		 length = S_Strlen( pSrcPath );
-	const char* pSrc	= pSrcPath + ( length ? length - 1 : 0 );
+	uint32		length = S_Strlen( pSrcPath );
+	const char* pSrc   = pSrcPath + ( length ? length - 1 : 0 );
 
 	// Back up until a path separator or the start
 	while ( pSrc != pSrcPath && !S_IsPathSeparator( *( pSrc - 1 ) ) )
@@ -562,7 +562,7 @@ bool S_GetFilePath( const char* pSrcPath, char* pDestPath, uint32 maxLen )
 	}
 
 	// Calculate length of a new string
-	length = ( uint32 )( pSrc - pSrcPath );
+	length = (uint32)( pSrc - pSrcPath );
 
 	// If length of a new string too big do nothing
 	if ( length > maxLen )
@@ -611,9 +611,9 @@ S_RemoveDotPathSeparators
 void S_RemoveDotPathSeparators( char* pPath, bool bRemoveDoubleSeparators /*= true*/ )
 {
 	// Read and write position in the string
-	char* pRead	 = pPath;
-	char* pWrite	 = pPath;
-	bool   bBoundary = true;
+	char* pRead		= pPath;
+	char* pWrite	= pPath;
+	bool  bBoundary = true;
 
 	// Remove all dot path separators ("./", "../")
 	while ( *pRead )

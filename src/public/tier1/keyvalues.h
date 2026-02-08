@@ -29,7 +29,7 @@ public:
 	bool LoadFromFile( const char* pPath );
 	bool LoadFromBuffer( const char* pBuffer, uint64 size );
 	bool SaveToFile( const char* pPath ) const;
-	bool SaveToBuffer( eastl::string& buffer ) const;
+	void SaveToBuffer( eastl::string& buffer ) const;
 
 	void AddSubKey( CKeyValues* pKeyValue );
 	void RemoveSubKey( CKeyValues* pKeyValue, bool bDelete = true );
@@ -48,6 +48,7 @@ public:
 	void SetString( const char* pValue );
 	void SetString( const char* pValue, uint32 length );
 
+	bool							IsEmpty() const;
 	bool							HasData() const;
 	bool							HasSubKeys() const;
 	const char*						GetName() const;
@@ -91,7 +92,7 @@ private:
 class CKeyValuesSubKeysIterator
 {
 public:
-	CKeyValuesSubKeysIterator( CKeyValues* pKeyValues, bool bWithValues = true, bool bWithSubKeys = false );
+	CKeyValuesSubKeysIterator( CKeyValues* pKeyValues, bool bAllowValues = true, bool bAllowSubKeys = false, bool bAllowEmpty = false );
 
 	void		operator++();
 	void		operator+=( uint32 offset );
@@ -113,8 +114,8 @@ protected:
 class CKeyValuesSubKeysReverseIterator : public CKeyValuesSubKeysIterator
 {
 public:
-	CKeyValuesSubKeysReverseIterator( CKeyValues* pKeyValues, bool bWithValues = true, bool bWithSubKeys = false )
-		: CKeyValuesSubKeysIterator( pKeyValues, bWithValues, bWithSubKeys )
+	CKeyValuesSubKeysReverseIterator( CKeyValues* pKeyValues, bool bAllowValues = true, bool bAllowSubKeys = false, bool bAllowEmpty = false )
+		: CKeyValuesSubKeysIterator( pKeyValues, bAllowValues, bAllowSubKeys, bAllowEmpty )
 	{
 		eastl::reverse( eastl::begin( keyValues ), eastl::end( keyValues ) );
 	}

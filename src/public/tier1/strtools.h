@@ -77,6 +77,18 @@ uint32 S_Utf8_CharSize( byte b );
 uint32 S_Utf8_Strlen( const char* pString, uint32 size );
 
 //-----------------------------------------------------------------------------
+// Functions to convert escape <-> unescape symbols
+//-----------------------------------------------------------------------------
+void S_ConvertEscapeToUnescapeSymbols( eastl::string& dest, const char* pSrc, uint32 srcLength );
+void S_ConvertEscapeToUnescapeSymbols( eastl::string& dest, const char* pSrc );
+void S_ConvertEscapeToUnescapeSymbols( eastl::wstring& dest, const wchar_t* pSrc, uint32 srcLength );
+void S_ConvertEscapeToUnescapeSymbols( eastl::wstring& dest, const wchar_t* pSrc );
+void S_ConvertUnescapeToEscapeSymbols( eastl::string& dest, const char* pSrc, uint32 srcLength );
+void S_ConvertUnescapeToEscapeSymbols( eastl::string& dest, const char* pSrc );
+void S_ConvertUnescapeToEscapeSymbols( eastl::wstring& dest, const wchar_t* pSrc, uint32 srcLength );
+void S_ConvertUnescapeToEscapeSymbols( eastl::wstring& dest, const wchar_t* pSrc );
+
+//-----------------------------------------------------------------------------
 // Class that handles the ANSI to WCHAR conversion
 //-----------------------------------------------------------------------------
 class CANSIToWCHAR_Convert

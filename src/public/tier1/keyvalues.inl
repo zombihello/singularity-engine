@@ -226,6 +226,16 @@ FORCEINLINE void CKeyValues::SetString( const char* pValue, uint32 length )
 CKeyValues::HasData
 ==================
 */
+FORCEINLINE bool CKeyValues::IsEmpty() const
+{
+	return !HasData() && !HasSubKeys();
+}
+
+/*
+==================
+CKeyValues::HasData
+==================
+*/
 FORCEINLINE bool CKeyValues::HasData() const
 {
 	return dataType != KEYVALUES_DATA_TYPE_NONE;
