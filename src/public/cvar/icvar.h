@@ -40,7 +40,7 @@ public:
 class IConsoleDisplayFunc
 {
 public:
-	virtual void Print( const char* pMsg )						 = 0;
+	virtual void Print( const char* pMsg )						= 0;
 	virtual void Print( const char* pMsg, const CColor& color ) = 0;
 };
 
@@ -59,14 +59,17 @@ public:
 
 	virtual bool Exec( const char* pCommand ) = 0;
 
-	virtual IConCmdBase* FindCommandBase( const char* pName ) const = 0;
-	virtual IConCmd*	 FindCommand( const char* pName ) const	 = 0;
-	virtual IConVar*	 FindVar( const char* pName ) const		 = 0;
+	virtual IConCmdBase* FindCommandBase( const char* pName, uint32 length ) const = 0;
+	virtual IConCmdBase* FindCommandBase( const char* pName ) const				   = 0;
+	virtual IConCmd*	 FindCommand( const char* pName, uint32 length ) const	   = 0;
+	virtual IConCmd*	 FindCommand( const char* pName ) const					   = 0;
+	virtual IConVar*	 FindVar( const char* pName, uint32 length ) const		   = 0;
+	virtual IConVar*	 FindVar( const char* pName ) const						   = 0;
 
 	// Read and write a configuration file
 	virtual void						 ReadConfigFile( const char* pConfigDir, bool bWriteConfigIfNotExist = true ) = 0;
 	virtual void						 WriteConfigFile( const char* pConfigDir, bool bWriteDefaultConfig = false )  = 0;
-	virtual IOnWriteConCmdsToConfigFile* OnWriteConCmdsToConfigFile() const											   = 0;
+	virtual IOnWriteConCmdsToConfigFile* OnWriteConCmdsToConfigFile() const											  = 0;
 
 	// Override IConVars from a command line
 	virtual void OverrideConVarsFromCommandLine()																= 0;
@@ -82,7 +85,7 @@ public:
 	virtual void CallGlobalChangeCallback( IConVar* pConVar )						   = 0;
 
 	virtual void SetConsoleDisplayFunc( IConsoleDisplayFunc* pConsoleDisplayFunc ) = 0;
-	virtual void ConsolePrintf( const CColor& color, const char* pFormat, ... )   = 0;
+	virtual void ConsolePrintf( const CColor& color, const char* pFormat, ... )	   = 0;
 	virtual void ConsolePrintf( const char* pFormat, ... )						   = 0;
 
 	// Method allowing the engine ICvarQuery interface to take over

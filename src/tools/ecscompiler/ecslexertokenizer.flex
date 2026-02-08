@@ -6,6 +6,7 @@
 %option nodefault
 %option extra-type="ecsLexerStateInternal_t*"
 %option verbose
+%option prefix="ecs_"
 
 %option nounput
 %option noyyget_lineno  noyyset_lineno

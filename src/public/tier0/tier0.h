@@ -2,9 +2,6 @@
 #include "tier0/tier0_api.h"
 #include "tier0/types.h"
 #include "tier0/memory.h"
-#include "tier1/template.h"
-#include "tier1/strtools.h"
-#include "tier1/guid.h"
 
 //-----------------------------------------------------------------------------
 // Core functions
@@ -43,4 +40,3 @@ TIER0_INTERFACE const char* Sys_GetComputerName();
 TIER0_INTERFACE const char* Sys_GetUserName();
 TIER0_INTERFACE const char* Sys_GetExecutablePath();
 TIER0_INTERFACE double		Sys_Seconds();
-TIER0_INTERFACE void		Sys_InitGuid( CGuid& guid );

@@ -8,7 +8,7 @@ Sys_CreateProc
 */
 void* Sys_CreateProc( const char* pPathToProcess, const char* pParams, bool bLaunchDetached, bool bLaunchHidden, int32 priorityModifier, uint64* pProcessId /* = NULL */ )
 {
-	eastl::string			commandLine = S_Sprintf( "%s %s", pPathToProcess, pParams );
+	eastl::string		commandLine = S_Sprintf( "%s %s", pPathToProcess, pParams );
 	PROCESS_INFORMATION procInfo;
 	SECURITY_ATTRIBUTES attributes;
 	attributes.nLength				= sizeof( SECURITY_ATTRIBUTES );
@@ -255,15 +255,4 @@ double Sys_GetSecondsPerCycle()
 
 	Assert( bResult );
 	return 1.0 / frequency.QuadPart;
-}
-
-/*
-==================
-Sys_InitGuid
-==================
-*/
-void Sys_InitGuid( CGuid& guid )
-{
-	HRESULT result = CoCreateGuid( (GUID*)&guid );
-	Assert( result == S_OK );
 }

@@ -25,6 +25,4 @@ private:
 	mutable CThreadMutex																						 mutex;
 };
 
-TStringPool<uint16>& GetGlobalStringPool();
-
 #include "tier1/stringpool.inl"

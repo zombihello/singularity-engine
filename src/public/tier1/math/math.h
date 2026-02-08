@@ -90,9 +90,11 @@ constexpr TType S_MinValue();
 template<typename TType>
 constexpr TType S_MaxValue();
 template<typename TType>
-constexpr TType S_Digits10();
+constexpr int32 S_Digits10();
 template<typename TType>
-constexpr TType S_MaxDigits10();
+constexpr int32 S_MaxDigits10();
+template<typename TType>
+constexpr bool S_IsFinite( const TType& value );
 
 //-----------------------------------------------------------------------------
 // Vector functions

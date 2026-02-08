@@ -88,6 +88,18 @@ FORCEINLINE bool CGuid::operator<( const CGuid& other ) const
 
 /*
 ==================
+CGuid::Generate
+==================
+*/
+FORCEINLINE CGuid CGuid::Generate()
+{
+	CGuid guid;
+	Generate( guid );
+	return guid;
+}
+
+/*
+==================
 CGuid::Set
 ==================
 */

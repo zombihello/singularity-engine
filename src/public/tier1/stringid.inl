@@ -2,286 +2,260 @@
 
 /*
 ==================
-TStringId::keyFunc_t::operator()
+CStringID::keyFunc_t::operator()
 ==================
 */
-template<typename TIdType, TStringPool<TIdType>& ( *GetStringPool )()>
-FORCEINLINE size_t TStringId<TIdType, GetStringPool>::keyFunc_t::operator()( const TStringId& stringID ) const
+FORCEINLINE size_t CStringID::keyFunc_t::operator()( const CStringID& stringID ) const
 {
 	return stringID.GetHash();
 }
 
 /*
 ==================
-TStringId::keyFunc_t::operator()
+CStringID::keyFunc_t::operator()
 ==================
 */
-template<typename TIdType, TStringPool<TIdType>& ( *GetStringPool )()>
-FORCEINLINE bool TStringId<TIdType, GetStringPool>::keyFunc_t::operator()( const TStringId& a, const TStringId& b ) const
+FORCEINLINE bool CStringID::keyFunc_t::operator()( const CStringID& a, const CStringID& b ) const
 {
 	return a.id < b.id;
 }
 
 /*
 ==================
-TStringId::TStringId
+CStringID::CStringID
 ==================
 */
-template<typename TIdType, TStringPool<TIdType>& ( *GetStringPool )()>
-FORCEINLINE TStringId<TIdType, GetStringPool>::TStringId()
+FORCEINLINE CStringID::CStringID()
 	: id( INVALID_INDEX )
 {
 }
 
 /*
 ==================
-TStringId::TStringId
+CStringID::CStringID
 ==================
 */
-template<typename TIdType, TStringPool<TIdType>& ( *GetStringPool )()>
-FORCEINLINE TStringId<TIdType, GetStringPool>::TStringId( const char* pString )
+FORCEINLINE CStringID::CStringID( const char* pString )
 	: id( GetStringPool().FindOrAdd( pString, S_Strlen( pString ) ) )
 {
 }
 
 /*
 ==================
-TStringId::TStringId
+CStringID::CStringID
 ==================
 */
-template<typename TIdType, TStringPool<TIdType>& ( *GetStringPool )()>
-FORCEINLINE TStringId<TIdType, GetStringPool>::TStringId( const char* pString, uint64 length )
+FORCEINLINE CStringID::CStringID( const char* pString, uint64 length )
 	: id( GetStringPool().FindOrAdd( pString, length ) )
 {
 }
 
 /*
 ==================
-TStringId::TStringId
+CStringID::CStringID
 ==================
 */
-template<typename TIdType, TStringPool<TIdType>& ( *GetStringPool )()>
-FORCEINLINE TStringId<TIdType, GetStringPool>::TStringId( const eastl::string& string )
+FORCEINLINE CStringID::CStringID( const eastl::string& string )
 	: id( GetStringPool().FindOrAdd( string.c_str(), string.size() ) )
 {
 }
 
 /*
 ==================
-TStringId::TStringId
+CStringID::CStringID
 ==================
 */
-template<typename TIdType, TStringPool<TIdType>& ( *GetStringPool )()>
-FORCEINLINE TStringId<TIdType, GetStringPool>::TStringId( const eastl::string_view& string )
+FORCEINLINE CStringID::CStringID( const eastl::string_view& string )
 	: id( GetStringPool().FindOrAdd( string.data(), string.size() ) )
 {
 }
 
 /*
 ==================
-TStringId::TStringId
+CStringID::CStringID
 ==================
 */
-template<typename TIdType, TStringPool<TIdType>& ( *GetStringPool )()>
-FORCEINLINE TStringId<TIdType, GetStringPool>::TStringId( const TStringId& copy )
+FORCEINLINE CStringID::CStringID( const CStringID& copy )
 	: id( copy.id )
 {
 }
 
 /*
 ==================
-TStringId::Make
+CStringID::Make
 ==================
 */
-template<typename TIdType, TStringPool<TIdType>& ( *GetStringPool )()>
-FORCEINLINE TStringId<TIdType, GetStringPool> TStringId<TIdType, GetStringPool>::Make( const char* pString )
+FORCEINLINE CStringID CStringID::Make( const char* pString )
 {
-	return TStringId( pString );
+	return CStringID( pString );
 }
 
 /*
 ==================
-TStringId::Make
+CStringID::Make
 ==================
 */
-template<typename TIdType, TStringPool<TIdType>& ( *GetStringPool )()>
-FORCEINLINE TStringId<TIdType, GetStringPool> TStringId<TIdType, GetStringPool>::Make( const char* pString, uint64 length )
+FORCEINLINE CStringID CStringID::Make( const char* pString, uint64 length )
 {
-	return TStringId( pString, length );
+	return CStringID( pString, length );
 }
 
 /*
 ==================
-TStringId::Make
+CStringID::Make
 ==================
 */
-template<typename TIdType, TStringPool<TIdType>& ( *GetStringPool )()>
-FORCEINLINE TStringId<TIdType, GetStringPool> TStringId<TIdType, GetStringPool>::Make( const eastl::string& string )
+FORCEINLINE CStringID CStringID::Make( const eastl::string& string )
 {
-	return TStringId( string );
+	return CStringID( string );
 }
 
 /*
 ==================
-TStringId::Make
+CStringID::Make
 ==================
 */
-template<typename TIdType, TStringPool<TIdType>& ( *GetStringPool )()>
-FORCEINLINE TStringId<TIdType, GetStringPool> TStringId<TIdType, GetStringPool>::Make( const eastl::string_view& string )
+FORCEINLINE CStringID CStringID::Make( const eastl::string_view& string )
 {
-	return TStringId( string );
+	return CStringID( string );
 }
 
 /*
 ==================
-TStringId::Make
+CStringID::Make
 ==================
 */
-template<typename TIdType, TStringPool<TIdType>& ( *GetStringPool )()>
-FORCEINLINE TStringId<TIdType, GetStringPool> TStringId<TIdType, GetStringPool>::Make( const TStringId& stringId )
+FORCEINLINE CStringID CStringID::Make( const CStringID& stringId )
 {
-	return TStringId( stringId );
+	return CStringID( stringId );
 }
 
 /*
 ==================
-TStringId::Clear
+CStringID::Clear
 ==================
 */
-template<typename TIdType, TStringPool<TIdType>& ( *GetStringPool )()>
-FORCEINLINE void TStringId<TIdType, GetStringPool>::Clear()
+FORCEINLINE void CStringID::Clear()
 {
 	id = INVALID_INDEX;
 }
 
 /*
 ==================
-TStringId::ToString
+CStringID::ToString
 ==================
 */
-template<typename TIdType, TStringPool<TIdType>& ( *GetStringPool )()>
-FORCEINLINE const char* TStringId<TIdType, GetStringPool>::ToString() const
+FORCEINLINE const char* CStringID::ToString() const
 {
 	return !IsEmpty() ? GetStringPool().GetString( id ) : "";
 }
 
 /*
 ==================
-TStringId::IsEmpty
+CStringID::IsEmpty
 ==================
 */
-template<typename TIdType, TStringPool<TIdType>& ( *GetStringPool )()>
-FORCEINLINE bool TStringId<TIdType, GetStringPool>::IsEmpty() const
+FORCEINLINE bool CStringID::IsEmpty() const
 {
 	return id == INVALID_INDEX;
 }
 
 /*
 ==================
-TStringId::GetHash
+CStringID::GetHash
 ==================
 */
-template<typename TIdType, TStringPool<TIdType>& ( *GetStringPool )()>
-FORCEINLINE hash_t TStringId<TIdType, GetStringPool>::GetHash() const
+FORCEINLINE hash_t CStringID::GetHash() const
 {
 	return FastHash( *this );
 }
 
 /*
 ==================
-TStringId::operator==
+CStringID::operator==
 ==================
 */
-template<typename TIdType, TStringPool<TIdType>& ( *GetStringPool )()>
-FORCEINLINE bool TStringId<TIdType, GetStringPool>::operator==( const char* pString ) const
+FORCEINLINE bool CStringID::operator==( const char* pString ) const
 {
 	return GetStringPool().Find( pString, S_Strlen( pString ) ) == id;
 }
 
 /*
 ==================
-TStringId::operator==
+CStringID::operator==
 ==================
 */
-template<typename TIdType, TStringPool<TIdType>& ( *GetStringPool )()>
-FORCEINLINE bool TStringId<TIdType, GetStringPool>::operator==( const eastl::string& string ) const
+FORCEINLINE bool CStringID::operator==( const eastl::string& string ) const
 {
 	return operator==( string.c_str() );
 }
 
 /*
 ==================
-TStringId::operator==
+CStringID::operator==
 ==================
 */
-template<typename TIdType, TStringPool<TIdType>& ( *GetStringPool )()>
-FORCEINLINE bool TStringId<TIdType, GetStringPool>::operator==( const eastl::string_view& string ) const
+FORCEINLINE bool CStringID::operator==( const eastl::string_view& string ) const
 {
 	return GetStringPool().Find( string.data(), string.size() ) == id;
 }
 
 /*
 ==================
-TStringId::operator==
+CStringID::operator==
 ==================
 */
-template<typename TIdType, TStringPool<TIdType>& ( *GetStringPool )()>
-FORCEINLINE bool TStringId<TIdType, GetStringPool>::operator==( const TStringId& stringId ) const
+FORCEINLINE bool CStringID::operator==( const CStringID& stringId ) const
 {
-	id == stringId.id;
+	return id == stringId.id;
 }
 
 /*
 ==================
-TStringId::operator!=
+CStringID::operator!=
 ==================
 */
-template<typename TIdType, TStringPool<TIdType>& ( *GetStringPool )()>
-FORCEINLINE bool TStringId<TIdType, GetStringPool>::operator!=( const char* pString ) const
+FORCEINLINE bool CStringID::operator!=( const char* pString ) const
 {
 	return GetStringPool().Find( pString, S_Strlen( pString ) ) != id;
 }
 
 /*
 ==================
-TStringId::operator!=
+CStringID::operator!=
 ==================
 */
-template<typename TIdType, TStringPool<TIdType>& ( *GetStringPool )()>
-FORCEINLINE bool TStringId<TIdType, GetStringPool>::operator!=( const eastl::string& string ) const
+FORCEINLINE bool CStringID::operator!=( const eastl::string& string ) const
 {
 	return operator!=( string.c_str() );
 }
 
 /*
 ==================
-TStringId::operator!=
+CStringID::operator!=
 ==================
 */
-template<typename TIdType, TStringPool<TIdType>& ( *GetStringPool )()>
-FORCEINLINE bool TStringId<TIdType, GetStringPool>::operator!=( const eastl::string_view& string ) const
+FORCEINLINE bool CStringID::operator!=( const eastl::string_view& string ) const
 {
 	return GetStringPool().Find( string.data(), string.size() ) != id;
 }
 
 /*
 ==================
-TStringId::operator!=
+CStringID::operator!=
 ==================
 */
-template<typename TIdType, TStringPool<TIdType>& ( *GetStringPool )()>
-FORCEINLINE bool TStringId<TIdType, GetStringPool>::operator!=( const TStringId& stringId ) const
+FORCEINLINE bool CStringID::operator!=( const CStringID& stringId ) const
 {
-	id != stringId.id;
+	return id != stringId.id;
 }
 
 /*
 ==================
-TStringId::operator=
+CStringID::operator=
 ==================
 */
-template<typename TIdType, TStringPool<TIdType>& ( *GetStringPool )()>
-FORCEINLINE TStringId<TIdType, GetStringPool>& TStringId<TIdType, GetStringPool>::operator=( const char* pString )
+FORCEINLINE CStringID& CStringID::operator=( const char* pString )
 {
 	id = GetStringPool().FindOrAdd( pString, S_Strlen( pString ) );
 	return *this;
@@ -289,11 +263,10 @@ FORCEINLINE TStringId<TIdType, GetStringPool>& TStringId<TIdType, GetStringPool>
 
 /*
 ==================
-TStringId::operator=
+CStringID::operator=
 ==================
 */
-template<typename TIdType, TStringPool<TIdType>& ( *GetStringPool )()>
-FORCEINLINE TStringId<TIdType, GetStringPool>& TStringId<TIdType, GetStringPool>::operator=( const eastl::string& string )
+FORCEINLINE CStringID& CStringID::operator=( const eastl::string& string )
 {
 	id = GetStringPool().FindOrAdd( string.c_str(), string.size() );
 	return *this;
@@ -301,11 +274,10 @@ FORCEINLINE TStringId<TIdType, GetStringPool>& TStringId<TIdType, GetStringPool>
 
 /*
 ==================
-TStringId::operator=
+CStringID::operator=
 ==================
 */
-template<typename TIdType, TStringPool<TIdType>& ( *GetStringPool )()>
-FORCEINLINE TStringId<TIdType, GetStringPool>& TStringId<TIdType, GetStringPool>::operator=( const eastl::string_view& string )
+FORCEINLINE CStringID& CStringID::operator=( const eastl::string_view& string )
 {
 	id = GetStringPool().FindOrAdd( string.data(), string.size() );
 	return *this;
@@ -313,11 +285,10 @@ FORCEINLINE TStringId<TIdType, GetStringPool>& TStringId<TIdType, GetStringPool>
 
 /*
 ==================
-TStringId::operator=
+CStringID::operator=
 ==================
 */
-template<typename TIdType, TStringPool<TIdType>& ( *GetStringPool )()>
-FORCEINLINE TStringId<TIdType, GetStringPool>& TStringId<TIdType, GetStringPool>::operator=( const TStringId& stringId )
+FORCEINLINE CStringID& CStringID::operator=( const CStringID& stringId )
 {
 	id = stringId.id;
 	return *this;

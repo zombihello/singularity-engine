@@ -46,7 +46,7 @@ parserLexerState_t::UpdateContext
 FORCEINLINE void parserLexerState_t::UpdateContext( const char* pToken, uint32 tokenByteLength )
 {
 	currentContext.byteOffset += tokenByteLength;
-	currentContext.charOffset += Parserlib_GetNumChars( pToken, tokenByteLength );
+	currentContext.charOffset += S_Utf8_Strlen( pToken, tokenByteLength );
 }
 
 /*
