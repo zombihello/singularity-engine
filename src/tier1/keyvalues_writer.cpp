@@ -6,12 +6,14 @@
 CKeyValuesWriter::Write
 ==================
 */
-void CKeyValuesWriter::Write( CKeyValues* pKeyValues, eastl::string& buffer ) const
+void CKeyValuesWriter::Write( CKeyValues* pKeyValues, IStreamDataWriter* pStreamWriter ) const
 {
 	PROFILE_SCOPE();
 	Assert( pKeyValues );
+	Assert( pStreamWriter );
 
 	// If the key values has subkeys save only they
+	eastl::string buffer;
 	if ( pKeyValues->HasSubKeys() )
 	{
 		Assert( !pKeyValues->HasData() );
@@ -27,11 +29,15 @@ void CKeyValuesWriter::Write( CKeyValues* pKeyValues, eastl::string& buffer ) co
 			WriteKeyToBuffer( pSubKey, buffer, 0 );
 			pPrevSubKey = pSubKey;
 		}
-		return;
+	}
+	// Otherwise save ourselves into the buffer
+	else
+	{
+		WriteKeyToBuffer( pKeyValues, buffer, 0 );
 	}
 
-	// Otherwise save ourselves into the buffer
-	WriteKeyToBuffer( pKeyValues, buffer, 0 );
+	// Write to the stream
+	pStreamWriter->Write( (byte*)buffer.c_str(), buffer.size() * sizeof( char ) );
 }
 
 /*

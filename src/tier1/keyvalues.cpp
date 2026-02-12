@@ -4,6 +4,7 @@
 #include "filesystem/ifilesystem.h"
 #include "utils/interfaces/interfaces.h"
 #include "tier1/filetools.h"
+#include "tier1/streamdata_memory.h"
 #include "tier1/keyvalues_parser.h"
 #include "tier1/keyvalues_writer.h"
 #include "tier1/keyvalues.h"
@@ -217,16 +218,9 @@ bool CKeyValues::LoadFromFile( const char* pPath )
 		return false;
 	}
 
-	// Allocate memory for buffer
-	uint64 fileSize = pFile->GetSize();
-	byte*  pBuffer	= (byte*)Mem_MallocZero( fileSize );
-
-	// Serialize data to string buffer
-	pFile->Read( pBuffer, fileSize );
-
 	// Parse the key values
 	CKeyValuesParser keyValuesParser;
-	keyValuesParser.Parse( pPath, this, (char*)pBuffer, fileSize );
+	keyValuesParser.Parse( this, pFile );
 	if ( keyValuesParser.HasErrors() )
 	{
 		const eastl::vector<eastl::string>& errorMsgs = keyValuesParser.GetErrorMsgs();
@@ -237,8 +231,6 @@ bool CKeyValues::LoadFromFile( const char* pPath )
 		}
 	}
 
-	// Free allocated memory
-	Mem_Free( pBuffer );
 	return !keyValuesParser.HasErrors();
 }
 
@@ -249,8 +241,9 @@ CKeyValues::LoadFromBuffer
 */
 bool CKeyValues::LoadFromBuffer( const char* pBuffer, uint64 size )
 {
-	CKeyValuesParser keyValuesParser;
-	keyValuesParser.Parse( "<buffer>", this, pBuffer, size );
+	CKeyValuesParser		keyValuesParser;
+	CStreamDataMemoryReader streamReader( (byte*)pBuffer, size );
+	keyValuesParser.Parse( this, &streamReader );
 	if ( keyValuesParser.HasErrors() )
 	{
 		const eastl::vector<eastl::string>& errorMsgs = keyValuesParser.GetErrorMsgs();
@@ -276,11 +269,7 @@ bool CKeyValues::SaveToFile( const char* pPath ) const
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 	Assert( g_pFileSystem );
 
-	// Save data to buffer
-	eastl::string buffer;
-	SaveToBuffer( buffer );
-
-	// Try open file for save
+	// Try to open a file
 	TRefPtr<IStreamDataWriter> pFile = g_pFileSystem->CreateFileWriter( pPath );
 	if ( !pFile )
 	{
@@ -288,8 +277,9 @@ bool CKeyValues::SaveToFile( const char* pPath ) const
 		return false;
 	}
 
-	// Serialize buffer to the file
-	pFile->Write( buffer.data(), buffer.size() * sizeof( char ) );
+	// Serialize the key values to the file
+	CKeyValuesWriter keyValuesWriter;
+	keyValuesWriter.Write( (CKeyValues*)this, pFile );
 	return true;
 }
 
@@ -298,11 +288,12 @@ bool CKeyValues::SaveToFile( const char* pPath ) const
 CKeyValues::SaveToBuffer
 ==================
 */
-void CKeyValues::SaveToBuffer( eastl::string& buffer ) const
+void CKeyValues::SaveToBuffer( eastl::vector<byte>& buffer ) const
 {
 	PROFILE_SCOPE();
-	CKeyValuesWriter keyValuesWriter;
-	keyValuesWriter.Write( (CKeyValues*)this, buffer );
+	CKeyValuesWriter		keyValuesWriter;
+	CStreamDataMemoryWriter streamWriter( buffer );
+	keyValuesWriter.Write( (CKeyValues*)this, &streamWriter );
 }
 
 /*

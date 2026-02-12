@@ -6,10 +6,7 @@ CKeyValuesParser::CKeyValuesParser
 ==================
 */
 FORCEINLINE CKeyValuesParser::CKeyValuesParser()
-	: pCurFile( nullptr )
-	, pCurPtr( nullptr )
-	, pEndPtr( nullptr )
-	, scopeLevel( 0 )
+	: scopeLevel( 0 )
 {
 }
 
@@ -35,18 +32,30 @@ FORCEINLINE const eastl::vector<eastl::string>& CKeyValuesParser::GetErrorMsgs()
 
 /*
 ==================
+CKeyValuesParser::ReadToken
+==================
+*/
+FORCEINLINE CKeyValuesParser::token_t CKeyValuesParser::ReadToken()
+{
+	token_t token;
+	ReadToken( token );
+	return token;
+}
+
+/*
+==================
 CKeyValuesParser::EmitError
 ==================
 */
-FORCEINLINE void CKeyValuesParser::EmitError( const char* pToken, const char* pFormat, ... )
+FORCEINLINE void CKeyValuesParser::EmitError( uint64 streamOffset, const char* pFormat, ... )
 {
 	va_list params;
 	uint64	line   = 0;
 	uint64	column = 0;
 
 	va_start( params, pFormat );
-	GetTokenPostion( pToken, line, column );
-	errorMsgs.emplace_back( S_Sprintf( "%s[%i:%i]: %s", pCurFile ? pCurFile : "<NO_FILE>", line, column, S_Vsprintf( pFormat, params ).c_str() ) );
+	GetPostionInCode( streamOffset, line, column );
+	errorMsgs.emplace_back( S_Sprintf( "%s[%i:%i]: %s", buffer.GetStream()->GetPath(), line, column, S_Vsprintf( pFormat, params ).c_str() ) );
 	va_end( params );
 }
 
@@ -67,27 +76,42 @@ FORCEINLINE void CKeyValuesParser::AppendIncludedKeys( CKeyValues* pKeyValues, C
 
 /*
 ==================
-CKeyValuesParser::IsBeginComment
+CKeyValuesParser::IsBeginLineComment
 ==================
 */
-FORCEINLINE bool CKeyValuesParser::IsBeginComment( const char* pPtr ) const
+FORCEINLINE bool CKeyValuesParser::IsBeginLineComment( uint32 offset /* = 0 */ ) const
 {
-	return GetBufferSize( pPtr ) >= 2 && pPtr[0] == '/' && ( pPtr[1] == '/' || pPtr[1] == '*' );
+	return buffer.Peek( offset ) == '/' && buffer.Peek( offset + 1 ) == '/';
 }
 
 /*
 ==================
-CKeyValuesParser::IsEndComment
+CKeyValuesParser::IsBeginMultilineComment
 ==================
 */
-FORCEINLINE bool CKeyValuesParser::IsEndComment( const char* pPtr, bool bMultiLine /* = false */ ) const
+FORCEINLINE bool CKeyValuesParser::IsBeginMultilineComment( uint32 offset /* = 0 */ ) const
 {
-	uint64 bufferSize = GetBufferSize( pPtr );
-	if ( !bMultiLine )
-	{
-		return bufferSize > 0 && *pPtr == '\n';
-	}
-	return bufferSize >= 2 && pPtr[0] == '*' && pPtr[1] == '/';
+	return buffer.Peek( offset ) == '/' && buffer.Peek( offset + 1 ) == '*';
+}
+
+/*
+==================
+CKeyValuesParser::IsBeginMultilineComment
+==================
+*/
+FORCEINLINE bool CKeyValuesParser::IsEndLineComment( uint32 offset /* = 0 */ ) const
+{
+	return buffer.Peek( offset ) == '\n';
+}
+
+/*
+==================
+CKeyValuesParser::IsEndMultilineComment
+==================
+*/
+FORCEINLINE bool CKeyValuesParser::IsEndMultilineComment( uint32 offset /* = 0 */ ) const
+{
+	return buffer.Peek( offset ) == '*' && buffer.Peek( offset + 1 ) == '/';
 }
 
 /*
@@ -95,19 +119,16 @@ FORCEINLINE bool CKeyValuesParser::IsEndComment( const char* pPtr, bool bMultiLi
 CKeyValuesParser::IsControlSymbol
 ==================
 */
-FORCEINLINE bool CKeyValuesParser::IsControlSymbol( const char* pPtr ) const
+FORCEINLINE bool CKeyValuesParser::IsControlSymbol( uint32 offset /* = 0 */ ) const
 {
-	return !IsEndOfBuffer( pPtr ) && ( IsBeginComment( pPtr ) || IsEndComment( pPtr, true ) || *pPtr == '{' || *pPtr == '}' || *pPtr == '[' || *pPtr == ']' || *pPtr == '"' || *pPtr == '|' );
-}
-
-/*
-==================
-CKeyValuesParser::IsEndOfBuffer
-==================
-*/
-FORCEINLINE bool CKeyValuesParser::IsEndOfBuffer( const char* pPtr ) const
-{
-	return pPtr >= pEndPtr;
+	const char c = buffer.Peek( offset );
+	return IsBeginLineComment( offset )
+		   || IsBeginMultilineComment( offset )
+		   || IsEndLineComment( offset )
+		   || IsEndMultilineComment( offset )
+		   || c == '{' || c == '}'
+		   || c == '[' || c == ']'
+		   || c == '"' || c == '|';
 }
 
 /*
@@ -115,21 +136,145 @@ FORCEINLINE bool CKeyValuesParser::IsEndOfBuffer( const char* pPtr ) const
 CKeyValuesParser::GetControlSymbolSize
 ==================
 */
-FORCEINLINE uint32 CKeyValuesParser::GetControlSymbolSize( const char* pPtr ) const
+FORCEINLINE uint32 CKeyValuesParser::GetControlSymbolSize( uint32 offset /* = 0 */ ) const
 {
-	if ( IsControlSymbol( pPtr ) )
+	if ( IsControlSymbol( offset ) )
 	{
-		return ( IsBeginComment( pPtr ) || IsEndComment( pPtr, true ) ) ? 2 : 1;
+		return ( IsBeginLineComment( offset ) || IsBeginMultilineComment( offset ) || IsEndLineComment( offset ) || IsEndMultilineComment( offset ) ) ? 2 : 1;
 	}
 	return 0;
 }
 
 /*
 ==================
-CKeyValuesParser::GetBufferSize
+CKeyValuesParser::CBuffer::CBuffer
 ==================
 */
-FORCEINLINE uint64 CKeyValuesParser::GetBufferSize( const char* pPtr ) const
+FORCEINLINE CKeyValuesParser::CBuffer::CBuffer()
+	: precachedSize( 0 )
+	, bufferOffset( 0 )
+	, streamOffset( 0 )
+	, pBuffer( (char*)Mem_MallocZero( BUFFER_SIZE ) )
 {
-	return (uint64)( pEndPtr - pPtr );
+}
+
+/*
+==================
+CKeyValuesParser::CBuffer::~CBuffer
+==================
+*/
+FORCEINLINE CKeyValuesParser::CBuffer::~CBuffer()
+{
+	Mem_Free( pBuffer );
+}
+
+/*
+==================
+CKeyValuesParser::CBuffer::SetStream
+==================
+*/
+FORCEINLINE void CKeyValuesParser::CBuffer::SetStream( IStreamDataReader* pStreamReader )
+{
+	CBuffer::pStreamReader = pStreamReader;
+	ResetPrecacheState();
+	if ( pStreamReader )
+	{
+		if ( !pStreamReader->IsEndOfStream() )
+		{
+			Precache( BUFFER_SIZE );
+		}
+		else
+		{
+			streamOffset = pStreamReader->Tell();
+		}
+	}
+}
+
+/*
+==================
+CKeyValuesParser::CBuffer::Peek
+==================
+*/
+FORCEINLINE char CKeyValuesParser::CBuffer::Peek( uint32 offset /* = 0 */ )
+{
+	Precache( offset + 1 );
+	if ( bufferOffset + offset >= precachedSize )
+	{
+		return '\0';
+	}
+	return pBuffer[bufferOffset + offset];
+}
+
+/*
+==================
+CKeyValuesParser::CBuffer::Seek
+==================
+*/
+FORCEINLINE void CKeyValuesParser::CBuffer::Seek( uint64 position )
+{
+	if ( position < pStreamReader->GetSize() )
+	{
+		pStreamReader->Seek( position );
+		ResetPrecacheState();
+		Precache( BUFFER_SIZE );
+	}
+}
+
+/*
+==================
+CKeyValuesParser::CBuffer::Advance
+==================
+*/
+FORCEINLINE void CKeyValuesParser::CBuffer::Advance( uint32 offset )
+{
+	if ( !IsEndOfBuffer() )
+	{
+		bufferOffset += offset;
+		if ( bufferOffset >= precachedSize )
+		{
+			Seek( Tell() );
+		}
+	}
+}
+
+/*
+==================
+CKeyValuesParser::CBuffer::ResetPrecacheState
+==================
+*/
+FORCEINLINE void CKeyValuesParser::CBuffer::ResetPrecacheState()
+{
+	bufferOffset  = 0;
+	precachedSize = 0;
+	streamOffset  = 0;
+}
+
+/*
+==================
+CKeyValuesParser::CBuffer::IsEndOfBuffer
+==================
+*/
+FORCEINLINE bool CKeyValuesParser::CBuffer::IsEndOfBuffer() const
+{
+	return pStreamReader->IsEndOfStream() && bufferOffset >= precachedSize;
+}
+
+/*
+==================
+CKeyValuesParser::CBuffer::Tell
+==================
+*/
+FORCEINLINE uint64 CKeyValuesParser::CBuffer::Tell() const
+{
+	return streamOffset + bufferOffset;
+}
+
+/*
+==================
+CKeyValuesParser::CBuffer::GetStream
+==================
+*/
+FORCEINLINE IStreamDataReader* CKeyValuesParser::CBuffer::GetStream() const
+{
+	return pStreamReader;
 }

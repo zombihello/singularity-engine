@@ -29,7 +29,7 @@ public:
 	bool LoadFromFile( const char* pPath );
 	bool LoadFromBuffer( const char* pBuffer, uint64 size );
 	bool SaveToFile( const char* pPath ) const;
-	void SaveToBuffer( eastl::string& buffer ) const;
+	void SaveToBuffer( eastl::vector<byte>& buffer ) const;
 
 	void AddSubKey( CKeyValues* pKeyValue );
 	void RemoveSubKey( CKeyValues* pKeyValue, bool bDelete = true );

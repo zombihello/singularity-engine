@@ -15,6 +15,16 @@ void CStreamDataMemoryReader::Read( void* pBuffer, uint64 size )
 
 /*
 ==================
+CStreamDataMemoryReader::IsEndOfStream
+==================
+*/
+bool CStreamDataMemoryReader::IsEndOfStream() const
+{
+	return Tell() == GetSize();
+}
+
+/*
+==================
 CStreamDataMemoryReader::IsReader
 ==================
 */
@@ -47,6 +57,16 @@ void CStreamDataMemoryWriter::Write( void* pBuffer, uint64 size )
 
 	Mem_Memcpy( data.data() + offset, pBuffer, size );
 	offset += size;
+}
+
+/*
+==================
+CStreamDataMemoryWriter::IsEndOfStream
+==================
+*/
+bool CStreamDataMemoryWriter::IsEndOfStream() const
+{
+	return false;
 }
 
 /*

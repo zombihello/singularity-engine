@@ -83,7 +83,7 @@ CStreamDataStdFileReader::IsEndOfStream
 */
 bool CStreamDataStdFileReader::IsEndOfStream() const
 {
-	return feof( pFile ) != 0;
+	return feof( pFile ) != 0 || Tell() == GetSize();
 }
 
 /*
@@ -175,5 +175,5 @@ CStreamDataStdFileWriter::IsEndOfStream
 */
 bool CStreamDataStdFileWriter::IsEndOfStream() const
 {
-	return feof( pFile ) != 0;
+	return false;
 }

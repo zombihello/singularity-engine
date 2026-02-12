@@ -34,18 +34,6 @@ void CBaseStreamDataMemory<TBaseClass>::Flush()
 
 /*
 ==================
-CBaseStreamDataMemory::IsEndOfStream
-==================
-*/
-template<class TBaseClass>
-bool CBaseStreamDataMemory<TBaseClass>::IsEndOfStream() const
-{
-	uint64 size = GetSize();
-	return Tell() == size;
-}
-
-/*
-==================
 CBaseStreamDataMemory::IsReader
 ==================
 */
