@@ -123,6 +123,75 @@ FORCEINLINE void CKeyValues::DetachFromParent()
 
 /*
 ==================
+CKeyValues::LoadFromFile
+==================
+*/
+FORCEINLINE bool CKeyValues::LoadFromFile( const char* pPath )
+{
+	// Do nothing if file system isn't valid
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	Assert( g_pFileSystem );
+
+	// Try open file
+	TRefPtr<IStreamDataReader> pFile = g_pFileSystem->CreateFileReader( pPath );
+	if ( !pFile )
+	{
+		return false;
+	}
+
+	// Parse the key values
+	return LoadFromStream( pFile );
+}
+
+/*
+==================
+CKeyValues::LoadFromBuffer
+==================
+*/
+FORCEINLINE bool CKeyValues::LoadFromBuffer( const char* pBuffer, uint64 size )
+{
+	CStreamDataMemoryReader streamReader( (byte*)pBuffer, size );
+	return LoadFromStream( &streamReader );
+}
+
+/*
+==================
+CKeyValues::SaveToFile
+==================
+*/
+FORCEINLINE bool CKeyValues::SaveToFile( const char* pPath ) const
+{
+	// Do nothing if file system isn't valid
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	Assert( g_pFileSystem );
+
+	// Try to open a file
+	TRefPtr<IStreamDataWriter> pFile = g_pFileSystem->CreateFileWriter( pPath );
+	if ( !pFile )
+	{
+		Warning( "KeyValues: Failed to create file '%s'", pPath );
+		return false;
+	}
+
+	// Serialize key values to the file
+	SaveToStream( pFile );
+	return true;
+}
+
+/*
+==================
+CKeyValues::SaveToBuffer
+==================
+*/
+FORCEINLINE void CKeyValues::SaveToBuffer( eastl::vector<byte>& buffer ) const
+{
+	PROFILE_SCOPE();
+	CStreamDataMemoryWriter streamWriter( buffer );
+	return SaveToStream( &streamWriter );
+}
+
+/*
+==================
 CKeyValues::SetName
 ==================
 */

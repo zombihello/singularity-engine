@@ -1,10 +1,7 @@
 #include "pch_tier1.h"
 #include <EASTL/stack.h>
 
-#include "filesystem/ifilesystem.h"
-#include "utils/interfaces/interfaces.h"
 #include "tier1/filetools.h"
-#include "tier1/streamdata_memory.h"
 #include "tier1/keyvalues_parser.h"
 #include "tier1/keyvalues_writer.h"
 #include "tier1/keyvalues.h"
@@ -202,29 +199,23 @@ void CKeyValues::MigrateNamePool( namePool_t* pNamePool )
 
 /*
 ==================
-CKeyValues::LoadFromFile
+CKeyValues::LoadFromStream
 ==================
 */
-bool CKeyValues::LoadFromFile( const char* pPath )
+bool CKeyValues::LoadFromStream( IStreamDataReader* pStreamReader )
 {
-	// Do nothing if file system isn't valid
+	// Do nothing if the stream isn't valid
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-	Assert( g_pFileSystem );
+	Assert( pStreamReader );
 
-	// Try open file
-	TRefPtr<IStreamDataReader> pFile = g_pFileSystem->CreateFileReader( pPath );
-	if ( !pFile )
-	{
-		return false;
-	}
-
-	// Parse the key values
+	// Parse key values from the stream
 	CKeyValuesParser keyValuesParser;
-	keyValuesParser.Parse( this, pFile );
+	keyValuesParser.Parse( this, pStreamReader );
 	if ( keyValuesParser.HasErrors() )
 	{
 		const eastl::vector<eastl::string>& errorMsgs = keyValuesParser.GetErrorMsgs();
-		Error( "KeyValues: Failed to load '%s', %i error(s)", pPath, errorMsgs.size() );
+		const char*							pPath	  = pStreamReader->GetPath();
+		Error( "KeyValues: Failed to load '%s', %i error(s)", pPath ? pPath : "<NO_PATH>", errorMsgs.size() );
 		for ( uint32 index = 0, count = (uint32)errorMsgs.size(); index < count; ++index )
 		{
 			Error( "KeyValues: %s", errorMsgs[index].c_str() );
@@ -236,64 +227,18 @@ bool CKeyValues::LoadFromFile( const char* pPath )
 
 /*
 ==================
-CKeyValues::LoadFromBuffer
+CKeyValues::SaveToStream
 ==================
 */
-bool CKeyValues::LoadFromBuffer( const char* pBuffer, uint64 size )
+void CKeyValues::SaveToStream( IStreamDataWriter* pStreamWriter ) const
 {
-	CKeyValuesParser		keyValuesParser;
-	CStreamDataMemoryReader streamReader( (byte*)pBuffer, size );
-	keyValuesParser.Parse( this, &streamReader );
-	if ( keyValuesParser.HasErrors() )
-	{
-		const eastl::vector<eastl::string>& errorMsgs = keyValuesParser.GetErrorMsgs();
-		Error( "KeyValues: Failed to load from buffer, %i error(s)", errorMsgs.size() );
-		Error( "KeyValues:\n%.*s", size, pBuffer );
-		Error( "KeyValues:" );
-		for ( uint32 index = 0, count = (uint32)errorMsgs.size(); index < count; ++index )
-		{
-			Error( "KeyValues: %s", errorMsgs[index].c_str() );
-		}
-	}
-	return !keyValuesParser.HasErrors();
-}
-
-/*
-==================
-CKeyValues::SaveToFile
-==================
-*/
-bool CKeyValues::SaveToFile( const char* pPath ) const
-{
-	// Do nothing if file system isn't valid
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-	Assert( g_pFileSystem );
-
-	// Try to open a file
-	TRefPtr<IStreamDataWriter> pFile = g_pFileSystem->CreateFileWriter( pPath );
-	if ( !pFile )
-	{
-		Warning( "KeyValues: Failed to create file '%s'", pPath );
-		return false;
-	}
-
-	// Serialize the key values to the file
-	CKeyValuesWriter keyValuesWriter;
-	keyValuesWriter.Write( (CKeyValues*)this, pFile );
-	return true;
-}
-
-/*
-==================
-CKeyValues::SaveToBuffer
-==================
-*/
-void CKeyValues::SaveToBuffer( eastl::vector<byte>& buffer ) const
-{
+	// Do nothing if the stream isn't valid
 	PROFILE_SCOPE();
-	CKeyValuesWriter		keyValuesWriter;
-	CStreamDataMemoryWriter streamWriter( buffer );
-	keyValuesWriter.Write( (CKeyValues*)this, &streamWriter );
+	Assert( pStreamWriter );
+
+	// Write key values into the stream
+	CKeyValuesWriter keyValuesWriter;
+	keyValuesWriter.Write( (CKeyValues*)this, pStreamWriter );
 }
 
 /*

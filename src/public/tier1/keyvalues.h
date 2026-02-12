@@ -4,6 +4,9 @@
 #include "tier0/defines.h"
 #include "tier0/types.h"
 #include "tier1/stringpool.h"
+#include "tier1/streamdata_memory.h"
+#include "filesystem/ifilesystem.h"
+#include "utils/interfaces/interfaces.h"
 
 //-----------------------------------------------------------------------------
 // Key values
@@ -28,8 +31,10 @@ public:
 	// NOTE: For use Tier1 must be connected by ConnectTier1 (except LoadFromBuffer and SaveToBuffer)
 	bool LoadFromFile( const char* pPath );
 	bool LoadFromBuffer( const char* pBuffer, uint64 size );
+	bool LoadFromStream( IStreamDataReader* pStreamReader );
 	bool SaveToFile( const char* pPath ) const;
 	void SaveToBuffer( eastl::vector<byte>& buffer ) const;
+	void SaveToStream( IStreamDataWriter* pStreamWriter ) const;
 
 	void AddSubKey( CKeyValues* pKeyValue );
 	void RemoveSubKey( CKeyValues* pKeyValue, bool bDelete = true );
