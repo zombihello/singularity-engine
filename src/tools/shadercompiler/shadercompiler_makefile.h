@@ -1,5 +1,4 @@
 #pragma once
-#include "tier1/jsondoc.h"
 #include "tools/shadercompiler/shadercompiler.h"
 
 //-----------------------------------------------------------------------------
@@ -33,5 +32,5 @@ public:
 
 private:
 	eastl::vector<eastl::string> includeDirs;
-	eastl::vector<shader_t>	 shaders;
+	eastl::vector<shader_t>		 shaders;
 };

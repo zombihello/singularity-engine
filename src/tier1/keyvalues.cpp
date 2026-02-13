@@ -243,27 +243,41 @@ void CKeyValues::SaveToStream( IStreamDataWriter* pStreamWriter ) const
 
 /*
 ==================
-CKeyValuesSubKeysIterator::CKeyValuesSubKeysIterator
+CKeyValuesSubKeysIterator::Init
 ==================
 */
-CKeyValuesSubKeysIterator::CKeyValuesSubKeysIterator( CKeyValues* pKeyValues, bool bAllowValues /* = true */, bool bAllowSubKeys /* = false */, bool bAllowEmpty /* = false */ )
-	: currentIndex( INVALID_INDEX )
+void CKeyValuesSubKeysIterator::Init( CKeyValues* pKeyValues, const char* pKeyName, bool bAllowValues, bool bAllowSubKeys, bool bAllowEmpty )
 {
 	// We iterate over all subkeys and filter out only the required ones
 	PROFILE_SCOPE();
 	Assert( pKeyValues );
-	const eastl::list<CKeyValues*>& subKeys = pKeyValues->GetSubKeys();
-	for ( auto it = subKeys.begin(), itEnd = subKeys.end(); it != itEnd; ++it )
+
+	// Reset key values in the iterator
+	currentIndex = INVALID_INDEX;
+	keyValues.clear();
+
+	bool							bSetKeyName = pKeyName && pKeyName[0];
+	CKeyValues::nameID_t			nameID		= bSetKeyName ? pKeyValues->pNamePool->Find( pKeyName, S_Strlen( pKeyName ) ) : INVALID_INDEX;
+	const eastl::list<CKeyValues*>& subKeys		= pKeyValues->GetSubKeys();
+	if ( !bSetKeyName || nameID != INVALID_INDEX )
 	{
-		CKeyValues* pSubKey = *it;
-		if ( ( bAllowValues && pSubKey->HasData() ) || ( bAllowSubKeys && pSubKey->HasSubKeys() ) || ( bAllowEmpty && pSubKey->IsEmpty() ) )
+		for ( auto it = subKeys.begin(), itEnd = subKeys.end(); it != itEnd; ++it )
 		{
-			keyValues.emplace_back( pSubKey );
+			CKeyValues* pSubKey = *it;
+			if ( bSetKeyName && pSubKey->nameID != nameID )
+			{
+				continue;
+			}
+
+			if ( ( bAllowValues && pSubKey->HasData() ) || ( bAllowSubKeys && pSubKey->HasSubKeys() ) || ( bAllowEmpty && pSubKey->IsEmpty() ) )
+			{
+				keyValues.emplace_back( pSubKey );
+			}
 		}
 	}
 
 	// Initialize the current index if key values aren't empty
-	if ( !subKeys.empty() )
+	if ( !keyValues.empty() )
 	{
 		currentIndex = 0;
 	}

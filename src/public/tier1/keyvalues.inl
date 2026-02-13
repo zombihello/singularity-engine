@@ -342,11 +342,16 @@ FORCEINLINE const char* CKeyValues::GetName() const
 CKeyValues::GetBool
 ==================
 */
-FORCEINLINE bool CKeyValues::GetBool( const char* pKeyName, bool defaultValue /* = false */ ) const
+FORCEINLINE bool CKeyValues::GetBool( const char* pKeyName, bool defaultValue /* = false */, bool* pbGotDefaultValue /* = NULL */ ) const
 {
 	CKeyValues* pKeyValues = const_cast<CKeyValues*>( this )->FindKey( pKeyName );
 	if ( pKeyValues )
 	{
+		if ( pbGotDefaultValue )
+		{
+			*pbGotDefaultValue = false;
+		}
+
 		switch ( pKeyValues->dataType )
 		{
 		case KEYVALUES_DATA_TYPE_INT: return pKeyValues->valueInt32 != 0;
@@ -356,6 +361,11 @@ FORCEINLINE bool CKeyValues::GetBool( const char* pKeyName, bool defaultValue /*
 		case KEYVALUES_DATA_TYPE_STRING: return CStringToBool::Convert( pKeyValues->valueString.c_str() );
 		}
 	}
+
+	if ( pbGotDefaultValue )
+	{
+		*pbGotDefaultValue = true;
+	}
 	return defaultValue;
 }
 
@@ -364,11 +374,16 @@ FORCEINLINE bool CKeyValues::GetBool( const char* pKeyName, bool defaultValue /*
 CKeyValues::GetInt
 ==================
 */
-FORCEINLINE int32 CKeyValues::GetInt( const char* pKeyName, int32 defaultValue /* = 0 */ ) const
+FORCEINLINE int32 CKeyValues::GetInt( const char* pKeyName, int32 defaultValue /* = 0 */, bool* pbGotDefaultValue /* = NULL */ ) const
 {
 	CKeyValues* pKeyValues = const_cast<CKeyValues*>( this )->FindKey( pKeyName );
 	if ( pKeyValues )
 	{
+		if ( pbGotDefaultValue )
+		{
+			*pbGotDefaultValue = false;
+		}
+
 		switch ( pKeyValues->dataType )
 		{
 		case KEYVALUES_DATA_TYPE_INT: return pKeyValues->valueInt32;
@@ -378,6 +393,11 @@ FORCEINLINE int32 CKeyValues::GetInt( const char* pKeyName, int32 defaultValue /
 		case KEYVALUES_DATA_TYPE_STRING: return S_Atoi( pKeyValues->valueString.c_str() );
 		}
 	}
+
+	if ( pbGotDefaultValue )
+	{
+		*pbGotDefaultValue = true;
+	}
 	return defaultValue;
 }
 
@@ -386,11 +406,16 @@ FORCEINLINE int32 CKeyValues::GetInt( const char* pKeyName, int32 defaultValue /
 CKeyValues::GetInt64
 ==================
 */
-FORCEINLINE int64 CKeyValues::GetInt64( const char* pKeyName, int64 defaultValue /* = 0 */ ) const
+FORCEINLINE int64 CKeyValues::GetInt64( const char* pKeyName, int64 defaultValue /* = 0 */, bool* pbGotDefaultValue /* = NULL */ ) const
 {
 	CKeyValues* pKeyValues = const_cast<CKeyValues*>( this )->FindKey( pKeyName );
 	if ( pKeyValues )
 	{
+		if ( pbGotDefaultValue )
+		{
+			*pbGotDefaultValue = false;
+		}
+
 		switch ( pKeyValues->dataType )
 		{
 		case KEYVALUES_DATA_TYPE_INT: return (int64)pKeyValues->valueInt32;
@@ -400,6 +425,11 @@ FORCEINLINE int64 CKeyValues::GetInt64( const char* pKeyName, int64 defaultValue
 		case KEYVALUES_DATA_TYPE_STRING: return S_Atoi64( pKeyValues->valueString.c_str() );
 		}
 	}
+
+	if ( pbGotDefaultValue )
+	{
+		*pbGotDefaultValue = true;
+	}
 	return defaultValue;
 }
 
@@ -408,11 +438,16 @@ FORCEINLINE int64 CKeyValues::GetInt64( const char* pKeyName, int64 defaultValue
 CKeyValues::GetFloat
 ==================
 */
-FORCEINLINE float CKeyValues::GetFloat( const char* pKeyName, float defaultValue /* = 0.f */ ) const
+FORCEINLINE float CKeyValues::GetFloat( const char* pKeyName, float defaultValue /* = 0.f */, bool* pbGotDefaultValue /* = NULL */ ) const
 {
 	CKeyValues* pKeyValues = const_cast<CKeyValues*>( this )->FindKey( pKeyName );
 	if ( pKeyValues )
 	{
+		if ( pbGotDefaultValue )
+		{
+			*pbGotDefaultValue = false;
+		}
+
 		switch ( pKeyValues->dataType )
 		{
 		case KEYVALUES_DATA_TYPE_INT: return (float)pKeyValues->valueInt32;
@@ -422,6 +457,11 @@ FORCEINLINE float CKeyValues::GetFloat( const char* pKeyName, float defaultValue
 		case KEYVALUES_DATA_TYPE_STRING: return S_Atof( pKeyValues->valueString.c_str() );
 		}
 	}
+
+	if ( pbGotDefaultValue )
+	{
+		*pbGotDefaultValue = true;
+	}
 	return defaultValue;
 }
 
@@ -430,11 +470,16 @@ FORCEINLINE float CKeyValues::GetFloat( const char* pKeyName, float defaultValue
 CKeyValues::GetDouble
 ==================
 */
-FORCEINLINE double CKeyValues::GetDouble( const char* pKeyName, double defaultValue /* = 0.0 */ ) const
+FORCEINLINE double CKeyValues::GetDouble( const char* pKeyName, double defaultValue /* = 0.0 */, bool* pbGotDefaultValue /* = NULL */ ) const
 {
 	CKeyValues* pKeyValues = const_cast<CKeyValues*>( this )->FindKey( pKeyName );
 	if ( pKeyValues )
 	{
+		if ( pbGotDefaultValue )
+		{
+			*pbGotDefaultValue = false;
+		}
+
 		switch ( pKeyValues->dataType )
 		{
 		case KEYVALUES_DATA_TYPE_INT: return (double)pKeyValues->valueInt32;
@@ -444,6 +489,11 @@ FORCEINLINE double CKeyValues::GetDouble( const char* pKeyName, double defaultVa
 		case KEYVALUES_DATA_TYPE_STRING: return S_Atod( pKeyValues->valueString.c_str() );
 		}
 	}
+
+	if ( pbGotDefaultValue )
+	{
+		*pbGotDefaultValue = true;
+	}
 	return defaultValue;
 }
 
@@ -452,11 +502,16 @@ FORCEINLINE double CKeyValues::GetDouble( const char* pKeyName, double defaultVa
 CKeyValues::GetString
 ==================
 */
-FORCEINLINE const char* CKeyValues::GetString( const char* pKeyName, const char* pDefaultValue /* = "" */ ) const
+FORCEINLINE const char* CKeyValues::GetString( const char* pKeyName, const char* pDefaultValue /* = "" */, bool* pbGotDefaultValue /* = NULL */ ) const
 {
 	CKeyValues* pKeyValues = const_cast<CKeyValues*>( this )->FindKey( pKeyName );
 	if ( pKeyValues )
 	{
+		if ( pbGotDefaultValue )
+		{
+			*pbGotDefaultValue = false;
+		}
+
 		eastl::string& valueStringRef = (eastl::string&)pKeyValues->valueString;
 		switch ( pKeyValues->dataType )
 		{
@@ -467,6 +522,11 @@ FORCEINLINE const char* CKeyValues::GetString( const char* pKeyName, const char*
 		case KEYVALUES_DATA_TYPE_STRING: break;
 		}
 		return pKeyValues->valueString.c_str();
+	}
+
+	if ( pbGotDefaultValue )
+	{
+		*pbGotDefaultValue = true;
 	}
 	return pDefaultValue;
 }
@@ -499,6 +559,28 @@ CKeyValues::GetSubKeys
 FORCEINLINE const eastl::list<CKeyValues*>& CKeyValues::GetSubKeys() const
 {
 	return subKeys;
+}
+
+/*
+==================
+CKeyValuesSubKeysIterator::CKeyValuesSubKeysIterator
+==================
+*/
+FORCEINLINE CKeyValuesSubKeysIterator::CKeyValuesSubKeysIterator( CKeyValues* pKeyValues, bool bAllowValues /* = true */, bool bAllowSubKeys /* = false */, bool bAllowEmpty /* = false */ )
+	: currentIndex( INVALID_INDEX )
+{
+	Init( pKeyValues, NULL, bAllowValues, bAllowSubKeys, bAllowEmpty );
+}
+
+/*
+==================
+CKeyValuesSubKeysIterator::CKeyValuesSubKeysIterator
+==================
+*/
+FORCEINLINE CKeyValuesSubKeysIterator::CKeyValuesSubKeysIterator( CKeyValues* pKeyValues, const char* pKeyName, bool bAllowValues /* = true */, bool bAllowSubKeys /* = false */, bool bAllowEmpty /* = false */ )
+	: currentIndex( INVALID_INDEX )
+{
+	Init( pKeyValues, pKeyName, bAllowValues, bAllowSubKeys, bAllowEmpty );
 }
 
 /*
@@ -575,4 +657,36 @@ CKeyValuesSubKeysIterator::GetKeyValues
 FORCEINLINE CKeyValues* CKeyValuesSubKeysIterator::GetKeyValues() const
 {
 	return !keyValues.empty() ? keyValues[currentIndex] : NULL;
+}
+
+/*
+==================
+CKeyValuesSubKeysReverseIterator::CKeyValuesSubKeysReverseIterator
+==================
+*/
+FORCEINLINE CKeyValuesSubKeysReverseIterator::CKeyValuesSubKeysReverseIterator( CKeyValues* pKeyValues, bool bAllowValues /* = true */, bool bAllowSubKeys /* = false */, bool bAllowEmpty /* = false */ )
+	: CKeyValuesSubKeysIterator( pKeyValues, bAllowValues, bAllowSubKeys, bAllowEmpty )
+{
+	Init();
+}
+
+/*
+==================
+CKeyValuesSubKeysReverseIterator::CKeyValuesSubKeysReverseIterator
+==================
+*/
+FORCEINLINE CKeyValuesSubKeysReverseIterator::CKeyValuesSubKeysReverseIterator( CKeyValues* pKeyValues, const char* pKeyName, bool bAllowValues /* = true */, bool bAllowSubKeys /* = false */, bool bAllowEmpty /* = false */ )
+	: CKeyValuesSubKeysIterator( pKeyValues, pKeyName, bAllowValues, bAllowSubKeys, bAllowEmpty )
+{
+	Init();
+}
+
+/*
+==================
+CKeyValuesSubKeysReverseIterator::Init
+==================
+*/
+FORCEINLINE void CKeyValuesSubKeysReverseIterator::Init()
+{
+	eastl::reverse( eastl::begin( keyValues ), eastl::end( keyValues ) );
 }

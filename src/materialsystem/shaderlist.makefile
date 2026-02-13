@@ -1,14 +1,7 @@
-{
-	// Include directories
-	"include": [
-		"./",
-		"../public/materialsystem/"
-	],
-	
-	// Shaders list (path to *.shader files, relative to the file)
-	"shaders": [
-		// Wireframe
-		"wireframe_vs",
-		"wireframe_ps"
-	]
-}
+// Include directories
+include "./"
+include "../public/materialsystem/"
+
+// Shaders list (path to *.shader files, relative to the file)
+shader "wireframe_vs"
+shader "wireframe_ps"

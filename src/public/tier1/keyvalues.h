@@ -3,10 +3,16 @@
 
 #include "tier0/defines.h"
 #include "tier0/types.h"
+#include "tier0/profile.h"
 #include "tier1/stringpool.h"
 #include "tier1/streamdata_memory.h"
 #include "filesystem/ifilesystem.h"
 #include "utils/interfaces/interfaces.h"
+
+//-----------------------------------------------------------------------------
+// Forward declarations
+//-----------------------------------------------------------------------------
+class CKeyValuesSubKeysIterator;
 
 //-----------------------------------------------------------------------------
 // Key values
@@ -24,6 +30,8 @@ enum keyValuesDataType_t
 class CKeyValues
 {
 public:
+	friend CKeyValuesSubKeysIterator;
+
 	CKeyValues( const char* pName, CKeyValues* pParentKey = NULL );
 	CKeyValues( const char* pName, uint32 length, CKeyValues* pParentKey = NULL );
 	~CKeyValues();
@@ -57,12 +65,12 @@ public:
 	bool							HasData() const;
 	bool							HasSubKeys() const;
 	const char*						GetName() const;
-	bool							GetBool( const char* pKeyName, bool defaultValue = false ) const;
-	int32							GetInt( const char* pKeyName, int32 defaultValue = 0 ) const;
-	int64							GetInt64( const char* pKeyName, int64 defaultValue = 0 ) const;
-	float							GetFloat( const char* pKeyName, float defaultValue = 0.f ) const;
-	double							GetDouble( const char* pKeyName, double defaultValue = 0.0 ) const;
-	const char*						GetString( const char* pKeyName, const char* pDefaultValue = "" ) const;
+	bool							GetBool( const char* pKeyName, bool defaultValue = false, bool* pbGotDefaultValue = NULL ) const;
+	int32							GetInt( const char* pKeyName, int32 defaultValue = 0, bool* pbGotDefaultValue = NULL ) const;
+	int64							GetInt64( const char* pKeyName, int64 defaultValue = 0, bool* pbGotDefaultValue = NULL ) const;
+	float							GetFloat( const char* pKeyName, float defaultValue = 0.f, bool* pbGotDefaultValue = NULL ) const;
+	double							GetDouble( const char* pKeyName, double defaultValue = 0.0, bool* pbGotDefaultValue = NULL ) const;
+	const char*						GetString( const char* pKeyName, const char* pDefaultValue = "", bool* pbGotDefaultValue = NULL ) const;
 	keyValuesDataType_t				GetDataType() const;
 	CKeyValues*						GetParentKey() const;
 	const eastl::list<CKeyValues*>& GetSubKeys() const;
@@ -98,6 +106,7 @@ class CKeyValuesSubKeysIterator
 {
 public:
 	CKeyValuesSubKeysIterator( CKeyValues* pKeyValues, bool bAllowValues = true, bool bAllowSubKeys = false, bool bAllowEmpty = false );
+	CKeyValuesSubKeysIterator( CKeyValues* pKeyValues, const char* pKeyName, bool bAllowValues = true, bool bAllowSubKeys = false, bool bAllowEmpty = false );
 
 	void		operator++();
 	void		operator+=( uint32 offset );
@@ -111,6 +120,9 @@ protected:
 
 	uint32					   currentIndex;
 	eastl::vector<CKeyValues*> keyValues;
+
+private:
+	void Init( CKeyValues* pKeyValues, const char* pKeyName, bool bAllowValues, bool bAllowSubKeys, bool bAllowEmpty );
 };
 
 //-----------------------------------------------------------------------------
@@ -119,11 +131,11 @@ protected:
 class CKeyValuesSubKeysReverseIterator : public CKeyValuesSubKeysIterator
 {
 public:
-	CKeyValuesSubKeysReverseIterator( CKeyValues* pKeyValues, bool bAllowValues = true, bool bAllowSubKeys = false, bool bAllowEmpty = false )
-		: CKeyValuesSubKeysIterator( pKeyValues, bAllowValues, bAllowSubKeys, bAllowEmpty )
-	{
-		eastl::reverse( eastl::begin( keyValues ), eastl::end( keyValues ) );
-	}
+	CKeyValuesSubKeysReverseIterator( CKeyValues* pKeyValues, bool bAllowValues = true, bool bAllowSubKeys = false, bool bAllowEmpty = false );
+	CKeyValuesSubKeysReverseIterator( CKeyValues* pKeyValues, const char* pKeyName, bool bAllowValues = true, bool bAllowSubKeys = false, bool bAllowEmpty = false );
+
+private:
+	void Init();
 };
 
 #include "tier1/keyvalues.inl"
