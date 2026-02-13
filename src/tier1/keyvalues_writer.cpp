@@ -89,7 +89,7 @@ void CKeyValuesWriter::WriteKeyToBuffer( CKeyValues* pKeyValues, eastl::string& 
 	{
 		Assert( !pKeyValues->HasSubKeys() );
 		buffer += " \"";
-		WriteConvertedString( buffer, pKeyValues->GetString() );
+		WriteConvertedString( buffer, pKeyValues->GetString( NULL ) );
 		buffer += "\"" LINE_TERMINATOR_STRING;
 	}
 }

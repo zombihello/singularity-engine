@@ -174,7 +174,7 @@ bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValues )
 			// Set as string if the value length is zero
 			if ( value.size() == 0 )
 			{
-				pSubKey->SetString( "" );
+				pSubKey->SetString( NULL, "" );
 			}
 			// Set as float/double if double scan ended at end of the value
 			else if ( pEndDouble > pEndInt64 && pEndDouble == pEndString )
@@ -224,11 +224,11 @@ bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValues )
 
 				if ( bMustBeDouble )
 				{
-					pSubKey->SetDouble( valueDouble );
+					pSubKey->SetDouble( NULL, valueDouble );
 				}
 				else
 				{
-					pSubKey->SetFloat( (float)valueDouble );
+					pSubKey->SetFloat( NULL, (float)valueDouble );
 				}
 			}
 			// Set as int32/int64 if int64 scan ended at end of the value
@@ -236,11 +236,11 @@ bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValues )
 			{
 				if ( valueInt64 >= S_MinValue<int32>() && valueInt64 <= S_MaxValue<int32>() )
 				{
-					pSubKey->SetInt( (int32)valueInt64 );
+					pSubKey->SetInt( NULL, (int32)valueInt64 );
 				}
 				else
 				{
-					pSubKey->SetInt64( valueInt64 );
+					pSubKey->SetInt64( NULL, valueInt64 );
 				}
 			}
 			// Otherwise set as string
@@ -248,7 +248,7 @@ bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValues )
 			{
 				eastl::string convertedValueBuffer;
 				S_ConvertUnescapeToEscapeSymbols( convertedValueBuffer, value.c_str() );
-				pSubKey->SetString( convertedValueBuffer.c_str() );
+				pSubKey->SetString( NULL, convertedValueBuffer.c_str() );
 			}
 
 			// Read conditional block if exists

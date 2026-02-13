@@ -4,7 +4,9 @@
 
 #include "tier0/defines.h"
 #include "tier0/types.h"
-#include "tier1/jsondoc.h"
+#include "tier0/profile.h"
+#include "tier1/filetools.h"
+#include "tier1/keyvalues.h"
 
 //-----------------------------------------------------------------------------
 // Helper for work with gameinfo.txt files
@@ -24,6 +26,7 @@ public:
 	// NOTE: For LoadFromFile must be connected Tier1
 	bool LoadFromFile( const char* pPath );
 	bool LoadFromBuffer( const char* pBuffer, const char* pGameInfoPath );
+	bool LoadFromStream( IStreamDataReader* pStreamReader, const char* pGameInfoPath );
 	void Clear();
 
 	const eastl::string&					   GetGame() const;
@@ -34,7 +37,6 @@ public:
 	bool									   IsLoaded() const;
 
 private:
-	bool GrabData( const CJsonDoc& jsonDoc, const char* pGameInfoPath );
 	void ReplaceMacros( eastl::string& string, const char* pGameInfoPath );
 
 	bool								bLoaded;

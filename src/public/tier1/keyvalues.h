@@ -45,24 +45,24 @@ public:
 
 	void SetName( const char* pName );
 	void SetName( const char* pName, uint32 length );
-	void SetBool( bool value );
-	void SetInt( int32 value );
-	void SetInt64( int64 value );
-	void SetFloat( float value );
-	void SetDouble( double value );
-	void SetString( const char* pValue );
-	void SetString( const char* pValue, uint32 length );
+	void SetBool( const char* pKeyName, bool value );
+	void SetInt( const char* pKeyName, int32 value );
+	void SetInt64( const char* pKeyName, int64 value );
+	void SetFloat( const char* pKeyName, float value );
+	void SetDouble( const char* pKeyName, double value );
+	void SetString( const char* pKeyName, const char* pValue );
+	void SetString( const char* pKeyName, const char* pValue, uint32 length );
 
 	bool							IsEmpty() const;
 	bool							HasData() const;
 	bool							HasSubKeys() const;
 	const char*						GetName() const;
-	bool							GetBool( bool defaultValue = false ) const;
-	int32							GetInt( int32 defaultValue = 0 ) const;
-	int64							GetInt64( int64 defaultValue = 0 ) const;
-	float							GetFloat( float defaultValue = 0.f ) const;
-	double							GetDouble( double defaultValue = 0.0 ) const;
-	const char*						GetString( const char* pDefaultValue = "" ) const;
+	bool							GetBool( const char* pKeyName, bool defaultValue = false ) const;
+	int32							GetInt( const char* pKeyName, int32 defaultValue = 0 ) const;
+	int64							GetInt64( const char* pKeyName, int64 defaultValue = 0 ) const;
+	float							GetFloat( const char* pKeyName, float defaultValue = 0.f ) const;
+	double							GetDouble( const char* pKeyName, double defaultValue = 0.0 ) const;
+	const char*						GetString( const char* pKeyName, const char* pDefaultValue = "" ) const;
 	keyValuesDataType_t				GetDataType() const;
 	CKeyValues*						GetParentKey() const;
 	const eastl::list<CKeyValues*>& GetSubKeys() const;

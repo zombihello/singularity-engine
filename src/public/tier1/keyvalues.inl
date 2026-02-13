@@ -150,6 +150,7 @@ CKeyValues::LoadFromBuffer
 */
 FORCEINLINE bool CKeyValues::LoadFromBuffer( const char* pBuffer, uint64 size )
 {
+	PROFILE_SCOPE();
 	CStreamDataMemoryReader streamReader( (byte*)pBuffer, size );
 	return LoadFromStream( &streamReader );
 }
@@ -215,9 +216,9 @@ FORCEINLINE void CKeyValues::SetName( const char* pName, uint32 length )
 CKeyValues::SetBool
 ==================
 */
-FORCEINLINE void CKeyValues::SetBool( bool value )
+FORCEINLINE void CKeyValues::SetBool( const char* pKeyName, bool value )
 {
-	SetInt( (int32)value );
+	SetInt( pKeyName, (int32)value );
 }
 
 /*
@@ -225,11 +226,12 @@ FORCEINLINE void CKeyValues::SetBool( bool value )
 CKeyValues::SetInt
 ==================
 */
-FORCEINLINE void CKeyValues::SetInt( int32 value )
+FORCEINLINE void CKeyValues::SetInt( const char* pKeyName, int32 value )
 {
-	dataType   = KEYVALUES_DATA_TYPE_INT;
-	valueInt32 = value;
-	valueString.clear();
+	CKeyValues* pKeyValues = FindKey( pKeyName, true );
+	pKeyValues->dataType   = KEYVALUES_DATA_TYPE_INT;
+	pKeyValues->valueInt32 = value;
+	pKeyValues->valueString.clear();
 }
 
 /*
@@ -237,11 +239,12 @@ FORCEINLINE void CKeyValues::SetInt( int32 value )
 CKeyValues::SetInt64
 ==================
 */
-FORCEINLINE void CKeyValues::SetInt64( int64 value )
+FORCEINLINE void CKeyValues::SetInt64( const char* pKeyName, int64 value )
 {
-	dataType   = KEYVALUES_DATA_TYPE_INT64;
-	valueInt64 = value;
-	valueString.clear();
+	CKeyValues* pKeyValues = FindKey( pKeyName, true );
+	pKeyValues->dataType   = KEYVALUES_DATA_TYPE_INT64;
+	pKeyValues->valueInt64 = value;
+	pKeyValues->valueString.clear();
 }
 
 /*
@@ -249,11 +252,12 @@ FORCEINLINE void CKeyValues::SetInt64( int64 value )
 CKeyValues::SetFloat
 ==================
 */
-FORCEINLINE void CKeyValues::SetFloat( float value )
+FORCEINLINE void CKeyValues::SetFloat( const char* pKeyName, float value )
 {
-	dataType   = KEYVALUES_DATA_TYPE_FLOAT;
-	valueFloat = value;
-	valueString.clear();
+	CKeyValues* pKeyValues = FindKey( pKeyName, true );
+	pKeyValues->dataType   = KEYVALUES_DATA_TYPE_FLOAT;
+	pKeyValues->valueFloat = value;
+	pKeyValues->valueString.clear();
 }
 
 /*
@@ -261,11 +265,12 @@ FORCEINLINE void CKeyValues::SetFloat( float value )
 CKeyValues::SetDouble
 ==================
 */
-FORCEINLINE void CKeyValues::SetDouble( double value )
+FORCEINLINE void CKeyValues::SetDouble( const char* pKeyName, double value )
 {
-	dataType	= KEYVALUES_DATA_TYPE_DOUBLE;
-	valueDouble = value;
-	valueString.clear();
+	CKeyValues* pKeyValues	= FindKey( pKeyName, true );
+	pKeyValues->dataType	= KEYVALUES_DATA_TYPE_DOUBLE;
+	pKeyValues->valueDouble = value;
+	pKeyValues->valueString.clear();
 }
 
 /*
@@ -273,10 +278,11 @@ FORCEINLINE void CKeyValues::SetDouble( double value )
 CKeyValues::SetString
 ==================
 */
-FORCEINLINE void CKeyValues::SetString( const char* pValue )
+FORCEINLINE void CKeyValues::SetString( const char* pKeyName, const char* pValue )
 {
-	dataType	= KEYVALUES_DATA_TYPE_STRING;
-	valueString = pValue;
+	CKeyValues* pKeyValues	= FindKey( pKeyName, true );
+	pKeyValues->dataType	= KEYVALUES_DATA_TYPE_STRING;
+	pKeyValues->valueString = pValue;
 }
 
 /*
@@ -284,10 +290,11 @@ FORCEINLINE void CKeyValues::SetString( const char* pValue )
 CKeyValues::SetString
 ==================
 */
-FORCEINLINE void CKeyValues::SetString( const char* pValue, uint32 length )
+FORCEINLINE void CKeyValues::SetString( const char* pKeyName, const char* pValue, uint32 length )
 {
-	dataType	= KEYVALUES_DATA_TYPE_STRING;
-	valueString = eastl::string_view( pValue, length );
+	CKeyValues* pKeyValues	= FindKey( pKeyName, true );
+	pKeyValues->dataType	= KEYVALUES_DATA_TYPE_STRING;
+	pKeyValues->valueString = eastl::string_view( pValue, length );
 }
 
 /*
@@ -335,17 +342,21 @@ FORCEINLINE const char* CKeyValues::GetName() const
 CKeyValues::GetBool
 ==================
 */
-FORCEINLINE bool CKeyValues::GetBool( bool defaultValue /* = false */ ) const
+FORCEINLINE bool CKeyValues::GetBool( const char* pKeyName, bool defaultValue /* = false */ ) const
 {
-	switch ( dataType )
+	CKeyValues* pKeyValues = const_cast<CKeyValues*>( this )->FindKey( pKeyName );
+	if ( pKeyValues )
 	{
-	case KEYVALUES_DATA_TYPE_INT: return valueInt32 != 0;
-	case KEYVALUES_DATA_TYPE_INT64: return valueInt64 != 0;
-	case KEYVALUES_DATA_TYPE_FLOAT: return valueFloat != 0;
-	case KEYVALUES_DATA_TYPE_DOUBLE: return valueDouble != 0;
-	case KEYVALUES_DATA_TYPE_STRING: return CStringToBool::Convert( valueString.c_str() );
-	default: return defaultValue;
+		switch ( pKeyValues->dataType )
+		{
+		case KEYVALUES_DATA_TYPE_INT: return pKeyValues->valueInt32 != 0;
+		case KEYVALUES_DATA_TYPE_INT64: return pKeyValues->valueInt64 != 0;
+		case KEYVALUES_DATA_TYPE_FLOAT: return pKeyValues->valueFloat != 0;
+		case KEYVALUES_DATA_TYPE_DOUBLE: return pKeyValues->valueDouble != 0;
+		case KEYVALUES_DATA_TYPE_STRING: return CStringToBool::Convert( pKeyValues->valueString.c_str() );
+		}
 	}
+	return defaultValue;
 }
 
 /*
@@ -353,17 +364,21 @@ FORCEINLINE bool CKeyValues::GetBool( bool defaultValue /* = false */ ) const
 CKeyValues::GetInt
 ==================
 */
-FORCEINLINE int32 CKeyValues::GetInt( int32 defaultValue /* = 0 */ ) const
+FORCEINLINE int32 CKeyValues::GetInt( const char* pKeyName, int32 defaultValue /* = 0 */ ) const
 {
-	switch ( dataType )
+	CKeyValues* pKeyValues = const_cast<CKeyValues*>( this )->FindKey( pKeyName );
+	if ( pKeyValues )
 	{
-	case KEYVALUES_DATA_TYPE_INT: return valueInt32;
-	case KEYVALUES_DATA_TYPE_INT64: return (int32)valueInt64;
-	case KEYVALUES_DATA_TYPE_FLOAT: return (int32)valueFloat;
-	case KEYVALUES_DATA_TYPE_DOUBLE: return (int32)valueDouble;
-	case KEYVALUES_DATA_TYPE_STRING: return S_Atoi( valueString.c_str() );
-	default: return defaultValue;
+		switch ( pKeyValues->dataType )
+		{
+		case KEYVALUES_DATA_TYPE_INT: return pKeyValues->valueInt32;
+		case KEYVALUES_DATA_TYPE_INT64: return (int32)pKeyValues->valueInt64;
+		case KEYVALUES_DATA_TYPE_FLOAT: return (int32)pKeyValues->valueFloat;
+		case KEYVALUES_DATA_TYPE_DOUBLE: return (int32)pKeyValues->valueDouble;
+		case KEYVALUES_DATA_TYPE_STRING: return S_Atoi( pKeyValues->valueString.c_str() );
+		}
 	}
+	return defaultValue;
 }
 
 /*
@@ -371,17 +386,21 @@ FORCEINLINE int32 CKeyValues::GetInt( int32 defaultValue /* = 0 */ ) const
 CKeyValues::GetInt64
 ==================
 */
-FORCEINLINE int64 CKeyValues::GetInt64( int64 defaultValue /* = 0 */ ) const
+FORCEINLINE int64 CKeyValues::GetInt64( const char* pKeyName, int64 defaultValue /* = 0 */ ) const
 {
-	switch ( dataType )
+	CKeyValues* pKeyValues = const_cast<CKeyValues*>( this )->FindKey( pKeyName );
+	if ( pKeyValues )
 	{
-	case KEYVALUES_DATA_TYPE_INT: return (int64)valueInt32;
-	case KEYVALUES_DATA_TYPE_INT64: return valueInt64;
-	case KEYVALUES_DATA_TYPE_FLOAT: return (int64)valueFloat;
-	case KEYVALUES_DATA_TYPE_DOUBLE: return (int64)valueDouble;
-	case KEYVALUES_DATA_TYPE_STRING: return S_Atoi64( valueString.c_str() );
-	default: return defaultValue;
+		switch ( pKeyValues->dataType )
+		{
+		case KEYVALUES_DATA_TYPE_INT: return (int64)pKeyValues->valueInt32;
+		case KEYVALUES_DATA_TYPE_INT64: return pKeyValues->valueInt64;
+		case KEYVALUES_DATA_TYPE_FLOAT: return (int64)pKeyValues->valueFloat;
+		case KEYVALUES_DATA_TYPE_DOUBLE: return (int64)pKeyValues->valueDouble;
+		case KEYVALUES_DATA_TYPE_STRING: return S_Atoi64( pKeyValues->valueString.c_str() );
+		}
 	}
+	return defaultValue;
 }
 
 /*
@@ -389,17 +408,21 @@ FORCEINLINE int64 CKeyValues::GetInt64( int64 defaultValue /* = 0 */ ) const
 CKeyValues::GetFloat
 ==================
 */
-FORCEINLINE float CKeyValues::GetFloat( float defaultValue /* = 0.f */ ) const
+FORCEINLINE float CKeyValues::GetFloat( const char* pKeyName, float defaultValue /* = 0.f */ ) const
 {
-	switch ( dataType )
+	CKeyValues* pKeyValues = const_cast<CKeyValues*>( this )->FindKey( pKeyName );
+	if ( pKeyValues )
 	{
-	case KEYVALUES_DATA_TYPE_INT: return (float)valueInt32;
-	case KEYVALUES_DATA_TYPE_INT64: return (float)valueInt64;
-	case KEYVALUES_DATA_TYPE_FLOAT: return valueFloat;
-	case KEYVALUES_DATA_TYPE_DOUBLE: return (float)valueDouble;
-	case KEYVALUES_DATA_TYPE_STRING: return S_Atof( valueString.c_str() );
-	default: return defaultValue;
+		switch ( pKeyValues->dataType )
+		{
+		case KEYVALUES_DATA_TYPE_INT: return (float)pKeyValues->valueInt32;
+		case KEYVALUES_DATA_TYPE_INT64: return (float)pKeyValues->valueInt64;
+		case KEYVALUES_DATA_TYPE_FLOAT: return pKeyValues->valueFloat;
+		case KEYVALUES_DATA_TYPE_DOUBLE: return (float)pKeyValues->valueDouble;
+		case KEYVALUES_DATA_TYPE_STRING: return S_Atof( pKeyValues->valueString.c_str() );
+		}
 	}
+	return defaultValue;
 }
 
 /*
@@ -407,17 +430,21 @@ FORCEINLINE float CKeyValues::GetFloat( float defaultValue /* = 0.f */ ) const
 CKeyValues::GetDouble
 ==================
 */
-FORCEINLINE double CKeyValues::GetDouble( double defaultValue /* = 0.0 */ ) const
+FORCEINLINE double CKeyValues::GetDouble( const char* pKeyName, double defaultValue /* = 0.0 */ ) const
 {
-	switch ( dataType )
+	CKeyValues* pKeyValues = const_cast<CKeyValues*>( this )->FindKey( pKeyName );
+	if ( pKeyValues )
 	{
-	case KEYVALUES_DATA_TYPE_INT: return (double)valueInt32;
-	case KEYVALUES_DATA_TYPE_INT64: return (double)valueInt64;
-	case KEYVALUES_DATA_TYPE_FLOAT: return (double)valueFloat;
-	case KEYVALUES_DATA_TYPE_DOUBLE: return valueDouble;
-	case KEYVALUES_DATA_TYPE_STRING: return S_Atod( valueString.c_str() );
-	default: return defaultValue;
+		switch ( pKeyValues->dataType )
+		{
+		case KEYVALUES_DATA_TYPE_INT: return (double)pKeyValues->valueInt32;
+		case KEYVALUES_DATA_TYPE_INT64: return (double)pKeyValues->valueInt64;
+		case KEYVALUES_DATA_TYPE_FLOAT: return (double)pKeyValues->valueFloat;
+		case KEYVALUES_DATA_TYPE_DOUBLE: return pKeyValues->valueDouble;
+		case KEYVALUES_DATA_TYPE_STRING: return S_Atod( pKeyValues->valueString.c_str() );
+		}
 	}
+	return defaultValue;
 }
 
 /*
@@ -425,20 +452,23 @@ FORCEINLINE double CKeyValues::GetDouble( double defaultValue /* = 0.0 */ ) cons
 CKeyValues::GetString
 ==================
 */
-FORCEINLINE const char* CKeyValues::GetString( const char* pDefaultValue /* = "" */ ) const
+FORCEINLINE const char* CKeyValues::GetString( const char* pKeyName, const char* pDefaultValue /* = "" */ ) const
 {
-	eastl::string& valueStringRef = (eastl::string&)valueString;
-	switch ( dataType )
+	CKeyValues* pKeyValues = const_cast<CKeyValues*>( this )->FindKey( pKeyName );
+	if ( pKeyValues )
 	{
-	case KEYVALUES_DATA_TYPE_INT: valueStringRef = S_Sprintf( "%i", valueInt32 ); break;
-	case KEYVALUES_DATA_TYPE_INT64: valueStringRef = S_Sprintf( "%lld", valueInt64 ); break;
-	case KEYVALUES_DATA_TYPE_FLOAT: valueStringRef = S_Sprintf( "%.*g", S_MaxDigits10<float>(), valueFloat ); break;
-	case KEYVALUES_DATA_TYPE_DOUBLE: valueStringRef = S_Sprintf( "%.*g", S_MaxDigits10<double>(), valueDouble ); break;
-	case KEYVALUES_DATA_TYPE_STRING: break;
-	default: return pDefaultValue;
+		eastl::string& valueStringRef = (eastl::string&)pKeyValues->valueString;
+		switch ( pKeyValues->dataType )
+		{
+		case KEYVALUES_DATA_TYPE_INT: valueStringRef = S_Sprintf( "%i", pKeyValues->valueInt32 ); break;
+		case KEYVALUES_DATA_TYPE_INT64: valueStringRef = S_Sprintf( "%lld", pKeyValues->valueInt64 ); break;
+		case KEYVALUES_DATA_TYPE_FLOAT: valueStringRef = S_Sprintf( "%.*g", S_MaxDigits10<float>(), pKeyValues->valueFloat ); break;
+		case KEYVALUES_DATA_TYPE_DOUBLE: valueStringRef = S_Sprintf( "%.*g", S_MaxDigits10<double>(), pKeyValues->valueDouble ); break;
+		case KEYVALUES_DATA_TYPE_STRING: break;
+		}
+		return pKeyValues->valueString.c_str();
 	}
-
-	return valueString.c_str();
+	return pDefaultValue;
 }
 
 /*
