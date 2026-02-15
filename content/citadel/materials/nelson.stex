@@ -1,9 +1,7 @@
-{
-	"type": 				"2d",
-	"sources": 				[ "nelson.jpg" ],
-	"filter": 				"anisotropic",
-	"generate-mipmaps": 	true,
-	"format": 				"bc1",
-	"output-dir":			"//BASE_PATH/citadel/materials/",
-	"max-anisotropy":		16
-}
+type 				2d
+source 				"nelson.jpg"
+filter 				anisotropic
+generate_mipmaps 	1
+format 				bc1
+output_dir 			"//BASE_PATH/citadel/materials/"
+max_anisotropy 		16

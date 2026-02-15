@@ -108,7 +108,7 @@ private:
 		{
 		}
 
-		eastl::string			 sourcePath;
+		eastl::string		 sourcePath;
 		resourceSourceType_t type;
 	};
 
@@ -116,11 +116,11 @@ private:
 	bool LoadFileList( const char* pPath );
 	bool AddFileToCompile( const char* pPath, const char* pWorkDir = "" );
 
-	ITextureTool*			  pTextureTool;
-	IMaterialTool*			  pMaterialTool;
-	IModelTool*				  pModelTool;
-	IEntityDescTool*		  pEntityDescTool;
-	IMapTool*				  pMapTool;
+	ITextureTool*				pTextureTool;
+	IMaterialTool*				pMaterialTool;
+	IModelTool*					pModelTool;
+	IEntityDescTool*			pEntityDescTool;
+	IMapTool*					pMapTool;
 	eastl::list<resourceFile_t> files;
 };
 
@@ -196,11 +196,11 @@ int32 CResourceCompilerAppSystemGroup::Main()
 	bool bPrintHelpUsage = CommandLine()->HasParam( "h" ) || CommandLine()->HasParam( "help" ) || CommandLine()->HasParam( "?" );
 
 	// Get and parse a file list
-	const char* pFileListPath		  = CommandLine()->GetFirstValue( "filelist" );
-	const char* pFilePath			  = CommandLine()->GetFirstValue( "file" );
-	bool		 bInvalidFileListPath = !pFileListPath || pFileListPath[0] == '\0';
-	bool		 bInvalidFilePath	  = !pFilePath || pFilePath[0] == '\0';
-	bool		 bInvalidFilePaths	  = bInvalidFileListPath && bInvalidFilePath;
+	const char* pFileListPath		 = CommandLine()->GetFirstValue( "filelist" );
+	const char* pFilePath			 = CommandLine()->GetFirstValue( "file" );
+	bool		bInvalidFileListPath = !pFileListPath || pFileListPath[0] == '\0';
+	bool		bInvalidFilePath	 = !pFilePath || pFilePath[0] == '\0';
+	bool		bInvalidFilePaths	 = bInvalidFileListPath && bInvalidFilePath;
 	if ( !bInvalidFilePaths && !bInvalidFileListPath && !LoadFileList( pFileListPath ) )
 	{
 		Error( "ResourceCompiler: Failed to load file list '%s'", pFileListPath );
@@ -249,8 +249,8 @@ int32 CResourceCompilerAppSystemGroup::Main()
 			}
 
 			// Get a absolute source texture paths
-			eastl::vector<eastl::string>  srcPaths;
-			eastl::vector<const char*> cSrcPaths;
+			eastl::vector<eastl::string> srcPaths;
+			eastl::vector<const char*>	 cSrcPaths;
 			{
 				const eastl::vector<eastl::string> originalSrcPaths = stexSourceFile.GetSourcePaths();
 				srcPaths.resize( originalSrcPaths.size() );
@@ -310,7 +310,7 @@ int32 CResourceCompilerAppSystemGroup::Main()
 			eastl::vector<resourceToolMaterialVar_t> resourceToolMaterialVars;
 			resourceToolMaterialVars.resize( smatSourceFile.GetNumVars() );
 			{
-				bool								 bMaterialVarsAreVaild	= true;
+				bool								   bMaterialVarsAreVaild  = true;
 				const eastl::vector<CSMATMaterialVar>& smatSourceMaterialVars = smatSourceFile.GetVars();
 				for ( uint32 varIdx = 0, numVars = smatSourceFile.GetNumVars(); varIdx < numVars; ++varIdx )
 				{
@@ -489,19 +489,19 @@ int32 CResourceCompilerAppSystemGroup::Main()
 			}
 
 			// Get entity descriptor components
-			eastl::vector<resourceToolEntityDescVar_t>	   resourceToolEntityDescVars;
+			eastl::vector<resourceToolEntityDescVar_t>		 resourceToolEntityDescVars;
 			eastl::vector<resourceToolEntityDescComponent_t> resourceToolEntityDescComponents;
 			resourceToolEntityDescComponents.resize( sentSourceFile.GetNumComponents() );
 			{
-				bool										 bEntityDescComponentsAreVaild	  = true;
-				uint32										 resourceToolEntityDescVarsOffset = 0;
-				const eastl::vector<CSENTEntityDescComponent>& sentEntityDescComponents		  = sentSourceFile.GetComponents();
+				bool										   bEntityDescComponentsAreVaild	= true;
+				uint32										   resourceToolEntityDescVarsOffset = 0;
+				const eastl::vector<CSENTEntityDescComponent>& sentEntityDescComponents			= sentSourceFile.GetComponents();
 				for ( uint32 componentIdx = 0, numComponents = sentSourceFile.GetNumComponents(); componentIdx < numComponents; ++componentIdx )
 				{
-					const CSENTEntityDescComponent&		   sentEntityDescComponent		   = sentEntityDescComponents[componentIdx];
-					const eastl::vector<CSENTEntityDescVar>& sentEntityDescVars			   = sentEntityDescComponent.GetVars();
-					resourceToolEntityDescComponent_t&	   resourceToolEntityDescComponent = resourceToolEntityDescComponents[componentIdx];
-					resourceToolEntityDescComponent.pType								   = sentEntityDescComponent.GetType();
+					const CSENTEntityDescComponent&			 sentEntityDescComponent		 = sentEntityDescComponents[componentIdx];
+					const eastl::vector<CSENTEntityDescVar>& sentEntityDescVars				 = sentEntityDescComponent.GetVars();
+					resourceToolEntityDescComponent_t&		 resourceToolEntityDescComponent = resourceToolEntityDescComponents[componentIdx];
+					resourceToolEntityDescComponent.pType									 = sentEntityDescComponent.GetType();
 
 					// Get entity descriptor vars
 					if ( !sentEntityDescVars.empty() )
@@ -770,7 +770,7 @@ CResourceCompilerAppSystemGroup::AddFileToCompile
 bool CResourceCompilerAppSystemGroup::AddFileToCompile( const char* pPath, const char* pWorkDir /* = "" */ )
 {
 	// Convert of the file path to absolute
-	eastl::string			 absoluteFilePath;
+	eastl::string		 absoluteFilePath;
 	resourceSourceType_t resourceSourceType;
 	S_MakeAbsolutePath( pPath, absoluteFilePath, pWorkDir );
 

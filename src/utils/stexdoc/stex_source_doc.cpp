@@ -1,7 +1,7 @@
 #include "utils/interfaces/interfaces.h"
 #include "tier0/profile.h"
 #include "filesystem/ifilesystem.h"
-#include "tier1/jsondoc.h"
+#include "tier1/keyvalues.h"
 #include "utils/stexdoc/stex_source_doc.h"
 
 // Table for convert text to studioAPITextureType_t
@@ -224,297 +224,107 @@ CSTEXSourceTextureDoc::LoadFromFile
 */
 bool CSTEXSourceTextureDoc::LoadFromFile( const char* pPath )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-
-	// Load a JSON file
-	CJsonDoc jsonDoc;
-	if ( !jsonDoc.LoadFromFile( pPath ) )
+	// Load key values file
+	PROFILE_SCOPE();
+	CKeyValues keyValues( "stex" );
+	if ( !keyValues.LoadFromFile( pPath ) )
 	{
-		Warning( "STEXDoc: Failed to load '%s', maybe wrong JSON syntax?", pPath );
 		return false;
 	}
 	Clear();
-	bool bResult = true;
 
 	// Get texture type
+	bool		bGotDefaultValue = false;
+	const char* pStringValue	 = keyValues.GetString( "type", "", &bGotDefaultValue );
+	if ( bGotDefaultValue )
 	{
-		CJsonValue jsonType = jsonDoc.GetValue( "type" );
-		if ( jsonType.IsValid() )
-		{
-			if ( jsonType.IsA( JSONVALUE_TYPE_STRING ) )
-			{
-				eastl::string typeName = jsonType.GetString();
-				if ( !ConvTextToTextureType( typeName.c_str(), type ) )
-				{
-					Error( "STEXDoc: Invalid 'type', unknown or unsupported texture type '%s'", typeName.c_str() );
-					bResult = false;
-				}
-			}
-			else
-			{
-				Error( "STEXDoc: Invalid 'type', must be string type" );
-				bResult = false;
-			}
-		}
-		else
-		{
-			Error( "STEXDoc: A source texture '%s' must have 'type' field", pPath );
-			bResult = false;
-		}
+		Error( "STEXDoc: Invalid STEX, not found required field 'type' (file: '%s')", pPath );
+		return false;
 	}
-
-	// Is need generate mipmaps
+	if ( !ConvTextToTextureType( pStringValue, type ) )
 	{
-		CJsonValue jsonGenerateMipmaps = jsonDoc.GetValue( "generate-mipmaps" );
-		if ( jsonGenerateMipmaps.IsValid() )
-		{
-			if ( jsonGenerateMipmaps.IsNumber() )
-			{
-				bGenerateMipMaps = jsonGenerateMipmaps.GetNumber() > 0.f;
-			}
-			else
-			{
-				Error( "STEXDoc: Invalid 'generate-mipmaps', must be number type" );
-				bResult = false;
-			}
-		}
-		else
-		{
-			bGenerateMipMaps = false;
-		}
+		Error( "STEXDoc: Invalid STEX, unknown or unsupported texture type '%s' (file: '%s')", pStringValue, pPath );
+		return false;
 	}
 
 	// Get an address mode by U coord
+	pStringValue = keyValues.GetString( "address_mode_u", "wrap" );
+	if ( !ConvTextToSamplerAddressMode( pStringValue, addressModeU ) )
 	{
-		CJsonValue jsonAddressModeU = jsonDoc.GetValue( "address-mode-u" );
-		if ( jsonAddressModeU.IsValid() )
-		{
-			if ( jsonAddressModeU.IsA( JSONVALUE_TYPE_STRING ) )
-			{
-				eastl::string addressModeUName = jsonAddressModeU.GetString();
-				if ( !ConvTextToSamplerAddressMode( addressModeUName.c_str(), addressModeU ) )
-				{
-					Error( "STEXDoc: Invalid 'address-mode-u', unknown or unsupported sampler address mode '%s'", addressModeUName.c_str() );
-					bResult = false;
-				}
-			}
-			else
-			{
-				Error( "STEXDoc: Invalid 'address-mode-u', must be string type" );
-				bResult = false;
-			}
-		}
-		else
-		{
-			addressModeU = STUDIOAPI_SAMPLER_ADDRESS_MODE_WRAP;
-		}
+		Error( "STEXDoc: Invalid STEX, unknown or unsupported sampler address mode '%s' (file: '%s')", pStringValue, pPath );
+		return false;
 	}
 
 	// Get an address mode by V coord
+	pStringValue = keyValues.GetString( "address_mode_v", "wrap" );
+	if ( !ConvTextToSamplerAddressMode( pStringValue, addressModeV ) )
 	{
-		CJsonValue jsonAddressModeV = jsonDoc.GetValue( "address-mode-v" );
-		if ( jsonAddressModeV.IsValid() )
-		{
-			if ( jsonAddressModeV.IsA( JSONVALUE_TYPE_STRING ) )
-			{
-				eastl::string addressModeVName = jsonAddressModeV.GetString();
-				if ( !ConvTextToSamplerAddressMode( addressModeVName.c_str(), addressModeV ) )
-				{
-					Error( "STEXDoc: Invalid 'address-mode-v', unknown or unsupported sampler address mode '%s'", addressModeVName.c_str() );
-					bResult = false;
-				}
-			}
-			else
-			{
-				Error( "STEXDoc: Invalid 'address-mode-v', must be string type" );
-				bResult = false;
-			}
-		}
-		else
-		{
-			addressModeV = STUDIOAPI_SAMPLER_ADDRESS_MODE_WRAP;
-		}
+		Error( "STEXDoc: Invalid STEX, unknown or unsupported sampler address mode '%s' (file: '%s')", pStringValue, pPath );
+		return false;
 	}
 
 	// Get an address mode by W coord
+	pStringValue = keyValues.GetString( "address_mode_w", "wrap" );
+	if ( !ConvTextToSamplerAddressMode( pStringValue, addressModeW ) )
 	{
-		CJsonValue jsonAddressModeW = jsonDoc.GetValue( "address-mode-w" );
-		if ( jsonAddressModeW.IsValid() )
-		{
-			if ( jsonAddressModeW.IsA( JSONVALUE_TYPE_STRING ) )
-			{
-				eastl::string addressModeWName = jsonAddressModeW.GetString();
-				if ( !ConvTextToSamplerAddressMode( addressModeWName.c_str(), addressModeW ) )
-				{
-					Error( "STEXDoc: Invalid 'address-mode-w', unknown or unsupported sampler address mode '%s'", addressModeWName.c_str() );
-					bResult = false;
-				}
-			}
-			else
-			{
-				Error( "STEXDoc: Invalid 'address-mode-w', must be string type" );
-				bResult = false;
-			}
-		}
-		else
-		{
-			addressModeW = STUDIOAPI_SAMPLER_ADDRESS_MODE_WRAP;
-		}
+		Error( "STEXDoc: Invalid STEX, unknown or unsupported sampler address mode '%s' (file: '%s')", pStringValue, pPath );
+		return false;
 	}
 
 	// Get a filter mode
+	pStringValue = keyValues.GetString( "filter", "point" );
+	if ( !ConvTextToSamplerFilter( pStringValue, filter ) )
 	{
-		CJsonValue jsonFilter = jsonDoc.GetValue( "filter" );
-		if ( jsonFilter.IsValid() )
-		{
-			if ( jsonFilter.IsA( JSONVALUE_TYPE_STRING ) )
-			{
-				eastl::string filterName = jsonFilter.GetString();
-				if ( !ConvTextToSamplerFilter( filterName.c_str(), filter ) )
-				{
-					Error( "STEXDoc: Invalid 'filter', unknown or unsupported sampler filter '%s'", filterName.c_str() );
-					bResult = false;
-				}
-			}
-			else
-			{
-				Error( "STEXDoc: Invalid 'filter', must be string type" );
-				bResult = false;
-			}
-		}
-		else
-		{
-			filter = STUDIOAPI_SAMPLER_FILTER_POINT;
-		}
+		Error( "STEXDoc: Invalid STEX, unknown or unsupported sampler filter '%s' (file: '%s')", pStringValue, pPath );
+		return false;
 	}
 
 	// Get a pixel format
+	pStringValue = keyValues.GetString( "format", ConvPixelFormatToText( defaultPixelFormat ) );
+	if ( !ConvTextToPixelFormat( pStringValue, pixelFormat ) )
 	{
-		CJsonValue jsonPixelFormat = jsonDoc.GetValue( "format" );
-		if ( jsonPixelFormat.IsValid() )
-		{
-			if ( jsonPixelFormat.IsA( JSONVALUE_TYPE_STRING ) )
-			{
-				eastl::string pixelFormatName = jsonPixelFormat.GetString();
-				if ( !ConvTextToPixelFormat( pixelFormatName.c_str(), pixelFormat ) )
-				{
-					Error( "STEXDoc: Invalid 'format', unknown or unsupported pixel format '%s'", pixelFormatName.c_str() );
-					bResult = false;
-				}
-			}
-			else
-			{
-				Error( "STEXDoc: Invalid 'format', must be string type" );
-				bResult = false;
-			}
-		}
-		else
-		{
-			pixelFormat = defaultPixelFormat;
-		}
-	}
-
-	// Get a source file
-	{
-		CJsonValue jsonSources = jsonDoc.GetValue( "sources" );
-		if ( jsonSources.IsValid() )
-		{
-			if ( jsonSources.IsA( JSONVALUE_TYPE_ARRAY ) )
-			{
-				eastl::string			  validateMsg;
-				eastl::vector<CJsonValue> jsonArray = jsonSources.GetArray();
-				if ( !IsValidNumSourcePaths( type, (uint32)jsonArray.size(), validateMsg ) )
-				{
-					Error( "STEXDoc: Invalid 'sources', %s", validateMsg.c_str() );
-					bResult = false;
-				}
-
-				for ( uint32 index = 0, count = (uint32)jsonArray.size(); index < count; ++index )
-				{
-					const CJsonValue& jsonSource = jsonArray[index];
-					if ( jsonSource.IsValid() && jsonSource.IsA( JSONVALUE_TYPE_STRING ) )
-					{
-						eastl::string sourcePath = jsonSource.GetString();
-						if ( sourcePath.empty() )
-						{
-							Error( "STEXDoc: Invalid 'sources[%i]', a source file can't be empty", index );
-							bResult = false;
-							continue;
-						}
-
-						sourcePaths.emplace_back( sourcePath );
-					}
-					else
-					{
-						Error( "STEXDoc: Invalid 'sources[%i]', must be string type", index );
-						bResult = false;
-					}
-				}
-			}
-			else
-			{
-				Error( "STEXDoc: Invalid 'sources', must be array of string type" );
-				bResult = false;
-			}
-		}
-		else
-		{
-			Error( "STEXDoc: A source texture '%s' must have 'sources' field", pPath );
-			bResult = false;
-		}
+		Error( "STEXDoc: Invalid STEX, unknown or unsupported pixel format '%s' (file: '%s')", pStringValue, pPath );
+		return false;
 	}
 
 	// Get a destination file
+	outputDir = keyValues.GetString( "output_dir", "", &bGotDefaultValue );
+	if ( bGotDefaultValue )
 	{
-		CJsonValue jsonOutputDir = jsonDoc.GetValue( "output-dir" );
-		if ( jsonOutputDir.IsValid() )
-		{
-			if ( jsonOutputDir.IsA( JSONVALUE_TYPE_STRING ) )
-			{
-				eastl::string outputDir = jsonOutputDir.GetString();
-				if ( outputDir.empty() )
-				{
-					Error( "STEXDoc: Invalid 'output-dir', an output directory can't be empty" );
-					bResult = false;
-				}
-
-				CSTEXSourceTextureDoc::outputDir = outputDir;
-			}
-			else
-			{
-				Error( "STEXDoc: Invalid 'output-dir', must be string type" );
-				bResult = false;
-			}
-		}
-		else
-		{
-			Error( "STEXDoc: A source texture '%s' must have 'output-dir' field", pPath );
-			bResult = false;
-		}
+		Error( "STEXDoc: Invalid STEX, not found required field 'output_dir' (file: '%s')", pPath );
+		return false;
+	}
+	if ( outputDir.empty() )
+	{
+		Error( "STEXDoc: Invalid STEX, an output directory can't be empty (file: '%s')", pPath );
+		return false;
 	}
 
-	// Get max anisotropy
+	// Get source files
+	for ( CKeyValuesSubKeysIterator it( &keyValues, "source" ); it; ++it )
 	{
-		CJsonValue jsonMaxAnisotropy = jsonDoc.GetValue( "max-anisotropy" );
-		if ( jsonMaxAnisotropy.IsValid() )
+		pStringValue = it->GetString( NULL );
+		if ( !pStringValue || !pStringValue[0] )
 		{
-			if ( jsonMaxAnisotropy.IsNumber() )
-			{
-				maxAnisotropy = (uint32)jsonMaxAnisotropy.GetNumber();
-			}
-			else
-			{
-				Error( "STEXDoc: Invalid 'max-anisotropy', must be number type" );
-				bResult = false;
-			}
+			Error( "STEXDoc: Invalid STEX, a source file can't be empty (file: '%s')", pPath );
+			return false;
 		}
-		else
-		{
-			maxAnisotropy = 0;
-		}
+
+		sourcePaths.emplace_back( pStringValue );
 	}
 
-	return bResult;
+	// Validate source paths number
+	eastl::string validateMsg;
+	if ( !IsValidNumSourcePaths( type, (uint32)sourcePaths.size(), validateMsg ) )
+	{
+		Error( "STEXDoc: Invalid STEX, %s", validateMsg.c_str() );
+		return false;
+	}
+
+	// Get other parameters
+	maxAnisotropy	 = keyValues.GetInt( "max_anisotropy" );
+	bGenerateMipMaps = keyValues.GetBool( "generate_mipmaps" );
+	return true;
 }
 
 /*
@@ -524,18 +334,8 @@ CSTEXSourceTextureDoc::SaveFile
 */
 bool CSTEXSourceTextureDoc::SaveFile( const char* pPath )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-	Assert( g_pFileSystem );
-
-	// Try to open a file
-	TRefPtr<IStreamDataWriter> pFile = g_pFileSystem->CreateFileWriter( pPath );
-	if ( !pFile )
-	{
-		Error( "STEXDoc: Failed to open file '%s' for save a STEX source texture", pPath );
-		return false;
-	}
-
 	// Validate source paths number
+	PROFILE_SCOPE();
 	eastl::string validateMsg;
 	if ( !IsValidNumSourcePaths( type, (uint32)sourcePaths.size(), validateMsg ) )
 	{
@@ -543,28 +343,23 @@ bool CSTEXSourceTextureDoc::SaveFile( const char* pPath )
 		return false;
 	}
 
-	// Combine all source paths to one string
-	eastl::string sources;
+	// Create key values
+	CKeyValues keyValues( "stex" );
+	keyValues.SetString( "type", ConvTextureTypeToText( type ) );
+	keyValues.SetString( "format", ConvPixelFormatToText( pixelFormat ) );
+	keyValues.SetString( "filter", ConvSamplerFilterToText( filter ) );
+	keyValues.SetString( "address_mode_u", ConvSamplerAddressModeToText( addressModeU ) );
+	keyValues.SetString( "address_mode_v", ConvSamplerAddressModeToText( addressModeV ) );
+	keyValues.SetString( "address_mode_w", ConvSamplerAddressModeToText( addressModeW ) );
+	keyValues.SetBool( "generate_mipmaps", bGenerateMipMaps );
+	keyValues.SetInt( "max_anisotropy", maxAnisotropy );
+	keyValues.SetString( "output_dir", outputDir.c_str() );
 	for ( uint32 index = 0, count = (uint32)sourcePaths.size(); index < count; ++index )
 	{
-		sources += S_Sprintf( "\"%s\"%s", sourcePaths[index].c_str(), index + 1 < count ? ", " : "" );
+		CKeyValues* pSource = new CKeyValues( "source", &keyValues );
+		pSource->SetString( NULL, sourcePaths[index].c_str() );
 	}
 
-	// Write the JSON file
-	eastl::string buffer;
-	buffer += "{\n";
-	buffer += S_Sprintf( "\t\"type\":\t%s,\n", ConvTextureTypeToText( type ) );
-	buffer += S_Sprintf( "\t\"sources\":\t[ %s ],\n", sources.c_str() );
-	buffer += S_Sprintf( "\t\"generate-mipmaps\":\t%s,\n", bGenerateMipMaps ? "true" : "false" );
-	buffer += S_Sprintf( "\t\"address-mode-u\":\t\"%s\",\n", ConvSamplerAddressModeToText( addressModeU ) );
-	buffer += S_Sprintf( "\t\"address-mode-v\":\t\"%s\",\n", ConvSamplerAddressModeToText( addressModeV ) );
-	buffer += S_Sprintf( "\t\"address-mode-w\":\t\"%s\",\n", ConvSamplerAddressModeToText( addressModeW ) );
-	buffer += S_Sprintf( "\t\"filter\":\t\"%s\",\n", ConvSamplerFilterToText( filter ) );
-	buffer += S_Sprintf( "\t\"format\":\t\"%s\",\n", ConvPixelFormatToText( pixelFormat ) );
-	buffer += S_Sprintf( "\t\"output-dir\":\t\"%s\",\n", outputDir.c_str() );
-	buffer += S_Sprintf( "\t\"max-anisotropy\":\t\"%i\"\n", maxAnisotropy );
-	buffer += "}\n";
-
-	pFile->Write( buffer.data(), buffer.size() * sizeof( char ) );
-	return true;
+	// Save the key values to a file
+	return keyValues.SaveToFile( pPath );
 }
