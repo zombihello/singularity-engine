@@ -235,7 +235,7 @@ bool CSTEXSourceTextureDoc::LoadFromFile( const char* pPath )
 
 	// Get texture type
 	bool		bGotDefaultValue = false;
-	const char* pStringValue	 = keyValues.GetString( "type", "", &bGotDefaultValue );
+	const char* pStringValue	 = keyValues.GetString( "type", "", NULL, &bGotDefaultValue );
 	if ( bGotDefaultValue )
 	{
 		Error( "STEXDoc: Invalid STEX, not found required field 'type' (file: '%s')", pPath );
@@ -288,7 +288,7 @@ bool CSTEXSourceTextureDoc::LoadFromFile( const char* pPath )
 	}
 
 	// Get a destination file
-	outputDir = keyValues.GetString( "output_dir", "", &bGotDefaultValue );
+	outputDir = keyValues.GetString( "output_dir", "", NULL, &bGotDefaultValue );
 	if ( bGotDefaultValue )
 	{
 		Error( "STEXDoc: Invalid STEX, not found required field 'output_dir' (file: '%s')", pPath );

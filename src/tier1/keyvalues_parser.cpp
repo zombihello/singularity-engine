@@ -155,12 +155,40 @@ bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValues )
 		// Otherwise it is a simple value
 		else
 		{
-			eastl::string value = eastl::move( token.string );
+			// Make sure that the token hasn't a control symbol
 			if ( token.type == TOKEN_TYPE_CONTROL )
 			{
 				EmitError( token.position, "Unexpected control symbol" );
 				delete pSubKey;
 				break;
+			}
+
+			// The current token is a schema if the next token is ':'
+			eastl::string value;
+			uint64		  prevPosition = buffer.Tell();
+			token_t		  nextToken	   = ReadToken();
+			if ( !nextToken.string.empty() && nextToken.string[0] == ':' )
+			{
+				// Set the schema into the key
+				pSubKey->SetSchema( token.string.c_str() );
+
+				// The next token it is a real value
+				token = ReadToken();
+				value = eastl::move( token.string );
+
+				// Make sure that the token hasn't a control symbol
+				if ( token.type == TOKEN_TYPE_CONTROL )
+				{
+					EmitError( token.position, "Unexpected control symbol" );
+					delete pSubKey;
+					break;
+				}
+			}
+			// Otherwise the token is a real value
+			else
+			{
+				value = eastl::move( token.string );
+				buffer.Seek( prevPosition );
 			}
 
 			// Try to deduce type

@@ -213,6 +213,26 @@ FORCEINLINE void CKeyValues::SetName( const char* pName, uint32 length )
 
 /*
 ==================
+CKeyValues::SetSchema
+==================
+*/
+FORCEINLINE void CKeyValues::SetSchema( const char* pSchema )
+{
+	valueSchema = pSchema;
+}
+
+/*
+==================
+CKeyValues::SetSchema
+==================
+*/
+FORCEINLINE void CKeyValues::SetSchema( const char* pSchema, uint32 length )
+{
+	valueSchema = eastl::string_view( pSchema, length );
+}
+
+/*
+==================
 CKeyValues::SetBool
 ==================
 */
@@ -329,6 +349,16 @@ FORCEINLINE bool CKeyValues::HasSubKeys() const
 
 /*
 ==================
+CKeyValues::HasSchema
+==================
+*/
+FORCEINLINE bool CKeyValues::HasSchema() const
+{
+	return !valueSchema.empty();
+}
+
+/*
+==================
 CKeyValues::GetName
 ==================
 */
@@ -339,10 +369,21 @@ FORCEINLINE const char* CKeyValues::GetName() const
 
 /*
 ==================
+CKeyValues::GetSchema
+==================
+*/
+FORCEINLINE const char* CKeyValues::GetSchema( const char* pKeyName ) const
+{
+	CKeyValues* pKeyValues = const_cast<CKeyValues*>( this )->FindKey( pKeyName );
+	return pKeyValues ? pKeyValues->HasSchema() ? pKeyValues->valueSchema.c_str() : NULL : NULL;
+}
+
+/*
+==================
 CKeyValues::GetBool
 ==================
 */
-FORCEINLINE bool CKeyValues::GetBool( const char* pKeyName, bool defaultValue /* = false */, bool* pbGotDefaultValue /* = NULL */ ) const
+FORCEINLINE bool CKeyValues::GetBool( const char* pKeyName, bool defaultValue /* = false */, const char** pSchema /* = NULL */, bool* pbGotDefaultValue /* = NULL */ ) const
 {
 	CKeyValues* pKeyValues = const_cast<CKeyValues*>( this )->FindKey( pKeyName );
 	if ( pKeyValues )
@@ -350,6 +391,10 @@ FORCEINLINE bool CKeyValues::GetBool( const char* pKeyName, bool defaultValue /*
 		if ( pbGotDefaultValue )
 		{
 			*pbGotDefaultValue = false;
+		}
+		if ( pSchema )
+		{
+			*pSchema = pKeyValues->HasSchema() ? pKeyValues->valueSchema.c_str() : NULL;
 		}
 
 		switch ( pKeyValues->dataType )
@@ -366,6 +411,10 @@ FORCEINLINE bool CKeyValues::GetBool( const char* pKeyName, bool defaultValue /*
 	{
 		*pbGotDefaultValue = true;
 	}
+	if ( pSchema )
+	{
+		*pSchema = NULL;
+	}
 	return defaultValue;
 }
 
@@ -374,7 +423,7 @@ FORCEINLINE bool CKeyValues::GetBool( const char* pKeyName, bool defaultValue /*
 CKeyValues::GetInt
 ==================
 */
-FORCEINLINE int32 CKeyValues::GetInt( const char* pKeyName, int32 defaultValue /* = 0 */, bool* pbGotDefaultValue /* = NULL */ ) const
+FORCEINLINE int32 CKeyValues::GetInt( const char* pKeyName, int32 defaultValue /* = 0 */, const char** pSchema /* = NULL */, bool* pbGotDefaultValue /* = NULL */ ) const
 {
 	CKeyValues* pKeyValues = const_cast<CKeyValues*>( this )->FindKey( pKeyName );
 	if ( pKeyValues )
@@ -382,6 +431,10 @@ FORCEINLINE int32 CKeyValues::GetInt( const char* pKeyName, int32 defaultValue /
 		if ( pbGotDefaultValue )
 		{
 			*pbGotDefaultValue = false;
+		}
+		if ( pSchema )
+		{
+			*pSchema = pKeyValues->HasSchema() ? pKeyValues->valueSchema.c_str() : NULL;
 		}
 
 		switch ( pKeyValues->dataType )
@@ -398,6 +451,10 @@ FORCEINLINE int32 CKeyValues::GetInt( const char* pKeyName, int32 defaultValue /
 	{
 		*pbGotDefaultValue = true;
 	}
+	if ( pSchema )
+	{
+		*pSchema = NULL;
+	}
 	return defaultValue;
 }
 
@@ -406,7 +463,7 @@ FORCEINLINE int32 CKeyValues::GetInt( const char* pKeyName, int32 defaultValue /
 CKeyValues::GetInt64
 ==================
 */
-FORCEINLINE int64 CKeyValues::GetInt64( const char* pKeyName, int64 defaultValue /* = 0 */, bool* pbGotDefaultValue /* = NULL */ ) const
+FORCEINLINE int64 CKeyValues::GetInt64( const char* pKeyName, int64 defaultValue /* = 0 */, const char** pSchema /* = NULL */, bool* pbGotDefaultValue /* = NULL */ ) const
 {
 	CKeyValues* pKeyValues = const_cast<CKeyValues*>( this )->FindKey( pKeyName );
 	if ( pKeyValues )
@@ -414,6 +471,10 @@ FORCEINLINE int64 CKeyValues::GetInt64( const char* pKeyName, int64 defaultValue
 		if ( pbGotDefaultValue )
 		{
 			*pbGotDefaultValue = false;
+		}
+		if ( pSchema )
+		{
+			*pSchema = pKeyValues->HasSchema() ? pKeyValues->valueSchema.c_str() : NULL;
 		}
 
 		switch ( pKeyValues->dataType )
@@ -430,6 +491,10 @@ FORCEINLINE int64 CKeyValues::GetInt64( const char* pKeyName, int64 defaultValue
 	{
 		*pbGotDefaultValue = true;
 	}
+	if ( pSchema )
+	{
+		*pSchema = NULL;
+	}
 	return defaultValue;
 }
 
@@ -438,7 +503,7 @@ FORCEINLINE int64 CKeyValues::GetInt64( const char* pKeyName, int64 defaultValue
 CKeyValues::GetFloat
 ==================
 */
-FORCEINLINE float CKeyValues::GetFloat( const char* pKeyName, float defaultValue /* = 0.f */, bool* pbGotDefaultValue /* = NULL */ ) const
+FORCEINLINE float CKeyValues::GetFloat( const char* pKeyName, float defaultValue /* = 0.f */, const char** pSchema /* = NULL */, bool* pbGotDefaultValue /* = NULL */ ) const
 {
 	CKeyValues* pKeyValues = const_cast<CKeyValues*>( this )->FindKey( pKeyName );
 	if ( pKeyValues )
@@ -446,6 +511,10 @@ FORCEINLINE float CKeyValues::GetFloat( const char* pKeyName, float defaultValue
 		if ( pbGotDefaultValue )
 		{
 			*pbGotDefaultValue = false;
+		}
+		if ( pSchema )
+		{
+			*pSchema = pKeyValues->HasSchema() ? pKeyValues->valueSchema.c_str() : NULL;
 		}
 
 		switch ( pKeyValues->dataType )
@@ -462,6 +531,10 @@ FORCEINLINE float CKeyValues::GetFloat( const char* pKeyName, float defaultValue
 	{
 		*pbGotDefaultValue = true;
 	}
+	if ( pSchema )
+	{
+		*pSchema = NULL;
+	}
 	return defaultValue;
 }
 
@@ -470,7 +543,7 @@ FORCEINLINE float CKeyValues::GetFloat( const char* pKeyName, float defaultValue
 CKeyValues::GetDouble
 ==================
 */
-FORCEINLINE double CKeyValues::GetDouble( const char* pKeyName, double defaultValue /* = 0.0 */, bool* pbGotDefaultValue /* = NULL */ ) const
+FORCEINLINE double CKeyValues::GetDouble( const char* pKeyName, double defaultValue /* = 0.0 */, const char** pSchema /* = NULL */, bool* pbGotDefaultValue /* = NULL */ ) const
 {
 	CKeyValues* pKeyValues = const_cast<CKeyValues*>( this )->FindKey( pKeyName );
 	if ( pKeyValues )
@@ -478,6 +551,10 @@ FORCEINLINE double CKeyValues::GetDouble( const char* pKeyName, double defaultVa
 		if ( pbGotDefaultValue )
 		{
 			*pbGotDefaultValue = false;
+		}
+		if ( pSchema )
+		{
+			*pSchema = pKeyValues->HasSchema() ? pKeyValues->valueSchema.c_str() : NULL;
 		}
 
 		switch ( pKeyValues->dataType )
@@ -494,6 +571,10 @@ FORCEINLINE double CKeyValues::GetDouble( const char* pKeyName, double defaultVa
 	{
 		*pbGotDefaultValue = true;
 	}
+	if ( pSchema )
+	{
+		*pSchema = NULL;
+	}
 	return defaultValue;
 }
 
@@ -502,7 +583,7 @@ FORCEINLINE double CKeyValues::GetDouble( const char* pKeyName, double defaultVa
 CKeyValues::GetString
 ==================
 */
-FORCEINLINE const char* CKeyValues::GetString( const char* pKeyName, const char* pDefaultValue /* = "" */, bool* pbGotDefaultValue /* = NULL */ ) const
+FORCEINLINE const char* CKeyValues::GetString( const char* pKeyName, const char* pDefaultValue /* = "" */, const char** pSchema /* = NULL */, bool* pbGotDefaultValue /* = NULL */ ) const
 {
 	CKeyValues* pKeyValues = const_cast<CKeyValues*>( this )->FindKey( pKeyName );
 	if ( pKeyValues )
@@ -510,6 +591,10 @@ FORCEINLINE const char* CKeyValues::GetString( const char* pKeyName, const char*
 		if ( pbGotDefaultValue )
 		{
 			*pbGotDefaultValue = false;
+		}
+		if ( pSchema )
+		{
+			*pSchema = pKeyValues->HasSchema() ? pKeyValues->valueSchema.c_str() : NULL;
 		}
 
 		eastl::string& valueStringRef = (eastl::string&)pKeyValues->valueString;
@@ -527,6 +612,10 @@ FORCEINLINE const char* CKeyValues::GetString( const char* pKeyName, const char*
 	if ( pbGotDefaultValue )
 	{
 		*pbGotDefaultValue = true;
+	}
+	if ( pSchema )
+	{
+		*pSchema = NULL;
 	}
 	return pDefaultValue;
 }

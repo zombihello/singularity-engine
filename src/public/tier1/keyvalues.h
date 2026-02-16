@@ -53,6 +53,8 @@ public:
 
 	void SetName( const char* pName );
 	void SetName( const char* pName, uint32 length );
+	void SetSchema( const char* pSchema );
+	void SetSchema( const char* pSchema, uint32 length );
 	void SetBool( const char* pKeyName, bool value );
 	void SetInt( const char* pKeyName, int32 value );
 	void SetInt64( const char* pKeyName, int64 value );
@@ -64,13 +66,15 @@ public:
 	bool							IsEmpty() const;
 	bool							HasData() const;
 	bool							HasSubKeys() const;
+	bool							HasSchema() const;
 	const char*						GetName() const;
-	bool							GetBool( const char* pKeyName, bool defaultValue = false, bool* pbGotDefaultValue = NULL ) const;
-	int32							GetInt( const char* pKeyName, int32 defaultValue = 0, bool* pbGotDefaultValue = NULL ) const;
-	int64							GetInt64( const char* pKeyName, int64 defaultValue = 0, bool* pbGotDefaultValue = NULL ) const;
-	float							GetFloat( const char* pKeyName, float defaultValue = 0.f, bool* pbGotDefaultValue = NULL ) const;
-	double							GetDouble( const char* pKeyName, double defaultValue = 0.0, bool* pbGotDefaultValue = NULL ) const;
-	const char*						GetString( const char* pKeyName, const char* pDefaultValue = "", bool* pbGotDefaultValue = NULL ) const;
+	const char*						GetSchema( const char* pKeyName ) const;
+	bool							GetBool( const char* pKeyName, bool defaultValue = false, const char** pSchema = NULL, bool* pbGotDefaultValue = NULL ) const;
+	int32							GetInt( const char* pKeyName, int32 defaultValue = 0, const char** pSchema = NULL, bool* pbGotDefaultValue = NULL ) const;
+	int64							GetInt64( const char* pKeyName, int64 defaultValue = 0, const char** pSchema = NULL, bool* pbGotDefaultValue = NULL ) const;
+	float							GetFloat( const char* pKeyName, float defaultValue = 0.f, const char** pSchema = NULL, bool* pbGotDefaultValue = NULL ) const;
+	double							GetDouble( const char* pKeyName, double defaultValue = 0.0, const char** pSchema = NULL, bool* pbGotDefaultValue = NULL ) const;
+	const char*						GetString( const char* pKeyName, const char* pDefaultValue = "", const char** pSchema = NULL, bool* pbGotDefaultValue = NULL ) const;
 	keyValuesDataType_t				GetDataType() const;
 	CKeyValues*						GetParentKey() const;
 	const eastl::list<CKeyValues*>& GetSubKeys() const;
@@ -86,6 +90,7 @@ private:
 	nameID_t			nameID;
 	bool				bOwnNamePool;
 	keyValuesDataType_t dataType;
+	eastl::string		valueSchema;
 	eastl::string		valueString;
 	union
 	{

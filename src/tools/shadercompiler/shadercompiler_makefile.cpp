@@ -68,7 +68,7 @@ bool CShaderCompilerMakeFile::LoadShader( const char* pPath, const char* pBaseDi
 
 	// Get source file
 	bool bGotDefaultValue = false;
-	S_MakeAbsolutePath( keyValues.GetString( "source", "", &bGotDefaultValue ), shader.source, pBaseDir );
+	S_MakeAbsolutePath( keyValues.GetString( "source", "", NULL, &bGotDefaultValue ), shader.source, pBaseDir );
 	if ( bGotDefaultValue )
 	{
 		Error( "ShaderCompiler: Invalid shader, not found required field 'source' (file: '%s')", absolutePath.c_str() );
@@ -76,7 +76,7 @@ bool CShaderCompilerMakeFile::LoadShader( const char* pPath, const char* pBaseDi
 	}
 
 	// Get main function
-	shader.mainFunc = keyValues.GetString( "main_func", "", &bGotDefaultValue );
+	shader.mainFunc = keyValues.GetString( "main_func", "", NULL, &bGotDefaultValue );
 	if ( bGotDefaultValue )
 	{
 		Error( "ShaderCompiler: Invalid shader, not found required field 'main_func' (file: '%s')", absolutePath.c_str() );
@@ -84,7 +84,7 @@ bool CShaderCompilerMakeFile::LoadShader( const char* pPath, const char* pBaseDi
 	}
 
 	// Get shader type
-	const char* pType = keyValues.GetString( "type", "", &bGotDefaultValue );
+	const char* pType = keyValues.GetString( "type", "", NULL, &bGotDefaultValue );
 	if ( bGotDefaultValue )
 	{
 		Error( "ShaderCompiler: Invalid shader, not found required field 'type' (file: '%s')", absolutePath.c_str() );
@@ -107,7 +107,7 @@ bool CShaderCompilerMakeFile::LoadShader( const char* pPath, const char* pBaseDi
 			flag.name = it->GetName();
 
 			// Get minimum value
-			flag.minValue = it->GetInt( "min", 0, &bGotDefaultValue );
+			flag.minValue = it->GetInt( "min", 0, NULL, &bGotDefaultValue );
 			if ( bGotDefaultValue )
 			{
 				Error( "ShaderCompiler: Invalid flag '%s', not found required field 'min' (file: '%s')", flag.name.c_str(), absolutePath.c_str() );
@@ -115,7 +115,7 @@ bool CShaderCompilerMakeFile::LoadShader( const char* pPath, const char* pBaseDi
 			}
 
 			// Get maximum value
-			flag.maxValue = it->GetInt( "max", 0, &bGotDefaultValue );
+			flag.maxValue = it->GetInt( "max", 0, NULL, &bGotDefaultValue );
 			if ( bGotDefaultValue )
 			{
 				Error( "ShaderCompiler: Invalid flag '%s', not found required field 'max' (file: '%s')", flag.name.c_str(), absolutePath.c_str() );
@@ -123,7 +123,7 @@ bool CShaderCompilerMakeFile::LoadShader( const char* pPath, const char* pBaseDi
 			}
 
 			// Get default value
-			flag.defaultValue = it->GetInt( "default", flag.minValue, &bGotDefaultValue );
+			flag.defaultValue = it->GetInt( "default", flag.minValue, NULL, &bGotDefaultValue );
 			flag.bSetDefault  = !bGotDefaultValue;
 
 			// Make sure what min and max range is valid. If not we fix it

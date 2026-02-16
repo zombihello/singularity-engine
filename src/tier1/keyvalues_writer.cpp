@@ -89,6 +89,13 @@ void CKeyValuesWriter::WriteKeyToBuffer( CKeyValues* pKeyValues, eastl::string& 
 	{
 		Assert( !pKeyValues->HasSubKeys() );
 		buffer += " \"";
+
+		const char* pSchema = pKeyValues->GetSchema( NULL );
+		if ( pSchema )
+		{
+			buffer += S_Sprintf( "%s\":\"", pSchema );
+		}
+
 		WriteConvertedString( buffer, pKeyValues->GetString( NULL ) );
 		buffer += "\"" LINE_TERMINATOR_STRING;
 	}

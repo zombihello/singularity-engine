@@ -128,7 +128,8 @@ FORCEINLINE bool CKeyValuesParser::IsControlSymbol( uint32 offset /* = 0 */ ) co
 		   || IsEndMultilineComment( offset )
 		   || c == '{' || c == '}'
 		   || c == '[' || c == ']'
-		   || c == '"' || c == '|';
+		   || c == '"' || c == '|'
+		   || c == ':';
 }
 
 /*
