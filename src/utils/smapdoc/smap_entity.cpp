@@ -15,10 +15,9 @@ CSMAPEntity::CSMAPEntity
 ==================
 */
 CSMAPEntity::CSMAPEntity( const CSMAPEntity& other )
-	: entityDesc( other.entityDesc )
+	: classname( other.classname )
 	, name( other.name )
 {
-	Copy( other );
 }
 
 /*

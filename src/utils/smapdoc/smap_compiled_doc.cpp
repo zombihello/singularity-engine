@@ -42,10 +42,10 @@ bool CSMAPCompiledMapDoc::SaveFile( const char* pPath )
 	{
 		const CSMAPEntity& entity = entities[entityIdx];
 
-		// Write an entity descriptor
-		uint32 entityDescSize = S_Strlen( entity.GetEntityDesc() );
-		pFile->Write( &entityDescSize, sizeof( uint32 ) );
-		pFile->Write( (void*)entity.GetEntityDesc(), entityDescSize );
+		// Write an class name
+		uint32 classNameSize = S_Strlen( entity.GetClassName() );
+		pFile->Write( &classNameSize, sizeof( uint32 ) );
+		pFile->Write( (void*)entity.GetClassName(), classNameSize );
 
 		// Write a name
 		uint32 nameSize = S_Strlen( entity.GetName() );
@@ -102,13 +102,13 @@ bool CSMAPCompiledMapDoc::LoadFromFile( const char* pPath )
 	{
 		CSMAPEntity& entity = entities[entityIdx];
 
-		// Read an entity descriptor
-		eastl::string entityDesc;
-		uint32		  entityDescSize = 0;
-		pFile->Read( &entityDescSize, sizeof( uint32 ) );
-		entityDesc.resize( entityDescSize );
-		pFile->Read( entityDesc.data(), entityDescSize );
-		entity.SetEntityDesc( entityDesc.c_str() );
+		// Read an class name
+		eastl::string classname;
+		uint32		  classNameSize = 0;
+		pFile->Read( &classNameSize, sizeof( uint32 ) );
+		classname.resize( classNameSize );
+		pFile->Read( classname.data(), classNameSize );
+		entity.SetClassName( classname.c_str() );
 
 		// Read a name
 		eastl::string name;

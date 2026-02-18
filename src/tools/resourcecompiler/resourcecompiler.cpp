@@ -634,7 +634,7 @@ int32 CResourceCompilerAppSystemGroup::Main()
 				{
 					const CSMAPEntity&		 smapEntity			   = smapEntities[entityIdx];
 					resourceToolMapEntity_t& resourceToolMapEntity = entities[entityIdx];
-					resourceToolMapEntity.pEntityDesc			   = smapEntity.GetEntityDesc();
+					resourceToolMapEntity.pClassName			   = smapEntity.GetClassName();
 					resourceToolMapEntity.pName					   = smapEntity.GetName();
 				}
 			}

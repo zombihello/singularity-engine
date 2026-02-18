@@ -1,13 +1,13 @@
+output_dir "//BASE_PATH/citadel/maps/"
+entities
 {
-	"output-dir": "//BASE_PATH/citadel/maps/",
-	"entities": [
-		{
-			"entity-desc": "entities/test_quad",
-			"name": "quad"
-		},
-		{
-			"entity-desc": "entities/player",
-			"name": "player"
-		}
-	]
+	quad
+	{
+		classname "entities/test_quad"
+	}
+	
+	player
+	{
+		classname "entities/player"
+	}
 }

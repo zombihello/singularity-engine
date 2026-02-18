@@ -7,18 +7,18 @@ CSMAPEntity::Copy
 */
 FORCEINLINE void CSMAPEntity::Copy( const CSMAPEntity& other )
 {
-	entityDesc = other.entityDesc;
-	name	   = other.name;
+	classname = other.classname;
+	name	  = other.name;
 }
 
 /*
 ==================
-CSMAPEntity::SetEntityDesc
+CSMAPEntity::SetClassName
 ==================
 */
-FORCEINLINE void CSMAPEntity::SetEntityDesc( const char* pEntityDesc )
+FORCEINLINE void CSMAPEntity::SetClassName( const char* pClassName )
 {
-	entityDesc = pEntityDesc;
+	classname = pClassName;
 }
 
 /*
@@ -33,12 +33,12 @@ FORCEINLINE void CSMAPEntity::SetName( const char* pName )
 
 /*
 ==================
-CSMAPEntity::GetEntityDesc
+CSMAPEntity::GetClassName
 ==================
 */
-FORCEINLINE const char* CSMAPEntity::GetEntityDesc() const
+FORCEINLINE const char* CSMAPEntity::GetClassName() const
 {
-	return entityDesc.c_str();
+	return classname.c_str();
 }
 
 /*
@@ -58,8 +58,8 @@ CSMAPEntity::Clear
 */
 FORCEINLINE void CSMAPEntity::Clear()
 {
-	entityDesc = "";
-	name	   = "";
+	classname = "";
+	name	  = "";
 }
 
 /*

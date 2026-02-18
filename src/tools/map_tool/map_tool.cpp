@@ -54,7 +54,7 @@ bool CMapTool::CompileMap( const resourceToolCompileMapParams_t& compileParams )
 	{
 		CSMAPEntity					   smapEntity;
 		const resourceToolMapEntity_t* pResourceToolMapEntity = &compileParams.pEntities[entityIdx];
-		smapEntity.SetEntityDesc( pResourceToolMapEntity->pEntityDesc );
+		smapEntity.SetClassName( pResourceToolMapEntity->pClassName );
 		smapEntity.SetName( pResourceToolMapEntity->pName );
 		smapCompiledFile.AddEntity( smapEntity );
 	}
