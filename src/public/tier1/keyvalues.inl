@@ -27,31 +27,6 @@ FORCEINLINE CKeyValues::CKeyValues( const char* pName, CKeyValues* pParentKey /*
 
 /*
 ==================
-CKeyValues::CKeyValues
-==================
-*/
-FORCEINLINE CKeyValues::CKeyValues( const char* pName, uint32 length, CKeyValues* pParentKey /*= NULL*/ )
-	: nameID( INVALID_INDEX )
-	, bOwnNamePool( false )
-	, dataType( KEYVALUES_DATA_TYPE_NONE )
-	, pParentKey( NULL )
-	, pNamePool( NULL )
-{
-	if ( pParentKey )
-	{
-		SetParent( pParentKey );
-	}
-	else
-	{
-		pNamePool	 = new namePool_t();
-		bOwnNamePool = true;
-	}
-
-	SetName( pName, length );
-}
-
-/*
-==================
 CKeyValues::~CKeyValues
 ==================
 */
@@ -203,16 +178,6 @@ FORCEINLINE void CKeyValues::SetName( const char* pName )
 
 /*
 ==================
-CKeyValues::SetName
-==================
-*/
-FORCEINLINE void CKeyValues::SetName( const char* pName, uint32 length )
-{
-	nameID = pNamePool->FindOrAdd( pName, length );
-}
-
-/*
-==================
 CKeyValues::SetSchema
 ==================
 */
@@ -223,22 +188,12 @@ FORCEINLINE void CKeyValues::SetSchema( const char* pSchema )
 
 /*
 ==================
-CKeyValues::SetSchema
-==================
-*/
-FORCEINLINE void CKeyValues::SetSchema( const char* pSchema, uint32 length )
-{
-	valueSchema = eastl::string_view( pSchema, length );
-}
-
-/*
-==================
 CKeyValues::SetBool
 ==================
 */
-FORCEINLINE void CKeyValues::SetBool( const char* pKeyName, bool value )
+FORCEINLINE void CKeyValues::SetBool( const char* pKeyName, bool value, const char* pSchema /* = NULL */ )
 {
-	SetInt( pKeyName, (int32)value );
+	SetInt( pKeyName, (int32)value, pSchema );
 }
 
 /*
@@ -246,12 +201,16 @@ FORCEINLINE void CKeyValues::SetBool( const char* pKeyName, bool value )
 CKeyValues::SetInt
 ==================
 */
-FORCEINLINE void CKeyValues::SetInt( const char* pKeyName, int32 value )
+FORCEINLINE void CKeyValues::SetInt( const char* pKeyName, int32 value, const char* pSchema /* = NULL */ )
 {
 	CKeyValues* pKeyValues = FindKey( pKeyName, true );
 	pKeyValues->dataType   = KEYVALUES_DATA_TYPE_INT;
 	pKeyValues->valueInt32 = value;
 	pKeyValues->valueString.clear();
+	if ( pSchema )
+	{
+		pKeyValues->valueSchema = pSchema;
+	}
 }
 
 /*
@@ -259,12 +218,16 @@ FORCEINLINE void CKeyValues::SetInt( const char* pKeyName, int32 value )
 CKeyValues::SetInt64
 ==================
 */
-FORCEINLINE void CKeyValues::SetInt64( const char* pKeyName, int64 value )
+FORCEINLINE void CKeyValues::SetInt64( const char* pKeyName, int64 value, const char* pSchema /* = NULL */ )
 {
 	CKeyValues* pKeyValues = FindKey( pKeyName, true );
 	pKeyValues->dataType   = KEYVALUES_DATA_TYPE_INT64;
 	pKeyValues->valueInt64 = value;
 	pKeyValues->valueString.clear();
+	if ( pSchema )
+	{
+		pKeyValues->valueSchema = pSchema;
+	}
 }
 
 /*
@@ -272,12 +235,16 @@ FORCEINLINE void CKeyValues::SetInt64( const char* pKeyName, int64 value )
 CKeyValues::SetFloat
 ==================
 */
-FORCEINLINE void CKeyValues::SetFloat( const char* pKeyName, float value )
+FORCEINLINE void CKeyValues::SetFloat( const char* pKeyName, float value, const char* pSchema /* = NULL */ )
 {
 	CKeyValues* pKeyValues = FindKey( pKeyName, true );
 	pKeyValues->dataType   = KEYVALUES_DATA_TYPE_FLOAT;
 	pKeyValues->valueFloat = value;
 	pKeyValues->valueString.clear();
+	if ( pSchema )
+	{
+		pKeyValues->valueSchema = pSchema;
+	}
 }
 
 /*
@@ -285,12 +252,16 @@ FORCEINLINE void CKeyValues::SetFloat( const char* pKeyName, float value )
 CKeyValues::SetDouble
 ==================
 */
-FORCEINLINE void CKeyValues::SetDouble( const char* pKeyName, double value )
+FORCEINLINE void CKeyValues::SetDouble( const char* pKeyName, double value, const char* pSchema /* = NULL */ )
 {
 	CKeyValues* pKeyValues	= FindKey( pKeyName, true );
 	pKeyValues->dataType	= KEYVALUES_DATA_TYPE_DOUBLE;
 	pKeyValues->valueDouble = value;
 	pKeyValues->valueString.clear();
+	if ( pSchema )
+	{
+		pKeyValues->valueSchema = pSchema;
+	}
 }
 
 /*
@@ -298,23 +269,15 @@ FORCEINLINE void CKeyValues::SetDouble( const char* pKeyName, double value )
 CKeyValues::SetString
 ==================
 */
-FORCEINLINE void CKeyValues::SetString( const char* pKeyName, const char* pValue )
+FORCEINLINE void CKeyValues::SetString( const char* pKeyName, const char* pValue, const char* pSchema /* = NULL */ )
 {
 	CKeyValues* pKeyValues	= FindKey( pKeyName, true );
 	pKeyValues->dataType	= KEYVALUES_DATA_TYPE_STRING;
 	pKeyValues->valueString = pValue;
-}
-
-/*
-==================
-CKeyValues::SetString
-==================
-*/
-FORCEINLINE void CKeyValues::SetString( const char* pKeyName, const char* pValue, uint32 length )
-{
-	CKeyValues* pKeyValues	= FindKey( pKeyName, true );
-	pKeyValues->dataType	= KEYVALUES_DATA_TYPE_STRING;
-	pKeyValues->valueString = eastl::string_view( pValue, length );
+	if ( pSchema )
+	{
+		pKeyValues->valueSchema = pSchema;
+	}
 }
 
 /*

@@ -33,7 +33,7 @@ private:
 	bool GrabValueAsVec2( const CJsonValue& jsonValue, vec2_t& value ) const;
 	bool GrabValueAsVec3( const CJsonValue& jsonValue, vec3_t& value ) const;
 	bool GrabValueAsVec4( const CJsonValue& jsonValue, vec4_t& value ) const;
-	bool GrabValueAsMatrix( const CJsonValue& jsonValue, matrix_t& value ) const;
+	bool GrabValueAsMatrix( const CJsonValue& jsonValue, mat4_t& value ) const;
 	bool GrabValueAsString( const CJsonValue& jsonValue, eastl::string& value ) const;
 	bool GrabValueAsComponent( const CJsonValue& jsonValue, CSENTEntityDescComponent& component ) const;
 	bool GrabValueAsVar( const CJsonValue& jsonValue, CSENTEntityDescVar& var ) const;

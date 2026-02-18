@@ -177,7 +177,7 @@ FORCEINLINE vec4_t CSENTEntityDescVar::GetVec4Value( const vec4_t& defaultValue 
 CSENTEntityDescVar::SetMatrixValue
 ==================
 */
-FORCEINLINE void CSENTEntityDescVar::SetMatrixValue( const matrix_t& value )
+FORCEINLINE void CSENTEntityDescVar::SetMatrixValue( const mat4_t& value )
 {
 	matrixValue = value;
 	type		= SENT_ENTITY_DESC_VAR_TYPE_MATRIX;
@@ -188,7 +188,7 @@ FORCEINLINE void CSENTEntityDescVar::SetMatrixValue( const matrix_t& value )
 CSENTEntityDescVar::GetMatrixValue
 ==================
 */
-FORCEINLINE matrix_t CSENTEntityDescVar::GetMatrixValue( const matrix_t& defaultValue /* = g_matrixIdentity */ ) const
+FORCEINLINE mat4_t CSENTEntityDescVar::GetMatrixValue( const mat4_t& defaultValue /* = g_matrixIdentity */ ) const
 {
 	return type == SENT_ENTITY_DESC_VAR_TYPE_MATRIX ? matrixValue : defaultValue;
 }

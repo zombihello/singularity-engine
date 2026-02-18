@@ -1,11 +1,6 @@
+output_dir 	"//BASE_PATH/citadel/materials/"
+shader 		unlitgeneric
+parameters
 {
-	"output-dir":	"//BASE_PATH/citadel/materials/",
-	"shader": 		"unlitgeneric",
-	"parameters": [
-		{
-			"name": 	"baseTexture",
-			"type": 	"texture",
-			"value": 	"materials/nelson"
-		}
-	]
+	baseTexture		texture:"materials/nelson"
 }

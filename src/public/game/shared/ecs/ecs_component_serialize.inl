@@ -83,7 +83,7 @@ EcsReadData
 ==================
 */
 template<>
-FORCEINLINE void EcsReadData<matrix_t>( matrix_t& data, const CSENTEntityDescVar& sentVar, const matrix_t& defaultValue /*= matrix_t( 0.f )*/ )
+FORCEINLINE void EcsReadData<mat4_t>( mat4_t& data, const CSENTEntityDescVar& sentVar, const mat4_t& defaultValue /*= mat4_t( 0.f )*/ )
 {
 	data = sentVar.GetMatrixValue( defaultValue );
 }

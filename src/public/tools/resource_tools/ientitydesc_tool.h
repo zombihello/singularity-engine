@@ -20,31 +20,31 @@ enum resourceToolEntityDescVarType_t
 
 struct resourceToolEntityDescVar_t
 {
-	const char*					pName;
+	const char*						pName;
 	resourceToolEntityDescVarType_t type;
 	union
 	{
-		bool		 boolValue;
-		int32		 intValue;
-		float		 floatValue;
-		vec2_t		 vector2DValue;
-		vec3_t		 vector3DValue;
-		vec4_t		 vector4DValue;
-		matrix_t	 matrixValue;
+		bool		boolValue;
+		int32		intValue;
+		float		floatValue;
+		vec2_t		vector2DValue;
+		vec3_t		vector3DValue;
+		vec4_t		vector4DValue;
+		mat4_t		matrixValue;
 		const char* pStringValue;
 	};
 };
 
 struct resourceToolEntityDescComponent_t
 {
-	const char*					   pType;
+	const char*						   pType;
 	const resourceToolEntityDescVar_t* pVars;
 	uint32							   numVars;
 };
 
 struct resourceToolCompileEntityDescParams_t
 {
-	const char*							 pDestPath;
+	const char*								 pDestPath;
 	const resourceToolEntityDescComponent_t* pComponents;
 	uint32									 numComponents;
 };

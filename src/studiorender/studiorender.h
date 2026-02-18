@@ -16,8 +16,8 @@ class CStudioViewport;
 //-----------------------------------------------------------------------------
 struct studioSceneView_t
 {
-	matrix_t viewMatrix;
-	matrix_t projectionMatrix;
+	mat4_t viewMatrix;
+	mat4_t projectionMatrix;
 };
 
 //-----------------------------------------------------------------------------

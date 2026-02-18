@@ -178,7 +178,7 @@ FORCEINLINE void CSMATMaterialVar::GetVecValue( float* pValue, uint32 numComps )
 CSMATMaterialVar::SetMatrixValue
 ==================
 */
-FORCEINLINE void CSMATMaterialVar::SetMatrixValue( const matrix_t& value )
+FORCEINLINE void CSMATMaterialVar::SetMatrixValue( const mat4_t& value )
 {
 	matrixValue = value;
 	type		= SMAT_MATERIAL_VAR_TYPE_MATRIX;
@@ -189,7 +189,7 @@ FORCEINLINE void CSMATMaterialVar::SetMatrixValue( const matrix_t& value )
 CSMATMaterialVar::GetMatrixValue
 ==================
 */
-FORCEINLINE matrix_t CSMATMaterialVar::GetMatrixValue() const
+FORCEINLINE mat4_t CSMATMaterialVar::GetMatrixValue() const
 {
 	return type == SMAT_MATERIAL_VAR_TYPE_MATRIX ? matrixValue : g_matrixIdentity;
 }

@@ -65,22 +65,22 @@ public:
 	void SetRotation( const quat_t& newRotation );
 	void SetScale( const vec3_t& newScale );
 
-	const matrix_t& AsMatrix() const;
-	void			AsMatrix( matrix_t& destMatrix ) const;
-	vec3_t			GetUnitAxis( axis_t axis ) const;
-	vec3_t			GetLocation() const;
-	quat_t			GetRotation() const;
-	vec3_t			GetScale() const;
+	const mat4_t& AsMatrix() const;
+	void		  AsMatrix( mat4_t& destMatrix ) const;
+	vec3_t		  GetUnitAxis( axis_t axis ) const;
+	vec3_t		  GetLocation() const;
+	quat_t		  GetRotation() const;
+	vec3_t		  GetScale() const;
 
 	CTransform operator+( const CTransform& other ) const;
 	CTransform operator-( const CTransform& other ) const;
 
 protected:
-	mutable bool	 bDirtyMatrix;
-	vec3_t			 translation;
-	quat_t			 rotation;
-	vec3_t			 scale;
-	mutable matrix_t matrix;
+	mutable bool   bDirtyMatrix;
+	vec3_t		   translation;
+	quat_t		   rotation;
+	vec3_t		   scale;
+	mutable mat4_t matrix;
 };
 
 #include "tier1/math/transform.inl"

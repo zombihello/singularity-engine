@@ -136,7 +136,7 @@ bool CSENTSourceEntityDescDoc::SaveFile( const char* pPath )
 
 					case SENT_ENTITY_DESC_VAR_TYPE_MATRIX:
 					{
-						matrix_t value = var.GetMatrixValue();
+						mat4_t value = var.GetMatrixValue();
 						buffer += "{\n";
 						buffer += S_Sprintf( "\t\t\t\t\t\"row0\": { \"x\": %f, \"y\": %f, \"z\": %f, \"w\": %f },\n", value[0].x, value[0].y, value[0].z, value[0].w );
 						buffer += S_Sprintf( "\t\t\t\t\t\"row1\": { \"x\": %f, \"y\": %f, \"z\": %f, \"w\": %f },\n", value[1].x, value[1].y, value[1].z, value[1].w );
@@ -420,7 +420,7 @@ bool CSENTSourceEntityDescDoc::GrabValueAsVec4( const CJsonValue& jsonValue, vec
 CSENTSourceEntityDescDoc::GrabValueAsMatrix
 ==================
 */
-bool CSENTSourceEntityDescDoc::GrabValueAsMatrix( const CJsonValue& jsonValue, matrix_t& value ) const
+bool CSENTSourceEntityDescDoc::GrabValueAsMatrix( const CJsonValue& jsonValue, mat4_t& value ) const
 {
 	if ( !jsonValue.IsValid() || !jsonValue.IsA( JSONVALUE_TYPE_OBJECT ) )
 	{
@@ -617,7 +617,7 @@ bool CSENTSourceEntityDescDoc::GrabValueAsVar( const CJsonValue& jsonValue, CSEN
 
 	case SENT_ENTITY_DESC_VAR_TYPE_MATRIX:
 	{
-		matrix_t value = g_matrixIdentity;
+		mat4_t value = g_matrixIdentity;
 		if ( !GrabValueAsMatrix( jsonObject.GetValue( "value" ), value ) )
 		{
 			Error( "SENTDoc: Invalid value in '%s', must be object type with required vector 4D fields: 'row0', 'row1', 'row2', 'row3'. Each vector 4D must have number fields: 'x', 'y', 'z' and 'w'", name.c_str() );

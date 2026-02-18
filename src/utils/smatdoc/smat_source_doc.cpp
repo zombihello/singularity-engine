@@ -1,29 +1,25 @@
 #include "utils/interfaces/interfaces.h"
 #include "tier0/profile.h"
+#include "tier1/keyvalues.h"
 #include "filesystem/ifilesystem.h"
 #include "utils/smatdoc/smat_source_doc.h"
 
-//-----------------------------------------------------------------------------
 // Table of variable type names
-//-----------------------------------------------------------------------------
 static const char* s_pVarTypeNames[] = {
 	"undefined",  // SMAT_MATERIAL_VAR_TYPE_UNDEFINED
 	"bool",		  // SMAT_MATERIAL_VAR_TYPE_BOOL
 	"int",		  // SMAT_MATERIAL_VAR_TYPE_INT
 	"float",	  // SMAT_MATERIAL_VAR_TYPE_FLOAT
-	"vector2d",	  // SMAT_MATERIAL_VAR_TYPE_VECTOR_2D
-	"vector3d",	  // SMAT_MATERIAL_VAR_TYPE_VECTOR_3D
-	"vector4d",	  // SMAT_MATERIAL_VAR_TYPE_VECTOR_4D
-	"matrix",	  // SMAT_MATERIAL_VAR_TYPE_MATRIX
+	"vec2",		  // SMAT_MATERIAL_VAR_TYPE_VECTOR_2D
+	"vec3",		  // SMAT_MATERIAL_VAR_TYPE_VECTOR_3D
+	"vec4",		  // SMAT_MATERIAL_VAR_TYPE_VECTOR_4D
+	"mat4",		  // SMAT_MATERIAL_VAR_TYPE_MATRIX
 	"string",	  // SMAT_MATERIAL_VAR_TYPE_STRING
 	"texture",	  // SMAT_MATERIAL_VAR_TYPE_TEXTURE
 	"material"	  // SMAT_MATERIAL_VAR_TYPE_MATERIAL
 };
 static_assert( ARRAYSIZE( s_pVarTypeNames ) == SMAT_MATERIAL_VAR_NUM_TYPES, "Array size 's_pVarTypeNames' must be equal to SMAT_MATERIAL_VAR_NUM_TYPES" );
 
-//-----------------------------------------------------------------------------
-// Functions to convert material type <-> text
-//-----------------------------------------------------------------------------
 /*
 ==================
 ConvTextToSMTMaterialVarType
@@ -56,453 +52,131 @@ static const char* ConvSMTMaterialVarTypeToText( smatMaterialVarType_t varType )
 
 /*
 ==================
+ConvKVDataTypeToSMTMaterialVarType
+==================
+*/
+static smatMaterialVarType_t ConvKVDataTypeToSMTMaterialVarType( keyValuesDataType_t kvDataType )
+{
+	switch ( kvDataType )
+	{
+	case KEYVALUES_DATA_TYPE_INT:
+	case KEYVALUES_DATA_TYPE_INT64:
+		return SMAT_MATERIAL_VAR_TYPE_INT;
+
+	case KEYVALUES_DATA_TYPE_FLOAT:
+	case KEYVALUES_DATA_TYPE_DOUBLE:
+		return SMAT_MATERIAL_VAR_TYPE_FLOAT;
+
+	case KEYVALUES_DATA_TYPE_STRING:
+		return SMAT_MATERIAL_VAR_TYPE_STRING;
+
+	default:
+		AssertMsg( false, "Unknown KeyValues type 0x%X", kvDataType );
+		return SMAT_MATERIAL_VAR_TYPE_UNDEFINED;
+	}
+}
+
+/*
+==================
 CSMATSourceMaterialDoc::LoadFromFile
 ==================
 */
 bool CSMATSourceMaterialDoc::LoadFromFile( const char* pPath )
 {
-	// Do nothing if the file system isn't valid
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-	Assert( g_pFileSystem );
-
-	// Try to open a file
-	TRefPtr<IStreamDataReader> pFile = g_pFileSystem->CreateFileReader( pPath );
-	if ( !pFile )
-	{
-		return false;
-	}
-
-	// Allocate memory for buffer
-	uint64 fileSize = pFile->GetSize() + 1;
-	byte*  pBuffer	= (byte*)Mem_MallocZero( fileSize );
-
-	// Serialize data to the buffer
-	pFile->Read( pBuffer, fileSize );
-
-	// Load the JSON file and free allocated memory for the buffer
-	CJsonDoc jsonMaterial;
-	bool	 bResult = jsonMaterial.LoadFromBuffer( (const char*)pBuffer );
-	Mem_Free( pBuffer );
-	if ( !bResult )
-	{
-		return false;
-	}
-	Clear();
-
-	// If all ok grab data from JSON
-	return GrabData( jsonMaterial );
-}
-
-/*
-==================
-CSMATSourceMaterialDoc::LoadFromBuffer
-==================
-*/
-bool CSMATSourceMaterialDoc::LoadFromBuffer( const char* pBuffer )
-{
-	// Clear the material
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-
-	// Load JSON from buffer
-	CJsonDoc jsonMaterial;
-	if ( !jsonMaterial.LoadFromBuffer( pBuffer ) )
-	{
-		return false;
-	}
-	Clear();
-
-	// If all ok grab data from JSON
-	return GrabData( jsonMaterial );
-}
-
-/*
-==================
-CSMATSourceMaterialDoc::GrabData
-==================
-*/
-bool CSMATSourceMaterialDoc::GrabData( const CJsonDoc& jsonDoc )
-{
+	// Load key values file
 	PROFILE_SCOPE();
-	bool bResult = true;
-
-	// Get output directory
+	CKeyValues keyValues( "smat" );
+	if ( !keyValues.LoadFromFile( pPath ) )
 	{
-		CJsonValue jsonOutputDir = jsonDoc.GetValue( "output-dir" );
-		if ( jsonOutputDir.IsValid() )
-		{
-			if ( jsonOutputDir.IsA( JSONVALUE_TYPE_STRING ) )
-			{
-				eastl::string outputDir = jsonOutputDir.GetString();
-				if ( outputDir.empty() )
-				{
-					Error( "SMATDoc: Invalid 'output-dir', an output directory can't be empty" );
-					bResult = false;
-				}
+		return false;
+	}
+	Clear();
 
-				CSMATSourceMaterialDoc::outputDir = outputDir;
-			}
-			else
-			{
-				Error( "SMATDoc: Invalid 'output-dir', must be string type" );
-				bResult = false;
-			}
-		}
-		else
-		{
-			Error( "SMATDoc: A source material '%s' must have 'output-dir' field" );
-			bResult = false;
-		}
+	// Get a destination file
+	bool bGotDefaultValue = false;
+	outputDir			  = keyValues.GetString( "output_dir", "", NULL, &bGotDefaultValue );
+	if ( bGotDefaultValue )
+	{
+		Error( "SMATDoc: Invalid SMAT, not found required field 'output_dir' (file: '%s')", pPath );
+		return false;
+	}
+	if ( outputDir.empty() )
+	{
+		Error( "SMATDoc: Invalid SMAT, an output directory can't be empty (file: '%s')", pPath );
+		return false;
 	}
 
 	// Get shader name
+	shaderName = keyValues.GetString( "shader", "", NULL, &bGotDefaultValue );
+	if ( bGotDefaultValue )
 	{
-		CJsonValue jsonShaderVar = jsonDoc.GetValue( "shader" );
-		if ( jsonShaderVar.IsValid() )
-		{
-			if ( jsonShaderVar.IsA( JSONVALUE_TYPE_STRING ) )
-			{
-				shaderName = jsonShaderVar.GetString();
-			}
-			else
-			{
-				Error( "SMATDoc: Invalid \"shader\", must be string type" );
-				bResult = false;
-			}
-		}
-		else
-		{
-			Error( "SMATDoc: A source material must have 'shader'" );
-			bResult = false;
-		}
+		Error( "SMATDoc: Invalid SMAT, not found required field 'shader' (file: '%s')", pPath );
+		return false;
+	}
+	if ( shaderName.empty() )
+	{
+		Error( "SMATDoc: Invalid SMAT, a shader name can't be empty (file: '%s')", pPath );
+		return false;
 	}
 
 	// Get parameters
+	CKeyValues* pParameters = keyValues.FindKey( "parameters" );
+	if ( pParameters )
 	{
-		CJsonValue jsonParametersVar = jsonDoc.GetValue( "parameters" );
-		if ( jsonParametersVar.IsValid() )
+		for ( CKeyValuesSubKeysIterator it( pParameters ); it; ++it )
 		{
-			if ( jsonParametersVar.IsA( JSONVALUE_TYPE_ARRAY ) )
+			CSMATMaterialVar	  smatMaterialVar;
+			smatMaterialVarType_t smatMaterialVarType = SMAT_MATERIAL_VAR_TYPE_UNDEFINED;
+			keyValuesDataType_t	  kvDataType		  = it->GetDataType();
+			smatMaterialVar.SetName( it->GetName() );
+
+			// If the key has schema get a value type from them
+			const char* pSchema = it->GetSchema( NULL );
+			if ( pSchema )
 			{
-				eastl::vector<CJsonValue> jsonParametersArray = jsonParametersVar.GetArray();
-				for ( uint32 varIdx = 0, count = (uint32)jsonParametersArray.size(); varIdx < count; ++varIdx )
+				smatMaterialVarType = ConvTextToSMTMaterialVarType( pSchema );
+				if ( smatMaterialVarType == SMAT_MATERIAL_VAR_TYPE_UNDEFINED )
 				{
-					const CJsonValue& jsonValue = jsonParametersArray[varIdx];
-					if ( jsonValue.IsValid() && jsonValue.IsA( JSONVALUE_TYPE_OBJECT ) )
-					{
-						CJsonObject	  jsonObject = jsonValue.GetObject();
-						eastl::string name		 = jsonObject.GetValue( "name" ).GetString();
-						eastl::string type		 = jsonObject.GetValue( "type" ).GetString();
-						if ( name.empty() )
-						{
-							Error( "SMATDoc: Invalid 'name' at parameter id '%i'", varIdx );
-							bResult = false;
-							continue;
-						}
-
-						if ( type.empty() )
-						{
-							Error( "SMATDoc: Invalid 'type' in '%s' (parameter id: %i)", name.c_str(), varIdx );
-							bResult = false;
-							continue;
-						}
-
-						CSMATMaterialVar	  smatMaterialVar;
-						smatMaterialVarType_t smatMaterialVarType = ConvTextToSMTMaterialVarType( type.c_str() );
-						smatMaterialVar.SetName( name.c_str() );
-						switch ( smatMaterialVarType )
-						{
-						case SMAT_MATERIAL_VAR_TYPE_BOOL:
-						{
-							float value = 0.f;
-							if ( !GrabValueAsNumber( jsonObject.GetValue( "value" ), value ) )
-							{
-								Error( "SMATDoc: Invalid value in '%s', must be number type (parameter id: %i)", name.c_str(), varIdx );
-								bResult = false;
-								continue;
-							}
-
-							smatMaterialVar.SetBoolValue( value > 0.f );
-							break;
-						}
-
-						case SMAT_MATERIAL_VAR_TYPE_INT:
-						{
-							float value = 0.f;
-							if ( !GrabValueAsNumber( jsonObject.GetValue( "value" ), value ) )
-							{
-								Error( "SMATDoc: Invalid value in '%s', must be number type (parameter id: %i)", name.c_str(), varIdx );
-								bResult = false;
-								continue;
-							}
-
-							smatMaterialVar.SetIntValue( (int32)value );
-							break;
-						}
-
-						case SMAT_MATERIAL_VAR_TYPE_FLOAT:
-						{
-							float value = 0.f;
-							if ( !GrabValueAsNumber( jsonObject.GetValue( "value" ), value ) )
-							{
-								Error( "SMATDoc: Invalid value in '%s', must be number type (parameter id: %i)", name.c_str(), varIdx );
-								bResult = false;
-								continue;
-							}
-
-							smatMaterialVar.SetFloatValue( value );
-							break;
-						}
-
-						case SMAT_MATERIAL_VAR_TYPE_VECTOR_2D:
-						{
-							vec2_t value = { 0.f, 0.f };
-							if ( !GrabValueAsVec2( jsonObject.GetValue( "value" ), value ) )
-							{
-								Error( "SMATDoc: Invalid value in '%s', must be object type with required number fields: 'x' and 'y' (parameter id: %i)", name.c_str(), varIdx );
-								bResult = false;
-								continue;
-							}
-
-							smatMaterialVar.SetVecValue( value );
-							break;
-						}
-
-						case SMAT_MATERIAL_VAR_TYPE_VECTOR_3D:
-						{
-							vec3_t value = { 0.f, 0.f, 0.f };
-							if ( !GrabValueAsVec3( jsonObject.GetValue( "value" ), value ) )
-							{
-								Error( "SMATDoc: Invalid value in '%s', must be object type with required number fields: 'x', 'y' and 'z' (parameter id: %i)", name.c_str(), varIdx );
-								bResult = false;
-								continue;
-							}
-
-							smatMaterialVar.SetVecValue( value );
-							break;
-						}
-
-						case SMAT_MATERIAL_VAR_TYPE_VECTOR_4D:
-						{
-							vec4_t value = { 0.f, 0.f, 0.f, 0.f };
-							if ( !GrabValueAsVec4( jsonObject.GetValue( "value" ), value ) )
-							{
-								Error( "SMATDoc: Invalid value in '%s', must be object type with required number fields: 'x', 'y', 'z' and 'w' (parameter id: %i)", name.c_str(), varIdx );
-								bResult = false;
-								continue;
-							}
-
-							smatMaterialVar.SetVecValue( value );
-							break;
-						}
-
-						case SMAT_MATERIAL_VAR_TYPE_MATRIX:
-						{
-							matrix_t value = g_matrixIdentity;
-							if ( !GrabValueAsMatrix( jsonObject.GetValue( "value" ), value ) )
-							{
-								Error( "SMATDoc: Invalid value in '%s', must be object type with required vector 4D fields: 'row0', 'row1', 'row2', 'row3'. Each vector 4D must have number fields: 'x', 'y', 'z' and 'w' (parameter id: %i)", name.c_str(), varIdx );
-								bResult = false;
-								continue;
-							}
-
-							smatMaterialVar.SetMatrixValue( value );
-							break;
-						}
-
-						case SMAT_MATERIAL_VAR_TYPE_STRING:
-						{
-							eastl::string value;
-							if ( !GrabValueAsString( jsonObject.GetValue( "value" ), value ) )
-							{
-								Error( "SMATDoc: Invalid value in '%s', must be string type (parameter id: %i)", name.c_str(), varIdx );
-								bResult = false;
-								continue;
-							}
-
-							smatMaterialVar.SetStringValue( value.c_str() );
-							break;
-						}
-
-						case SMAT_MATERIAL_VAR_TYPE_TEXTURE:
-						{
-							eastl::string value;
-							if ( !GrabValueAsString( jsonObject.GetValue( "value" ), value ) )
-							{
-								Error( "SMATDoc: Invalid value in '%s', must be string type (parameter id: %i)", name.c_str(), varIdx );
-								bResult = false;
-								continue;
-							}
-
-							smatMaterialVar.SetTextureValue( value.c_str() );
-							break;
-						}
-
-						case SMAT_MATERIAL_VAR_TYPE_MATERIAL:
-						{
-							eastl::string value;
-							if ( !GrabValueAsString( jsonObject.GetValue( "value" ), value ) )
-							{
-								Error( "SMATDoc: Invalid value in '%s', must be string type (parameter id: %i)", name.c_str(), varIdx );
-								bResult = false;
-								continue;
-							}
-
-							smatMaterialVar.SetMaterialValue( value.c_str() );
-							break;
-						}
-
-						default:
-							Error( "SMATDoc: Unknown type '%s' in '%s' (parameter id: %i)", type.c_str(), name.c_str(), varIdx );
-							bResult = false;
-							continue;
-						}
-
-						vars.emplace_back( smatMaterialVar );
-					}
-					else
-					{
-						Error( "SMATDoc: Invalid parameter at id %i, must be object with required fields: 'name', 'type' and 'value'", varIdx );
-						bResult = false;
-					}
+					Error( "SMATDoc: Invalid SMAT, unknown schema '%s' in 'parameters/%s' (file: '%s')", pSchema, it->GetName(), pPath );
+					return false;
 				}
 			}
+			// Otherwise the value type get from the KeyValues type
 			else
 			{
-				Error( "SMATDoc: Invalid \"parameters\", must be array of objects" );
-				bResult = false;
+				smatMaterialVarType = ConvKVDataTypeToSMTMaterialVarType( kvDataType );
+				if ( smatMaterialVarType == SMAT_MATERIAL_VAR_TYPE_UNDEFINED )
+				{
+					Error( "SMATDoc: Invalid SMAT, unknown KeyValues type 0x%X in 'parameters/%s' (file: '%s')", kvDataType, it->GetName(), pPath );
+					return false;
+				}
 			}
+
+			// Set SMAT value
+			switch ( smatMaterialVarType )
+			{
+			case SMAT_MATERIAL_VAR_TYPE_BOOL: smatMaterialVar.SetBoolValue( it->GetBool( NULL ) ); break;
+			case SMAT_MATERIAL_VAR_TYPE_INT: smatMaterialVar.SetIntValue( it->GetInt( NULL ) ); break;
+			case SMAT_MATERIAL_VAR_TYPE_FLOAT: smatMaterialVar.SetFloatValue( it->GetFloat( NULL ) ); break;
+			case SMAT_MATERIAL_VAR_TYPE_STRING: smatMaterialVar.SetStringValue( it->GetString( NULL ) ); break;
+			case SMAT_MATERIAL_VAR_TYPE_TEXTURE: smatMaterialVar.SetTextureValue( it->GetString( NULL ) ); break;
+			case SMAT_MATERIAL_VAR_TYPE_MATERIAL: smatMaterialVar.SetMaterialValue( it->GetString( NULL ) ); break;
+			case SMAT_MATERIAL_VAR_TYPE_VECTOR_2D: smatMaterialVar.SetVecValue( S_VectorCreate<vec2_t>( it->GetString( NULL ) ) ); break;
+			case SMAT_MATERIAL_VAR_TYPE_VECTOR_3D: smatMaterialVar.SetVecValue( S_VectorCreate<vec3_t>( it->GetString( NULL ) ) ); break;
+			case SMAT_MATERIAL_VAR_TYPE_VECTOR_4D: smatMaterialVar.SetVecValue( S_VectorCreate<vec4_t>( it->GetString( NULL ) ) ); break;
+			case SMAT_MATERIAL_VAR_TYPE_MATRIX: smatMaterialVar.SetMatrixValue( S_MatrixCreate( it->GetString( NULL ) ) ); break;
+			default:
+				Error( "SMATDoc: Invalid SMAT, unknown SMAT value type '%s' in 'parameters/%s' (file: '%s')", ConvSMTMaterialVarTypeToText( smatMaterialVarType ), it->GetName(), pPath );
+				Assert( false );
+				return false;
+			}
+
+			// Add the SMAT var into an array
+			vars.emplace_back( smatMaterialVar );
 		}
 	}
 
-	return bResult;
-}
-
-/*
-==================
-CSMATSourceMaterialDoc::GrabValueAsNumber
-==================
-*/
-bool CSMATSourceMaterialDoc::GrabValueAsNumber( const CJsonValue& jsonValue, float& value ) const
-{
-	if ( !jsonValue.IsValid() || !jsonValue.IsNumber() )
-	{
-		return false;
-	}
-
-	value = jsonValue.GetNumber();
-	return true;
-}
-
-/*
-==================
-CSMATSourceMaterialDoc::GrabValueAsVec2
-==================
-*/
-bool CSMATSourceMaterialDoc::GrabValueAsVec2( const CJsonValue& jsonValue, vec2_t& value ) const
-{
-	if ( !jsonValue.IsValid() || !jsonValue.IsA( JSONVALUE_TYPE_OBJECT ) )
-	{
-		return false;
-	}
-
-	CJsonObject jsonObject = jsonValue.GetObject();
-	CJsonValue	jsonValueX = jsonObject.GetValue( "x" );
-	CJsonValue	jsonValueY = jsonObject.GetValue( "y" );
-	if ( !jsonValueX.IsValid() || !jsonValueY.IsValid() || !jsonValueX.IsNumber() || !jsonValueY.IsNumber() )
-	{
-		return false;
-	}
-
-	value.x = jsonValueX.GetNumber();
-	value.y = jsonValueY.GetNumber();
-	return true;
-}
-
-/*
-==================
-CSMATSourceMaterialDoc::GrabValueAsVec3
-==================
-*/
-bool CSMATSourceMaterialDoc::GrabValueAsVec3( const CJsonValue& jsonValue, vec3_t& value ) const
-{
-	if ( !jsonValue.IsValid() || !jsonValue.IsA( JSONVALUE_TYPE_OBJECT ) )
-	{
-		return false;
-	}
-
-	CJsonObject jsonObject = jsonValue.GetObject();
-	CJsonValue	jsonValueX = jsonObject.GetValue( "x" );
-	CJsonValue	jsonValueY = jsonObject.GetValue( "y" );
-	CJsonValue	jsonValueZ = jsonObject.GetValue( "z" );
-	if ( !jsonValueX.IsValid() || !jsonValueY.IsValid() || !jsonValueZ.IsValid() || !jsonValueX.IsNumber() || !jsonValueY.IsNumber() || !jsonValueZ.IsNumber() )
-	{
-		return false;
-	}
-
-	value.x = jsonValueX.GetNumber();
-	value.y = jsonValueY.GetNumber();
-	value.z = jsonValueZ.GetNumber();
-	return true;
-}
-
-/*
-==================
-CSMATSourceMaterialDoc::GrabValueAsVec4
-==================
-*/
-bool CSMATSourceMaterialDoc::GrabValueAsVec4( const CJsonValue& jsonValue, vec4_t& value ) const
-{
-	if ( !jsonValue.IsValid() || !jsonValue.IsA( JSONVALUE_TYPE_OBJECT ) )
-	{
-		return false;
-	}
-
-	CJsonObject jsonObject = jsonValue.GetObject();
-	CJsonValue	jsonValueX = jsonObject.GetValue( "x" );
-	CJsonValue	jsonValueY = jsonObject.GetValue( "y" );
-	CJsonValue	jsonValueZ = jsonObject.GetValue( "z" );
-	CJsonValue	jsonValueW = jsonObject.GetValue( "w" );
-	if ( !jsonValueX.IsValid() || !jsonValueY.IsValid() || !jsonValueZ.IsValid() || !jsonValueW.IsValid() || !jsonValueX.IsNumber() || !jsonValueY.IsNumber() || !jsonValueZ.IsNumber() || !jsonValueW.IsNumber() )
-	{
-		return false;
-	}
-
-	value.x = jsonValueX.GetNumber();
-	value.y = jsonValueY.GetNumber();
-	value.z = jsonValueZ.GetNumber();
-	value.w = jsonValueW.GetNumber();
-	return true;
-}
-
-/*
-==================
-CSMATSourceMaterialDoc::GrabValueAsMatrix
-==================
-*/
-bool CSMATSourceMaterialDoc::GrabValueAsMatrix( const CJsonValue& jsonValue, matrix_t& value ) const
-{
-	if ( !jsonValue.IsValid() || !jsonValue.IsA( JSONVALUE_TYPE_OBJECT ) )
-	{
-		return false;
-	}
-
-	CJsonObject jsonObject = jsonValue.GetObject();
-	return GrabValueAsVec4( jsonObject.GetValue( "row0" ), value[0] ) && GrabValueAsVec4( jsonObject.GetValue( "row1" ), value[1] ) && GrabValueAsVec4( jsonObject.GetValue( "row2" ), value[2] ) && GrabValueAsVec4( jsonObject.GetValue( "row3" ), value[3] );
-}
-
-/*
-==================
-CSMATSourceMaterialDoc::GrabValueAsString
-==================
-*/
-bool CSMATSourceMaterialDoc::GrabValueAsString( const CJsonValue& jsonValue, eastl::string& value ) const
-{
-	if ( !jsonValue.IsValid() || !jsonValue.IsA( JSONVALUE_TYPE_STRING ) )
-	{
-		return false;
-	}
-
-	value = jsonValue.GetString();
+	// We are done
 	return true;
 }
 
@@ -513,117 +187,60 @@ CSMATSourceMaterialDoc::SaveFile
 */
 bool CSMATSourceMaterialDoc::SaveFile( const char* pPath )
 {
-	// Do nothing if the file system isn't valid
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-	Assert( g_pFileSystem );
+	// Create key values
+	PROFILE_SCOPE();
+	CKeyValues keyValues( "smat" );
+	keyValues.SetString( "output_dir", outputDir.c_str() );
+	keyValues.SetString( "shader", shaderName.c_str() );
 
-	// Try to open a file
-	TRefPtr<IStreamDataWriter> pFile = g_pFileSystem->CreateFileWriter( pPath );
-	if ( !pFile )
-	{
-		Error( "SMATDoc: Failed to open file '%s' for save a SMAT material", pPath );
-		return false;
-	}
-
-	eastl::string buffer;
-	buffer += "{\n";
-
-	// Write an output directory and the shader name
-	buffer += S_Sprintf( "\t\"output-dir\": \"%s\",\n", outputDir.c_str() );
-	buffer += S_Sprintf( "\t\"shader\": \"%s\",\n", shaderName.c_str() );
-
-	// Write material parameters
+	// Create a key value for each material variable
 	if ( !vars.empty() )
 	{
-		buffer += "\t\"parameters\": [\n";
-		for ( uint32 varIdx = 0, count = (uint32)vars.size(); varIdx < count; ++varIdx )
+		CKeyValues* pParameters = new CKeyValues( "parameters", &keyValues );
+		for ( uint32 index = 0, count = (uint32)vars.size(); index < count; ++index )
 		{
-			const CSMATMaterialVar& var = vars[varIdx];
-			buffer += "\t\t{\n";
-			buffer += S_Sprintf( "\t\t\t\"name\": \"%s\",\n", var.GetName() );
-			buffer += S_Sprintf( "\t\t\t\"type\": \"%s\",\n", ConvSMTMaterialVarTypeToText( var.GetType() ) );
-			buffer += "\t\t\t\"value\": ";
-			switch ( var.GetType() )
+			const CSMATMaterialVar& smatMaterialVar		= vars[index];
+			smatMaterialVarType_t	smatMaterialVarType = smatMaterialVar.GetType();
+			const char*				pSchema				= ConvSMTMaterialVarTypeToText( smatMaterialVarType );
+			switch ( smatMaterialVarType )
 			{
-			case SMAT_MATERIAL_VAR_TYPE_BOOL:
-				buffer += var.GetBoolValue() ? "true\n" : "false\n";
-				break;
-
-			case SMAT_MATERIAL_VAR_TYPE_INT:
-				buffer += S_Sprintf( "%i\n", var.GetIntValue() );
-				break;
-
-			case SMAT_MATERIAL_VAR_TYPE_FLOAT:
-				buffer += S_Sprintf( "%f\n", var.GetFloatValue() );
-				break;
-
+			case SMAT_MATERIAL_VAR_TYPE_UNDEFINED: Warning( "SMATDoc: Material variable '%s' is undefined, skipped", smatMaterialVar.GetName() ); continue;
+			case SMAT_MATERIAL_VAR_TYPE_BOOL: pParameters->SetBool( smatMaterialVar.GetName(), smatMaterialVar.GetBoolValue(), pSchema ); break;
+			case SMAT_MATERIAL_VAR_TYPE_INT: pParameters->SetInt( smatMaterialVar.GetName(), smatMaterialVar.GetIntValue(), pSchema ); break;
+			case SMAT_MATERIAL_VAR_TYPE_FLOAT: pParameters->SetFloat( smatMaterialVar.GetName(), smatMaterialVar.GetFloatValue(), pSchema ); break;
 			case SMAT_MATERIAL_VAR_TYPE_VECTOR_2D:
 			{
-				vec2_t value = { 0.f, 0.f };
-				var.GetVecValue( &value.x, 2 );
-				buffer += S_Sprintf( "{ \"x\": %f, \"y\": %f }\n", value.x, value.y );
+				vec2_t value;
+				smatMaterialVar.GetVecValue( &value.x, 2 );
+				pParameters->SetString( smatMaterialVar.GetName(), S_VectorToString( value ).c_str(), pSchema );
 				break;
 			}
-
 			case SMAT_MATERIAL_VAR_TYPE_VECTOR_3D:
 			{
-				vec3_t value = { 0.f, 0.f, 0.f };
-				var.GetVecValue( &value.x, 3 );
-				buffer += S_Sprintf( "{ \"x\": %f, \"y\": %f, \"z\": %f }\n", value.x, value.y, value.z );
+				vec3_t value;
+				smatMaterialVar.GetVecValue( &value.x, 3 );
+				pParameters->SetString( smatMaterialVar.GetName(), S_VectorToString( value ).c_str(), pSchema );
 				break;
 			}
-
 			case SMAT_MATERIAL_VAR_TYPE_VECTOR_4D:
 			{
-				vec4_t value = { 0.f, 0.f, 0.f, 0.f };
-				var.GetVecValue( &value.x, 4 );
-				buffer += S_Sprintf( "{ \"x\": %f, \"y\": %f, \"z\": %f, \"w\": %f }\n", value.x, value.y, value.z, value.w );
+				vec4_t value;
+				smatMaterialVar.GetVecValue( &value.x, 4 );
+				pParameters->SetString( smatMaterialVar.GetName(), S_VectorToString( value ).c_str(), pSchema );
 				break;
 			}
-
-			case SMAT_MATERIAL_VAR_TYPE_MATRIX:
-			{
-				matrix_t value = var.GetMatrixValue();
-				buffer += "{\n";
-				buffer += S_Sprintf( "\t\t\t\t\"row0\": { \"x\": %f, \"y\": %f, \"z\": %f, \"w\": %f },\n", value[0].x, value[0].y, value[0].z, value[0].w );
-				buffer += S_Sprintf( "\t\t\t\t\"row1\": { \"x\": %f, \"y\": %f, \"z\": %f, \"w\": %f },\n", value[1].x, value[1].y, value[1].z, value[1].w );
-				buffer += S_Sprintf( "\t\t\t\t\"row2\": { \"x\": %f, \"y\": %f, \"z\": %f, \"w\": %f },\n", value[2].x, value[2].y, value[2].z, value[2].w );
-				buffer += S_Sprintf( "\t\t\t\t\"row3\": { \"x\": %f, \"y\": %f, \"z\": %f, \"w\": %f }\n", value[3].x, value[3].y, value[3].z, value[3].w );
-				buffer += "\t\t\t}\n";
-				break;
-			}
-
-			case SMAT_MATERIAL_VAR_TYPE_STRING:
-				buffer += S_Sprintf( "\"%s\"\n", var.GetStringValue() );
-				break;
-
-			case SMAT_MATERIAL_VAR_TYPE_TEXTURE:
-				buffer += S_Sprintf( "\"%s\"\n", var.GetTextureValue() );
-				break;
-
-			case SMAT_MATERIAL_VAR_TYPE_MATERIAL:
-				buffer += S_Sprintf( "\"%s\"\n", var.GetMaterialValue() );
-				break;
-
+			case SMAT_MATERIAL_VAR_TYPE_MATRIX: pParameters->SetString( smatMaterialVar.GetName(), S_MatrixToString( smatMaterialVar.GetMatrixValue() ).c_str(), pSchema ); break;
+			case SMAT_MATERIAL_VAR_TYPE_STRING: pParameters->SetString( smatMaterialVar.GetName(), smatMaterialVar.GetStringValue(), pSchema ); break;
+			case SMAT_MATERIAL_VAR_TYPE_TEXTURE: pParameters->SetString( smatMaterialVar.GetName(), smatMaterialVar.GetTextureValue(), pSchema ); break;
+			case SMAT_MATERIAL_VAR_TYPE_MATERIAL: pParameters->SetString( smatMaterialVar.GetName(), smatMaterialVar.GetMaterialValue(), pSchema ); break;
 			default:
-				Warning( "SMATDoc: Unknown type 0x%X in variable '%s'", var.GetType(), var.GetName() );
+				Warning( "SMATDoc: Unknown type 0x%X in variable '%s'", smatMaterialVar.GetType(), smatMaterialVar.GetName() );
 				Assert( false );
 				break;
 			}
-
-			if ( varIdx + 1 < count )
-			{
-				buffer += "\t\t},\n";
-			}
-			else
-			{
-				buffer += "\t\t}\n";
-			}
 		}
-		buffer += "\t]\n";
 	}
 
-	buffer += "}\n";
-	pFile->Write( buffer.data(), buffer.size() * sizeof( char ) );
-	return true;
+	// Save the key values to a file
+	return keyValues.SaveToFile( pPath );
 }

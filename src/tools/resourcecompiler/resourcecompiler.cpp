@@ -319,6 +319,10 @@ int32 CResourceCompilerAppSystemGroup::Main()
 					resourceToolMaterialVar.pName					   = smatSourceMaterialVar.GetName();
 					switch ( smatSourceMaterialVar.GetType() )
 					{
+					case SMAT_MATERIAL_VAR_TYPE_UNDEFINED:
+						resourceToolMaterialVar.type = RESOURCE_TOOL_MATERIAL_VAR_TYPE_UNDEFINED;
+						break;
+
 					case SMAT_MATERIAL_VAR_TYPE_BOOL:
 						resourceToolMaterialVar.boolValue = smatSourceMaterialVar.GetBoolValue();
 						resourceToolMaterialVar.type	  = RESOURCE_TOOL_MATERIAL_VAR_TYPE_BOOL;
@@ -517,6 +521,10 @@ int32 CResourceCompilerAppSystemGroup::Main()
 							resourceToolEntityDescVar.pName						   = sentEntityDescVar.GetName();
 							switch ( sentEntityDescVar.GetType() )
 							{
+							case SENT_ENTITY_DESC_VAR_TYPE_UNDEFINED:
+								resourceToolEntityDescVar.type = RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_UNDEFINED;
+								break;
+
 							case SENT_ENTITY_DESC_VAR_TYPE_BOOL:
 								resourceToolEntityDescVar.boolValue = sentEntityDescVar.GetBoolValue();
 								resourceToolEntityDescVar.type		= RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_BOOL;

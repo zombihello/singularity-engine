@@ -33,7 +33,6 @@ public:
 	friend CKeyValuesSubKeysIterator;
 
 	CKeyValues( const char* pName, CKeyValues* pParentKey = NULL );
-	CKeyValues( const char* pName, uint32 length, CKeyValues* pParentKey = NULL );
 	~CKeyValues();
 
 	// NOTE: For use Tier1 must be connected by ConnectTier1 (except LoadFromBuffer and SaveToBuffer)
@@ -52,16 +51,13 @@ public:
 	CKeyValues* FindKey( const char* pName, bool bCreate = false );
 
 	void SetName( const char* pName );
-	void SetName( const char* pName, uint32 length );
 	void SetSchema( const char* pSchema );
-	void SetSchema( const char* pSchema, uint32 length );
-	void SetBool( const char* pKeyName, bool value );
-	void SetInt( const char* pKeyName, int32 value );
-	void SetInt64( const char* pKeyName, int64 value );
-	void SetFloat( const char* pKeyName, float value );
-	void SetDouble( const char* pKeyName, double value );
-	void SetString( const char* pKeyName, const char* pValue );
-	void SetString( const char* pKeyName, const char* pValue, uint32 length );
+	void SetBool( const char* pKeyName, bool value, const char* pSchema = NULL );
+	void SetInt( const char* pKeyName, int32 value, const char* pSchema = NULL );
+	void SetInt64( const char* pKeyName, int64 value, const char* pSchema = NULL );
+	void SetFloat( const char* pKeyName, float value, const char* pSchema = NULL );
+	void SetDouble( const char* pKeyName, double value, const char* pSchema = NULL );
+	void SetString( const char* pKeyName, const char* pValue, const char* pSchema = NULL );
 
 	bool							IsEmpty() const;
 	bool							HasData() const;

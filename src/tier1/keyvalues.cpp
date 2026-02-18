@@ -70,7 +70,15 @@ CKeyValues* CKeyValues::FindKey( const char* pName, bool bCreate /* = false */ )
 	{
 		if ( bCreate )
 		{
-			keyValues.emplace_back( new CKeyValues( pName, nameLength, this ) );
+			char* pSubKeyName = nameLength <= 255 ? (char*)Mem_Alloca( nameLength + 1 ) : (char*)Mem_Malloc( nameLength + 1 );
+			Mem_Memcpy( pSubKeyName, pName, nameLength );
+			pSubKeyName[nameLength] = '\0';
+			keyValues.emplace_back( new CKeyValues( pSubKeyName, this ) );
+
+			if ( nameLength > 255 )
+			{
+				delete pSubKeyName;
+			}
 		}
 		else
 		{

@@ -220,7 +220,7 @@ void CMaterialVar::GetVecValue( float* pValue, uint32 numComps ) const
 CMaterialVar::SetMatrixValue
 ==================
 */
-void CMaterialVar::SetMatrixValue( const matrix_t& value )
+void CMaterialVar::SetMatrixValue( const mat4_t& value )
 {
 	matrixValue = value;
 	type		= MATERIALVAR_TYPE_MATRIX;
@@ -235,7 +235,7 @@ void CMaterialVar::SetMatrixValue( const matrix_t& value )
 CMaterialVar::GetMatrixValue
 ==================
 */
-matrix_t CMaterialVar::GetMatrixValue() const
+mat4_t CMaterialVar::GetMatrixValue() const
 {
 	return type == MATERIALVAR_TYPE_MATRIX ? matrixValue : g_matrixIdentity;
 }

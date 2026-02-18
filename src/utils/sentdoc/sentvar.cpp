@@ -38,22 +38,25 @@ CSENTEntityDescVar::Copy
 */
 void CSENTEntityDescVar::Copy( const CSENTEntityDescVar& other )
 {
-	name		= other.name;
-	type		= other.type;
-	stringValue = other.stringValue;
-	switch ( other.type )
+	name = other.name;
+	type = other.type;
+	if ( other.type != SENT_ENTITY_DESC_VAR_TYPE_UNDEFINED )
 	{
-	case SENT_ENTITY_DESC_VAR_TYPE_BOOL: boolValue = other.boolValue; break;
-	case SENT_ENTITY_DESC_VAR_TYPE_INT: intValue = other.intValue; break;
-	case SENT_ENTITY_DESC_VAR_TYPE_FLOAT: floatValue = other.floatValue; break;
-	case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_2D: vector2DValue = other.vector2DValue; break;
-	case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_3D: vector3DValue = other.vector3DValue; break;
-	case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_4D: vector4DValue = other.vector4DValue; break;
-	case SENT_ENTITY_DESC_VAR_TYPE_MATRIX: matrixValue = other.matrixValue; break;
-	case SENT_ENTITY_DESC_VAR_TYPE_STRING: pStringValue = stringValue.c_str(); break;
-	default:
-		Warning( "SENTDoc: Unknown type 0x%X in variable '%s'", other.name.c_str() );
-		Assert( false );
-		break;
+		stringValue = other.stringValue;
+		switch ( other.type )
+		{
+		case SENT_ENTITY_DESC_VAR_TYPE_BOOL: boolValue = other.boolValue; break;
+		case SENT_ENTITY_DESC_VAR_TYPE_INT: intValue = other.intValue; break;
+		case SENT_ENTITY_DESC_VAR_TYPE_FLOAT: floatValue = other.floatValue; break;
+		case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_2D: vector2DValue = other.vector2DValue; break;
+		case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_3D: vector3DValue = other.vector3DValue; break;
+		case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_4D: vector4DValue = other.vector4DValue; break;
+		case SENT_ENTITY_DESC_VAR_TYPE_MATRIX: matrixValue = other.matrixValue; break;
+		case SENT_ENTITY_DESC_VAR_TYPE_STRING: pStringValue = stringValue.c_str(); break;
+		default:
+			Warning( "SENTDoc: Unknown type 0x%X in variable '%s'", other.type, other.name.c_str() );
+			Assert( false );
+			break;
+		}
 	}
 }
