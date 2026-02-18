@@ -1,3 +1,1 @@
-{
-	"output-dir": "//CORE/entities/"
-}
+output_dir "//CORE/entities/"

@@ -1,16 +1,9 @@
+output_dir "//BASE_PATH/citadel/entities/"
+components
 {
-	"output-dir": "//BASE_PATH/citadel/entities/",
-	"components": [
-		{ "type": "Transform" 	},
-		{ 
-			"type": "Quad",
-			"properties": [
-				{
-					"name": "Material",
-					"type": "string",
-					"value": "materials/nelson"
-				}
-			]
-		}
-	]
+	Transform {}
+	Quad
+	{
+		Material	"materials/nelson"
+	}
 }
