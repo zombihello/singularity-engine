@@ -1,9 +1,7 @@
-{
-	"type": 				"2d",
-	"sources": 				[ "default.jpg" ],
-	"filter": 				"anisotropic",
-	"generate-mipmaps": 	true,
-	"format": 				"rgba8",
-	"output-dir":			"//CORE/materials/",
-	"max-anisotropy":		16
-}
+type 				2d
+source 				"default.jpg"
+filter 				anisotropic
+generate_mipmaps 	1
+format 				rgba8
+output_dir 			"//CORE/materials/"
+max_anisotropy 		16

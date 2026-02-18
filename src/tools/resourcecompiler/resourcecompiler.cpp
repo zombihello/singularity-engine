@@ -1,7 +1,7 @@
 #include "pch_resourcecompiler.h"
 #include "tier0/icommandline.h"
 #include "tier0/crashdump.h"
-#include "tier1/jsondoc.h"
+#include "tier1/keyvalues.h"
 #include "utils/stexdoc/stex_source_doc.h"
 #include "utils/smatdoc/smat_source_doc.h"
 #include "utils/smdldoc/smdl_source_doc.h"
@@ -108,7 +108,7 @@ private:
 		{
 		}
 
-		eastl::string			 sourcePath;
+		eastl::string		 sourcePath;
 		resourceSourceType_t type;
 	};
 
@@ -116,11 +116,11 @@ private:
 	bool LoadFileList( const char* pPath );
 	bool AddFileToCompile( const char* pPath, const char* pWorkDir = "" );
 
-	ITextureTool*			  pTextureTool;
-	IMaterialTool*			  pMaterialTool;
-	IModelTool*				  pModelTool;
-	IEntityDescTool*		  pEntityDescTool;
-	IMapTool*				  pMapTool;
+	ITextureTool*				pTextureTool;
+	IMaterialTool*				pMaterialTool;
+	IModelTool*					pModelTool;
+	IEntityDescTool*			pEntityDescTool;
+	IMapTool*					pMapTool;
 	eastl::list<resourceFile_t> files;
 };
 
@@ -196,11 +196,11 @@ int32 CResourceCompilerAppSystemGroup::Main()
 	bool bPrintHelpUsage = CommandLine()->HasParam( "h" ) || CommandLine()->HasParam( "help" ) || CommandLine()->HasParam( "?" );
 
 	// Get and parse a file list
-	const char* pFileListPath		  = CommandLine()->GetFirstValue( "filelist" );
-	const char* pFilePath			  = CommandLine()->GetFirstValue( "file" );
-	bool		 bInvalidFileListPath = !pFileListPath || pFileListPath[0] == '\0';
-	bool		 bInvalidFilePath	  = !pFilePath || pFilePath[0] == '\0';
-	bool		 bInvalidFilePaths	  = bInvalidFileListPath && bInvalidFilePath;
+	const char* pFileListPath		 = CommandLine()->GetFirstValue( "filelist" );
+	const char* pFilePath			 = CommandLine()->GetFirstValue( "file" );
+	bool		bInvalidFileListPath = !pFileListPath || pFileListPath[0] == '\0';
+	bool		bInvalidFilePath	 = !pFilePath || pFilePath[0] == '\0';
+	bool		bInvalidFilePaths	 = bInvalidFileListPath && bInvalidFilePath;
 	if ( !bInvalidFilePaths && !bInvalidFileListPath && !LoadFileList( pFileListPath ) )
 	{
 		Error( "ResourceCompiler: Failed to load file list '%s'", pFileListPath );
@@ -249,8 +249,8 @@ int32 CResourceCompilerAppSystemGroup::Main()
 			}
 
 			// Get a absolute source texture paths
-			eastl::vector<eastl::string>  srcPaths;
-			eastl::vector<const char*> cSrcPaths;
+			eastl::vector<eastl::string> srcPaths;
+			eastl::vector<const char*>	 cSrcPaths;
 			{
 				const eastl::vector<eastl::string> originalSrcPaths = stexSourceFile.GetSourcePaths();
 				srcPaths.resize( originalSrcPaths.size() );
@@ -310,7 +310,7 @@ int32 CResourceCompilerAppSystemGroup::Main()
 			eastl::vector<resourceToolMaterialVar_t> resourceToolMaterialVars;
 			resourceToolMaterialVars.resize( smatSourceFile.GetNumVars() );
 			{
-				bool								 bMaterialVarsAreVaild	= true;
+				bool								   bMaterialVarsAreVaild  = true;
 				const eastl::vector<CSMATMaterialVar>& smatSourceMaterialVars = smatSourceFile.GetVars();
 				for ( uint32 varIdx = 0, numVars = smatSourceFile.GetNumVars(); varIdx < numVars; ++varIdx )
 				{
@@ -319,6 +319,10 @@ int32 CResourceCompilerAppSystemGroup::Main()
 					resourceToolMaterialVar.pName					   = smatSourceMaterialVar.GetName();
 					switch ( smatSourceMaterialVar.GetType() )
 					{
+					case SMAT_MATERIAL_VAR_TYPE_UNDEFINED:
+						resourceToolMaterialVar.type = RESOURCE_TOOL_MATERIAL_VAR_TYPE_UNDEFINED;
+						break;
+
 					case SMAT_MATERIAL_VAR_TYPE_BOOL:
 						resourceToolMaterialVar.boolValue = smatSourceMaterialVar.GetBoolValue();
 						resourceToolMaterialVar.type	  = RESOURCE_TOOL_MATERIAL_VAR_TYPE_BOOL;
@@ -489,19 +493,19 @@ int32 CResourceCompilerAppSystemGroup::Main()
 			}
 
 			// Get entity descriptor components
-			eastl::vector<resourceToolEntityDescVar_t>	   resourceToolEntityDescVars;
+			eastl::vector<resourceToolEntityDescVar_t>		 resourceToolEntityDescVars;
 			eastl::vector<resourceToolEntityDescComponent_t> resourceToolEntityDescComponents;
 			resourceToolEntityDescComponents.resize( sentSourceFile.GetNumComponents() );
 			{
-				bool										 bEntityDescComponentsAreVaild	  = true;
-				uint32										 resourceToolEntityDescVarsOffset = 0;
-				const eastl::vector<CSENTEntityDescComponent>& sentEntityDescComponents		  = sentSourceFile.GetComponents();
+				bool										   bEntityDescComponentsAreVaild	= true;
+				uint32										   resourceToolEntityDescVarsOffset = 0;
+				const eastl::vector<CSENTEntityDescComponent>& sentEntityDescComponents			= sentSourceFile.GetComponents();
 				for ( uint32 componentIdx = 0, numComponents = sentSourceFile.GetNumComponents(); componentIdx < numComponents; ++componentIdx )
 				{
-					const CSENTEntityDescComponent&		   sentEntityDescComponent		   = sentEntityDescComponents[componentIdx];
-					const eastl::vector<CSENTEntityDescVar>& sentEntityDescVars			   = sentEntityDescComponent.GetVars();
-					resourceToolEntityDescComponent_t&	   resourceToolEntityDescComponent = resourceToolEntityDescComponents[componentIdx];
-					resourceToolEntityDescComponent.pType								   = sentEntityDescComponent.GetType();
+					const CSENTEntityDescComponent&			 sentEntityDescComponent		 = sentEntityDescComponents[componentIdx];
+					const eastl::vector<CSENTEntityDescVar>& sentEntityDescVars				 = sentEntityDescComponent.GetVars();
+					resourceToolEntityDescComponent_t&		 resourceToolEntityDescComponent = resourceToolEntityDescComponents[componentIdx];
+					resourceToolEntityDescComponent.pType									 = sentEntityDescComponent.GetType();
 
 					// Get entity descriptor vars
 					if ( !sentEntityDescVars.empty() )
@@ -517,6 +521,10 @@ int32 CResourceCompilerAppSystemGroup::Main()
 							resourceToolEntityDescVar.pName						   = sentEntityDescVar.GetName();
 							switch ( sentEntityDescVar.GetType() )
 							{
+							case SENT_ENTITY_DESC_VAR_TYPE_UNDEFINED:
+								resourceToolEntityDescVar.type = RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_UNDEFINED;
+								break;
+
 							case SENT_ENTITY_DESC_VAR_TYPE_BOOL:
 								resourceToolEntityDescVar.boolValue = sentEntityDescVar.GetBoolValue();
 								resourceToolEntityDescVar.type		= RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_BOOL;
@@ -626,7 +634,7 @@ int32 CResourceCompilerAppSystemGroup::Main()
 				{
 					const CSMAPEntity&		 smapEntity			   = smapEntities[entityIdx];
 					resourceToolMapEntity_t& resourceToolMapEntity = entities[entityIdx];
-					resourceToolMapEntity.pEntityDesc			   = smapEntity.GetEntityDesc();
+					resourceToolMapEntity.pClassName			   = smapEntity.GetClassName();
 					resourceToolMapEntity.pName					   = smapEntity.GetName();
 				}
 			}
@@ -696,11 +704,11 @@ void CResourceCompilerAppSystemGroup::PrintUsageHelp()
 	Msg( "Usage resourcecompiler -filelist <path>" );
 	Msg( "" );
 	Msg( "The compiler supports next resource types: texture (*.stex), material (*.smat), model (*.smdl), entity (*.sent) and map (*.smap)" );
-	Msg( "For syntax example see 'content/tier0/meterials/default_tex.stex', 'content/tier0/meterials/default_mat.smat'" );
+	Msg( "For syntax example see 'content/core/meterials/default_tex.stex', 'content/core/meterials/default_mat.smat'" );
 	Msg( "" );
 	Msg( "Launch arguments:" );
 	Msg( "file\tSpecify a JSON file containing settings to compile the resource" );
-	Msg( "filelist\tSpecify a JSON file containing a list of files to be processed as inputs. For syntax example see 'content/tier0/resourcelist.txt'" );
+	Msg( "filelist\tSpecify a JSON file containing a list of files to be processed as inputs. For syntax example see 'content/core/resourcelist.txt'" );
 	Msg( "" );
 }
 
@@ -713,14 +721,12 @@ bool CResourceCompilerAppSystemGroup::LoadFileList( const char* pPath )
 {
 	Msg( "ResourceCompiler: Load file list '%s'", pPath );
 
-	// Load a JSON file
-	CJsonDoc jsonFileList;
-	if ( !jsonFileList.LoadFromFile( pPath ) )
+	// Load key values file
+	CKeyValues keyValues( "filelist" );
+	if ( !keyValues.LoadFromFile( pPath ) )
 	{
-		Warning( "ResourceCompiler: Failed to load, maybe wrong JSON syntax?" );
 		return false;
 	}
-	bool bResult = true;
 
 	// Get path to directory with the file list
 	eastl::string fileListDir;
@@ -730,35 +736,18 @@ bool CResourceCompilerAppSystemGroup::LoadFileList( const char* pPath )
 		S_MakeAbsolutePath( tmpBuffer, fileListDir, "", false );
 	}
 
-	// Get resource list
-	CJsonValue jsonResourceList = jsonFileList.GetValue( "resources" );
-	if ( jsonResourceList.IsValid() && jsonResourceList.IsA( JSONVALUE_TYPE_ARRAY ) )
+	// Get resources
+	bool bResult = true;
+	for ( CKeyValuesSubKeysIterator it( &keyValues, "file" ); it; ++it )
 	{
-		eastl::vector<CJsonValue> jsonArray = jsonResourceList.GetArray();
-		for ( uint32 index = 0, count = (uint32)jsonArray.size(); index < count; ++index )
+		if ( !AddFileToCompile( it->GetString( NULL ), fileListDir.c_str() ) )
 		{
-			const CJsonValue& jsonElement = jsonArray[index];
-			if ( !jsonElement.IsA( JSONVALUE_TYPE_STRING ) )
-			{
-				Warning( "ResourceCompiler: Invalid 'resources[%i]', must be string", index );
-				bResult = false;
-				continue;
-			}
-
-			// Add the file to compile
-			if ( !AddFileToCompile( jsonElement.GetString().c_str(), fileListDir.c_str() ) )
-			{
-				bResult = false;
-				continue;
-			}
+			bResult = false;
+			continue;
 		}
 	}
-	else
-	{
-		Warning( "ResourceCompiler: File lists must have 'resources'" );
-		bResult = false;
-	}
 
+	// We are done
 	return bResult;
 }
 
@@ -770,7 +759,7 @@ CResourceCompilerAppSystemGroup::AddFileToCompile
 bool CResourceCompilerAppSystemGroup::AddFileToCompile( const char* pPath, const char* pWorkDir /* = "" */ )
 {
 	// Convert of the file path to absolute
-	eastl::string			 absoluteFilePath;
+	eastl::string		 absoluteFilePath;
 	resourceSourceType_t resourceSourceType;
 	S_MakeAbsolutePath( pPath, absoluteFilePath, pWorkDir );
 

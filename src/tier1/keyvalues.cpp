@@ -1,8 +1,6 @@
 #include "pch_tier1.h"
 #include <EASTL/stack.h>
 
-#include "filesystem/ifilesystem.h"
-#include "utils/interfaces/interfaces.h"
 #include "tier1/filetools.h"
 #include "tier1/keyvalues_parser.h"
 #include "tier1/keyvalues_writer.h"
@@ -72,7 +70,15 @@ CKeyValues* CKeyValues::FindKey( const char* pName, bool bCreate /* = false */ )
 	{
 		if ( bCreate )
 		{
-			keyValues.emplace_back( new CKeyValues( pName, nameLength, this ) );
+			char* pSubKeyName = nameLength <= 255 ? (char*)Mem_Alloca( nameLength + 1 ) : (char*)Mem_Malloc( nameLength + 1 );
+			Mem_Memcpy( pSubKeyName, pName, nameLength );
+			pSubKeyName[nameLength] = '\0';
+			keyValues.emplace_back( new CKeyValues( pSubKeyName, this ) );
+
+			if ( nameLength > 255 )
+			{
+				delete pSubKeyName;
+			}
 		}
 		else
 		{
@@ -201,133 +207,85 @@ void CKeyValues::MigrateNamePool( namePool_t* pNamePool )
 
 /*
 ==================
-CKeyValues::LoadFromFile
+CKeyValues::LoadFromStream
 ==================
 */
-bool CKeyValues::LoadFromFile( const char* pPath )
+bool CKeyValues::LoadFromStream( IStreamDataReader* pStreamReader )
 {
-	// Do nothing if file system isn't valid
+	// Do nothing if the stream isn't valid
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-	Assert( g_pFileSystem );
+	Assert( pStreamReader );
 
-	// Try open file
-	TRefPtr<IStreamDataReader> pFile = g_pFileSystem->CreateFileReader( pPath );
-	if ( !pFile )
-	{
-		return false;
-	}
-
-	// Allocate memory for buffer
-	uint64 fileSize = pFile->GetSize();
-	byte*  pBuffer	= (byte*)Mem_MallocZero( fileSize );
-
-	// Serialize data to string buffer
-	pFile->Read( pBuffer, fileSize );
-
-	// Parse the key values
+	// Parse key values from the stream
 	CKeyValuesParser keyValuesParser;
-	keyValuesParser.Parse( pPath, this, (char*)pBuffer, fileSize );
+	keyValuesParser.Parse( this, pStreamReader );
 	if ( keyValuesParser.HasErrors() )
 	{
 		const eastl::vector<eastl::string>& errorMsgs = keyValuesParser.GetErrorMsgs();
-		Error( "KeyValues: Failed to load '%s', %i error(s)", pPath, errorMsgs.size() );
+		const char*							pPath	  = pStreamReader->GetPath();
+		Error( "KeyValues: Failed to load '%s', %i error(s)", pPath ? pPath : "<NO_PATH>", errorMsgs.size() );
 		for ( uint32 index = 0, count = (uint32)errorMsgs.size(); index < count; ++index )
 		{
 			Error( "KeyValues: %s", errorMsgs[index].c_str() );
 		}
 	}
 
-	// Free allocated memory
-	Mem_Free( pBuffer );
 	return !keyValuesParser.HasErrors();
 }
 
 /*
 ==================
-CKeyValues::LoadFromBuffer
+CKeyValues::SaveToStream
 ==================
 */
-bool CKeyValues::LoadFromBuffer( const char* pBuffer, uint64 size )
+void CKeyValues::SaveToStream( IStreamDataWriter* pStreamWriter ) const
 {
-	CKeyValuesParser keyValuesParser;
-	keyValuesParser.Parse( "<buffer>", this, pBuffer, size );
-	if ( keyValuesParser.HasErrors() )
-	{
-		const eastl::vector<eastl::string>& errorMsgs = keyValuesParser.GetErrorMsgs();
-		Error( "KeyValues: Failed to load from buffer, %i error(s)", errorMsgs.size() );
-		Error( "KeyValues:\n%.*s", size, pBuffer );
-		Error( "KeyValues:" );
-		for ( uint32 index = 0, count = (uint32)errorMsgs.size(); index < count; ++index )
-		{
-			Error( "KeyValues: %s", errorMsgs[index].c_str() );
-		}
-	}
-	return !keyValuesParser.HasErrors();
-}
-
-/*
-==================
-CKeyValues::SaveToFile
-==================
-*/
-bool CKeyValues::SaveToFile( const char* pPath ) const
-{
-	// Do nothing if file system isn't valid
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-	Assert( g_pFileSystem );
-
-	// Save data to buffer
-	eastl::string buffer;
-	SaveToBuffer( buffer );
-
-	// Try open file for save
-	TRefPtr<IStreamDataWriter> pFile = g_pFileSystem->CreateFileWriter( pPath );
-	if ( !pFile )
-	{
-		Warning( "KeyValues: Failed to create file '%s'", pPath );
-		return false;
-	}
-
-	// Serialize buffer to the file
-	pFile->Write( buffer.data(), buffer.size() * sizeof( char ) );
-	return true;
-}
-
-/*
-==================
-CKeyValues::SaveToBuffer
-==================
-*/
-void CKeyValues::SaveToBuffer( eastl::string& buffer ) const
-{
+	// Do nothing if the stream isn't valid
 	PROFILE_SCOPE();
+	Assert( pStreamWriter );
+
+	// Write key values into the stream
 	CKeyValuesWriter keyValuesWriter;
-	keyValuesWriter.Write( (CKeyValues*)this, buffer );
+	keyValuesWriter.Write( (CKeyValues*)this, pStreamWriter );
 }
 
 /*
 ==================
-CKeyValuesSubKeysIterator::CKeyValuesSubKeysIterator
+CKeyValuesSubKeysIterator::Init
 ==================
 */
-CKeyValuesSubKeysIterator::CKeyValuesSubKeysIterator( CKeyValues* pKeyValues, bool bAllowValues /* = true */, bool bAllowSubKeys /* = false */, bool bAllowEmpty /* = false */ )
-	: currentIndex( INVALID_INDEX )
+void CKeyValuesSubKeysIterator::Init( CKeyValues* pKeyValues, const char* pKeyName, bool bAllowValues, bool bAllowSubKeys, bool bAllowEmpty )
 {
 	// We iterate over all subkeys and filter out only the required ones
 	PROFILE_SCOPE();
 	Assert( pKeyValues );
-	const eastl::list<CKeyValues*>& subKeys = pKeyValues->GetSubKeys();
-	for ( auto it = subKeys.begin(), itEnd = subKeys.end(); it != itEnd; ++it )
+
+	// Reset key values in the iterator
+	currentIndex = INVALID_INDEX;
+	keyValues.clear();
+
+	bool							bSetKeyName = pKeyName && pKeyName[0];
+	CKeyValues::nameID_t			nameID		= bSetKeyName ? pKeyValues->pNamePool->Find( pKeyName, S_Strlen( pKeyName ) ) : INVALID_INDEX;
+	const eastl::list<CKeyValues*>& subKeys		= pKeyValues->GetSubKeys();
+	if ( !bSetKeyName || nameID != INVALID_INDEX )
 	{
-		CKeyValues* pSubKey = *it;
-		if ( ( bAllowValues && pSubKey->HasData() ) || ( bAllowSubKeys && pSubKey->HasSubKeys() ) || ( bAllowEmpty && pSubKey->IsEmpty() ) )
+		for ( auto it = subKeys.begin(), itEnd = subKeys.end(); it != itEnd; ++it )
 		{
-			keyValues.emplace_back( pSubKey );
+			CKeyValues* pSubKey = *it;
+			if ( bSetKeyName && pSubKey->nameID != nameID )
+			{
+				continue;
+			}
+
+			if ( ( bAllowValues && pSubKey->HasData() ) || ( bAllowSubKeys && pSubKey->HasSubKeys() ) || ( bAllowEmpty && pSubKey->IsEmpty() ) )
+			{
+				keyValues.emplace_back( pSubKey );
+			}
 		}
 	}
 
 	// Initialize the current index if key values aren't empty
-	if ( !subKeys.empty() )
+	if ( !keyValues.empty() )
 	{
 		currentIndex = 0;
 	}

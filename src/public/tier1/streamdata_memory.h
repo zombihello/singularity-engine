@@ -22,7 +22,6 @@ public:
 	virtual void   Seek( uint64 position ) override;
 	virtual void   Flush() override;
 
-	virtual bool			 IsEndOfStream() const override;
 	virtual bool			 IsReader() const override;
 	virtual bool			 IsWriter() const override;
 	virtual const char*		 GetPath() const override;
@@ -45,7 +44,9 @@ public:
 	}
 
 	// IStreamDataReader interface
-	virtual void   Read( void* pBuffer, uint64 size ) override;
+	virtual void Read( void* pBuffer, uint64 size ) override;
+
+	virtual bool   IsEndOfStream() const override;
 	virtual bool   IsReader() const override;
 	virtual uint64 GetSize() const override;
 
@@ -66,7 +67,9 @@ public:
 	}
 
 	// IStreamDataWriter interface
-	virtual void   Write( void* pBuffer, uint64 size ) override;
+	virtual void Write( void* pBuffer, uint64 size ) override;
+
+	virtual bool   IsEndOfStream() const override;
 	virtual bool   IsWriter() const override;
 	virtual uint64 GetSize() const override;
 

@@ -42,7 +42,7 @@ public:
 	void SetVecValue( const vec2_t& value );
 	void SetVecValue( const vec3_t& value );
 	void SetVecValue( const vec4_t& value );
-	void SetMatrixValue( const matrix_t& value );
+	void SetMatrixValue( const mat4_t& value );
 	void SetStringValue( const char* pValue );
 	void SetTextureValue( const char* pValue );
 	void SetMaterialValue( const char* pValue );
@@ -54,7 +54,7 @@ public:
 	int32				  GetIntValue() const;
 	float				  GetFloatValue() const;
 	void				  GetVecValue( float* pValue, uint32 numComps ) const;
-	matrix_t			  GetMatrixValue() const;
+	mat4_t				  GetMatrixValue() const;
 	const char*			  GetStringValue() const;
 	const char*			  GetTextureValue() const;
 	const char*			  GetMaterialValue() const;
@@ -73,7 +73,7 @@ private:
 		vec2_t		vector2DValue;
 		vec3_t		vector3DValue;
 		vec4_t		vector4DValue;
-		matrix_t	matrixValue;
+		mat4_t		matrixValue;
 		const char* pStringValue;
 		const char* pTextureValue;
 		const char* pMaterialValue;

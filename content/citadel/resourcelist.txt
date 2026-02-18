@@ -1,12 +1,8 @@
-{
-	"resources": [
-		"materials/nelson.stex",
-		"materials/nelson.smat",
-		"materials/veh_btr_br.stex",
-		"materials/veh_btr_br.smat",
-		"models/veh_btr_br.smdl",
-		"entities/test_quad.sent",
-		"entities/player.sent",
-		"maps/test.smap"
-	]
-}
+file "materials/nelson.stex"
+file "materials/nelson.smat"
+file "materials/veh_btr_br.stex"
+file "materials/veh_btr_br.smat"
+file "models/veh_btr_br.smdl"
+file "entities/test_quad.sent"
+file "entities/player.sent"
+file "maps/test.smap"

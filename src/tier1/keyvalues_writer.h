@@ -1,6 +1,8 @@
 #pragma once
 #include <EASTL/string.h>
+
 #include "tier1/keyvalues.h"
+#include "tier1/istreamdata.h"
 
 //-----------------------------------------------------------------------------
 // Key values writer
@@ -8,7 +10,7 @@
 class CKeyValuesWriter
 {
 public:
-	void Write( CKeyValues* pKeyValues, eastl::string& buffer ) const;
+	void Write( CKeyValues* pKeyValues, IStreamDataWriter* pStreamWriter ) const;
 
 private:
 	void WriteKeyToBuffer( CKeyValues* pKeyValues, eastl::string& buffer, uint32 indentLevel ) const;

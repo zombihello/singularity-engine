@@ -1,1 +1,0 @@
-set( CMAKE_MODULE_PATH      "${RAPIDJSON_PATH}/cmake/modules/" ${CMAKE_MODULE_PATH} )

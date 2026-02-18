@@ -63,6 +63,7 @@ bool CEntityDescTool::CompileEntityDesc( const resourceToolCompileEntityDescPara
 			sentEntityDescVar.SetName( resourceToolEntityDescVar.pName );
 			switch ( resourceToolEntityDescVar.type )
 			{
+			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_UNDEFINED: Warning( "EntityDescTool: Entity descriptor variable '%s' is undefined, skipped", resourceToolEntityDescVar.pName ); continue;
 			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_BOOL: sentEntityDescVar.SetBoolValue( resourceToolEntityDescVar.boolValue ); break;
 			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_INT: sentEntityDescVar.SetIntValue( resourceToolEntityDescVar.intValue ); break;
 			case RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_FLOAT: sentEntityDescVar.SetFloatValue( resourceToolEntityDescVar.floatValue ); break;

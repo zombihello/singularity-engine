@@ -1,5 +1,4 @@
 #include "pch_shadercompiler.h"
-#include "tier1/jsondoc.h"
 #include "tier0/icommandline.h"
 #include "tier0/crashdump.h"
 #include "cvar/icvar.h"

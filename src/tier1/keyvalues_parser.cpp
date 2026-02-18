@@ -9,27 +9,30 @@
 CKeyValuesParser::Setup
 ==================
 */
-void CKeyValuesParser::Setup( const char* pFile, const char* pBuffer, uint64 size )
+void CKeyValuesParser::Setup( IStreamDataReader* pStreamReader )
 {
-	// Initialize buffer pointers
-	lineRanges.clear();
-	pCurFile = pFile;
-	pCurPtr	 = pBuffer;
-	pEndPtr	 = pBuffer + size;
+	// Save the stream reader
+	PROFILE_SCOPE();
+	Assert( pStreamReader );
+	buffer.SetStream( pStreamReader );
 
 	// Initialize line ranges
-	const char* pStartLine = pCurPtr;
-	const char* pEndLine   = pStartLine;
-	while ( !IsEndOfBuffer( pEndLine ) )
+	lineRanges.clear();
+	uint64 lineStart = buffer.Tell();
+	while ( !buffer.IsEndOfBuffer() )
 	{
-		if ( *pEndLine == '\n' )
+		const char c	   = buffer.Peek();
+		uint64	   lineEnd = buffer.Tell();
+		if ( c == '\n' )
 		{
-			lineRanges.emplace_back( eastl::string_view( pStartLine, (uint64)( pEndLine - pStartLine ) ) );
-			pStartLine = pEndLine + 1;
+			lineRanges.emplace_back( eastl::make_pair( lineStart, lineEnd ) );
+			lineStart = lineEnd + 1;
 		}
-		++pEndLine;
+
+		buffer.Advance( 1 );
 	}
-	lineRanges.emplace_back( eastl::string_view( pStartLine, (uint64)( pEndLine - pStartLine ) ) );
+	lineRanges.emplace_back( eastl::make_pair( lineStart, buffer.Tell() ) );
+	buffer.Seek( 0 );
 }
 
 /*
@@ -37,11 +40,12 @@ void CKeyValuesParser::Setup( const char* pFile, const char* pBuffer, uint64 siz
 CKeyValuesParser::Parse
 ==================
 */
-void CKeyValuesParser::Parse( const char* pFile, CKeyValues* pKeyValues, const char* pBuffer, uint64 size )
+void CKeyValuesParser::Parse( CKeyValues* pKeyValues, IStreamDataReader* pStreamReader )
 {
 	PROFILE_SCOPE();
 	Assert( pKeyValues );
-	Setup( pFile, pBuffer, size );
+	Assert( pStreamReader );
+	Setup( pStreamReader );
 	ReadKeyValues( pKeyValues );
 }
 
@@ -54,43 +58,41 @@ bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValues )
 {
 	// Keep parsing until we hit the end of the buffer or a parse error
 	PROFILE_SCOPE();
-	eastl::string			   valueBuffer;
 	eastl::vector<CKeyValues*> includedKeys;
 	eastl::vector<CKeyValues*> baseKeys;
 	uint32					   blockScopeLevel = scopeLevel;
-	while ( !IsEndOfBuffer( pCurPtr ) )
+	while ( !buffer.IsEndOfBuffer() )
 	{
 		// Skip whitespaces and comments
 		SkipSpacesAndComments();
-		if ( IsEndOfBuffer( pCurPtr ) )
+		if ( buffer.IsEndOfBuffer() )
 		{
 			break;
 		}
 
 		// Read current token
-		bool			   bQuotedToken = false;
-		eastl::string_view token		= ReadToken( bQuotedToken );
-		if ( token.empty() )
+		token_t token = ReadToken();
+		if ( token.string.empty() )
 		{
-			EmitError( token.data(), "Got empty token" );
+			EmitError( token.position, "Got empty token" );
 			break;
 		}
 
 		// Check control symbols if the token isn't quoted
-		if ( !bQuotedToken )
+		if ( token.type != TOKEN_TYPE_QUOTED )
 		{
 			// Top level closed, stop reading
-			if ( scopeLevel > 0 && *token.data() == '}' )
+			if ( scopeLevel > 0 && token.string[0] == '}' )
 			{
 				--scopeLevel;
 				break;
 			}
 
 			// Read special macroses
-			if ( *token.data() == '#' )
+			if ( token.string[0] == '#' )
 			{
 				// Include macro
-				if ( token == "#include" )
+				if ( token.string == "#include" )
 				{
 					if ( !ReadIncludeKeys( includedKeys ) )
 					{
@@ -98,7 +100,7 @@ bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValues )
 					}
 				}
 				// Base macro
-				else if ( token == "#base" )
+				else if ( token.string == "#base" )
 				{
 					if ( !ReadIncludeKeys( baseKeys ) )
 					{
@@ -108,7 +110,7 @@ bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValues )
 				// Otherwise it is an unknown macros
 				else
 				{
-					EmitError( token.data(), "Unknown macros '%.*s'", token.size(), token.data() );
+					EmitError( token.position, "Unknown macros '%s'", token.string.c_str() );
 					break;
 				}
 
@@ -118,16 +120,16 @@ bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValues )
 
 		// Read a key-value
 		// The current token it is a key name
-		eastl::string_view name = token;
-		if ( !bQuotedToken && IsControlSymbol( name.data() ) )
+		eastl::string name = eastl::move( token.string );
+		if ( token.type == TOKEN_TYPE_CONTROL )
 		{
-			EmitError( token.data(), "Unexpected control symbol" );
+			EmitError( token.position, "Unexpected control symbol" );
 			break;
 		}
 
 		// Create a new sub key
 		bool		bAccepted = true;
-		CKeyValues* pSubKey	  = new CKeyValues( name.data(), name.size(), pKeyValues );
+		CKeyValues* pSubKey	  = new CKeyValues( name.c_str(), pKeyValues );
 
 		// Read conditional block if exists
 		if ( !ReadConditionalBlock( bAccepted ) )
@@ -137,10 +139,10 @@ bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValues )
 		}
 
 		// The next token it is a value
-		token = ReadToken( bQuotedToken );
+		token = ReadToken();
 
 		// If the token it is '{' then read sub key-values
-		if ( *token.data() == '{' )
+		if ( token.string[0] == '{' )
 		{
 			// Read sub key-values
 			++scopeLevel;
@@ -153,35 +155,54 @@ bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValues )
 		// Otherwise it is a simple value
 		else
 		{
-			eastl::string_view value = token;
-			if ( !bQuotedToken && IsControlSymbol( value.data() ) )
+			// Make sure that the token hasn't a control symbol
+			if ( token.type == TOKEN_TYPE_CONTROL )
 			{
-				EmitError( token.data(), "Unexpected control symbol" );
+				EmitError( token.position, "Unexpected control symbol" );
 				delete pSubKey;
 				break;
 			}
 
-			// We copy the token into a temporary buffer so that the string is null-terminated
-			uint64 valueLength = value.size();
-			if ( valueBuffer.size() < valueLength + 1 )
+			// The current token is a schema if the next token is ':'
+			eastl::string value;
+			uint64		  prevPosition = buffer.Tell();
+			token_t		  nextToken	   = ReadToken();
+			if ( !nextToken.string.empty() && nextToken.string[0] == ':' )
 			{
-				valueBuffer.resize( valueLength + 1 );
+				// Set the schema into the key
+				pSubKey->SetSchema( token.string.c_str() );
+
+				// The next token it is a real value
+				token = ReadToken();
+				value = eastl::move( token.string );
+
+				// Make sure that the token hasn't a control symbol
+				if ( token.type == TOKEN_TYPE_CONTROL )
+				{
+					EmitError( token.position, "Unexpected control symbol" );
+					delete pSubKey;
+					break;
+				}
 			}
-			char* pValueStr = valueBuffer.data();
-			Mem_Memcpy( pValueStr, value.data(), valueLength );
-			valueBuffer[valueLength] = '\0';
+			// Otherwise the token is a real value
+			else
+			{
+				value = eastl::move( token.string );
+				buffer.Seek( prevPosition );
+			}
 
 			// Try to deduce type
 			char*		pEndInt64	= NULL;	 // Position where int64 scan ended
 			char*		pEndDouble	= NULL;	 // Position where double scan ended
-			const char* pEndString	= pValueStr + valueLength;
+			const char* pValueStr	= value.c_str();
+			const char* pEndString	= pValueStr + value.size();
 			int64		valueInt64	= S_Atoi64( pValueStr, &pEndInt64 );
 			double		valueDouble = S_Atod( pValueStr, &pEndDouble );
 
 			// Set as string if the value length is zero
-			if ( valueLength == 0 )
+			if ( value.size() == 0 )
 			{
-				pSubKey->SetString( "" );
+				pSubKey->SetString( NULL, "" );
 			}
 			// Set as float/double if double scan ended at end of the value
 			else if ( pEndDouble > pEndInt64 && pEndDouble == pEndString )
@@ -231,11 +252,11 @@ bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValues )
 
 				if ( bMustBeDouble )
 				{
-					pSubKey->SetDouble( valueDouble );
+					pSubKey->SetDouble( NULL, valueDouble );
 				}
 				else
 				{
-					pSubKey->SetFloat( (float)valueDouble );
+					pSubKey->SetFloat( NULL, (float)valueDouble );
 				}
 			}
 			// Set as int32/int64 if int64 scan ended at end of the value
@@ -243,19 +264,19 @@ bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValues )
 			{
 				if ( valueInt64 >= S_MinValue<int32>() && valueInt64 <= S_MaxValue<int32>() )
 				{
-					pSubKey->SetInt( (int32)valueInt64 );
+					pSubKey->SetInt( NULL, (int32)valueInt64 );
 				}
 				else
 				{
-					pSubKey->SetInt64( valueInt64 );
+					pSubKey->SetInt64( NULL, valueInt64 );
 				}
 			}
 			// Otherwise set as string
 			else
 			{
 				eastl::string convertedValueBuffer;
-				S_ConvertUnescapeToEscapeSymbols( convertedValueBuffer, valueBuffer.c_str() );
-				pSubKey->SetString( convertedValueBuffer.c_str() );
+				S_ConvertUnescapeToEscapeSymbols( convertedValueBuffer, value.c_str() );
+				pSubKey->SetString( NULL, convertedValueBuffer.c_str() );
 			}
 
 			// Read conditional block if exists
@@ -276,7 +297,7 @@ bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValues )
 	// All sub scopes must be closed
 	if ( scopeLevel > 0 && scopeLevel >= blockScopeLevel )
 	{
-		EmitError( pCurPtr, "Got EOF instead of '}'" );
+		EmitError( buffer.Tell(), "Got EOF instead of '}'" );
 	}
 
 	// Append include keys into the key values
@@ -313,116 +334,111 @@ bool CKeyValuesParser::ReadConditionalBlock( bool& bAccepted )
 		// Here you can add your constant variables
 	};
 
-	bAccepted						= true;
-	bool			   bQuotedToken = false;
-	const char*		   pPrevPtr		= pCurPtr;
-	eastl::string_view token		= ReadToken( bQuotedToken );
-	if ( !bQuotedToken && *token.data() == '[' )
+	bAccepted			 = false;
+	uint64	prevPosition = buffer.Tell();
+	token_t token		 = ReadToken();
+	if ( token.string.empty() || token.type == TOKEN_TYPE_QUOTED || token.string[0] != '[' )
 	{
-		bAccepted				  = false;
-		bool bExpectVar			  = true;
-		bool bEndConditionalBlock = false;
+		bAccepted = true;
+		buffer.Seek( prevPosition );
+		return true;
+	}
 
-		eastl::vector<bool> bConditionalGroups;
-		uint32				curConditionalGroupId = 0;
-		bConditionalGroups.emplace_back( true );
-		while ( !IsEndOfBuffer( pCurPtr ) )
+	bool				bExpectVar			 = true;
+	bool				bEndConditionalBlock = false;
+	eastl::vector<bool> bConditionalGroups;
+	uint32				curConditionalGroupId = 0;
+	bConditionalGroups.emplace_back( true );
+	while ( !buffer.IsEndOfBuffer() )
+	{
+		// Skip whitespaces and comments
+		SkipSpacesAndComments();
+		if ( buffer.IsEndOfBuffer() )
 		{
-			// Skip whitespaces and comments
-			SkipSpacesAndComments();
-			if ( IsEndOfBuffer( pCurPtr ) )
+			break;
+		}
+
+		// Read current token
+		token = ReadToken();
+		if ( token.string.empty() )
+		{
+			EmitError( token.position, "Got empty token" );
+			break;
+		}
+
+		if ( token.type != TOKEN_TYPE_QUOTED )
+		{
+			// Check if we reach end of the conditional block
+			if ( token.string[0] == ']' )
 			{
+				bEndConditionalBlock = true;
 				break;
 			}
-
-			// Read current token
-			token = ReadToken( bQuotedToken );
-			if ( token.empty() )
+			// Should we go to a new conditional group
+			else if ( token.string[0] == '|' )
 			{
-				EmitError( token.data(), "Got empty token" );
+				bExpectVar = true;
+				++curConditionalGroupId;
+				bConditionalGroups.emplace_back( true );
+				continue;
+			}
+		}
+
+		// Evaluate the conditional variable
+		bExpectVar		= false;
+		bool bEvaluated = false;
+		bool bNot		= false;  // Should we negate this command?
+		if ( token.string[0] == '!' )
+		{
+			token.string.erase( token.string.begin() );
+			bNot = true;
+		}
+
+		// First, let's see if it's a constant variable
+		for ( uint32 index = 0, count = ARRAYSIZE( s_constantVars ); index < count; ++index )
+		{
+			const eastl::pair<const char*, bool>& constantVar = s_constantVars[index];
+			if ( token.string == constantVar.first )
+			{
+				bEvaluated = true;
+				bConditionalGroups[curConditionalGroupId] &= constantVar.second ^ bNot;
 				break;
 			}
-
-			if ( !bQuotedToken )
-			{
-				// Check if we reach end of the conditional block
-				if ( *token.data() == ']' )
-				{
-					bEndConditionalBlock = true;
-					break;
-				}
-
-				// Should we go to a new conditional group
-				if ( *token.data() == '|' )
-				{
-					bExpectVar = true;
-					++curConditionalGroupId;
-					bConditionalGroups.emplace_back( true );
-					continue;
-				}
-			}
-
-			// Evaluate the conditional variable
-			bExpectVar		= false;
-			bool bEvaluated = false;
-			bool bNot		= false;  // Should we negate this command?
-			if ( *token.data() == '!' )
-			{
-				token = eastl::string_view( token.data() + 1, token.size() - 1 );
-				bNot  = true;
-			}
-
-			// First, let's see if it's a constant variable
-			for ( uint32 index = 0, count = ARRAYSIZE( s_constantVars ); index < count; ++index )
-			{
-				const eastl::pair<const char*, bool>& constantVar			= s_constantVars[index];
-				uint32								  constantVarNameLength = S_Strlen( constantVar.first );
-				if ( token.size() == constantVarNameLength && !S_Strnicmp( token.data(), constantVar.first, constantVarNameLength ) )
-				{
-					bEvaluated = true;
-					bConditionalGroups[curConditionalGroupId] &= constantVar.second ^ bNot;
-					break;
-				}
-			}
-
-			// Otherwise, it must be a cvar
-			if ( !bEvaluated )
-			{
-				IConVar* pConVar = g_pCvar->FindVar( token.data(), token.size() );
-				if ( pConVar )
-				{
-					bEvaluated = true;
-					bConditionalGroups[curConditionalGroupId] &= pConVar->GetBool() ^ bNot;
-				}
-				else
-				{
-					EmitError( token.data(), "Unknown cvar '%.*s'", token.size(), token.data() );
-				}
-			}
 		}
 
-		// A conditional block must be closed by ']'
-		if ( !bEndConditionalBlock )
+		// Otherwise, it must be a cvar
+		if ( !bEvaluated )
 		{
-			EmitError( pCurPtr, "Got EOF instead of ']'" );
-		}
-		// A conditional block must have a var
-		else if ( bExpectVar )
-		{
-			EmitError( pCurPtr, "Got ']' instead of a var" );
-		}
-		// Otherwise everything is ok, we calculate the final result of the condition
-		else
-		{
-			for ( uint32 index = 0, count = (uint32)bConditionalGroups.size(); index < count && !bAccepted; ++index )
+			IConVar* pConVar = g_pCvar->FindVar( token.string.c_str() );
+			if ( pConVar )
 			{
-				bAccepted = bConditionalGroups[index];
+				bEvaluated = true;
+				bConditionalGroups[curConditionalGroupId] &= pConVar->GetBool() ^ bNot;
+			}
+			else
+			{
+				EmitError( token.position, "Unknown cvar '%s'", token.string.c_str() );
 			}
 		}
 	}
+
+	// A conditional block must be closed by ']'
+	if ( !bEndConditionalBlock )
+	{
+		EmitError( token.position, "Got EOF instead of ']'" );
+	}
+	// A conditional block must have a var
+	else if ( bExpectVar )
+	{
+		EmitError( token.position, "Got ']' instead of a var" );
+	}
+	// Otherwise everything is ok, we calculate the final result of the condition
 	else
 	{
-		pCurPtr = pPrevPtr;
+		for ( uint32 index = 0, count = (uint32)bConditionalGroups.size(); index < count && !bAccepted; ++index )
+		{
+			bAccepted = bConditionalGroups[index];
+		}
 	}
 
 	return !HasErrors();
@@ -437,33 +453,34 @@ bool CKeyValuesParser::ReadIncludeKeys( eastl::vector<CKeyValues*>& includedKeys
 {
 	// Read a file path
 	PROFILE_SCOPE();
-	bool			   bQuotedToken = false;
-	eastl::string_view token		= ReadToken( bQuotedToken );
-	if ( token.empty() )
+	Assert( g_pFileSystem );
+
+	token_t token = ReadToken();
+	if ( token.string.empty() )
 	{
-		EmitError( token.data(), "Got empty token" );
+		EmitError( token.position, "Got empty token" );
 		return false;
 	}
 
 	// Get relative subdirectory
 	eastl::string fullPath;
-	S_GetFilePath( pCurFile, fullPath, false );
+	S_GetFilePath( buffer.GetStream()->GetPath(), fullPath, false );
 	size_t offset = fullPath.size();
-	fullPath.resize( fullPath.size() + token.size() );
-	Mem_Memcpy( fullPath.data() + offset, token.data(), token.size() );
+	fullPath.resize( fullPath.size() + token.string.size() );
+	Mem_Memcpy( fullPath.data() + offset, token.string.data(), token.string.size() );
 
-	// Load the file
-	eastl::string buffer;
-	if ( !S_LoadFileToString( fullPath.c_str(), buffer ) )
+	// Try open the file
+	TRefPtr<IStreamDataReader> pFile = g_pFileSystem->CreateFileReader( fullPath.c_str() );
+	if ( !pFile )
 	{
-		EmitError( token.data(), "Failed to load keyvalue file '%s'", fullPath.c_str() );
+		EmitError( token.position, "Failed to load keyvalue file '%s'", fullPath.c_str() );
 		return false;
 	}
 
 	// Create a new key values and parse it
 	CKeyValues*		 pKeyValues = new CKeyValues( fullPath.c_str() );
 	CKeyValuesParser keyValuesParser;
-	keyValuesParser.Parse( fullPath.c_str(), pKeyValues, buffer.c_str(), buffer.size() );
+	keyValuesParser.Parse( pKeyValues, pFile );
 	if ( keyValuesParser.HasErrors() )
 	{
 		const eastl::vector<eastl::string>& errorMsgs = keyValuesParser.GetErrorMsgs();
@@ -523,48 +540,46 @@ CKeyValuesParser::SkipSpacesAndComments
 void CKeyValuesParser::SkipSpacesAndComments()
 {
 	PROFILE_SCOPE();
-	while ( !IsEndOfBuffer( pCurPtr ) )
+	while ( !buffer.IsEndOfBuffer() )
 	{
 		// Skip spaces
-		while ( pCurPtr < pEndPtr && S_IsSpace( *pCurPtr ) )
+		while ( !buffer.IsEndOfBuffer() && S_IsSpace( buffer.Peek() ) )
 		{
-			++pCurPtr;
+			buffer.Advance( 1 );
 		}
 
 		// Stray multi-line comment terminator '*/' outside of comment
-		if ( IsEndComment( pCurPtr, true ) )
+		if ( IsEndMultilineComment() )
 		{
-			EmitError( pCurPtr, "Unexpected '*/' comment terminator" );
+			EmitError( buffer.Tell(), "Unexpected '*/' comment terminator" );
 		}
 
-		// Skip line and block comments
-		if ( IsBeginComment( pCurPtr ) )
+		// Skip line comments
+		if ( IsBeginLineComment() )
 		{
-			// Line comment
-			if ( pCurPtr[1] == '/' )
+			while ( !buffer.IsEndOfBuffer() && !IsEndLineComment() )
 			{
-				while ( pCurPtr < pEndPtr && !IsEndComment( pCurPtr ) )
-				{
-					++pCurPtr;
-				}
-				continue;
+				buffer.Advance( 1 );
+			}
+			continue;
+		}
+
+		// Skip block comments
+		if ( IsBeginMultilineComment() )
+		{
+			while ( !buffer.IsEndOfBuffer() && !IsEndMultilineComment() )
+			{
+				buffer.Advance( 1 );
 			}
 
-			// Multi-line comment
-			if ( pCurPtr[1] == '*' )
+			if ( IsEndMultilineComment() )
 			{
-				while ( pCurPtr < pEndPtr )
-				{
-					if ( IsEndComment( pCurPtr, true ) )
-					{
-						pCurPtr += 2;
-						break;
-					}
-					++pCurPtr;
-				}
-				continue;
+				buffer.Advance( 2 );
 			}
+			continue;
 		}
+
+		// We are done
 		break;
 	}
 }
@@ -574,86 +589,137 @@ void CKeyValuesParser::SkipSpacesAndComments()
 CKeyValuesParser::ReadToken
 ==================
 */
-eastl::string_view CKeyValuesParser::ReadToken( bool& bQuoted )
+void CKeyValuesParser::ReadToken( token_t& token )
 {
 	// Before read skip whitespaces and comments
 	PROFILE_SCOPE();
 	SkipSpacesAndComments();
-	if ( IsEndOfBuffer( pCurPtr ) )
+	token.string.clear();
+	token.position = buffer.Tell();
+	if ( buffer.IsEndOfBuffer() )
 	{
-		return eastl::string_view( pEndPtr, 0 );
+		return;
 	}
-
-	// Read as bare token if the one isn't begin on '"'
-	const char* pStartToken = pCurPtr;
-	const char* pEndToken	= pStartToken;
-	bQuoted					= *pStartToken == '"';
+	token.string.reserve( 256 );
 
 	// Read as quoted token
-	if ( bQuoted )
+	if ( buffer.Peek() == '"' )
 	{
 		// Skip "
-		++pStartToken;
-		pEndToken = pStartToken;
+		token.type = TOKEN_TYPE_QUOTED;
+		buffer.Advance( 1 );
+		++token.position;
 
 		bool bIsEscapeSymbol = false;
-		while ( !IsEndOfBuffer( pEndToken ) && ( bIsEscapeSymbol || *pEndToken != '"' ) )
+		while ( !buffer.IsEndOfBuffer() && ( bIsEscapeSymbol || buffer.Peek() != '"' ) )
 		{
-			bIsEscapeSymbol = *pEndToken == '\\';
-			++pEndToken;
+			const char c	= buffer.Peek();
+			bIsEscapeSymbol = c == '\\';
+
+			token.string += c;
+			buffer.Advance( 1 );
 		}
 
 		// Validate the token
-		if ( IsEndOfBuffer( pEndToken ) )
+		if ( buffer.IsEndOfBuffer() )
 		{
-			EmitError( pEndToken, "Got EOF instead of '\"'" );
+			EmitError( buffer.Tell(), "Got EOF instead of '\"'" );
 		}
 	}
 	// Read as control symbol
-	else if ( IsControlSymbol( pStartToken ) )
+	else if ( IsControlSymbol() )
 	{
-		pEndToken += GetControlSymbolSize( pStartToken );
+		token.type = TOKEN_TYPE_CONTROL;
+		for ( uint32 index = 0, count = GetControlSymbolSize(); index < count; ++index )
+		{
+			token.string += buffer.Peek();
+			buffer.Advance( 1 );
+		}
 	}
 	// Read as bare token
 	else
 	{
 		// Advance the end pointer until whitespaces or control tokens
+		token.type			 = TOKEN_TYPE_BARE;
 		bool bIsEscapeSymbol = false;
-		while ( !IsEndOfBuffer( pEndToken ) && ( bIsEscapeSymbol || !IsControlSymbol( pEndToken ) ) && !S_IsSpace( *pEndToken ) )
+		while ( !buffer.IsEndOfBuffer() && ( bIsEscapeSymbol || !IsControlSymbol() ) && !S_IsSpace( buffer.Peek() ) )
 		{
-			bIsEscapeSymbol = *pEndToken == '\\';
-			++pEndToken;
+			const char c	= buffer.Peek();
+			bIsEscapeSymbol = c == '\\';
+
+			token.string += c;
+			buffer.Advance( 1 );
 		}
 	}
 
 	// Skip " if was quoted
-	pCurPtr = pEndToken;
-	if ( bQuoted && !IsEndOfBuffer( pCurPtr ) )
+	if ( token.type == TOKEN_TYPE_QUOTED && !buffer.IsEndOfBuffer() )
 	{
-		++pCurPtr;
+		buffer.Advance( 1 );
 	}
-	return eastl::string_view( pStartToken, (uint64)( pEndToken - pStartToken ) );
 }
 
 /*
 ==================
-CKeyValuesParser::GetTokenPostion
+CKeyValuesParser::GetPostionInCode
 ==================
 */
-void CKeyValuesParser::GetTokenPostion( const char* pToken, uint64& line, uint64& column ) const
+void CKeyValuesParser::GetPostionInCode( uint64 streamOffset, uint64& line, uint64& column ) const
 {
 	line   = 0;
 	column = 0;
 	for ( uint64 index = 0, count = lineRanges.size(); index < count; ++index )
 	{
-		const eastl::string_view& curLine	 = lineRanges[index];
-		const char*				  pStartLine = curLine.data();
-		const char*				  pEndLine	 = pStartLine + curLine.size();
-		if ( pToken >= pStartLine && pToken <= pEndLine )
+		const eastl::pair<uint64, uint64>& lineRange = lineRanges[index];
+		if ( streamOffset >= lineRange.first && streamOffset <= lineRange.second )
 		{
 			line   = index + 1;
-			column = (uint64)( pToken - pStartLine ) + 1;
+			column = ( streamOffset - lineRange.first ) + 1;
 			break;
 		}
 	}
+}
+
+/*
+==================
+CKeyValuesParser::CBuffer::Precache
+==================
+*/
+void CKeyValuesParser::CBuffer::Precache( uint32 requestedSize )
+{
+	// We don't do precache if we already have enough precached data size
+	PROFILE_SCOPE();
+	Assert( requestedSize <= BUFFER_SIZE );
+	uint32 unusedPrecachedSize = precachedSize - bufferOffset;
+	if ( unusedPrecachedSize >= requestedSize )
+	{
+		return;
+	}
+
+	// Do nothing if we reach to the end of the stream
+	if ( pStreamReader->IsEndOfStream() )
+	{
+		return;
+	}
+
+	// If there might not be enough space at the end of the buffer, we move the tail to the beginning
+	// Idea: we make it so that the data [bufferOffset, requestedSize) ends up at the beginning [0, unusedPrecachedSize)
+	// and the bufferOffset becomes 0
+	if ( unusedPrecachedSize != 0 )
+	{
+		Mem_Memmove( pBuffer, pBuffer + bufferOffset, unusedPrecachedSize );
+		streamOffset += bufferOffset;
+		precachedSize = unusedPrecachedSize;
+		bufferOffset  = 0;
+	}
+	else
+	{
+		streamOffset = pStreamReader->Tell();
+	}
+
+	// Now we have the tail at the beginning, and there's free space at the end
+	// We load exactly as much as we need
+	uint32 restRequestedSize = Min( BUFFER_SIZE - precachedSize, (uint32)( pStreamReader->GetSize() - streamOffset ) );
+	pStreamReader->Read( pBuffer + precachedSize, restRequestedSize );
+	precachedSize += restRequestedSize;
 }

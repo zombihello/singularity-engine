@@ -1,17 +1,10 @@
+output_dir "//BASE_PATH/citadel/entities/"
+components
 {
-	"output-dir": "//BASE_PATH/citadel/entities/",
-	"components": [
-		{ "type": "Transform" 		},
-		{ "type": "CameraActive" 	},
-		{ 
-			"type": "Camera",
-			"properties": [
-				{ 
-					"name": "bAutoViewData",
-					"type": "bool",
-					"value": true 
-				}
-			]
-		}
-	]
+	Transform 		{}	
+	CameraActive 	{}	
+	Camera
+	{
+		bAutoViewData 	1
+	}
 }

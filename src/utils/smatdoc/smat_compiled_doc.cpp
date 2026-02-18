@@ -103,8 +103,8 @@ bool CSMATCompiledMaterialDoc::SaveFile( const char* pPath )
 
 		case SMAT_MATERIAL_VAR_TYPE_MATRIX:
 		{
-			matrix_t value = var.GetMatrixValue();
-			pFile->Write( &value, sizeof( matrix_t ) );
+			mat4_t value = var.GetMatrixValue();
+			pFile->Write( &value, sizeof( mat4_t ) );
 			break;
 		}
 
@@ -256,8 +256,8 @@ bool CSMATCompiledMaterialDoc::LoadFromFile( const char* pPath )
 
 		case SMAT_MATERIAL_VAR_TYPE_MATRIX:
 		{
-			matrix_t value;
-			pFile->Read( &value, sizeof( matrix_t ) );
+			mat4_t value;
+			pFile->Read( &value, sizeof( mat4_t ) );
 			var.SetMatrixValue( value );
 			break;
 		}

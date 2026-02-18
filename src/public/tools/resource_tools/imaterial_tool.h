@@ -22,17 +22,17 @@ enum resourceToolMaterialVarType_t
 
 struct resourceToolMaterialVar_t
 {
-	const char*				  pName;
+	const char*					  pName;
 	resourceToolMaterialVarType_t type;
 	union
 	{
-		bool		 boolValue;
-		int32		 intValue;
-		float		 floatValue;
-		vec2_t		 vector2DValue;
-		vec3_t		 vector3DValue;
-		vec4_t		 vector4DValue;
-		matrix_t	 matrixValue;
+		bool		boolValue;
+		int32		intValue;
+		float		floatValue;
+		vec2_t		vector2DValue;
+		vec3_t		vector3DValue;
+		vec4_t		vector4DValue;
+		mat4_t		matrixValue;
 		const char* pStringValue;
 		const char* pTextureValue;
 		const char* pMaterialValue;
@@ -41,8 +41,8 @@ struct resourceToolMaterialVar_t
 
 struct resourceToolCompileMaterialParams_t
 {
-	const char*					 pDestPath;
-	const char*					 pShaderName;
+	const char*						 pDestPath;
+	const char*						 pShaderName;
 	const resourceToolMaterialVar_t* pVars;
 	uint32							 numVars;
 };

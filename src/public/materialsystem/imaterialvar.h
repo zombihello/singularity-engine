@@ -39,21 +39,21 @@ public:
 	virtual void SetVecValue( const vec2_t& value )					 = 0;
 	virtual void SetVecValue( const vec3_t& value )					 = 0;
 	virtual void SetVecValue( const vec4_t& value )					 = 0;
-	virtual void SetMatrixValue( const matrix_t& value )			 = 0;
+	virtual void SetMatrixValue( const mat4_t& value )				 = 0;
 	virtual void SetStringValue( const char* pValue )				 = 0;
 	virtual void SetTextureValue( ITexture* pValue )				 = 0;
 	virtual void SetMaterialValue( IMaterial* pValue )				 = 0;
 
 	virtual bool			  IsDefined() const									  = 0;
-	virtual const char*	  GetName() const									  = 0;
+	virtual const char*		  GetName() const									  = 0;
 	virtual materialVarType_t GetType() const									  = 0;
 	virtual IMaterial*		  GetOwningMaterial() const							  = 0;
 	virtual bool			  GetBoolValue() const								  = 0;
 	virtual int32			  GetIntValue() const								  = 0;
 	virtual float			  GetFloatValue() const								  = 0;
 	virtual void			  GetVecValue( float* pValue, uint32 numComps ) const = 0;
-	virtual matrix_t		  GetMatrixValue() const							  = 0;
-	virtual const char*	  GetStringValue() const							  = 0;
+	virtual mat4_t			  GetMatrixValue() const							  = 0;
+	virtual const char*		  GetStringValue() const							  = 0;
 	virtual ITexture*		  GetTextureValue() const							  = 0;
 	virtual IMaterial*		  GetMaterialValue() const							  = 0;
 };

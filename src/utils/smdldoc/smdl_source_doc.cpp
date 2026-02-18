@@ -1,6 +1,6 @@
 #include "utils/interfaces/interfaces.h"
 #include "tier0/profile.h"
-#include "tier1/jsondoc.h"
+#include "tier1/keyvalues.h"
 #include "filesystem/ifilesystem.h"
 #include "utils/smdldoc/smdl_source_doc.h"
 
@@ -20,16 +20,19 @@ static_assert( ARRAYSIZE( s_pAxisUpNames ) == AXIS_UP_NUM, "Array size 's_pAxisU
 ConvTextToAxisUp
 ==================
 */
-static axisUp_t ConvTextToAxisUp( const char* pText )
+static bool ConvTextToAxisUp( const char* pText, axisUp_t& axisUp )
 {
 	for ( uint32 index = 0; index < ARRAYSIZE( s_pAxisUpNames ); ++index )
 	{
 		if ( !S_Stricmp( pText, s_pAxisUpNames[index] ) )
 		{
-			return (axisUp_t)index;
+			axisUp = (axisUp_t)index;
+			return true;
 		}
 	}
-	return AXIS_UP_DEFAULT;
+
+	axisUp = AXIS_UP_DEFAULT;
+	return false;
 }
 
 /*
@@ -61,201 +64,81 @@ CSMDLSourceModelDoc::LoadFromFile
 */
 bool CSMDLSourceModelDoc::LoadFromFile( const char* pPath )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-
-	// Load a JSON file
-	CJsonDoc jsonDoc;
-	if ( !jsonDoc.LoadFromFile( pPath ) )
+	// Load key values file
+	PROFILE_SCOPE();
+	CKeyValues keyValues( "smdl" );
+	if ( !keyValues.LoadFromFile( pPath ) )
 	{
-		Warning( "SMDLDoc: Failed to load '%s', maybe wrong JSON syntax?", pPath );
 		return false;
 	}
 	Clear();
-	bool bResult = true;
 
 	// Get combine models
-	{
-		CJsonValue jsonCombineModels = jsonDoc.GetValue( "combine-models" );
-		if ( jsonCombineModels.IsValid() )
-		{
-			if ( jsonCombineModels.IsNumber() )
-			{
-				bCombineModels = jsonCombineModels.GetNumber();
-			}
-			else
-			{
-				Error( "SMDLDoc: Invalid 'combine-models', must be number type" );
-				bResult = false;
-			}
-		}
-		else
-		{
-			bCombineModels = false;
-		}
-	}
+	bCombineModels = keyValues.GetBool( "combine_models" );
 
 	// Get axis up
+	const char* pStringValue = keyValues.GetString( "axis_up", ConvAxisUpToText( AXIS_UP_DEFAULT ) );
+	if ( !ConvTextToAxisUp( pStringValue, axisUp ) )
 	{
-		CJsonValue jsonAxisUp = jsonDoc.GetValue( "axis-up" );
-		if ( jsonAxisUp.IsValid() )
-		{
-			if ( jsonAxisUp.IsA( JSONVALUE_TYPE_STRING ) )
-			{
-				eastl::string axisUp = jsonAxisUp.GetString();
-				if ( axisUp.empty() )
-				{
-					Error( "SMDLDoc: Invalid 'axis-up', an axis up can't be empty" );
-					bResult = false;
-				}
-
-				CSMDLSourceModelDoc::axisUp = ConvTextToAxisUp( axisUp.c_str() );
-			}
-			else
-			{
-				Error( "SMDLDoc: Invalid 'axis-up', must be string type" );
-				bResult = false;
-			}
-		}
-		else
-		{
-			axisUp = AXIS_UP_DEFAULT;
-		}
+		Error( "SMDLDoc: Invalid SMDL, unknown axis up '%s' (file: '%s')", pStringValue, pPath );
+		return false;
 	}
 
 	// Get source path
+	bool bGotDefaultValue = false;
+	sourcePath			  = keyValues.GetString( "source", "", NULL, &bGotDefaultValue );
+	if ( bGotDefaultValue )
 	{
-		CJsonValue jsonSourcePath = jsonDoc.GetValue( "source" );
-		if ( jsonSourcePath.IsValid() )
-		{
-			if ( jsonSourcePath.IsA( JSONVALUE_TYPE_STRING ) )
-			{
-				eastl::string sourcePath = jsonSourcePath.GetString();
-				if ( sourcePath.empty() )
-				{
-					Error( "SMDLDoc: Invalid 'source', an source path can't be empty" );
-					bResult = false;
-				}
-
-				CSMDLSourceModelDoc::sourcePath = sourcePath;
-			}
-			else
-			{
-				Error( "SMDLDoc: Invalid 'source', must be string type" );
-				bResult = false;
-			}
-		}
-		else
-		{
-			Error( "SMDLDoc: A source model must have 'source'" );
-			bResult = false;
-		}
+		Error( "SMDLDoc: Invalid SMDL, not found required field 'source' (file: '%s')", pPath );
+		return false;
+	}
+	if ( sourcePath.empty() )
+	{
+		Error( "SMDLDoc: Invalid SMDL, a source file can't be empty (file: '%s')", pPath );
+		return false;
 	}
 
 	// Get materials directory
-	{
-		CJsonValue jsonMaterialsDir = jsonDoc.GetValue( "materials-dir" );
-		if ( jsonMaterialsDir.IsValid() )
-		{
-			if ( jsonMaterialsDir.IsA( JSONVALUE_TYPE_STRING ) )
-			{
-				eastl::string materialsDir = jsonMaterialsDir.GetString();
-				if ( materialsDir.empty() )
-				{
-					Error( "SMDLDoc: Invalid 'materials-dir', an materials directory can't be empty" );
-					bResult = false;
-				}
-
-				CSMDLSourceModelDoc::materialsDir = materialsDir;
-			}
-			else
-			{
-				Error( "SMDLDoc: Invalid 'materials-dir', must be string type" );
-				bResult = false;
-			}
-		}
-		else
-		{
-			CSMDLSourceModelDoc::materialsDir = "materials/";
-		}
-	}
+	materialsDir = keyValues.GetString( "materials_dir", "materials/" );
 
 	// Get output directory
+	outputDir = keyValues.GetString( "output_dir", "", NULL, &bGotDefaultValue );
+	if ( bGotDefaultValue )
 	{
-		CJsonValue jsonOutputDir = jsonDoc.GetValue( "output-dir" );
-		if ( jsonOutputDir.IsValid() )
-		{
-			if ( jsonOutputDir.IsA( JSONVALUE_TYPE_STRING ) )
-			{
-				eastl::string outputDir = jsonOutputDir.GetString();
-				if ( outputDir.empty() )
-				{
-					Error( "SMDLDoc: Invalid 'output-dir', an output directory can't be empty" );
-					bResult = false;
-				}
-
-				CSMDLSourceModelDoc::outputDir = outputDir;
-			}
-			else
-			{
-				Error( "SMDLDoc: Invalid 'output-dir', must be string type" );
-				bResult = false;
-			}
-		}
-		else
-		{
-			Error( "SMDLDoc: A source model '%s' must have 'output-dir' field" );
-			bResult = false;
-		}
+		Error( "SMDLDoc: Invalid SMDL, not found required field 'output_dir' (file: '%s')", pPath );
+		return false;
+	}
+	if ( outputDir.empty() )
+	{
+		Error( "SMDLDoc: Invalid SMDL, an output directory can't be empty (file: '%s')", pPath );
+		return false;
 	}
 
 	// Get renamed materials
+	CKeyValues* pRenamedMaterials = keyValues.FindKey( "rename_materials" );
+	if ( pRenamedMaterials )
 	{
-		CJsonValue jsonRenamedMaterialsVar = jsonDoc.GetValue( "rename-materials" );
-		if ( jsonRenamedMaterialsVar.IsValid() )
+		for ( CKeyValuesSubKeysIterator it( pRenamedMaterials ); it; ++it )
 		{
-			if ( jsonRenamedMaterialsVar.IsA( JSONVALUE_TYPE_ARRAY ) )
+			const char* pName = it->GetName();
+			pStringValue	  = it->GetString( NULL );
+			if ( !pName || !pName[0] )
 			{
-				eastl::vector<CJsonValue> jsonRenamedMaterialsArray = jsonRenamedMaterialsVar.GetArray();
-				for ( uint32 renamedMaterialIdx = 0, count = (uint32)jsonRenamedMaterialsArray.size(); renamedMaterialIdx < count; ++renamedMaterialIdx )
-				{
-					const CJsonValue& jsonValue = jsonRenamedMaterialsArray[renamedMaterialIdx];
-					if ( jsonValue.IsValid() && jsonValue.IsA( JSONVALUE_TYPE_OBJECT ) )
-					{
-						CJsonObject	  jsonObject   = jsonValue.GetObject();
-						eastl::string originalName = jsonObject.GetValue( "original" ).GetString();
-						eastl::string newName	   = jsonObject.GetValue( "new" ).GetString();
-						if ( originalName.empty() )
-						{
-							Error( "SMDLDoc: Invalid 'original' at renamed material id '%i'", renamedMaterialIdx );
-							bResult = false;
-							continue;
-						}
-
-						if ( newName.empty() )
-						{
-							Error( "SMDLDoc: Invalid 'new' at renamed material id '%i'", renamedMaterialIdx );
-							bResult = false;
-							continue;
-						}
-
-						renamedMaterialsDict[originalName] = newName;
-					}
-					else
-					{
-						Error( "SMDLDoc: Invalid renamed material at id %i, must be object with required fields: 'original' and 'new'", renamedMaterialIdx );
-						bResult = false;
-					}
-				}
+				Error( "SMDLDoc: Invalid SMDL, an original material name can't be empty (file: '%s')", pPath );
+				return false;
 			}
-			else
+			if ( !pStringValue || !pStringValue[0] )
 			{
-				Error( "SMDLDoc: Invalid \"rename-materials\", must be array of objects" );
-				bResult = false;
+				Error( "SMDLDoc: Invalid SMDL, a new material name can't be empty (file: '%s')", pPath );
+				return false;
 			}
+
+			renamedMaterialsDict[pName] = pStringValue;
 		}
 	}
 
-	return bResult;
+	// We are done
+	return true;
 }
 
 /*
@@ -265,43 +148,23 @@ CSMDLSourceModelDoc::SaveFile
 */
 bool CSMDLSourceModelDoc::SaveFile( const char* pPath )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-	Assert( g_pFileSystem );
-
-	// Try to open a file
-	TRefPtr<IStreamDataWriter> pFile = g_pFileSystem->CreateFileWriter( pPath );
-	if ( !pFile )
+	// Create key values
+	PROFILE_SCOPE();
+	CKeyValues keyValues( "smdl" );
+	keyValues.SetBool( "combine_models", bCombineModels );
+	keyValues.SetString( "axis_up", ConvAxisUpToText( axisUp ) );
+	keyValues.SetString( "source", sourcePath.c_str() );
+	keyValues.SetString( "materials_dir", materialsDir.c_str() );
+	keyValues.SetString( "output_dir", outputDir.c_str() );
+	if ( !renamedMaterialsDict.empty() )
 	{
-		Error( "SMDLDoc: Failed to open file '%s' for save a SMDL source model", pPath );
-		return false;
-	}
-
-	eastl::string buffer;
-	buffer += "{\n";
-
-	// Write is need combine models, axis up, source path, materials directory and output directory
-	buffer += S_Sprintf( "\t\"combine-models\": %s,\n", bCombineModels ? "true" : "false" );
-	buffer += S_Sprintf( "\t\"axis-up\": \"%s\",\n", ConvAxisUpToText( axisUp ) );
-	buffer += S_Sprintf( "\t\"source\": \"%s\",\n", sourcePath.c_str() );
-	buffer += S_Sprintf( "\t\"materials-dir\": \"%s\",\n", materialsDir.c_str() );
-	buffer += S_Sprintf( "\t\"output-dir\": \"%s\",\n", outputDir.c_str() );
-	buffer += "\t\"rename-materials\": [\n";
-	for ( auto it = renamedMaterialsDict.begin(), itEnd = renamedMaterialsDict.end(); it != itEnd; ++it )
-	{
-		buffer += "\t\t{\n";
-		buffer += S_Sprintf( "\t\t\t\"original\": \"%s\",\n", it->first.c_str() );
-		buffer += S_Sprintf( "\t\t\t\"new\": \"%s\"\n", it->second.c_str() );
-		buffer += "\t\t}";
-
-		if ( eastl::next( it, 1 ) != itEnd )
+		CKeyValues* pRenamedMaterials = new CKeyValues( "rename_materials", &keyValues );
+		for ( auto it = renamedMaterialsDict.begin(), itEnd = renamedMaterialsDict.end(); it != itEnd; ++it )
 		{
-			buffer += ",";
+			pRenamedMaterials->SetString( it->first.c_str(), it->second.c_str() );
 		}
-		buffer += "\n";
 	}
-	buffer += "\t]\n";
 
-	buffer += "}\n";
-	pFile->Write( buffer.data(), buffer.size() * sizeof( char ) );
-	return true;
+	// Save the key values to a file
+	return keyValues.SaveToFile( pPath );
 }

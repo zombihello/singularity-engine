@@ -13,16 +13,16 @@ public:
 	~CSMAPEntity();
 
 	void		Copy( const CSMAPEntity& other );
-	void		SetEntityDesc( const char* pEntityDesc );
+	void		SetClassName( const char* pClassName );
 	void		SetName( const char* pName );
-	const char* GetEntityDesc() const;
+	const char* GetClassName() const;
 	const char* GetName() const;
 	void		Clear();
 
 	CSMAPEntity& operator=( const CSMAPEntity& right );
 
 private:
-	eastl::string entityDesc;
+	eastl::string classname;
 	eastl::string name;
 };
 

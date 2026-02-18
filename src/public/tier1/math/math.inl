@@ -370,6 +370,187 @@ constexpr FORCEINLINE bool S_IsFinite( const TType& value )
 
 /*
 ==================
+S_VectorCreate
+==================
+*/
+template<typename TVectorType>
+FORCEINLINE TVectorType S_VectorCreate( const char* pString )
+{
+	TVectorType result;
+	S_VectorCreate( pString, result );
+	return result;
+}
+
+/*
+==================
+S_VectorCreate
+==================
+*/
+FORCEINLINE void S_VectorCreate( const char* pString, vec2_t& vector )
+{
+	S_Sscanf( pString, "%f %f", &vector.x, &vector.y );
+}
+
+/*
+==================
+S_VectorCreate
+==================
+*/
+FORCEINLINE void S_VectorCreate( const char* pString, vec3_t& vector )
+{
+	S_Sscanf( pString, "%f %f %f", &vector.x, &vector.y, &vector.z );
+}
+
+/*
+==================
+S_VectorCreate
+==================
+*/
+FORCEINLINE void S_VectorCreate( const char* pString, vec4_t& vector )
+{
+	S_Sscanf( pString, "%f %f %f %f", &vector.x, &vector.y, &vector.z, &vector.w );
+}
+
+/*
+==================
+S_VectorCreate
+==================
+*/
+FORCEINLINE vec2_t S_VectorCreate( float x, float y )
+{
+	vec2_t result;
+	S_VectorCreate( x, y, result );
+	return result;
+}
+
+/*
+==================
+S_VectorCreate
+==================
+*/
+FORCEINLINE vec3_t S_VectorCreate( float x, float y, float z )
+{
+	vec3_t result;
+	S_VectorCreate( x, y, z, result );
+	return result;
+}
+
+/*
+==================
+S_VectorCreate
+==================
+*/
+FORCEINLINE vec4_t S_VectorCreate( float x, float y, float z, float w )
+{
+	vec4_t result;
+	S_VectorCreate( x, y, z, w, result );
+	return result;
+}
+
+/*
+==================
+S_VectorCreate
+==================
+*/
+FORCEINLINE void S_VectorCreate( float x, float y, vec2_t& vector )
+{
+	vector.x = x;
+	vector.y = y;
+}
+
+/*
+==================
+S_VectorCreate
+==================
+*/
+FORCEINLINE void S_VectorCreate( float x, float y, float z, vec3_t& vector )
+{
+	vector.x = x;
+	vector.y = y;
+	vector.z = z;
+}
+
+/*
+==================
+S_VectorCreate
+==================
+*/
+FORCEINLINE void S_VectorCreate( float x, float y, float z, float w, vec4_t& vector )
+{
+	vector.x = x;
+	vector.y = y;
+	vector.z = z;
+	vector.w = w;
+}
+
+/*
+==================
+S_VectorToString
+==================
+*/
+FORCEINLINE eastl::string S_VectorToString( const vec2_t& vector )
+{
+	eastl::string result;
+	S_VectorToString( vector, result );
+	return result;
+}
+
+/*
+==================
+S_VectorToString
+==================
+*/
+FORCEINLINE eastl::string S_VectorToString( const vec3_t& vector )
+{
+	eastl::string result;
+	S_VectorToString( vector, result );
+	return result;
+}
+
+/*
+==================
+S_VectorToString
+==================
+*/
+FORCEINLINE eastl::string S_VectorToString( const vec4_t& vector )
+{
+	eastl::string result;
+	S_VectorToString( vector, result );
+	return result;
+}
+
+/*
+==================
+S_VectorToString
+==================
+*/
+FORCEINLINE void S_VectorToString( const vec2_t& vector, eastl::string& result )
+{
+	result = S_Sprintf( "%f %f", vector.x, vector.y );
+}
+
+/*
+==================
+S_VectorToString
+==================
+*/
+FORCEINLINE void S_VectorToString( const vec3_t& vector, eastl::string& result )
+{
+	result = S_Sprintf( "%f %f %f", vector.x, vector.y, vector.z );
+}
+
+/*
+==================
+S_VectorToString
+==================
+*/
+FORCEINLINE void S_VectorToString( const vec4_t& vector, eastl::string& result )
+{
+	result = S_Sprintf( "%f %f %f %f", vector.x, vector.y, vector.z, vector.w );
+}
+
+/*
+==================
 S_VectorDotProduct
 ==================
 */
@@ -472,6 +653,75 @@ FORCEINLINE float S_VectorDistance( const vec3_t& vectorA, const vec3_t& vectorB
 
 /*
 ==================
+S_QuaternionCreate
+==================
+*/
+FORCEINLINE quat_t S_QuaternionCreate( const char* pString )
+{
+	quat_t result;
+	S_QuaternionCreate( pString, result );
+	return result;
+}
+
+/*
+==================
+S_QuaternionCreate
+==================
+*/
+FORCEINLINE void S_QuaternionCreate( const char* pString, quat_t& quaternion )
+{
+	S_Sscanf( pString, "%f %f %f %f", &quaternion.x, &quaternion.y, &quaternion.z, &quaternion.w );
+}
+
+/*
+==================
+S_QuaternionCreate
+==================
+*/
+FORCEINLINE quat_t S_QuaternionCreate( float x, float y, float z, float w )
+{
+	quat_t result;
+	S_QuaternionCreate( x, y, z, w, result );
+	return result;
+}
+
+/*
+==================
+S_QuaternionCreate
+==================
+*/
+FORCEINLINE void S_QuaternionCreate( float x, float y, float z, float w, quat_t& quaternion )
+{
+	quaternion.x = x;
+	quaternion.y = y;
+	quaternion.z = z;
+	quaternion.w = w;
+}
+
+/*
+==================
+S_QuaternionToString
+==================
+*/
+FORCEINLINE eastl::string S_QuaternionToString( const quat_t& quaternion )
+{
+	eastl::string result;
+	S_QuaternionToString( quaternion, result );
+	return result;
+}
+
+/*
+==================
+S_QuaternionToString
+==================
+*/
+FORCEINLINE void S_QuaternionToString( const quat_t& quaternion, eastl::string& result )
+{
+	result = S_Sprintf( "%f %f %f %f", quaternion.x, quaternion.y, quaternion.z, quaternion.w );
+}
+
+/*
+==================
 S_AnglesToQuaternionYZX
 ==================
 */
@@ -559,7 +809,7 @@ FORCEINLINE vec3_t S_QuaternionToAngles( const quat_t& quaternion )
 S_QuaternionToMatrix
 ==================
 */
-FORCEINLINE matrix_t S_QuaternionToMatrix( const quat_t& quaternion )
+FORCEINLINE mat4_t S_QuaternionToMatrix( const quat_t& quaternion )
 {
 	return glm::mat4_cast( quaternion );
 }
@@ -627,12 +877,79 @@ FORCEINLINE quat_t S_QuaternionNormalize( const quat_t& quaternion )
 
 /*
 ==================
-S_MatrixIdentity
+S_MatrixCreate
 ==================
 */
-FORCEINLINE void S_MatrixIdentity( matrix_t& matrix )
+FORCEINLINE mat4_t S_MatrixCreate( const char* pString )
 {
-	matrix = glm::identity<matrix_t>();
+	mat4_t result;
+	S_MatrixCreate( pString, result );
+	return result;
+}
+
+/*
+==================
+S_MatrixCreate
+==================
+*/
+FORCEINLINE void S_MatrixCreate( const char* pString, mat4_t& matrix )
+{
+	S_Sscanf( pString, "%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f",
+			  &matrix[0].x, &matrix[0].y, &matrix[0].z, &matrix[0].w,
+			  &matrix[1].x, &matrix[1].y, &matrix[1].z, &matrix[1].w,
+			  &matrix[2].x, &matrix[2].y, &matrix[2].z, &matrix[2].w,
+			  &matrix[3].x, &matrix[3].y, &matrix[3].z, &matrix[3].w );
+}
+
+/*
+==================
+S_MatrixCreate
+==================
+*/
+FORCEINLINE mat4_t S_MatrixCreate( const vec4_t& row0, const vec4_t& row1, const vec4_t& row2, const vec4_t& row3 )
+{
+	mat4_t result;
+	S_MatrixCreate( row0, row1, row2, row3, result );
+	return result;
+}
+
+/*
+==================
+S_MatrixCreate
+==================
+*/
+FORCEINLINE void S_MatrixCreate( const vec4_t& row0, const vec4_t& row1, const vec4_t& row2, const vec4_t& row3, mat4_t& matrix )
+{
+	matrix[0] = row0;
+	matrix[1] = row1;
+	matrix[2] = row2;
+	matrix[3] = row3;
+}
+
+/*
+==================
+S_MatrixToString
+==================
+*/
+FORCEINLINE eastl::string S_MatrixToString( const mat4_t& matrix )
+{
+	eastl::string result;
+	S_MatrixToString( matrix, result );
+	return result;
+}
+
+/*
+==================
+S_MatrixToString
+==================
+*/
+FORCEINLINE void S_MatrixToString( const mat4_t& matrix, eastl::string& result )
+{
+	result = S_Sprintf( "%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f",
+						matrix[0].x, matrix[0].y, matrix[0].z, matrix[0].w,
+						matrix[1].x, matrix[1].y, matrix[1].z, matrix[1].w,
+						matrix[2].x, matrix[2].y, matrix[2].z, matrix[2].w,
+						matrix[3].x, matrix[3].y, matrix[3].z, matrix[3].w );
 }
 
 /*
@@ -640,9 +957,19 @@ FORCEINLINE void S_MatrixIdentity( matrix_t& matrix )
 S_MatrixIdentity
 ==================
 */
-FORCEINLINE matrix_t S_MatrixIdentity()
+FORCEINLINE void S_MatrixIdentity( mat4_t& matrix )
 {
-	return glm::identity<matrix_t>();
+	matrix = glm::identity<mat4_t>();
+}
+
+/*
+==================
+S_MatrixIdentity
+==================
+*/
+FORCEINLINE mat4_t S_MatrixIdentity()
+{
+	return glm::identity<mat4_t>();
 }
 
 /*
@@ -650,7 +977,7 @@ FORCEINLINE matrix_t S_MatrixIdentity()
 S_MatrixOrigin
 ==================
 */
-FORCEINLINE void S_MatrixOrigin( const matrix_t& matrix, vec3_t& origin )
+FORCEINLINE void S_MatrixOrigin( const mat4_t& matrix, vec3_t& origin )
 {
 	origin.x = matrix[3].x;
 	origin.y = matrix[3].y;
@@ -662,7 +989,7 @@ FORCEINLINE void S_MatrixOrigin( const matrix_t& matrix, vec3_t& origin )
 S_MatrixOrigin
 ==================
 */
-FORCEINLINE vec3_t S_MatrixOrigin( const matrix_t& matrix )
+FORCEINLINE vec3_t S_MatrixOrigin( const mat4_t& matrix )
 {
 	vec3_t result;
 	S_MatrixOrigin( matrix, result );
@@ -674,7 +1001,7 @@ FORCEINLINE vec3_t S_MatrixOrigin( const matrix_t& matrix )
 S_MatrixTranslate
 ==================
 */
-FORCEINLINE void S_MatrixTranslate( const vec3_t& location, matrix_t& matrix )
+FORCEINLINE void S_MatrixTranslate( const vec3_t& location, mat4_t& matrix )
 {
 	matrix[3].x = location.x;
 	matrix[3].y = location.y;
@@ -686,7 +1013,7 @@ FORCEINLINE void S_MatrixTranslate( const vec3_t& location, matrix_t& matrix )
 S_MatrixTranslate
 ==================
 */
-FORCEINLINE void S_MatrixTranslate( const vec3_t& location, const matrix_t& initMatrix, matrix_t& matrix )
+FORCEINLINE void S_MatrixTranslate( const vec3_t& location, const mat4_t& initMatrix, mat4_t& matrix )
 {
 	matrix = glm::translate( initMatrix, location );
 }
@@ -696,7 +1023,7 @@ FORCEINLINE void S_MatrixTranslate( const vec3_t& location, const matrix_t& init
 S_MatrixTranslate
 ==================
 */
-FORCEINLINE matrix_t S_MatrixTranslate( const vec3_t& location, const matrix_t& initMatrix /*= matrix_t( 1.f )*/ )
+FORCEINLINE mat4_t S_MatrixTranslate( const vec3_t& location, const mat4_t& initMatrix /*= mat4_t( 1.f )*/ )
 {
 	return glm::translate( initMatrix, location );
 }
@@ -706,7 +1033,7 @@ FORCEINLINE matrix_t S_MatrixTranslate( const vec3_t& location, const matrix_t& 
 S_MatrixScale
 ==================
 */
-FORCEINLINE void S_MatrixScale( const vec3_t& scale, matrix_t& matrix )
+FORCEINLINE void S_MatrixScale( const vec3_t& scale, mat4_t& matrix )
 {
 	matrix[0].x = scale.x;
 	matrix[1].y = scale.y;
@@ -718,7 +1045,7 @@ FORCEINLINE void S_MatrixScale( const vec3_t& scale, matrix_t& matrix )
 S_MatrixScale
 ==================
 */
-FORCEINLINE void S_MatrixScale( const vec3_t& scale, const matrix_t& initMatrix, matrix_t& matrix )
+FORCEINLINE void S_MatrixScale( const vec3_t& scale, const mat4_t& initMatrix, mat4_t& matrix )
 {
 	matrix = glm::scale( initMatrix, scale );
 }
@@ -728,7 +1055,7 @@ FORCEINLINE void S_MatrixScale( const vec3_t& scale, const matrix_t& initMatrix,
 S_MatrixScale
 ==================
 */
-FORCEINLINE matrix_t S_MatrixScale( const vec3_t& scale, const matrix_t& initMatrix /*= matrix_t( 1.f )*/ )
+FORCEINLINE mat4_t S_MatrixScale( const vec3_t& scale, const mat4_t& initMatrix /*= mat4_t( 1.f )*/ )
 {
 	return glm::scale( initMatrix, scale );
 }
@@ -738,7 +1065,7 @@ FORCEINLINE matrix_t S_MatrixScale( const vec3_t& scale, const matrix_t& initMat
 S_MatrixInverse
 ==================
 */
-FORCEINLINE void S_MatrixInverse( const matrix_t& srcMatrix, matrix_t& destMatrix )
+FORCEINLINE void S_MatrixInverse( const mat4_t& srcMatrix, mat4_t& destMatrix )
 {
 	destMatrix = glm::inverse( srcMatrix );
 }
@@ -748,9 +1075,9 @@ FORCEINLINE void S_MatrixInverse( const matrix_t& srcMatrix, matrix_t& destMatri
 S_MatrixInverse
 ==================
 */
-FORCEINLINE matrix_t S_MatrixInverse( const matrix_t& matrix )
+FORCEINLINE mat4_t S_MatrixInverse( const mat4_t& matrix )
 {
-	matrix_t result;
+	mat4_t result;
 	S_MatrixInverse( matrix, result );
 	return result;
 }
@@ -760,9 +1087,9 @@ FORCEINLINE matrix_t S_MatrixInverse( const matrix_t& matrix )
 S_MatrixPerspective
 ==================
 */
-FORCEINLINE matrix_t S_MatrixPerspective( float fieldOfView, float aspectRatio, float nearClipPlane, float farClipPlane )
+FORCEINLINE mat4_t S_MatrixPerspective( float fieldOfView, float aspectRatio, float nearClipPlane, float farClipPlane )
 {
-	matrix_t result;
+	mat4_t result;
 	S_MatrixPerspective( fieldOfView, aspectRatio, nearClipPlane, farClipPlane, result );
 	return result;
 }
@@ -772,7 +1099,7 @@ FORCEINLINE matrix_t S_MatrixPerspective( float fieldOfView, float aspectRatio, 
 S_MatrixPerspective
 ==================
 */
-FORCEINLINE void S_MatrixPerspective( float fieldOfView, float aspectRatio, float nearClipPlane, float farClipPlane, matrix_t& matrix )
+FORCEINLINE void S_MatrixPerspective( float fieldOfView, float aspectRatio, float nearClipPlane, float farClipPlane, mat4_t& matrix )
 {
 	matrix = glm::perspective( S_DegreesToRadians( fieldOfView ), aspectRatio, nearClipPlane, farClipPlane );
 }
@@ -782,9 +1109,9 @@ FORCEINLINE void S_MatrixPerspective( float fieldOfView, float aspectRatio, floa
 S_MatrixOrtho
 ==================
 */
-FORCEINLINE matrix_t S_MatrixOrtho( float left, float right, float bottom, float top, float nearClipPlane, float farClipPlane )
+FORCEINLINE mat4_t S_MatrixOrtho( float left, float right, float bottom, float top, float nearClipPlane, float farClipPlane )
 {
-	matrix_t result;
+	mat4_t result;
 	S_MatrixOrtho( left, right, bottom, top, nearClipPlane, farClipPlane, result );
 	return result;
 }
@@ -794,7 +1121,7 @@ FORCEINLINE matrix_t S_MatrixOrtho( float left, float right, float bottom, float
 S_MatrixOrtho
 ==================
 */
-FORCEINLINE void S_MatrixOrtho( float left, float right, float bottom, float top, float nearClipPlane, float farClipPlane, matrix_t& matrix )
+FORCEINLINE void S_MatrixOrtho( float left, float right, float bottom, float top, float nearClipPlane, float farClipPlane, mat4_t& matrix )
 {
 	matrix = glm::ortho( left, right, bottom, top, nearClipPlane, farClipPlane );
 }
@@ -804,9 +1131,9 @@ FORCEINLINE void S_MatrixOrtho( float left, float right, float bottom, float top
 S_MatrixLookAt
 ==================
 */
-FORCEINLINE matrix_t S_MatrixLookAt( const vec3_t& location, const vec3_t& direction, const vec3_t& axisUp )
+FORCEINLINE mat4_t S_MatrixLookAt( const vec3_t& location, const vec3_t& direction, const vec3_t& axisUp )
 {
-	matrix_t result;
+	mat4_t result;
 	S_MatrixLookAt( location, direction, axisUp, result );
 	return result;
 }
@@ -816,7 +1143,7 @@ FORCEINLINE matrix_t S_MatrixLookAt( const vec3_t& location, const vec3_t& direc
 S_MatrixLookAt
 ==================
 */
-FORCEINLINE void S_MatrixLookAt( const vec3_t& location, const vec3_t& direction, const vec3_t& axisUp, matrix_t& matrix )
+FORCEINLINE void S_MatrixLookAt( const vec3_t& location, const vec3_t& direction, const vec3_t& axisUp, mat4_t& matrix )
 {
 	matrix = glm::lookAt( location, direction, axisUp );
 }

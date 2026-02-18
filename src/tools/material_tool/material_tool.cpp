@@ -59,6 +59,7 @@ bool CMaterialTool::CompileMaterial( const resourceToolCompileMaterialParams_t& 
 		smatMaterialVar.SetName( resourceToolMaterialVar.pName );
 		switch ( resourceToolMaterialVar.type )
 		{
+		case RESOURCE_TOOL_MATERIAL_VAR_TYPE_UNDEFINED: Warning( "MaterialTool: Material variable '%s' is undefined, skipped", resourceToolMaterialVar.pName ); continue;
 		case RESOURCE_TOOL_MATERIAL_VAR_TYPE_BOOL: smatMaterialVar.SetBoolValue( resourceToolMaterialVar.boolValue ); break;
 		case RESOURCE_TOOL_MATERIAL_VAR_TYPE_INT: smatMaterialVar.SetIntValue( resourceToolMaterialVar.intValue ); break;
 		case RESOURCE_TOOL_MATERIAL_VAR_TYPE_FLOAT: smatMaterialVar.SetFloatValue( resourceToolMaterialVar.floatValue ); break;

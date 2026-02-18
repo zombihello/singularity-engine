@@ -7,13 +7,13 @@
 //-----------------------------------------------------------------------------
 struct resourceToolMapEntity_t
 {
-	const char* pEntityDesc;
+	const char* pClassName;
 	const char* pName;
 };
 
 struct resourceToolCompileMapParams_t
 {
-	const char*				   pDestPath;
+	const char*					   pDestPath;
 	const resourceToolMapEntity_t* pEntities;
 	uint32						   numEntities;
 };

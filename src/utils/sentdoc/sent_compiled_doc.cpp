@@ -108,8 +108,8 @@ bool CSENTCompiledEntityDescDoc::SaveFile( const char* pPath )
 
 			case SENT_ENTITY_DESC_VAR_TYPE_MATRIX:
 			{
-				matrix_t value = var.GetMatrixValue();
-				pFile->Write( &value, sizeof( matrix_t ) );
+				mat4_t value = var.GetMatrixValue();
+				pFile->Write( &value, sizeof( mat4_t ) );
 				break;
 			}
 
@@ -255,8 +255,8 @@ bool CSENTCompiledEntityDescDoc::LoadFromFile( const char* pPath )
 
 			case SENT_ENTITY_DESC_VAR_TYPE_MATRIX:
 			{
-				matrix_t value;
-				pFile->Read( &value, sizeof( matrix_t ) );
+				mat4_t value;
+				pFile->Read( &value, sizeof( mat4_t ) );
 				var.SetMatrixValue( value );
 				break;
 			}

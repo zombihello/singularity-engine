@@ -1,6 +1,6 @@
 #include "utils/interfaces/interfaces.h"
 #include "tier0/profile.h"
-#include "tier1/jsondoc.h"
+#include "tier1/keyvalues.h"
 #include "filesystem/ifilesystem.h"
 #include "utils/smapdoc/smap_source_doc.h"
 
@@ -11,155 +11,65 @@ CSMAPSourceMapDoc::LoadFromFile
 */
 bool CSMAPSourceMapDoc::LoadFromFile( const char* pPath )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-
-	// Load a JSON file
-	CJsonDoc jsonDoc;
-	if ( !jsonDoc.LoadFromFile( pPath ) )
+	// Load key values file
+	PROFILE_SCOPE();
+	CKeyValues keyValues( "smap" );
+	if ( !keyValues.LoadFromFile( pPath ) )
 	{
-		Warning( "SMAPDoc: Failed to load '%s', maybe wrong JSON syntax?", pPath );
 		return false;
 	}
 	Clear();
 
-	// If all ok grab data from JSON
-	return GrabData( jsonDoc );
-}
-
-/*
-==================
-CSMAPSourceMapDoc::GrabData
-==================
-*/
-bool CSMAPSourceMapDoc::GrabData( const CJsonDoc& jsonDoc )
-{
-	PROFILE_SCOPE();
-	bool bResult = true;
-
-	// Get output directory
+	// Get a destination file
+	bool bGotDefaultValue = false;
+	outputDir			  = keyValues.GetString( "output_dir", "", NULL, &bGotDefaultValue );
+	if ( bGotDefaultValue )
 	{
-		CJsonValue jsonOutputDir = jsonDoc.GetValue( "output-dir" );
-		if ( jsonOutputDir.IsValid() )
-		{
-			if ( jsonOutputDir.IsA( JSONVALUE_TYPE_STRING ) )
-			{
-				eastl::string outputDir = jsonOutputDir.GetString();
-				if ( outputDir.empty() )
-				{
-					Error( "SMAPDoc: Invalid 'output-dir', an output directory can't be empty" );
-					bResult = false;
-				}
-
-				CSMAPSourceMapDoc::outputDir = outputDir;
-			}
-			else
-			{
-				Error( "SMAPDoc: Invalid 'output-dir', must be string type" );
-				bResult = false;
-			}
-		}
-		else
-		{
-			Error( "SMAPDoc: A source map must have 'output-dir' field" );
-			bResult = false;
-		}
+		Error( "SMAPDoc: Invalid SMAP, not found required field 'output_dir' (file: '%s')", pPath );
+		return false;
 	}
-
-	// Get entities
+	if ( outputDir.empty() )
 	{
-		CJsonValue jsonEntitiesVar = jsonDoc.GetValue( "entities" );
-		if ( jsonEntitiesVar.IsValid() )
-		{
-			if ( jsonEntitiesVar.IsA( JSONVALUE_TYPE_ARRAY ) )
-			{
-				eastl::vector<CJsonValue> jsonEntitiesArray = jsonEntitiesVar.GetArray();
-				for ( uint32 entityIdx = 0, numEntities = (uint32)jsonEntitiesArray.size(); entityIdx < numEntities; ++entityIdx )
-				{
-					const CJsonValue& jsonEntityVar = jsonEntitiesArray[entityIdx];
-					CSMAPEntity		  smapEntity;
-					if ( !GrabValueAsEntity( jsonEntityVar, smapEntity ) )
-					{
-						Error( "SMAPDoc: Invalid entity at id %i", entityIdx );
-						bResult = false;
-						continue;
-					}
-
-					entities.emplace_back( smapEntity );
-				}
-			}
-			else
-			{
-				Error( "SMAPDoc: Invalid \"entities\", must be array of objects" );
-				bResult = false;
-			}
-		}
-	}
-
-	return bResult;
-}
-
-/*
-==================
-CSMAPSourceMapDoc::GrabValueAsEntity
-==================
-*/
-bool CSMAPSourceMapDoc::GrabValueAsEntity( const CJsonValue& jsonValue, CSMAPEntity& entity ) const
-{
-	if ( !jsonValue.IsValid() || !jsonValue.IsA( JSONVALUE_TYPE_OBJECT ) )
-	{
+		Error( "SMAPDoc: Invalid SMAP, an output directory can't be empty (file: '%s')", pPath );
 		return false;
 	}
 
-	bool		bResult	   = true;
-	CJsonObject jsonObject = jsonValue.GetObject();
-
-	// Get entity descriptor
+	// Get entities
+	CKeyValues* pEntities = keyValues.FindKey( "entities" );
+	if ( pEntities )
 	{
-		CJsonValue jsonEntityDesc = jsonObject.GetValue( "entity-desc" );
-		if ( jsonEntityDesc.IsValid() )
+		for ( CKeyValuesSubKeysIterator it( pEntities, false, true, true ); it; ++it )
 		{
-			if ( jsonEntityDesc.IsA( JSONVALUE_TYPE_STRING ) )
+			CSMAPEntity smapEntity;
+			const char* pName	   = it->GetName();
+			const char* pClassName = it->GetString( "classname", "", NULL, &bGotDefaultValue );
+			if ( !pName || !pName[0] )
 			{
-				eastl::string entityDesc = jsonEntityDesc.GetString();
-				if ( entityDesc.empty() )
-				{
-					Error( "SMAPDoc: Invalid 'entity-desc', an entity descriptor can't be empty" );
-					bResult = false;
-				}
+				Error( "SMAPDoc: Invalid SMAP, an entity name can't be empty (file: '%s')", pPath );
+				return false;
+			}
+			if ( bGotDefaultValue )
+			{
+				Error( "SMAPDoc: Invalid SMAP, not found required field 'classname' in entity 'entities/%s' (file: '%s')", pName, pPath );
+				return false;
+			}
+			if ( !pClassName || !pClassName[0] )
+			{
+				Error( "SMAPDoc: Invalid SMAP, empty class name in 'entities/%s' (file: '%s')", pName, pPath );
+				return false;
+			}
 
-				entity.SetEntityDesc( entityDesc.c_str() );
-			}
-			else
-			{
-				Error( "SMAPDoc: Invalid 'entity-desc', must be string type" );
-				bResult = false;
-			}
-		}
-		else
-		{
-			Error( "SMAPDoc: An entity must have 'entity-desc' field" );
-			bResult = false;
+			// Set an entity and class name
+			smapEntity.SetName( pName );
+			smapEntity.SetClassName( pClassName );
+
+			// Add the entity into an array
+			entities.emplace_back( smapEntity );
 		}
 	}
 
-	// Get name
-	{
-		CJsonValue jsonName = jsonObject.GetValue( "name" );
-		if ( jsonName.IsValid() )
-		{
-			if ( jsonName.IsA( JSONVALUE_TYPE_STRING ) )
-			{
-				entity.SetName( jsonName.GetString().c_str() );
-			}
-			else
-			{
-				Error( "SMAPDoc: Invalid 'name', must be string type" );
-				bResult = false;
-			}
-		}
-	}
-
-	return bResult;
+	// We are done
+	return true;
 }
 
 /*
@@ -169,48 +79,21 @@ CSMAPSourceMapDoc::SaveFile
 */
 bool CSMAPSourceMapDoc::SaveFile( const char* pPath )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-	Assert( g_pFileSystem );
-
-	// Try to open a file
-	TRefPtr<IStreamDataWriter> pFile = g_pFileSystem->CreateFileWriter( pPath );
-	if ( !pFile )
-	{
-		Error( "SMAPDoc: Failed to open file '%s' for save a SMAP source map", pPath );
-		return false;
-	}
-
-	eastl::string buffer;
-	buffer += "{\n";
-
-	// Write an output directory
-	buffer += S_Sprintf( "\t\"output-dir\": \"%s\",\n", outputDir.c_str() );
-
-	// Write entities
+	// Create key values
+	PROFILE_SCOPE();
+	CKeyValues keyValues( "smap" );
+	keyValues.SetString( "output_dir", outputDir.c_str() );
 	if ( !entities.empty() )
 	{
-		buffer += "\t\"entities\": [\n";
+		CKeyValues* pEntities = new CKeyValues( "entities", &keyValues );
 		for ( uint32 entityIdx = 0, numEntities = (uint32)entities.size(); entityIdx < numEntities; ++entityIdx )
 		{
-			const CSMAPEntity& entity = entities[entityIdx];
-
-			buffer += "\t\t{\n";
-			buffer += S_Sprintf( "\t\t\t\"entity-desc\": \"%s\",\n", entity.GetEntityDesc() );
-			buffer += S_Sprintf( "\t\t\t\"name\": \"%s\"\n", entity.GetName() );
-
-			if ( entityIdx + 1 < numEntities )
-			{
-				buffer += "\t\t},\n";
-			}
-			else
-			{
-				buffer += "\t\t}\n";
-			}
+			const CSMAPEntity& smapEntity = entities[entityIdx];
+			CKeyValues*		   pEntity	  = new CKeyValues( smapEntity.GetName(), pEntities );
+			pEntity->SetString( "classname", smapEntity.GetClassName() );
 		}
-		buffer += "\t]\n";
 	}
 
-	buffer += "}\n";
-	pFile->Write( buffer.data(), buffer.size() * sizeof( char ) );
-	return true;
+	// Save the key values to a file
+	return keyValues.SaveToFile( pPath );
 }

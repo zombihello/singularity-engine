@@ -254,7 +254,7 @@ FORCEINLINE vec3_t CTransform::GetScale() const
 CTransform::AsMatrix
 ==================
 */
-FORCEINLINE const matrix_t& CTransform::AsMatrix() const
+FORCEINLINE const mat4_t& CTransform::AsMatrix() const
 {
 	if ( bDirtyMatrix )
 	{
@@ -269,7 +269,7 @@ FORCEINLINE const matrix_t& CTransform::AsMatrix() const
 CTransform::AsMatrix
 ==================
 */
-FORCEINLINE void CTransform::AsMatrix( matrix_t& destMatrix ) const
+FORCEINLINE void CTransform::AsMatrix( mat4_t& destMatrix ) const
 {
 	if ( bDirtyMatrix )
 	{
