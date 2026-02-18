@@ -10,9 +10,9 @@ static const char* s_pTextureTypeNames[] = {
 	"2d",		  // STUDIOAPI_TEXTURE_TYPE_2D
 	"cube",		  // STUDIOAPI_TEXTURE_TYPE_CUBE
 	"3d",		  // STUDIOAPI_TEXTURE_TYPE_3D
-	"1d-array",	  // STUDIOAPI_TEXTURE_TYPE_1D_ARRAY
-	"2d-array",	  // STUDIOAPI_TEXTURE_TYPE_2D_ARRAY
-	"cube-array"  // STUDIOAPI_TEXTURE_TYPE_CUBE_ARRAY
+	"1d_array",	  // STUDIOAPI_TEXTURE_TYPE_1D_ARRAY
+	"2d_array",	  // STUDIOAPI_TEXTURE_TYPE_2D_ARRAY
+	"cube_array"  // STUDIOAPI_TEXTURE_TYPE_CUBE_ARRAY
 };
 static_assert( ARRAYSIZE( s_pTextureTypeNames ) == STUDIOAPI_TEXTURE_NUM_TYPES, "Array size 's_pTextureTypeNames' must be equal to STUDIOAPI_TEXTURE_NUM_TYPES" );
 
@@ -29,8 +29,8 @@ static_assert( ARRAYSIZE( s_pSamplerFilterNames ) == STUDIOAPI_SAMPLER_NUM_FILTE
 static const char* s_pSamplerAddressModeNames[] = {
 	"wrap",			 // STUDIOAPI_SAMPLER_ADDRESS_MODE_WRAP
 	"clamp",		 // STUDIOAPI_SAMPLER_ADDRESS_MODE_CLAMP
-	"mirror-wrap",	 // STUDIOAPI_SAMPLER_ADDRESS_MODE_MIRROR_WRAP
-	"mirror-clamp",	 // STUDIOAPI_SAMPLER_ADDRESS_MODE_MIRROR_CLAMP
+	"mirror_wrap",	 // STUDIOAPI_SAMPLER_ADDRESS_MODE_MIRROR_WRAP
+	"mirror_clamp",	 // STUDIOAPI_SAMPLER_ADDRESS_MODE_MIRROR_CLAMP
 	"border"		 // STUDIOAPI_SAMPLER_ADDRESS_MODE_BORDER
 };
 static_assert( ARRAYSIZE( s_pSamplerAddressModeNames ) == STUDIOAPI_SAMPLER_ADDRESS_NUM_MODES, "Array size 's_pSamplerAddressModeNames' must be equal to STUDIOAPI_SAMPLER_ADDRESS_NUM_MODES" );
