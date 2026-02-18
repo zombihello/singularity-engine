@@ -3,6 +3,7 @@
 #include <EASTL/string.h>
 
 #include "tier0/tier0.h"
+#include "tier1/jsondoc.h"
 #include "utils/smapdoc/smap_entity.h"
 
 //-----------------------------------------------------------------------------

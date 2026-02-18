@@ -1,7 +1,7 @@
 #include "pch_resourcecompiler.h"
 #include "tier0/icommandline.h"
 #include "tier0/crashdump.h"
-#include "tier1/jsondoc.h"
+#include "tier1/keyvalues.h"
 #include "utils/stexdoc/stex_source_doc.h"
 #include "utils/smatdoc/smat_source_doc.h"
 #include "utils/smdldoc/smdl_source_doc.h"
@@ -704,11 +704,11 @@ void CResourceCompilerAppSystemGroup::PrintUsageHelp()
 	Msg( "Usage resourcecompiler -filelist <path>" );
 	Msg( "" );
 	Msg( "The compiler supports next resource types: texture (*.stex), material (*.smat), model (*.smdl), entity (*.sent) and map (*.smap)" );
-	Msg( "For syntax example see 'content/tier0/meterials/default_tex.stex', 'content/tier0/meterials/default_mat.smat'" );
+	Msg( "For syntax example see 'content/core/meterials/default_tex.stex', 'content/core/meterials/default_mat.smat'" );
 	Msg( "" );
 	Msg( "Launch arguments:" );
 	Msg( "file\tSpecify a JSON file containing settings to compile the resource" );
-	Msg( "filelist\tSpecify a JSON file containing a list of files to be processed as inputs. For syntax example see 'content/tier0/resourcelist.txt'" );
+	Msg( "filelist\tSpecify a JSON file containing a list of files to be processed as inputs. For syntax example see 'content/core/resourcelist.txt'" );
 	Msg( "" );
 }
 
@@ -721,14 +721,12 @@ bool CResourceCompilerAppSystemGroup::LoadFileList( const char* pPath )
 {
 	Msg( "ResourceCompiler: Load file list '%s'", pPath );
 
-	// Load a JSON file
-	CJsonDoc jsonFileList;
-	if ( !jsonFileList.LoadFromFile( pPath ) )
+	// Load key values file
+	CKeyValues keyValues( "filelist" );
+	if ( !keyValues.LoadFromFile( pPath ) )
 	{
-		Warning( "ResourceCompiler: Failed to load, maybe wrong JSON syntax?" );
 		return false;
 	}
-	bool bResult = true;
 
 	// Get path to directory with the file list
 	eastl::string fileListDir;
@@ -738,35 +736,18 @@ bool CResourceCompilerAppSystemGroup::LoadFileList( const char* pPath )
 		S_MakeAbsolutePath( tmpBuffer, fileListDir, "", false );
 	}
 
-	// Get resource list
-	CJsonValue jsonResourceList = jsonFileList.GetValue( "resources" );
-	if ( jsonResourceList.IsValid() && jsonResourceList.IsA( JSONVALUE_TYPE_ARRAY ) )
+	// Get resources
+	bool bResult = true;
+	for ( CKeyValuesSubKeysIterator it( &keyValues, "file" ); it; ++it )
 	{
-		eastl::vector<CJsonValue> jsonArray = jsonResourceList.GetArray();
-		for ( uint32 index = 0, count = (uint32)jsonArray.size(); index < count; ++index )
+		if ( !AddFileToCompile( it->GetString( NULL ), fileListDir.c_str() ) )
 		{
-			const CJsonValue& jsonElement = jsonArray[index];
-			if ( !jsonElement.IsA( JSONVALUE_TYPE_STRING ) )
-			{
-				Warning( "ResourceCompiler: Invalid 'resources[%i]', must be string", index );
-				bResult = false;
-				continue;
-			}
-
-			// Add the file to compile
-			if ( !AddFileToCompile( jsonElement.GetString().c_str(), fileListDir.c_str() ) )
-			{
-				bResult = false;
-				continue;
-			}
+			bResult = false;
+			continue;
 		}
 	}
-	else
-	{
-		Warning( "ResourceCompiler: File lists must have 'resources'" );
-		bResult = false;
-	}
 
+	// We are done
 	return bResult;
 }
 

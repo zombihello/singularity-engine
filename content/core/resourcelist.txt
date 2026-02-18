@@ -1,7 +1,3 @@
-{
-	"resources": [
-		"materials/default.stex",
-		"materials/default.smat",
-		"entities/default.sent"
-	]
-}
+file "materials/default.stex"
+file "materials/default.smat"
+file "entities/default.sent"
