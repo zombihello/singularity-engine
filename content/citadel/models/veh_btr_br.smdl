@@ -1,5 +1,4 @@
 source 			"veh_btr_br.fbx"
 materials_dir 	"materials/models/"
 axis_up 		+y
-output_dir		"//BASE_PATH/citadel/models/"
 combine_models	1

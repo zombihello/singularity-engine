@@ -1,9 +1,5 @@
-output_dir "//BASE_PATH/citadel/entities/"
-components
+Transform {}
+Quad
 {
-	Transform {}
-	Quad
-	{
-		Material	"materials/nelson"
-	}
+	Material "materials/nelson"
 }

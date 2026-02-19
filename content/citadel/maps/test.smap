@@ -1,13 +1,9 @@
-output_dir "//BASE_PATH/citadel/maps/"
-entities
+quad
 {
-	quad
-	{
-		classname "entities/test_quad"
-	}
-	
-	player
-	{
-		classname "entities/player"
-	}
+	classname "entities/test_quad"
+}
+
+player
+{
+	classname "entities/player"
 }

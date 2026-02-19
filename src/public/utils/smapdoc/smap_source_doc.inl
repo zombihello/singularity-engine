@@ -33,16 +33,6 @@ FORCEINLINE void CSMAPSourceMapDoc::Clear()
 
 /*
 ==================
-CSMAPSourceMapDoc::GetOutputDir
-==================
-*/
-FORCEINLINE const char* CSMAPSourceMapDoc::GetOutputDir() const
-{
-	return outputDir.c_str();
-}
-
-/*
-==================
 CSMAPSourceMapDoc::GetNumEntities
 ==================
 */

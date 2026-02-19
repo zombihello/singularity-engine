@@ -27,12 +27,9 @@ ConvTextToSMTMaterialVarType
 */
 static smatMaterialVarType_t ConvTextToSMTMaterialVarType( const char* pText )
 {
-	eastl::string normalizedText = pText;
-	S_Strlwr( (char*)normalizedText.c_str() );
-
 	for ( uint32 index = 0; index < ARRAYSIZE( s_pVarTypeNames ); ++index )
 	{
-		if ( normalizedText == s_pVarTypeNames[index] )
+		if ( !S_Stricmp( pText, s_pVarTypeNames[index] ) )
 		{
 			return (smatMaterialVarType_t)index;
 		}
@@ -92,88 +89,72 @@ bool CSMATSourceMaterialDoc::LoadFromFile( const char* pPath )
 	}
 	Clear();
 
-	// Get a destination file
-	bool bGotDefaultValue = false;
-	outputDir			  = keyValues.GetString( "output_dir", "", NULL, &bGotDefaultValue );
-	if ( bGotDefaultValue )
+	// Make sure that we have only one a subkey
+	const eastl::list<CKeyValues*>& subKeys = keyValues.GetSubKeys();
+	if ( subKeys.empty() )
 	{
-		Error( "SMATDoc: Invalid SMAT, not found required field 'output_dir' (file: '%s')", pPath );
+		Error( "SMATDoc: Invalid SMAT, not found required a shader subkey (file: '%s')", pPath );
 		return false;
 	}
-	if ( outputDir.empty() )
+	if ( subKeys.size() > 1 )
 	{
-		Error( "SMATDoc: Invalid SMAT, an output directory can't be empty (file: '%s')", pPath );
-		return false;
-	}
-
-	// Get shader name
-	shaderName = keyValues.GetString( "shader", "", NULL, &bGotDefaultValue );
-	if ( bGotDefaultValue )
-	{
-		Error( "SMATDoc: Invalid SMAT, not found required field 'shader' (file: '%s')", pPath );
-		return false;
-	}
-	if ( shaderName.empty() )
-	{
-		Error( "SMATDoc: Invalid SMAT, a shader name can't be empty (file: '%s')", pPath );
+		Error( "SMATDoc: Invalid SMAT, a material can only have one shader subkey (file: '%s')", pPath );
 		return false;
 	}
 
-	// Get parameters
-	CKeyValues* pParameters = keyValues.FindKey( "parameters" );
-	if ( pParameters )
+	// Get shader
+	CKeyValues* pShader = subKeys.front();
+	shaderName			= pShader->GetName();
+	for ( CKeyValuesSubKeysIterator it( pShader ); it; ++it )
 	{
-		for ( CKeyValuesSubKeysIterator it( pParameters ); it; ++it )
+		CSMATMaterialVar	  smatMaterialVar;
+		smatMaterialVarType_t smatMaterialVarType = SMAT_MATERIAL_VAR_TYPE_UNDEFINED;
+		keyValuesDataType_t	  kvDataType		  = it->GetDataType();
+		smatMaterialVar.SetName( it->GetName() );
+
+		// If the key has schema get a value type from them
+		const char* pSchema = it->GetSchema( NULL );
+		if ( pSchema )
 		{
-			CSMATMaterialVar	  smatMaterialVar;
-			smatMaterialVarType_t smatMaterialVarType = SMAT_MATERIAL_VAR_TYPE_UNDEFINED;
-			keyValuesDataType_t	  kvDataType		  = it->GetDataType();
-			smatMaterialVar.SetName( it->GetName() );
-
-			// If the key has schema get a value type from them
-			const char* pSchema = it->GetSchema( NULL );
-			if ( pSchema )
+			smatMaterialVarType = ConvTextToSMTMaterialVarType( pSchema );
+			if ( smatMaterialVarType == SMAT_MATERIAL_VAR_TYPE_UNDEFINED )
 			{
-				smatMaterialVarType = ConvTextToSMTMaterialVarType( pSchema );
-				if ( smatMaterialVarType == SMAT_MATERIAL_VAR_TYPE_UNDEFINED )
-				{
-					Error( "SMATDoc: Invalid SMAT, unknown schema '%s' in 'parameters/%s' (file: '%s')", pSchema, it->GetName(), pPath );
-					return false;
-				}
-			}
-			// Otherwise the value type get from the KeyValues type
-			else
-			{
-				smatMaterialVarType = ConvKVDataTypeToSMTMaterialVarType( kvDataType );
-				if ( smatMaterialVarType == SMAT_MATERIAL_VAR_TYPE_UNDEFINED )
-				{
-					Error( "SMATDoc: Invalid SMAT, unknown KeyValues type 0x%X in 'parameters/%s' (file: '%s')", kvDataType, it->GetName(), pPath );
-					return false;
-				}
-			}
-
-			// Set SMAT value
-			switch ( smatMaterialVarType )
-			{
-			case SMAT_MATERIAL_VAR_TYPE_BOOL: smatMaterialVar.SetBoolValue( it->GetBool( NULL ) ); break;
-			case SMAT_MATERIAL_VAR_TYPE_INT: smatMaterialVar.SetIntValue( it->GetInt( NULL ) ); break;
-			case SMAT_MATERIAL_VAR_TYPE_FLOAT: smatMaterialVar.SetFloatValue( it->GetFloat( NULL ) ); break;
-			case SMAT_MATERIAL_VAR_TYPE_STRING: smatMaterialVar.SetStringValue( it->GetString( NULL ) ); break;
-			case SMAT_MATERIAL_VAR_TYPE_TEXTURE: smatMaterialVar.SetTextureValue( it->GetString( NULL ) ); break;
-			case SMAT_MATERIAL_VAR_TYPE_MATERIAL: smatMaterialVar.SetMaterialValue( it->GetString( NULL ) ); break;
-			case SMAT_MATERIAL_VAR_TYPE_VECTOR_2D: smatMaterialVar.SetVecValue( S_VectorCreate<vec2_t>( it->GetString( NULL ) ) ); break;
-			case SMAT_MATERIAL_VAR_TYPE_VECTOR_3D: smatMaterialVar.SetVecValue( S_VectorCreate<vec3_t>( it->GetString( NULL ) ) ); break;
-			case SMAT_MATERIAL_VAR_TYPE_VECTOR_4D: smatMaterialVar.SetVecValue( S_VectorCreate<vec4_t>( it->GetString( NULL ) ) ); break;
-			case SMAT_MATERIAL_VAR_TYPE_MATRIX: smatMaterialVar.SetMatrixValue( S_MatrixCreate( it->GetString( NULL ) ) ); break;
-			default:
-				Error( "SMATDoc: Invalid SMAT, unknown SMAT value type '%s' in 'parameters/%s' (file: '%s')", ConvSMTMaterialVarTypeToText( smatMaterialVarType ), it->GetName(), pPath );
-				Assert( false );
+				Error( "SMATDoc: Invalid SMAT, unknown schema '%s' in '%s/%s' (file: '%s')", pSchema, shaderName.c_str(), it->GetName(), pPath );
 				return false;
 			}
-
-			// Add the SMAT var into an array
-			vars.emplace_back( smatMaterialVar );
 		}
+		// Otherwise the value type get from the KeyValues type
+		else
+		{
+			smatMaterialVarType = ConvKVDataTypeToSMTMaterialVarType( kvDataType );
+			if ( smatMaterialVarType == SMAT_MATERIAL_VAR_TYPE_UNDEFINED )
+			{
+				Error( "SMATDoc: Invalid SMAT, unknown KeyValues type 0x%X in '%s/%s' (file: '%s')", kvDataType, shaderName.c_str(), it->GetName(), pPath );
+				return false;
+			}
+		}
+
+		// Set SMAT value
+		switch ( smatMaterialVarType )
+		{
+		case SMAT_MATERIAL_VAR_TYPE_BOOL: smatMaterialVar.SetBoolValue( it->GetBool( NULL ) ); break;
+		case SMAT_MATERIAL_VAR_TYPE_INT: smatMaterialVar.SetIntValue( it->GetInt( NULL ) ); break;
+		case SMAT_MATERIAL_VAR_TYPE_FLOAT: smatMaterialVar.SetFloatValue( it->GetFloat( NULL ) ); break;
+		case SMAT_MATERIAL_VAR_TYPE_STRING: smatMaterialVar.SetStringValue( it->GetString( NULL ) ); break;
+		case SMAT_MATERIAL_VAR_TYPE_TEXTURE: smatMaterialVar.SetTextureValue( it->GetString( NULL ) ); break;
+		case SMAT_MATERIAL_VAR_TYPE_MATERIAL: smatMaterialVar.SetMaterialValue( it->GetString( NULL ) ); break;
+		case SMAT_MATERIAL_VAR_TYPE_VECTOR_2D: smatMaterialVar.SetVecValue( S_VectorCreate<vec2_t>( it->GetString( NULL ) ) ); break;
+		case SMAT_MATERIAL_VAR_TYPE_VECTOR_3D: smatMaterialVar.SetVecValue( S_VectorCreate<vec3_t>( it->GetString( NULL ) ) ); break;
+		case SMAT_MATERIAL_VAR_TYPE_VECTOR_4D: smatMaterialVar.SetVecValue( S_VectorCreate<vec4_t>( it->GetString( NULL ) ) ); break;
+		case SMAT_MATERIAL_VAR_TYPE_MATRIX: smatMaterialVar.SetMatrixValue( S_MatrixCreate( it->GetString( NULL ) ) ); break;
+		default:
+			Error( "SMATDoc: Invalid SMAT, unknown SMAT value type '%s' in '%s/%s' (file: '%s')", ConvSMTMaterialVarTypeToText( smatMaterialVarType ), shaderName.c_str(), it->GetName(), pPath );
+			Assert( false );
+			return false;
+		}
+
+		// Add the SMAT var into an array
+		vars.emplace_back( smatMaterialVar );
 	}
 
 	// We are done
@@ -189,14 +170,12 @@ bool CSMATSourceMaterialDoc::SaveFile( const char* pPath )
 {
 	// Create key values
 	PROFILE_SCOPE();
-	CKeyValues keyValues( "smat" );
-	keyValues.SetString( "output_dir", outputDir.c_str() );
-	keyValues.SetString( "shader", shaderName.c_str() );
+	CKeyValues	keyValues( "smat" );
+	CKeyValues* pShader = new CKeyValues( shaderName.c_str(), &keyValues );
 
 	// Create a key value for each material variable
 	if ( !vars.empty() )
 	{
-		CKeyValues* pParameters = new CKeyValues( "parameters", &keyValues );
 		for ( uint32 index = 0, count = (uint32)vars.size(); index < count; ++index )
 		{
 			const CSMATMaterialVar& smatMaterialVar		= vars[index];
@@ -205,34 +184,34 @@ bool CSMATSourceMaterialDoc::SaveFile( const char* pPath )
 			switch ( smatMaterialVarType )
 			{
 			case SMAT_MATERIAL_VAR_TYPE_UNDEFINED: Warning( "SMATDoc: Material variable '%s' is undefined, skipped", smatMaterialVar.GetName() ); continue;
-			case SMAT_MATERIAL_VAR_TYPE_BOOL: pParameters->SetBool( smatMaterialVar.GetName(), smatMaterialVar.GetBoolValue(), pSchema ); break;
-			case SMAT_MATERIAL_VAR_TYPE_INT: pParameters->SetInt( smatMaterialVar.GetName(), smatMaterialVar.GetIntValue(), pSchema ); break;
-			case SMAT_MATERIAL_VAR_TYPE_FLOAT: pParameters->SetFloat( smatMaterialVar.GetName(), smatMaterialVar.GetFloatValue(), pSchema ); break;
+			case SMAT_MATERIAL_VAR_TYPE_BOOL: pShader->SetBool( smatMaterialVar.GetName(), smatMaterialVar.GetBoolValue(), pSchema ); break;
+			case SMAT_MATERIAL_VAR_TYPE_INT: pShader->SetInt( smatMaterialVar.GetName(), smatMaterialVar.GetIntValue(), pSchema ); break;
+			case SMAT_MATERIAL_VAR_TYPE_FLOAT: pShader->SetFloat( smatMaterialVar.GetName(), smatMaterialVar.GetFloatValue(), pSchema ); break;
 			case SMAT_MATERIAL_VAR_TYPE_VECTOR_2D:
 			{
 				vec2_t value;
 				smatMaterialVar.GetVecValue( &value.x, 2 );
-				pParameters->SetString( smatMaterialVar.GetName(), S_VectorToString( value ).c_str(), pSchema );
+				pShader->SetString( smatMaterialVar.GetName(), S_VectorToString( value ).c_str(), pSchema );
 				break;
 			}
 			case SMAT_MATERIAL_VAR_TYPE_VECTOR_3D:
 			{
 				vec3_t value;
 				smatMaterialVar.GetVecValue( &value.x, 3 );
-				pParameters->SetString( smatMaterialVar.GetName(), S_VectorToString( value ).c_str(), pSchema );
+				pShader->SetString( smatMaterialVar.GetName(), S_VectorToString( value ).c_str(), pSchema );
 				break;
 			}
 			case SMAT_MATERIAL_VAR_TYPE_VECTOR_4D:
 			{
 				vec4_t value;
 				smatMaterialVar.GetVecValue( &value.x, 4 );
-				pParameters->SetString( smatMaterialVar.GetName(), S_VectorToString( value ).c_str(), pSchema );
+				pShader->SetString( smatMaterialVar.GetName(), S_VectorToString( value ).c_str(), pSchema );
 				break;
 			}
-			case SMAT_MATERIAL_VAR_TYPE_MATRIX: pParameters->SetString( smatMaterialVar.GetName(), S_MatrixToString( smatMaterialVar.GetMatrixValue() ).c_str(), pSchema ); break;
-			case SMAT_MATERIAL_VAR_TYPE_STRING: pParameters->SetString( smatMaterialVar.GetName(), smatMaterialVar.GetStringValue(), pSchema ); break;
-			case SMAT_MATERIAL_VAR_TYPE_TEXTURE: pParameters->SetString( smatMaterialVar.GetName(), smatMaterialVar.GetTextureValue(), pSchema ); break;
-			case SMAT_MATERIAL_VAR_TYPE_MATERIAL: pParameters->SetString( smatMaterialVar.GetName(), smatMaterialVar.GetMaterialValue(), pSchema ); break;
+			case SMAT_MATERIAL_VAR_TYPE_MATRIX: pShader->SetString( smatMaterialVar.GetName(), S_MatrixToString( smatMaterialVar.GetMatrixValue() ).c_str(), pSchema ); break;
+			case SMAT_MATERIAL_VAR_TYPE_STRING: pShader->SetString( smatMaterialVar.GetName(), smatMaterialVar.GetStringValue(), pSchema ); break;
+			case SMAT_MATERIAL_VAR_TYPE_TEXTURE: pShader->SetString( smatMaterialVar.GetName(), smatMaterialVar.GetTextureValue(), pSchema ); break;
+			case SMAT_MATERIAL_VAR_TYPE_MATERIAL: pShader->SetString( smatMaterialVar.GetName(), smatMaterialVar.GetMaterialValue(), pSchema ); break;
 			default:
 				Warning( "SMATDoc: Unknown type 0x%X in variable '%s'", smatMaterialVar.GetType(), smatMaterialVar.GetName() );
 				Assert( false );

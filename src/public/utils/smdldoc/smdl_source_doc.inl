@@ -27,7 +27,7 @@ CSMDLSourceModelDoc::SetSourcePath
 */
 FORCEINLINE void CSMDLSourceModelDoc::SetSourcePath( const char* pSourcePath )
 {
-	CSMDLSourceModelDoc::sourcePath = pSourcePath;
+	CSMDLSourceModelDoc::srcPath = pSourcePath;
 }
 
 /*
@@ -37,7 +37,7 @@ CSMDLSourceModelDoc::GetSourcePath
 */
 FORCEINLINE const eastl::string& CSMDLSourceModelDoc::GetSourcePath() const
 {
-	return sourcePath;
+	return srcPath;
 }
 
 /*
@@ -58,26 +58,6 @@ CSMDLSourceModelDoc::GetMaterialsDir
 FORCEINLINE const eastl::string& CSMDLSourceModelDoc::GetMaterialsDir() const
 {
 	return materialsDir;
-}
-
-/*
-==================
-CSMDLSourceModelDoc::SetOutputDir
-==================
-*/
-FORCEINLINE void CSMDLSourceModelDoc::SetOutputDir( const char* pOutputDir )
-{
-	CSMDLSourceModelDoc::outputDir = pOutputDir;
-}
-
-/*
-==================
-CSMDLSourceModelDoc::GetOutputDir
-==================
-*/
-FORCEINLINE const eastl::string& CSMDLSourceModelDoc::GetOutputDir() const
-{
-	return outputDir;
 }
 
 /*
@@ -149,8 +129,7 @@ FORCEINLINE void CSMDLSourceModelDoc::Clear()
 {
 	bCombineModels = false;
 	axisUp		   = AXIS_UP_DEFAULT;
-	sourcePath	   = "";
+	srcPath		   = "";
 	materialsDir   = "materials/";
-	outputDir	   = "";
 	renamedMaterialsDict.clear();
 }

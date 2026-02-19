@@ -287,19 +287,6 @@ bool CSTEXSourceTextureDoc::LoadFromFile( const char* pPath )
 		return false;
 	}
 
-	// Get a destination file
-	outputDir = keyValues.GetString( "output_dir", "", NULL, &bGotDefaultValue );
-	if ( bGotDefaultValue )
-	{
-		Error( "STEXDoc: Invalid STEX, not found required field 'output_dir' (file: '%s')", pPath );
-		return false;
-	}
-	if ( outputDir.empty() )
-	{
-		Error( "STEXDoc: Invalid STEX, an output directory can't be empty (file: '%s')", pPath );
-		return false;
-	}
-
 	// Get source files
 	for ( CKeyValuesSubKeysIterator it( &keyValues, "source" ); it; ++it )
 	{
@@ -353,7 +340,6 @@ bool CSTEXSourceTextureDoc::SaveFile( const char* pPath )
 	keyValues.SetString( "address_mode_w", ConvSamplerAddressModeToText( addressModeW ) );
 	keyValues.SetBool( "generate_mipmaps", bGenerateMipMaps );
 	keyValues.SetInt( "max_anisotropy", maxAnisotropy );
-	keyValues.SetString( "output_dir", outputDir.c_str() );
 	for ( uint32 index = 0, count = (uint32)sourcePaths.size(); index < count; ++index )
 	{
 		CKeyValues* pSource = new CKeyValues( "source", &keyValues );

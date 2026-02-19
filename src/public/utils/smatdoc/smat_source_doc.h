@@ -25,11 +25,7 @@ public:
 	const eastl::vector<CSMATMaterialVar>& GetVars() const;
 	const char*							   GetShaderName() const;
 
-	void		SetOutputDir( const char* pOutputDir );
-	const char* GetOutputDir() const;
-
 private:
-	eastl::string					outputDir;
 	eastl::string					shaderName;
 	eastl::vector<CSMATMaterialVar> vars;
 };

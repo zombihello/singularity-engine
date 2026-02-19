@@ -22,22 +22,19 @@ public:
 	void SetAxisUp( axisUp_t axisUp );
 	void SetSourcePath( const char* pSourcePath );
 	void SetMaterialsDir( const char* pMaterialsDir );
-	void SetOutputDir( const char* pOutputDir );
 	void SetCombineModels( bool bCombineModels );
 
 	bool													  IsCombineModels() const;
 	axisUp_t												  GetAxisUp() const;
 	const eastl::string&									  GetSourcePath() const;
 	const eastl::string&									  GetMaterialsDir() const;
-	const eastl::string&									  GetOutputDir() const;
 	const eastl::unordered_map<eastl::string, eastl::string>& GetRenamedMaterials() const;
 
 private:
 	bool											   bCombineModels;	// If it is TRUE, combines all models into a single model
 	axisUp_t										   axisUp;
-	eastl::string									   sourcePath;
+	eastl::string									   srcPath;
 	eastl::string									   materialsDir;  // Path to a directory where the model materials should be located
-	eastl::string									   outputDir;
 	eastl::unordered_map<eastl::string, eastl::string> renamedMaterialsDict;
 };
 

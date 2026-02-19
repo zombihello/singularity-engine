@@ -1,10 +1,6 @@
-output_dir "//BASE_PATH/citadel/entities/"
-components
+Transform 			{}	
+CameraActive 		{}	
+Camera
 {
-	Transform 		{}	
-	CameraActive 	{}	
-	Camera
-	{
-		bAutoViewData 	1
-	}
+	bAutoViewData 	1
 }
