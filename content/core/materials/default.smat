@@ -1,6 +1,4 @@
-output_dir "//CORE/materials/"
-shader 		unlitgeneric
-parameters
+unlitgeneric
 {
 	baseTexture 	texture:"materials/default"
 }

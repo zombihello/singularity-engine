@@ -112,7 +112,7 @@ public:
 	CShaderCompilerAppSystemGroup();
 
 private:
-	void PrintHelp();
+	void PrintUsageHelp();
 	bool GenerateShaderCppClass();
 	bool CompileShaders();
 	bool CompileShader( const shader_t& shader, CShaderCacheDoc& shaderCacheDoc );
@@ -145,38 +145,27 @@ CShaderCompilerAppSystemGroup::Main
 */
 int32 CShaderCompilerAppSystemGroup::Main()
 {
-	// Print help if it need
-	if ( CommandLine()->HasParam( "h" ) || CommandLine()->HasParam( "help" ) || CommandLine()->HasParam( "?" ) )
-	{
-		PrintHelp();
-		return 0;
-	}
+	// Is need to print help of usage
+	bool bPrintHelpUsage = CommandLine()->HasParam( "h" ) || CommandLine()->HasParam( "help" ) || CommandLine()->HasParam( "?" );
 
 	// Get shader compiler mode
-	shaderCompilerMode_t mode = SHADER_COMPILER_MODE_NUM;
-	{
-		const char* pMode = CommandLine()->GetFirstValue( "mode" );
-		if ( !pMode || pMode[0] == '\0' || !ConvStringToShaderCompilerMode( pMode, mode ) )
-		{
-			Error( "ShaderCompiler: Operation mode is unknown or isn't specified" );
-			return 1;
-		}
-	}
+	shaderCompilerMode_t mode		  = SHADER_COMPILER_MODE_NUM;
+	const char*			 pMode		  = CommandLine()->GetFirstValue( "mode" );
+	bool				 bInvalidMode = !pMode || pMode[0] == '\0' || !ConvStringToShaderCompilerMode( pMode, mode );
 
 	// Get shader file
-	const char* pFilePath = CommandLine()->GetFirstValue( "file" );
-	if ( !pFilePath || pFilePath[0] == '\0' )
-	{
-		Error( "ShaderCompiler: Shader file isn't specified" );
-		return 1;
-	}
+	const char* pFilePath	 = CommandLine()->GetFirstValue( "file" );
+	bool		bInvalidFile = !pFilePath || pFilePath[0] == '\0';
 
-	// Get path to output directory
-	outputPath = CommandLine()->GetFirstValue( "output" );
-	if ( outputPath.empty() )
+	// Get an output directory
+	outputPath				= CommandLine()->GetFirstValue( "output" );
+	bool bInvalidOutputPath = outputPath.empty();
+
+	// Print help of usage if it need or some parameters aren't set
+	if ( bPrintHelpUsage || bInvalidMode || bInvalidFile || bInvalidOutputPath )
 	{
-		Error( "ShaderCompiler: Output directory path isn't specified" );
-		return 1;
+		PrintUsageHelp();
+		return 0;
 	}
 
 	// Load shader file
@@ -199,7 +188,7 @@ int32 CShaderCompilerAppSystemGroup::Main()
 	}
 	else
 	{
-		Error( "ShaderCompiler: Shader file extension is unknown" );
+		Error( "ShaderCompiler: Unknown '%s' extension", pFileExtension );
 		return 1;
 	}
 
@@ -254,7 +243,7 @@ int32 CShaderCompilerAppSystemGroup::Main()
 CShaderCompilerAppSystemGroup::PrintHelp
 ==================
 */
-void CShaderCompilerAppSystemGroup::PrintHelp()
+void CShaderCompilerAppSystemGroup::PrintUsageHelp()
 {
 	Msg( "" );
 	Msg( "Shader compiler for Singularity Engine (" __DATE__ " " __TIME__ ")" );

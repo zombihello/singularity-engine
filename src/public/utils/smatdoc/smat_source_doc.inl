@@ -38,7 +38,6 @@ CSMATSourceMaterialDoc::Clear
 */
 FORCEINLINE void CSMATSourceMaterialDoc::Clear()
 {
-	outputDir  = "";
 	shaderName = "";
 	vars.clear();
 }
@@ -71,24 +70,4 @@ CSMATSourceMaterialDoc::GetShaderName
 FORCEINLINE const char* CSMATSourceMaterialDoc::GetShaderName() const
 {
 	return shaderName.c_str();
-}
-
-/*
-==================
-CSMATSourceMaterialDoc::SetOutputDir
-==================
-*/
-FORCEINLINE void CSMATSourceMaterialDoc::SetOutputDir( const char* pOutputDir )
-{
-	outputDir = pOutputDir;
-}
-
-/*
-==================
-CSMATSourceMaterialDoc::GetOutputDir
-==================
-*/
-FORCEINLINE const char* CSMATSourceMaterialDoc::GetOutputDir() const
-{
-	return outputDir.c_str();
 }

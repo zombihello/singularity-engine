@@ -3,5 +3,4 @@ source 				"default.jpg"
 filter 				anisotropic
 generate_mipmaps 	1
 format 				rgba8
-output_dir 			"//CORE/materials/"
 max_anisotropy 		16

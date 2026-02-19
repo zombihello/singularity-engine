@@ -224,26 +224,6 @@ FORCEINLINE uint32 CSTEXSourceTextureDoc::GetMaxAnisotropy() const
 
 /*
 ==================
-CSTEXSourceTextureDoc::SetOutputDir
-==================
-*/
-FORCEINLINE void CSTEXSourceTextureDoc::SetOutputDir( const char* pOutputDir )
-{
-	outputDir = pOutputDir;
-}
-
-/*
-==================
-CSTEXSourceTextureDoc::GetOutputDir
-==================
-*/
-FORCEINLINE const char* CSTEXSourceTextureDoc::GetOutputDir() const
-{
-	return outputDir.c_str();
-}
-
-/*
-==================
 CSTEXSourceTextureDoc::Clear
 ==================
 */
@@ -257,7 +237,6 @@ FORCEINLINE void CSTEXSourceTextureDoc::Clear()
 	filter			 = STUDIOAPI_SAMPLER_FILTER_POINT;
 	pixelFormat		 = STUDIOAPI_PIXEL_FORMAT_UNKNOWN;
 	maxAnisotropy	 = 0;
-	outputDir		 = "";
 	sourcePaths.clear();
 }
 

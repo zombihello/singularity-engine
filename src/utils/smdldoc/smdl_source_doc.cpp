@@ -86,13 +86,13 @@ bool CSMDLSourceModelDoc::LoadFromFile( const char* pPath )
 
 	// Get source path
 	bool bGotDefaultValue = false;
-	sourcePath			  = keyValues.GetString( "source", "", NULL, &bGotDefaultValue );
+	srcPath				  = keyValues.GetString( "source", "", NULL, &bGotDefaultValue );
 	if ( bGotDefaultValue )
 	{
 		Error( "SMDLDoc: Invalid SMDL, not found required field 'source' (file: '%s')", pPath );
 		return false;
 	}
-	if ( sourcePath.empty() )
+	if ( srcPath.empty() )
 	{
 		Error( "SMDLDoc: Invalid SMDL, a source file can't be empty (file: '%s')", pPath );
 		return false;
@@ -100,19 +100,6 @@ bool CSMDLSourceModelDoc::LoadFromFile( const char* pPath )
 
 	// Get materials directory
 	materialsDir = keyValues.GetString( "materials_dir", "materials/" );
-
-	// Get output directory
-	outputDir = keyValues.GetString( "output_dir", "", NULL, &bGotDefaultValue );
-	if ( bGotDefaultValue )
-	{
-		Error( "SMDLDoc: Invalid SMDL, not found required field 'output_dir' (file: '%s')", pPath );
-		return false;
-	}
-	if ( outputDir.empty() )
-	{
-		Error( "SMDLDoc: Invalid SMDL, an output directory can't be empty (file: '%s')", pPath );
-		return false;
-	}
 
 	// Get renamed materials
 	CKeyValues* pRenamedMaterials = keyValues.FindKey( "rename_materials" );
@@ -153,9 +140,8 @@ bool CSMDLSourceModelDoc::SaveFile( const char* pPath )
 	CKeyValues keyValues( "smdl" );
 	keyValues.SetBool( "combine_models", bCombineModels );
 	keyValues.SetString( "axis_up", ConvAxisUpToText( axisUp ) );
-	keyValues.SetString( "source", sourcePath.c_str() );
+	keyValues.SetString( "source", srcPath.c_str() );
 	keyValues.SetString( "materials_dir", materialsDir.c_str() );
-	keyValues.SetString( "output_dir", outputDir.c_str() );
 	if ( !renamedMaterialsDict.empty() )
 	{
 		CKeyValues* pRenamedMaterials = new CKeyValues( "rename_materials", &keyValues );

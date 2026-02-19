@@ -20,12 +20,10 @@ public:
 	void AddEntity( const CSMAPEntity& entity );
 	void RemoveEntity( uint32 index );
 
-	const char*						  GetOutputDir() const;
 	uint32							  GetNumEntities() const;
 	const eastl::vector<CSMAPEntity>& GetEntities() const;
 
 private:
-	eastl::string			   outputDir;
 	eastl::vector<CSMAPEntity> entities;
 };
 

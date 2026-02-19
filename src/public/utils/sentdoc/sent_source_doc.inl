@@ -2,16 +2,6 @@
 
 /*
 ==================
-CSENTSourceEntityDescDoc::SetOutputDir
-==================
-*/
-FORCEINLINE void CSENTSourceEntityDescDoc::SetOutputDir( const char* pOutputDir )
-{
-	outputDir = pOutputDir;
-}
-
-/*
-==================
 CSENTSourceEntityDescDoc::AddComponent
 ==================
 */
@@ -38,18 +28,7 @@ CSENTSourceEntityDescDoc::Clear
 */
 FORCEINLINE void CSENTSourceEntityDescDoc::Clear()
 {
-	outputDir = "";
 	components.clear();
-}
-
-/*
-==================
-CSENTSourceEntityDescDoc::GetOutputDir
-==================
-*/
-FORCEINLINE const char* CSENTSourceEntityDescDoc::GetOutputDir() const
-{
-	return outputDir.c_str();
 }
 
 /*

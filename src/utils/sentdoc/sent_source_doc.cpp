@@ -25,12 +25,9 @@ ConvTextToSENTEntityVarType
 */
 static sentEntityDescVarType_t ConvTextToSENTEntityVarType( const char* pText )
 {
-	eastl::string normalizedText = pText;
-	S_Strlwr( (char*)normalizedText.c_str() );
-
 	for ( uint32 index = 0; index < ARRAYSIZE( s_pVarTypeNames ); ++index )
 	{
-		if ( normalizedText == s_pVarTypeNames[index] )
+		if ( !S_Stricmp( pText, s_pVarTypeNames[index] ) )
 		{
 			return (sentEntityDescVarType_t)index;
 		}
@@ -90,83 +87,65 @@ bool CSENTSourceEntityDescDoc::LoadFromFile( const char* pPath )
 	}
 	Clear();
 
-	// Get a destination file
-	bool bGotDefaultValue = false;
-	outputDir			  = keyValues.GetString( "output_dir", "", NULL, &bGotDefaultValue );
-	if ( bGotDefaultValue )
+	// Get each component
+	for ( CKeyValuesSubKeysIterator itComponent( &keyValues, false, true, true ); itComponent; ++itComponent )
 	{
-		Error( "SENTTDoc: Invalid SENT, not found required field 'output_dir' (file: '%s')", pPath );
-		return false;
-	}
-	if ( outputDir.empty() )
-	{
-		Error( "SENTTDoc: Invalid SENT, an output directory can't be empty (file: '%s')", pPath );
-		return false;
-	}
+		CSENTEntityDescComponent sentEntityComponent;
+		sentEntityComponent.SetType( itComponent->GetName() );
 
-	// Get components
-	CKeyValues* pComponents = keyValues.FindKey( "components" );
-	if ( pComponents )
-	{
-		for ( CKeyValuesSubKeysIterator itComponent( pComponents, false, true, true ); itComponent; ++itComponent )
+		// Get all parameters
+		for ( CKeyValuesSubKeysIterator itParameter( *itComponent ); itParameter; ++itParameter )
 		{
-			CSENTEntityDescComponent sentEntityComponent;
-			sentEntityComponent.SetType( itComponent->GetName() );
+			CSENTEntityDescVar		sentEntityDescVar;
+			sentEntityDescVarType_t sentEntityDescVarType = SENT_ENTITY_DESC_VAR_TYPE_UNDEFINED;
+			keyValuesDataType_t		kvDataType			  = itParameter->GetDataType();
+			sentEntityDescVar.SetName( itParameter->GetName() );
 
-			// Get all parameters
-			for ( CKeyValuesSubKeysIterator itParameter( *itComponent ); itParameter; ++itParameter )
+			// If the key has schema get a value type from them
+			const char* pSchema = itParameter->GetSchema( NULL );
+			if ( pSchema )
 			{
-				CSENTEntityDescVar		sentEntityDescVar;
-				sentEntityDescVarType_t sentEntityDescVarType = SENT_ENTITY_DESC_VAR_TYPE_UNDEFINED;
-				keyValuesDataType_t		kvDataType			  = itParameter->GetDataType();
-				sentEntityDescVar.SetName( itParameter->GetName() );
-
-				// If the key has schema get a value type from them
-				const char* pSchema = itParameter->GetSchema( NULL );
-				if ( pSchema )
+				sentEntityDescVarType = ConvTextToSENTEntityVarType( pSchema );
+				if ( sentEntityDescVarType == SENT_ENTITY_DESC_VAR_TYPE_UNDEFINED )
 				{
-					sentEntityDescVarType = ConvTextToSENTEntityVarType( pSchema );
-					if ( sentEntityDescVarType == SENT_ENTITY_DESC_VAR_TYPE_UNDEFINED )
-					{
-						Error( "SENTTDoc: Invalid SENT, unknown schema '%s' in 'components/%s/%s' (file: '%s')", pSchema, itComponent->GetName(), itParameter->GetName(), pPath );
-						return false;
-					}
-				}
-				// Otherwise the value type get from the KeyValues type
-				else
-				{
-					sentEntityDescVarType = ConvKVDataTypeToSENTEntityVarType( kvDataType );
-					if ( sentEntityDescVarType == SENT_ENTITY_DESC_VAR_TYPE_UNDEFINED )
-					{
-						Error( "SENTTDoc: Invalid SENT, unknown KeyValues type 0x%X in 'components/%s/%s' (file: '%s')", kvDataType, itComponent->GetName(), itParameter->GetName(), pPath );
-						return false;
-					}
-				}
-
-				// Set a value
-				switch ( sentEntityDescVarType )
-				{
-				case SENT_ENTITY_DESC_VAR_TYPE_BOOL: sentEntityDescVar.SetBoolValue( itParameter->GetBool( NULL ) ); break;
-				case SENT_ENTITY_DESC_VAR_TYPE_INT: sentEntityDescVar.SetIntValue( itParameter->GetInt( NULL ) ); break;
-				case SENT_ENTITY_DESC_VAR_TYPE_FLOAT: sentEntityDescVar.SetFloatValue( itParameter->GetFloat( NULL ) ); break;
-				case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_2D: sentEntityDescVar.SetVec2Value( S_VectorCreate<vec2_t>( itParameter->GetString( NULL ) ) ); break;
-				case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_3D: sentEntityDescVar.SetVec3Value( S_VectorCreate<vec3_t>( itParameter->GetString( NULL ) ) ); break;
-				case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_4D: sentEntityDescVar.SetVec4Value( S_VectorCreate<vec4_t>( itParameter->GetString( NULL ) ) ); break;
-				case SENT_ENTITY_DESC_VAR_TYPE_MATRIX: sentEntityDescVar.SetMatrixValue( S_MatrixCreate( itParameter->GetString( NULL ) ) ); break;
-				case SENT_ENTITY_DESC_VAR_TYPE_STRING: sentEntityDescVar.SetStringValue( itParameter->GetString( NULL ) ); break;
-				default:
-					Error( "SENTTDoc: Invalid SENT, unknown SENT value type '%s' in 'components/%s/%s' (file: '%s')", ConvSENTEntityVarTypeToText( sentEntityDescVarType ), itComponent->GetName(), itParameter->GetName(), pPath );
-					Assert( false );
+					Error( "SENTTDoc: Invalid SENT, unknown schema '%s' in '%s/%s' (file: '%s')", pSchema, itComponent->GetName(), itParameter->GetName(), pPath );
 					return false;
 				}
-
-				// Add the var into the component
-				sentEntityComponent.AddVar( sentEntityDescVar );
+			}
+			// Otherwise the value type get from the KeyValues type
+			else
+			{
+				sentEntityDescVarType = ConvKVDataTypeToSENTEntityVarType( kvDataType );
+				if ( sentEntityDescVarType == SENT_ENTITY_DESC_VAR_TYPE_UNDEFINED )
+				{
+					Error( "SENTTDoc: Invalid SENT, unknown KeyValues type 0x%X in '%s/%s' (file: '%s')", kvDataType, itComponent->GetName(), itParameter->GetName(), pPath );
+					return false;
+				}
 			}
 
-			// Add the component into an array
-			components.emplace_back( sentEntityComponent );
+			// Set a value
+			switch ( sentEntityDescVarType )
+			{
+			case SENT_ENTITY_DESC_VAR_TYPE_BOOL: sentEntityDescVar.SetBoolValue( itParameter->GetBool( NULL ) ); break;
+			case SENT_ENTITY_DESC_VAR_TYPE_INT: sentEntityDescVar.SetIntValue( itParameter->GetInt( NULL ) ); break;
+			case SENT_ENTITY_DESC_VAR_TYPE_FLOAT: sentEntityDescVar.SetFloatValue( itParameter->GetFloat( NULL ) ); break;
+			case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_2D: sentEntityDescVar.SetVec2Value( S_VectorCreate<vec2_t>( itParameter->GetString( NULL ) ) ); break;
+			case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_3D: sentEntityDescVar.SetVec3Value( S_VectorCreate<vec3_t>( itParameter->GetString( NULL ) ) ); break;
+			case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_4D: sentEntityDescVar.SetVec4Value( S_VectorCreate<vec4_t>( itParameter->GetString( NULL ) ) ); break;
+			case SENT_ENTITY_DESC_VAR_TYPE_MATRIX: sentEntityDescVar.SetMatrixValue( S_MatrixCreate( itParameter->GetString( NULL ) ) ); break;
+			case SENT_ENTITY_DESC_VAR_TYPE_STRING: sentEntityDescVar.SetStringValue( itParameter->GetString( NULL ) ); break;
+			default:
+				Error( "SENTTDoc: Invalid SENT, unknown SENT value type '%s' in '%s/%s' (file: '%s')", ConvSENTEntityVarTypeToText( sentEntityDescVarType ), itComponent->GetName(), itParameter->GetName(), pPath );
+				Assert( false );
+				return false;
+			}
+
+			// Add the var into the component
+			sentEntityComponent.AddVar( sentEntityDescVar );
 		}
+
+		// Add the component into an array
+		components.emplace_back( sentEntityComponent );
 	}
 
 	// We are done
@@ -183,17 +162,13 @@ bool CSENTSourceEntityDescDoc::SaveFile( const char* pPath )
 	// Create key values
 	PROFILE_SCOPE();
 	CKeyValues keyValues( "sent" );
-	keyValues.SetString( "output_dir", outputDir.c_str() );
-
-	// Create a key value for each component
 	if ( !components.empty() )
 	{
-		CKeyValues* pComponents = new CKeyValues( "components", &keyValues );
 		for ( uint32 componentIdx = 0, numComponents = (uint32)components.size(); componentIdx < numComponents; ++componentIdx )
 		{
 			// Create a key value for each component property
 			const CSENTEntityDescComponent& sentEntityComponent = components[componentIdx];
-			CKeyValues*						pComponent			= new CKeyValues( sentEntityComponent.GetType(), pComponents );
+			CKeyValues*						pComponent			= new CKeyValues( sentEntityComponent.GetType(), &keyValues );
 			for ( uint32 propertyIdx = 0, numProperties = sentEntityComponent.GetNumVars(); propertyIdx < numProperties; ++propertyIdx )
 			{
 				const CSENTEntityDescVar& sentEntityDescVar		= sentEntityComponent.GetVar( propertyIdx );

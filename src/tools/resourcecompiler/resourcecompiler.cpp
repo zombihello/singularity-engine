@@ -108,19 +108,27 @@ private:
 		{
 		}
 
-		eastl::string		 sourcePath;
+		eastl::string		 srcPath;
+		eastl::string		 destPath;
 		resourceSourceType_t type;
 	};
 
 	void PrintUsageHelp();
 	bool LoadFileList( const char* pPath );
-	bool AddFileToCompile( const char* pPath, const char* pWorkDir = "" );
+	bool AddFileToCompile( const char* pPath, const char* pWorkDir );
+	bool CompileTexture( const resourceFile_t& resourceFile ) const;
+	bool CompileMaterial( const resourceFile_t& resourceFile ) const;
+	bool CompileModel( const resourceFile_t& resourceFile ) const;
+	bool CompileEntityDesc( const resourceFile_t& resourceFile ) const;
+	bool CompileMap( const resourceFile_t& resourceFile ) const;
 
 	ITextureTool*				pTextureTool;
 	IMaterialTool*				pMaterialTool;
 	IModelTool*					pModelTool;
 	IEntityDescTool*			pEntityDescTool;
 	IMapTool*					pMapTool;
+	eastl::string				outputPath;
+	eastl::string				workDir;
 	eastl::list<resourceFile_t> files;
 };
 
@@ -195,30 +203,55 @@ int32 CResourceCompilerAppSystemGroup::Main()
 	// Is need to print help of usage
 	bool bPrintHelpUsage = CommandLine()->HasParam( "h" ) || CommandLine()->HasParam( "help" ) || CommandLine()->HasParam( "?" );
 
-	// Get and parse a file list
-	const char* pFileListPath		 = CommandLine()->GetFirstValue( "filelist" );
-	const char* pFilePath			 = CommandLine()->GetFirstValue( "file" );
-	bool		bInvalidFileListPath = !pFileListPath || pFileListPath[0] == '\0';
-	bool		bInvalidFilePath	 = !pFilePath || pFilePath[0] == '\0';
-	bool		bInvalidFilePaths	 = bInvalidFileListPath && bInvalidFilePath;
-	if ( !bInvalidFilePaths && !bInvalidFileListPath && !LoadFileList( pFileListPath ) )
-	{
-		Error( "ResourceCompiler: Failed to load file list '%s'", pFileListPath );
-		return 1;
-	}
+	// Get a path to a file or file list
+	const char* pFile			 = CommandLine()->GetFirstValue( "file" );
+	const char* pFileList		 = CommandLine()->GetFirstValue( "filelist" );
+	bool		bInvalidFile	 = !pFile || pFile[0] == '\0';
+	bool		bInvalidFileList = !pFileList || pFileList[0] == '\0';
 
-	// Add the file to the file list
-	if ( !bInvalidFilePaths && !bInvalidFilePath && !AddFileToCompile( pFilePath ) )
-	{
-		Error( "ResourceCompiler: Failed to add file '%s' to compile", pFilePath );
-		return 1;
-	}
+	// Get an output directory
+	outputPath				= CommandLine()->GetFirstValue( "output" );
+	bool bInvalidOutputPath = outputPath.empty();
 
 	// Print help of usage if it need or some parameters aren't set
-	if ( bPrintHelpUsage || bInvalidFilePaths )
+	if ( bPrintHelpUsage || ( bInvalidFile && bInvalidFileList ) || bInvalidOutputPath )
 	{
 		PrintUsageHelp();
 		return 0;
+	}
+
+	// Make sure that set only one flag
+	if ( !( bInvalidFile ^ bInvalidFileList ) )
+	{
+		Error( "ResourceCompiler: Must be set only 'file' or 'filelist'" );
+		return 1;
+	}
+
+	// Get directory with the file list
+	{
+		eastl::string tmpBuffer;
+		S_GetFilePath( bInvalidFileList ? pFile : pFileList, tmpBuffer, false );
+		S_MakeAbsolutePath( tmpBuffer, workDir, "" );
+	}
+
+	// Append a path separator to the output path and convert it into an absolute path
+	S_AppendPathSeparator( outputPath );
+	if ( !S_IsAbsolutePath( outputPath ) )
+	{
+		eastl::string tempBuffer = eastl::move( outputPath );
+		S_MakeAbsolutePath( tempBuffer, outputPath );
+	}
+
+	// Add the file/filelist to the compile list
+	if ( bInvalidFileList && !AddFileToCompile( pFile, workDir.c_str() ) )
+	{
+		Error( "ResourceCompiler: Failed to add file '%s' to compile", pFile );
+		return 1;
+	}
+	else if ( bInvalidFile && !LoadFileList( pFileList ) )
+	{
+		Error( "ResourceCompiler: Failed to load file list '%s'", pFileList );
+		return 1;
 	}
 
 	// Compile each file by tools
@@ -229,462 +262,25 @@ int32 CResourceCompilerAppSystemGroup::Main()
 		const resourceFile_t& resourceFile		= *it;
 		switch ( resourceFile.type )
 		{
-			// Compile a texture
-		case RESOURCE_SOURCE_TYPE_TEXTURE:
-		{
-			CSTEXSourceTextureDoc stexSourceFile;
-			if ( !stexSourceFile.LoadFromFile( resourceFile.sourcePath.c_str() ) )
-			{
-				Error( "ResourceCompiler: Failed to load STEX file '%s'", resourceFile.sourcePath.c_str() );
-				bResult = false;
-				continue;
-			}
-
-			// Get path to directory with the source file
-			eastl::string sourceFileDir;
-			{
-				eastl::string tmpBuffer;
-				S_GetFilePath( resourceFile.sourcePath, tmpBuffer, false );
-				S_MakeAbsolutePath( tmpBuffer, sourceFileDir, "", false );
-			}
-
-			// Get a absolute source texture paths
-			eastl::vector<eastl::string> srcPaths;
-			eastl::vector<const char*>	 cSrcPaths;
-			{
-				const eastl::vector<eastl::string> originalSrcPaths = stexSourceFile.GetSourcePaths();
-				srcPaths.resize( originalSrcPaths.size() );
-				cSrcPaths.resize( originalSrcPaths.size() );
-				for ( uint32 sourcePathIdx = 0, numSourcePaths = (uint32)originalSrcPaths.size(); sourcePathIdx < numSourcePaths; ++sourcePathIdx )
-				{
-					eastl::string& srcPath = srcPaths[sourcePathIdx];
-					S_MakeAbsolutePath( originalSrcPaths[sourcePathIdx], srcPath, sourceFileDir );
-					cSrcPaths[sourcePathIdx] = srcPath.c_str();
-				}
-			}
-
-			// Get a destination file
-			eastl::string destPath;
-			{
-				eastl::string outputDir = stexSourceFile.GetOutputDir();
-				if ( !S_IsAbsolutePath( outputDir ) )
-				{
-					S_MakeAbsolutePath( stexSourceFile.GetOutputDir(), outputDir, sourceFileDir );
-				}
-
-				eastl::string baseFileName;
-				S_GetFileBaseName( resourceFile.sourcePath, baseFileName );
-
-				S_AppendPathSeparator( outputDir );
-				destPath = S_Sprintf( "%s%s", outputDir.c_str(), baseFileName.c_str() );
-			}
-
-			resourceToolCompileTextureParams_t compileParams = {};
-			compileParams.bGenerateMipMaps					 = stexSourceFile.IsNeedGenerateMipMaps();
-			compileParams.type								 = stexSourceFile.GetType();
-			compileParams.addressModeU						 = stexSourceFile.GetAddressModeU();
-			compileParams.addressModeV						 = stexSourceFile.GetAddressModeV();
-			compileParams.addressModeW						 = stexSourceFile.GetAddressModeW();
-			compileParams.filter							 = stexSourceFile.GetFilter();
-			compileParams.pixelFormat						 = stexSourceFile.GetPixelFormat();
-			compileParams.maxAnisotropy						 = stexSourceFile.GetMaxAnisotropy();
-			compileParams.numSrcPaths						 = (uint32)cSrcPaths.size();
-			compileParams.ppSrcPaths						 = cSrcPaths.data();
-			compileParams.pDestPath							 = destPath.c_str();
-			bResourceCompiled								 = pTextureTool->CompileTexture( compileParams );
-			break;
-		}
-
-			// Compile a material
-		case RESOURCE_SOURCE_TYPE_MATERIAL:
-		{
-			CSMATSourceMaterialDoc smatSourceFile;
-			if ( !smatSourceFile.LoadFromFile( resourceFile.sourcePath.c_str() ) )
-			{
-				Error( "ResourceCompiler: Failed to load SMAT file '%s'", resourceFile.sourcePath.c_str() );
-				bResult = false;
-				continue;
-			}
-
-			// Get material variables
-			eastl::vector<resourceToolMaterialVar_t> resourceToolMaterialVars;
-			resourceToolMaterialVars.resize( smatSourceFile.GetNumVars() );
-			{
-				bool								   bMaterialVarsAreVaild  = true;
-				const eastl::vector<CSMATMaterialVar>& smatSourceMaterialVars = smatSourceFile.GetVars();
-				for ( uint32 varIdx = 0, numVars = smatSourceFile.GetNumVars(); varIdx < numVars; ++varIdx )
-				{
-					const CSMATMaterialVar&	   smatSourceMaterialVar   = smatSourceMaterialVars[varIdx];
-					resourceToolMaterialVar_t& resourceToolMaterialVar = resourceToolMaterialVars[varIdx];
-					resourceToolMaterialVar.pName					   = smatSourceMaterialVar.GetName();
-					switch ( smatSourceMaterialVar.GetType() )
-					{
-					case SMAT_MATERIAL_VAR_TYPE_UNDEFINED:
-						resourceToolMaterialVar.type = RESOURCE_TOOL_MATERIAL_VAR_TYPE_UNDEFINED;
-						break;
-
-					case SMAT_MATERIAL_VAR_TYPE_BOOL:
-						resourceToolMaterialVar.boolValue = smatSourceMaterialVar.GetBoolValue();
-						resourceToolMaterialVar.type	  = RESOURCE_TOOL_MATERIAL_VAR_TYPE_BOOL;
-						break;
-
-					case SMAT_MATERIAL_VAR_TYPE_INT:
-						resourceToolMaterialVar.intValue = smatSourceMaterialVar.GetIntValue();
-						resourceToolMaterialVar.type	 = RESOURCE_TOOL_MATERIAL_VAR_TYPE_INT;
-						break;
-
-					case SMAT_MATERIAL_VAR_TYPE_FLOAT:
-						resourceToolMaterialVar.floatValue = smatSourceMaterialVar.GetFloatValue();
-						resourceToolMaterialVar.type	   = RESOURCE_TOOL_MATERIAL_VAR_TYPE_FLOAT;
-						break;
-
-					case SMAT_MATERIAL_VAR_TYPE_VECTOR_2D:
-						smatSourceMaterialVar.GetVecValue( &resourceToolMaterialVar.vector2DValue.x, 2 );
-						resourceToolMaterialVar.type = RESOURCE_TOOL_MATERIAL_VAR_TYPE_VECTOR_2D;
-						break;
-
-					case SMAT_MATERIAL_VAR_TYPE_VECTOR_3D:
-						smatSourceMaterialVar.GetVecValue( &resourceToolMaterialVar.vector3DValue.x, 3 );
-						resourceToolMaterialVar.type = RESOURCE_TOOL_MATERIAL_VAR_TYPE_VECTOR_3D;
-						break;
-
-					case SMAT_MATERIAL_VAR_TYPE_VECTOR_4D:
-						smatSourceMaterialVar.GetVecValue( &resourceToolMaterialVar.vector4DValue.x, 4 );
-						resourceToolMaterialVar.type = RESOURCE_TOOL_MATERIAL_VAR_TYPE_VECTOR_4D;
-						break;
-
-					case SMAT_MATERIAL_VAR_TYPE_MATRIX:
-						resourceToolMaterialVar.matrixValue = smatSourceMaterialVar.GetMatrixValue();
-						resourceToolMaterialVar.type		= RESOURCE_TOOL_MATERIAL_VAR_TYPE_MATRIX;
-						break;
-
-					case SMAT_MATERIAL_VAR_TYPE_STRING:
-						resourceToolMaterialVar.pStringValue = smatSourceMaterialVar.GetStringValue();
-						resourceToolMaterialVar.type		 = RESOURCE_TOOL_MATERIAL_VAR_TYPE_STRING;
-						break;
-
-					case SMAT_MATERIAL_VAR_TYPE_TEXTURE:
-						resourceToolMaterialVar.pTextureValue = smatSourceMaterialVar.GetTextureValue();
-						resourceToolMaterialVar.type		  = RESOURCE_TOOL_MATERIAL_VAR_TYPE_TEXTURE;
-						break;
-
-					case SMAT_MATERIAL_VAR_TYPE_MATERIAL:
-						resourceToolMaterialVar.pMaterialValue = smatSourceMaterialVar.GetMaterialValue();
-						resourceToolMaterialVar.type		   = RESOURCE_TOOL_MATERIAL_VAR_TYPE_MATERIAL;
-						break;
-
-					default:
-						Error( "ResourceCompiler: Unknown material type 0x%X in variable '%s' of '%s'", smatSourceMaterialVar.GetType(), resourceToolMaterialVar.pName, resourceFile.sourcePath.c_str() );
-						bMaterialVarsAreVaild = false;
-						break;
-					}
-				}
-
-				if ( !bMaterialVarsAreVaild )
-				{
-					bResourceCompiled = false;
-					break;
-				}
-			}
-
-			// Get path to directory with the source file
-			eastl::string sourceFileDir;
-			{
-				eastl::string tmpBuffer;
-				S_GetFilePath( resourceFile.sourcePath, tmpBuffer, false );
-				S_MakeAbsolutePath( tmpBuffer, sourceFileDir, "", false );
-			}
-
-			// Get a destination file
-			eastl::string destPath;
-			{
-				eastl::string outputDir = smatSourceFile.GetOutputDir();
-				if ( !S_IsAbsolutePath( outputDir ) )
-				{
-					S_MakeAbsolutePath( smatSourceFile.GetOutputDir(), outputDir, sourceFileDir );
-				}
-
-				eastl::string baseFileName;
-				S_GetFileBaseName( resourceFile.sourcePath, baseFileName );
-
-				S_AppendPathSeparator( outputDir );
-				destPath = S_Sprintf( "%s%s", outputDir.c_str(), baseFileName.c_str() );
-			}
-
-			resourceToolCompileMaterialParams_t compileParams = {};
-			compileParams.pDestPath							  = destPath.c_str();
-			compileParams.pShaderName						  = smatSourceFile.GetShaderName();
-			compileParams.pVars								  = resourceToolMaterialVars.data();
-			compileParams.numVars							  = smatSourceFile.GetNumVars();
-			bResourceCompiled								  = pMaterialTool->CompileMaterial( compileParams );
-			break;
-		}
-
-			// Compile a model
-		case RESOURCE_SOURCE_TYPE_MODEL:
-		{
-			CSMDLSourceModelDoc smdlSourceFile;
-			if ( !smdlSourceFile.LoadFromFile( resourceFile.sourcePath.c_str() ) )
-			{
-				Error( "ResourceCompiler: Failed to load SMDL file '%s'", resourceFile.sourcePath.c_str() );
-				bResult = false;
-				continue;
-			}
-
-			// Convert renamed materials for SMDL tool
-			eastl::vector<resourceToolRenamedMaterial_t> resourceToolRenamedMaterials;
-			{
-				const eastl::unordered_map<eastl::string, eastl::string>& renamedMaterialsDict = smdlSourceFile.GetRenamedMaterials();
-				for ( auto it = renamedMaterialsDict.begin(), itEnd = renamedMaterialsDict.end(); it != itEnd; ++it )
-				{
-					resourceToolRenamedMaterials.emplace_back( resourceToolRenamedMaterial_t{ it->first.c_str(), it->second.c_str() } );
-				}
-			}
-
-			// Get path to directory with the source file
-			eastl::string sourceFileDir;
-			{
-				eastl::string tmpBuffer;
-				S_GetFilePath( resourceFile.sourcePath, tmpBuffer, false );
-				S_MakeAbsolutePath( tmpBuffer, sourceFileDir, "", false );
-			}
-
-			// Get an absolute source path
-			eastl::string srcPath;
-			S_MakeAbsolutePath( smdlSourceFile.GetSourcePath(), srcPath, sourceFileDir );
-
-			// Get a destination file
-			eastl::string destPath;
-			{
-				eastl::string outputDir = smdlSourceFile.GetOutputDir();
-				if ( !S_IsAbsolutePath( outputDir ) )
-				{
-					S_MakeAbsolutePath( smdlSourceFile.GetOutputDir(), outputDir, sourceFileDir );
-				}
-
-				eastl::string baseFileName;
-				S_GetFileBaseName( resourceFile.sourcePath, baseFileName );
-
-				S_AppendPathSeparator( outputDir );
-				destPath = S_Sprintf( "%s%s", outputDir.c_str(), baseFileName.c_str() );
-			}
-
-			resourceToolCompileModelParams_t compileParams = {};
-			compileParams.bCombineModels				   = smdlSourceFile.IsCombineModels();
-			compileParams.axisUp						   = smdlSourceFile.GetAxisUp();
-			compileParams.pMaterialsDir					   = smdlSourceFile.GetMaterialsDir().c_str();
-			compileParams.pSrcPath						   = srcPath.c_str();
-			compileParams.pDestPath						   = destPath.c_str();
-			compileParams.pRenamedMaterials				   = resourceToolRenamedMaterials.data();
-			compileParams.numRenamedMaterials			   = (uint32)resourceToolRenamedMaterials.size();
-			bResourceCompiled							   = pModelTool->CompileModel( compileParams );
-			break;
-		}
-
-			// Compile an entity descriptor
-		case RESOURCE_SOURCE_TYPE_ENTITY_DESC:
-		{
-			CSENTSourceEntityDescDoc sentSourceFile;
-			if ( !sentSourceFile.LoadFromFile( resourceFile.sourcePath.c_str() ) )
-			{
-				Error( "ResourceCompiler: Failed to load SENT file '%s'", resourceFile.sourcePath.c_str() );
-				bResult = false;
-				continue;
-			}
-
-			// Get entity descriptor components
-			eastl::vector<resourceToolEntityDescVar_t>		 resourceToolEntityDescVars;
-			eastl::vector<resourceToolEntityDescComponent_t> resourceToolEntityDescComponents;
-			resourceToolEntityDescComponents.resize( sentSourceFile.GetNumComponents() );
-			{
-				bool										   bEntityDescComponentsAreVaild	= true;
-				uint32										   resourceToolEntityDescVarsOffset = 0;
-				const eastl::vector<CSENTEntityDescComponent>& sentEntityDescComponents			= sentSourceFile.GetComponents();
-				for ( uint32 componentIdx = 0, numComponents = sentSourceFile.GetNumComponents(); componentIdx < numComponents; ++componentIdx )
-				{
-					const CSENTEntityDescComponent&			 sentEntityDescComponent		 = sentEntityDescComponents[componentIdx];
-					const eastl::vector<CSENTEntityDescVar>& sentEntityDescVars				 = sentEntityDescComponent.GetVars();
-					resourceToolEntityDescComponent_t&		 resourceToolEntityDescComponent = resourceToolEntityDescComponents[componentIdx];
-					resourceToolEntityDescComponent.pType									 = sentEntityDescComponent.GetType();
-
-					// Get entity descriptor vars
-					if ( !sentEntityDescVars.empty() )
-					{
-						resourceToolEntityDescComponent.numVars = sentEntityDescComponent.GetNumVars();
-						resourceToolEntityDescVars.resize( resourceToolEntityDescVarsOffset + resourceToolEntityDescComponent.numVars );
-						resourceToolEntityDescComponent.pVars = resourceToolEntityDescVars.data() + resourceToolEntityDescVarsOffset;
-
-						for ( uint32 varIdx = 0, numVars = sentEntityDescComponent.GetNumVars(); varIdx < numVars; ++varIdx )
-						{
-							const CSENTEntityDescVar&	 sentEntityDescVar		   = sentEntityDescVars[varIdx];
-							resourceToolEntityDescVar_t& resourceToolEntityDescVar = resourceToolEntityDescVars[resourceToolEntityDescVarsOffset + varIdx];
-							resourceToolEntityDescVar.pName						   = sentEntityDescVar.GetName();
-							switch ( sentEntityDescVar.GetType() )
-							{
-							case SENT_ENTITY_DESC_VAR_TYPE_UNDEFINED:
-								resourceToolEntityDescVar.type = RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_UNDEFINED;
-								break;
-
-							case SENT_ENTITY_DESC_VAR_TYPE_BOOL:
-								resourceToolEntityDescVar.boolValue = sentEntityDescVar.GetBoolValue();
-								resourceToolEntityDescVar.type		= RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_BOOL;
-								break;
-
-							case SENT_ENTITY_DESC_VAR_TYPE_INT:
-								resourceToolEntityDescVar.intValue = sentEntityDescVar.GetIntValue();
-								resourceToolEntityDescVar.type	   = RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_INT;
-								break;
-
-							case SENT_ENTITY_DESC_VAR_TYPE_FLOAT:
-								resourceToolEntityDescVar.floatValue = sentEntityDescVar.GetFloatValue();
-								resourceToolEntityDescVar.type		 = RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_FLOAT;
-								break;
-
-							case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_2D:
-								resourceToolEntityDescVar.vector2DValue = sentEntityDescVar.GetVec2Value();
-								resourceToolEntityDescVar.type			= RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_VECTOR_2D;
-								break;
-
-							case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_3D:
-								resourceToolEntityDescVar.vector3DValue = sentEntityDescVar.GetVec3Value();
-								resourceToolEntityDescVar.type			= RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_VECTOR_3D;
-								break;
-
-							case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_4D:
-								resourceToolEntityDescVar.vector4DValue = sentEntityDescVar.GetVec4Value();
-								resourceToolEntityDescVar.type			= RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_VECTOR_4D;
-								break;
-
-							case SENT_ENTITY_DESC_VAR_TYPE_MATRIX:
-								resourceToolEntityDescVar.matrixValue = sentEntityDescVar.GetMatrixValue();
-								resourceToolEntityDescVar.type		  = RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_MATRIX;
-								break;
-
-							case SENT_ENTITY_DESC_VAR_TYPE_STRING:
-								resourceToolEntityDescVar.pStringValue = sentEntityDescVar.GetStringValue();
-								resourceToolEntityDescVar.type		   = RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_STRING;
-								break;
-
-							default:
-								Error( "ResourceCompiler: Unknown entity descriptor type 0x%X in variable '%s' of '%s'", sentEntityDescVar.GetType(), resourceToolEntityDescVar.pName, resourceFile.sourcePath.c_str() );
-								bEntityDescComponentsAreVaild = false;
-								break;
-							}
-						}
-						resourceToolEntityDescVarsOffset += resourceToolEntityDescComponent.numVars;
-					}
-				}
-
-				if ( !bEntityDescComponentsAreVaild )
-				{
-					bResourceCompiled = false;
-					break;
-				}
-			}
-
-			// Get path to directory with the source file
-			eastl::string sourceFileDir;
-			{
-				eastl::string tmpBuffer;
-				S_GetFilePath( resourceFile.sourcePath, tmpBuffer, false );
-				S_MakeAbsolutePath( tmpBuffer, sourceFileDir, "", false );
-			}
-
-			// Get a destination file
-			eastl::string destPath;
-			{
-				eastl::string outputDir = sentSourceFile.GetOutputDir();
-				if ( !S_IsAbsolutePath( outputDir ) )
-				{
-					S_MakeAbsolutePath( sentSourceFile.GetOutputDir(), outputDir, sourceFileDir );
-				}
-
-				eastl::string baseFileName;
-				S_GetFileBaseName( resourceFile.sourcePath, baseFileName );
-
-				S_AppendPathSeparator( outputDir );
-				destPath = S_Sprintf( "%s%s", outputDir.c_str(), baseFileName.c_str() );
-			}
-
-			resourceToolCompileEntityDescParams_t compileParams = {};
-			compileParams.pDestPath								= destPath.c_str();
-			compileParams.pComponents							= resourceToolEntityDescComponents.data();
-			compileParams.numComponents							= (uint32)resourceToolEntityDescComponents.size();
-			bResourceCompiled									= pEntityDescTool->CompileEntityDesc( compileParams );
-			break;
-		}
-
-			// Compile a map
-		case RESOURCE_SOURCE_TYPE_MAP:
-		{
-			CSMAPSourceMapDoc smapSourceFile;
-			if ( !smapSourceFile.LoadFromFile( resourceFile.sourcePath.c_str() ) )
-			{
-				Error( "ResourceCompiler: Failed to load SMAP file '%s'", resourceFile.sourcePath.c_str() );
-				bResult = false;
-				continue;
-			}
-
-			// Get entities
-			eastl::vector<resourceToolMapEntity_t> entities;
-			entities.resize( smapSourceFile.GetNumEntities() );
-			{
-				const eastl::vector<CSMAPEntity>& smapEntities = smapSourceFile.GetEntities();
-				for ( uint32 entityIdx = 0, numEntities = (uint32)smapEntities.size(); entityIdx < numEntities; ++entityIdx )
-				{
-					const CSMAPEntity&		 smapEntity			   = smapEntities[entityIdx];
-					resourceToolMapEntity_t& resourceToolMapEntity = entities[entityIdx];
-					resourceToolMapEntity.pClassName			   = smapEntity.GetClassName();
-					resourceToolMapEntity.pName					   = smapEntity.GetName();
-				}
-			}
-
-			// Get path to directory with the source file
-			eastl::string sourceFileDir;
-			{
-				eastl::string tmpBuffer;
-				S_GetFilePath( resourceFile.sourcePath, tmpBuffer, false );
-				S_MakeAbsolutePath( tmpBuffer, sourceFileDir, "", false );
-			}
-
-			// Get a destination file
-			eastl::string destPath;
-			{
-				eastl::string outputDir = smapSourceFile.GetOutputDir();
-				if ( !S_IsAbsolutePath( outputDir ) )
-				{
-					S_MakeAbsolutePath( smapSourceFile.GetOutputDir(), outputDir, sourceFileDir );
-				}
-
-				eastl::string baseFileName;
-				S_GetFileBaseName( resourceFile.sourcePath, baseFileName );
-
-				S_AppendPathSeparator( outputDir );
-				destPath = S_Sprintf( "%s%s", outputDir.c_str(), baseFileName.c_str() );
-			}
-
-			resourceToolCompileMapParams_t compileParams = {};
-			compileParams.pDestPath						 = destPath.c_str();
-			compileParams.pEntities						 = entities.data();
-			compileParams.numEntities					 = (uint32)entities.size();
-			bResourceCompiled							 = pMapTool->CompileMap( compileParams );
-			break;
-		}
-
+		case RESOURCE_SOURCE_TYPE_TEXTURE: bResourceCompiled = CompileTexture( resourceFile ); break;
+		case RESOURCE_SOURCE_TYPE_MATERIAL: bResourceCompiled = CompileMaterial( resourceFile ); break;
+		case RESOURCE_SOURCE_TYPE_MODEL: bResourceCompiled = CompileModel( resourceFile ); break;
+		case RESOURCE_SOURCE_TYPE_ENTITY_DESC: bResourceCompiled = CompileEntityDesc( resourceFile ); break;
+		case RESOURCE_SOURCE_TYPE_MAP: bResourceCompiled = CompileMap( resourceFile ); break;
 		default:
-			Error( "ResourceCompiler: Failed to compile '%s', unsupported resource type '%s'", resourceFile.sourcePath.c_str(), ConvResourceSourceTypeToString( resourceFile.type ) );
+			Error( "ResourceCompiler: Failed to compile '%s', unsupported resource type '%s'", resourceFile.srcPath.c_str(), ConvResourceSourceTypeToString( resourceFile.type ) );
 			bResult = false;
 			continue;
 		}
 
 		if ( !bResourceCompiled )
 		{
-			Error( "ResourceCompiler: Failed to compile '%s'", resourceFile.sourcePath.c_str() );
+			Error( "ResourceCompiler: Failed to compile '%s'", resourceFile.srcPath.c_str() );
 			bResult = false;
 		}
 		else
 		{
-			Msg( "ResourceCompiler: Resource '%s' compiled", resourceFile.sourcePath.c_str() );
+			Msg( "ResourceCompiler: Resource '%s' compiled", resourceFile.srcPath.c_str() );
 		}
 	}
 
@@ -700,8 +296,8 @@ void CResourceCompilerAppSystemGroup::PrintUsageHelp()
 {
 	Msg( "" );
 	Msg( "Resource compiler for Singularity Engine (" __DATE__ " " __TIME__ ")" );
-	Msg( "Usage resourcecompiler -file <path>" );
-	Msg( "Usage resourcecompiler -filelist <path>" );
+	Msg( "Usage resourcecompiler -file <path> -output <dir>" );
+	Msg( "Usage resourcecompiler -filelist <path> -output <dir>" );
 	Msg( "" );
 	Msg( "The compiler supports next resource types: texture (*.stex), material (*.smat), model (*.smdl), entity (*.sent) and map (*.smap)" );
 	Msg( "For syntax example see 'content/core/meterials/default_tex.stex', 'content/core/meterials/default_mat.smat'" );
@@ -709,6 +305,7 @@ void CResourceCompilerAppSystemGroup::PrintUsageHelp()
 	Msg( "Launch arguments:" );
 	Msg( "file\tSpecify a JSON file containing settings to compile the resource" );
 	Msg( "filelist\tSpecify a JSON file containing a list of files to be processed as inputs. For syntax example see 'content/core/resourcelist.txt'" );
+	Msg( "output <dir>\tOutput directory path" );
 	Msg( "" );
 }
 
@@ -728,19 +325,22 @@ bool CResourceCompilerAppSystemGroup::LoadFileList( const char* pPath )
 		return false;
 	}
 
-	// Get path to directory with the file list
-	eastl::string fileListDir;
-	{
-		eastl::string tmpBuffer;
-		S_GetFilePath( pPath, tmpBuffer, false );
-		S_MakeAbsolutePath( tmpBuffer, fileListDir, "", false );
-	}
-
 	// Get resources
 	bool bResult = true;
 	for ( CKeyValuesSubKeysIterator it( &keyValues, "file" ); it; ++it )
 	{
-		if ( !AddFileToCompile( it->GetString( NULL ), fileListDir.c_str() ) )
+		// Make sure that a file in work directory
+		eastl::string absoluteFilePath;
+		S_MakeAbsolutePath( it->GetString( NULL ), absoluteFilePath, workDir );
+		if ( S_Strnicmp( absoluteFilePath.c_str(), workDir.c_str(), (uint32)workDir.size() ) )
+		{
+			Warning( "ResourceCompiler: Resource file '%s' must be in '%s'", absoluteFilePath.c_str(), workDir.c_str() );
+			bResult = false;
+			continue;
+		}
+
+		// Add the file to compile list
+		if ( !AddFileToCompile( absoluteFilePath.c_str(), workDir.c_str() ) )
 		{
 			bResult = false;
 			continue;
@@ -756,28 +356,384 @@ bool CResourceCompilerAppSystemGroup::LoadFileList( const char* pPath )
 CResourceCompilerAppSystemGroup::AddFileToCompile
 ==================
 */
-bool CResourceCompilerAppSystemGroup::AddFileToCompile( const char* pPath, const char* pWorkDir /* = "" */ )
+bool CResourceCompilerAppSystemGroup::AddFileToCompile( const char* pPath, const char* pWorkDir )
 {
 	// Convert of the file path to absolute
-	eastl::string		 absoluteFilePath;
+	eastl::string		 absoluteSourceFilePath;
 	resourceSourceType_t resourceSourceType;
-	S_MakeAbsolutePath( pPath, absoluteFilePath, pWorkDir );
+	S_MakeAbsolutePath( pPath, absoluteSourceFilePath, pWorkDir );
 
 	// Get resource type by the file extension
-	if ( !ConvScriptFileExtensionToResourceSourceType( S_GetFileExtension( absoluteFilePath.c_str() ), resourceSourceType ) )
+	if ( !ConvScriptFileExtensionToResourceSourceType( S_GetFileExtension( absoluteSourceFilePath.c_str() ), resourceSourceType ) )
 	{
-		Warning( "ResourceCompiler: Unknown resource type for file '%s'", absoluteFilePath.c_str() );
+		Warning( "ResourceCompiler: Unknown resource type for file '%s'", absoluteSourceFilePath.c_str() );
 		return false;
 	}
 
+	// Get an absolute destination path
+	eastl::string tempBuffer;
+	eastl::string sourceFileDir;
+	eastl::string baseFileName;
+	S_MakeRelativePath( absoluteSourceFilePath, pWorkDir, tempBuffer, false );
+	S_GetFilePath( tempBuffer, sourceFileDir, false );
+	S_GetFileBaseName( absoluteSourceFilePath, baseFileName, false );
+	S_AppendPathSeparator( sourceFileDir );
+
 	// Add into a list the file
 	resourceFile_t resourceFile = {};
-	resourceFile.sourcePath		= absoluteFilePath;
+	resourceFile.srcPath		= absoluteSourceFilePath;
+	resourceFile.destPath		= S_Sprintf( "%s%s%s", outputPath.c_str(), sourceFileDir.c_str(), baseFileName.c_str() );
 	resourceFile.type			= resourceSourceType;
 
-	Msg( "ResourceCompiler: File '%s' added to compile as '%s'", absoluteFilePath.c_str(), ConvResourceSourceTypeToString( resourceSourceType ) );
+	Msg( "ResourceCompiler: File '%s' added to compile as '%s'", absoluteSourceFilePath.c_str(), ConvResourceSourceTypeToString( resourceSourceType ) );
 	files.emplace_back( resourceFile );
 	return true;
+}
+
+/*
+==================
+CResourceCompilerAppSystemGroup::CompileTexture
+==================
+*/
+bool CResourceCompilerAppSystemGroup::CompileTexture( const resourceFile_t& resourceFile ) const
+{
+	CSTEXSourceTextureDoc stexSourceFile;
+	if ( !stexSourceFile.LoadFromFile( resourceFile.srcPath.c_str() ) )
+	{
+		Error( "ResourceCompiler: Failed to load STEX file '%s'", resourceFile.srcPath.c_str() );
+		return false;
+	}
+
+	// Get path to directory with the source file
+	eastl::string sourceFileDir;
+	{
+		eastl::string tmpBuffer;
+		S_GetFilePath( resourceFile.srcPath, tmpBuffer, false );
+		S_MakeAbsolutePath( tmpBuffer, sourceFileDir, "", false );
+	}
+
+	// Get a absolute source texture paths
+	eastl::vector<eastl::string> srcPaths;
+	eastl::vector<const char*>	 cSrcPaths;
+	{
+		const eastl::vector<eastl::string>& originalSrcPaths = stexSourceFile.GetSourcePaths();
+		srcPaths.resize( originalSrcPaths.size() );
+		cSrcPaths.resize( originalSrcPaths.size() );
+		for ( uint32 sourcePathIdx = 0, numSourcePaths = (uint32)originalSrcPaths.size(); sourcePathIdx < numSourcePaths; ++sourcePathIdx )
+		{
+			eastl::string& srcPath = srcPaths[sourcePathIdx];
+			S_MakeAbsolutePath( originalSrcPaths[sourcePathIdx], srcPath, sourceFileDir );
+			cSrcPaths[sourcePathIdx] = srcPath.c_str();
+		}
+	}
+
+	resourceToolCompileTextureParams_t compileParams = {};
+	compileParams.bGenerateMipMaps					 = stexSourceFile.IsNeedGenerateMipMaps();
+	compileParams.type								 = stexSourceFile.GetType();
+	compileParams.addressModeU						 = stexSourceFile.GetAddressModeU();
+	compileParams.addressModeV						 = stexSourceFile.GetAddressModeV();
+	compileParams.addressModeW						 = stexSourceFile.GetAddressModeW();
+	compileParams.filter							 = stexSourceFile.GetFilter();
+	compileParams.pixelFormat						 = stexSourceFile.GetPixelFormat();
+	compileParams.maxAnisotropy						 = stexSourceFile.GetMaxAnisotropy();
+	compileParams.numSrcPaths						 = (uint32)cSrcPaths.size();
+	compileParams.ppSrcPaths						 = cSrcPaths.data();
+	compileParams.pDestPath							 = resourceFile.destPath.c_str();
+	return pTextureTool->CompileTexture( compileParams );
+}
+
+/*
+==================
+CResourceCompilerAppSystemGroup::CompileMaterial
+==================
+*/
+bool CResourceCompilerAppSystemGroup::CompileMaterial( const resourceFile_t& resourceFile ) const
+{
+	CSMATSourceMaterialDoc smatSourceFile;
+	if ( !smatSourceFile.LoadFromFile( resourceFile.srcPath.c_str() ) )
+	{
+		Error( "ResourceCompiler: Failed to load SMAT file '%s'", resourceFile.srcPath.c_str() );
+		return false;
+	}
+
+	// Get material variables
+	eastl::vector<resourceToolMaterialVar_t> resourceToolMaterialVars;
+	resourceToolMaterialVars.resize( smatSourceFile.GetNumVars() );
+	{
+		bool								   bMaterialVarsAreVaild  = true;
+		const eastl::vector<CSMATMaterialVar>& smatSourceMaterialVars = smatSourceFile.GetVars();
+		for ( uint32 varIdx = 0, numVars = smatSourceFile.GetNumVars(); varIdx < numVars; ++varIdx )
+		{
+			const CSMATMaterialVar&	   smatSourceMaterialVar   = smatSourceMaterialVars[varIdx];
+			resourceToolMaterialVar_t& resourceToolMaterialVar = resourceToolMaterialVars[varIdx];
+			resourceToolMaterialVar.pName					   = smatSourceMaterialVar.GetName();
+			switch ( smatSourceMaterialVar.GetType() )
+			{
+			case SMAT_MATERIAL_VAR_TYPE_UNDEFINED:
+				resourceToolMaterialVar.type = RESOURCE_TOOL_MATERIAL_VAR_TYPE_UNDEFINED;
+				break;
+
+			case SMAT_MATERIAL_VAR_TYPE_BOOL:
+				resourceToolMaterialVar.boolValue = smatSourceMaterialVar.GetBoolValue();
+				resourceToolMaterialVar.type	  = RESOURCE_TOOL_MATERIAL_VAR_TYPE_BOOL;
+				break;
+
+			case SMAT_MATERIAL_VAR_TYPE_INT:
+				resourceToolMaterialVar.intValue = smatSourceMaterialVar.GetIntValue();
+				resourceToolMaterialVar.type	 = RESOURCE_TOOL_MATERIAL_VAR_TYPE_INT;
+				break;
+
+			case SMAT_MATERIAL_VAR_TYPE_FLOAT:
+				resourceToolMaterialVar.floatValue = smatSourceMaterialVar.GetFloatValue();
+				resourceToolMaterialVar.type	   = RESOURCE_TOOL_MATERIAL_VAR_TYPE_FLOAT;
+				break;
+
+			case SMAT_MATERIAL_VAR_TYPE_VECTOR_2D:
+				smatSourceMaterialVar.GetVecValue( &resourceToolMaterialVar.vector2DValue.x, 2 );
+				resourceToolMaterialVar.type = RESOURCE_TOOL_MATERIAL_VAR_TYPE_VECTOR_2D;
+				break;
+
+			case SMAT_MATERIAL_VAR_TYPE_VECTOR_3D:
+				smatSourceMaterialVar.GetVecValue( &resourceToolMaterialVar.vector3DValue.x, 3 );
+				resourceToolMaterialVar.type = RESOURCE_TOOL_MATERIAL_VAR_TYPE_VECTOR_3D;
+				break;
+
+			case SMAT_MATERIAL_VAR_TYPE_VECTOR_4D:
+				smatSourceMaterialVar.GetVecValue( &resourceToolMaterialVar.vector4DValue.x, 4 );
+				resourceToolMaterialVar.type = RESOURCE_TOOL_MATERIAL_VAR_TYPE_VECTOR_4D;
+				break;
+
+			case SMAT_MATERIAL_VAR_TYPE_MATRIX:
+				resourceToolMaterialVar.matrixValue = smatSourceMaterialVar.GetMatrixValue();
+				resourceToolMaterialVar.type		= RESOURCE_TOOL_MATERIAL_VAR_TYPE_MATRIX;
+				break;
+
+			case SMAT_MATERIAL_VAR_TYPE_STRING:
+				resourceToolMaterialVar.pStringValue = smatSourceMaterialVar.GetStringValue();
+				resourceToolMaterialVar.type		 = RESOURCE_TOOL_MATERIAL_VAR_TYPE_STRING;
+				break;
+
+			case SMAT_MATERIAL_VAR_TYPE_TEXTURE:
+				resourceToolMaterialVar.pTextureValue = smatSourceMaterialVar.GetTextureValue();
+				resourceToolMaterialVar.type		  = RESOURCE_TOOL_MATERIAL_VAR_TYPE_TEXTURE;
+				break;
+
+			case SMAT_MATERIAL_VAR_TYPE_MATERIAL:
+				resourceToolMaterialVar.pMaterialValue = smatSourceMaterialVar.GetMaterialValue();
+				resourceToolMaterialVar.type		   = RESOURCE_TOOL_MATERIAL_VAR_TYPE_MATERIAL;
+				break;
+
+			default:
+				Error( "ResourceCompiler: Unknown material type 0x%X in variable '%s' of '%s'", smatSourceMaterialVar.GetType(), resourceToolMaterialVar.pName, resourceFile.srcPath.c_str() );
+				bMaterialVarsAreVaild = false;
+				break;
+			}
+		}
+
+		if ( !bMaterialVarsAreVaild )
+		{
+			return false;
+		}
+	}
+
+	resourceToolCompileMaterialParams_t compileParams = {};
+	compileParams.pDestPath							  = resourceFile.destPath.c_str();
+	compileParams.pShaderName						  = smatSourceFile.GetShaderName();
+	compileParams.pVars								  = resourceToolMaterialVars.data();
+	compileParams.numVars							  = smatSourceFile.GetNumVars();
+	return pMaterialTool->CompileMaterial( compileParams );
+}
+
+/*
+==================
+CResourceCompilerAppSystemGroup::CompileModel
+==================
+*/
+bool CResourceCompilerAppSystemGroup::CompileModel( const resourceFile_t& resourceFile ) const
+{
+	CSMDLSourceModelDoc smdlSourceFile;
+	if ( !smdlSourceFile.LoadFromFile( resourceFile.srcPath.c_str() ) )
+	{
+		Error( "ResourceCompiler: Failed to load SMDL file '%s'", resourceFile.srcPath.c_str() );
+		return false;
+	}
+
+	// Convert renamed materials for SMDL tool
+	eastl::vector<resourceToolRenamedMaterial_t> resourceToolRenamedMaterials;
+	{
+		const eastl::unordered_map<eastl::string, eastl::string>& renamedMaterialsDict = smdlSourceFile.GetRenamedMaterials();
+		for ( auto it = renamedMaterialsDict.begin(), itEnd = renamedMaterialsDict.end(); it != itEnd; ++it )
+		{
+			resourceToolRenamedMaterials.emplace_back( resourceToolRenamedMaterial_t{ it->first.c_str(), it->second.c_str() } );
+		}
+	}
+
+	// Get path to directory with the source file
+	eastl::string sourceFileDir;
+	{
+		eastl::string tmpBuffer;
+		S_GetFilePath( resourceFile.srcPath, tmpBuffer, false );
+		S_MakeAbsolutePath( tmpBuffer, sourceFileDir, "", false );
+	}
+
+	// Get an absolute source path
+	eastl::string srcPath;
+	S_MakeAbsolutePath( smdlSourceFile.GetSourcePath(), srcPath, sourceFileDir );
+
+	resourceToolCompileModelParams_t compileParams = {};
+	compileParams.bCombineModels				   = smdlSourceFile.IsCombineModels();
+	compileParams.axisUp						   = smdlSourceFile.GetAxisUp();
+	compileParams.pMaterialsDir					   = smdlSourceFile.GetMaterialsDir().c_str();
+	compileParams.pSrcPath						   = srcPath.c_str();
+	compileParams.pDestPath						   = resourceFile.destPath.c_str();
+	compileParams.pRenamedMaterials				   = resourceToolRenamedMaterials.data();
+	compileParams.numRenamedMaterials			   = (uint32)resourceToolRenamedMaterials.size();
+	return pModelTool->CompileModel( compileParams );
+}
+
+/*
+==================
+CResourceCompilerAppSystemGroup::CompileEntityDesc
+==================
+*/
+bool CResourceCompilerAppSystemGroup::CompileEntityDesc( const resourceFile_t& resourceFile ) const
+{
+	CSENTSourceEntityDescDoc sentSourceFile;
+	if ( !sentSourceFile.LoadFromFile( resourceFile.srcPath.c_str() ) )
+	{
+		Error( "ResourceCompiler: Failed to load SENT file '%s'", resourceFile.srcPath.c_str() );
+		return false;
+	}
+
+	// Get entity descriptor components
+	eastl::vector<resourceToolEntityDescVar_t>		 resourceToolEntityDescVars;
+	eastl::vector<resourceToolEntityDescComponent_t> resourceToolEntityDescComponents;
+	resourceToolEntityDescComponents.resize( sentSourceFile.GetNumComponents() );
+	{
+		bool										   bEntityDescComponentsAreVaild	= true;
+		uint32										   resourceToolEntityDescVarsOffset = 0;
+		const eastl::vector<CSENTEntityDescComponent>& sentEntityDescComponents			= sentSourceFile.GetComponents();
+		for ( uint32 componentIdx = 0, numComponents = sentSourceFile.GetNumComponents(); componentIdx < numComponents; ++componentIdx )
+		{
+			const CSENTEntityDescComponent&			 sentEntityDescComponent		 = sentEntityDescComponents[componentIdx];
+			const eastl::vector<CSENTEntityDescVar>& sentEntityDescVars				 = sentEntityDescComponent.GetVars();
+			resourceToolEntityDescComponent_t&		 resourceToolEntityDescComponent = resourceToolEntityDescComponents[componentIdx];
+			resourceToolEntityDescComponent.pType									 = sentEntityDescComponent.GetType();
+
+			// Get entity descriptor vars
+			if ( !sentEntityDescVars.empty() )
+			{
+				resourceToolEntityDescComponent.numVars = sentEntityDescComponent.GetNumVars();
+				resourceToolEntityDescVars.resize( resourceToolEntityDescVarsOffset + resourceToolEntityDescComponent.numVars );
+				resourceToolEntityDescComponent.pVars = resourceToolEntityDescVars.data() + resourceToolEntityDescVarsOffset;
+
+				for ( uint32 varIdx = 0, numVars = sentEntityDescComponent.GetNumVars(); varIdx < numVars; ++varIdx )
+				{
+					const CSENTEntityDescVar&	 sentEntityDescVar		   = sentEntityDescVars[varIdx];
+					resourceToolEntityDescVar_t& resourceToolEntityDescVar = resourceToolEntityDescVars[resourceToolEntityDescVarsOffset + varIdx];
+					resourceToolEntityDescVar.pName						   = sentEntityDescVar.GetName();
+					switch ( sentEntityDescVar.GetType() )
+					{
+					case SENT_ENTITY_DESC_VAR_TYPE_UNDEFINED:
+						resourceToolEntityDescVar.type = RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_UNDEFINED;
+						break;
+
+					case SENT_ENTITY_DESC_VAR_TYPE_BOOL:
+						resourceToolEntityDescVar.boolValue = sentEntityDescVar.GetBoolValue();
+						resourceToolEntityDescVar.type		= RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_BOOL;
+						break;
+
+					case SENT_ENTITY_DESC_VAR_TYPE_INT:
+						resourceToolEntityDescVar.intValue = sentEntityDescVar.GetIntValue();
+						resourceToolEntityDescVar.type	   = RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_INT;
+						break;
+
+					case SENT_ENTITY_DESC_VAR_TYPE_FLOAT:
+						resourceToolEntityDescVar.floatValue = sentEntityDescVar.GetFloatValue();
+						resourceToolEntityDescVar.type		 = RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_FLOAT;
+						break;
+
+					case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_2D:
+						resourceToolEntityDescVar.vector2DValue = sentEntityDescVar.GetVec2Value();
+						resourceToolEntityDescVar.type			= RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_VECTOR_2D;
+						break;
+
+					case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_3D:
+						resourceToolEntityDescVar.vector3DValue = sentEntityDescVar.GetVec3Value();
+						resourceToolEntityDescVar.type			= RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_VECTOR_3D;
+						break;
+
+					case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_4D:
+						resourceToolEntityDescVar.vector4DValue = sentEntityDescVar.GetVec4Value();
+						resourceToolEntityDescVar.type			= RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_VECTOR_4D;
+						break;
+
+					case SENT_ENTITY_DESC_VAR_TYPE_MATRIX:
+						resourceToolEntityDescVar.matrixValue = sentEntityDescVar.GetMatrixValue();
+						resourceToolEntityDescVar.type		  = RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_MATRIX;
+						break;
+
+					case SENT_ENTITY_DESC_VAR_TYPE_STRING:
+						resourceToolEntityDescVar.pStringValue = sentEntityDescVar.GetStringValue();
+						resourceToolEntityDescVar.type		   = RESOURCE_TOOL_ENTITY_DESC_VAR_TYPE_STRING;
+						break;
+
+					default:
+						Error( "ResourceCompiler: Unknown entity descriptor type 0x%X in variable '%s' of '%s'", sentEntityDescVar.GetType(), resourceToolEntityDescVar.pName, resourceFile.srcPath.c_str() );
+						bEntityDescComponentsAreVaild = false;
+						break;
+					}
+				}
+				resourceToolEntityDescVarsOffset += resourceToolEntityDescComponent.numVars;
+			}
+		}
+
+		if ( !bEntityDescComponentsAreVaild )
+		{
+			return false;
+		}
+	}
+
+	resourceToolCompileEntityDescParams_t compileParams = {};
+	compileParams.pDestPath								= resourceFile.destPath.c_str();
+	compileParams.pComponents							= resourceToolEntityDescComponents.data();
+	compileParams.numComponents							= (uint32)resourceToolEntityDescComponents.size();
+	return pEntityDescTool->CompileEntityDesc( compileParams );
+}
+
+/*
+==================
+CResourceCompilerAppSystemGroup::CompileMap
+==================
+*/
+bool CResourceCompilerAppSystemGroup::CompileMap( const resourceFile_t& resourceFile ) const
+{
+	CSMAPSourceMapDoc smapSourceFile;
+	if ( !smapSourceFile.LoadFromFile( resourceFile.srcPath.c_str() ) )
+	{
+		Error( "ResourceCompiler: Failed to load SMAP file '%s'", resourceFile.srcPath.c_str() );
+		return false;
+	}
+
+	// Get entities
+	eastl::vector<resourceToolMapEntity_t> entities;
+	entities.resize( smapSourceFile.GetNumEntities() );
+	{
+		const eastl::vector<CSMAPEntity>& smapEntities = smapSourceFile.GetEntities();
+		for ( uint32 entityIdx = 0, numEntities = (uint32)smapEntities.size(); entityIdx < numEntities; ++entityIdx )
+		{
+			const CSMAPEntity&		 smapEntity			   = smapEntities[entityIdx];
+			resourceToolMapEntity_t& resourceToolMapEntity = entities[entityIdx];
+			resourceToolMapEntity.pClassName			   = smapEntity.GetClassName();
+			resourceToolMapEntity.pName					   = smapEntity.GetName();
+		}
+	}
+
+	resourceToolCompileMapParams_t compileParams = {};
+	compileParams.pDestPath						 = resourceFile.destPath.c_str();
+	compileParams.pEntities						 = entities.data();
+	compileParams.numEntities					 = (uint32)entities.size();
+	return pMapTool->CompileMap( compileParams );
 }
 
 /*

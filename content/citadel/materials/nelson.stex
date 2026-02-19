@@ -3,5 +3,4 @@ source 				"nelson.jpg"
 filter 				anisotropic
 generate_mipmaps 	1
 format 				bc1
-output_dir 			"//BASE_PATH/citadel/materials/"
 max_anisotropy 		16

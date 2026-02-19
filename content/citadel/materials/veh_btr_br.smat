@@ -1,6 +1,4 @@
-output_dir 	"//BASE_PATH/citadel/materials/"
-shader 		unlitgeneric
-parameters
+unlitgeneric
 {
-	baseTexture		texture:"materials/veh_btr_br"
+	baseTexture texture:"materials/veh_btr_br"
 }

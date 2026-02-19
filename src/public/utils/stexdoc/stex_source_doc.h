@@ -29,7 +29,6 @@ public:
 	void SetFilter( studioAPISamplerFilter_t filter );
 	void SetPixelFormat( studioAPIPixelFormat_t pixelFormat );
 	void SetMaxAnisotropy( uint32 maxAnisotropy );
-	void SetOutputDir( const char* pOutputDir );
 
 	bool								IsNeedGenerateMipMaps() const;
 	studioAPISamplerAddressMode_t		GetAddressModeU() const;
@@ -42,7 +41,6 @@ public:
 	const char*							GetSourcePath( uint32 sourcePathIdx );
 	const eastl::vector<eastl::string>& GetSourcePaths() const;
 	uint32								GetMaxAnisotropy() const;
-	const char*							GetOutputDir() const;
 
 private:
 	// Is valid source paths number for a texture type
@@ -56,7 +54,6 @@ private:
 	studioAPISamplerFilter_t	  filter;
 	studioAPIPixelFormat_t		  pixelFormat;
 	uint32						  maxAnisotropy;
-	eastl::string				  outputDir;
 	eastl::vector<eastl::string>  sourcePaths;
 	static studioAPIPixelFormat_t defaultPixelFormat;
 };

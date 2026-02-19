@@ -17,16 +17,13 @@ public:
 	bool SaveFile( const char* pPath );
 	void Clear();
 
-	void SetOutputDir( const char* pOutputDir );
 	void AddComponent( const CSENTEntityDescComponent& component );
 	void RemoveComponent( uint32 index );
 
-	const char*									   GetOutputDir() const;
 	uint32										   GetNumComponents() const;
 	const eastl::vector<CSENTEntityDescComponent>& GetComponents() const;
 
 private:
-	eastl::string							outputDir;
 	eastl::vector<CSENTEntityDescComponent> components;
 };
 
