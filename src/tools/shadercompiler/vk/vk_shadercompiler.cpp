@@ -3,11 +3,12 @@
 #include "spirv-tools/optimizer.hpp"
 
 #include "utils/interfaces/interfaces.h"
+#include "tier0/assert.h"
+#include "tier0/ilogger.h"
 #include "tier1/tier1.h"
 #include "tier1/strtools.h"
 #include "tier1/filetools.h"
 #include "tier1/streamdata_memory.h"
-#include "tier0/debug.h"
 #include "filesystem/ifilesystem.h"
 #include "utils/shadercache/shaderreflection.h"
 #include "tools/shadercompiler/ishadercompiler_backend.h"

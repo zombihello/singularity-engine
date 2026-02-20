@@ -1,6 +1,9 @@
 #pragma once
 #include "tier0/tier0_api.h"
+#include "tier0/defines.h"
 #include "tier0/types.h"
+#include "tier0/assert.h"
+#include "tier0/ilogger.h"
 #include "tier0/memory.h"
 
 //-----------------------------------------------------------------------------

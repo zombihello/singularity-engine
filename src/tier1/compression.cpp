@@ -1,7 +1,6 @@
 #include "pch_tier1.h"
 #include <zlib.h>
 
-#include "tier0/debug.h"
 #include "tier1/compression.h"
 
 #define UNCOMPRESS_CHUNK_SIZE 131072

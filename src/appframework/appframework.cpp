@@ -5,7 +5,7 @@
 #include "filesystem/ifilesystem.h"
 
 #if ENABLE_LOGGING
-	#include "tier0/debug.h"
+	#include "tier0/ilogger.h"
 	#include "tier0/crashdump.h"
 	#include "tier0/icommandline.h"
 

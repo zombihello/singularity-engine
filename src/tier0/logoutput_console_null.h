@@ -1,5 +1,5 @@
 #pragma once
-#include "tier0/debug.h"
+#include "tier0/ilogger.h"
 
 // A Null log output to a console
 class CNullLogOutputConsole : public ILogOutputConsole

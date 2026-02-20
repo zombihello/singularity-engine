@@ -21,23 +21,8 @@
 //-----------------------------------------------------------------------------
 // Platform specific defines
 //-----------------------------------------------------------------------------
-#define PLATFORM_WINDOWS 1
-
-#if RETAIL
-	#define Sys_IsDebuggerPresent() false
-	#define Sys_DebugBreak()
-	#define Sys_DebugMessage( Msg )
-#else
-	// Macro for checking the presence of a debugger
-	#define Sys_IsDebuggerPresent() IsDebuggerPresent()
-
-	// Macro for for triggering breakpoint
-	#define Sys_DebugBreak()		( Sys_IsDebuggerPresent() ? ( DebugBreak(), 1 ) : 1 )
-
-	// Macro for print message to debugger
-	#define Sys_DebugMessage( Msg ) OutputDebugStringA( Msg )
-#endif	// RETAIL
-
+#define PLATFORM_WINDOWS	   1
+#define DEBUG_BREAK()		   ( __nop(), __debugbreak() )
 #define DLL_EXT_STRING		   ".dll"
 #define EXE_EXT_STRING		   ".exe"
 #define VARARGS				   __cdecl

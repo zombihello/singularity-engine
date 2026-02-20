@@ -1,6 +1,6 @@
 #pragma once
 #include "tier1/math/math.h"
-#include "tier0/debug.h"
+#include "tier0/assert.h"
 
 //-----------------------------------------------------------------------------
 // Class for work with transform

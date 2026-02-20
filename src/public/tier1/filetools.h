@@ -4,6 +4,7 @@
 
 #include "tier0/defines.h"
 #include "tier0/types.h"
+#include "tier0/ilogger.h"
 #include "tier1/strtools.h"
 #include "filesystem/ifilesystem.h"
 #include "utils/interfaces/interfaces.h"

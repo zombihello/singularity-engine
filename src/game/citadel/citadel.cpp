@@ -85,7 +85,7 @@ void CCitadelGame::Disconnect()
 	g_pStudioAPI = NULL;
 	CGame::Disconnect();
 }
-
+#include "tier0/debug.h"
 /*
 ==================
 CCitadelGame::Init

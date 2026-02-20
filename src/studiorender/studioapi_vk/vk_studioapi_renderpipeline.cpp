@@ -1,5 +1,4 @@
 #include "pch_studioapi_vk.h"
-#include "tier0/debug.h"
 #include "tier1/math/math.h"
 #include "studiorender/studioapi_vk/vk_studioapi_renderpipeline.h"
 #include "studiorender/studioapi_vk/vk_studioapi_shader.h"
@@ -295,9 +294,9 @@ CStudioAPIRenderPipelineVk::CStudioAPIRenderPipelineVk( const studioAPIRenderPip
 
 	// Create a render pipeline
 	// Save fields
-	pBoundShaderState												= (CStudioAPIBoundShaderStateVk*)createInfo.pBoundShaderState;
-	CStudioAPIRenderPassVk*						 pRenderPass		= (CStudioAPIRenderPassVk*)createInfo.pRenderPass;
-	CStudioAPIVertexDeclarationVk*				 pVertexDeclaration = (CStudioAPIVertexDeclarationVk*)pBoundShaderState->GetVertexDeclaration();
+	pBoundShaderState												  = (CStudioAPIBoundShaderStateVk*)createInfo.pBoundShaderState;
+	CStudioAPIRenderPassVk*						   pRenderPass		  = (CStudioAPIRenderPassVk*)createInfo.pRenderPass;
+	CStudioAPIVertexDeclarationVk*				   pVertexDeclaration = (CStudioAPIVertexDeclarationVk*)pBoundShaderState->GetVertexDeclaration();
 	eastl::vector<VkPipelineShaderStageCreateInfo> vkPipelineShaderStageCreateInfos;
 
 	if ( pBoundShaderState->GetVertexShader() )
@@ -364,9 +363,8 @@ CStudioAPIRenderPipelineVk::~CStudioAPIRenderPipelineVk()
 	// Destroy the Vulkan pipeline
 	if ( vkPipeline != VK_NULL_HANDLE )
 	{
-		g_StudioAPIVk.GetMemoryMgr().FreeResource( [vkPipeline = vkPipeline]() {
-			vkDestroyPipeline( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), vkPipeline, NULL );
-		} );
+		g_StudioAPIVk.GetMemoryMgr().FreeResource( [vkPipeline = vkPipeline]()
+												   { vkDestroyPipeline( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), vkPipeline, NULL ); } );
 		vkPipeline = VK_NULL_HANDLE;
 	}
 

@@ -1,5 +1,4 @@
 #include "pch_tier0.h"
-#include "tier0/debug.h"
 #include "tier0/icommandline.h"
 
 class CCommandLine : public ICommandLine

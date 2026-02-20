@@ -1,6 +1,5 @@
 #pragma once
 #include "tier0/tier0.h"
-#include "tier0/debug.h"
 
 //-----------------------------------------------------------------------------
 // The list of enumerated thread priorities we support

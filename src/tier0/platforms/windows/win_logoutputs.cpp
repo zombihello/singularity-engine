@@ -1,4 +1,5 @@
 #include "pch_tier0.h"
+#include "tier0/debug.h"
 #include "tier0/logoutput_console_null.h"
 
 #if ENABLE_LOGGING
@@ -35,7 +36,8 @@ public:
 	~CWindowsLogOutputConsole();
 
 private:
-	HANDLE consoleHandle;
+	static BOOL WINAPI ConsoleCtrlHandler( DWORD ctrlType );
+	HANDLE			   handle;
 };
 
 /*
@@ -45,7 +47,7 @@ CWindowsLogOutputDebug::Print
 */
 void CWindowsLogOutputDebug::Print( logLevel_t level, const char* pMessage )
 {
-	if ( Sys_IsDebuggerPresent() )
+	if ( Sys_IsDebuggerAttached() )
 	{
 		Sys_DebugMessage( pMessage );
 	}
@@ -57,7 +59,7 @@ CWindowsLogOutputConsole::CWindowsLogOutputConsole
 ==================
 */
 CWindowsLogOutputConsole::CWindowsLogOutputConsole()
-	: consoleHandle( NULL )
+	: handle( NULL )
 {
 }
 
@@ -78,20 +80,22 @@ CWindowsLogOutputConsole::Show
 */
 void CWindowsLogOutputConsole::Show( bool bShowConsole )
 {
-	if ( bShowConsole && !consoleHandle )
+	if ( bShowConsole && !handle )
 	{
 		AllocConsole();
-		consoleHandle = GetStdHandle( STD_OUTPUT_HANDLE );
+		SetConsoleCtrlHandler( ConsoleCtrlHandler, TRUE );
+		handle = GetStdHandle( STD_OUTPUT_HANDLE );
 
 		freopen( "conin$", "r", stdin );
 		freopen( "conout$", "w", stdout );
 		freopen( "conout$", "w", stderr );
 		SetTextColor( textColor );
 	}
-	else if ( !bShowConsole && consoleHandle )
+	else if ( !bShowConsole && handle )
 	{
-		consoleHandle = NULL;
+		SetConsoleCtrlHandler( NULL, TRUE );
 		FreeConsole();
+		handle = NULL;
 	}
 }
 
@@ -102,7 +106,7 @@ CWindowsLogOutputConsole::IsShown
 */
 bool CWindowsLogOutputConsole::IsShown() const
 {
-	return !!consoleHandle;
+	return !!handle;
 }
 
 /*
@@ -112,9 +116,9 @@ CWindowsLogOutputConsole::SetTextColor
 */
 void CWindowsLogOutputConsole::SetTextColor( logTextColor_t textColor )
 {
-	if ( consoleHandle && CWindowsLogOutputConsole::textColor != textColor )
+	if ( handle && CWindowsLogOutputConsole::textColor != textColor )
 	{
-		SetConsoleTextAttribute( consoleHandle, s_LogTextColorsWin32[(uint32)textColor] );
+		SetConsoleTextAttribute( handle, s_LogTextColorsWin32[(uint32)textColor] );
 	}
 	CBaseLogOutput<ILogOutputConsole>::SetTextColor( textColor );
 }
@@ -126,8 +130,9 @@ CWindowsLogOutputConsole::Print
 */
 void CWindowsLogOutputConsole::Print( logLevel_t level, const char* pMessage )
 {
-	if ( consoleHandle )
+	if ( handle )
 	{
+		// Change a text color if it need
 		logTextColor_t originalTextColor = textColor;
 		bool		   bNeedResetColor	 = true;
 		switch ( level )
@@ -137,11 +142,38 @@ void CWindowsLogOutputConsole::Print( logLevel_t level, const char* pMessage )
 		default: bNeedResetColor = false; break;
 		}
 
-		printf( pMessage );
+		// Write message into the console
+		eastl::wstring wideMessage	= UTF8_TO_WCHAR( pMessage );
+		DWORD		   charsWritten = 0;
+		bool		   bResult		= WriteConsoleW( handle, wideMessage.c_str(), (DWORD)wideMessage.size(), &charsWritten, NULL );
+		Assert( bResult );
+		Ensure( wideMessage.size() == charsWritten );
+
+		// Reset the text color
 		if ( bNeedResetColor )
 		{
 			SetTextColor( originalTextColor );
 		}
+	}
+}
+
+/*
+==================
+CWindowsLogOutputConsole::ConsoleCtrlHandler
+==================
+*/
+BOOL WINAPI CWindowsLogOutputConsole::ConsoleCtrlHandler( DWORD ctrlType )
+{
+	switch ( ctrlType )
+	{
+	// BS yehor.pohuliaka - Event CTRL_CLOSE_EVENT need to dodge memory corruption.
+	// I don't what cause it but time to time without the handle we crash on some memory issues
+	case CTRL_CLOSE_EVENT:
+		Sys_RequestExit( false );
+		return TRUE;
+
+	default:
+		return FALSE;
 	}
 }
 

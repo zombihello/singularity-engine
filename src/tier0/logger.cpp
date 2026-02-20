@@ -1,5 +1,5 @@
 #include "pch_tier0.h"
-#include "tier0/crashdump_internal.h"
+#include "tier0/ilogger.h"
 
 #if ENABLE_LOGGING
 class CLogger : public ILogger
@@ -22,8 +22,8 @@ public:
 
 private:
 	eastl::vector<ILogOutput*> outputs;
-	bool					 bActiveGroups[LOG_NUM_GROUPS];
-	logTextColor_t			 textColor;
+	bool					   bActiveGroups[LOG_NUM_GROUPS];
+	logTextColor_t			   textColor;
 };
 
 static const char* s_pLogLevelNames[] = {
@@ -160,84 +160,6 @@ logTextColor_t CLogger::GetTextColor() const
 {
 	return textColor;
 }
-
-/*
-==================
-Msg
-==================
-*/
-void Msg( const char* pFormat, ... )
-{
-	va_list params;
-	va_start( params, pFormat );
-	Logger()->VPrintf( LOG_GROUP_GENERAL, LOG_LEVEL_MESSAGE, pFormat, params );
-	va_end( params );
-}
-
-/*
-==================
-Warning
-==================
-*/
-void Warning( const char* pFormat, ... )
-{
-	va_list params;
-	va_start( params, pFormat );
-	Logger()->VPrintf( LOG_GROUP_GENERAL, LOG_LEVEL_WARNING, pFormat, params );
-	va_end( params );
-}
-
-/*
-==================
-Error
-==================
-*/
-void Error( const char* pFormat, ... )
-{
-	va_list params;
-	va_start( params, pFormat );
-	Logger()->VPrintf( LOG_GROUP_GENERAL, LOG_LEVEL_ERROR, pFormat, params );
-	va_end( params );
-}
-
-/*
-==================
-DevMsg
-==================
-*/
-void DevMsg( const char* pFormat, ... )
-{
-	va_list params;
-	va_start( params, pFormat );
-	Logger()->VPrintf( LOG_GROUP_DEVELOPER, LOG_LEVEL_MESSAGE, pFormat, params );
-	va_end( params );
-}
-
-/*
-==================
-DevWarning
-==================
-*/
-void DevWarning( const char* pFormat, ... )
-{
-	va_list params;
-	va_start( params, pFormat );
-	Logger()->VPrintf( LOG_GROUP_DEVELOPER, LOG_LEVEL_WARNING, pFormat, params );
-	va_end( params );
-}
-
-/*
-==================
-DevError
-==================
-*/
-void DevError( const char* pFormat, ... )
-{
-	va_list params;
-	va_start( params, pFormat );
-	Logger()->VPrintf( LOG_GROUP_DEVELOPER, LOG_LEVEL_ERROR, pFormat, params );
-	va_end( params );
-}
 #else
 class CNullLogger : public ILogger
 {
@@ -272,98 +194,3 @@ ILogger* Logger()
 	return &s_NullLogger;
 #endif	// ENABLE_LOGGING
 }
-
-#if ENABLE_ASSERT
-/*
-==================
-Sys_AssertFailed
-==================
-*/
-bool Sys_AssertFailed( const char* pExpr, const char* pFile, int32 line, const char* pFormat /*= "" */, ... )
-{
-	// Don't show message if we already shutdown the game by a critical error
-	static bool s_bAlreadyHasError = false;
-	if ( s_bAlreadyHasError )
-	{
-		return false;
-	}
-	s_bAlreadyHasError = true;
-
-	// Get the message
-	va_list params;
-	va_start( params, pFormat );
-	eastl::string message = S_Strlen( pFormat ) > 0 ? S_Vsprintf( pFormat, params ) : "<None>";
-	va_end( params );
-
-	// Print the message and show message box
-	Error( "------------ ASSERTION FAILED --------------" );
-	Error( "Expression: %s", pExpr );
-	Error( "Message: %s", message.c_str() );
-	Error( "" );
-	Error( "File: %s", pFile );
-	Error( "Line: %i", line );
-	Error( "--------------------------------------------" );
-
-	if ( Sys_IsDebuggerPresent() )
-	{
-		Sys_DebugBreak();
-	}
-	eastl::string fullMessage = S_Sprintf( "Expression: %s\nMessage: %s\n\nFile: %s\nLine: %i", pExpr, message.c_str(), pFile, line );
-	Sys_ShowMessageBox( "Singularity Error", fullMessage.c_str(), MESSAGE_BOX_ERROR );
-
-	// Set crash dump message
-	CrashDump_SetMessage( fullMessage.c_str() );
-
-	// Shutdown application
-	Sys_RequestExit( true );
-	return true;
-}
-#endif	// ENABLE_ASSERT
-
-#if ENABLE_ENSURE
-static bool s_bEnsureAllowed = true;
-
-/*
-==================
-Sys_EnsureFailed
-==================
-*/
-bool Sys_EnsureFailed( const char* pExpr, const char* pFile, int32 line, bool bAlways, const char* pFormat /*= ""*/, ... )
-{
-	if ( bAlways || s_bEnsureAllowed )
-	{
-		// Get the final message
-		va_list params;
-		va_start( params, pFormat );
-		eastl::string message = S_Strlen( pFormat ) > 0 ? S_Vsprintf( pFormat, params ) : "<None>";
-		va_end( params );
-
-		// Print the message
-		Error( "------------ ENSURE FAILED --------------" );
-		Error( "Expression: %s", pExpr );
-		Error( "Message: %s", message.c_str() );
-		Error( "" );
-		Error( "File: %s", pFile );
-		Error( "Line: %i", line );
-		Error( "--------------------------------------------" );
-
-		if ( Sys_IsDebuggerPresent() )
-		{
-			Sys_DebugBreak();
-		}
-		return true;
-	}
-
-	return false;
-}
-
-/*
-==================
-Sys_SetEnsureAllow
-==================
-*/
-void Sys_SetEnsureAllow( bool bAllowed )
-{
-	s_bEnsureAllowed = bAllowed;
-}
-#endif	// ENABLE_ENSURE

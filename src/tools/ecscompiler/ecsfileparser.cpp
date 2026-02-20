@@ -1,6 +1,7 @@
 #include "utils/parserlib/tokenstream.h"
 #include "utils/parserlib/tokeneater.h"
 #include "utils/parserlib/lexerlistener.h"
+#include "tier0/ilogger.h"
 #include "tools/ecscompiler/ecsfileparser.h"
 
 // Entry function to call lexer to tokenize source code

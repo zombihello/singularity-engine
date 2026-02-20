@@ -1,4 +1,5 @@
 #include "tier0/profile.h"
+#include "tier0/ilogger.h"
 #include "tools/ecscompiler/ecscppgenerator.h"
 
 // Table for convert ecsSystemStage_t to text
@@ -180,8 +181,8 @@ CEcsCppGenerator::GenerateComponents
 */
 void CEcsCppGenerator::GenerateStructs( const eastl::vector<TRefPtr<CEcsStubDataType>>& ecsStubDataTypes, ecsStructType_t structsType )
 {
-	const char* pCppComment	   = NULL;
-	const char* pStructPrefix	   = NULL;
+	const char* pCppComment		  = NULL;
+	const char* pStructPrefix	  = NULL;
 	const char* pStructCapsPrefix = NULL;
 	switch ( structsType )
 	{
@@ -206,12 +207,12 @@ void CEcsCppGenerator::GenerateStructs( const eastl::vector<TRefPtr<CEcsStubData
 		buffer += S_Sprintf( "\n// BEGIN ECS %s\n", pCppComment );
 		for ( uint32 dataTypeIdx = 0, numDataTypes = (uint32)ecsStubDataTypes.size(); dataTypeIdx < numDataTypes; ++dataTypeIdx )
 		{
-			CEcsStubDataType*									   pEcsStubDataType				= ecsStubDataTypes[dataTypeIdx];
-			const eastl::vector<TRefPtr<CEcsStubDefaultFieldValue>>& ecsStubDefaultFieldValues	= pEcsStubDataType->GetDefaultFieldValues();
-			const eastl::vector<TRefPtr<CEcsStubField>>&			   ecsStubFields				= pEcsStubDataType->GetFields();
-			CEcsStubMetadata*									   pEcsStubDataTypeMetadata		= pEcsStubDataType->GetMetadata();
-			CEcsStubMetadataValue*								   pEcsStubDataTypeNameMetadata = pEcsStubDataTypeMetadata ? pEcsStubDataTypeMetadata->GetValue( ECS_METADATA_TYPE_NAME ) : NULL;
-			eastl::string											   ecsDataTypeName				= pEcsStubDataTypeNameMetadata && pEcsStubDataTypeNameMetadata->HasValue() ? pEcsStubDataTypeNameMetadata->GetValue() : pEcsStubDataType->GetName();
+			CEcsStubDataType*										 pEcsStubDataType			  = ecsStubDataTypes[dataTypeIdx];
+			const eastl::vector<TRefPtr<CEcsStubDefaultFieldValue>>& ecsStubDefaultFieldValues	  = pEcsStubDataType->GetDefaultFieldValues();
+			const eastl::vector<TRefPtr<CEcsStubField>>&			 ecsStubFields				  = pEcsStubDataType->GetFields();
+			CEcsStubMetadata*										 pEcsStubDataTypeMetadata	  = pEcsStubDataType->GetMetadata();
+			CEcsStubMetadataValue*									 pEcsStubDataTypeNameMetadata = pEcsStubDataTypeMetadata ? pEcsStubDataTypeMetadata->GetValue( ECS_METADATA_TYPE_NAME ) : NULL;
+			eastl::string											 ecsDataTypeName			  = pEcsStubDataTypeNameMetadata && pEcsStubDataTypeNameMetadata->HasValue() ? pEcsStubDataTypeNameMetadata->GetValue() : pEcsStubDataType->GetName();
 			buffer += S_Sprintf( "struct ecs%s%s_t\n{\n"
 								 "\tECS_%s_BODY( \"%s\" )",
 								 pStructPrefix, pEcsStubDataType->GetName(),
@@ -271,7 +272,7 @@ void CEcsCppGenerator::GenerateSystems( const eastl::vector<TRefPtr<CEcsStubSyst
 			CEcsStubSystem*		   pEcsStubSystem			  = ecsStubSystems[systemIdx];
 			CEcsStubMetadata*	   pEcsStubSystemMetadata	  = pEcsStubSystem->GetMetadata();
 			CEcsStubMetadataValue* pEcsStubSystemNameMetadata = pEcsStubSystemMetadata ? pEcsStubSystemMetadata->GetValue( ECS_METADATA_TYPE_NAME ) : NULL;
-			eastl::string			   ecsSystemName			  = pEcsStubSystemNameMetadata && pEcsStubSystemNameMetadata->HasValue() ? pEcsStubSystemNameMetadata->GetValue() : pEcsStubSystem->GetName();
+			eastl::string		   ecsSystemName			  = pEcsStubSystemNameMetadata && pEcsStubSystemNameMetadata->HasValue() ? pEcsStubSystemNameMetadata->GetValue() : pEcsStubSystem->GetName();
 
 			eastl::string updateParams;
 			for ( uint32 fieldAccessType = 0; fieldAccessType < ECS_FIELD_NUM_ACCESS_TYPES; ++fieldAccessType )
@@ -349,10 +350,10 @@ CEcsCppGenerator::GenerateRegistrarConstructor
 */
 eastl::string CEcsCppGenerator::GenerateRegistrarConstructor( CEcsStubModule* pEcsStubModule )
 {
-	eastl::string									  result;
+	eastl::string									result;
 	const eastl::vector<TRefPtr<CEcsStubDataType>>& ecsStubComponents = pEcsStubModule->GetComponents();
-	const eastl::vector<TRefPtr<CEcsStubDataType>>& ecsStubResources	= pEcsStubModule->GetResources();
-	const eastl::vector<TRefPtr<CEcsStubSystem>>&	  ecsStubSystems	= pEcsStubModule->GetSystems();
+	const eastl::vector<TRefPtr<CEcsStubDataType>>& ecsStubResources  = pEcsStubModule->GetResources();
+	const eastl::vector<TRefPtr<CEcsStubSystem>>&	ecsStubSystems	  = pEcsStubModule->GetSystems();
 
 	// Write the constructor header
 	result += S_Sprintf( "\tecsModule%s_t( flecs::world& flecsWorld )\n"
@@ -388,11 +389,11 @@ eastl::string CEcsCppGenerator::GenerateRegistrarConstructor( CEcsStubModule* pE
 		for ( uint32 systemIdx = 0, numSystems = (uint32)ecsStubSystems.size(); systemIdx < numSystems; ++systemIdx )
 		{
 			CEcsStubSystem* pEcsStubSystem = ecsStubSystems[systemIdx];
-			eastl::string		templateParams;
-			eastl::string		readWriteFuncs;
-			eastl::string		filterFuncs;
-			eastl::string		updateParams;
-			eastl::string		callUpdateParams;
+			eastl::string	templateParams;
+			eastl::string	readWriteFuncs;
+			eastl::string	filterFuncs;
+			eastl::string	updateParams;
+			eastl::string	callUpdateParams;
 
 			// Write template params and Flecs read/write functions
 			for ( uint32 fieldAccessType = 0, globalFieldIdx = 0; fieldAccessType < ECS_FIELD_NUM_ACCESS_TYPES; ++fieldAccessType )
@@ -517,7 +518,7 @@ eastl::string CEcsCppGenerator::GenerateRegistrarConstructor( CEcsStubModule* pE
 			// Register the system
 			CEcsStubMetadata*	   pEcsStubSystemMetadata			   = pEcsStubSystem->GetMetadata();
 			CEcsStubMetadataValue* pEcsStubSystemMetadataProfilerGroup = pEcsStubSystemMetadata ? pEcsStubSystemMetadata->GetValue( ECS_METADATA_TYPE_PROFILER_GROUP ) : NULL;
-			const char*		   pProfilerScopeGroupName			   = NULL;
+			const char*			   pProfilerScopeGroupName			   = NULL;
 			if ( pEcsStubSystemMetadataProfilerGroup && S_Strlen( pEcsStubSystemMetadataProfilerGroup->GetValue() ) > 0 && !ConvTextToProfilerScopeGroup( pEcsStubSystemMetadataProfilerGroup->GetValue(), pProfilerScopeGroupName ) )
 			{
 				Error( "%s: Unknown profiler group '%s'", pEcsStubSystemMetadataProfilerGroup->GetValueContext().ToString().c_str(), pEcsStubSystemMetadataProfilerGroup->GetValue() );
@@ -525,7 +526,7 @@ eastl::string CEcsCppGenerator::GenerateRegistrarConstructor( CEcsStubModule* pE
 			}
 
 			CEcsStubMetadataValue* pEcsStubSystemMetadataStage = pEcsStubSystemMetadata ? pEcsStubSystemMetadata->GetValue( ECS_METADATA_TYPE_STAGE ) : NULL;
-			const char*		   pSystemStageName			   = s_pEcsSystemStageNames[ECS_SYSTEM_STAGE_ONUPDATE].second;
+			const char*			   pSystemStageName			   = s_pEcsSystemStageNames[ECS_SYSTEM_STAGE_ONUPDATE].second;
 			if ( pEcsStubSystemMetadataStage && S_Strlen( pEcsStubSystemMetadataStage->GetValue() ) > 0 && !ConvTextToSystemStage( pEcsStubSystemMetadataStage->GetValue(), pSystemStageName ) )
 			{
 				Error( "%s: Unknown system stage '%s'", pEcsStubSystemMetadataStage->GetValueContext().ToString().c_str(), pEcsStubSystemMetadataStage->GetValue() );
@@ -572,10 +573,10 @@ CEcsCppGenerator::GenerateRegistrarDestructor
 */
 eastl::string CEcsCppGenerator::GenerateRegistrarDestructor( CEcsStubModule* pEcsStubModule )
 {
-	eastl::string									  result;
+	eastl::string									result;
 	const eastl::vector<TRefPtr<CEcsStubDataType>>& ecsStubComponents = pEcsStubModule->GetComponents();
-	const eastl::vector<TRefPtr<CEcsStubDataType>>& ecsStubResources	= pEcsStubModule->GetResources();
-	const eastl::vector<TRefPtr<CEcsStubSystem>>&	  ecsStubSystems	= pEcsStubModule->GetSystems();
+	const eastl::vector<TRefPtr<CEcsStubDataType>>& ecsStubResources  = pEcsStubModule->GetResources();
+	const eastl::vector<TRefPtr<CEcsStubSystem>>&	ecsStubSystems	  = pEcsStubModule->GetSystems();
 
 	// Write the destructor header
 	result += S_Sprintf( "\t~ecsModule%s_t()\n"
@@ -597,9 +598,9 @@ void CEcsCppGenerator::GenerateImplementationEcsReadDataFuncs( CEcsStubModule* p
 	const eastl::vector<TRefPtr<CEcsStubDataType>>& ecsStubComponents = pEcsStubModule->GetComponents();
 	for ( uint32 componentIdx = 0, numComponents = (uint32)ecsStubComponents.size(); componentIdx < numComponents; ++componentIdx )
 	{
-		eastl::string								   sentReadDataFields;
-		CEcsStubDataType*						   pEcsStubComponent = ecsStubComponents[componentIdx];
-		const eastl::vector<TRefPtr<CEcsStubField>>& ecsStubFields	 = pEcsStubComponent->GetFields();
+		eastl::string								 sentReadDataFields;
+		CEcsStubDataType*							 pEcsStubComponent = ecsStubComponents[componentIdx];
+		const eastl::vector<TRefPtr<CEcsStubField>>& ecsStubFields	   = pEcsStubComponent->GetFields();
 		for ( uint32 varIdx = 0, numVars = (uint32)ecsStubFields.size(); varIdx < numVars; ++varIdx )
 		{
 			CEcsStubField*	  pEcsStubField			= ecsStubFields[varIdx];
@@ -608,7 +609,7 @@ void CEcsCppGenerator::GenerateImplementationEcsReadDataFuncs( CEcsStubModule* p
 			{
 				CEcsStubDefaultFieldValue* pEcsStubDefaultFieldValue = pEcsStubComponent->FindDefaultFieldValue( pEcsStubField->GetName() );
 				CEcsStubMetadataValue*	   pEcsStubFieldNameMetadata = pEcsStubFieldMetadata->GetValue( ECS_METADATA_TYPE_NAME );
-				eastl::string				   fieldName				 = pEcsStubFieldNameMetadata && pEcsStubFieldNameMetadata->HasValue() ? pEcsStubFieldNameMetadata->GetValue() : "";
+				eastl::string			   fieldName				 = pEcsStubFieldNameMetadata && pEcsStubFieldNameMetadata->HasValue() ? pEcsStubFieldNameMetadata->GetValue() : "";
 				if ( fieldName.empty() )
 				{
 					fieldName = pEcsStubField->GetName();
@@ -663,9 +664,9 @@ void CEcsCppGenerator::GenerateImplementationEcsFactories( CEcsStubModule* pEcsS
 	const eastl::vector<TRefPtr<CEcsStubDataType>>& ecsStubComponents = pEcsStubModule->GetComponents();
 	for ( uint32 componentIdx = 0, numComponents = (uint32)ecsStubComponents.size(); componentIdx < numComponents; ++componentIdx )
 	{
-		bool									   bHasSerializableField = false;
-		CEcsStubDataType*						   pEcsStubComponent	 = ecsStubComponents[componentIdx];
-		const eastl::vector<TRefPtr<CEcsStubField>>& ecsStubFields		 = pEcsStubComponent->GetFields();
+		bool										 bHasSerializableField = false;
+		CEcsStubDataType*							 pEcsStubComponent	   = ecsStubComponents[componentIdx];
+		const eastl::vector<TRefPtr<CEcsStubField>>& ecsStubFields		   = pEcsStubComponent->GetFields();
 		for ( uint32 varIdx = 0, numVars = (uint32)ecsStubFields.size(); varIdx < numVars; ++varIdx )
 		{
 			CEcsStubField*	  pEcsStubField			= ecsStubFields[varIdx];
