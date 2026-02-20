@@ -94,10 +94,7 @@ void S_ConvertUnescapeToEscapeSymbols( eastl::wstring& dest, const wchar_t* pSrc
 class CANSIToWCHAR_Convert
 {
 public:
-	// Converts the string to the desired format. Allocates memory if the
-	// specified destination buffer isn't large enough
-	wchar_t* Convert( const char* pSrcData, wchar_t* pDstData, uint32 size ) const;
-	uint32	 GetLength( wchar_t* pData ) const;
+	static wchar_t* Convert( const char* pSrcData, wchar_t* pDstData, uint32 size );
 };
 
 //-----------------------------------------------------------------------------
@@ -106,30 +103,45 @@ public:
 class CWCHARToANSI_Convert
 {
 public:
-	// Converts the string to the desired format. Allocates memory if the
-	// specified destination buffer isn't large enough
-	char*  Convert( const wchar_t* pSrcData, char* pDstData, uint32 size ) const;
-	uint32 GetLength( char* pData );
+	static char* Convert( const wchar_t* pSrcData, char* pDstData, uint32 size );
+};
+
+//-----------------------------------------------------------------------------
+// Class that handles UTF8 to WCHAR conversion
+//-----------------------------------------------------------------------------
+class CUTF8ToWCHAR_Convert
+{
+public:
+	static wchar_t* Convert( const char* pSrcData, wchar_t* pDstData, uint32 size );
+};
+
+//-----------------------------------------------------------------------------
+// Class that handles WCHAR to UTF8 conversion
+//-----------------------------------------------------------------------------
+class CWCHARToUTF8_Convert
+{
+public:
+	static char* Convert( const wchar_t* pSrcData, char* pDstData, uint32 size );
 };
 
 //-----------------------------------------------------------------------------
 // Class takes one type of string and converts it to another
 //-----------------------------------------------------------------------------
-template<typename TConverTo, typename TConvertFrom, typename TBaseConverter, uint32 defaultConversionSize = 128>
-class TStringConversion : public TBaseConverter
+template<typename TConverTo, typename TConvertFrom, typename TConverter, uint32 defaultConversionSize = 128>
+class TStringConversion
 {
 public:
 	// Converts the data by using the Convert() method on the base class
-	explicit TStringConversion( const TConvertFrom* pSrcData )
+	TStringConversion( const TConvertFrom* pSrcData )
 	{
 		if ( pSrcData )
 		{
 			// Use base class convert method
-			pConvertedString = TBaseConverter::Convert( pSrcData, buffer, defaultConversionSize );
+			pConvertedString = TConverter::Convert( pSrcData, buffer, defaultConversionSize );
 		}
 		else
 		{
-			pConvertedString = nullptr;
+			pConvertedString = NULL;
 		}
 	}
 	~TStringConversion()
@@ -149,13 +161,9 @@ public:
 		}
 	}
 
-		   operator TConverTo*() const;
-	uint32 GetLength() const;
+	operator TConverTo*() const;
 
 private:
-	TStringConversion()
-		: pConvertedString( NULL ) {};
-
 	TConverTo  buffer[defaultConversionSize];  // Holds the converted data if the size is large enough
 	TConverTo* pConvertedString;			   // Points to the converted data. If this pointer doesn't match Buffer, then memory was allocated and needs to be freed
 };
@@ -185,9 +193,13 @@ public:
 //-----------------------------------------------------------------------------
 typedef TStringConversion<wchar_t, char, CANSIToWCHAR_Convert> ansiToWchar_t;
 typedef TStringConversion<char, wchar_t, CWCHARToANSI_Convert> wcharToAnsi_t;
+typedef TStringConversion<wchar_t, char, CUTF8ToWCHAR_Convert> utf8ToWchar_t;
+typedef TStringConversion<char, wchar_t, CWCHARToUTF8_Convert> wcharToUtf8_t;
 
 #define ANSI_TO_WCHAR( String ) (wchar_t*)ansiToWchar_t( (const char*)String )
 #define WCHAR_TO_ANSI( String ) (char*)wcharToAnsi_t( (const wchar_t*)String )
+#define UTF8_TO_WCHAR( String ) (wchar_t*)utf8ToWchar_t( (const char*)String )
+#define WCHAR_TO_UTF8( String ) (char*)wcharToUtf8_t( (const wchar_t*)String )
 
 #include "tier1/strtools.inl"
 #if PLATFORM_WINDOWS

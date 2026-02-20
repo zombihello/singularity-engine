@@ -622,10 +622,10 @@ FORCEINLINE void S_ConvertUnescapeToEscapeSymbols( eastl::wstring& dest, const w
 CANSIToWCHAR_Convert::Convert
 ==================
 */
-FORCEINLINE wchar_t* CANSIToWCHAR_Convert::Convert( const char* pSrcData, wchar_t* pDstData, uint32 size ) const
+FORCEINLINE wchar_t* CANSIToWCHAR_Convert::Convert( const char* pSrcData, wchar_t* pDstData, uint32 size )
 {
 	// Determine whether we need to allocate memory or not
-	uint32 length = (uint32)S_Strlen( pSrcData ) + 1;
+	uint32 length = S_Strlen( pSrcData ) + 1;
 	if ( length > size )
 	{
 		// Need to allocate memory because the string is too big
@@ -644,23 +644,13 @@ FORCEINLINE wchar_t* CANSIToWCHAR_Convert::Convert( const char* pSrcData, wchar_
 
 /*
 ==================
-CANSIToWCHAR_Convert::GetLength
-==================
-*/
-FORCEINLINE uint32 CANSIToWCHAR_Convert::GetLength( wchar_t* pData ) const
-{
-	return (uint32)S_Strlen( pData );
-}
-
-/*
-==================
 CWCHARToANSI_Convert::Convert
 ==================
 */
-FORCEINLINE char* CWCHARToANSI_Convert::Convert( const wchar_t* pSrcData, char* pDstData, uint32 size ) const
+FORCEINLINE char* CWCHARToANSI_Convert::Convert( const wchar_t* pSrcData, char* pDstData, uint32 size )
 {
 	// Determine whether we need to allocate memory or not
-	uint32 lengthW = (uint32)S_Strlen( pSrcData );
+	uint32 lengthW = S_Strlen( pSrcData );
 
 	// Needs to be multiply by sizeof( wchar_t ) the wide in case each converted char is multibyte
 	uint32 lengthA = lengthW * sizeof( wchar_t );
@@ -682,16 +672,6 @@ FORCEINLINE char* CWCHARToANSI_Convert::Convert( const wchar_t* pSrcData, char* 
 
 /*
 ==================
-CWCHARToANSI_Convert::GetLength
-==================
-*/
-FORCEINLINE uint32 CWCHARToANSI_Convert::GetLength( char* pData )
-{
-	return (uint32)S_Strlen( pData );
-}
-
-/*
-==================
 TStringConversion::operator TConverTo*
 ==================
 */
@@ -699,17 +679,6 @@ template<typename TConverTo, typename TConvertFrom, typename TBaseConverter, uin
 FORCEINLINE TStringConversion<TConverTo, TConvertFrom, TBaseConverter, defaultConversionSize>::operator TConverTo*() const
 {
 	return pConvertedString;
-}
-
-/*
-==================
-TStringConversion::GetLength
-==================
-*/
-template<typename TConverTo, typename TConvertFrom, typename TBaseConverter, uint32 defaultConversionSize /*= 128*/>
-FORCEINLINE uint32 TStringConversion<TConverTo, TConvertFrom, TBaseConverter, defaultConversionSize>::GetLength() const
-{
-	return pConvertedString ? TBaseConverter::GetLength( pConvertedString ) : 0;
 }
 
 /*
