@@ -20,7 +20,7 @@ CSearchPathIterator::CSearchPathIterator( const char* pFilePath, bool bForWrite,
 	// For absolute path we use only s_NullSearchPath (except paths with path IDs)
 	if ( ( pFilePath[0] != '/' && pFilePath[1] != '/' ) && S_IsAbsolutePath( pFilePath ) )
 	{
-		searchPaths.push_back( &s_NullSearchPath );
+		searchPaths.emplace_back( &s_NullSearchPath );
 	}
 	// Otherwise it is a relative path
 	else
@@ -31,11 +31,11 @@ CSearchPathIterator::CSearchPathIterator( const char* pFilePath, bool bForWrite,
 			// We iterate from end to beginning to be able to overload paths
 			for ( int32 index = (int32)pFileSystem->searchPaths.size(); --index >= 0; )
 			{
-				CSearchPath*	  pSearchPath  = &pFileSystem->searchPaths[index];
-				const eastl::string searchPathID = pSearchPath->GetPathID();
+				CSearchPath*		 pSearchPath  = &pFileSystem->searchPaths[index];
+				const eastl::string& searchPathID = pSearchPath->GetPathID();
 				if ( searchPathID.size() == lengthPathID && !S_Strnicmp( searchPathID.c_str(), pPathID, lengthPathID ) )
 				{
-					searchPaths.push_back( pSearchPath );
+					searchPaths.emplace_back( pSearchPath );
 				}
 			}
 
@@ -44,8 +44,8 @@ CSearchPathIterator::CSearchPathIterator( const char* pFilePath, bool bForWrite,
 			{
 				Warning( "FileSystem: Requested non-existent write path '%s'!", pPathID );
 				CSearchPath* pFirstWriteSearchPath	  = NULL;
-				const char* pDefaultWritePathID	  = "DEFAULT_WRITE_PATH";
-				const uint32 lenghtDefaultWritePathID = 19;
+				const char*	 pDefaultWritePathID	  = "default_write_path";
+				const uint32 lenghtDefaultWritePathID = 18;
 
 				// We iterate from end to beginning to be able to overload paths
 				for ( int32 index = (int32)pFileSystem->searchPaths.size(); --index >= 0; )
@@ -56,17 +56,17 @@ CSearchPathIterator::CSearchPathIterator( const char* pFilePath, bool bForWrite,
 						pFirstWriteSearchPath = pSearchPath;
 					}
 
-					const eastl::string searchPathID = pSearchPath->GetPathID();
+					const eastl::string& searchPathID = pSearchPath->GetPathID();
 					if ( searchPathID.size() == lenghtDefaultWritePathID && !S_Strnicmp( searchPathID.c_str(), pDefaultWritePathID, lenghtDefaultWritePathID ) )
 					{
-						searchPaths.push_back( pSearchPath );
+						searchPaths.emplace_back( pSearchPath );
 					}
 				}
 
 				// Didn't nothing to find? Okay, just add the first write search path
 				if ( searchPaths.empty() && pFirstWriteSearchPath )
 				{
-					searchPaths.push_back( pFirstWriteSearchPath );
+					searchPaths.emplace_back( pFirstWriteSearchPath );
 				}
 			}
 		}
@@ -76,7 +76,7 @@ CSearchPathIterator::CSearchPathIterator( const char* pFilePath, bool bForWrite,
 			// We iterate from end to beginning to be able to overload paths
 			for ( int32 index = (int32)pFileSystem->searchPaths.size(); --index >= 0; )
 			{
-				searchPaths.push_back( &pFileSystem->searchPaths[index] );
+				searchPaths.emplace_back( &pFileSystem->searchPaths[index] );
 			}
 		}
 	}

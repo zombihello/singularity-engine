@@ -44,15 +44,7 @@
 #define MS_ALIGN( Alignment ) __declspec( align( Alignment ) )
 
 #define INVALID_DLL_HANDLE	  NULL
+#define INVALID_PROC_HANDLE	  NULL
 #define INVALID_THREAD_HANDLE NULL
 #define INVALID_THREAD_ID	  0
 #define INVALID_WINDOW_HANDLE NULL
-
-//-----------------------------------------------------------------------------
-// Platform specific types
-//-----------------------------------------------------------------------------
-typedef HMODULE	  dllHandle_t;
-typedef HANDLE	  windowHandle_t;
-typedef HINSTANCE appInstanceHandle_t;
-typedef HANDLE	  threadHandle_t;
-typedef DWORD	  threadId_t;

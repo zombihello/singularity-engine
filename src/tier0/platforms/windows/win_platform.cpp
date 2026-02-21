@@ -6,37 +6,31 @@
 Sys_CreateProc
 ==================
 */
-void* Sys_CreateProc( const char* pPathToProcess, const char* pParams, bool bLaunchDetached, bool bLaunchHidden, int32 priorityModifier, uint64* pProcessId /* = NULL */ )
+procHandle_t Sys_CreateProc( const char* pPath, const char* pParams, bool bLaunchDetached, bool bLaunchHidden, procPriority_t priority /* = PROC_PRIORITY_NORMAL */, uint64* pProcessId /* = NULL */ )
 {
-	eastl::string		commandLine = S_Sprintf( "%s %s", pPathToProcess, pParams );
+	eastl::wstring		commandLine = UTF8_TO_WCHAR( S_Sprintf( "%s %s", pPath, pParams ).c_str() );
 	PROCESS_INFORMATION procInfo;
 	SECURITY_ATTRIBUTES attributes;
 	attributes.nLength				= sizeof( SECURITY_ATTRIBUTES );
-	attributes.lpSecurityDescriptor = nullptr;
+	attributes.lpSecurityDescriptor = NULL;
 	attributes.bInheritHandle		= true;
-
-	uint64 createFlags = NORMAL_PRIORITY_CLASS;
-	if ( priorityModifier < 0 )
+	if ( pProcessId )
 	{
-		if ( priorityModifier == -1 )
-		{
-			createFlags = BELOW_NORMAL_PRIORITY_CLASS;
-		}
-		else
-		{
-			createFlags = IDLE_PRIORITY_CLASS;
-		}
+		*pProcessId = 0;
 	}
-	else if ( priorityModifier > 0 )
+
+	uint64 createFlags = 0;
+	switch ( priority )
 	{
-		if ( priorityModifier == 1 )
-		{
-			createFlags = ABOVE_NORMAL_PRIORITY_CLASS;
-		}
-		else
-		{
-			createFlags = HIGH_PRIORITY_CLASS;
-		}
+	case PROC_PRIORITY_IDLE: createFlags |= IDLE_PRIORITY_CLASS; break;
+	case PROC_PRIORITY_BELOW_NORMAL: createFlags |= BELOW_NORMAL_PRIORITY_CLASS; break;
+	case PROC_PRIORITY_NORMAL: createFlags |= NORMAL_PRIORITY_CLASS; break;
+	case PROC_PRIORITY_ABOVE_NORMAL: createFlags |= ABOVE_NORMAL_PRIORITY_CLASS; break;
+	case PROC_PRIORITY_HIGH: createFlags |= HIGH_PRIORITY_CLASS; break;
+	default:
+		AssertMsg( false, "Unknown process priority 0x%X", priority );
+		createFlags |= NORMAL_PRIORITY_CLASS;
+		break;
 	}
 
 	if ( bLaunchDetached )
@@ -56,24 +50,21 @@ void* Sys_CreateProc( const char* pPathToProcess, const char* pParams, bool bLau
 		}
 	}
 
-	STARTUPINFO startupInfo = {
-		sizeof( STARTUPINFO ), NULL, NULL, NULL,
+	STARTUPINFOW startupInfo = {
+		sizeof( STARTUPINFOW ), NULL, NULL, NULL,
 		(DWORD)CW_USEDEFAULT, (DWORD)CW_USEDEFAULT, (DWORD)CW_USEDEFAULT, (DWORD)CW_USEDEFAULT,
 		NULL, NULL, NULL, (DWORD)flags,
 		(WORD)showWindowFlags, NULL, NULL, NULL,
 		NULL, NULL
 	};
 
-	char path[MAX_PATH];
-	GetCurrentDirectoryA( MAX_PATH, path );
+	eastl::wstring currentDirectory;
+	currentDirectory.resize( GetCurrentDirectoryW( 0, NULL ) );
+	uint32 length = GetCurrentDirectoryW( (uint32)currentDirectory.size(), currentDirectory.data() );
+	AssertMsg( length > 0, "Failed to get current directory (GetLastError 0x%X)", GetLastError() );
 
-	if ( !CreateProcessA( NULL, (LPSTR)commandLine.c_str(), &attributes, &attributes, TRUE, (DWORD)createFlags, NULL, (LPCSTR)path, (LPSTARTUPINFOA)&startupInfo, &procInfo ) )
+	if ( !CreateProcessW( NULL, (LPWSTR)commandLine.c_str(), &attributes, &attributes, TRUE, (DWORD)createFlags, NULL, (LPCWSTR)currentDirectory.c_str(), (LPSTARTUPINFOW)&startupInfo, &procInfo ) )
 	{
-		if ( pProcessId )
-		{
-			*pProcessId = 0;
-		}
-
 		return NULL;
 	}
 
@@ -81,7 +72,7 @@ void* Sys_CreateProc( const char* pPathToProcess, const char* pParams, bool bLau
 	{
 		*pProcessId = procInfo.dwProcessId;
 	}
-	return (void*)procInfo.hProcess;
+	return (procHandle_t)procInfo.hProcess;
 }
 
 /*
@@ -89,7 +80,7 @@ void* Sys_CreateProc( const char* pPathToProcess, const char* pParams, bool bLau
 Sys_GetProcReturnCode
 ==================
 */
-bool Sys_GetProcReturnCode( void* pProcHandle, int32* pReturnCode )
+bool Sys_GetProcReturnCode( procHandle_t pProcHandle, int32* pReturnCode )
 {
 	return GetExitCodeProcess( (HANDLE)pProcHandle, (DWORD*)pReturnCode ) && *( (DWORD*)pReturnCode ) != STILL_ACTIVE;
 }
@@ -99,7 +90,7 @@ bool Sys_GetProcReturnCode( void* pProcHandle, int32* pReturnCode )
 Sys_IsProcRunning
 ==================
 */
-bool Sys_IsProcRunning( void* pProcHandle )
+bool Sys_IsProcRunning( procHandle_t pProcHandle )
 {
 	DWORD waitResult = WaitForSingleObject( (HANDLE)pProcHandle, 0 );
 	return waitResult != WAIT_TIMEOUT ? false : true;
@@ -110,7 +101,7 @@ bool Sys_IsProcRunning( void* pProcHandle )
 Sys_WaitForProc
 ==================
 */
-void Sys_WaitForProc( void* pProcHandle )
+void Sys_WaitForProc( procHandle_t pProcHandle )
 {
 	WaitForSingleObject( (HANDLE)pProcHandle, INFINITE );
 }
@@ -120,7 +111,7 @@ void Sys_WaitForProc( void* pProcHandle )
 Sys_TerminateProc
 ==================
 */
-void Sys_TerminateProc( void* pProcHandle )
+void Sys_TerminateProc( procHandle_t pProcHandle )
 {
 	TerminateProcess( (HANDLE)pProcHandle, 0 );
 }
@@ -132,7 +123,7 @@ Sys_DLL_LoadModule
 */
 dllHandle_t Sys_DLL_LoadModule( const char* pDLLName )
 {
-	return LoadLibraryExA( pDLLName, NULL, LOAD_WITH_ALTERED_SEARCH_PATH );
+	return LoadLibraryExW( UTF8_TO_WCHAR( pDLLName ), NULL, LOAD_WITH_ALTERED_SEARCH_PATH );
 }
 
 /*
@@ -189,13 +180,24 @@ Sys_GetComputerName
 */
 const char* Sys_GetComputerName()
 {
-	static char result[256] = "";
-	if ( !result[0] )
+	static eastl::string s_computerName;
+	if ( s_computerName.empty() )
 	{
-		DWORD size = ARRAYSIZE( result );
-		GetComputerNameA( result, &size );
+		// Get length of the computer name
+		DWORD size = 0;
+		GetComputerNameW( NULL, &size );
+
+		// Get the computer name
+		eastl::wstring wideComputerName;
+		wideComputerName.resize( size );
+		BOOL bResult = GetComputerNameW( wideComputerName.data(), &size );
+		Assert( bResult );
+
+		// Convert WCHAR to UTF8 string
+		s_computerName = WCHAR_TO_UTF8( wideComputerName.c_str() );
 	}
-	return result;
+
+	return s_computerName.c_str();
 }
 
 /*
@@ -205,13 +207,24 @@ Sys_GetUserName
 */
 const char* Sys_GetUserName()
 {
-	static char result[256] = "";
-	if ( !result[0] )
+	static eastl::string s_userName;
+	if ( s_userName.empty() )
 	{
-		DWORD size = ARRAYSIZE( result );
-		GetUserNameA( result, &size );
+		// Get length of the user name
+		DWORD size = 0;
+		GetUserNameW( NULL, &size );
+
+		// Get the user name
+		eastl::wstring wideUserName;
+		wideUserName.resize( size );
+		BOOL bResult = GetUserNameW( wideUserName.data(), &size );
+		Assert( bResult );
+
+		// Convert WCHAR to UTF8 string
+		s_userName = WCHAR_TO_UTF8( wideUserName.c_str() );
 	}
-	return result;
+
+	return s_userName.c_str();
 }
 
 /*
@@ -221,12 +234,33 @@ Sys_GetExecutablePath
 */
 const char* Sys_GetExecutablePath()
 {
-	static char path[MAX_PATH] = "";
-	if ( !path[0] )
+	static eastl::string s_executablePath;
+	if ( s_executablePath.empty() )
 	{
-		GetModuleFileNameA( NULL, path, MAX_PATH );
+		DWORD		   size = MAX_PATH;
+		eastl::wstring wideBuffer;
+		while ( true )
+		{
+			// Try get an executable path
+			wideBuffer.resize( size );
+			DWORD length = GetModuleFileNameW( NULL, wideBuffer.data(), size );
+			AssertMsg( length > 0, "Failed to get executable path (GetLastError 0x%X)", GetLastError() );
+
+			// Done if the path fits into the buffer
+			if ( length < size - 1 )
+			{
+				break;
+			}
+
+			// Otherwise we increase the buffer size
+			size *= 2;
+		}
+
+		// Convert WCHAR to UTF8 string
+		s_executablePath = WCHAR_TO_UTF8( wideBuffer.c_str() );
 	}
-	return path;
+
+	return s_executablePath.c_str();
 }
 
 /*

@@ -54,4 +54,4 @@ public:
 	virtual bool IsWriter() const override;
 };
 
-#include "filesystem/file_base.inl"
+#include "filesystem/platforms/generic/file_base.inl"

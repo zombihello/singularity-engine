@@ -29,8 +29,8 @@ FORCEINLINE bool Sys_AssertFailed( const char* pExpr, const char* pFile, int32 l
 	#define AssertNoEntry()
 	#define AssertNoReentry()
 	#define AssertUnimplemented()
-	#define Verify( Expr )				!!( Expr )
-	#define VerifyMsg( Expr, Msg, ... ) !!( Expr )
+	#define Verify( Expr )				( Expr )
+	#define VerifyMsg( Expr, Msg, ... ) ( Expr )
 #endif	// ENABLE_ASSERT
 
 //-----------------------------------------------------------------------------
@@ -40,16 +40,16 @@ FORCEINLINE bool Sys_AssertFailed( const char* pExpr, const char* pFile, int32 l
 TIER0_INTERFACE bool Sys_EnsureFailed( const char* pExpr, const char* pFile, int32 line, bool bAlways, const char* pFormat = "", ... );
 TIER0_INTERFACE void Sys_SetEnsureAllow( bool bAllowed );
 
-	#define Ensure( Expr )					  ( ( Expr ) ? true : ( Sys_EnsureFailed( #Expr, __FILE__, __LINE__, false ), false ) )
-	#define EnsureMsg( Expr, Msg, ... )		  ( ( Expr ) ? true : ( Sys_EnsureFailed( #Expr, __FILE__, __LINE__, false, Msg, __VA_ARGS__ ), false ) )
-	#define EnsureAlways( Expr )			  ( ( Expr ) ? true : ( Sys_EnsureFailed( #Expr, __FILE__, __LINE__, true ), false ) )
-	#define EnsureAlwaysMsg( Expr, Msg, ... ) ( ( Expr ) ? true : ( Sys_EnsureFailed( #Expr, __FILE__, __LINE__, true, Msg, __VA_ARGS__ ), false ) )
+	#define Ensure( Expr )					  ( !!( Expr ) ? true : ( Sys_EnsureFailed( #Expr, __FILE__, __LINE__, false ), false ) )
+	#define EnsureMsg( Expr, Msg, ... )		  ( !!( Expr ) ? true : ( Sys_EnsureFailed( #Expr, __FILE__, __LINE__, false, Msg, __VA_ARGS__ ), false ) )
+	#define EnsureAlways( Expr )			  ( !!( Expr ) ? true : ( Sys_EnsureFailed( #Expr, __FILE__, __LINE__, true ), false ) )
+	#define EnsureAlwaysMsg( Expr, Msg, ... ) ( !!( Expr ) ? true : ( Sys_EnsureFailed( #Expr, __FILE__, __LINE__, true, Msg, __VA_ARGS__ ), false ) )
 #else
 FORCEINLINE bool Sys_EnsureFailed( const char* pExpr, const char* pFile, int32 line, bool bAlways, const char* pFormat = "", ... ) { return false; }
 FORCEINLINE void Sys_SetEnsureAllow( bool bAllowed ) {}
 
-	#define Ensure( Expr )					  !!( Expr )
-	#define EnsureMsg( Expr, Msg, ... )		  !!( Expr )
-	#define EnsureAlways( Expr )			  !!( Expr )
-	#define EnsureAlwaysMsg( Expr, Msg, ... ) !!( Expr )
+	#define Ensure( Expr )					  ( Expr )
+	#define EnsureMsg( Expr, Msg, ... )		  ( Expr )
+	#define EnsureAlways( Expr )			  ( Expr )
+	#define EnsureAlwaysMsg( Expr, Msg, ... ) ( Expr )
 #endif	// ENABLE_ENSURE

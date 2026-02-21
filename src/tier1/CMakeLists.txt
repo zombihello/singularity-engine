@@ -52,13 +52,15 @@ set_target_properties( tier1 PROPERTIES FOLDER				Engine/Tiers )
 set_target_properties( tier1 PROPERTIES PREFIX 				"" )
 
 target_include_directories( tier1 PUBLIC					${THIRDPARTY_INCLUDES} )
-target_link_libraries( tier1 PUBLIC 						${THIRDPARTY_LIBS} )
+target_link_libraries( tier1 PUBLIC 						interfaces ${THIRDPARTY_LIBS} )
 add_common_target_defines( tier1 )
 
 
 #
 # Install
 #
+inherit_install_files( tier1									TARGETS interfaces )
+
 # Binaries
 install_files( tier1 FILES ${THIRDPARTY_INSTALL_DEBUG_DLLS}		DESTINATION		bin/${PLATFORM_BIN_DIR}/	CONFIGURATIONS 	Debug )
 install_files( tier1 FILES ${THIRDPARTY_INSTALL_RELEASE_DLLS}	DESTINATION		bin/${PLATFORM_BIN_DIR}/	CONFIGURATIONS 	Release Retail )

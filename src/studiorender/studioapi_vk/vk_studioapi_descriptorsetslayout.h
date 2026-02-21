@@ -28,7 +28,7 @@ struct studioAPIDescriptorSetLayoutVk_t
 	eastl::vector<VkDescriptorSetLayoutBinding> vkLayoutBindings;
 	studioAPIDescriptorSetInfoVk_t				descriptorSetInfo;
 #if !RETAIL
-	eastl::unordered_map<uint8, hash_t> descriptorSlotValidationHashDict;
+	eastl::unordered_map<uint8, hash> descriptorSlotValidationHashDict;
 #endif	// !RETAIL
 };
 
@@ -52,14 +52,14 @@ public:
 	const eastl::vector<VkDescriptorSetLayout>&			 GetVkDescriptorSetLayouts() const;
 	uint32												 GetNumUsedDescriptorTypes( VkDescriptorType vkDescriptorType ) const;
 	uint32												 GetNumDescriptorSets() const;
-	hash_t												 GetDescriptorTypesUsageHash() const;
+	hash												 GetDescriptorTypesUsageHash() const;
 	const eastl::vector<studioAPIDescriptorSetInfoVk_t>& GetDescriptorSetInfos() const;
 	VkPipelineLayout									 GetVkPipelineLayout() const;
 	VkDescriptorSetAllocateInfo							 GetVkAllocateInfo() const;
 
 private:
 	uint32											  numDescriptorSets;
-	hash_t											  descriptorTypesUsageHash;
+	hash											  descriptorTypesUsageHash;
 	eastl::unordered_map<VkDescriptorType, uint32>	  numUsedDescriptorTypesDict;
 	eastl::vector<VkDescriptorSetLayout>			  vkDescriptorSetLayouts;
 	eastl::vector<studioAPIDescriptorSetInfoVk_t>	  descriptorSetInfos;

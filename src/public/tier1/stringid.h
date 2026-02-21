@@ -31,7 +31,7 @@ public:
 	const char* ToString() const;
 
 	bool   IsEmpty() const;
-	hash_t GetHash() const;
+	hash GetHash() const;
 
 	bool operator==( const char* pString ) const;
 	bool operator==( const eastl::string& string ) const;

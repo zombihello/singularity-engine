@@ -64,7 +64,7 @@ public:
 private:
 	bool															  bUsed;
 	uint64															  lastFrameUsed;
-	eastl::unordered_map<hash_t, CStudioAPITypedDescriptorPoolSetVk*> typedDescriptorPoolsDict;
+	eastl::unordered_map<hash, CStudioAPITypedDescriptorPoolSetVk*> typedDescriptorPoolsDict;
 };
 
 //-----------------------------------------------------------------------------

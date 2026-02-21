@@ -4,7 +4,6 @@
 
 #include "tier0/defines.h"
 #include "tier0/types.h"
-#include "tier0/ilogger.h"
 #include "tier1/strtools.h"
 #include "filesystem/ifilesystem.h"
 #include "utils/interfaces/interfaces.h"
@@ -12,19 +11,16 @@
 //-----------------------------------------------------------------------------
 // File tools
 //-----------------------------------------------------------------------------
-bool S_SetCurrentDirectory( const char* pDirName );
-bool S_SetCurrentDirectory( const eastl::string& dirName );
-bool S_GetCurrentDirectory( char* pDestStr, uint32 maxLen );
-void S_GetCurrentDirectory( eastl::string& destStr, bool bShrinkToFit = true );
-
 bool  S_MakeAbsolutePath( const char* pSrcPath, char* pDestPath, uint32 maxLen, const char* pStartingDir = NULL );
 void  S_MakeAbsolutePath( const eastl::string& srcPath, eastl::string& destPath, const eastl::string& startingDir = "", bool bShrinkToFit = true );
 int32 S_MakeRelativePath( const char* pFullPath, const char* pDirPath, char* pRelativePath, uint32 maxLen );
 bool  S_MakeRelativePath( const eastl::string& fullPath, const eastl::string& dirPath, eastl::string& relativePath, bool bShrinkToFit = true );
-bool  S_IsAbsolutePath( const char* pPath );
-bool  S_IsAbsolutePath( const eastl::string& path );
 
+bool S_IsAbsolutePath( const char* pPath );
+bool S_IsAbsolutePath( const eastl::string& path );
 bool S_IsPathSeparator( char c );
+bool S_HasPathSeparator( const char* pPath );
+bool S_HasPathSeparator( const eastl::string& path );
 bool S_AppendPathSeparator( char* pStr, uint32 strSize );
 void S_AppendPathSeparator( eastl::string& str );
 void S_FixPathSeparators( char* pPath );

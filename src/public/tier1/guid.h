@@ -46,7 +46,7 @@ public:
 
 	bool		  IsValid() const;
 	eastl::string AsString() const;
-	hash_t		  GetHash() const;
+	hash		  GetHash() const;
 
 	friend bool operator==( const CGuid& x, const CGuid& y );
 	friend bool operator!=( const CGuid& x, const CGuid& y );
