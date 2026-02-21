@@ -165,7 +165,7 @@ FORCEINLINE bool CStringID::IsEmpty() const
 CStringID::GetHash
 ==================
 */
-FORCEINLINE hash_t CStringID::GetHash() const
+FORCEINLINE hash CStringID::GetHash() const
 {
 	return FastHash( *this );
 }

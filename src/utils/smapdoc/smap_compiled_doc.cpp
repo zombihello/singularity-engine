@@ -1,5 +1,6 @@
 #include "utils/interfaces/interfaces.h"
 #include "tier0/profile.h"
+#include "tier0/ilogger.h"
 #include "filesystem/ifilesystem.h"
 #include "tier1/compression.h"
 #include "utils/smapdoc/smap_compiled_doc.h"

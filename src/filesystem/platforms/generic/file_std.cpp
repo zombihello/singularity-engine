@@ -1,5 +1,6 @@
 #include "pch_filesystem.h"
-#include "filesystem/file_std.h"
+#if PLATFORM_USE_STD_FILE
+	#include "filesystem/platforms/generic/file_std.h"
 
 /*
 ==================
@@ -177,3 +178,4 @@ bool CStreamDataStdFileWriter::IsEndOfStream() const
 {
 	return false;
 }
+#endif	// PLATFORM_USE_STD_FILE

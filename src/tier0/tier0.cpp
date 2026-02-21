@@ -2,6 +2,7 @@
 #include <SDL2/SDL.h>
 #include "tier0/tier0_internal.h"
 #include "tier0/crashdump_internal.h"
+#include "tier0/debug.h"
 #include "tier1/threading.h"
 
 bool			  g_bRequestingExit = false;
@@ -31,10 +32,7 @@ void Sys_Error( const char* pFormat, ... )
 
 	// Print message and show message box
 	Error( message.c_str() );
-	if ( Sys_IsDebuggerPresent() )
-	{
-		Sys_DebugBreak();
-	}
+	Sys_DebugBreak();
 	Sys_ShowMessageBox( "Singularity Error", message.c_str(), MESSAGE_BOX_ERROR );
 
 	// Set crash dump message

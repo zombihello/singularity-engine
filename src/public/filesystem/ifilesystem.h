@@ -1,4 +1,6 @@
 #pragma once
+#include <EASTL/string.h>
+
 #include "tier0/types.h"
 #include "appframework/iappsystem.h"
 #include "tier1/refcount.h"
@@ -56,7 +58,7 @@ public:
 	virtual TRefPtr<IStreamDataWriter> CreateFileWriter( const char* pPath, uint32 flags = FILE_WRITE_NONE ) = 0;
 
 	// This is method looks files in the search paths or in the first if it set
-	virtual TRefPtr<IPathArrayResult> FindFiles( const char* pPath, bool bFiles, bool bDirectories, bool bLookAllPathIDs = true ) = 0;
+	virtual TRefPtr<IPathArrayResult> FindFiles( const char* pPath, const char* pPattern, bool bFiles, bool bDirectories, bool bLookAllPathIDs = true ) = 0;
 
 	// This is method looks a DLL module in the search paths and first opened returns
 	virtual dllHandle_t LoadModule( const char* pDLLName )	  = 0;
@@ -87,11 +89,20 @@ public:
 	// the first found search path in pDestPath
 	virtual copyMoveResult_t MoveDirectory( const char* pSrcPath, const char* pDestPath, bool bMoveAllPathIDs = false, bool bReplaceExisting = false, bool bEvenReadOnly = false ) = 0;
 
+	// This method looks for directories in the search paths and the first one select as the current directory
+	virtual bool SetCurrentDirectory( const char* pPath ) = 0;
+
 	// This is method looks for a file or a directory in the search paths and when first was found returns TRUE
 	virtual bool IsFileExists( const char* pPath ) const = 0;
 
 	// This is method looks for a file or a directory in the search paths and when first was found returns TRUE if it is directory
 	virtual bool IsFileDirectory( const char* pPath ) const = 0;
+
+	// Functions to get path to some directories
+	virtual const char* GetUserDirectory() const								= 0;
+	virtual bool		GetCurrentDirectory( char* pDest, uint32 maxLen ) const = 0;
+	void				GetCurrentDirectory( eastl::string& dest, bool bShrinkToFit = true ) const;
+	eastl::string		GetCurrentDirectory( bool bShrinkToFit = true ) const;
 
 	// Functions to work with search paths
 	virtual void					  AddSearchPath( const char* pSearchPath, const char* pPathID ) = 0;
@@ -100,3 +111,5 @@ public:
 	virtual TRefPtr<IPathArrayResult> GetSearchPath( const char* pPathID ) const					= 0;
 	virtual uint32					  GetNumSearchPaths() const										= 0;
 };
+
+#include "filesystem/ifilesystem.inl"

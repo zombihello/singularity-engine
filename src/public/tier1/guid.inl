@@ -148,7 +148,7 @@ FORCEINLINE bool CGuid::InitFromString( const eastl::string& string )
 CGuid::GetHash
 ==================
 */
-FORCEINLINE hash_t CGuid::GetHash() const
+FORCEINLINE hash CGuid::GetHash() const
 {
 	return FastHash( *this );
 }

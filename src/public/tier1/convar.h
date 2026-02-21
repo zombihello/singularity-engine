@@ -2,7 +2,7 @@
 #include <EASTL/string.h>
 
 #include "utils/interfaces/interfaces.h"
-#include "tier0/debug.h"
+#include "tier0/assert.h"
 #include "cvar/icvar.h"
 
 //-----------------------------------------------------------------------------

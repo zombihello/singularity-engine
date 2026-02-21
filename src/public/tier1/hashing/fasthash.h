@@ -8,29 +8,29 @@
 //-----------------------------------------------------------------------------
 // Fast hashing function that doesn't require a table lookup for each element
 //-----------------------------------------------------------------------------
-hash_t FastHash( const void* pData, uint64 size, hash_t hash = 0 );
+hash FastHash( const void* pData, uint64 size, hash hash = 0 );
 template<typename TType>
-hash_t FastHash( const TType& data, hash_t hash = 0 );
+hash FastHash( const TType& data, hash hash = 0 );
 
 template<typename TType>
-hash_t FastHashString( const TType* pString, uint64 length, hash_t hash = 0 );
+hash FastHashString( const TType* pString, uint64 length, hash hash = 0 );
 template<typename TType>
-hash_t FastHashString( const TType* pString, hash_t hash = 0 );
+hash FastHashString( const TType* pString, hash hash = 0 );
 template<typename TType>
-hash_t FastHashString( const eastl::basic_string<TType>& string, hash_t hash = 0 );
+hash FastHashString( const eastl::basic_string<TType>& string, hash hash = 0 );
 template<typename TType>
-hash_t FastHashString( const eastl::basic_string_view<TType>& string, hash_t hash = 0 );
+hash FastHashString( const eastl::basic_string_view<TType>& string, hash hash = 0 );
 
 template<typename TType>
-hash_t FastHashStringInsensitive( const TType* pString, uint64 length, hash_t hash = 0 );
+hash FastHashStringInsensitive( const TType* pString, uint64 length, hash hash = 0 );
 template<typename TType>
-hash_t FastHashStringInsensitive( const TType* pString, hash_t hash = 0 );
+hash FastHashStringInsensitive( const TType* pString, hash hash = 0 );
 template<typename TType>
-hash_t FastHashStringInsensitive( const eastl::basic_string<TType>& string, hash_t hash = 0 );
+hash FastHashStringInsensitive( const eastl::basic_string<TType>& string, hash hash = 0 );
 template<typename TType>
-hash_t FastHashStringInsensitive( const eastl::basic_string_view<TType>& string, hash_t hash = 0 );
+hash FastHashStringInsensitive( const eastl::basic_string_view<TType>& string, hash hash = 0 );
 
 template<typename TType>
-hash_t FastHashItem( const TType& data, hash_t hash = 0 );
+hash FastHashItem( const TType& data, hash hash = 0 );
 
 #include "tier1/hashing/fasthash.inl"

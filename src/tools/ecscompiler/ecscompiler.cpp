@@ -102,7 +102,7 @@ CEcsCompilerAppSystemGroup::ParseEcsFiles
 bool CEcsCompilerAppSystemGroup::ParseEcsFiles( const eastl::string& dir, const eastl::string rootDir, CEcsSystemStub& stubs )
 {
 	bool					  bResult = true;
-	TRefPtr<IPathArrayResult> pFiles  = g_pFileSystem->FindFiles( dir.c_str(), true, true );
+	TRefPtr<IPathArrayResult> pFiles  = g_pFileSystem->FindFiles( dir.c_str(), "*", true, true );
 	for ( uint32 fileIdx = 0, numFiles = pFiles->GetNum(); fileIdx < numFiles; ++fileIdx )
 	{
 		// If the file is a directory look in

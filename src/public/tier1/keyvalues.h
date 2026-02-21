@@ -1,8 +1,9 @@
 #pragma once
 #include <EASTL/list.h>
 
-#include "tier0/defines.h"
 #include "tier0/types.h"
+#include "tier0/assert.h"
+#include "tier0/ilogger.h"
 #include "tier0/profile.h"
 #include "tier1/stringpool.h"
 #include "tier1/streamdata_memory.h"

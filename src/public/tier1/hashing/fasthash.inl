@@ -5,7 +5,7 @@
 FastHash
 ==================
 */
-FORCEINLINE hash_t FastHash( const void* pData, uint64 size, hash_t hash /*= 0*/ )
+FORCEINLINE hash FastHash( const void* pData, uint64 size, hash hash /*= 0*/ )
 {
 	byte* pLocalData = (byte*)pData;
 	for ( uint64 index = 0; index < size; ++index )
@@ -21,7 +21,7 @@ FastHash
 ==================
 */
 template<typename TType>
-FORCEINLINE hash_t FastHash( const TType& data, hash_t hash )
+FORCEINLINE hash FastHash( const TType& data, hash hash )
 {
 	return FastHash( &data, sizeof( data ), hash );
 }
@@ -32,7 +32,7 @@ FastHashString
 ==================
 */
 template<typename TType>
-FORCEINLINE hash_t FastHashString( const TType* pString, uint64 length, hash_t hash /*= 0*/ )
+FORCEINLINE hash FastHashString( const TType* pString, uint64 length, hash hash /*= 0*/ )
 {
 	for ( uint64 index = 0, size = length * sizeof( TType ); index < size; ++index )
 	{
@@ -47,7 +47,7 @@ FastHashString
 ==================
 */
 template<typename TType>
-FORCEINLINE hash_t FastHashString( const TType* pString, hash_t hash /*= 0*/ )
+FORCEINLINE hash FastHashString( const TType* pString, hash hash /*= 0*/ )
 {
 	return FastHashString( pString, S_Strlen( pString ), hash );
 }
@@ -58,7 +58,7 @@ FastHashString
 ==================
 */
 template<typename TType>
-FORCEINLINE hash_t FastHashString( const eastl::basic_string<TType>& string, hash_t hash /*= 0*/ )
+FORCEINLINE hash FastHashString( const eastl::basic_string<TType>& string, hash hash /*= 0*/ )
 {
 	return FastHashString( string.c_str(), string.size(), hash );
 }
@@ -69,7 +69,7 @@ FastHashString
 ==================
 */
 template<typename TType>
-FORCEINLINE hash_t FastHashString( const eastl::basic_string_view<TType>& string, hash_t hash /*= 0*/ )
+FORCEINLINE hash FastHashString( const eastl::basic_string_view<TType>& string, hash hash /*= 0*/ )
 {
 	return FastHashString( string.data(), string.size(), hash );
 }
@@ -80,7 +80,7 @@ FastHashStringInsensitive
 ==================
 */
 template<typename TType>
-FORCEINLINE hash_t FastHashStringInsensitive( const TType* pString, uint64 length, hash_t hash /*= 0*/ )
+FORCEINLINE hash FastHashStringInsensitive( const TType* pString, uint64 length, hash hash /*= 0*/ )
 {
 	for ( uint64 index = 0, size = length * sizeof( TType ); index < size; ++index )
 	{
@@ -95,7 +95,7 @@ FastHashStringInsensitive
 ==================
 */
 template<typename TType>
-FORCEINLINE hash_t FastHashStringInsensitive( const TType* pString, hash_t hash /*= 0*/ )
+FORCEINLINE hash FastHashStringInsensitive( const TType* pString, hash hash /*= 0*/ )
 {
 	return FastHashStringInsensitive( pString, S_Strlen( pString ), hash );
 }
@@ -106,7 +106,7 @@ FastHashStringInsensitive
 ==================
 */
 template<typename TType>
-FORCEINLINE hash_t FastHashStringInsensitive( const eastl::basic_string<TType>& string, hash_t hash /*= 0*/ )
+FORCEINLINE hash FastHashStringInsensitive( const eastl::basic_string<TType>& string, hash hash /*= 0*/ )
 {
 	return FastHashStringInsensitive( string.c_str(), string.size(), hash );
 }
@@ -117,7 +117,7 @@ FastHashStringInsensitive
 ==================
 */
 template<typename TType>
-FORCEINLINE hash_t FastHashStringInsensitive( const eastl::basic_string_view<TType>& string, hash_t hash /*= 0*/ )
+FORCEINLINE hash FastHashStringInsensitive( const eastl::basic_string_view<TType>& string, hash hash /*= 0*/ )
 {
 	return FastHashStringInsensitive( string.data(), string.size(), hash );
 }
@@ -128,7 +128,7 @@ FastHashItem
 ==================
 */
 template<typename TType>
-FORCEINLINE hash_t FastHashItem( const TType& data, hash_t hash /* = 0 */ )
+FORCEINLINE hash FastHashItem( const TType& data, hash hash /* = 0 */ )
 {
 	return data + ( hash << 6 ) + ( hash << 16 ) - hash;
 }

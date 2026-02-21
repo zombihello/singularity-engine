@@ -2,7 +2,7 @@
 #include "tier0/icommandline.h"
 #include "filesystem/filesystem.h"
 #include "filesystem/patharrayresult.h"
-#include "filesystem/platforms.h"
+#include "filesystem/filesystem_internal.h"
 
 // File system singleton
 EXPOSE_SINGLE_INTERFACE( CFileSystem, IFileSystem, FILESYSTEM_INTERFACE_VERSION );
@@ -54,11 +54,6 @@ CFileSystem::Init
 */
 bool CFileSystem::Init()
 {
-	// Get the executable path and append at the end path separator if it need
-	eastl::string exePath;
-	S_GetFilePath( Sys_GetExecutablePath(), exePath, false );
-	S_AppendPathSeparator( exePath );
-
 	// Get base directory from command line if it set
 	eastl::string baseDir;
 	if ( CommandLine()->HasParam( "basedir" ) )
@@ -74,21 +69,19 @@ bool CFileSystem::Init()
 	// Make absolute path to the base directory (if it need)
 	if ( !S_IsAbsolutePath( baseDir ) )
 	{
-		eastl::string oldBaseDir = baseDir;
+		eastl::string exePath;
+		eastl::string oldBaseDir = eastl::move( baseDir );
+		S_GetFilePath( Sys_GetExecutablePath(), exePath, false );
+		S_AppendPathSeparator( exePath );
 		S_MakeAbsolutePath( oldBaseDir, baseDir, exePath, false );
 	}
 
 	// Set our base directory
-	S_SetCurrentDirectory( baseDir );
+	SetCurrentDirectory( baseDir.c_str() );
 
 	// Add a search path to base directory
-	AddSearchPath( baseDir.c_str(), "BASE_PATH" );
-
-	// Add a search path to folder with engine binary files
-	AddSearchPath( exePath.c_str(), "ENGINEBIN" );
-
-	// Add search path to folder with core resources
-	AddSearchPath( "core", "CORE" );
+	AddSearchPath( baseDir.c_str(), "base_path" );
+	AddSearchPath( baseDir.c_str(), "default_write_path" );
 	return true;
 }
 
@@ -102,7 +95,7 @@ void CFileSystem::Shutdown()
 	// Reset default current directory
 	eastl::string exePath;
 	S_GetFilePath( Sys_GetExecutablePath(), exePath, false );
-	S_SetCurrentDirectory( exePath );
+	SetCurrentDirectory( exePath.c_str() );
 	searchPaths.clear();
 }
 
@@ -113,9 +106,8 @@ CFileSystem::CreateFileReader
 */
 TRefPtr<IStreamDataReader> CFileSystem::CreateFileReader( const char* pPath, uint32 flags /* = FILE_READ_NONE */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-
 	// Parse a path ID in pPath
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 	const char* pFilePath	 = NULL;
 	const char* pPathID		 = NULL;
 	uint32		lengthPathID = 0;
@@ -153,9 +145,8 @@ CFileSystem::CreateFileWriter
 */
 TRefPtr<IStreamDataWriter> CFileSystem::CreateFileWriter( const char* pPath, uint32 flags /* = FILE_WRITE_NONE */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-
 	// Parse a path ID in pPath
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 	const char* pFilePath	 = NULL;
 	const char* pPathID		 = NULL;
 	uint32		lengthPathID = 0;
@@ -200,11 +191,10 @@ TRefPtr<IStreamDataWriter> CFileSystem::CreateFileWriter( const char* pPath, uin
 CFileSystem::FindFiles
 ==================
 */
-TRefPtr<IPathArrayResult> CFileSystem::FindFiles( const char* pPath, bool bFiles, bool bDirectories, bool bLookAllPathIDs /* = true */ )
+TRefPtr<IPathArrayResult> CFileSystem::FindFiles( const char* pPath, const char* pPattern, bool bFiles, bool bDirectories, bool bLookAllPathIDs /* = true */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-
 	// Parse a path ID in pPath
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 	const char* pFilePath	 = NULL;
 	const char* pPathID		 = NULL;
 	uint32		lengthPathID = 0;
@@ -217,7 +207,7 @@ TRefPtr<IPathArrayResult> CFileSystem::FindFiles( const char* pPath, bool bFiles
 	{
 		// Compute a full path and find files in the full path
 		ComputeFullPath( pFilePath, *it, finalPath );
-		bool bResult = Plat_FindFiles( finalPath.c_str(), bFiles, bDirectories, result );
+		bool bResult = Plat_FindFiles( finalPath.c_str(), pPattern, bFiles, bDirectories, result );
 
 		// It's the end if we need look for only in the first search path where found any files
 		if ( !bLookAllPathIDs && bResult )
@@ -237,9 +227,8 @@ CFileSystem::LoadModule
 */
 dllHandle_t CFileSystem::LoadModule( const char* pDLLName )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-
 	// Parse a path ID in pPath
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 	const char* pModulePath	 = NULL;
 	const char* pPathID		 = NULL;
 	uint32		lengthPathID = 0;
@@ -286,9 +275,8 @@ CFileSystem::DeleteFile
 */
 bool CFileSystem::DeleteFile( const char* pPath, bool bDeleteAllPathIDs /* = false */, bool bEvenReadOnly /* = false */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-
 	// Parse a path ID in pPath
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 	const char* pFilePath	 = NULL;
 	const char* pPathID		 = NULL;
 	uint32		lengthPathID = 0;
@@ -329,9 +317,8 @@ CFileSystem::MakeDirectory
 */
 bool CFileSystem::MakeDirectory( const char* pPath )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-
 	// Parse a path ID in pPath
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 	const char* pFilePath	 = NULL;
 	const char* pPathID		 = NULL;
 	uint32		lengthPathID = 0;
@@ -363,9 +350,8 @@ CFileSystem::DeleteDirectory
 */
 bool CFileSystem::DeleteDirectory( const char* pPath, bool bDeleteAllPathIDs /* = false */, bool bEvenReadOnly /* = false */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-
 	// Parse a path ID in pPath
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 	const char* pFilePath	 = NULL;
 	const char* pPathID		 = NULL;
 	uint32		lengthPathID = 0;
@@ -406,9 +392,8 @@ CFileSystem::CopyFile
 */
 copyMoveResult_t CFileSystem::CopyFile( const char* pSrcPath, const char* pDestPath, bool bReplaceExisting /* = false */, bool bEvenReadOnly /* = false */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-
 	// Parse a path ID in pSrcPath
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 	const char* pSrcFilePath	= NULL;
 	const char* pSrcPathID		= NULL;
 	uint32		lengthSrcPathID = 0;
@@ -472,9 +457,8 @@ CFileSystem::CopyDirectory
 */
 copyMoveResult_t CFileSystem::CopyDirectory( const char* pSrcPath, const char* pDestPath, bool bCopyAllPathIDs /* = false */, bool bReplaceExisting /* = false */, bool bEvenReadOnly /* = false */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-
 	// Parse a path ID in pSrcPath
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 	const char* pSrcFilePath	= NULL;
 	const char* pSrcPathID		= NULL;
 	uint32		lengthSrcPathID = 0;
@@ -492,7 +476,7 @@ copyMoveResult_t CFileSystem::CopyDirectory( const char* pSrcPath, const char* p
 			// If file was found and it is directory then add the one to paths
 			if ( Plat_IsFileExists( finalSrcPath.c_str() ) && Plat_IsFileDirectory( finalSrcPath.c_str() ) )
 			{
-				srcPaths.push_back( finalSrcPath );
+				srcPaths.emplace_back( finalSrcPath );
 			}
 
 			// We stop if need copy only from the first path ID
@@ -547,9 +531,8 @@ CFileSystem::MoveFile
 */
 copyMoveResult_t CFileSystem::MoveFile( const char* pSrcPath, const char* pDestPath, bool bReplaceExisting /* = false */, bool bEvenReadOnly /* = false */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-
 	// Parse a path ID in pSrcPath
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 	const char* pSrcFilePath	= NULL;
 	const char* pSrcPathID		= NULL;
 	uint32		lengthSrcPathID = 0;
@@ -613,9 +596,8 @@ CFileSystem::MoveDirectory
 */
 copyMoveResult_t CFileSystem::MoveDirectory( const char* pSrcPath, const char* pDestPath, bool bMoveAllPathIDs /* = false */, bool bReplaceExisting /* = false */, bool bEvenReadOnly /* = false */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-
 	// Parse a path ID in pSrcPath
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 	const char* pSrcFilePath	= NULL;
 	const char* pSrcPathID		= NULL;
 	uint32		lengthSrcPathID = 0;
@@ -633,7 +615,7 @@ copyMoveResult_t CFileSystem::MoveDirectory( const char* pSrcPath, const char* p
 			// If file was found and it is directory then add the one to paths
 			if ( Plat_IsFileExists( finalSrcPath.c_str() ) && Plat_IsFileDirectory( finalSrcPath.c_str() ) )
 			{
-				srcPaths.push_back( finalSrcPath );
+				srcPaths.emplace_back( finalSrcPath );
 			}
 
 			// We stop if need move only from the first path ID
@@ -683,14 +665,46 @@ copyMoveResult_t CFileSystem::MoveDirectory( const char* pSrcPath, const char* p
 
 /*
 ==================
+CFileSystem::SetCurrentDirectory
+==================
+*/
+bool CFileSystem::SetCurrentDirectory( const char* pPath )
+{
+	// Parse a path ID in pPath
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	const char* pFilePath	 = NULL;
+	const char* pPathID		 = NULL;
+	uint32		lengthPathID = 0;
+	ParsePathID( pPath, pFilePath, pPathID, lengthPathID );
+
+	// Select the first as current directory
+	eastl::string finalPath;
+	for ( CSearchPathIterator it( pFilePath, false, pPathID, lengthPathID ); it; ++it )
+	{
+		// Compute a full path
+		ComputeFullPath( pFilePath, *it, finalPath );
+
+		// If the directory is exist try to set as the current directory
+		if ( Plat_IsFileDirectory( finalPath.c_str() ) && Plat_SetCurrentDirectory( finalPath.c_str() ) )
+		{
+			return true;
+		}
+	}
+
+	// Otherwise it's fail
+	Warning( "FileSystem: Failed to change current directory to '%s'", pPath );
+	return false;
+}
+
+/*
+==================
 CFileSystem::IsFileExists
 ==================
 */
 bool CFileSystem::IsFileExists( const char* pPath ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-
 	// Parse a path ID in pPath
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 	const char* pFilePath	 = NULL;
 	const char* pPathID		 = NULL;
 	uint32		lengthPathID = 0;
@@ -721,9 +735,8 @@ CFileSystem::IsFileDirectory
 */
 bool CFileSystem::IsFileDirectory( const char* pPath ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-
 	// Parse a path ID in pPath
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 	const char* pFilePath	 = NULL;
 	const char* pPathID		 = NULL;
 	uint32		lengthPathID = 0;
@@ -749,14 +762,33 @@ bool CFileSystem::IsFileDirectory( const char* pPath ) const
 
 /*
 ==================
+CFileSystem::GetUserDirectory
+==================
+*/
+const char* CFileSystem::GetUserDirectory() const
+{
+	return Plat_GetUserDirectory();
+}
+
+/*
+==================
+CFileSystem::GetCurrentDirectory
+==================
+*/
+bool CFileSystem::GetCurrentDirectory( char* pDest, uint32 maxLen ) const
+{
+	return Plat_GetCurrentDirectory( pDest, maxLen );
+}
+
+/*
+==================
 CFileSystem::MakeDirectoryInternal
 ==================
 */
 bool CFileSystem::MakeDirectoryInternal( const char* pPath )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-
 	// Do nothing if the path is empty
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 	if ( !pPath || pPath[0] == '\0' )
 	{
 		return false;
@@ -789,9 +821,8 @@ CFileSystem::DeleteDirectoryInternal
 */
 bool CFileSystem::DeleteDirectoryInternal( const char* pPath, bool bEvenReadOnly /* = false */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-
 	// Do nothing if the path is empty
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 	if ( !pPath || pPath[0] == '\0' )
 	{
 		return false;
@@ -799,7 +830,7 @@ bool CFileSystem::DeleteDirectoryInternal( const char* pPath, bool bEvenReadOnly
 
 	// Delete all files
 	eastl::vector<eastl::string> paths;
-	Plat_FindFiles( pPath, true, false, paths );
+	Plat_FindFiles( pPath, "*", true, false, paths );
 	for ( uint32 index = 0, count = (uint32)paths.size(); index < count; ++index )
 	{
 		if ( !Plat_DeleteFile( paths[index].c_str(), bEvenReadOnly ) )
@@ -810,7 +841,7 @@ bool CFileSystem::DeleteDirectoryInternal( const char* pPath, bool bEvenReadOnly
 
 	// Delete all directories
 	paths.clear();
-	Plat_FindFiles( pPath, false, true, paths );
+	Plat_FindFiles( pPath, "*", false, true, paths );
 	for ( uint32 index = 0, count = (uint32)paths.size(); index < count; ++index )
 	{
 		if ( !DeleteDirectoryInternal( paths[index].c_str(), bEvenReadOnly ) )
@@ -829,23 +860,22 @@ CFileSystem::CopyDirectoryInternal
 */
 copyMoveResult_t CFileSystem::CopyDirectoryInternal( const char* pSrcPath, const char* pDestPath, bool bReplaceExisting /* = false */, bool bEvenReadOnly /* = false */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-
 	// Do nothing if src or dest path is empty
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 	if ( !pSrcPath || !pDestPath || pSrcPath[0] == '\0' || pDestPath[0] == '\0' )
 	{
 		return COPYMOVE_RESULT_MISC_FAIL;
 	}
 
 	// Make directory tree for a new one
-	if ( !CFileSystem::MakeDirectoryInternal( pDestPath ) )
+	if ( !MakeDirectoryInternal( pDestPath ) )
 	{
 		return COPYMOVE_RESULT_WRITE_FAIL;
 	}
 
 	// Copy files
 	eastl::vector<eastl::string> paths;
-	Plat_FindFiles( pSrcPath, true, false, paths );
+	Plat_FindFiles( pSrcPath, "*", true, false, paths );
 	for ( uint32 index = 0, count = (uint32)paths.size(); index < count; ++index )
 	{
 		// Get a full destination path
@@ -862,7 +892,7 @@ copyMoveResult_t CFileSystem::CopyDirectoryInternal( const char* pSrcPath, const
 
 	// Copy sub directories
 	paths.clear();
-	Plat_FindFiles( pSrcPath, false, true, paths );
+	Plat_FindFiles( pSrcPath, "*", false, true, paths );
 	for ( uint32 index = 0, count = (uint32)paths.size(); index < count; ++index )
 	{
 		// Get a full destination path
@@ -887,23 +917,22 @@ CFileSystem::MoveDirectoryInternal
 */
 copyMoveResult_t CFileSystem::MoveDirectoryInternal( const char* pSrcPath, const char* pDestPath, bool bReplaceExisting /* = false */, bool bEvenReadOnly /* = false */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
-
 	// Do nothing if src or dest path is empty
+	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
 	if ( !pSrcPath || !pDestPath || pSrcPath[0] == '\0' || pDestPath[0] == '\0' )
 	{
 		return COPYMOVE_RESULT_MISC_FAIL;
 	}
 
 	// Make directory tree for a new one
-	if ( !CFileSystem::MakeDirectoryInternal( pDestPath ) )
+	if ( !MakeDirectoryInternal( pDestPath ) )
 	{
 		return COPYMOVE_RESULT_WRITE_FAIL;
 	}
 
 	// Move files
 	eastl::vector<eastl::string> paths;
-	Plat_FindFiles( pSrcPath, true, false, paths );
+	Plat_FindFiles( pSrcPath, "*", true, false, paths );
 	for ( uint32 index = 0, count = (uint32)paths.size(); index < count; ++index )
 	{
 		// Get a full destination path
@@ -920,7 +949,7 @@ copyMoveResult_t CFileSystem::MoveDirectoryInternal( const char* pSrcPath, const
 
 	// Move sub directories
 	paths.clear();
-	Plat_FindFiles( pSrcPath, false, true, paths );
+	Plat_FindFiles( pSrcPath, "*", false, true, paths );
 	for ( uint32 index = 0, count = (uint32)paths.size(); index < count; ++index )
 	{
 		// Get a full destination path

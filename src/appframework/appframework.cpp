@@ -1,11 +1,12 @@
 #include "pch_appframework.h"
-#include "appframework/appframework.h"
 #include "tier1/convar.h"
+#include "tier1/filetools.h"
 #include "cvar/icvar.h"
 #include "filesystem/ifilesystem.h"
+#include "appframework/appframework.h"
 
 #if ENABLE_LOGGING
-	#include "tier0/debug.h"
+	#include "tier0/ilogger.h"
 	#include "tier0/crashdump.h"
 	#include "tier0/icommandline.h"
 
@@ -98,6 +99,16 @@ CApplication::PostInit
 */
 bool CApplication::PostInit()
 {
+	// Get the executable path and append at the end path separator if it need
+	eastl::string exePath;
+	S_GetFilePath( Sys_GetExecutablePath(), exePath, false );
+	S_AppendPathSeparator( exePath );
+
+	// Add search paths
+	g_pFileSystem->AddSearchPath( exePath.c_str(), "enginebin" );
+	g_pFileSystem->AddSearchPath( "core", "core" );
+
+	// Setup a log file
 #if ENABLE_LOGGING
 	if ( pLogFileName && S_Strlen( pLogFileName ) > 0 && ( DEBUG || CommandLine()->HasParam( "log" ) ) )
 	{
@@ -107,7 +118,6 @@ bool CApplication::PostInit()
 		Logger()->AddOutput( pLogOutputFile );
 	}
 #endif	// ENABLE_LOGGING
-
 	return true;
 }
 

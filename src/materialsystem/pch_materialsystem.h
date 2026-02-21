@@ -3,11 +3,10 @@
 #include <EASTL/unordered_map.h>
 
 #include "utils/interfaces/interfaces.h"
+#include "tier0/tier0.h"
+#include "tier0/profile.h"
 #include "tier1/convar.h"
 #include "tier1/stl.h"
-#include "tier0/tier0.h"
-#include "tier0/debug.h"
-#include "tier0/profile.h"
 #include "studiorender/studioapi/istudioapi.h"
 #include "studiorender/istudiorender.h"
 #include "materialsystem/ishadermgr.h"

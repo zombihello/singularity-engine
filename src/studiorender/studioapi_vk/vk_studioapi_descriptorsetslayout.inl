@@ -51,7 +51,7 @@ FORCEINLINE uint32 CStudioAPIDescriptorSetsLayoutVk::GetNumDescriptorSets() cons
 CStudioAPIDescriptorSetsLayoutVk::GetDescriptorTypesUsageHash
 ==================
 */
-FORCEINLINE hash_t CStudioAPIDescriptorSetsLayoutVk::GetDescriptorTypesUsageHash() const
+FORCEINLINE hash CStudioAPIDescriptorSetsLayoutVk::GetDescriptorTypesUsageHash() const
 {
 	return descriptorTypesUsageHash;
 }

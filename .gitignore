@@ -18,6 +18,7 @@
 **/.vs
 **/__pycache__
 **/obj
+**/intermediate
 src/build
 compile_commands.json
 Makefile

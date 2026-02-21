@@ -2,7 +2,7 @@
 #include <EASTL/string.h>
 
 #include "tier0/tier0.h"
-#include "tier0/debug.h"
+#include "tier0/ilogger.h"
 #include "tier1/math/math.h"
 
 //-----------------------------------------------------------------------------

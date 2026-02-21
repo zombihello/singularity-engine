@@ -33,7 +33,7 @@ public:
 	virtual TRefPtr<IStreamDataWriter> CreateFileWriter( const char* pPath, uint32 flags = FILE_WRITE_NONE ) override;
 
 	// This is method looks files in the search paths or in the first if it set
-	virtual TRefPtr<IPathArrayResult> FindFiles( const char* pPath, bool bFiles, bool bDirectories, bool bLookAllPathIDs = true ) override;
+	virtual TRefPtr<IPathArrayResult> FindFiles( const char* pPath, const char* pPattern, bool bFiles, bool bDirectories, bool bLookAllPathIDs = true ) override;
 
 	// This is method looks a DLL module in the search paths and first opened returns
 	virtual dllHandle_t LoadModule( const char* pDLLName ) override;
@@ -64,11 +64,18 @@ public:
 	// the first found search path in pDestPath
 	virtual copyMoveResult_t MoveDirectory( const char* pSrcPath, const char* pDestPath, bool bMoveAllPathIDs = false, bool bReplaceExisting = false, bool bEvenReadOnly = false ) override;
 
+	// This method looks for directories in the search paths and the first one select as the current directory
+	virtual bool SetCurrentDirectory( const char* pPath ) override;
+
 	// This is method looks for a file or a directory in the search paths and when first was found returns TRUE
 	virtual bool IsFileExists( const char* pPath ) const override;
 
 	// This is method looks for a file or a directory in the search paths and when first was found returns TRUE if it is directory
 	virtual bool IsFileDirectory( const char* pPath ) const override;
+
+	// Functions to get path to some directories
+	virtual const char* GetUserDirectory() const override;
+	virtual bool		GetCurrentDirectory( char* pDest, uint32 maxLen ) const override;
 
 	// Functions to work with search paths
 	virtual void					  AddSearchPath( const char* pSearchPath, const char* pPathID ) override;

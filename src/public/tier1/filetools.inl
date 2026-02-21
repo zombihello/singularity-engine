@@ -12,12 +12,30 @@ FORCEINLINE bool S_IsPathSeparator( char c )
 
 /*
 ==================
-S_SetCurrentDirectory
+S_HasPathSeparator
 ==================
 */
-FORCEINLINE bool S_SetCurrentDirectory( const eastl::string& dirName )
+FORCEINLINE bool S_HasPathSeparator( const char* pPath )
 {
-	return S_SetCurrentDirectory( dirName.c_str() );
+	// Do nothing if the buffer isn't valid
+	if ( !pPath || !pPath[0] )
+	{
+		return false;
+	}
+
+	uint32 length = S_Strlen( pPath );
+	Assert( length > 0 );
+	return S_IsPathSeparator( pPath[length - 1] );
+}
+
+/*
+==================
+S_HasPathSeparator
+==================
+*/
+FORCEINLINE bool S_HasPathSeparator( const eastl::string& path )
+{
+	return S_HasPathSeparator( path.c_str() );
 }
 
 /*

@@ -48,9 +48,9 @@ static FORCEINLINE VkFormat VK_TranslateVertexAttributeType( studioAPIVertexAttr
 VK_ShaderReflectionCalcHash
 ==================
 */
-static FORCEINLINE hash_t VK_ShaderReflectionCalcHash( const shaderReflectionConstantBuffer_t& shaderReflectionConstnatBuffer )
+static FORCEINLINE hash VK_ShaderReflectionCalcHash( const shaderReflectionConstantBuffer_t& shaderReflectionConstnatBuffer )
 {
-	hash_t hash = FastHash( shaderReflectionConstnatBuffer.name.c_str(), (uint64)shaderReflectionConstnatBuffer.name.size() * sizeof( char ) );
+	hash hash = FastHash( shaderReflectionConstnatBuffer.name.c_str(), (uint64)shaderReflectionConstnatBuffer.name.size() * sizeof( char ) );
 	return FastHash( shaderReflectionConstnatBuffer.size, hash );
 }
 
@@ -59,9 +59,9 @@ static FORCEINLINE hash_t VK_ShaderReflectionCalcHash( const shaderReflectionCon
 VK_ShaderReflectionCalcHash
 ==================
 */
-static FORCEINLINE hash_t VK_ShaderReflectionCalcHash( const shaderReflectionStorageBuffer_t& shaderReflectionStorageBuffer )
+static FORCEINLINE hash VK_ShaderReflectionCalcHash( const shaderReflectionStorageBuffer_t& shaderReflectionStorageBuffer )
 {
-	hash_t hash = FastHash( shaderReflectionStorageBuffer.name.c_str(), (uint64)shaderReflectionStorageBuffer.name.size() * sizeof( char ) );
+	hash hash = FastHash( shaderReflectionStorageBuffer.name.c_str(), (uint64)shaderReflectionStorageBuffer.name.size() * sizeof( char ) );
 	return FastHash( shaderReflectionStorageBuffer.size, hash );
 }
 
@@ -70,9 +70,9 @@ static FORCEINLINE hash_t VK_ShaderReflectionCalcHash( const shaderReflectionSto
 VK_ShaderReflectionCalcHash
 ==================
 */
-static FORCEINLINE hash_t VK_ShaderReflectionCalcHash( const shaderReflectionImageSampler_t& shaderReflectionImageSampler )
+static FORCEINLINE hash VK_ShaderReflectionCalcHash( const shaderReflectionImageSampler_t& shaderReflectionImageSampler )
 {
-	hash_t hash = FastHash( shaderReflectionImageSampler.name.c_str(), (uint64)shaderReflectionImageSampler.name.size() * sizeof( char ) );
+	hash hash = FastHash( shaderReflectionImageSampler.name.c_str(), (uint64)shaderReflectionImageSampler.name.size() * sizeof( char ) );
 	hash		= FastHash( shaderReflectionImageSampler.dimensionType, hash );
 	return FastHash( shaderReflectionImageSampler.arraySize, hash );
 }

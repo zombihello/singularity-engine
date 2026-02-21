@@ -1,8 +1,9 @@
 #pragma once
-#include <stdio.h>
+#if PLATFORM_USE_STD_FILE
+	#include <stdio.h>
 
-#include "tier0/defines.h"
-#include "filesystem/file_base.h"
+	#include "tier0/defines.h"
+	#include "filesystem/platforms/generic/file_base.h"
 
 //-----------------------------------------------------------------------------
 // The class for reading from a eastl file
@@ -61,3 +62,4 @@ public:
 private:
 	FILE* pFile;
 };
+#endif	// PLATFORM_USE_STD_FILE

@@ -3,6 +3,7 @@
 
 #include "tier0/defines.h"
 #include "tier0/types.h"
+#include "tier0/assert.h"
 #include "tier1/istreamdata.h"
 #include "studiorender/studioapi/istudioapi_shader.h"
 

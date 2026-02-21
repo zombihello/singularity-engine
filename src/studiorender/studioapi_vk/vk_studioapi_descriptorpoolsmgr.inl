@@ -28,7 +28,7 @@ CStudioAPIDescriptorPoolSetContainerVk::AcquireTypedPoolSet
 FORCEINLINE CStudioAPITypedDescriptorPoolSetVk* CStudioAPIDescriptorPoolSetContainerVk::AcquireTypedPoolSet( const CStudioAPIDescriptorSetsLayoutVk& descriptorSetsLayout )
 {
 	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
-	hash_t hash = descriptorSetsLayout.GetDescriptorTypesUsageHash();
+	hash hash = descriptorSetsLayout.GetDescriptorTypesUsageHash();
 	auto   it	= typedDescriptorPoolsDict.find( hash );
 	if ( it == typedDescriptorPoolsDict.end() )
 	{

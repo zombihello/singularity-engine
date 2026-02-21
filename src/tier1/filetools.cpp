@@ -1,32 +1,5 @@
 #include "pch_tier1.h"
-#include "tier0/debug.h"
 #include "tier1/filetools.h"
-
-/*
-==================
-S_GetCurrentDirectory
-==================
-*/
-void S_GetCurrentDirectory( eastl::string& destStr, bool bShrinkToFit /*= true*/ )
-{
-	// Pre-allocate memory for current directory
-	destStr.resize( 1024 );
-
-	// Try get the current directory
-	while ( !S_GetCurrentDirectory( destStr.data(), (uint32)destStr.size() ) )
-	{
-		destStr.resize( destStr.size() * 2 );
-	}
-
-	// Remove all extra null terminator characters
-	destStr = destStr.c_str();
-
-	// Shrink to fit if it need
-	if ( bShrinkToFit )
-	{
-		destStr.shrink_to_fit();
-	}
-}
 
 /*
 ==================
@@ -35,10 +8,10 @@ S_MakeAbsolutePath
 */
 bool S_MakeAbsolutePath( const char* pSrcPath, char* pDestPath, uint32 maxLen, const char* pStartingDir /*= nullptr*/ )
 {
+	// Do nothing if pSrcPath isn't valid
+	Assert( g_pFileSystem );
 	Assert( pDestPath );
 	Assert( maxLen >= 1 );
-
-	// Do nothing if pSrcPath isn't valid
 	if ( !pSrcPath || !pSrcPath[0] )
 	{
 		*pDestPath = 0;
@@ -87,8 +60,8 @@ bool S_MakeAbsolutePath( const char* pSrcPath, char* pDestPath, uint32 maxLen, c
 		}
 		else
 		{
-			// Copy to pDestPath current directory. If S_GetCurrentDirectory return FALSE, it's mean what pDestPath too small
-			if ( !S_GetCurrentDirectory( pDestPath, maxLen ) )
+			// Copy to pDestPath current directory. If GetCurrentDirectory return FALSE, it's mean what pDestPath too small
+			if ( !g_pFileSystem->GetCurrentDirectory( pDestPath, maxLen ) )
 			{
 				*pDestPath = 0;
 				return false;

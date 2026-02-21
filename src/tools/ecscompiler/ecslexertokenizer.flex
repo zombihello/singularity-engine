@@ -20,7 +20,8 @@
     #include <EASTL/stack.h>
 
     #include "ecsfileparser_bison.cpp.h"
-    #include "tier0/debug.h"
+    #include "tier0/assert.h"
+    #include "tier0/ilogger.h"
     #include "utils/parserlib/lexerstate.h"
     #include "utils/parserlib/lexerlistener.h"
 
