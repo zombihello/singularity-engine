@@ -19,6 +19,3 @@ extern double g_SecondsPerCycle;
 // Internal tier0 functions
 //-----------------------------------------------------------------------------
 double Sys_GetSecondsPerCycle();
-#if ENABLE_LOGGING
-void Sys_SetupDefaultLogOutputs( ILogger* pLogger );
-#endif	// ENABLE_LOGGING

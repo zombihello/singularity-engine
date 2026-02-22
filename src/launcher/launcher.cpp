@@ -596,7 +596,7 @@ void CSingularityAppSystemGroup::OnProcessWindowEvent( void* pUserData, const wi
 		break;
 	}
 }
-
+#include "tier0/consoleio.h"
 /*
 ==================
 LauncherMain
@@ -605,21 +605,23 @@ LauncherMain
 extern "C" DLL_EXPORT uint32 LauncherMain( appInstanceHandle_t hInstance, const char* pDefaultGameDir, const char* pCommandLine )
 {
 	// Enable developer messages if we in debug configuration
-#if DEBUG
+#if DEBUG && ENABLE_LOGGING
 	Logger()->SetGroupActivate( LOG_GROUP_DEVELOPER, true );
-#endif	// DEBUG
+#endif	// DEBUG && ENABLE_LOGGING
 
-	// Initialize the main thread
+	// Initialize the main thread and the command line
 	Sys_InitMainThread();
-
-	// Initialize the command line
 	CommandLine()->Init( pCommandLine );
 
-	// Initialize OS console if it need
-	if ( CommandLine()->HasParam( "console" ) )
+	// Attach a console for I/O if it need
+#if ENABLE_LOGGING
+	if ( CommandLine()->HasParam( "stdout" ) )
 	{
-		LogConsoleOS()->Show( true );
+		Sys_SetupConsoleIO();
+		static CLogOutputStdOut s_logOutputStdOut;
+		Logger()->AddOutput( &s_logOutputStdOut );
 	}
+#endif	// ENABLE_LOGGING
 
 	// Disable ensures if it need
 #if ENABLE_ENSURE

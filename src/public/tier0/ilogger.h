@@ -1,19 +1,16 @@
 #pragma once
-#include "tier0/tier0_api.h"
-#include "tier0/defines.h"
-#include "tier0/types.h"
+#include "tier0/debug.h"
+#include "tier0/consoleio.h"
+#include "tier1/strtools.h"
 
 //-----------------------------------------------------------------------------
-// Logger
+// Constants and types
 //-----------------------------------------------------------------------------
-enum logTextColor_t
+enum
 {
-	LOG_TEXT_COLOR_DEFAULT,
-	LOG_TEXT_COLOR_WHITE,
-	LOG_TEXT_COLOR_RED,
-	LOG_TEXT_COLOR_YELLOW,
-	LOG_TEXT_COLOR_GREEN,
-	LOG_TEXT_NUM_COLORS
+	// An invalid color set on a log output to imply that it should use
+	// a device-dependent default color where applicable
+	UNSPECIFIED_LOG_COLOR = 0
 };
 
 enum logGroup_t
@@ -31,69 +28,74 @@ enum logLevel_t
 	LOG_NUM_LEVELS
 };
 
-// A log output
+struct logContext_t
+{
+	logGroup_t group;
+	logLevel_t level;
+	CColor	   color;
+};
+
+//-----------------------------------------------------------------------------
+// Interface for classes to handle logging output
+//-----------------------------------------------------------------------------
 class ILogOutput
 {
 public:
-	virtual void SetTextColor( logTextColor_t textColor )		 = 0;
-	virtual void Print( logLevel_t level, const char* pMessage ) = 0;
+	virtual void Print( const logContext_t& context, const char* pMessage ) = 0;
 };
 
-// A log output into a console
-class ILogOutputConsole : public ILogOutput
-{
-public:
-	virtual void Show( bool bShowConsole ) = 0;
-	virtual bool IsShown() const		   = 0;
-};
-
-// The logger system that supports multiple outputs
-// (i.g: output into a console, file, etc)
+//-----------------------------------------------------------------------------
+// The central logging system interface
+//-----------------------------------------------------------------------------
 class ILogger
 {
 public:
 	virtual void AddOutput( ILogOutput* pLogOutput )	= 0;
 	virtual void RemoveOutput( ILogOutput* pLogOutput ) = 0;
-	virtual void RemoveAllOutputs()						= 0;
 
 	virtual void SetGroupActivate( logGroup_t group, bool bActivate ) = 0;
 	virtual bool IsGroupActive( logGroup_t group ) const			  = 0;
 
-	virtual void		   Printf( logGroup_t group, logLevel_t level, const char* pFormat, ... )			  = 0;
-	virtual void		   VPrintf( logGroup_t group, logLevel_t level, const char* pFormat, va_list params ) = 0;
-	virtual void		   SetTextColor( logTextColor_t textColor )											  = 0;
-	virtual logTextColor_t GetTextColor() const																  = 0;
+	virtual void Printf( logGroup_t group, logLevel_t level, const CColor& color, const char* pFormat, ... )			 = 0;
+	virtual void VPrintf( logGroup_t group, logLevel_t level, const CColor& color, const char* pFormat, va_list params ) = 0;
 };
 
-// Helper base implementation of an ILogOutput
-template<class TBaseClass>
-class CBaseLogOutput : public TBaseClass
+//-----------------------------------------------------------------------------
+// A log output into stdout
+//-----------------------------------------------------------------------------
+class CLogOutputStdOut : public ILogOutput
 {
 public:
 	// ILogOutput interface
-	virtual void SetTextColor( logTextColor_t textColor ) override { CBaseLogOutput::textColor = textColor; }
+	virtual void Print( const logContext_t& context, const char* pMessage ) override;
 
-	CBaseLogOutput()
-		: textColor( LOG_TEXT_COLOR_DEFAULT )
-	{
-	}
+	CLogOutputStdOut();
 
-protected:
-	logTextColor_t textColor;
+private:
+	consoleColorContext_t colorContext;
 };
 
+//-----------------------------------------------------------------------------
 // Functions for logging in 'general' group
+//-----------------------------------------------------------------------------
 void Msg( const char* pFormat, ... );
+void Msg( const CColor& color, const char* pFormat, ... );
 void Warning( const char* pFormat, ... );
+void Warning( const CColor& color, const char* pFormat, ... );
 void Error( const char* pFormat, ... );
+void Error( const CColor& color, const char* pFormat, ... );
 
+//-----------------------------------------------------------------------------
 // Functions for logging in 'developer' group
+//-----------------------------------------------------------------------------
 void DevMsg( const char* pFormat, ... );
+void DevMsg( const CColor& color, const char* pFormat, ... );
 void DevWarning( const char* pFormat, ... );
+void DevWarning( const CColor& color, const char* pFormat, ... );
 void DevError( const char* pFormat, ... );
+void DevError( const CColor& color, const char* pFormat, ... );
 
 // NOTE: If the module was build with disabled logging the functions return a null implementation
-TIER0_INTERFACE ILogger*		   Logger();
-TIER0_INTERFACE ILogOutputConsole* LogConsoleOS();
+TIER0_INTERFACE ILogger* Logger();
 
 #include "tier0/ilogger.inl"

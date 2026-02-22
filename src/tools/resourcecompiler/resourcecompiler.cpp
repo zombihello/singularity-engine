@@ -743,16 +743,19 @@ main
 */
 int main( int argc, char** argv )
 {
+#if ENABLE_LOGGING
+	// Add a log output into stdout
+	static CLogOutputStdOut s_logOutputStdOut;
+	Logger()->AddOutput( &s_logOutputStdOut );
+
 	// Enable developer messages if we in debug configuration
-#if DEBUG
+	#if DEBUG
 	Logger()->SetGroupActivate( LOG_GROUP_DEVELOPER, true );
-#endif	// DEBUG
+	#endif	// DEBUG
+#endif		// ENABLE_LOGGING
 
 	// Initialize the main thread
 	Sys_InitMainThread();
-
-	// Initialize OS console
-	LogConsoleOS()->Show( true );
 
 	// Setup application information for the crash dump
 	CrashDump_SetAppInfo( crashDumpAppInfo_t{ "Resource Compiler", __DATE__ " " __TIME__, NULL, NULL } );

@@ -35,7 +35,7 @@ class IWindowMgr : public IAppSystem
 {
 public:
 	virtual bool Create( const char* pTitle, uint32 width, uint32 height, uint32 flags = WINDOW_STYLE_DEFAULT ) = 0;
-	virtual void Close()																						 = 0;
+	virtual void Close()																						= 0;
 
 	virtual void ShowWindow( bool bShowWindow = true ) = 0;
 	virtual void Maximize()							   = 0;
@@ -43,7 +43,7 @@ public:
 
 	virtual void ProcessEvents() = 0;
 
-	virtual void SetTitle( const char* pTitle )		= 0;
+	virtual void SetTitle( const char* pTitle )			= 0;
 	virtual void SetSize( uint32 width, uint32 height ) = 0;
 	virtual void SetFullscreen( bool bFullscreen )		= 0;
 
