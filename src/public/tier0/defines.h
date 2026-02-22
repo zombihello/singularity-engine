@@ -31,7 +31,8 @@
 // Platform specific macros
 //-----------------------------------------------------------------------------
 // By default all defines PLATFORM_XXX are 0
-#define PLATFORM_WINDOWS 0
+#define PLATFORM_WINDOWS		  0
+#define PLATFORM_USE_WCHAR_STDOUT 0
 
 #if _WIN32 || _WIN64  // Windows platform
 	#include "tier0/platforms/windows/win_defines.h"

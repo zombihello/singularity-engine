@@ -407,7 +407,8 @@ function( add_flex_commands DEST_DIR DEST_OUTPUT_FILES )
             add_custom_command( OUTPUT "${OUTPUT_FILE_CPP}"
                                 COMMAND "${FLEX_EXE}" -o "${OUTPUT_FILE_CPP}" "${FILE}"
                                 DEPENDS "${FILE}"
-                                WORKING_DIRECTORY "${FLEX_BIN_DIR}" )
+                                WORKING_DIRECTORY "${FLEX_BIN_DIR}"
+                                COMMAND_EXPAND_LISTS )
 
             set_source_files_properties( "${OUTPUT_FILE_CPP}" PROPERTIES GENERATED TRUE )
             list( APPEND OUTPUT_FILES "${OUTPUT_FILE_CPP}" )
@@ -441,7 +442,8 @@ function( add_bison_commands DEST_DIR DEST_OUTPUT_FILES )
             add_custom_command( OUTPUT "${OUTPUT_FILE_HEADER}" "${OUTPUT_FILE_CPP}"
                                 COMMAND "${BISON_EXE}" --defines="${OUTPUT_FILE_HEADER}" -o "${OUTPUT_FILE_CPP}" "${FILE}"
                                 DEPENDS "${FILE}"
-                                WORKING_DIRECTORY "${BISON_BIN_DIR}" )
+                                WORKING_DIRECTORY "${BISON_BIN_DIR}"
+                                COMMAND_EXPAND_LISTS )
 
             set_source_files_properties( "${OUTPUT_FILE_HEADER}" "${OUTPUT_FILE_CPP}" PROPERTIES GENERATED TRUE )
             list( APPEND OUTPUT_FILES "${OUTPUT_FILE_HEADER}" "${OUTPUT_FILE_CPP}" )
@@ -482,7 +484,8 @@ function( add_ecscompiler_commands BASE_DIR DEST_DIR DEST_OUTPUT_FILES )
             add_custom_command( OUTPUT "${OUTPUT_FILE_HEADER}" "${OUTPUT_FILE_CPP}"
                                 COMMAND "${ECSCOMPILER_EXE}" -file "${FILE}" -output "${FILE_DEST_DIR}"
                                 DEPENDS "${FILE}"
-                                WORKING_DIRECTORY "${ROOT_DIR}" )
+                                WORKING_DIRECTORY "${ROOT_DIR}"
+                                COMMAND_EXPAND_LISTS )
 
             set_source_files_properties( "${OUTPUT_FILE_CPP}"                           PROPERTIES HEADER_FILE_ONLY TRUE )
             set_source_files_properties( "${OUTPUT_FILE_HEADER}" "${OUTPUT_FILE_CPP}"   PROPERTIES GENERATED TRUE )
@@ -523,7 +526,8 @@ function( add_shadercompiler_commands BASE_DIR DEST_DIR DEST_OUTPUT_FILES )
             add_custom_command( OUTPUT "${OUTPUT_FILE_HEADER}"
                                 COMMAND "${SHADERCOMPILER_EXE}" -mode gencpp -file "${FILE}" -output "${FILE_DEST_DIR}"
                                 DEPENDS "${FILE}"
-                                WORKING_DIRECTORY "${ROOT_DIR}" )
+                                WORKING_DIRECTORY "${ROOT_DIR}"
+                                COMMAND_EXPAND_LISTS )
 
             set_source_files_properties( "${OUTPUT_FILE_HEADER}" PROPERTIES GENERATED TRUE )
             list( APPEND OUTPUT_FILES "${OUTPUT_FILE_HEADER}" )

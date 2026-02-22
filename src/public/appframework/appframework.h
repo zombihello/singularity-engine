@@ -1,5 +1,8 @@
 #pragma once
 #include "appframework/iappsystemgroup.h"
+#if ENABLE_LOGGING
+	#include "tier1/tier1_logoutputs.h"
+#endif	// ENABLE_LOGGING
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -45,8 +48,8 @@ public:
 protected:
 	CAppSystemGroup* pChildAppSystemGroup;
 #if ENABLE_LOGGING
-	const char* pLogFileName;
-	ILogOutput* pLogOutputFile;
+	const char*		pLogFileName;
+	CLogOutputFile* pLogOutputFile;
 #endif	// ENABLE_LOGGING
 };
 

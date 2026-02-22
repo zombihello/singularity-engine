@@ -4,55 +4,9 @@
 #include "cvar/icvar.h"
 #include "filesystem/ifilesystem.h"
 #include "appframework/appframework.h"
-
 #if ENABLE_LOGGING
-	#include "tier0/ilogger.h"
 	#include "tier0/crashdump.h"
 	#include "tier0/icommandline.h"
-
-//-----------------------------------------------------------------------------
-// A log output into a file
-// NOTE: For use must be connected Tier1
-//-----------------------------------------------------------------------------
-class CLogOutputFile : public CBaseLogOutput<ILogOutput>
-{
-public:
-	// ILogOutput interface
-	virtual void Print( logLevel_t level, const char* pMessage ) override;
-
-	CLogOutputFile( const char* pPath );
-
-private:
-	TRefPtr<IStreamDataWriter> pFile;
-};
-
-/*
-==================
-CLogOutputFile::CLogOutputFile
-==================
-*/
-CLogOutputFile::CLogOutputFile( const char* pPath )
-{
-	Assert( g_pFileSystem );
-	pFile = g_pFileSystem->CreateFileWriter( pPath );
-	if ( !pFile )
-	{
-		Warning( "AppFramework: Failed to open log file '%s'", pPath );
-	}
-}
-
-/*
-==================
-CLogOutputFile::Print
-==================
-*/
-void CLogOutputFile::Print( logLevel_t level, const char* pMessage )
-{
-	if ( pFile )
-	{
-		pFile->Write( (void*)pMessage, S_Strlen( pMessage ) * sizeof( char ) );
-	}
-}
 #endif	// ENABLE_LOGGING
 
 /*
@@ -110,7 +64,7 @@ bool CApplication::PostInit()
 
 	// Setup a log file
 #if ENABLE_LOGGING
-	if ( pLogFileName && S_Strlen( pLogFileName ) > 0 && ( DEBUG || CommandLine()->HasParam( "log" ) ) )
+	if ( pLogFileName && pLogFileName[0] != '\0' && ( DEBUG || CommandLine()->HasParam( "log" ) ) )
 	{
 		eastl::string logFilePath = S_Sprintf( "//BASE_PATH/logs/%s.log", pLogFileName );
 		pLogOutputFile			  = new CLogOutputFile( logFilePath.c_str() );
