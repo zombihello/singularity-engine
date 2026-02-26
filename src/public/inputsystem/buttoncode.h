@@ -5,8 +5,6 @@
 //-----------------------------------------------------------------------------
 enum buttonCode_t
 {
-	BUTTON_CODE_NONE = 0,
-
 	//
 	// Keyboard buttons
 	//
@@ -14,7 +12,7 @@ enum buttonCode_t
 	KEY_FIRST = 0,
 	KEY_NONE  = KEY_FIRST,
 
-	KEY_0,
+	KEY_0 = KEY_FIRST,
 	KEY_1,
 	KEY_2,
 	KEY_3,
@@ -146,6 +144,8 @@ enum buttonCode_t
 	MOUSE_LAST	 = MOUSE_Y,
 	MOUSE_COUNT	 = MOUSE_LAST - MOUSE_FIRST + 1,
 
+	BUTTON_CODE_NONE  = 0,
+	BUTTON_CODE_FIRST = KEY_FIRST,
 	BUTTON_CODE_LAST  = MOUSE_LAST,
-	BUTTON_CODE_COUNT = BUTTON_CODE_LAST - KEY_FIRST + 1
+	BUTTON_CODE_COUNT = BUTTON_CODE_LAST - BUTTON_CODE_FIRST + 1
 };

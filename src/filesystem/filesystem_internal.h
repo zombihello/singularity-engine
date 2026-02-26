@@ -4,7 +4,6 @@
 
 #include "tier0/defines.h"
 #include "tier0/types.h"
-#include "filesystem/ifilesystem.h"
 
 //-----------------------------------------------------------------------------
 // Platform specific internal defines

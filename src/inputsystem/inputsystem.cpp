@@ -2,7 +2,7 @@
 #include "tier1/convar.h"
 #include "tier1/istreamdata.h"
 #include "cvar/icvar.h"
-#include "inputsystem/inputsystem_private.h"
+#include "inputsystem/inputsystem_internal.h"
 #include "inputsystem/iinputsystem.h"
 
 //-----------------------------------------------------------------------------
@@ -151,9 +151,9 @@ public:
 	virtual void ClearInputState() override;
 
 	// Functions set/get console command which binded on a button
-	virtual void		 SetBinding( buttonCode_t button, const char* pCommand ) override;
+	virtual void		SetBinding( buttonCode_t button, const char* pCommand ) override;
 	virtual const char* GetBindingCommand( buttonCode_t button ) const override;
-	virtual void		 UnbindAll() override;
+	virtual void		UnbindAll() override;
 
 	// Set relative mouse mode
 	// While the mouse is in relative mode, the cursor is hidden, and the
@@ -177,7 +177,7 @@ public:
 
 	virtual buttonEvent_t GetButtonEvent( buttonCode_t buttonCode ) const override;
 	virtual buttonCode_t  GetButtonCodeByName( const char* pButtonName ) const override;
-	virtual const char*  GetButtonName( buttonCode_t buttonCode ) const override;
+	virtual const char*	  GetButtonName( buttonCode_t buttonCode ) const override;
 
 	void ExecBindingCommand( buttonCode_t button );
 
@@ -186,15 +186,18 @@ private:
 	static void ProcessInputEvent( void* pUserData, const inputEvent_t& inputEvent );
 	static void WriteConCmdsToConfigFile( void* pUserData, IStreamDataWriter* pStreamData );
 
-	bool										 bRelativeMouseMode;
-	IWindowMgr*									 pWindowMgr;  // A window manager that was attached the input system
+	bool		bRelativeMouseMode;
+	IWindowMgr* pWindowMgr;	 // A window manager that was attached the input system
+// AHTUNG
+#if 0
 	IOnProcessWindowEvent::funcDelegate_t*		 pWindowEventDelegate;
 	IOnProcessInputEvent::funcDelegate_t*		 pInputEventDelegate;
+#endif	// 0
 	IOnWriteConCmdsToConfigFile::funcDelegate_t* pWriteConCmdsDelegate;
 	buttonEvent_t								 buttonEvents[BUTTON_CODE_COUNT];
 	vec2_t										 mouseLocation;
 	vec2_t										 mouseOffset;
-	eastl::string									 binds[BUTTON_CODE_COUNT];
+	eastl::string								 binds[BUTTON_CODE_COUNT];
 };
 
 // Input system singleton
@@ -209,8 +212,11 @@ CInputSystem::CInputSystem
 CInputSystem::CInputSystem()
 	: bRelativeMouseMode( false )
 	, pWindowMgr( NULL )
+// AHTUNG
+#if 0
 	, pWindowEventDelegate( NULL )
 	, pInputEventDelegate( NULL )
+#endif	// 0
 	, pWriteConCmdsDelegate( NULL )
 	, mouseLocation( g_vectorZero )
 	, mouseOffset( g_vectorZero )
@@ -270,6 +276,8 @@ CInputSystem::AttachToWindow
 */
 void CInputSystem::AttachToWindow( IWindowMgr* pWindowMgr )
 {
+// AHTUNG
+#if 0
 	if ( pWindowMgr )
 	{
 		DetachFromWindow();
@@ -278,6 +286,7 @@ void CInputSystem::AttachToWindow( IWindowMgr* pWindowMgr )
 	pWindowEventDelegate	 = pWindowMgr->OnProcessWindowEvent()->AddFunc( &CInputSystem::ProcessWindowEvent, this );
 	pInputEventDelegate		 = pWindowMgr->OnProcessInputEvent()->AddFunc( &CInputSystem::ProcessInputEvent, this );
 	CInputSystem::pWindowMgr = pWindowMgr;
+#endif	// 0
 }
 
 /*
@@ -287,6 +296,8 @@ CInputSystem::DetachFromWindow
 */
 void CInputSystem::DetachFromWindow()
 {
+// AHTUNG
+#if 0
 	if ( pWindowMgr )
 	{
 		pWindowMgr->OnProcessWindowEvent()->RemoveFunc( pWindowEventDelegate );
@@ -295,6 +306,7 @@ void CInputSystem::DetachFromWindow()
 		pWindowEventDelegate = NULL;
 		pInputEventDelegate	 = NULL;
 	}
+#endif	// 0
 }
 
 /*
@@ -308,22 +320,25 @@ void CInputSystem::ProcessWindowEvent( void* pUserData, const windowEvent_t& win
 	Assert( pUserData );
 	CInputSystem* pInputSystem = (CInputSystem*)pUserData;
 
+// AHTUNG
+#if 0
 	switch ( windowEvent.type )
 	{
 	case windowEvent_t::EVENT_WINDOW_FOCUS_GAINED:
 		if ( pInputSystem->bRelativeMouseMode )
 		{
-			Sys_SetRelativeMouseMode( true );
+			Plat_SetRelativeMouseMode( true );
 		}
 		break;
 
 	case windowEvent_t::EVENT_WINDOW_FOCUS_LOST:
 		if ( pInputSystem->bRelativeMouseMode )
 		{
-			Sys_SetRelativeMouseMode( false );
+			Plat_SetRelativeMouseMode( false );
 		}
 		break;
 	}
+#endif	// 0
 }
 
 /*
@@ -337,6 +352,8 @@ void CInputSystem::ProcessInputEvent( void* pUserData, const inputEvent_t& input
 	Assert( pUserData );
 	CInputSystem* pInputSystem = (CInputSystem*)pUserData;
 
+// AHTUNG
+#if 0
 	switch ( inputEvent.type )
 	{
 		// Key pressed
@@ -396,6 +413,7 @@ void CInputSystem::ProcessInputEvent( void* pUserData, const inputEvent_t& input
 	case inputEvent_t::EVENT_TEXT_INPUT:
 		break;
 	}
+#endif	// 0
 }
 
 /*
@@ -501,7 +519,7 @@ CInputSystem::SetRelativeMouseMode
 void CInputSystem::SetRelativeMouseMode( bool bEnabled )
 {
 	bRelativeMouseMode = bEnabled;
-	Sys_SetRelativeMouseMode( bEnabled );
+	Plat_SetRelativeMouseMode( bEnabled );
 }
 
 /*

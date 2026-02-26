@@ -5,11 +5,6 @@
 #endif	// ENABLE_LOGGING
 
 //-----------------------------------------------------------------------------
-// Forward declarations
-//-----------------------------------------------------------------------------
-class ILogOutput;
-
-//-----------------------------------------------------------------------------
 // This class is a helper class used for applications.
 // It loads up the file system in preparation for using it to load other required modules
 //-----------------------------------------------------------------------------

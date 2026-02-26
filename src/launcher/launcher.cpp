@@ -16,10 +16,15 @@
 #include "resourcesystem/iresourcesystem.h"
 #include "game/igame.h"
 #include "utils/gameinfo/gameinfo.h"
+#if ENABLE_LOGGING
+	#include "tier0/consoleio.h"
+#endif	// ENABLE_LOGGING
 
+CConVar window_displayId( "window_displayId", "-1", "Window display id (-1: Not specified)", FCVAR_ARCHIVE );
 CConVar window_width( "window_width", "1280", "Window width", FCVAR_ARCHIVE );
 CConVar window_height( "window_height", "720", "Window height", FCVAR_ARCHIVE );
-CConVar fullscreen( "fullscreen", "0", "Is need open the window in fullscreen mode", FCVAR_ARCHIVE );
+CConVar window_refreshRate( "window_refreshRate", "0", "Window refresh rate (0: Not specified)", FCVAR_ARCHIVE );
+CConVar window_mode( "window_mode", "1", "Window mode (0: Hidden, 1: Windowed, 2: Borderless Fullscreen, 3: Exclusive Fullscreen)", FCVAR_ARCHIVE );
 
 //-----------------------------------------------------------------------------
 // IConVars overrider
@@ -85,17 +90,19 @@ private:
 	bool GameDLL_Load();
 	void GameDLL_Unload();
 
-	static void OnProcessWindowEvent( void* pUserData, const windowEvent_t& windowEvent );
+	static void OnWindowEvent( void* pUserData, const windowEvent_t& windowEvent );
+	static void OnChangedMainWindow( void* pUserData, windowId_t newMainWindowId );
 
-	bool								   bInFocus;
-	appInstanceHandle_t					   hInstance;
-	const char*							   pDefaultGameDir;
-	CGameInfoDoc						   gameInfo;
-	CGameViewportClient					   gameViewportClient;
-	dllHandle_t							   gameDLLHandle;
-	createInterfaceFn_t					   pGameFactory;
-	TRefPtr<IStudioViewport>			   pStudioViewport;
-	IOnProcessWindowEvent::funcDelegate_t* pProcessWindowEventDelegate;
+	bool											  bInFocus;
+	appInstanceHandle_t								  hInstance;
+	const char*										  pDefaultGameDir;
+	CGameInfoDoc									  gameInfo;
+	CGameViewportClient								  gameViewportClient;
+	dllHandle_t										  gameDLLHandle;
+	createInterfaceFn_t								  pGameFactory;
+	TRefPtr<IStudioViewport>						  pStudioViewport;
+	IWindowMgr::IOnWindowEvent::funcDelegate_t*		  pWindowEventDelegate;
+	IWindowMgr::IOnChangedMainWindow::funcDelegate_t* pChangedMainWindowDelegate;
 };
 
 /*
@@ -110,12 +117,12 @@ void CConVarsOverrider::OverrideFromCommandLine()
 	// Check for windowed mode command line override
 	if ( pCommandLine->HasParam( "windowed" ) || pCommandLine->HasParam( "window" ) )
 	{
-		fullscreen.SetInt( 0 );
+		window_mode.SetInt( WINDOW_MODE_WINDOWED );
 	}
 	// Check for fullscreen override
 	else if ( pCommandLine->HasParam( "full" ) || pCommandLine->HasParam( "fullscreen" ) )
 	{
-		fullscreen.SetInt( 1 );
+		window_mode.SetInt( WINDOW_MODE_EXCLUSIVE_FULLSCREEN );
 	}
 
 	// Get width
@@ -164,7 +171,8 @@ CSingularityAppSystemGroup::CSingularityAppSystemGroup( const char* pDefaultGame
 	, pDefaultGameDir( pDefaultGameDir )
 	, gameDLLHandle( NULL )
 	, pGameFactory( NULL )
-	, pProcessWindowEventDelegate( NULL )
+	, pWindowEventDelegate( NULL )
+	, pChangedMainWindowDelegate( NULL )
 {
 }
 
@@ -391,16 +399,32 @@ bool CSingularityAppSystemGroup::PreInit()
 	CrashDump_SetAppInfo( crashDumpAppInfo );
 
 	// Read file configuration and override it from the command line
-	g_pCvar->ReadConfigFile( "//GAME/cfg" );
+	g_pCvar->ReadConfigFile( "//game/cfg" );
 	g_pCvar->OverrideConVarsFromCommandLine();
 
 	// Create a hidden window for we can init render context and other things links with the one
-	if ( !g_pWindowMgr->Create( gameInfo.GetGame().c_str(), window_width.GetInt(), window_height.GetInt(), WINDOW_STYLE_DEFAULT | WINDOW_STYLE_HIDDEN ) )
+	display_t		   display;
+	windowCreateInfo_t windowCreateInfo = {};
+	windowCreateInfo.pTitle				= gameInfo.GetGame().c_str();
+	windowCreateInfo.width				= window_width.GetInt();
+	windowCreateInfo.height				= window_height.GetInt();
+	windowCreateInfo.refreshRate		= window_refreshRate.GetFloat();
+	windowCreateInfo.mode				= WINDOW_MODE_HIDDEN;
+	if ( g_pWindowMgr->GetPrimaryDisplay( display ) )
+	{
+		windowCreateInfo.pDisplay = &display;
+	}
+
+	// TODO BS yehor.pohuliaka -
+	// 1. Refactor CApplication and separate it by some parts, because g_pWindowMgr must be initialized before use
+	// 2. Set correct window size in mode Borderless/Exclusive Fullscreen
+	// 3. The input system
+
+	if ( !g_pWindowMgr->GetOrCreateMainWindow()->Create( windowCreateInfo ) )
 	{
 		Sys_Error( "Failed to create a window" );
 		return false;
 	}
-
 	return true;
 }
 
@@ -411,27 +435,17 @@ CSingularityAppSystemGroup::PostInit
 */
 bool CSingularityAppSystemGroup::PostInit()
 {
+#if 0
 	// Attach the input system to the window
 	g_pInputSystem->AttachToWindow( g_pWindowMgr );
+#endif	// 0
 
 	// Subscribe on window events
-	pProcessWindowEventDelegate = g_pWindowMgr->OnProcessWindowEvent()->AddFunc( &CSingularityAppSystemGroup::OnProcessWindowEvent, this );
+	pWindowEventDelegate	   = g_pWindowMgr->OnWindowEvent()->AddFunc( &CSingularityAppSystemGroup::OnWindowEvent, this );
+	pChangedMainWindowDelegate = g_pWindowMgr->OnChangedMainWindow()->AddFunc( &CSingularityAppSystemGroup::OnChangedMainWindow, this );
 
-	// Create and initialize a viewport
-	pStudioViewport = g_pStudioRender->CreateViewport();
-	if ( !pStudioViewport )
-	{
-		return false;
-	}
-
-	uint32	   windowWidth	= 0;
-	uint32	   windowHeight = 0;
-	CConVarRef r_vsyncRef( "r_vsync" );
-	g_pWindowMgr->GetSize( windowWidth, windowHeight );
-	g_pWindowMgr->SetFullscreen( fullscreen.GetBool() );
-	pStudioViewport->SetViewportClient( &gameViewportClient );
-	pStudioViewport->Init( g_pWindowMgr->GetHandle(), windowWidth, windowHeight, r_vsyncRef.IsValid() ? r_vsyncRef->GetBool() : false );
-	g_pWindowMgr->ShowWindow();
+	// Trigger the delegate to initialize a studio viewport
+	OnChangedMainWindow( this, g_pWindowMgr->GetMainWindowId() );
 	return true;
 }
 
@@ -442,10 +456,8 @@ CSingularityAppSystemGroup::Main
 */
 int32 CSingularityAppSystemGroup::Main()
 {
-	// Initialize the profiler
-	PROFILE_INIT();
-
 	// Main game loop
+	PROFILE_INIT();
 	while ( !Sys_IsRequestingExit() )
 	{
 		PROFILE_FRAME( "Main Thread" );
@@ -482,10 +494,15 @@ void CSingularityAppSystemGroup::PreShutdown()
 	g_pInputSystem->DetachFromWindow();
 
 	// Describe from window events
-	if ( pProcessWindowEventDelegate )
+	if ( pWindowEventDelegate )
 	{
-		g_pWindowMgr->OnProcessWindowEvent()->RemoveFunc( pProcessWindowEventDelegate );
-		pProcessWindowEventDelegate = NULL;
+		g_pWindowMgr->OnWindowEvent()->RemoveFunc( pWindowEventDelegate );
+		pWindowEventDelegate = NULL;
+	}
+	if ( pChangedMainWindowDelegate )
+	{
+		g_pWindowMgr->OnChangedMainWindow()->RemoveFunc( pChangedMainWindowDelegate );
+		pChangedMainWindowDelegate = NULL;
 	}
 
 	// Shutdown the viewport
@@ -495,8 +512,8 @@ void CSingularityAppSystemGroup::PreShutdown()
 		pStudioViewport = NULL;
 	}
 
-	// Close the window
-	g_pWindowMgr->Close();
+	// Destroy the main window
+	g_pWindowMgr->DestroyWindow( g_pWindowMgr->GetMainWindowId() );
 
 	// Unregister cvars
 	ConVar_Unregister();
@@ -509,12 +526,12 @@ CSingularityAppSystemGroup::PostShutdown
 */
 void CSingularityAppSystemGroup::PostShutdown()
 {
-	// Remove only paths "GAME" and "GAMEBIN" if gameinfo.txt not loaded
+	// Remove only paths "game" and "gamebin" if gameinfo.txt not loaded
 	if ( !gameInfo.IsLoaded() )
 	{
-		Warning( "Launcher: gameinfo.txt not loaded, will be remove only search paths \"GAME\" and \"GAMEBIN\"" );
-		g_pFileSystem->RemoveSearchPath( "GAME" );
-		g_pFileSystem->RemoveSearchPath( "GAMEBIN" );
+		Warning( "Launcher: gameinfo.txt not loaded, will be remove only search paths \"game\" and \"gamebin\"" );
+		g_pFileSystem->RemoveSearchPath( "game" );
+		g_pFileSystem->RemoveSearchPath( "gamebin" );
 		return;
 	}
 
@@ -552,51 +569,69 @@ void CSingularityAppSystemGroup::Destroy()
 
 /*
 ==================
-CSingularityAppSystemGroup::OnProcessWindowEvent
+CSingularityAppSystemGroup::OnWindowEvent
 ==================
 */
-void CSingularityAppSystemGroup::OnProcessWindowEvent( void* pUserData, const windowEvent_t& windowEvent )
+void CSingularityAppSystemGroup::OnWindowEvent( void* pUserData, const windowEvent_t& windowEvent )
 {
 	PROFILE_SCOPE();
+	if ( windowEvent.windowId != g_pWindowMgr->GetMainWindowId() )
+	{
+		return;
+	}
+
 	CSingularityAppSystemGroup* pSingularityAppGroup = (CSingularityAppSystemGroup*)pUserData;
 	switch ( windowEvent.type )
 	{
 		// Focus gained
-	case windowEvent_t::EVENT_WINDOW_RESTORED:
-	case windowEvent_t::EVENT_WINDOW_FOCUS_GAINED:
-		if ( g_pWindowMgr->GetID() == windowEvent.windowId )
-		{
-			pSingularityAppGroup->bInFocus = true;
-		}
+	case WINDOW_EVENT_TYPE_RESTORED:
+	case WINDOW_EVENT_TYPE_FOCUS_GAINED:
+		pSingularityAppGroup->bInFocus = true;
 		break;
 
 		// Focus lost
-	case windowEvent_t::EVENT_WINDOW_MINIMIZED:
-	case windowEvent_t::EVENT_WINDOW_FOCUS_LOST:
-		if ( g_pWindowMgr->GetID() == windowEvent.windowId )
-		{
-			pSingularityAppGroup->bInFocus = false;
-		}
+	case WINDOW_EVENT_TYPE_MINIMIZED:
+	case WINDOW_EVENT_TYPE_FOCUS_LOST:
+		pSingularityAppGroup->bInFocus = false;
 		break;
 
 		// Resize window
-	case windowEvent_t::EVENT_WINDOW_RESIZE:
-		if ( g_pWindowMgr->GetID() == windowEvent.windowId && pSingularityAppGroup->pStudioViewport )
+	case WINDOW_EVENT_TYPE_RESIZE:
+		if ( pSingularityAppGroup->pStudioViewport )
 		{
-			pSingularityAppGroup->pStudioViewport->Resize( windowEvent.events.windowResize.width, windowEvent.events.windowResize.height );
+			pSingularityAppGroup->pStudioViewport->Resize( windowEvent.resize.width, windowEvent.resize.height );
 		}
 		break;
 
 		// Close window
-	case windowEvent_t::EVENT_WINDOW_CLOSE:
-		if ( g_pWindowMgr->GetID() == windowEvent.windowId )
-		{
-			Sys_RequestExit( false );
-		}
+	case WINDOW_EVENT_TYPE_CLOSE:
+		Sys_RequestExit( false );
 		break;
 	}
 }
-#include "tier0/consoleio.h"
+
+/*
+==================
+CSingularityAppSystemGroup::OnChangedMainWindow
+==================
+*/
+void CSingularityAppSystemGroup::OnChangedMainWindow( void* pUserData, windowId_t newMainWindowId )
+{
+	CConVarRef					r_vsyncRef( "r_vsync" );
+	IWindow*					pMainWindow			 = g_pWindowMgr->GetWindow( newMainWindowId );
+	ivec2_t						windowSize			 = pMainWindow->GetSize();
+	CSingularityAppSystemGroup* pSingularityAppGroup = (CSingularityAppSystemGroup*)pUserData;
+	if ( !pSingularityAppGroup->pStudioViewport )
+	{
+		pSingularityAppGroup->pStudioViewport = g_pStudioRender->CreateViewport();
+	}
+	Assert( pSingularityAppGroup->pStudioViewport );
+
+	pSingularityAppGroup->pStudioViewport->SetViewportClient( &pSingularityAppGroup->gameViewportClient );
+	pSingularityAppGroup->pStudioViewport->Init( pMainWindow->GetHandle(), windowSize.x, windowSize.y, r_vsyncRef.IsValid() ? r_vsyncRef->GetBool() : false );
+	pMainWindow->SetMode( (windowMode_t)window_mode.GetInt() );
+}
+
 /*
 ==================
 LauncherMain

@@ -11,6 +11,8 @@ CEcsSystemCameraInit::OnUpdate
 */
 void CEcsSystemCameraInit::OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity, const ecsResourceWindowMgr_t& windowMgr, ecsComponentCamera_t& camera )
 {
+// AHTUNG
+#if 0
 	if ( camera.bAutoViewData )
 	{
 		// TODO BS yehor.pohuliaka - Implement handle resize the window
@@ -21,6 +23,7 @@ void CEcsSystemCameraInit::OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity, con
 	}
 
 	ecsWorld.AddComponent<ecsComponentCameraInited_t>( entity );
+#endif	// 0
 }
 
 /*

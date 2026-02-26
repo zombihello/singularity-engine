@@ -1,75 +1,72 @@
 #pragma once
 #include "tier0/types.h"
+#include "appframework/iwindow.h"
+#include "inputsystem/keymodifiermask.h"
 #include "inputsystem/buttoncode.h"
 
 //-----------------------------------------------------------------------------
-//  Struct for storage input event
+// Input events
 //-----------------------------------------------------------------------------
+enum inputEventType_t
+{
+	INPUT_EVENT_TYPE_NONE,
+	INPUT_EVENT_TYPE_KEY_PRESSED,
+	INPUT_EVENT_TYPE_KEY_REPEAT,
+	INPUT_EVENT_TYPE_KEY_RELEASED,
+	INPUT_EVENT_TYPE_MOUSE_PRESSED,
+	INPUT_EVENT_TYPE_MOUSE_RELEASED,
+	INPUT_EVENT_TYPE_MOUSE_MOVE,
+	INPUT_EVENT_TYPE_MOUSE_WHEEL,
+	INPUT_EVENT_TYPE_TEXT_INPUT
+};
+
+struct keyEvent_t
+{
+	buttonCode_t	  code;
+	keyModifierMask_t modifierMask;
+};
+
+struct mouseButtonEvent_t
+{
+	buttonCode_t	  code;
+	keyModifierMask_t modifierMask;
+};
+
+struct mouseMoveEvent_t
+{
+	float x;
+	float y;
+	float xDirection;
+	float yDirection;
+};
+
+struct mouseWheelEvent_t
+{
+	float			  x;
+	float			  y;
+	keyModifierMask_t modifierMask;
+};
+
+struct textInputEvent_t
+{
+	const char*		  pText;
+	keyModifierMask_t modifierMask;
+};
+
 struct inputEvent_t
 {
-	enum type_t
-	{
-		EVENT_NONE,
-		EVENT_KEY_PRESSED,
-		EVENT_KEY_RELEASED,
-		EVENT_MOUSE_PRESSED,
-		EVENT_MOUSE_RELEASED,
-		EVENT_MOUSE_MOVE,
-		EVENT_MOUSE_WHEEL,
-		EVENT_TEXT_INPUT
-	};
+	inputEvent_t();
 
-	struct keyEvent_t
-	{
-		buttonCode_t code;
-		bool		 bAlt;
-		bool		 bControl;
-		bool		 bShift;
-		bool		 bSuper;
-		bool		 bCapsLock;
-		bool		 bNumLock;
-	};
-
-	struct mouseButtonEvent_t
-	{
-		buttonCode_t code;
-		int32		 x;
-		int32		 y;
-	};
-
-	struct mouseMoveEvent_t
-	{
-		int32 x;
-		int32 y;
-		int32 xDirection;
-		int32 yDirection;
-	};
-
-	struct mouseWheelEvent_t
-	{
-		int32 x;
-		int32 y;
-	};
-
-	struct textInputEvent_t
-	{
-		char* pText;
-	};
-
-	union uevents_t
+	inputEventType_t type;
+	windowId_t		 windowId;
+	union
 	{
 		keyEvent_t		   key;
 		mouseButtonEvent_t mouseButton;
 		mouseMoveEvent_t   mouseMove;
 		mouseWheelEvent_t  mouseWheel;
-		textInputEvent_t   textInputEvent;
+		textInputEvent_t   textInput;
 	};
-
-	inputEvent_t()
-		: type( EVENT_NONE )
-	{
-	}
-
-	type_t	  type;
-	uevents_t events;
 };
+
+#include "inputsystem/inputevent.inl"

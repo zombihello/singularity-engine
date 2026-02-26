@@ -3,12 +3,12 @@ cmake_minimum_required( VERSION 3.19 )
 #
 # Find third parties
 #
-find_package( SDL2 REQUIRED )
+find_package( SDL3 REQUIRED )
 
-set( THIRDPARTY_INCLUDES		        ${SDL2_INCLUDE} )
-set( THIRDPARTY_LIBS                    ${SDL2_LIBS} )
-set( THIRDPARTY_INSTALL_DEBUG_DLLS      ${SDL2_INSTALL_DLLS_DEBUG} )
-set( THIRDPARTY_INSTALL_RELEASE_DLLS    ${SDL2_INSTALL_DLLS_RELEASE} )
+set( THIRDPARTY_INCLUDES		        ${SDL3_INCLUDE} )
+set( THIRDPARTY_LIBS                    ${SDL3_LIBS} )
+set( THIRDPARTY_INSTALL_DEBUG_DLLS      ${SDL3_INSTALL_DLLS_DEBUG} )
+set( THIRDPARTY_INSTALL_RELEASE_DLLS    ${SDL3_INSTALL_DLLS_RELEASE} )
 
 
 #
@@ -61,4 +61,4 @@ install_files( appframework FILES ${THIRDPARTY_INSTALL_DEBUG_DLLS}		DESTINATION 
 install_files( appframework FILES ${THIRDPARTY_INSTALL_RELEASE_DLLS}	DESTINATION 	bin/${PLATFORM_BIN_DIR}/	CONFIGURATIONS 	Release Retail )
 
 # Linceses
-install_files( appframework FILES ${SDL2_INSTALL_LICENSES}				DESTINATION 	licenses/sdl2/ )
+install_files( appframework FILES ${SDL3_INSTALL_LICENSES}				DESTINATION 	licenses/sdl3/ )
