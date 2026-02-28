@@ -1,5 +1,4 @@
 #pragma once
-#include "appframework/iappsystemgroup.h"
 #include "game/igame.h"
 #include "game/shared/ecs/ecs_core.h"
 #include "game/shared/ecs/ecs_component_factory.h"

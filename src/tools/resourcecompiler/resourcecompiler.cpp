@@ -1,20 +1,13 @@
 #include "pch_resourcecompiler.h"
 #include "tier0/icommandline.h"
-#include "tier0/crashdump.h"
 #include "tier1/keyvalues.h"
+#include "appframework/application.h"
 #include "utils/stexdoc/stex_source_doc.h"
 #include "utils/smatdoc/smat_source_doc.h"
 #include "utils/smdldoc/smdl_source_doc.h"
 #include "utils/sentdoc/sent_source_doc.h"
 #include "utils/smapdoc/smap_source_doc.h"
-#include "filesystem/ifilesystem.h"
-#include "cvar/icvar.h"
-#include "tools/resource_tools/itexture_tool.h"
-#include "tools/resource_tools/imaterial_tool.h"
-#include "tools/resource_tools/imodel_tool.h"
-#include "tools/resource_tools/ientitydesc_tool.h"
-#include "tools/resource_tools/imap_tool.h"
-#include "appframework/appframework.h"
+#include "tools/resourcecompiler/appsystemgroup_resource_tools.h"
 
 // Resource source types
 enum resourceSourceType_t
@@ -84,22 +77,22 @@ static const char* ConvResourceSourceTypeToString( resourceSourceType_t resource
 }
 
 //-----------------------------------------------------------------------------
-// Resource compiler app system group
+// Resource compiler app
 //-----------------------------------------------------------------------------
-class CResourceCompilerAppSystemGroup : public CDefaultAppSystemGroup<CAppSystemGroup>
+class CResourceCompilerApp : public CApplication
 {
+	typedef CApplication BaseClass;
+
 public:
-	// IAppSystemGroup interface
-	// An installed application creation function, you should tell the group
-	// the DLLs and the singleton interfaces you want to instantiate
-	// Return FALSE if there's any problems and the app will abort
-	virtual bool Create() override;
-
-	// Main loop implemented by the application
-	// Return exit code. If all ok returns zero
+	// CApplication interface
+	virtual void  Init() override;
 	virtual int32 Main() override;
+	virtual void  Shutdown() override;
 
-	CResourceCompilerAppSystemGroup();
+	virtual const appInfo_t&		  GetAppInfo() const override;
+	virtual const crashDumpAppInfo_t& GetCrashDumpInfo() const override;
+
+	CResourceCompilerApp( const char* pCommandLine, appInstanceHandle_t hInstance = NULL );
 
 private:
 	struct resourceFile_t
@@ -122,23 +115,25 @@ private:
 	bool CompileEntityDesc( const resourceFile_t& resourceFile ) const;
 	bool CompileMap( const resourceFile_t& resourceFile ) const;
 
-	ITextureTool*				pTextureTool;
-	IMaterialTool*				pMaterialTool;
-	IModelTool*					pModelTool;
-	IEntityDescTool*			pEntityDescTool;
-	IMapTool*					pMapTool;
-	eastl::string				outputPath;
-	eastl::string				workDir;
-	eastl::list<resourceFile_t> files;
+	CAppSystemGroupResourceTools resourceToolsSystemGroup;
+	ITextureTool*				 pTextureTool;
+	IMaterialTool*				 pMaterialTool;
+	IModelTool*					 pModelTool;
+	IEntityDescTool*			 pEntityDescTool;
+	IMapTool*					 pMapTool;
+	eastl::string				 outputPath;
+	eastl::string				 workDir;
+	eastl::list<resourceFile_t>	 files;
 };
 
 /*
 ==================
-CResourceCompilerAppSystemGroup::CResourceCompilerAppSystemGroup
+CResourceCompilerApp::CResourceCompilerApp
 ==================
 */
-CResourceCompilerAppSystemGroup::CResourceCompilerAppSystemGroup()
-	: pTextureTool( NULL )
+CResourceCompilerApp::CResourceCompilerApp( const char* pCommandLine, appInstanceHandle_t hInstance /* = NULL */ )
+	: CApplication( pCommandLine, hInstance )
+	, pTextureTool( NULL )
 	, pMaterialTool( NULL )
 	, pModelTool( NULL )
 	, pEntityDescTool( NULL )
@@ -148,26 +143,16 @@ CResourceCompilerAppSystemGroup::CResourceCompilerAppSystemGroup()
 
 /*
 ==================
-CResourceCompilerAppSystemGroup::Create
+CResourceCompilerApp::Init
 ==================
 */
-bool CResourceCompilerAppSystemGroup::Create()
+void CResourceCompilerApp::Init()
 {
-	// Load application systems
-	appSystemInfo_t appSystemInfos[] = {
-		{ "texture_tool" DLL_EXT_STRING, TEXTURE_TOOL_INTERFACE_VERSION },
-		{ "material_tool" DLL_EXT_STRING, MATERIAL_TOOL_INTERFACE_VERSION },
-		{ "model_tool" DLL_EXT_STRING, MODEL_TOOL_INTERFACE_VERSION },
-		{ "entitydesc_tool" DLL_EXT_STRING, ENTITYDESC_TOOL_INTERFACE_VERSION },
-		{ "map_tool" DLL_EXT_STRING, MAP_TOOL_INTERFACE_VERSION },
-		{ "", "" }	// Required to terminate the list
-	};
+	BaseClass::Init();
 
-	// Add all systems from array
-	if ( !AddSystems( appSystemInfos ) )
-	{
-		return false;
-	}
+	// Initialize resource tools
+	AddGroup( &resourceToolsSystemGroup );
+	resourceToolsSystemGroup.InitSystems();
 
 	// Get a texture, material, model and entity tool
 	pTextureTool	= (ITextureTool*)FindSystem( TEXTURE_TOOL_INTERFACE_VERSION );
@@ -188,17 +173,14 @@ bool CResourceCompilerAppSystemGroup::Create()
 		CSTEXSourceTextureDoc::SetDefaultPixelFormat( (studioAPIPixelFormat_t)index );
 		break;
 	}
-
-	// We are done
-	return true;
 }
 
 /*
 ==================
-CResourceCompilerAppSystemGroup::Main
+CResourceCompilerApp::Main
 ==================
 */
-int32 CResourceCompilerAppSystemGroup::Main()
+int32 CResourceCompilerApp::Main()
 {
 	// Is need to print help of usage
 	bool bPrintHelpUsage = CommandLine()->HasParam( "h" ) || CommandLine()->HasParam( "help" ) || CommandLine()->HasParam( "?" );
@@ -289,10 +271,21 @@ int32 CResourceCompilerAppSystemGroup::Main()
 
 /*
 ==================
-CResourceCompilerAppSystemGroup::PrintUsageHelp
+CResourceCompilerApp::Shutdown
 ==================
 */
-void CResourceCompilerAppSystemGroup::PrintUsageHelp()
+void CResourceCompilerApp::Shutdown()
+{
+	RemoveGroup( &resourceToolsSystemGroup );
+	BaseClass::Shutdown();
+}
+
+/*
+==================
+CResourceCompilerApp::PrintUsageHelp
+==================
+*/
+void CResourceCompilerApp::PrintUsageHelp()
 {
 	Msg( "" );
 	Msg( "Resource compiler for Singularity Engine (" __DATE__ " " __TIME__ ")" );
@@ -311,10 +304,10 @@ void CResourceCompilerAppSystemGroup::PrintUsageHelp()
 
 /*
 ==================
-CResourceCompilerAppSystemGroup::LoadFileList
+CResourceCompilerApp::LoadFileList
 ==================
 */
-bool CResourceCompilerAppSystemGroup::LoadFileList( const char* pPath )
+bool CResourceCompilerApp::LoadFileList( const char* pPath )
 {
 	Msg( "ResourceCompiler: Load file list '%s'", pPath );
 
@@ -353,10 +346,10 @@ bool CResourceCompilerAppSystemGroup::LoadFileList( const char* pPath )
 
 /*
 ==================
-CResourceCompilerAppSystemGroup::AddFileToCompile
+CResourceCompilerApp::AddFileToCompile
 ==================
 */
-bool CResourceCompilerAppSystemGroup::AddFileToCompile( const char* pPath, const char* pWorkDir )
+bool CResourceCompilerApp::AddFileToCompile( const char* pPath, const char* pWorkDir )
 {
 	// Convert of the file path to absolute
 	eastl::string		 absoluteSourceFilePath;
@@ -392,10 +385,10 @@ bool CResourceCompilerAppSystemGroup::AddFileToCompile( const char* pPath, const
 
 /*
 ==================
-CResourceCompilerAppSystemGroup::CompileTexture
+CResourceCompilerApp::CompileTexture
 ==================
 */
-bool CResourceCompilerAppSystemGroup::CompileTexture( const resourceFile_t& resourceFile ) const
+bool CResourceCompilerApp::CompileTexture( const resourceFile_t& resourceFile ) const
 {
 	CSTEXSourceTextureDoc stexSourceFile;
 	if ( !stexSourceFile.LoadFromFile( resourceFile.srcPath.c_str() ) )
@@ -444,10 +437,10 @@ bool CResourceCompilerAppSystemGroup::CompileTexture( const resourceFile_t& reso
 
 /*
 ==================
-CResourceCompilerAppSystemGroup::CompileMaterial
+CResourceCompilerApp::CompileMaterial
 ==================
 */
-bool CResourceCompilerAppSystemGroup::CompileMaterial( const resourceFile_t& resourceFile ) const
+bool CResourceCompilerApp::CompileMaterial( const resourceFile_t& resourceFile ) const
 {
 	CSMATSourceMaterialDoc smatSourceFile;
 	if ( !smatSourceFile.LoadFromFile( resourceFile.srcPath.c_str() ) )
@@ -546,10 +539,10 @@ bool CResourceCompilerAppSystemGroup::CompileMaterial( const resourceFile_t& res
 
 /*
 ==================
-CResourceCompilerAppSystemGroup::CompileModel
+CResourceCompilerApp::CompileModel
 ==================
 */
-bool CResourceCompilerAppSystemGroup::CompileModel( const resourceFile_t& resourceFile ) const
+bool CResourceCompilerApp::CompileModel( const resourceFile_t& resourceFile ) const
 {
 	CSMDLSourceModelDoc smdlSourceFile;
 	if ( !smdlSourceFile.LoadFromFile( resourceFile.srcPath.c_str() ) )
@@ -593,10 +586,10 @@ bool CResourceCompilerAppSystemGroup::CompileModel( const resourceFile_t& resour
 
 /*
 ==================
-CResourceCompilerAppSystemGroup::CompileEntityDesc
+CResourceCompilerApp::CompileEntityDesc
 ==================
 */
-bool CResourceCompilerAppSystemGroup::CompileEntityDesc( const resourceFile_t& resourceFile ) const
+bool CResourceCompilerApp::CompileEntityDesc( const resourceFile_t& resourceFile ) const
 {
 	CSENTSourceEntityDescDoc sentSourceFile;
 	if ( !sentSourceFile.LoadFromFile( resourceFile.srcPath.c_str() ) )
@@ -703,10 +696,10 @@ bool CResourceCompilerAppSystemGroup::CompileEntityDesc( const resourceFile_t& r
 
 /*
 ==================
-CResourceCompilerAppSystemGroup::CompileMap
+CResourceCompilerApp::CompileMap
 ==================
 */
-bool CResourceCompilerAppSystemGroup::CompileMap( const resourceFile_t& resourceFile ) const
+bool CResourceCompilerApp::CompileMap( const resourceFile_t& resourceFile ) const
 {
 	CSMAPSourceMapDoc smapSourceFile;
 	if ( !smapSourceFile.LoadFromFile( resourceFile.srcPath.c_str() ) )
@@ -738,48 +731,47 @@ bool CResourceCompilerAppSystemGroup::CompileMap( const resourceFile_t& resource
 
 /*
 ==================
+CResourceCompilerApp::GetAppInfo
+==================
+*/
+const appInfo_t& CResourceCompilerApp::GetAppInfo() const
+{
+	static appInfo_t s_appInfo{ "resourcecompiler", APPLICATION_TYPE_CONSOLE, FCVAR_NONE, NULL, NULL };
+	return s_appInfo;
+}
+
+/*
+==================
+CResourceCompilerApp::GetCrashDumpInfo
+==================
+*/
+const crashDumpAppInfo_t& CResourceCompilerApp::GetCrashDumpInfo() const
+{
+	static crashDumpAppInfo_t s_crashDumpAppInfo{ "Resource Compiler", __DATE__ " " __TIME__, NULL, NULL };
+	return s_crashDumpAppInfo;
+}
+
+/*
+==================
 main
 ==================
 */
 int main( int argc, char** argv )
 {
-#if ENABLE_LOGGING
-	// Add a log output into stdout
-	static CLogOutputStdOut s_logOutputStdOut;
-	Logger()->AddOutput( &s_logOutputStdOut );
-
-	// Enable developer messages if we in debug configuration
-	#if DEBUG
-	Logger()->SetGroupActivate( LOG_GROUP_DEVELOPER, true );
-	#endif	// DEBUG
-#endif		// ENABLE_LOGGING
-
-	// Initialize the main thread
-	Sys_InitMainThread();
-
-	// Setup application information for the crash dump
-	CrashDump_SetAppInfo( crashDumpAppInfo_t{ "Resource Compiler", __DATE__ " " __TIME__, NULL, NULL } );
-
-	// Initialize a command line
+	// Prepare a command line
+	eastl::string commandLine;
+	for ( uint32 index = 0; index < (uint32)argc; ++index )
 	{
-		eastl::string arguments;
-		for ( uint32 index = 0; index < (uint32)argc; ++index )
+		if ( *argv[index] == '-' || *argv[index] == '/' )
 		{
-			if ( *argv[index] == '-' || *argv[index] == '/' )
-			{
-				arguments += argv[index];
-				arguments += " ";
-			}
-			else
-			{
-				arguments += S_Sprintf( "\"%s\" ", argv[index] );
-			}
+			commandLine += argv[index];
+			commandLine += " ";
 		}
-		CommandLine()->Init( arguments.c_str() );
+		else
+		{
+			commandLine += S_Sprintf( "\"%s\" ", argv[index] );
+		}
 	}
 
-	// Run the application
-	CResourceCompilerAppSystemGroup resourceCompilerSystems;
-	CApplication					application( &resourceCompilerSystems, "resourcecompiler" );
-	return application.Run();
+	return CResourceCompilerApp( commandLine.c_str() ).Run();
 }

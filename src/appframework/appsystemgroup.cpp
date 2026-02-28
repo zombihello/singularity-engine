@@ -1,127 +1,125 @@
 #include "pch_appframework.h"
-#include "appframework/iappsystemgroup.h"
-
-//-----------------------------------------------------------------------------
-// Gets at a factory that works just like FindSystem
-//-----------------------------------------------------------------------------
-// This function is used to make this system appear to the outside world to
-// function exactly like the currently existing factory system
-CAppSystemGroup* s_pCurrentAppSystem = NULL;
-void*			 AppSystemCreateInterfaceFn( const char* pName )
-{
-	return s_pCurrentAppSystem->FindSystem( pName );
-}
+#include "tier0/profile.h"
+#include "appframework/application.h"
+#include "appframework/appsystemgroup.h"
 
 static const char* s_pStageLookup[] = {
-	"CREATION",			   // APPSYSTEM_STAGE_CREATION
-	"CONNECTION",		   // APPSYSTEM_STAGE_CONNECTION
-	"PREINITIALIZATION",   // APPSYSTEM_STAGE_PREINITIALIZATION
-	"INITIALIZATION",	   // APPSYSTEM_STAGE_INITIALIZATION
-	"POSTINITIALIZATION",  // APPSYSTEM_STAGE_POSTINITIALIZATION
-	"RUNNING",			   // APPSYSTEM_STAGE_RUNNING
-	"PRESHUTDOWN",		   // APPSYSTEM_STAGE_PRESHUTDOWN
-	"SHUTDOWN",			   // APPSYSTEM_STAGE_SHUTDOWN
-	"POSTSHUTDOWN",		   // APPSYSTEM_STAGE_POSTSHUTDOWN
-	"DISCONNECTION",	   // APPSYSTEM_STAGE_DISCONNECTION
-	"DESTRUCTION",		   // APPSYSTEM_STAGE_DESTRUCTION
+	"Unknown",		   // APPSYSTEM_GROUP_STATE_NONE
+	"Creation",		   // APPSYSTEM_GROUP_STATE_CREATED
+	"Connection",	   // APPSYSTEM_GROUP_STATE_CONNECTED
+	"Initialization",  // APPSYSTEM_GROUP_STATE_INITIALIZED
 };
-static_assert( CAppSystemGroup::APPSYSTEM_GROUP_STAGE_COUNT == ARRAYSIZE( s_pStageLookup ), "Array size 's_pStageLookup' must be equal to APPSYSTEM_GROUP_STAGE_COUNT" );
+static_assert( ARRAYSIZE( s_pStageLookup ) == APPSYSTEM_GROUP_STATE_COUNT, "Array size 's_pStageLookup' must be equal to APPSYSTEM_GROUP_STATE_COUNT" );
 
 /*
 ==================
-CAppSystemGroup::CAppSystemGroup
+CAppSystemGroup::ConnectSystems
 ==================
 */
-CAppSystemGroup::CAppSystemGroup( CAppSystemGroup* pParentAppSystem /* = NULL */ )
-	: pParentAppSystemGroup( pParentAppSystem )
-	, currentStage( APPSYSTEM_STAGE_NONE )
+void CAppSystemGroup::Startup()
 {
-}
-
-/*
-==================
-CAppSystemGroup::Run
-==================
-*/
-int32 CAppSystemGroup::Run()
-{
-	// The factory now uses this app system group
-	s_pCurrentAppSystem = this;
-
-	// Load, connect, init
-	int32 retVal = Startup();
-
-	// Main loop implemented by the application
-	if ( currentStage == APPSYSTEM_STAGE_RUNNING )
+	if ( state == APPSYSTEM_GROUP_STATE_NONE )
 	{
-		retVal = Main();
-		if ( retVal != 0 )
+		// Let prepare a list of systems
+		if ( !Create() )
 		{
-			ReportFailure( APPSYSTEM_STAGE_RUNNING );
+			ReportFailure( APPSYSTEM_GROUP_STATE_CREATED );
+			return;
 		}
+
+		state = APPSYSTEM_GROUP_STATE_CREATED;
 	}
-
-	// Shutdown, disconnect, unload
-	Shutdown();
-
-	// The factory now uses the parent's app system group
-	s_pCurrentAppSystem = GetParent();
-	return retVal;
 }
 
 /*
 ==================
-CAppSystemGroup::Startup
+CAppSystemGroup::ConnectSystems
 ==================
 */
-int32 CAppSystemGroup::Startup()
+void CAppSystemGroup::ConnectSystems()
 {
-	// The factory now uses this app system group
-	uint32 failureSysIndex = 0;
-	s_pCurrentAppSystem	   = this;
-
-	// Call an installed application creation function
-	currentStage = APPSYSTEM_STAGE_CREATION;
-	if ( !Create() )
+	Startup();
+	if ( state == APPSYSTEM_GROUP_STATE_CREATED )
 	{
-		ReportFailure( APPSYSTEM_STAGE_CREATION );
-		return -1;
-	}
+		// Let the libraries grab any other interfaces they may need
+		for ( uint32 index = 0, count = (uint32)systems.size(); index < count; ++index )
+		{
+			if ( !systems[index]->Connect( CApplication::GetFactory() ) )
+			{
+				ReportFailure( APPSYSTEM_GROUP_STATE_CONNECTED, index );
+				return;
+			}
+		}
 
-	// Let all systems know about each other
-	currentStage = APPSYSTEM_STAGE_CONNECTION;
-	if ( !ConnectSystems( failureSysIndex ) )
+		state = APPSYSTEM_GROUP_STATE_CONNECTED;
+	}
+}
+
+/*
+==================
+CAppSystemGroup::InitSystems
+==================
+*/
+void CAppSystemGroup::InitSystems()
+{
+	ConnectSystems();
+	if ( state == APPSYSTEM_GROUP_STATE_CONNECTED )
 	{
-		ReportFailure( APPSYSTEM_STAGE_CONNECTION, failureSysIndex );
-		return -1;
-	}
+		// Call Init on all App Systems
+		for ( uint32 index = 0, count = (uint32)systems.size(); index < count; ++index )
+		{
+			if ( !systems[index]->Init() )
+			{
+				for ( int32 systemRewindIndex = index; systemRewindIndex-- > 0; )  // NOTE: Shutdown in reverse order of initialization
+				{
+					systems[systemRewindIndex]->Shutdown();
+				}
 
-	// Allow the application to do some work before init
-	currentStage = APPSYSTEM_STAGE_PREINITIALIZATION;
-	if ( !PreInit() )
+				ReportFailure( APPSYSTEM_GROUP_STATE_INITIALIZED, index );
+				return;
+			}
+		}
+
+		state = APPSYSTEM_GROUP_STATE_INITIALIZED;
+	}
+}
+
+/*
+==================
+CAppSystemGroup::ShutdownSystems
+==================
+*/
+void CAppSystemGroup::ShutdownSystems()
+{
+	if ( state == APPSYSTEM_GROUP_STATE_INITIALIZED )
 	{
-		ReportFailure( APPSYSTEM_STAGE_PREINITIALIZATION );
-		return -1;
-	}
+		// Call Shutdown on all App Systems
+		for ( int32 index = (int32)systems.size(); --index >= 0; )	// NOTE: Shutdown in reverse order of initialization
+		{
+			systems[index]->Shutdown();
+		}
 
-	// Call Init on all App Systems
-	currentStage = APPSYSTEM_STAGE_INITIALIZATION;
-	if ( !InitSystems( failureSysIndex ) )
+		state = APPSYSTEM_GROUP_STATE_CONNECTED;
+	}
+}
+
+/*
+==================
+CAppSystemGroup::DisconnectSystems
+==================
+*/
+void CAppSystemGroup::DisconnectSystems()
+{
+	ShutdownSystems();
+	if ( state == APPSYSTEM_GROUP_STATE_CONNECTED )
 	{
-		ReportFailure( APPSYSTEM_STAGE_INITIALIZATION, failureSysIndex );
-		return -1;
+		// Systems should disconnect from each other
+		for ( int32 index = (int32)systems.size(); --index >= 0; )	// NOTE: Disconnect in reverse order of connection
+		{
+			systems[index]->Disconnect();
+		}
+		state = APPSYSTEM_GROUP_STATE_CREATED;
 	}
-
-	// Allow the application to do some work after init
-	currentStage = APPSYSTEM_STAGE_POSTINITIALIZATION;
-	if ( !PostInit() )
-	{
-		ReportFailure( APPSYSTEM_STAGE_POSTINITIALIZATION );
-		return -1;
-	}
-
-	currentStage = APPSYSTEM_STAGE_RUNNING;
-	return 0;
 }
 
 /*
@@ -131,62 +129,59 @@ CAppSystemGroup::Shutdown
 */
 void CAppSystemGroup::Shutdown()
 {
-	// The factory now uses this app system group
-	s_pCurrentAppSystem = this;
-
-	switch ( currentStage )
-	{
-	case APPSYSTEM_STAGE_RUNNING:
-	case APPSYSTEM_STAGE_POSTINITIALIZATION:
-		break;
-
-	case APPSYSTEM_STAGE_PREINITIALIZATION:
-	case APPSYSTEM_STAGE_INITIALIZATION:
-		goto disconnect;
-
-	case APPSYSTEM_STAGE_CREATION:
-	case APPSYSTEM_STAGE_CONNECTION:
-		goto destroy;
-
-	default:
-		break;
-	}
-
-	// Allow the application to do some work before shutdown
-	currentStage = APPSYSTEM_STAGE_PRESHUTDOWN;
-	PreShutdown();
-
-	// Cal Shutdown on all App Systems
-	currentStage = APPSYSTEM_STAGE_SHUTDOWN;
-	ShutdownSystems();
-
-	// Allow the application to do some work after shutdown
-	currentStage = APPSYSTEM_STAGE_POSTSHUTDOWN;
-	PostShutdown();
-
-disconnect:
-	// Systems should disconnect from each other
-	currentStage = APPSYSTEM_STAGE_DISCONNECTION;
 	DisconnectSystems();
+	if ( state == APPSYSTEM_GROUP_STATE_CREATED )
+	{
+		// Call an installed application destroy function
+		Destroy();
 
-destroy:
-	// Unload all DLLs loaded in the AppCreate block
-	currentStage = APPSYSTEM_STAGE_DESTRUCTION;
-	RemoveAllSystems();
-	UnloadAllModules();
+		// Unload all DLLs loaded in the AppCreate block
+		for ( int32 index = (int32)modules.size(); --index >= 0; )	// NOTE: Iterate in reverse order so they are unloaded in opposite order from loading
+		{
+			if ( modules[index].handle )
+			{
+				Msg( "AppFramework: Unloaded module '%s'", modules[index].name.c_str() );
+				Sys_DLL_UnloadModule( modules[index].handle );
+			}
+			else if ( modules[index].pFactoryFn )
+			{
+				Msg( "AppFramework: Unloaded module '%p'", modules[index].pFactoryFn );
+			}
+		}
 
-	// Call an installed application destroy function
-	Destroy();
+		systems.clear();
+		systemDict.clear();
+		modules.clear();
+		state = APPSYSTEM_GROUP_STATE_NONE;
+	}
 }
 
 /*
 ==================
-CAppSystemGroup::GetCurrentStage
+CAppSystemGroup::FindSystem
 ==================
 */
-CAppSystemGroup::appSystemGroupStage_t CAppSystemGroup::GetCurrentStage() const
+void* CAppSystemGroup::FindSystem( const char* pInterfaceName ) const
 {
-	return currentStage;
+	PROFILE_SCOPE();
+	auto it = systemDict.find( pInterfaceName );
+	if ( it != systemDict.end() )
+	{
+		return systems[it->second];
+	}
+
+	// If it's not an interface we know about, it could be an older
+	// version of an interface, or maybe something implemented by
+	// one of the instantiated interfaces...
+	for ( uint32 index = 0, count = (uint32)systems.size(); index < count; ++index )
+	{
+		void* pInterface = systems[index]->QueryInterface( pInterfaceName );
+		if ( pInterface )
+		{
+			return pInterface;
+		}
+	}
+	return NULL;
 }
 
 /*
@@ -338,184 +333,17 @@ bool CAppSystemGroup::AddSystems( appSystemInfo_t* pAppSystems )
 
 /*
 ==================
-CAppSystemGroup::FindSystem
-==================
-*/
-void* CAppSystemGroup::FindSystem( const char* pInterfaceName ) const
-{
-	PROFILE_SCOPE();
-	auto it = systemDict.find( pInterfaceName );
-	if ( it != systemDict.end() )
-	{
-		return systems[it->second];
-	}
-
-	// If it's not an interface we know about, it could be an older
-	// version of an interface, or maybe something implemented by
-	// one of the instantiated interfaces...
-	for ( uint32 index = 0, count = (uint32)systems.size(); index < count; ++index )
-	{
-		void* pInterface = systems[index]->QueryInterface( pInterfaceName );
-		if ( pInterface )
-		{
-			return pInterface;
-		}
-	}
-
-	if ( pParentAppSystemGroup )
-	{
-		void* pInterface = pParentAppSystemGroup->FindSystem( pInterfaceName );
-		if ( pInterface )
-		{
-			return pInterface;
-		}
-	}
-
-	return NULL;
-}
-
-/*
-==================
-CAppSystemGroup::GetFactory
-==================
-*/
-createInterfaceFn_t CAppSystemGroup::GetFactory()
-{
-	return AppSystemCreateInterfaceFn;
-}
-
-/*
-==================
-CAppSystemGroup::UnloadAllModules
-==================
-*/
-void CAppSystemGroup::UnloadAllModules()
-{
-	// NOTE: Iterate in reverse order so they are unloaded in opposite order
-	// from loading
-	for ( int32 index = (int32)modules.size(); --index >= 0; )
-	{
-		if ( modules[index].handle )
-		{
-			Msg( "AppFramework: Unloaded module '%s'", modules[index].name.c_str() );
-			Sys_DLL_UnloadModule( modules[index].handle );
-		}
-		else if ( modules[index].pFactoryFn )
-		{
-			Msg( "AppFramework: Unloaded module '%p'", modules[index].pFactoryFn );
-		}
-	}
-
-	modules.clear();
-}
-
-/*
-==================
-CAppSystemGroup::RemoveAllSystems
-==================
-*/
-void CAppSystemGroup::RemoveAllSystems()
-{
-	systems.clear();
-	systemDict.clear();
-}
-
-/*
-==================
-CAppSystemGroup::ConnectSystems
-==================
-*/
-bool CAppSystemGroup::ConnectSystems( uint32& failureSysIndex )
-{
-	// Let the libraries grab any other interfaces they may need
-	for ( uint32 index = 0, count = (uint32)systems.size(); index < count; ++index )
-	{
-		IAppSystem* pSystem = systems[index];
-		if ( !pSystem->Connect( GetFactory() ) )
-		{
-			failureSysIndex = index;
-			return false;
-		}
-	}
-
-	return true;
-}
-
-/*
-==================
-CAppSystemGroup::DisconnectSystems
-==================
-*/
-void CAppSystemGroup::DisconnectSystems()
-{
-	// Disconnect in reverse order of connection
-	for ( int32 index = (int32)systems.size(); --index >= 0; )
-	{
-		systems[index]->Disconnect();
-	}
-}
-
-/*
-==================
-CAppSystemGroup::InitSystems
-==================
-*/
-bool CAppSystemGroup::InitSystems( uint32& failureSysIndex )
-{
-	for ( uint32 index = 0, count = (uint32)systems.size(); index < count; ++index )
-	{
-		if ( !systems[index]->Init() )
-		{
-			for ( int32 systemRewindIndex = index; systemRewindIndex-- > 0; )
-			{
-				systems[systemRewindIndex]->Shutdown();
-			}
-
-			failureSysIndex = index;
-			return false;
-		}
-	}
-
-	return true;
-}
-
-/*
-==================
-CAppSystemGroup::ShutdownSystems
-==================
-*/
-void CAppSystemGroup::ShutdownSystems()
-{
-	// Shutdown in reverse order of initialization
-	for ( int32 index = (int32)systems.size(); --index >= 0; )
-	{
-		systems[index]->Shutdown();
-	}
-}
-
-/*
-==================
-CAppSystemGroup::GetParent
-==================
-*/
-CAppSystemGroup* CAppSystemGroup::GetParent() const
-{
-	return pParentAppSystemGroup;
-}
-
-/*
-==================
 CAppSystemGroup::FindSystemName
 ==================
 */
-eastl::string CAppSystemGroup::FindSystemName( int32 index )
+const char* CAppSystemGroup::FindSystemName( int32 sysIndex ) const
 {
 	PROFILE_SCOPE();
 	for ( auto it = systemDict.begin(), itEnd = systemDict.end(); it != itEnd; ++it )
 	{
-		if ( it->second == index )
+		if ( it->second == sysIndex )
 		{
-			return it->first;
+			return it->first.c_str();
 		}
 	}
 	return "";
@@ -526,28 +354,29 @@ eastl::string CAppSystemGroup::FindSystemName( int32 index )
 CAppSystemGroup::ReportFailure
 ==================
 */
-void CAppSystemGroup::ReportFailure( int32 errorStage, int32 sysIndex /* = -1 */ )
+void CAppSystemGroup::ReportFailure( int32 errorStage, int32 sysIndex /* = -1 */ ) const
 {
-	const char* pStageDesc = "Unknown";
+	const char* pStageName = "Unknown";
+	const char* pGroupName = GetName();
 	if ( errorStage >= 0 && errorStage < (int32)ARRAYSIZE( s_pStageLookup ) )
 	{
-		pStageDesc = s_pStageLookup[errorStage];
+		pStageName = s_pStageLookup[errorStage];
 	}
 
 	// Failure happened on some a system
 	if ( sysIndex != -1 )
 	{
-		eastl::string systemName = FindSystemName( sysIndex );
-		if ( systemName.empty() )
+		const char* pSystemName = FindSystemName( sysIndex );
+		if ( !pSystemName || !pSystemName[0] )
 		{
-			systemName = "(Unknown)";
+			pSystemName = "(Unknown)";
 		}
 
-		Sys_Error( "AppFramework: System (%s) failed during stage '%s'", systemName.c_str(), pStageDesc );
+		Sys_Error( "AppFramework: System '%s' in group '%s' failed during stage '%s'", pSystemName, pGroupName, pStageName );
 	}
-	// Failure happened in application
+	// Failure happened in the group
 	else
 	{
-		Sys_Error( "AppFramework: Application failed during stage '%s'", pStageDesc );
+		Sys_Error( "AppFramework: System group '%s' failed during stage '%s'", pGroupName, pStageName );
 	}
 }

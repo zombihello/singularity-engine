@@ -2,17 +2,38 @@
 
 /*
 ==================
-CLogOutputFile::CLogOutputFile
+CLogOutputFile::BeginLoggingToFile
 ==================
 */
-FORCEINLINE CLogOutputFile::CLogOutputFile( const char* pPath )
+FORCEINLINE TRefPtr<IStreamDataWriter> CLogOutputFile::BeginLoggingToFile( const char* pPath )
 {
-	Assert( g_pFileSystem );
+	EndLoggingToFile();
 	pFile = g_pFileSystem->CreateFileWriter( pPath );
 	if ( !pFile )
 	{
 		Warning( "Tier1: Failed to open log file '%s'", pPath );
 	}
+	return pFile;
+}
+
+/*
+==================
+CLogOutputFile::EndLoggingToFile
+==================
+*/
+FORCEINLINE void CLogOutputFile::EndLoggingToFile()
+{
+	pFile = NULL;
+}
+
+/*
+==================
+CLogOutputFile::GetFile
+==================
+*/
+FORCEINLINE TRefPtr<IStreamDataWriter> CLogOutputFile::GetFile() const
+{
+	return pFile;
 }
 
 /*
