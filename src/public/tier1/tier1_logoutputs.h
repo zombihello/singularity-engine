@@ -12,7 +12,9 @@ public:
 	// ILogOutput interface
 	virtual void Print( const logContext_t& context, const char* pMessage ) override;
 
-	CLogOutputFile( const char* pPath );
+	TRefPtr<IStreamDataWriter> BeginLoggingToFile( const char* pPath );
+	void					   EndLoggingToFile();
+	TRefPtr<IStreamDataWriter> GetFile() const;
 
 private:
 	TRefPtr<IStreamDataWriter> pFile;
