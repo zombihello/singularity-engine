@@ -11,19 +11,16 @@ CEcsSystemCameraInit::OnUpdate
 */
 void CEcsSystemCameraInit::OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity, const ecsResourceWindowMgr_t& windowMgr, ecsComponentCamera_t& camera )
 {
-// AHTUNG
-#if 0
 	if ( camera.bAutoViewData )
 	{
 		// TODO BS yehor.pohuliaka - Implement handle resize the window
-		uint32 windowWidth;
-		uint32 windowHeight;
-		windowMgr.pWindowMgr->GetSize( windowWidth, windowHeight );
-		camera.aspectRatio = (float)windowWidth / windowHeight;
+		ivec2_t	 size;
+		IWindow* pMainWindow = windowMgr.pWindowMgr->GetOrCreateMainWindow();
+		pMainWindow->GetSize( size );
+		camera.aspectRatio = (float)size.x / size.y;
 	}
 
 	ecsWorld.AddComponent<ecsComponentCameraInited_t>( entity );
-#endif	// 0
 }
 
 /*

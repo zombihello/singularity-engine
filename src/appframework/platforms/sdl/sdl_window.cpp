@@ -46,7 +46,7 @@ bool CWindowSDL::Create( const windowCreateInfo_t& createInfo )
 	// Do nothing if we already create the window
 	if ( pSDLWindow )
 	{
-		Warning( "WindowMgrSDL: Window already created (ptr: 0x%p)", this );
+		Warning( "WindowMgrSDL: Window already created (id: %i)", id );
 		return true;
 	}
 
@@ -74,7 +74,7 @@ bool CWindowSDL::Create( const windowCreateInfo_t& createInfo )
 		bool		   bValidDisplay = ( createInfo.displayHandle != INVALID_DISPLAY_HANDLE && windowMgrSDL.GetDisplayByHandle( createInfo.displayHandle, display ) ) || windowMgrSDL.GetPrimaryDisplay( display );
 		if ( !bValidDisplay )
 		{
-			Warning( "WindowMgrSDL: Couldn't resolve display, using default window size %ix%i (displayHandle: 0x%X, ptr: 0x%p)", DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, createInfo.displayHandle, this );
+			Warning( "WindowMgrSDL: Couldn't resolve display, using default window size %ix%i (displayHandle: 0x%X, id: %i)", DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT, createInfo.displayHandle, id );
 		}
 
 		if ( width == WINDOW_SIZE_FROM_DISPLAY )
@@ -91,7 +91,7 @@ bool CWindowSDL::Create( const windowCreateInfo_t& createInfo )
 	pSDLWindow = SDL_CreateWindow( createInfo.pTitle, width, height, sdlFlags );
 	if ( !pSDLWindow )
 	{
-		Warning( "WindowMgrSDL: Couldn't create window (width: %i, height: %i, title: %s, mode: 0x%X, ptr: 0x%p): %s", width, height, createInfo.pTitle, createInfo.mode, this, SDL_GetError() );
+		Warning( "WindowMgrSDL: Couldn't create window (width: %i, height: %i, title: %s, mode: 0x%X, id: %i): %s", width, height, createInfo.pTitle, createInfo.mode, id, SDL_GetError() );
 		return false;
 	}
 
@@ -107,7 +107,7 @@ bool CWindowSDL::Create( const windowCreateInfo_t& createInfo )
 	#endif	// PLATFORM_WINDOWS
 
 	Assert( handle );
-	Msg( "WindowMgrSDL: Window created (width: %i, height: %i, title: %s, mode: 0x%X, ptr: 0x%p)", width, height, createInfo.pTitle, createInfo.mode, this );
+	Msg( "WindowMgrSDL: Window created (width: %i, height: %i, title: %s, mode: 0x%X, id: %i)", width, height, createInfo.pTitle, createInfo.mode, id );
 
 	SDL_WindowID sdlWindowId = SDL_GetWindowID( pSDLWindow );
 	Assert( s_sdlWindowIdDict.find( sdlWindowId ) == s_sdlWindowIdDict.end() );
@@ -126,7 +126,7 @@ void CWindowSDL::Close()
 	{
 		s_sdlWindowIdDict.erase( SDL_GetWindowID( pSDLWindow ) );
 		SDL_DestroyWindow( pSDLWindow );
-		Msg( "WindowMgrSDL: Window closed (ptr: 0x%p)", this );
+		Msg( "WindowMgrSDL: Window closed (id: %i)", id );
 
 		refreshRate = 0.f;
 		pSDLWindow	= NULL;
@@ -178,17 +178,17 @@ void CWindowSDL::UpdateDisplayMode()
 		{
 			refreshRate = sdlDisplayMode.refresh_rate;
 			SDL_SetWindowFullscreenMode( pSDLWindow, &sdlDisplayMode );
-			Msg( "WindowMgrSDL: Set display mode %ix%i@%fHz (ptr: 0x%p)", size.x, size.y, refreshRate, this );
+			Msg( "WindowMgrSDL: Set display mode %ix%i@%fHz (id: %i)", size.x, size.y, refreshRate, id );
 			break;
 		}
 		else
 		{
-			Warning( "WindowMgrSDL: Couldn't find closest display mode to %ix%i@%fHz (ptr: 0x%p)", size.x, size.y, refreshRate, this );
+			Warning( "WindowMgrSDL: Couldn't find closest display mode to %ix%i@%fHz (id: %i)", size.x, size.y, refreshRate, id );
 		}
 	}
 
 	case WINDOW_MODE_BORDERLESS_FULLSCREEN:
-		Msg( "WindowMgrSDL: Set borderless fullscreen mode (ptr: 0x%p)", this );
+		Msg( "WindowMgrSDL: Set borderless fullscreen mode (id: %i)", id );
 		SDL_SetWindowFullscreenMode( pSDLWindow, NULL );
 		break;
 	}

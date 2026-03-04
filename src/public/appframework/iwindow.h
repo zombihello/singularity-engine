@@ -19,8 +19,10 @@ public:
 	virtual void SetRefreshRate( float refreshRate )		 = 0;
 	virtual void SetDisplay( displayHandle_t displayHandle ) = 0;
 	virtual void SetMode( windowMode_t mode )				 = 0;
+	virtual void SetCursorVisible( bool bVisible )			 = 0;
 
 	virtual bool		   IsOpen() const						  = 0;
+	virtual bool		   IsCursorVisible() const				  = 0;
 	virtual windowMode_t   GetMode() const						  = 0;
 	virtual float		   GetRefreshRate() const				  = 0;
 	virtual float		   GetPixelDensity() const				  = 0;

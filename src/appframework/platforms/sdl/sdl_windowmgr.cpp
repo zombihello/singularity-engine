@@ -320,7 +320,7 @@ void CWindowMgrSDL::ProcessEvents()
 			}
 			else
 			{
-				inputEvent.type = !sdlEvent.key.repeat ? INPUT_EVENT_TYPE_KEY_PRESSED : INPUT_EVENT_TYPE_KEY_REPEAT;
+				inputEvent.type = INPUT_EVENT_TYPE_KEY_PRESSED;
 			}
 
 			inputEvent.windowId			= CWindowSDL::GetIdBySDLWindowId( sdlEvent.key.windowID );

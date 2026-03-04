@@ -122,8 +122,6 @@ void CLauncherApp::Init()
 	// Initialize WindowMgr group
 	windowMgrSystemGroup.InitSystems();
 
-	// TODO BS yehor.pohuliaka - Migrate the input events
-
 	// Create a hidden window for we can init render context and other things links with the one
 	windowCreateInfo_t windowCreateInfo = {};
 	windowCreateInfo.pTitle				= gameInfo.GetGame().c_str();
@@ -155,10 +153,8 @@ void CLauncherApp::Init()
 	// After initializing the engine and game groups, we can the change window mode to default
 	pMainWindow->SetMode( (windowMode_t)window_mode.GetInt() );
 
-#if 0
 	// Attach the input system to the window
-	g_pInputSystem->AttachToWindow( g_pWindowMgr );
-#endif	// 0
+	g_pInputSystem->AttachToWindow( pMainWindow->GetId() );
 
 	// Create a studio viewport
 	pStudioViewport = g_pStudioRender->CreateViewport();

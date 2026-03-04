@@ -99,12 +99,34 @@ FORCEINLINE void CWindowSDL::SetDisplay( displayHandle_t displayHandle )
 
 /*
 ==================
+CWindowSDL::SetCursorVisible
+==================
+*/
+FORCEINLINE void CWindowSDL::SetCursorVisible( bool bVisible )
+{
+	Assert( pSDLWindow );
+	SDL_SetWindowRelativeMouseMode( pSDLWindow, !bVisible );
+}
+
+/*
+==================
 CWindowSDL::IsOpen
 ==================
 */
 FORCEINLINE bool CWindowSDL::IsOpen() const
 {
 	return !!pSDLWindow;
+}
+
+/*
+==================
+CWindowSDL::IsCursorVisible
+==================
+*/
+FORCEINLINE bool CWindowSDL::IsCursorVisible() const
+{
+	Assert( pSDLWindow );
+	return !SDL_GetWindowRelativeMouseMode( pSDLWindow );
 }
 
 /*

@@ -26,8 +26,10 @@ public:
 	virtual void SetRefreshRate( float refreshRate ) override;
 	virtual void SetDisplay( displayHandle_t displayHandle ) override;
 	virtual void SetMode( windowMode_t mode ) override;
+	virtual void SetCursorVisible( bool bVisible ) override;
 
 	virtual bool		   IsOpen() const override;
+	virtual bool		   IsCursorVisible() const override;
 	virtual windowMode_t   GetMode() const override;
 	virtual float		   GetRefreshRate() const override;
 	virtual float		   GetPixelDensity() const override;
