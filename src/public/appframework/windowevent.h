@@ -1,56 +1,61 @@
 #pragma once
 #include "tier0/types.h"
+#include "appframework/iwindowmgr.h"
 
 //-----------------------------------------------------------------------------
 // Window events
 //-----------------------------------------------------------------------------
+enum windowEventType_t
+{
+	WINDOW_EVENT_TYPE_NONE,
+	WINDOW_EVENT_TYPE_CLOSE,
+	WINDOW_EVENT_TYPE_RESIZE,
+	WINDOW_EVENT_TYPE_PIXEL_SIZE_CHANGED,
+	WINDOW_EVENT_TYPE_FOCUS_GAINED,
+	WINDOW_EVENT_TYPE_FOCUS_LOST,
+	WINDOW_EVENT_TYPE_MOVE,
+	WINDOW_EVENT_TYPE_MINIMIZED,
+	WINDOW_EVENT_TYPE_MAXIMIZED,
+	WINDOW_EVENT_TYPE_RESTORED,
+	WINDOW_EVENT_TYPE_DISPLAY_CHANGED
+};
+
+struct windowDisplayChangedEvent_t
+{
+	uint32 displayId;
+};
+
+struct windowResizeEvent_t
+{
+	int32 width;
+	int32 height;
+};
+
+struct windowPixelSizeChangedEvent_t
+{
+	int32 width;
+	int32 height;
+};
+
+struct windowMoveEvent_t
+{
+	int32 x;
+	int32 y;
+};
+
 struct windowEvent_t
 {
-	enum type_t
+	windowEvent_t();
+
+	windowEventType_t type;
+	windowId_t		  windowId;
+	union
 	{
-		EVENT_NONE,
-		EVENT_WINDOW_CLOSE,
-		EVENT_WINDOW_RESIZE,
-		EVENT_WINDOW_FOCUS_GAINED,
-		EVENT_WINDOW_FOCUS_LOST,
-		EVENT_WINDOW_MOVE,
-		EVENT_WINDOW_MINIMIZED,
-		EVENT_WINDOW_MAXIMIZED,
-		EVENT_WINDOW_RESTORED,
-		EVENT_WINDOW_DISPLAY_CHANGED
+		windowResizeEvent_t			  resize;
+		windowPixelSizeChangedEvent_t pixelSizeChanged;
+		windowMoveEvent_t			  move;
+		windowDisplayChangedEvent_t	  displayChanged;
 	};
-
-	struct windowDisplayChangedEvent_t
-	{
-		uint32 displayId;
-	};
-
-	struct windowResizeEvent_t
-	{
-		int32 width;
-		int32 height;
-	};
-
-	struct windowMoveEvent_t
-	{
-		int32 x;
-		int32 y;
-	};
-
-	union uevents_t
-	{
-		windowResizeEvent_t			windowResize;
-		windowMoveEvent_t			windowMove;
-		windowDisplayChangedEvent_t windowDisplayChanged;
-	};
-
-	windowEvent_t()
-		: type( EVENT_NONE )
-		, windowId( 0 )
-	{
-	}
-
-	type_t	  type;
-	uint32	  windowId;
-	uevents_t events;
 };
+
+#include "appframework/windowevent.inl"

@@ -1,5 +1,4 @@
 #include "pch_tier0.h"
-#include <SDL2/SDL.h>
 #include "tier0/tier0_internal.h"
 #include "tier0/crashdump_internal.h"
 #include "tier0/debug.h"
@@ -40,27 +39,6 @@ void Sys_Error( const char* pFormat, ... )
 
 	// Shutdown application
 	Sys_RequestExit( true );
-}
-
-/*
-==================
-Sys_ShowMessageBox
-==================
-*/
-void Sys_ShowMessageBox( const char* pTitle, const char* pMessage, messageBox_t type )
-{
-	uint32 sdlFlags = 0;
-	switch ( type )
-	{
-	case MESSAGE_BOX_INFO: sdlFlags = SDL_MESSAGEBOX_INFORMATION; break;
-	case MESSAGE_BOX_WARNING: sdlFlags = SDL_MESSAGEBOX_WARNING; break;
-	case MESSAGE_BOX_ERROR: sdlFlags = SDL_MESSAGEBOX_ERROR; break;
-	default:
-		AssertMsg( false, "Unknown message type" );
-		break;
-	}
-
-	SDL_ShowSimpleMessageBox( sdlFlags, pTitle, pMessage, NULL );
 }
 
 /*

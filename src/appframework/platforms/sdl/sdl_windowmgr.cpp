@@ -1,19 +1,14 @@
 #include "pch_appframework.h"
-#include "appframework/iwindowmgr.h"
+#include "appframework/appframework_internal.h"
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_syswm.h>
+#if PLATFORM_USE_SDL
+	#include <SDL3/SDL.h>
 
-//-----------------------------------------------------------------------------
-// SDL window delegates
-//-----------------------------------------------------------------------------
-DECLARE_MULTICAST_DELEGATE( COnProcessWindowEvent, const windowEvent_t& /* windowEvent */ );
-DECLARE_MULTICAST_DELEGATE( COnProcessInputEvent, const inputEvent_t& /* inputEvent */ );
+	#include "tier0/profile.h"
+	#include "appframework/platforms/sdl/sdl_windowmgr.h"
 
-//-----------------------------------------------------------------------------
 // Table for convert SDL scancode to engine button code
-//-----------------------------------------------------------------------------
-static SDL_Scancode s_ScanCodeToButtonCode[] = {
+static SDL_Scancode s_scanCodeTable[] = {
 	SDL_SCANCODE_UNKNOWN,  // BUTTON_CODE_NONE
 	SDL_SCANCODE_0,		   // KEY_0
 	SDL_SCANCODE_1,		   // KEY_1
@@ -124,44 +119,49 @@ static SDL_Scancode s_ScanCodeToButtonCode[] = {
 	SDL_SCANCODE_F12   // KEY_F12
 };
 
-//-----------------------------------------------------------------------------
-// Some helper functions to convert engine button code <-> SDL
-//-----------------------------------------------------------------------------
 /*
 ==================
-ScanCodeToButtonCode
+TranslateSDLDisplayOrientation
 ==================
 */
-static FORCEINLINE buttonCode_t ScanCodeToButtonCode( uint32 scancode )
+FORCEINLINE static displayOrientation_t TranslateSDLDisplayOrientation( SDL_DisplayOrientation sdlDisplayOrientation )
+{
+	switch ( sdlDisplayOrientation )
+	{
+	case SDL_ORIENTATION_UNKNOWN: return DISPLAY_ORIENTATION_UNKNOWN;
+	case SDL_ORIENTATION_LANDSCAPE: return DISPLAY_ORIENTATION_LANDSCAPE;
+	case SDL_ORIENTATION_LANDSCAPE_FLIPPED: return DISPLAY_ORIENTATION_LANDSCAPE_FLIPPED;
+	case SDL_ORIENTATION_PORTRAIT: return DISPLAY_ORIENTATION_PORTRAIT;
+	case SDL_ORIENTATION_PORTRAIT_FLIPPED: return DISPLAY_ORIENTATION_PORTRAIT_FLIPPED;
+	default:
+		AssertMsg( false, "Unkown SDL display orientation 0x%X", sdlDisplayOrientation );
+		return DISPLAY_ORIENTATION_UNKNOWN;
+	}
+}
+
+/*
+==================
+TranslateSDLScanCode
+==================
+*/
+FORCEINLINE static buttonCode_t TranslateSDLScanCode( uint32 scancode )
 {
 	for ( uint32 index = 0; index < BUTTON_CODE_COUNT; ++index )
 	{
-		if ( s_ScanCodeToButtonCode[index] == (SDL_Scancode)scancode )
+		if ( s_scanCodeTable[index] == (SDL_Scancode)scancode )
 		{
 			return (buttonCode_t)index;
 		}
 	}
-
 	return BUTTON_CODE_NONE;
 }
 
 /*
 ==================
-ButtonCodeToScanCode
+TranslateSDLMouseButton
 ==================
 */
-static FORCEINLINE uint32 ButtonCodeToScanCode( buttonCode_t buttonCode )
-{
-	Assert( buttonCode >= KEY_FIRST && buttonCode <= KEY_LAST );
-	return s_ScanCodeToButtonCode[(uint32)buttonCode];
-}
-
-/*
-==================
-MouseButtonToButtonCode
-==================
-*/
-static FORCEINLINE buttonCode_t MouseButtonToButtonCode( uint8 buttonIndex )
+FORCEINLINE static buttonCode_t TranslateSDLMouseButton( uint8 buttonIndex )
 {
 	switch ( buttonIndex )
 	{
@@ -177,509 +177,535 @@ static FORCEINLINE buttonCode_t MouseButtonToButtonCode( uint8 buttonIndex )
 	}
 }
 
-//-----------------------------------------------------------------------------
-// SDL window manager
-//-----------------------------------------------------------------------------
-class CSDLWindowMgr : public CBaseAppSystem<IWindowMgr>
-{
-public:
-	CSDLWindowMgr();
-	~CSDLWindowMgr();
-
-	virtual bool Create( const char* pTitle, uint32 width, uint32 height, uint32 flags = WINDOW_STYLE_DEFAULT ) override;
-	virtual void Close() override;
-
-	virtual void ShowWindow( bool bShowWindow = true ) override;
-	virtual void Maximize() override;
-	virtual void Minimize() override;
-
-	virtual void ProcessEvents() override;
-
-	virtual void SetTitle( const char* pTitle ) override;
-	virtual void SetSize( uint32 width, uint32 height ) override;
-	virtual void SetFullscreen( bool bFullscreen ) override;
-
-	virtual IOnProcessWindowEvent* OnProcessWindowEvent() const override;
-	virtual IOnProcessInputEvent*  OnProcessInputEvent() const override;
-
-	virtual bool		   IsOpen() const override;
-	virtual bool		   IsFullscreen() const override;
-	virtual void		   GetSize( uint32& width, uint32& height ) const override;
-	virtual windowHandle_t GetHandle() const override;
-	virtual uint32		   GetID() const override;
-	FORCEINLINE SDL_Window* GetSDLWindow() const
-	{
-		return pSDLWindow;
-	}
-
-private:
-	bool				  bFullscreen;
-	uint32				  id;
-	SDL_Window*			  pSDLWindow;
-	windowHandle_t		  handle;
-	COnProcessWindowEvent onProcessWindowEvent;
-	COnProcessInputEvent  onProcessInputEvent;
-};
-
-//-----------------------------------------------------------------------------
-// Create a singleton window manager
-//-----------------------------------------------------------------------------
 /*
 ==================
-CreateWindowMgr
+TranslateSDLKeymod
 ==================
 */
-static CSDLWindowMgr* s_pSDLWindowMgr = NULL;
-IWindowMgr*			  CreateWindowMgr()
+FORCEINLINE static keyModifierMask_t TranslateSDLKeymod( SDL_Keymod sdlKeymod )
 {
-	if ( !s_pSDLWindowMgr )
-	{
-		s_pSDLWindowMgr = new CSDLWindowMgr();
-	}
-	return s_pSDLWindowMgr;
+	keyModifierMask_t result;
+	result.bAlt		 = sdlKeymod & SDL_KMOD_ALT;
+	result.bCapsLock = sdlKeymod & SDL_KMOD_CAPS;
+	result.bControl	 = sdlKeymod & SDL_KMOD_CTRL;
+	result.bNumLock	 = sdlKeymod & SDL_KMOD_NUM;
+	result.bShift	 = sdlKeymod & SDL_KMOD_SHIFT;
+	result.bSuper	 = sdlKeymod & SDL_KMOD_GUI;
+	return result;
 }
 
-//-----------------------------------------------------------------------------
-// SDL window implementation
-//-----------------------------------------------------------------------------
 /*
 ==================
-CSDLWindowMgr::CSDLWindowMgr
+CWindowMgrSDL::CWindowMgrSDL
 ==================
 */
-CSDLWindowMgr::CSDLWindowMgr()
-	: bFullscreen( false )
-	, id( -1 )
-	, pSDLWindow( NULL )
-	, handle( INVALID_WINDOW_HANDLE )
+CWindowMgrSDL::CWindowMgrSDL()
+	: mainWindowId( INVALID_INDEX )
 {
 }
 
 /*
 ==================
-CSDLWindowMgr::~CSDLWindowMgr
+CWindowMgrSDL::Init
 ==================
 */
-CSDLWindowMgr::~CSDLWindowMgr()
+bool CWindowMgrSDL::Init()
 {
-	Close();
-}
-
-/*
-==================
-CSDLWindowMgr::SetTitle
-==================
-*/
-void CSDLWindowMgr::SetTitle( const char* pTitle )
-{
-	if ( pSDLWindow )
+	if ( !SDL_WasInit( SDL_INIT_VIDEO ) && !SDL_Init( SDL_INIT_VIDEO ) )
 	{
-		SDL_SetWindowTitle( pSDLWindow, pTitle );
-	}
-}
-
-/*
-==================
-CSDLWindowMgr::SetSize
-==================
-*/
-void CSDLWindowMgr::SetSize( uint32 width, uint32 height )
-{
-	if ( pSDLWindow )
-	{
-		SDL_SetWindowSize( pSDLWindow, width, height );
-		SDL_SetWindowPosition( pSDLWindow, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED );
-	}
-}
-
-/*
-==================
-CSDLWindowMgr::SetFullscreen
-==================
-*/
-void CSDLWindowMgr::SetFullscreen( bool bFullscreen )
-{
-	if ( pSDLWindow )
-	{
-		CSDLWindowMgr::bFullscreen = bFullscreen;
-		SDL_SetWindowFullscreen( pSDLWindow, bFullscreen ? SDL_WINDOW_FULLSCREEN : 0 );
-	}
-}
-
-/*
-==================
-CSDLWindowMgr::IsOpen
-==================
-*/
-bool CSDLWindowMgr::IsOpen() const
-{
-	return !!pSDLWindow;
-}
-
-/*
-==================
-CSDLWindowMgr::IsFullscreen
-==================
-*/
-bool CSDLWindowMgr::IsFullscreen() const
-{
-	return bFullscreen;
-}
-
-/*
-==================
-CSDLWindowMgr::GetSize
-==================
-*/
-void CSDLWindowMgr::GetSize( uint32& width, uint32& height ) const
-{
-	if ( pSDLWindow )
-	{
-		SDL_GetWindowSize( pSDLWindow, (int*)&width, (int*)&height );
-	}
-}
-
-/*
-==================
-CSDLWindowMgr::GetHandle
-==================
-*/
-windowHandle_t CSDLWindowMgr::GetHandle() const
-{
-	return handle;
-}
-
-/*
-==================
-CSDLWindowMgr::Create
-==================
-*/
-bool CSDLWindowMgr::Create( const char* pTitle, uint32 width, uint32 height, uint32 flags /* = WINDOW_STYLE_DEFAULT */ )
-{
-	// Do nothing if we already create the window
-	if ( pSDLWindow )
-	{
-		Warning( "SDLWindowMgr: Window already created" );
-		return true;
-	}
-
-	// Combine flags for SDL2
-	uint32 sdlFlags = 0;
-	if ( flags & WINDOW_STYLE_HIDDEN )
-	{
-		sdlFlags = SDL_WINDOW_HIDDEN;
-	}
-	else
-	{
-		sdlFlags = SDL_WINDOW_SHOWN;
-	}
-
-	if ( flags & WINDOW_STYLE_FULLSCREEN )
-	{
-		bFullscreen = true;
-		sdlFlags |= SDL_WINDOW_FULLSCREEN;
-	}
-	else
-	{
-		if ( flags & WINDOW_STYLE_RESIZABLE )
-		{
-			sdlFlags |= SDL_WINDOW_RESIZABLE;
-		}
-
-		if ( !( flags & WINDOW_STYLE_DECORATED ) )
-		{
-			sdlFlags |= SDL_WINDOW_BORDERLESS;
-		}
-
-		if ( flags & WINDOW_STYLE_MINIMIZED )
-		{
-			sdlFlags |= SDL_WINDOW_MINIMIZED;
-		}
-
-		if ( flags & WINDOW_STYLE_MAXIMIZED )
-		{
-			sdlFlags |= SDL_WINDOW_MAXIMIZED;
-		}
-	}
-
-	// Create the window
-	pSDLWindow = SDL_CreateWindow( pTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, sdlFlags );
-	if ( !pSDLWindow )
-	{
-		Sys_Error( "SDLWindowMgr: Failed to create window (%ix%i) with title '%s' and flags 0x%X. SDL error: %s", width, height, pTitle, flags, SDL_GetError() );
+		Error( "WindowMgrSDL: Failed to initialize SDL. SDL error: %s", SDL_GetError() );
 		return false;
 	}
-
-	// Get OS handle on window
-	SDL_SysWMinfo sdlWindowInfo;
-	SDL_VERSION( &sdlWindowInfo.version );
-	SDL_GetWindowWMInfo( pSDLWindow, &sdlWindowInfo );
-
-#if PLATFORM_WINDOWS
-	handle = sdlWindowInfo.info.win.window;
-#else
-	#error Unknown platform
-#endif	// PLATFORM_WINDOWS
-
-	Msg( "SDLWindowMgr: Window created (%ix%i) with title '%s', flags 0x%X and handle 0x%p", width, height, pTitle, flags, handle );
-	id = SDL_GetWindowID( pSDLWindow );
 	return true;
 }
 
 /*
 ==================
-CSDLWindowMgr::Maximize
+CWindowMgrSDL::Shutdown
 ==================
 */
-void CSDLWindowMgr::Maximize()
+void CWindowMgrSDL::Shutdown()
 {
-	if ( pSDLWindow )
+	for ( size index = 0, count = windowIds.size(); index < count; ++index )
 	{
-		SDL_MaximizeWindow( pSDLWindow );
+		windowPool.Free( windowIds[index] );
 	}
+
+	onWindowEvent.RemoveAll();
+	onInputEvent.RemoveAll();
+	SDL_Quit();
+
+	windowIds.clear();
+	mainWindowId = INVALID_INDEX;
 }
 
 /*
 ==================
-CSDLWindowMgr::Minimize
+CWindowMgrSDL::CreateWindow
 ==================
 */
-void CSDLWindowMgr::Minimize()
+IWindow* CWindowMgrSDL::CreateWindow()
 {
-	if ( pSDLWindow )
+	IWindow*   pWindow	= windowPool.Create();
+	windowId_t windowId = pWindow->GetId();
+	windowIds.emplace_back( windowId );
+
+	if ( mainWindowId == INVALID_INDEX )
 	{
-		SDL_MinimizeWindow( pSDLWindow );
+		mainWindowId = windowId;
+		onChangedMainWindow.Broadcast( mainWindowId );
 	}
+	return pWindow;
 }
 
 /*
 ==================
-CSDLWindowMgr::Close
+CWindowMgrSDL::CreateWindow
 ==================
 */
-void CSDLWindowMgr::Close()
+void CWindowMgrSDL::DestroyWindow( windowId_t windowId )
 {
-	if ( pSDLWindow )
-	{
-		SDL_DestroyWindow( pSDLWindow );
-		Msg( "SDLWindowMgr: Window with handle 0x%p closed", handle );
-
-		id			= (uint32)-1;
-		pSDLWindow	= NULL;
-		handle		= INVALID_WINDOW_HANDLE;
-		bFullscreen = false;
-	}
-}
-
-/*
-==================
-CSDLWindowMgr::ShowWindow
-==================
-*/
-void CSDLWindowMgr::ShowWindow( bool bShowWindow /* = true */ )
-{
-	if ( pSDLWindow )
-	{
-		if ( bShowWindow )
-		{
-			SDL_ShowWindow( pSDLWindow );
-		}
-		else
-		{
-			SDL_HideWindow( pSDLWindow );
-		}
-	}
-}
-
-/*
-==================
-CSDLWindowMgr::ProcessEvents
-==================
-*/
-void CSDLWindowMgr::ProcessEvents()
-{
-	PROFILE_SCOPE();
-
-	// Do nothing if window isn't created
-	if ( !pSDLWindow )
+	if ( windowId == INVALID_INDEX )
 	{
 		return;
 	}
 
-	// Polls for currently pending SDL2 events
+	windowPool.Free( windowId );
+	for ( size index = 0, count = windowIds.size(); index < count; ++index )
+	{
+		if ( windowId == windowIds[index] )
+		{
+			windowIds.erase( windowIds.begin() + index );
+			break;
+		}
+	}
+
+	if ( mainWindowId == windowId )
+	{
+		mainWindowId = !windowIds.empty() ? windowIds[0] : INVALID_INDEX;
+		onChangedMainWindow.Broadcast( mainWindowId );
+	}
+}
+
+/*
+==================
+CWindowMgrSDL::ProcessEvents
+==================
+*/
+void CWindowMgrSDL::ProcessEvents()
+{
+	// Polls for currently pending SDL3 events
+	PROFILE_SCOPE();
 	SDL_Event sdlEvent;
 	while ( SDL_PollEvent( &sdlEvent ) )
 	{
 		windowEvent_t windowEvent;
 		inputEvent_t  inputEvent;
-
 		switch ( sdlEvent.type )
 		{
 			// Text input event
-		case SDL_TEXTINPUT:
-			inputEvent.type						   = inputEvent_t::EVENT_TEXT_INPUT;
-			inputEvent.events.textInputEvent.pText = sdlEvent.text.text;
+		case SDL_EVENT_TEXT_INPUT:
+			inputEvent.type					  = INPUT_EVENT_TYPE_TEXT_INPUT;
+			inputEvent.windowId				  = CWindowSDL::GetIdBySDLWindowId( sdlEvent.text.windowID );
+			inputEvent.textInput.pText		  = sdlEvent.text.text;
+			inputEvent.textInput.modifierMask = TranslateSDLKeymod( SDL_GetModState() );
 			break;
 
 			// Key pressed and released button events
-		case SDL_KEYDOWN:
-		case SDL_KEYUP:
-			if ( sdlEvent.type == SDL_KEYUP )
+		case SDL_EVENT_KEY_DOWN:
+		case SDL_EVENT_KEY_UP:
+			if ( sdlEvent.type == SDL_EVENT_KEY_UP )
 			{
-				inputEvent.type = inputEvent_t::EVENT_KEY_RELEASED;
+				inputEvent.type = INPUT_EVENT_TYPE_KEY_RELEASED;
 			}
 			else
 			{
-				inputEvent.type = inputEvent_t::EVENT_KEY_PRESSED;
+				inputEvent.type = INPUT_EVENT_TYPE_KEY_PRESSED;
 			}
 
-			inputEvent.events.key.bAlt		= sdlEvent.key.keysym.mod & KMOD_ALT;
-			inputEvent.events.key.bCapsLock = sdlEvent.key.keysym.mod & KMOD_CAPS;
-			inputEvent.events.key.bControl	= sdlEvent.key.keysym.mod & KMOD_CTRL;
-			inputEvent.events.key.bNumLock	= sdlEvent.key.keysym.mod & KMOD_NUM;
-			inputEvent.events.key.bShift	= sdlEvent.key.keysym.mod & KMOD_SHIFT;
-			inputEvent.events.key.bSuper	= sdlEvent.key.keysym.mod & KMOD_GUI;
-			inputEvent.events.key.code		= ScanCodeToButtonCode( sdlEvent.key.keysym.scancode );
+			inputEvent.windowId			= CWindowSDL::GetIdBySDLWindowId( sdlEvent.key.windowID );
+			inputEvent.key.code			= TranslateSDLScanCode( sdlEvent.key.scancode );
+			inputEvent.key.modifierMask = TranslateSDLKeymod( sdlEvent.key.mod );
 			break;
 
 			// Mouse button pressed and released events
-		case SDL_MOUSEBUTTONDOWN:
-		case SDL_MOUSEBUTTONUP:
-			if ( sdlEvent.type == SDL_MOUSEBUTTONUP )
+		case SDL_EVENT_MOUSE_BUTTON_DOWN:
+		case SDL_EVENT_MOUSE_BUTTON_UP:
+			if ( sdlEvent.type == SDL_EVENT_MOUSE_BUTTON_UP )
 			{
-				inputEvent.type = inputEvent_t::EVENT_MOUSE_RELEASED;
+				inputEvent.type = INPUT_EVENT_TYPE_MOUSE_RELEASED;
 			}
 			else
 			{
-				inputEvent.type = inputEvent_t::EVENT_MOUSE_PRESSED;
+				inputEvent.type = INPUT_EVENT_TYPE_MOUSE_PRESSED;
 			}
 
-			inputEvent.events.mouseButton.code = MouseButtonToButtonCode( sdlEvent.button.button );
-			inputEvent.events.mouseButton.x	   = sdlEvent.button.x;
-			inputEvent.events.mouseButton.y	   = sdlEvent.button.y;
+			inputEvent.windowId					= CWindowSDL::GetIdBySDLWindowId( sdlEvent.button.windowID );
+			inputEvent.mouseButton.code			= TranslateSDLMouseButton( sdlEvent.button.button );
+			inputEvent.mouseButton.modifierMask = TranslateSDLKeymod( SDL_GetModState() );
 			break;
 
 			// Moving wheel mouse event
-		case SDL_MOUSEWHEEL:
-			inputEvent.type				   = inputEvent_t::EVENT_MOUSE_WHEEL;
-			inputEvent.events.mouseWheel.x = sdlEvent.wheel.direction == SDL_MOUSEWHEEL_FLIPPED ? sdlEvent.wheel.x * -1 : sdlEvent.wheel.x;
-			inputEvent.events.mouseWheel.y = sdlEvent.wheel.direction == SDL_MOUSEWHEEL_FLIPPED ? sdlEvent.wheel.y * -1 : sdlEvent.wheel.y;
+		case SDL_EVENT_MOUSE_WHEEL:
+			inputEvent.type					   = INPUT_EVENT_TYPE_MOUSE_WHEEL;
+			inputEvent.windowId				   = CWindowSDL::GetIdBySDLWindowId( sdlEvent.wheel.windowID );
+			inputEvent.mouseWheel.x			   = sdlEvent.wheel.direction == SDL_MOUSEWHEEL_FLIPPED ? sdlEvent.wheel.x * -1 : sdlEvent.wheel.x;
+			inputEvent.mouseWheel.y			   = sdlEvent.wheel.direction == SDL_MOUSEWHEEL_FLIPPED ? sdlEvent.wheel.y * -1 : sdlEvent.wheel.y;
+			inputEvent.mouseWheel.modifierMask = TranslateSDLKeymod( SDL_GetModState() );
 			break;
 
 			// Mouse moving event
-		case SDL_MOUSEMOTION:
-			inputEvent.type						   = inputEvent_t::EVENT_MOUSE_MOVE;
-			inputEvent.events.mouseMove.x		   = sdlEvent.motion.x;
-			inputEvent.events.mouseMove.y		   = sdlEvent.motion.y;
-			inputEvent.events.mouseMove.xDirection = sdlEvent.motion.xrel;
-			inputEvent.events.mouseMove.yDirection = sdlEvent.motion.yrel;
+		case SDL_EVENT_MOUSE_MOTION:
+			inputEvent.type					= INPUT_EVENT_TYPE_MOUSE_MOVE;
+			inputEvent.windowId				= CWindowSDL::GetIdBySDLWindowId( sdlEvent.motion.windowID );
+			inputEvent.mouseMove.x			= sdlEvent.motion.x;
+			inputEvent.mouseMove.y			= sdlEvent.motion.y;
+			inputEvent.mouseMove.xDirection = sdlEvent.motion.xrel;
+			inputEvent.mouseMove.yDirection = sdlEvent.motion.yrel;
 			break;
 
-			// Window events
-		case SDL_WINDOWEVENT:
-			windowEvent.windowId = sdlEvent.window.windowID;
+			// Close window event
+		case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+			windowEvent.type	 = WINDOW_EVENT_TYPE_CLOSE;
+			windowEvent.windowId = CWindowSDL::GetIdBySDLWindowId( sdlEvent.window.windowID );
+			break;
 
-			switch ( sdlEvent.window.event )
-			{
-				// Close window event
-			case SDL_WINDOWEVENT_CLOSE:
-				windowEvent.type = windowEvent_t::EVENT_WINDOW_CLOSE;
-				break;
+			// Pixel size has been changed event
+		case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
+			windowEvent.type		  = WINDOW_EVENT_TYPE_PIXEL_SIZE_CHANGED;
+			windowEvent.windowId	  = CWindowSDL::GetIdBySDLWindowId( sdlEvent.window.windowID );
+			windowEvent.resize.width  = sdlEvent.window.data1;
+			windowEvent.resize.height = sdlEvent.window.data2;
+			break;
 
-				// Resize window event
-			case SDL_WINDOWEVENT_SIZE_CHANGED:
-			case SDL_WINDOWEVENT_RESIZED:
-				windowEvent.type					   = windowEvent_t::EVENT_WINDOW_RESIZE;
-				windowEvent.events.windowResize.width  = sdlEvent.window.data1;
-				windowEvent.events.windowResize.height = sdlEvent.window.data2;
-				break;
+			// Resize window event
+		case SDL_EVENT_WINDOW_RESIZED:
+			windowEvent.type		  = WINDOW_EVENT_TYPE_RESIZE;
+			windowEvent.windowId	  = CWindowSDL::GetIdBySDLWindowId( sdlEvent.window.windowID );
+			windowEvent.resize.width  = sdlEvent.window.data1;
+			windowEvent.resize.height = sdlEvent.window.data2;
+			break;
 
-				// Gained focus event
-			case SDL_WINDOWEVENT_FOCUS_GAINED:
-				windowEvent.type = windowEvent_t::EVENT_WINDOW_FOCUS_GAINED;
-				break;
+			// Gained focus event
+		case SDL_EVENT_WINDOW_FOCUS_GAINED:
+			windowEvent.type	 = WINDOW_EVENT_TYPE_FOCUS_GAINED;
+			windowEvent.windowId = CWindowSDL::GetIdBySDLWindowId( sdlEvent.window.windowID );
+			break;
 
-				// Lost focus event
-			case SDL_WINDOWEVENT_FOCUS_LOST:
-				windowEvent.type = windowEvent_t::EVENT_WINDOW_FOCUS_LOST;
-				break;
+			// Lost focus event
+		case SDL_EVENT_WINDOW_FOCUS_LOST:
+			windowEvent.type	 = WINDOW_EVENT_TYPE_FOCUS_LOST;
+			windowEvent.windowId = CWindowSDL::GetIdBySDLWindowId( sdlEvent.window.windowID );
+			break;
 
-				// Move window event
-			case SDL_WINDOWEVENT_MOVED:
-				windowEvent.type				= windowEvent_t::EVENT_WINDOW_MOVE;
-				windowEvent.events.windowMove.x = sdlEvent.window.data1;
-				windowEvent.events.windowMove.y = sdlEvent.window.data2;
-				break;
+			// Move window event
+		case SDL_EVENT_WINDOW_MOVED:
+			windowEvent.type	 = WINDOW_EVENT_TYPE_MOVE;
+			windowEvent.windowId = CWindowSDL::GetIdBySDLWindowId( sdlEvent.window.windowID );
+			windowEvent.move.x	 = sdlEvent.window.data1;
+			windowEvent.move.y	 = sdlEvent.window.data2;
+			break;
 
-				// Window has been minimized
-			case SDL_WINDOWEVENT_MINIMIZED:
-				windowEvent.type = windowEvent_t::EVENT_WINDOW_MINIMIZED;
-				break;
+			// Window has been minimized
+		case SDL_EVENT_WINDOW_MINIMIZED:
+			windowEvent.type	 = WINDOW_EVENT_TYPE_MINIMIZED;
+			windowEvent.windowId = CWindowSDL::GetIdBySDLWindowId( sdlEvent.window.windowID );
+			break;
 
-				// Window has been maximized
-			case SDL_WINDOWEVENT_MAXIMIZED:
-				windowEvent.type = windowEvent_t::EVENT_WINDOW_MAXIMIZED;
-				break;
+			// Window has been maximized
+		case SDL_EVENT_WINDOW_MAXIMIZED:
+			windowEvent.type	 = WINDOW_EVENT_TYPE_MAXIMIZED;
+			windowEvent.windowId = CWindowSDL::GetIdBySDLWindowId( sdlEvent.window.windowID );
+			break;
 
-				// Window has been restored to normal size and position
-			case SDL_WINDOWEVENT_RESTORED:
-				windowEvent.type = windowEvent_t::EVENT_WINDOW_RESTORED;
-				break;
+			// Window has been restored to normal size and position
+		case SDL_EVENT_WINDOW_RESTORED:
+			windowEvent.type	 = WINDOW_EVENT_TYPE_RESTORED;
+			windowEvent.windowId = CWindowSDL::GetIdBySDLWindowId( sdlEvent.window.windowID );
+			break;
 
-				// Window has been moved to display data1
-			case SDL_WINDOWEVENT_DISPLAY_CHANGED:
-				windowEvent.type								  = windowEvent_t::EVENT_WINDOW_DISPLAY_CHANGED;
-				windowEvent.events.windowDisplayChanged.displayId = sdlEvent.window.data1;
-				break;
+			// Window has been moved to display data1
+		case SDL_EVENT_WINDOW_DISPLAY_CHANGED:
+			windowEvent.type					 = WINDOW_EVENT_TYPE_DISPLAY_CHANGED;
+			windowEvent.windowId				 = CWindowSDL::GetIdBySDLWindowId( sdlEvent.window.windowID );
+			windowEvent.displayChanged.displayId = sdlEvent.window.data1;
+			break;
 
-				// Unknown event
-			default:
-				windowEvent.type = windowEvent_t::EVENT_NONE;
-				break;
-			}
+			// Unknown event
+		default:
+			inputEvent.type	 = INPUT_EVENT_TYPE_NONE;
+			windowEvent.type = WINDOW_EVENT_TYPE_NONE;
 			break;
 		}
 
-		// Broadcast process window event
-		if ( windowEvent.type != windowEvent_t::EVENT_NONE )
+		// Broadcast process the window event
+		if ( windowEvent.type != WINDOW_EVENT_TYPE_NONE )
 		{
-			onProcessWindowEvent.Broadcast( windowEvent );
+			onWindowEvent.Broadcast( windowEvent );
 		}
 
-		// Broadcast process input event
-		if ( inputEvent.type != inputEvent_t::EVENT_NONE )
+		// Broadcast process the input event
+		if ( inputEvent.type != INPUT_EVENT_TYPE_NONE )
 		{
-			onProcessInputEvent.Broadcast( inputEvent );
+			onInputEvent.Broadcast( inputEvent );
 		}
 	}
 }
 
 /*
 ==================
-CSDLWindowMgr::OnProcessWindowEvent
+CWindowMgrSDL::GetDisplays
 ==================
 */
-IOnProcessWindowEvent* CSDLWindowMgr::OnProcessWindowEvent() const
+uint32 CWindowMgrSDL::GetDisplays( display_t* pDisplays, uint32 maxNumDisplays ) const
 {
-	return (IOnProcessWindowEvent*)&onProcessWindowEvent;
+	uint32		   numDisplays	  = 0;
+	SDL_DisplayID* pSDLDisplayIds = SDL_GetDisplays( (int32*)&numDisplays );
+	if ( numDisplays > 0 )
+	{
+		SDL_Rect sdlRect;
+		uint32	 numDisplaysToWrite = Min( numDisplays, pDisplays ? maxNumDisplays : 0 );
+		for ( uint32 index = 0; index < numDisplaysToWrite; ++index )
+		{
+			SDL_DisplayID sdlDisplayId = pSDLDisplayIds[index];
+			display_t&	  display	   = pDisplays[index];
+			display.handle			   = sdlDisplayId;
+			display.pName			   = SDL_GetDisplayName( sdlDisplayId );
+			display.orientation		   = TranslateSDLDisplayOrientation( SDL_GetCurrentDisplayOrientation( sdlDisplayId ) );
+
+			SDL_GetDisplayBounds( sdlDisplayId, &sdlRect );
+			display.bounds.x	  = sdlRect.x;
+			display.bounds.y	  = sdlRect.y;
+			display.bounds.width  = sdlRect.w;
+			display.bounds.height = sdlRect.h;
+
+			SDL_GetDisplayUsableBounds( sdlDisplayId, &sdlRect );
+			display.usableBounds.x		= sdlRect.x;
+			display.usableBounds.y		= sdlRect.y;
+			display.usableBounds.width	= sdlRect.w;
+			display.usableBounds.height = sdlRect.h;
+		}
+	}
+
+	SDL_free( pSDLDisplayIds );
+	return numDisplays;
 }
 
 /*
 ==================
-CSDLWindowMgr::OnProcessInputEvent
+CWindowMgrSDL::GetDisplayById
 ==================
 */
-IOnProcessInputEvent* CSDLWindowMgr::OnProcessInputEvent() const
+bool CWindowMgrSDL::GetDisplayById( uint32 index, display_t& display ) const
 {
-	return (IOnProcessInputEvent*)&onProcessInputEvent;
+	uint32		   numDisplays	  = 0;
+	SDL_DisplayID* pSDLDisplayIds = SDL_GetDisplays( (int32*)&numDisplays );
+	if ( index < numDisplays )
+	{
+		SDL_Rect	  sdlRect;
+		SDL_DisplayID sdlDisplayId = pSDLDisplayIds[index];
+		display.handle			   = sdlDisplayId;
+		display.pName			   = SDL_GetDisplayName( sdlDisplayId );
+		display.orientation		   = TranslateSDLDisplayOrientation( SDL_GetCurrentDisplayOrientation( sdlDisplayId ) );
+
+		SDL_GetDisplayBounds( sdlDisplayId, &sdlRect );
+		display.bounds.x	  = sdlRect.x;
+		display.bounds.y	  = sdlRect.y;
+		display.bounds.width  = sdlRect.w;
+		display.bounds.height = sdlRect.h;
+
+		SDL_GetDisplayUsableBounds( sdlDisplayId, &sdlRect );
+		display.usableBounds.x		= sdlRect.x;
+		display.usableBounds.y		= sdlRect.y;
+		display.usableBounds.width	= sdlRect.w;
+		display.usableBounds.height = sdlRect.h;
+	}
+
+	SDL_free( pSDLDisplayIds );
+	return index < numDisplays;
 }
 
 /*
 ==================
-CSDLWindowMgr::GetID
+CWindowMgrSDL::GetDisplayById
 ==================
 */
-uint32 CSDLWindowMgr::GetID() const
+bool CWindowMgrSDL::GetDisplayByHandle( displayHandle_t displayHandle, display_t& display ) const
 {
-	return id;
+	if ( displayHandle != INVALID_DISPLAY_HANDLE )
+	{
+		SDL_Rect sdlRect;
+		display.handle		= displayHandle;
+		display.pName		= SDL_GetDisplayName( displayHandle );
+		display.orientation = TranslateSDLDisplayOrientation( SDL_GetCurrentDisplayOrientation( displayHandle ) );
+
+		SDL_GetDisplayBounds( displayHandle, &sdlRect );
+		display.bounds.x	  = sdlRect.x;
+		display.bounds.y	  = sdlRect.y;
+		display.bounds.width  = sdlRect.w;
+		display.bounds.height = sdlRect.h;
+
+		SDL_GetDisplayUsableBounds( displayHandle, &sdlRect );
+		display.usableBounds.x		= sdlRect.x;
+		display.usableBounds.y		= sdlRect.y;
+		display.usableBounds.width	= sdlRect.w;
+		display.usableBounds.height = sdlRect.h;
+	}
+
+	return displayHandle != INVALID_DISPLAY_HANDLE;
 }
+
+/*
+==================
+CWindowMgrSDL::GetPrimaryDisplay
+==================
+*/
+bool CWindowMgrSDL::GetPrimaryDisplay( display_t& display ) const
+{
+	SDL_DisplayID sdlDisplayId = SDL_GetPrimaryDisplay();
+	if ( sdlDisplayId != 0 )
+	{
+		SDL_Rect sdlRect;
+		display.handle		= sdlDisplayId;
+		display.pName		= SDL_GetDisplayName( sdlDisplayId );
+		display.orientation = TranslateSDLDisplayOrientation( SDL_GetCurrentDisplayOrientation( sdlDisplayId ) );
+
+		SDL_GetDisplayBounds( sdlDisplayId, &sdlRect );
+		display.bounds.x	  = sdlRect.x;
+		display.bounds.y	  = sdlRect.y;
+		display.bounds.width  = sdlRect.w;
+		display.bounds.height = sdlRect.h;
+
+		SDL_GetDisplayUsableBounds( sdlDisplayId, &sdlRect );
+		display.usableBounds.x		= sdlRect.x;
+		display.usableBounds.y		= sdlRect.y;
+		display.usableBounds.width	= sdlRect.w;
+		display.usableBounds.height = sdlRect.h;
+	}
+
+	return sdlDisplayId != 0;
+}
+
+/*
+==================
+CWindowMgrSDL::GetDisplayModes
+==================
+*/
+uint32 CWindowMgrSDL::GetDisplayModes( displayHandle_t displayHandle, displayMode_t* pDisplayModes, uint32 maxNumDisplayModes ) const
+{
+	uint32			  sdlNumDisplayModes = 0;
+	uint32			  numDisplayModes	 = 0;
+	SDL_DisplayMode** ppSDLDisplayModes	 = SDL_GetFullscreenDisplayModes( displayHandle, (int32*)&sdlNumDisplayModes );
+	if ( numDisplayModes > 0 )
+	{
+		uint32* pSDLDisplayModeIds = (uint32*)Mem_Alloca( sdlNumDisplayModes * sizeof( uint32 ) );
+		for ( uint32 index = 0; index < sdlNumDisplayModes; ++index )
+		{
+			SDL_DisplayMode* pSDLDisplayMode   = ppSDLDisplayModes[index];
+			bool			 bFoundDisplayMode = false;
+			for ( uint32 searchIndex = 0; searchIndex < numDisplayModes && !bFoundDisplayMode; ++searchIndex )
+			{
+				SDL_DisplayMode* pSDLDisplayModeSearch = ppSDLDisplayModes[pSDLDisplayModeIds[searchIndex]];
+				if ( pSDLDisplayMode->w == pSDLDisplayModeSearch->w && pSDLDisplayMode->h == pSDLDisplayModeSearch->h
+					 && pSDLDisplayMode->refresh_rate == pSDLDisplayModeSearch->refresh_rate )
+				{
+					bFoundDisplayMode = true;
+				}
+			}
+
+			if ( !bFoundDisplayMode )
+			{
+				pSDLDisplayModeIds[numDisplayModes++] = index;
+			}
+		}
+
+		uint32 numDisplayModesToWrite = Min( numDisplayModes, pDisplayModes ? maxNumDisplayModes : 0 );
+		for ( uint32 index = 0; index < numDisplayModesToWrite; ++index )
+		{
+			SDL_DisplayMode* pSDLDisplayMode = ppSDLDisplayModes[pSDLDisplayModeIds[index]];
+			displayMode_t&	 displayMode	 = pDisplayModes[index];
+			displayMode.width				 = pSDLDisplayMode->w;
+			displayMode.height				 = pSDLDisplayMode->h;
+			displayMode.refreshRate			 = pSDLDisplayMode->refresh_rate;
+		}
+	}
+
+	SDL_free( ppSDLDisplayModes );
+	return numDisplayModes;
+}
+
+/*
+==================
+CWindowMgrSDL::GetDesktopDisplayMode
+==================
+*/
+bool CWindowMgrSDL::GetDesktopDisplayMode( displayHandle_t displayHandle, displayMode_t& displayMode ) const
+{
+	const SDL_DisplayMode* pSDLDisplayMode = SDL_GetDesktopDisplayMode( displayHandle );
+	if ( pSDLDisplayMode )
+	{
+		displayMode.width		= pSDLDisplayMode->w;
+		displayMode.height		= pSDLDisplayMode->h;
+		displayMode.refreshRate = pSDLDisplayMode->refresh_rate;
+	}
+	return !!pSDLDisplayMode;
+}
+
+/*
+==================
+CWindowMgrSDL::GetCurrentDisplayMode
+==================
+*/
+bool CWindowMgrSDL::GetCurrentDisplayMode( displayHandle_t displayHandle, displayMode_t& displayMode ) const
+{
+	const SDL_DisplayMode* pSDLDisplayMode = SDL_GetCurrentDisplayMode( displayHandle );
+	if ( pSDLDisplayMode )
+	{
+		displayMode.width		= pSDLDisplayMode->w;
+		displayMode.height		= pSDLDisplayMode->h;
+		displayMode.refreshRate = pSDLDisplayMode->refresh_rate;
+	}
+	return !!pSDLDisplayMode;
+}
+
+/*
+==================
+CWindowMgrSDL::FindClosestDisplayMode
+==================
+*/
+bool CWindowMgrSDL::FindClosestDisplayMode( displayHandle_t displayHandle, int32 width, int32 height, float refreshRate, bool bIncludeHightDensityModes, displayMode_t& displayMode ) const
+{
+	SDL_DisplayMode sdlDisplayMode;
+	if ( !SDL_GetClosestFullscreenDisplayMode( displayHandle, width, height, refreshRate, bIncludeHightDensityModes, &sdlDisplayMode ) )
+	{
+		Warning( "WindowMgrSDL: Couldn't find closest display mode to %ix%i@%fHz", width, height, refreshRate );
+		return false;
+	}
+
+	displayMode.width		= sdlDisplayMode.w;
+	displayMode.height		= sdlDisplayMode.h;
+	displayMode.refreshRate = sdlDisplayMode.refresh_rate;
+	return true;
+}
+
+/*
+==================
+GetWindowMgrSDL
+==================
+*/
+CWindowMgrSDL& GetWindowMgrSDL()
+{
+	static CWindowMgrSDL s_windowMgrSDL;
+	return s_windowMgrSDL;
+}
+
+/*
+==================
+CreateWindowMgr
+==================
+*/
+IWindowMgr* CreateWindowMgr()
+{
+	return &GetWindowMgrSDL();
+}
+#endif	// PLATFORM_USE_SDL
