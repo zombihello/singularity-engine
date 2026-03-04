@@ -1,30 +1,5 @@
 #pragma once
-#include "tier0/types.h"
-#include "tier1/math/types.h"
-
-//-----------------------------------------------------------------------------
-// Constants, types and forward declarations
-//-----------------------------------------------------------------------------
-struct display_t;
-typedef uint32 windowId_t;
-
-enum windowMode_t
-{
-	WINDOW_MODE_HIDDEN,
-	WINDOW_MODE_WINDOWED,
-	WINDOW_MODE_BORDERLESS_FULLSCREEN,
-	WINDOW_MODE_EXCLUSIVE_FULLSCREEN
-};
-
-struct windowCreateInfo_t
-{
-	const char*		 pTitle;
-	uint32			 width;
-	uint32			 height;
-	float			 refreshRate;
-	windowMode_t	 mode;
-	const display_t* pDisplay;	// Optional
-};
+#include "appframework/windowmgr_types.h"
 
 //-----------------------------------------------------------------------------
 // A window interface
@@ -39,11 +14,11 @@ public:
 	virtual void Maximize()				   = 0;
 	virtual void Minimize()				   = 0;
 
-	virtual void SetTitle( const char* pTitle )			= 0;
-	virtual void SetSize( uint32 width, uint32 height ) = 0;
-	virtual void SetRefreshRate( float refreshRate )	= 0;
-	virtual void SetDisplay( const display_t& display ) = 0;
-	virtual void SetMode( windowMode_t mode )			= 0;
+	virtual void SetTitle( const char* pTitle )				 = 0;
+	virtual void SetSize( uint32 width, uint32 height )		 = 0;
+	virtual void SetRefreshRate( float refreshRate )		 = 0;
+	virtual void SetDisplay( displayHandle_t displayHandle ) = 0;
+	virtual void SetMode( windowMode_t mode )				 = 0;
 
 	virtual bool		   IsOpen() const						  = 0;
 	virtual windowMode_t   GetMode() const						  = 0;

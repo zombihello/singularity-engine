@@ -122,19 +122,27 @@ void CLauncherApp::Init()
 	// Initialize WindowMgr group
 	windowMgrSystemGroup.InitSystems();
 
+	// TODO BS yehor.pohuliaka - Migrate the input events
+
 	// Create a hidden window for we can init render context and other things links with the one
-	display_t		   display;
 	windowCreateInfo_t windowCreateInfo = {};
 	windowCreateInfo.pTitle				= gameInfo.GetGame().c_str();
-	windowCreateInfo.width				= window_width.GetInt();
-	windowCreateInfo.height				= window_height.GetInt();
-	windowCreateInfo.refreshRate		= window_refreshRate.GetFloat();
 	windowCreateInfo.mode				= WINDOW_MODE_HIDDEN;
-	if ( g_pWindowMgr->GetPrimaryDisplay( display ) )
+	windowCreateInfo.displayHandle		= INVALID_DISPLAY_HANDLE;
+	windowCreateInfo.width				= window_width.GetInt() >= 0 ? window_width.GetInt() : WINDOW_SIZE_FROM_DISPLAY;
+	windowCreateInfo.height				= window_height.GetInt() >= 0 ? window_height.GetInt() : WINDOW_SIZE_FROM_DISPLAY;
+	windowCreateInfo.refreshRate		= window_refreshRate.GetFloat();
+
+	// Select the display on which the window should be opened
+	display_t display;
+	int32	  displayId = window_displayId.GetInt();
+	if ( ( displayId >= 0 && g_pWindowMgr->GetDisplayById( displayId, display ) ) || g_pWindowMgr->GetPrimaryDisplay( display ) )
 	{
-		windowCreateInfo.pDisplay = &display;
+		windowCreateInfo.displayHandle = display.handle;
 	}
-	if ( !g_pWindowMgr->GetOrCreateMainWindow()->Create( windowCreateInfo ) )
+
+	IWindow* pMainWindow = g_pWindowMgr->GetOrCreateMainWindow();
+	if ( !pMainWindow->Create( windowCreateInfo ) )
 	{
 		Sys_Error( "Failed to create a window" );
 		return;
@@ -144,17 +152,24 @@ void CLauncherApp::Init()
 	engineSystemGroup.InitSystems();
 	gameSystemGroup.InitSystems();
 
+	// After initializing the engine and game groups, we can the change window mode to default
+	pMainWindow->SetMode( (windowMode_t)window_mode.GetInt() );
+
 #if 0
 	// Attach the input system to the window
 	g_pInputSystem->AttachToWindow( g_pWindowMgr );
 #endif	// 0
 
-	// Subscribe on window events
-	pWindowEventDelegate	   = g_pWindowMgr->OnWindowEvent()->AddFunc( &CLauncherApp::OnWindowEvent, this );
-	pChangedMainWindowDelegate = g_pWindowMgr->OnChangedMainWindow()->AddFunc( &CLauncherApp::OnChangedMainWindow, this );
+	// Create a studio viewport
+	pStudioViewport = g_pStudioRender->CreateViewport();
+	pStudioViewport->SetViewportClient( &gameViewportClient );
 
 	// Trigger the delegate to initialize a studio viewport
 	OnChangedMainWindow( this, g_pWindowMgr->GetMainWindowId() );
+
+	// Subscribe on window events
+	pWindowEventDelegate	   = g_pWindowMgr->OnWindowEvent()->AddFunc( &CLauncherApp::OnWindowEvent, this );
+	pChangedMainWindowDelegate = g_pWindowMgr->OnChangedMainWindow()->AddFunc( &CLauncherApp::OnChangedMainWindow, this );
 }
 
 /*
@@ -312,15 +327,9 @@ void CLauncherApp::OnChangedMainWindow( void* pUserData, windowId_t newMainWindo
 	IWindow*	  pMainWindow = g_pWindowMgr->GetWindow( newMainWindowId );
 	ivec2_t		  windowSize  = pMainWindow->GetSize();
 	CLauncherApp* pApp		  = (CLauncherApp*)pUserData;
-	if ( !pApp->pStudioViewport )
-	{
-		pApp->pStudioViewport = g_pStudioRender->CreateViewport();
-	}
-	Assert( pApp->pStudioViewport );
 
-	pApp->pStudioViewport->SetViewportClient( &pApp->gameViewportClient );
+	Assert( pApp->pStudioViewport );
 	pApp->pStudioViewport->Init( pMainWindow->GetHandle(), windowSize.x, windowSize.y, r_vsyncRef.IsValid() ? r_vsyncRef->GetBool() : false );
-	pMainWindow->SetMode( (windowMode_t)window_mode.GetInt() );
 }
 
 /*

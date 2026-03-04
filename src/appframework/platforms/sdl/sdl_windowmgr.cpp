@@ -5,57 +5,7 @@
 	#include <SDL3/SDL.h>
 
 	#include "tier0/profile.h"
-	#include "appframework/iwindowmgr.h"
-	#include "appframework/platforms/sdl/sdl_window.h"
-	#include "appframework/windowpool.h"
-
-//-----------------------------------------------------------------------------
-// SDL window manager
-//-----------------------------------------------------------------------------
-class CWindowMgrSDL : public CBaseAppSystem<IWindowMgr>
-{
-public:
-	DECLARE_MULTICAST_DELEGATE( COnChangedMainWindow, windowId_t /* newMainWindowId */ );
-	DECLARE_MULTICAST_DELEGATE( COnWindowEvent, const windowEvent_t& /* windowEvent */ );
-	DECLARE_MULTICAST_DELEGATE( COnInputEvent, const inputEvent_t& /* inputEvent */ );
-
-	// IAppSystem interface
-	virtual bool Init() override;
-	virtual void Shutdown() override;
-
-	// IWindowMgr interface
-	// Functions to work with windows
-	virtual IWindow*   CreateWindow() override;
-	virtual void	   DestroyWindow( windowId_t windowId ) override;
-	virtual IWindow*   GetWindow( windowId_t windowId ) const override;
-	virtual void	   ChangeMainWindow( windowId_t newMainWindowId ) override;
-	virtual IWindow*   GetOrCreateMainWindow() override;
-	virtual windowId_t GetMainWindowId() const override;
-
-	// Functions to process events
-	virtual void				  ProcessEvents() override;
-	virtual IOnChangedMainWindow* OnChangedMainWindow() const override;
-	virtual IOnWindowEvent*		  OnWindowEvent() const override;
-	virtual IOnInputEvent*		  OnInputEvent() const override;
-
-	// Functions to get information about displays
-	virtual uint32 GetDisplays( display_t* pDisplays, uint32 maxNumDisplays ) const override;
-	virtual bool   GetPrimaryDisplay( display_t& display ) const override;
-	virtual uint32 GetDisplayModes( const display_t& display, displayMode_t* pDisplayModes, uint32 maxNumDisplayModes ) const override;
-	virtual bool   GetDesktopDisplayMode( const display_t& display, displayMode_t& displayMode ) const override;
-	virtual bool   GetCurrentDisplayMode( const display_t& display, displayMode_t& displayMode ) const override;
-	virtual bool   FindClosestDisplayMode( const display_t& display, int32 width, int32 height, float refreshRate, bool bIncludeHightDensityModes, displayMode_t& displayMode ) const override;
-
-	CWindowMgrSDL();
-
-private:
-	windowId_t					 mainWindowId;
-	TWindowPool<CWindowSDL>		 windowPool;
-	eastl::vector<windowId_t>	 windowIds;
-	mutable COnChangedMainWindow onChangedMainWindow;
-	mutable COnWindowEvent		 onWindowEvent;
-	mutable COnInputEvent		 onInputEvent;
-};
+	#include "appframework/platforms/sdl/sdl_windowmgr.h"
 
 // Table for convert SDL scancode to engine button code
 static SDL_Scancode s_scanCodeTable[] = {
@@ -339,48 +289,6 @@ void CWindowMgrSDL::DestroyWindow( windowId_t windowId )
 
 /*
 ==================
-CWindowMgrSDL::GetWindow
-==================
-*/
-IWindow* CWindowMgrSDL::GetWindow( windowId_t windowId ) const
-{
-	return windowId != INVALID_INDEX ? windowPool.Get( windowId ) : NULL;
-}
-
-/*
-==================
-CWindowMgrSDL::ChangeMainWindow
-==================
-*/
-void CWindowMgrSDL::ChangeMainWindow( windowId_t newMainWindowId )
-{
-	Assert( newMainWindowId != INVALID_INDEX );
-	mainWindowId = newMainWindowId;
-	onChangedMainWindow.Broadcast( newMainWindowId );
-}
-
-/*
-==================
-CWindowMgrSDL::GetOrCreateMainWindow
-==================
-*/
-IWindow* CWindowMgrSDL::GetOrCreateMainWindow()
-{
-	return mainWindowId != INVALID_INDEX ? GetWindow( mainWindowId ) : CreateWindow();
-}
-
-/*
-==================
-CWindowMgrSDL::GetMainWindowId
-==================
-*/
-windowId_t CWindowMgrSDL::GetMainWindowId() const
-{
-	return mainWindowId;
-}
-
-/*
-==================
 CWindowMgrSDL::ProcessEvents
 ==================
 */
@@ -546,36 +454,6 @@ void CWindowMgrSDL::ProcessEvents()
 
 /*
 ==================
-CWindowMgrSDL::OnChangedMainWindow
-==================
-*/
-IWindowMgr::IOnChangedMainWindow* CWindowMgrSDL::OnChangedMainWindow() const
-{
-	return &onChangedMainWindow;
-}
-
-/*
-==================
-CWindowMgrSDL::OnWindowEvent
-==================
-*/
-IWindowMgr::IOnWindowEvent* CWindowMgrSDL::OnWindowEvent() const
-{
-	return &onWindowEvent;
-}
-
-/*
-==================
-CWindowMgrSDL::OnInputEvent
-==================
-*/
-IWindowMgr::IOnInputEvent* CWindowMgrSDL::OnInputEvent() const
-{
-	return &onInputEvent;
-}
-
-/*
-==================
 CWindowMgrSDL::GetDisplays
 ==================
 */
@@ -583,7 +461,7 @@ uint32 CWindowMgrSDL::GetDisplays( display_t* pDisplays, uint32 maxNumDisplays )
 {
 	uint32		   numDisplays	  = 0;
 	SDL_DisplayID* pSDLDisplayIds = SDL_GetDisplays( (int32*)&numDisplays );
-	if ( pSDLDisplayIds )
+	if ( numDisplays > 0 )
 	{
 		SDL_Rect sdlRect;
 		uint32	 numDisplaysToWrite = Min( numDisplays, pDisplays ? maxNumDisplays : 0 );
@@ -591,7 +469,7 @@ uint32 CWindowMgrSDL::GetDisplays( display_t* pDisplays, uint32 maxNumDisplays )
 		{
 			SDL_DisplayID sdlDisplayId = pSDLDisplayIds[index];
 			display_t&	  display	   = pDisplays[index];
-			display.id				   = sdlDisplayId;
+			display.handle			   = sdlDisplayId;
 			display.pName			   = SDL_GetDisplayName( sdlDisplayId );
 			display.orientation		   = TranslateSDLDisplayOrientation( SDL_GetCurrentDisplayOrientation( sdlDisplayId ) );
 
@@ -615,6 +493,70 @@ uint32 CWindowMgrSDL::GetDisplays( display_t* pDisplays, uint32 maxNumDisplays )
 
 /*
 ==================
+CWindowMgrSDL::GetDisplayById
+==================
+*/
+bool CWindowMgrSDL::GetDisplayById( uint32 index, display_t& display ) const
+{
+	uint32		   numDisplays	  = 0;
+	SDL_DisplayID* pSDLDisplayIds = SDL_GetDisplays( (int32*)&numDisplays );
+	if ( index < numDisplays )
+	{
+		SDL_Rect	  sdlRect;
+		SDL_DisplayID sdlDisplayId = pSDLDisplayIds[index];
+		display.handle			   = sdlDisplayId;
+		display.pName			   = SDL_GetDisplayName( sdlDisplayId );
+		display.orientation		   = TranslateSDLDisplayOrientation( SDL_GetCurrentDisplayOrientation( sdlDisplayId ) );
+
+		SDL_GetDisplayBounds( sdlDisplayId, &sdlRect );
+		display.bounds.x	  = sdlRect.x;
+		display.bounds.y	  = sdlRect.y;
+		display.bounds.width  = sdlRect.w;
+		display.bounds.height = sdlRect.h;
+
+		SDL_GetDisplayUsableBounds( sdlDisplayId, &sdlRect );
+		display.usableBounds.x		= sdlRect.x;
+		display.usableBounds.y		= sdlRect.y;
+		display.usableBounds.width	= sdlRect.w;
+		display.usableBounds.height = sdlRect.h;
+	}
+
+	SDL_free( pSDLDisplayIds );
+	return index < numDisplays;
+}
+
+/*
+==================
+CWindowMgrSDL::GetDisplayById
+==================
+*/
+bool CWindowMgrSDL::GetDisplayByHandle( displayHandle_t displayHandle, display_t& display ) const
+{
+	if ( displayHandle != INVALID_DISPLAY_HANDLE )
+	{
+		SDL_Rect sdlRect;
+		display.handle		= displayHandle;
+		display.pName		= SDL_GetDisplayName( displayHandle );
+		display.orientation = TranslateSDLDisplayOrientation( SDL_GetCurrentDisplayOrientation( displayHandle ) );
+
+		SDL_GetDisplayBounds( displayHandle, &sdlRect );
+		display.bounds.x	  = sdlRect.x;
+		display.bounds.y	  = sdlRect.y;
+		display.bounds.width  = sdlRect.w;
+		display.bounds.height = sdlRect.h;
+
+		SDL_GetDisplayUsableBounds( displayHandle, &sdlRect );
+		display.usableBounds.x		= sdlRect.x;
+		display.usableBounds.y		= sdlRect.y;
+		display.usableBounds.width	= sdlRect.w;
+		display.usableBounds.height = sdlRect.h;
+	}
+
+	return displayHandle != INVALID_DISPLAY_HANDLE;
+}
+
+/*
+==================
 CWindowMgrSDL::GetPrimaryDisplay
 ==================
 */
@@ -624,7 +566,7 @@ bool CWindowMgrSDL::GetPrimaryDisplay( display_t& display ) const
 	if ( sdlDisplayId != 0 )
 	{
 		SDL_Rect sdlRect;
-		display.id			= sdlDisplayId;
+		display.handle		= sdlDisplayId;
 		display.pName		= SDL_GetDisplayName( sdlDisplayId );
 		display.orientation = TranslateSDLDisplayOrientation( SDL_GetCurrentDisplayOrientation( sdlDisplayId ) );
 
@@ -649,12 +591,12 @@ bool CWindowMgrSDL::GetPrimaryDisplay( display_t& display ) const
 CWindowMgrSDL::GetDisplayModes
 ==================
 */
-uint32 CWindowMgrSDL::GetDisplayModes( const display_t& display, displayMode_t* pDisplayModes, uint32 maxNumDisplayModes ) const
+uint32 CWindowMgrSDL::GetDisplayModes( displayHandle_t displayHandle, displayMode_t* pDisplayModes, uint32 maxNumDisplayModes ) const
 {
 	uint32			  sdlNumDisplayModes = 0;
 	uint32			  numDisplayModes	 = 0;
-	SDL_DisplayMode** ppSDLDisplayModes	 = SDL_GetFullscreenDisplayModes( display.id, (int32*)&sdlNumDisplayModes );
-	if ( ppSDLDisplayModes )
+	SDL_DisplayMode** ppSDLDisplayModes	 = SDL_GetFullscreenDisplayModes( displayHandle, (int32*)&sdlNumDisplayModes );
+	if ( numDisplayModes > 0 )
 	{
 		uint32* pSDLDisplayModeIds = (uint32*)Mem_Alloca( sdlNumDisplayModes * sizeof( uint32 ) );
 		for ( uint32 index = 0; index < sdlNumDisplayModes; ++index )
@@ -697,9 +639,9 @@ uint32 CWindowMgrSDL::GetDisplayModes( const display_t& display, displayMode_t* 
 CWindowMgrSDL::GetDesktopDisplayMode
 ==================
 */
-bool CWindowMgrSDL::GetDesktopDisplayMode( const display_t& display, displayMode_t& displayMode ) const
+bool CWindowMgrSDL::GetDesktopDisplayMode( displayHandle_t displayHandle, displayMode_t& displayMode ) const
 {
-	const SDL_DisplayMode* pSDLDisplayMode = SDL_GetDesktopDisplayMode( display.id );
+	const SDL_DisplayMode* pSDLDisplayMode = SDL_GetDesktopDisplayMode( displayHandle );
 	if ( pSDLDisplayMode )
 	{
 		displayMode.width		= pSDLDisplayMode->w;
@@ -714,9 +656,9 @@ bool CWindowMgrSDL::GetDesktopDisplayMode( const display_t& display, displayMode
 CWindowMgrSDL::GetCurrentDisplayMode
 ==================
 */
-bool CWindowMgrSDL::GetCurrentDisplayMode( const display_t& display, displayMode_t& displayMode ) const
+bool CWindowMgrSDL::GetCurrentDisplayMode( displayHandle_t displayHandle, displayMode_t& displayMode ) const
 {
-	const SDL_DisplayMode* pSDLDisplayMode = SDL_GetCurrentDisplayMode( display.id );
+	const SDL_DisplayMode* pSDLDisplayMode = SDL_GetCurrentDisplayMode( displayHandle );
 	if ( pSDLDisplayMode )
 	{
 		displayMode.width		= pSDLDisplayMode->w;
@@ -731,10 +673,10 @@ bool CWindowMgrSDL::GetCurrentDisplayMode( const display_t& display, displayMode
 CWindowMgrSDL::FindClosestDisplayMode
 ==================
 */
-bool CWindowMgrSDL::FindClosestDisplayMode( const display_t& display, int32 width, int32 height, float refreshRate, bool bIncludeHightDensityModes, displayMode_t& displayMode ) const
+bool CWindowMgrSDL::FindClosestDisplayMode( displayHandle_t displayHandle, int32 width, int32 height, float refreshRate, bool bIncludeHightDensityModes, displayMode_t& displayMode ) const
 {
 	SDL_DisplayMode sdlDisplayMode;
-	if ( !SDL_GetClosestFullscreenDisplayMode( display.id, width, height, refreshRate, bIncludeHightDensityModes, &sdlDisplayMode ) )
+	if ( !SDL_GetClosestFullscreenDisplayMode( displayHandle, width, height, refreshRate, bIncludeHightDensityModes, &sdlDisplayMode ) )
 	{
 		Warning( "WindowMgrSDL: Couldn't find closest display mode to %ix%i@%fHz", width, height, refreshRate );
 		return false;
@@ -748,12 +690,22 @@ bool CWindowMgrSDL::FindClosestDisplayMode( const display_t& display, int32 widt
 
 /*
 ==================
+GetWindowMgrSDL
+==================
+*/
+CWindowMgrSDL& GetWindowMgrSDL()
+{
+	static CWindowMgrSDL s_windowMgrSDL;
+	return s_windowMgrSDL;
+}
+
+/*
+==================
 CreateWindowMgr
 ==================
 */
 IWindowMgr* CreateWindowMgr()
 {
-	static CWindowMgrSDL s_windowMgrSDL;
-	return &s_windowMgrSDL;
+	return &GetWindowMgrSDL();
 }
 #endif	// PLATFORM_USE_SDL

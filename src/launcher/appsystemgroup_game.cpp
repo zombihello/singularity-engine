@@ -33,7 +33,7 @@ bool CAppSystemGroupGame::Create()
 	IGameAppSystems* pGameAppSystems = (IGameAppSystems*)pGameFactory( GAME_APPSYSTEMS_INTERFACE_VERSION );
 	if ( !pGame )
 	{
-		Warning( "Launcher: Could not get " GAME_INTERFACE_VERSION " from '//GAMEBIN/game" DLL_EXT_STRING "'" );
+		Warning( "Launcher: Could not get " GAME_INTERFACE_VERSION " from '//gamebin/game" DLL_EXT_STRING "'" );
 		GameDLL_Unload();
 		return false;
 	}
@@ -82,7 +82,7 @@ bool CAppSystemGroupGame::Create()
 		AddSystem( pGame, GAME_INTERFACE_VERSION );
 	}
 
-	Msg( "Launcher: '//GAMEBIN/game" DLL_EXT_STRING "' is %s", pGame->GetGameDescription() );
+	Msg( "Launcher: '//gamebin/game" DLL_EXT_STRING "' is %s", pGame->GetGameDescription() );
 	return true;
 }
 
@@ -105,10 +105,10 @@ bool CAppSystemGroupGame::GameDLL_Load()
 {
 	// Load a game dll
 	AssertMsg( !gameDLLHandle, "Cannot load game module twice!" );
-	gameDLLHandle = g_pFileSystem->LoadModule( "//GAMEBIN/game" DLL_EXT_STRING );
+	gameDLLHandle = g_pFileSystem->LoadModule( "//gamebin/game" DLL_EXT_STRING );
 	if ( !gameDLLHandle )
 	{
-		Warning( "Launcher: Failed to load '//GAMEBIN/game" DLL_EXT_STRING "'" );
+		Warning( "Launcher: Failed to load '//gamebin/game" DLL_EXT_STRING "'" );
 		GameDLL_Unload();
 		return false;
 	}
@@ -117,13 +117,13 @@ bool CAppSystemGroupGame::GameDLL_Load()
 	pGameFactory = Sys_GetFactory( gameDLLHandle );
 	if ( !pGameFactory )
 	{
-		Warning( "Launcher: Could not find " CREATEINTERFACE_FUNCNAME " in '//GAMEBIN/game" DLL_EXT_STRING "'" );
+		Warning( "Launcher: Could not find " CREATEINTERFACE_FUNCNAME " in '//gamebin/game" DLL_EXT_STRING "'" );
 		GameDLL_Unload();
 		return false;
 	}
 
 	// We are done, all ok
-	Msg( "Launcher: '//GAMEBIN/game" DLL_EXT_STRING "' loaded" );
+	Msg( "Launcher: '//gamebin/game" DLL_EXT_STRING "' loaded" );
 	return true;
 }
 

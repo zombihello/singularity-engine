@@ -70,7 +70,12 @@ CWindowSDL::SetRefreshRate
 */
 FORCEINLINE void CWindowSDL::SetRefreshRate( float refreshRate )
 {
+	// Change the refresh rate and update display mode if we in exclusive fullscreen mode
 	CWindowSDL::refreshRate = refreshRate;
+	if ( mode == WINDOW_MODE_EXCLUSIVE_FULLSCREEN )
+	{
+		UpdateDisplayMode();
+	}
 }
 
 /*
@@ -78,15 +83,17 @@ FORCEINLINE void CWindowSDL::SetRefreshRate( float refreshRate )
 CWindowSDL::SetDisplay
 ==================
 */
-FORCEINLINE void CWindowSDL::SetDisplay( const display_t& display )
+FORCEINLINE void CWindowSDL::SetDisplay( displayHandle_t displayHandle )
 {
 	Assert( pSDLWindow );
-	SDL_SetWindowPosition( pSDLWindow, SDL_WINDOWPOS_CENTERED_DISPLAY( display.id ), SDL_WINDOWPOS_CENTERED_DISPLAY( display.id ) );
-
-	// Update display mode if we in exclusive fullscreen mode
-	if ( mode == WINDOW_MODE_EXCLUSIVE_FULLSCREEN )
+	if ( displayHandle != INVALID_DISPLAY_HANDLE )
 	{
-		UpdateDisplayMode();
+		// Change the window position and update display mode if we in exclusive fullscreen mode
+		SDL_SetWindowPosition( pSDLWindow, SDL_WINDOWPOS_CENTERED_DISPLAY( displayHandle ), SDL_WINDOWPOS_CENTERED_DISPLAY( displayHandle ) );
+		if ( mode == WINDOW_MODE_EXCLUSIVE_FULLSCREEN )
+		{
+			UpdateDisplayMode();
+		}
 	}
 }
 

@@ -1,6 +1,6 @@
 #pragma once
 #include "tier0/types.h"
-#include "appframework/iwindow.h"
+#include "appframework/iwindowmgr.h"
 
 //-----------------------------------------------------------------------------
 // Window events

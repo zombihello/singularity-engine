@@ -4,10 +4,10 @@
 
 // ConVars
 CConVar			  window_displayId( "window_displayId", "-1", "Window display id (-1: Not specified)", FCVAR_ARCHIVE );
-CConVar			  window_width( "window_width", "1280", "Window width", FCVAR_ARCHIVE );
-CConVar			  window_height( "window_height", "720", "Window height", FCVAR_ARCHIVE );
+CConVar			  window_width( "window_width", "-1", "Window width (-1: Use display size)", FCVAR_ARCHIVE );
+CConVar			  window_height( "window_height", "-1", "Window height (-1: Use display size)", FCVAR_ARCHIVE );
 CConVar			  window_refreshRate( "window_refreshRate", "0", "Window refresh rate (0: Not specified)", FCVAR_ARCHIVE );
-CConVar			  window_mode( "window_mode", "1", "Window mode (0: Hidden, 1: Windowed, 2: Borderless Fullscreen, 3: Exclusive Fullscreen)", FCVAR_ARCHIVE );
+CConVar			  window_mode( "window_mode", "2", "Window mode (0: Hidden, 1: Windowed, 2: Borderless Fullscreen, 3: Exclusive Fullscreen)", FCVAR_ARCHIVE );
 CConVarsOverrider g_conVarsOverrider;
 
 /*

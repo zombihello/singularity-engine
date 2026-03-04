@@ -1,38 +1,9 @@
 #pragma once
 #include "tier1/delegate.h"
-#include "tier1/math/rect.h"
 #include "appframework/iappsystem.h"
 #include "appframework/iwindow.h"
 #include "appframework/windowevent.h"
 #include "inputsystem/inputevent.h"
-
-//-----------------------------------------------------------------------------
-// Constants and types
-//-----------------------------------------------------------------------------
-enum displayOrientation_t
-{
-	DISPLAY_ORIENTATION_UNKNOWN,			// The display orientation can't be determined
-	DISPLAY_ORIENTATION_LANDSCAPE,			// The display is in landscape mode, with the right side up, relative to portrait mode
-	DISPLAY_ORIENTATION_LANDSCAPE_FLIPPED,	// The display is in landscape mode, with the left side up, relative to portrait mode
-	DISPLAY_ORIENTATION_PORTRAIT,			// The display is in portrait mode
-	DISPLAY_ORIENTATION_PORTRAIT_FLIPPED	// The display is in portrait mode, upside down
-};
-
-struct displayMode_t
-{
-	uint32 width;
-	uint32 height;
-	float  refreshRate;
-};
-
-struct display_t
-{
-	uint32				 id;
-	const char*			 pName;
-	rect_t<uint32>		 bounds;
-	rect_t<uint32>		 usableBounds;
-	displayOrientation_t orientation;
-};
 
 //-----------------------------------------------------------------------------
 // The window manager interface
@@ -60,12 +31,14 @@ public:
 	virtual IOnInputEvent*		  OnInputEvent() const		  = 0;
 
 	// Functions to get information about displays
-	virtual uint32 GetDisplays( display_t* pDisplays, uint32 maxNumDisplays ) const																									  = 0;
-	virtual bool   GetPrimaryDisplay( display_t& display ) const																													  = 0;
-	virtual uint32 GetDisplayModes( const display_t& display, displayMode_t* pDisplayModes, uint32 maxNumDisplayModes ) const														  = 0;
-	virtual bool   GetDesktopDisplayMode( const display_t& display, displayMode_t& displayMode ) const																				  = 0;
-	virtual bool   GetCurrentDisplayMode( const display_t& display, displayMode_t& displayMode ) const																				  = 0;
-	virtual bool   FindClosestDisplayMode( const display_t& display, int32 width, int32 height, float refreshRate, bool bIncludeHightDensityModes, displayMode_t& displayMode ) const = 0;
+	virtual uint32 GetDisplays( display_t* pDisplay, uint32 maxNumDisplays ) const																										   = 0;
+	virtual bool   GetDisplayById( uint32 index, display_t& display ) const																												   = 0;
+	virtual bool   GetDisplayByHandle( displayHandle_t displayHandle, display_t& display ) const																						   = 0;
+	virtual bool   GetPrimaryDisplay( display_t& display ) const																														   = 0;
+	virtual uint32 GetDisplayModes( displayHandle_t displayHandle, displayMode_t* pDisplayModes, uint32 maxNumDisplayModes ) const														   = 0;
+	virtual bool   GetDesktopDisplayMode( displayHandle_t displayHandle, displayMode_t& displayMode ) const																				   = 0;
+	virtual bool   GetCurrentDisplayMode( displayHandle_t displayHandle, displayMode_t& displayMode ) const																				   = 0;
+	virtual bool   FindClosestDisplayMode( displayHandle_t displayHandle, int32 width, int32 height, float refreshRate, bool bIncludeHightDensityModes, displayMode_t& displayMode ) const = 0;
 };
 
 //-----------------------------------------------------------------------------

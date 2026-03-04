@@ -24,7 +24,7 @@ public:
 	virtual void SetTitle( const char* pTitle ) override;
 	virtual void SetSize( uint32 width, uint32 height ) override;
 	virtual void SetRefreshRate( float refreshRate ) override;
-	virtual void SetDisplay( const display_t& display ) override;
+	virtual void SetDisplay( displayHandle_t displayHandle ) override;
 	virtual void SetMode( windowMode_t mode ) override;
 
 	virtual bool		   IsOpen() const override;
