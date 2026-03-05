@@ -262,31 +262,3 @@ const char* Sys_GetExecutablePath()
 
 	return s_executablePath.c_str();
 }
-
-/*
-==================
-Sys_Seconds
-==================
-*/
-double Sys_Seconds()
-{
-	LARGE_INTEGER cycles;
-	QueryPerformanceCounter( &cycles );
-
-	// Add big number to make bugs apparent where return value is being passed to FLOAT
-	return cycles.QuadPart * g_SecondsPerCycle + 16777216.0;
-}
-
-/*
-==================
-Sys_GetSecondsPerCycle
-==================
-*/
-double Sys_GetSecondsPerCycle()
-{
-	LARGE_INTEGER frequency;
-	bool		  bResult = QueryPerformanceFrequency( &frequency );
-
-	Assert( bResult );
-	return 1.0 / frequency.QuadPart;
-}

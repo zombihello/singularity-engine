@@ -51,4 +51,3 @@ TIER0_INTERFACE void		Sys_ShowMessageBox( const char* pTitle, const char* pMessa
 TIER0_INTERFACE const char* Sys_GetComputerName();
 TIER0_INTERFACE const char* Sys_GetUserName();
 TIER0_INTERFACE const char* Sys_GetExecutablePath();
-TIER0_INTERFACE double		Sys_Seconds();
