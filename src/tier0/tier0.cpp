@@ -5,7 +5,6 @@
 #include "tier1/threading.h"
 
 bool			  g_bRequestingExit = false;
-double			  g_SecondsPerCycle = Sys_GetSecondsPerCycle();
 static threadId_t s_MainThreadId	= INVALID_THREAD_ID;
 
 /*
