@@ -5,7 +5,7 @@
 IStudioRenderCmd::operator new
 ==================
 */
-FORCEINLINE void* IStudioRenderCmd::operator new( size_t size, const studioCmdAlloc_t& studioCmdAlloc )
+FORCEINLINE void* IStudioRenderCmd::operator new( size size, const studioCmdAlloc_t& studioCmdAlloc )
 {
 	return studioCmdAlloc.pAllocation;
 }

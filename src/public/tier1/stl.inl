@@ -6,7 +6,7 @@ stlInsensitiveStringHash_t::operator()
 ==================
 */
 template<typename TType>
-FORCEINLINE size_t stlInsensitiveStringHash_t::operator()( const TType* pString ) const
+FORCEINLINE size stlInsensitiveStringHash_t::operator()( const TType* pString ) const
 {
 	return FastHashStringInsensitive( pString );
 }
@@ -17,7 +17,7 @@ stlInsensitiveStringHash_t::operator()
 ==================
 */
 template<typename TType>
-FORCEINLINE size_t stlInsensitiveStringHash_t::operator()( const eastl::basic_string<TType>& string ) const
+FORCEINLINE size stlInsensitiveStringHash_t::operator()( const eastl::basic_string<TType>& string ) const
 {
 	return FastHashStringInsensitive( string );
 }
@@ -28,7 +28,7 @@ stlInsensitiveStringHash_t::operator()
 ==================
 */
 template<typename TType>
-FORCEINLINE size_t stlInsensitiveStringHash_t::operator()( const eastl::basic_string_view<TType>& string ) const
+FORCEINLINE size stlInsensitiveStringHash_t::operator()( const eastl::basic_string_view<TType>& string ) const
 {
 	return FastHashStringInsensitive( string );
 }

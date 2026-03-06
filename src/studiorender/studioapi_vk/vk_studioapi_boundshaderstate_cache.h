@@ -21,7 +21,7 @@ public:
 	// Key hasher for using CStudioAPIBoundShaderStateKeyVk in eastl::unordered_map
 	struct boundShaderStateKeyHasher_t
 	{
-		size_t operator()( const CStudioAPIBoundShaderStateKeyVk& key ) const;
+		size operator()( const CStudioAPIBoundShaderStateKeyVk& key ) const;
 	};
 
 	CStudioAPIBoundShaderStateKeyVk( CStudioAPIVertexDeclarationVk* pVertexDeclaration, CStudioAPIVertexShaderVk* pVertexShader, CStudioAPIPixelShaderVk* pPixelShader, CStudioAPIHullShaderVk* pHullShader = NULL, CStudioAPIDomainShaderVk* pDomainShader = NULL, CStudioAPIGeometryShaderVk* pGeometryShader = NULL );

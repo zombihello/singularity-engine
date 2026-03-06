@@ -5,7 +5,7 @@
 Mem_Malloc
 ==================
 */
-FORCEINLINE void* Mem_Malloc( size_t numBytes, uint32 alignment /*= DEFAULT_ALIGNMENT*/ )
+FORCEINLINE void* Mem_Malloc( size numBytes, uint32 alignment /*= 0*/ )
 {
 	return MemAlloc()->Malloc( numBytes, alignment );
 }
@@ -15,7 +15,7 @@ FORCEINLINE void* Mem_Malloc( size_t numBytes, uint32 alignment /*= DEFAULT_ALIG
 Mem_MallocZero
 ==================
 */
-FORCEINLINE void* Mem_MallocZero( size_t numBytes, uint32 alignment /*= DEFAULT_ALIGNMENT*/ )
+FORCEINLINE void* Mem_MallocZero( size numBytes, uint32 alignment /*= 0*/ )
 {
 	void* pData = Mem_Malloc( numBytes, alignment );
 	Mem_Memzero( pData, numBytes );
@@ -27,7 +27,7 @@ FORCEINLINE void* Mem_MallocZero( size_t numBytes, uint32 alignment /*= DEFAULT_
 Mem_Realloc
 ==================
 */
-FORCEINLINE void* Mem_Realloc( void* pOriginal, size_t numBytes, uint32 alignment /*= DEFAULT_ALIGNMENT*/ )
+FORCEINLINE void* Mem_Realloc( void* pOriginal, size numBytes, uint32 alignment /*= 0*/ )
 {
 	return MemAlloc()->Realloc( pOriginal, numBytes, alignment );
 }
@@ -47,9 +47,9 @@ FORCEINLINE void Mem_Free( void* pOriginal )
 Mem_AllocSize
 ==================
 */
-FORCEINLINE size_t Mem_AllocSize( void* pOriginal )
+FORCEINLINE size Mem_AllocSize( void* pOriginal )
 {
-	size_t numBytes = 0;
+	size numBytes = 0;
 	return MemAlloc()->GetAllocationSize( pOriginal, numBytes ) ? numBytes : 0;
 }
 
@@ -58,7 +58,7 @@ FORCEINLINE size_t Mem_AllocSize( void* pOriginal )
 Mem_MallocSystem
 ==================
 */
-FORCEINLINE void* Mem_MallocSystem( size_t numBytes )
+FORCEINLINE void* Mem_MallocSystem( size numBytes )
 {
 	return malloc( numBytes );
 }
@@ -68,7 +68,7 @@ FORCEINLINE void* Mem_MallocSystem( size_t numBytes )
 Mem_ReallocSystem
 ==================
 */
-FORCEINLINE void* Mem_ReallocSystem( void* pOriginal, size_t numBytes )
+FORCEINLINE void* Mem_ReallocSystem( void* pOriginal, size numBytes )
 {
 	return realloc( pOriginal, numBytes );
 }
@@ -88,7 +88,7 @@ FORCEINLINE void Mem_FreeSystem( void* pOriginal )
 CUseSystemMemAllocForNew::operator new
 ==================
 */
-FORCEINLINE void* CUseSystemMemAllocForNew::operator new( size_t numBytes )
+FORCEINLINE void* CUseSystemMemAllocForNew::operator new( size numBytes )
 {
 	return Mem_MallocSystem( numBytes );
 }
@@ -108,7 +108,7 @@ FORCEINLINE void CUseSystemMemAllocForNew::operator delete( void* pPtr )
 CUseSystemMemAllocForNew::operator new[]
 ==================
 */
-FORCEINLINE void* CUseSystemMemAllocForNew::operator new[]( size_t numBytes )
+FORCEINLINE void* CUseSystemMemAllocForNew::operator new[]( size numBytes )
 {
 	return Mem_MallocSystem( numBytes );
 }

@@ -9,7 +9,7 @@
 operator new
 ==================
 */
-void* operator new( size_t numBytes )
+void* operator new( size numBytes )
 {
 	return Mem_Malloc( numBytes );
 }
@@ -29,7 +29,7 @@ void operator delete( void* pPtr ) noexcept
 operator new[]
 ==================
 */
-void* operator new[]( size_t numBytes )
+void* operator new[]( size numBytes )
 {
 	return Mem_Malloc( numBytes );
 }

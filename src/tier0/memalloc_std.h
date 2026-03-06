@@ -10,14 +10,12 @@ public:
 	CMemAllocStd();
 
 	// IMemAlloc interface
-	virtual void* Malloc( size_t numBytes, uint32 alignment = DEFAULT_ALIGNMENT ) override;
-	virtual void* TryMalloc( size_t numBytes, uint32 alignment = DEFAULT_ALIGNMENT ) override;
-	virtual void* Realloc( void* pOriginal, size_t numBytes, uint32 alignment = DEFAULT_ALIGNMENT ) override;
-	virtual void* TryRealloc( void* pOriginal, size_t numBytes, uint32 alignment = DEFAULT_ALIGNMENT ) override;
+	virtual void* TryMalloc( size numBytes, uint32 alignment = 0 ) override;
+	virtual void* TryRealloc( void* pOriginal, size numBytes, uint32 alignment = 0 ) override;
 	virtual void  Free( void* pOriginal ) override;
 
-	virtual bool GetAllocationSize( void* pOriginal, size_t& numBytes ) override;
+	virtual bool GetAllocationSize( void* pOriginal, size& numBytes ) const override;
 
 	// CMemAllocBase interface
-	virtual bool IsInternallyThreadSafe() const override;
+	virtual bool IsThreadSafe() const override;
 };

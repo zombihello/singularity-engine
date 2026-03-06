@@ -5,7 +5,7 @@
 CStringID::keyFunc_t::operator()
 ==================
 */
-FORCEINLINE size_t CStringID::keyFunc_t::operator()( const CStringID& stringID ) const
+FORCEINLINE size CStringID::keyFunc_t::operator()( const CStringID& stringID ) const
 {
 	return stringID.GetHash();
 }

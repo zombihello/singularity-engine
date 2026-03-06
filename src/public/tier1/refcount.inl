@@ -47,7 +47,7 @@ TRefPtr::hashFunction_t::operator()
 ==================
 */
 template<typename TPtrType>
-FORCEINLINE size_t TRefPtr<TPtrType>::hashFunction_t::operator()( const TRefPtr& refPtr ) const
+FORCEINLINE size TRefPtr<TPtrType>::hashFunction_t::operator()( const TRefPtr& refPtr ) const
 {
 	return FastHash( refPtr );
 }

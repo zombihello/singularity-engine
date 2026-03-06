@@ -168,7 +168,7 @@ public:
 	{
 	}
 
-	shaderc_include_result* GetInclude( const char* pRequestedSource, shaderc_include_type includeType, const char* pRequestingSource, size_t includeDepth )
+	shaderc_include_result* GetInclude( const char* pRequestedSource, shaderc_include_type includeType, const char* pRequestingSource, size includeDepth )
 	{
 		// Initialize result information
 		shaderc_include_result* pShadercIncludeResult = new shaderc_include_result;

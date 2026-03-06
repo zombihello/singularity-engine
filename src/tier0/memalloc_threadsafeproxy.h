@@ -8,21 +8,18 @@
 class CMemAllocThreadSafeProxy : public CMemAllocBase
 {
 public:
-	CMemAllocThreadSafeProxy( IMemAlloc* pMemAlloc )
-		: pUsedMemAlloc( pMemAlloc )
-	{
-	}
+	CMemAllocThreadSafeProxy( IMemAlloc* pMemAlloc );
 
 	// IMemAlloc interface
-	virtual void* Malloc( size_t numBytes, uint32 alignment = DEFAULT_ALIGNMENT ) override;
-	virtual void* Realloc( void* pOriginal, size_t numBytes, uint32 alignment = DEFAULT_ALIGNMENT ) override;
+	virtual void* TryMalloc( size numBytes, uint32 alignment = 0 ) override;
+	virtual void* TryRealloc( void* pOriginal, size numBytes, uint32 alignment = 0 ) override;
 	virtual void  Free( void* pOriginal ) override;
 	virtual void  Trim( bool bTrimThreadCaches ) override;
 
-	virtual bool GetAllocationSize( void* pOriginal, size_t& numBytes ) override;
+	virtual bool GetAllocationSize( void* pOriginal, size& numBytes ) const override;
 
 	// CMemAllocBase interface
-	virtual bool IsInternallyThreadSafe() const override;
+	virtual bool IsThreadSafe() const override;
 
 private:
 	IMemAlloc*			 pUsedMemAlloc;

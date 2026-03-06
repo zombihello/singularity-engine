@@ -8,9 +8,9 @@ To use EASTL we need override the next global operators
 https://github.com/electronicarts/EASTL/blob/master/doc/FAQ.md#cont23-how-do-i-override-the-default-global-allocator
 ==================
 */
-void* operator new[]( size_t size, const char* name, int flags, unsigned debugFlags, const char* file, int line )
+void* operator new[]( size numBytes, const char* pName, int flags, unsigned debugFlags, const char* pFile, int line )
 {
-	return Mem_Malloc( size );
+	return Mem_Malloc( numBytes );
 }
 
 /*
@@ -18,7 +18,7 @@ void* operator new[]( size_t size, const char* name, int flags, unsigned debugFl
 operator new[]
 ==================
 */
-void* operator new[]( size_t size, size_t alignment, size_t alignmentOffset, const char* name, int flags, unsigned debugFlags, const char* file, int line )
+void* operator new[]( size numBytes, size alignment, size alignmentOffset, const char* pName, int flags, unsigned debugFlags, const char* pFile, int line )
 {
-	return Mem_Malloc( size );
+	return Mem_Malloc( numBytes );
 }
