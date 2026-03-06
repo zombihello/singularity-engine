@@ -95,7 +95,7 @@ void CGameInfoDoc::ReplaceMacros( eastl::string& string, const char* pGameInfoPa
 		const char* pCurMacro = s_pMacrosTable[macroIndex];
 		const char* pCurValue = s_pValueMacroTable[macroIndex];
 
-		size_t startPos = 0;
+		size startPos = 0;
 		while ( ( startPos = string.find( pCurMacro, startPos ) ) != eastl::string::npos )
 		{
 			string.replace( startPos, S_Strlen( pCurMacro ), pCurValue );

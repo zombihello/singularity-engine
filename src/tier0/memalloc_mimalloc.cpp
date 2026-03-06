@@ -1,60 +1,27 @@
 #include "pch_tier0.h"
-#include "tier0/memalloc_mimalloc.h"
 
 #if PLATFORM_SUPPORTS_MIMALLOC
 	#include <mimalloc.h>
+	#include "tier0/memalloc_mimalloc.h"
 
-/*
-==================
-CMemAllocMimalloc::Malloc
-==================
-*/
-void* CMemAllocMimalloc::Malloc( size_t numBytes, uint32 alignment /* = DEFAULT_ALIGNMENT */ )
-{
-	PROFILE_SCOPE()
-	void* pResult = TryMalloc( numBytes, alignment );
-	if ( !pResult && numBytes )
-	{
-		Sys_OutOfMemory( numBytes, alignment );
-	}
-	return pResult;
-}
+	#define MEMALLOC_MIMALLOC_NAME "MemAlloc Mimalloc"
 
 /*
 ==================
 CMemAllocMimalloc::TryMalloc
 ==================
 */
-void* CMemAllocMimalloc::TryMalloc( size_t numBytes, uint32 alignment /* = DEFAULT_ALIGNMENT */ )
+void* CMemAllocMimalloc::TryMalloc( size numBytes, uint32 alignment /*= 0*/ )
 {
 	PROFILE_SCOPE()
-	void* pNewPtr = nullptr;
-	if ( alignment != DEFAULT_ALIGNMENT )
+	alignment	  = GetAlignment( numBytes, alignment );
+	void* pNewPtr = mi_malloc_aligned( numBytes, alignment );
+	if ( pNewPtr )
 	{
-		pNewPtr = mi_malloc_aligned( numBytes, Max<uint32>( numBytes >= 16 ? 16 : 8, alignment ) );
-	}
-	else
-	{
-		pNewPtr = mi_malloc_aligned( numBytes, numBytes >= 16 ? 16 : 8 );
+		// TODO BS yehor.pohuliaka - CIT-13 Integrate Tracy profiler
+		// PROFILER_MEM_ALLOC( pNewPtr, Align( numBytes, alignment ), MEMALLOC_MIMALLOC_NAME );
 	}
 	return pNewPtr;
-}
-
-/*
-==================
-CMemAllocMimalloc::Realloc
-==================
-*/
-void* CMemAllocMimalloc::Realloc( void* pOriginal, size_t numBytes, uint32 alignment /* = DEFAULT_ALIGNMENT */ )
-{
-	PROFILE_SCOPE()
-	void* pResult = TryRealloc( pOriginal, numBytes, alignment );
-	if ( !pResult && numBytes )
-	{
-		Sys_OutOfMemory( numBytes, alignment );
-	}
-
-	return pResult;
 }
 
 /*
@@ -62,25 +29,35 @@ void* CMemAllocMimalloc::Realloc( void* pOriginal, size_t numBytes, uint32 align
 CMemAllocMimalloc::TryRealloc
 ==================
 */
-void* CMemAllocMimalloc::TryRealloc( void* pOriginal, size_t numBytes, uint32 alignment /* = DEFAULT_ALIGNMENT */ )
+void* CMemAllocMimalloc::TryRealloc( void* pOriginal, size numBytes, uint32 alignment /*= 0*/ )
 {
 	PROFILE_SCOPE()
-	void* pNewPtr = nullptr;
-	if ( numBytes == 0 )
-	{
-		mi_free( pOriginal );
-		return nullptr;
-	}
+	alignment	  = GetAlignment( numBytes, alignment );
+	void* pNewPtr = NULL;
 
-	if ( alignment != DEFAULT_ALIGNMENT )
+	if ( pOriginal && numBytes )
 	{
-		pNewPtr = mi_realloc_aligned( pOriginal, numBytes, Max<uint32>( numBytes >= 16 ? 16 : 8, alignment ) );
+		pNewPtr = mi_realloc_aligned( pOriginal, numBytes, alignment );
+	}
+	else if ( !pOriginal )
+	{
+		pNewPtr = mi_malloc_aligned( numBytes, alignment );
 	}
 	else
 	{
-		pNewPtr = mi_realloc( pOriginal, numBytes );
+		mi_free( pOriginal );
 	}
 
+	if ( pOriginal )
+	{
+		// TODO BS yehor.pohuliaka - CIT-13 Integrate Tracy profiler
+		// PROFILER_MEM_FREE( pOriginal, MEMALLOC_MIMALLOC_NAME );
+	}
+	if ( pNewPtr )
+	{
+		// TODO BS yehor.pohuliaka - CIT-13 Integrate Tracy profiler
+		// PROFILER_MEM_ALLOC( pNewPtr, Align( numBytes, alignment ), MEMALLOC_MIMALLOC_NAME );
+	}
 	return pNewPtr;
 }
 
@@ -92,24 +69,12 @@ CMemAllocMimalloc::Free
 void CMemAllocMimalloc::Free( void* pOriginal )
 {
 	PROFILE_SCOPE()
-	if ( !pOriginal )
+	if ( pOriginal )
 	{
-		return;
+		mi_free( pOriginal );
+		// TODO BS yehor.pohuliaka - CIT-13 Integrate Tracy profiler
+		// PROFILER_MEM_FREE( pOriginal, MEMALLOC_MIMALLOC_NAME );
 	}
-
-	mi_free( pOriginal );
-}
-
-/*
-==================
-CMemAllocMimalloc::GetAllocationSize
-==================
-*/
-bool CMemAllocMimalloc::GetAllocationSize( void* pOriginal, size_t& numBytes )
-{
-	PROFILE_SCOPE()
-	numBytes = mi_malloc_size( pOriginal );
-	return true;
 }
 
 /*
@@ -125,11 +90,23 @@ void CMemAllocMimalloc::Trim( bool bTrimThreadCaches )
 
 /*
 ==================
-CMemAllocMimalloc::IsInternallyThreadSafe
+CMemAllocMimalloc::IsThreadSafe
 ==================
 */
-bool CMemAllocMimalloc::IsInternallyThreadSafe() const
+bool CMemAllocMimalloc::IsThreadSafe() const
 {
+	return true;
+}
+
+/*
+==================
+CMemAllocMimalloc::GetAllocationSize
+==================
+*/
+bool CMemAllocMimalloc::GetAllocationSize( void* pOriginal, size& numBytes ) const
+{
+	PROFILE_SCOPE()
+	numBytes = mi_malloc_size( pOriginal );
 	return true;
 }
 #endif	// PLATFORM_SUPPORTS_MIMALLOC

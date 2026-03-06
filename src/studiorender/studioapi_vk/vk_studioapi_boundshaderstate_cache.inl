@@ -5,7 +5,7 @@
 CStudioAPIBoundShaderStateKeyVk::boundShaderStateKeyHasher_t::operator()
 ==================
 */
-FORCEINLINE size_t CStudioAPIBoundShaderStateKeyVk::boundShaderStateKeyHasher_t::operator()( const CStudioAPIBoundShaderStateKeyVk& key ) const
+FORCEINLINE size CStudioAPIBoundShaderStateKeyVk::boundShaderStateKeyHasher_t::operator()( const CStudioAPIBoundShaderStateKeyVk& key ) const
 {
 	return key.GetHash();
 }

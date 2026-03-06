@@ -10,11 +10,11 @@
 struct stlInsensitiveStringHash_t
 {
 	template<typename TType>
-	size_t operator()( const TType* pString ) const;
+	size operator()( const TType* pString ) const;
 	template<typename TType>
-	size_t operator()( const eastl::basic_string<TType>& string ) const;
+	size operator()( const eastl::basic_string<TType>& string ) const;
 	template<typename TType>
-	size_t operator()( const eastl::basic_string_view<TType>& string ) const;
+	size operator()( const eastl::basic_string_view<TType>& string ) const;
 };
 
 //-----------------------------------------------------------------------------

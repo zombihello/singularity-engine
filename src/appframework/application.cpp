@@ -49,7 +49,7 @@ void CApplication::Init()
 	// Setup application information for the crash dump
 	CrashDump_SetAppInfo( GetCrashDumpInfo() );
 
-// Attach a console for I/O if it need (only for window apps)
+	// Attach a console for I/O if it need (only for window apps)
 #if ENABLE_LOGGING
 	if ( IsWindowApp() && CommandLine()->HasParam( "stdout" ) )
 	{
@@ -92,10 +92,13 @@ void CApplication::Init()
 	}
 #endif	// ENABLE_LOGGING
 
-	// Print some information about a user
-	Msg( "AppFramework: User %s//%s", Sys_GetComputerName(), Sys_GetUserName() );
+	// Print some information about the system
+	systemMemoryInfo_t systemMemoryInfo = Mem_SystemMemoryInfo();
+	Msg( "AppFramework: User: %s//%s", Sys_GetComputerName(), Sys_GetUserName() );
+	Msg( "AppFramework: Total memory: %.2f MB", (double)systemMemoryInfo.totalSize / ( 1024 * 1024 ) );
+	Msg( "AppFramework: Free memory: %.2f MB", (double)systemMemoryInfo.freeSize / ( 1024 * 1024 ) );
 
-// Set true in cheats and developer cvars if we in debug configuration
+	// Set true in cheats and developer cvars if we in debug configuration
 #if DEBUG
 	CConVarRef cheatsRef( "cheats" );
 	CConVarRef developerRef( "developer" );

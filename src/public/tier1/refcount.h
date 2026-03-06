@@ -51,7 +51,7 @@ public:
 	// Hash function for STL containers
 	struct hashFunction_t
 	{
-		size_t operator()( const TRefPtr& refPtr ) const;
+		size operator()( const TRefPtr& refPtr ) const;
 	};
 
 	TRefPtr()

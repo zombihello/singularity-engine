@@ -465,7 +465,7 @@ bool CKeyValuesParser::ReadIncludeKeys( eastl::vector<CKeyValues*>& includedKeys
 	// Get relative subdirectory
 	eastl::string fullPath;
 	S_GetFilePath( buffer.GetStream()->GetPath(), fullPath, false );
-	size_t offset = fullPath.size();
+	size offset = fullPath.size();
 	fullPath.resize( fullPath.size() + token.string.size() );
 	Mem_Memcpy( fullPath.data() + offset, token.string.data(), token.string.size() );
 

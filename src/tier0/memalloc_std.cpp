@@ -1,6 +1,8 @@
 #include "pch_tier0.h"
 #include "tier0/memalloc_std.h"
 
+#define MEMALLOC_STD_NAME "MemAlloc Std"
+
 /*
 ==================
 CMemAllocStd::CMemAllocStd
@@ -18,62 +20,33 @@ CMemAllocStd::CMemAllocStd()
 
 /*
 ==================
-CMemAllocStd::Malloc
-==================
-*/
-void* CMemAllocStd::Malloc( size_t numBytes, uint32 alignment /* = DEFAULT_ALIGNMENT */ )
-{
-	PROFILE_SCOPE()
-	void* pResult = TryMalloc( numBytes, alignment );
-	if ( !pResult && numBytes )
-	{
-		Sys_OutOfMemory( numBytes, alignment );
-	}
-
-	return pResult;
-}
-
-/*
-==================
 CMemAllocStd::TryMalloc
 ==================
 */
-void* CMemAllocStd::TryMalloc( size_t numBytes, uint32 alignment /* = DEFAULT_ALIGNMENT */ )
+void* CMemAllocStd::TryMalloc( size numBytes, uint32 alignment /* = 0 */ )
 {
 	PROFILE_SCOPE()
-	alignment	  = Max<uint32>( numBytes >= 16 ? 16 : 8, alignment );
-	void* pResult = nullptr;
+	alignment	  = GetAlignment( numBytes, alignment );
+	void* pResult = NULL;
 
 	// Allocate memory
 #if PLATFORM_USE__ALIGNED_MALLOC
 	pResult = _aligned_malloc( numBytes, alignment );
 #else
-	void* pPtr = L_malloc_system( numBytes + alignment + sizeof( void* ) + sizeof( size_t ) );
+	void* pPtr = Mem_MallocSystem( numBytes + alignment + sizeof( void* ) + sizeof( size ) );
 	if ( pPtr )
 	{
-		pResult																   = Align( (uint8*)pPtr + sizeof( void* ) + sizeof( size_t ), alignment );
-		*( (void**)( (uint8*)pResult - sizeof( void* ) ) )					   = pPtr;
-		*( (size_t*)( (uint8*)pResult - sizeof( void* ) - sizeof( size_t ) ) ) = numBytes;
+		pResult															   = Align( (uint8*)pPtr + sizeof( void* ) + sizeof( size ), alignment );
+		*( (void**)( (uint8*)pResult - sizeof( void* ) ) )				   = pPtr;
+		*( (size*)( (uint8*)pResult - sizeof( void* ) - sizeof( size ) ) ) = numBytes;
 	}
 #endif	// PLATFORM_USE__ALIGNED_MALLOC
 
-	return pResult;
-}
-
-/*
-==================
-CMemAllocStd::Realloc
-==================
-*/
-void* CMemAllocStd::Realloc( void* pOriginal, size_t numBytes, uint32 alignment /* = DEFAULT_ALIGNMENT */ )
-{
-	PROFILE_SCOPE()
-	void* pResult = TryRealloc( pOriginal, numBytes, alignment );
-	if ( !pResult && numBytes != 0 )
+	if ( pResult )
 	{
-		Sys_OutOfMemory( numBytes, alignment );
+		// TODO BS yehor.pohuliaka - CIT-13 Integrate Tracy profiler
+		// PROFILER_MEM_ALLOC( pResult, Align( numBytes, alignment ), MEMALLOC_STD_NAME );
 	}
-
 	return pResult;
 }
 
@@ -82,11 +55,11 @@ void* CMemAllocStd::Realloc( void* pOriginal, size_t numBytes, uint32 alignment 
 CMemAllocStd::TryRealloc
 ==================
 */
-void* CMemAllocStd::TryRealloc( void* pOriginal, size_t numBytes, uint32 alignment /* = DEFAULT_ALIGNMENT */ )
+void* CMemAllocStd::TryRealloc( void* pOriginal, size numBytes, uint32 alignment /* = 0 */ )
 {
 	PROFILE_SCOPE()
-	alignment	  = Max<uint32>( numBytes >= 16 ? 16 : 8, alignment );
-	void* pResult = nullptr;
+	alignment	  = GetAlignment( numBytes, alignment );
+	void* pResult = NULL;
 
 #if PLATFORM_USE__ALIGNED_MALLOC
 	if ( pOriginal && numBytes )
@@ -100,17 +73,16 @@ void* CMemAllocStd::TryRealloc( void* pOriginal, size_t numBytes, uint32 alignme
 	else
 	{
 		_aligned_free( pOriginal );
-		pResult = nullptr;
 	}
 #else
 	if ( pOriginal && numBytes )
 	{
 		// Can't use realloc as it might screw with alignment
-		pResult		   = TryMalloc( numBytes, alignment );
-		size_t ptrSize = 0;
-		bool   bResult = GetAllocationSize( pOriginal, ptrSize );
+		pResult		 = TryMalloc( numBytes, alignment );
+		size ptrSize = 0;
+		bool bResult = GetAllocationSize( pOriginal, ptrSize );
 		Assert( ptrSize );
-		L_memcpy( pResult, pOriginal, Min( numBytes, ptrSize ) );
+		Mem_Memcpy( pResult, pOriginal, Min( numBytes, ptrSize ) );
 		Free( pOriginal );
 	}
 	else if ( !pOriginal )
@@ -119,11 +91,20 @@ void* CMemAllocStd::TryRealloc( void* pOriginal, size_t numBytes, uint32 alignme
 	}
 	else
 	{
-		L_free_system( *( (void**)( (uint8*)pOriginal - sizeof( void* ) ) ) );
-		pResult = nullptr;
+		Mem_FreeSystem( *( (void**)( (uint8*)pOriginal - sizeof( void* ) ) ) );
 	}
 #endif	// PLATFORM_USE__ALIGNED_MALLOC
 
+	if ( pOriginal )
+	{
+		// TODO BS yehor.pohuliaka - CIT-13 Integrate Tracy profiler
+		// PROFILER_MEM_FREE( pOriginal, MEMALLOC_STD_NAME );
+	}
+	if ( pResult )
+	{
+		// TODO BS yehor.pohuliaka - CIT-13 Integrate Tracy profiler
+		// PROFILER_MEM_ALLOC( pResult, Align( numBytes, alignment ), MEMALLOC_STD_NAME );
+	}
 	return pResult;
 }
 
@@ -135,14 +116,17 @@ CMemAllocStd::Free
 void CMemAllocStd::Free( void* pOriginal )
 {
 	PROFILE_SCOPE()
-#if PLATFORM_USE__ALIGNED_MALLOC
-	_aligned_free( pOriginal );
-#else
 	if ( pOriginal )
 	{
-		L_free_system( *( (void**)( (uint8*)pOriginal - sizeof( void* ) ) ) );
-	}
+#if PLATFORM_USE__ALIGNED_MALLOC
+		_aligned_free( pOriginal );
+#else
+		Mem_FreeSystem( *( (void**)( (uint8*)pOriginal - sizeof( void* ) ) ) );
 #endif	// PLATFORM_USE__ALIGNED_MALLOC
+
+		// TODO BS yehor.pohuliaka - CIT-13 Integrate Tracy profiler
+		// PROFILER_MEM_FREE( pOriginal, MEMALLOC_STD_NAME );
+	}
 }
 
 /*
@@ -150,7 +134,7 @@ void CMemAllocStd::Free( void* pOriginal )
 CMemAllocStd::GetAllocationSize
 ==================
 */
-bool CMemAllocStd::GetAllocationSize( void* pOriginal, size_t& numBytes )
+bool CMemAllocStd::GetAllocationSize( void* pOriginal, size& numBytes ) const
 {
 	PROFILE_SCOPE()
 	if ( !pOriginal )
@@ -159,24 +143,24 @@ bool CMemAllocStd::GetAllocationSize( void* pOriginal, size_t& numBytes )
 	}
 
 #if PLATFORM_USE__ALIGNED_MALLOC
-	numBytes = _aligned_msize( pOriginal, 16, 0 );	// Assumes alignment of 16
+	numBytes = _aligned_msize( pOriginal, DEFAULT_ALIGNMENT, 0 );  // Assumes default alignment
 	return true;
 #else
-	numBytes = *( (size_t*)( (uint8*)pOriginal - sizeof( void* ) - sizeof( size_t ) ) );
+	numBytes = *( (size*)( (uint8*)pOriginal - sizeof( void* ) - sizeof( size ) ) );
 	return true;
 #endif	// PLATFORM_USE__ALIGNED_MALLOC
 }
 
 /*
 ==================
-CMemAllocStd::IsInternallyThreadSafe
+CMemAllocStd::IsThreadSafe
 ==================
 */
-bool CMemAllocStd::IsInternallyThreadSafe() const
+bool CMemAllocStd::IsThreadSafe() const
 {
 #if PLATFORM_IS_ANSI_MALLOC_THREADSAFE
 	return true;
 #else
 	return false;
-#endif
+#endif	// PLATFORM_IS_ANSI_MALLOC_THREADSAFE
 }

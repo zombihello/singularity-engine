@@ -41,7 +41,7 @@ private:
 	// Calculate a hash for a string to use it in eastl::unordered_map
 	struct insensitiveStringHash_t
 	{
-		size_t operator()( const char* pString ) const;
+		size operator()( const char* pString ) const;
 	};
 
 	// Comparator for eastl::unordered_map to insensitive compre strings

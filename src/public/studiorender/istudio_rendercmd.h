@@ -15,7 +15,7 @@ public:
 	virtual uint32 Execute()	   = 0;
 	virtual uint32 GetSize() const = 0;
 
-	void* operator new( size_t size, const studioCmdAlloc_t& studioCmdAlloc );
+	void* operator new( size size, const studioCmdAlloc_t& studioCmdAlloc );
 	void  operator delete( void* pPtr, const studioCmdAlloc_t& studioCmdAlloc );
 };
 

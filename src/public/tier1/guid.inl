@@ -5,7 +5,7 @@
 CGuid::keyFunc_t::operator()
 ==================
 */
-FORCEINLINE size_t CGuid::keyFunc_t::operator()( const CGuid& guid ) const
+FORCEINLINE size CGuid::keyFunc_t::operator()( const CGuid& guid ) const
 {
 	return guid.GetHash();
 }

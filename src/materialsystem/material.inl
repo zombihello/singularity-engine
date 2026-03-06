@@ -5,7 +5,7 @@
 CMaterial::insensitiveStringHash_t::operator()
 ==================
 */
-FORCEINLINE size_t CMaterial::insensitiveStringHash_t::operator()( const char* pString ) const
+FORCEINLINE size CMaterial::insensitiveStringHash_t::operator()( const char* pString ) const
 {
 	return FastHashStringInsensitive( pString );
 }

@@ -11,7 +11,7 @@ public:
 	// Functions to extract the Guid as a key for eastl::unordered_map and eastl::unordered_set
 	struct keyFunc_t
 	{
-		size_t operator()( const CGuid& guid ) const;
+		size operator()( const CGuid& guid ) const;
 		bool   operator()( const CGuid& a, const CGuid& b ) const;
 	};
 

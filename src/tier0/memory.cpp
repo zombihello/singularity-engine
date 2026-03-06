@@ -26,16 +26,15 @@ MemAlloc
 */
 IMemAlloc* MemAlloc()
 {
-	static IMemAlloc* s_pMemAlloc = NULL;
-
 	// If the global memory allocator not created yet then do it now!
+	static IMemAlloc* s_pMemAlloc = NULL;
 	if ( !s_pMemAlloc )
 	{
 		// Allocate a new memory allocator
 		CMemAllocBase* pMemAlloc = AllocateMemAlloc();
 
 		// If the allocator is already thread safe, there is no need for the thread safe proxy
-		if ( !pMemAlloc->IsInternallyThreadSafe() )
+		if ( !pMemAlloc->IsThreadSafe() )
 		{
 			pMemAlloc = new CMemAllocThreadSafeProxy( pMemAlloc );
 		}
@@ -45,14 +44,4 @@ IMemAlloc* MemAlloc()
 	}
 
 	return s_pMemAlloc;
-}
-
-/*
-==================
-Sys_OutOfMemory
-==================
-*/
-void Sys_OutOfMemory( size_t numBytes, uint32 alignment )
-{
-	Sys_Error( "Ran out of memory allocating %llu bytes with alignment %u", numBytes, alignment );
 }

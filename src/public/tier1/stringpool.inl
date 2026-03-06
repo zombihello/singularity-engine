@@ -8,7 +8,7 @@ TStringPool::~TStringPool
 template<typename TIdType>
 FORCEINLINE TStringPool<TIdType>::~TStringPool()
 {
-	for ( size_t index = 0, count = strings.size(); index < count; ++index )
+	for ( size index = 0, count = strings.size(); index < count; ++index )
 	{
 		Mem_Free( (void*)strings[index] );
 	}
@@ -42,7 +42,7 @@ FORCEINLINE TIdType TStringPool<TIdType>::FindOrAdd( const char* pString, uint64
 		return id;
 	}
 
-	size_t numStrings = strings.size();
+	size numStrings = strings.size();
 	if ( numStrings > S_MaxValue<TIdType>() )
 	{
 		Sys_Error( "String pool overflow, too many strings" );

@@ -10,7 +10,7 @@ public:
 	// Functions to extract the string ID as a key for eastl::unordered_map and eastl::unordered_set
 	struct keyFunc_t
 	{
-		size_t operator()( const CStringID& stringID ) const;
+		size operator()( const CStringID& stringID ) const;
 		bool   operator()( const CStringID& a, const CStringID& b ) const;
 	};
 
