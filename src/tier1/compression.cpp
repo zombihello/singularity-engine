@@ -28,7 +28,7 @@ CompressMemoryZLIB
 */
 static bool CompressMemoryZLIB( void* pCompressedBuffer, uint32& compressedSize, const void* pUncompressedBuffer, uint32 uncompressedSize )
 {
-	PROFILE_SCOPE()
+	PROFILER_SCOPE_FUNC()
 
 	// Zlib wants to use unsigned long.
 	unsigned long zCompressedSize	= compressedSize;
@@ -49,7 +49,7 @@ UncompressMemoryZLIB
 */
 static bool UncompressMemoryZLIB( void* pUncompressedBuffer, uint32 uncompressedSize, const void* pCompressedBuffer, uint32 compressedSize )
 {
-	PROFILE_SCOPE()
+	PROFILER_SCOPE_FUNC()
 
 	// Zlib wants to use unsigned long.
 	unsigned long zCompressedSize	= compressedSize;
@@ -70,7 +70,7 @@ CompressMemory
 */
 bool CompressMemory( compressionType_t compressionType, void* pCompressedBuffer, uint32& compressedSize, const void* pUncompressedBuffer, uint32 uncompressedSize )
 {
-	PROFILE_SCOPE()
+	PROFILER_SCOPE_FUNC()
 
 	// Make sure a valid compression scheme was provided
 	Assert( compressionType != COMPRESSION_NONE );
@@ -98,7 +98,7 @@ UncompressMemory
 */
 bool UncompressMemory( compressionType_t compressionType, void* pUncompressedBuffer, uint32 uncompressedSize, const void* pCompressedBuffer, uint32 compressedSize )
 {
-	PROFILE_SCOPE()
+	PROFILER_SCOPE_FUNC()
 
 	// Make sure a valid compression scheme was provided
 	Assert( compressionType != COMPRESSION_NONE );
@@ -127,7 +127,7 @@ CompressStreamData
 void CompressStreamData( compressionType_t compressionType, IStreamDataWriter* pStreamWriter, byte* pSrcBuffer, uint64 srcSize )
 {
 	// Do nothing if source size is zero
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	if ( srcSize <= 0 )
 	{
 		return;
@@ -218,7 +218,7 @@ UncompressStreamData
 void UncompressStreamData( compressionType_t compressionType, IStreamDataReader* pStreamReader, byte* pDestBuffer, uint64 destSize )
 {
 	// Do nothing if destination size is zero
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	if ( destSize <= 0 )
 	{
 		return;

@@ -2,7 +2,7 @@
 #include <EASTL/list.h>
 
 #include "tier0/defines.h"
-#include "tier0/profile.h"
+#include "tier0/iprofiler.h"
 #include "tier1/threading.h"
 
 //-----------------------------------------------------------------------------

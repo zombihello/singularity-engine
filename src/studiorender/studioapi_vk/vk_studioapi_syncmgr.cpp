@@ -220,10 +220,8 @@ CStudioAPISyncMgrVk::WaitFrameInFlight
 */
 void CStudioAPISyncMgrVk::WaitFrameInFlight( uint32 indexFrameInFlight )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_WAIT );
-	PROFILE_TAG( "Frame In Flight", indexFrameInFlight )
-
-	// Wait until the current frame in-flight will be available
+	// Wait until the current frame in flight will be available
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_WAIT );
 	eastl::list<CStudioAPIFenceVk*>& currentFrameInFlightFences = frameInFlightFences[indexFrameInFlight];
 	for ( auto it = currentFrameInFlightFences.begin(), itEnd = currentFrameInFlightFences.end(); it != itEnd; ++it )
 	{
@@ -344,7 +342,7 @@ VK_UpdateSyncStateBufferWithBarrier
 */
 bool VK_UpdateSyncStateBufferWithBarrier( VkAccessFlags vkDstAccessMask, VkPipelineStageFlags vkDstStageMask, uint32 dstQueueFamilyIndex, studioAPISyncStateBufferVk_t& syncState, studioAPIBufferMemoryBarrierVk_t& bufferMemoryBarrier, uint32 bufferUsageFlags )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Split vkDstAccessMask by read and write mask
 	bool		  bIsNeedBarrier	   = false;

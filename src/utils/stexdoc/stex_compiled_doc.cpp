@@ -1,5 +1,5 @@
 #include "utils/interfaces/interfaces.h"
-#include "tier0/profile.h"
+#include "tier0/iprofiler.h"
 #include "tier0/ilogger.h"
 #include "filesystem/ifilesystem.h"
 #include "tier1/compression.h"
@@ -39,7 +39,7 @@ CSTEXCompiledTextureDoc::SaveFile
 bool CSTEXCompiledTextureDoc::SaveFile( const char* pPath )
 {
 	// Do nothing if the file system isn't valid
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	Assert( g_pFileSystem );
 
 	// Try to open a file
@@ -86,7 +86,7 @@ CSTEXCompiledTextureDoc::LoadFromFile
 bool CSTEXCompiledTextureDoc::LoadFromFile( const char* pPath )
 {
 	// Do nothing if the file system isn't valid
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	Assert( g_pFileSystem );
 
 	// Try to open a file

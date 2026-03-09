@@ -55,7 +55,7 @@ CStudioAPISwapChainImageVk::UpdateSyncStateWithBarrier
 */
 void CStudioAPISwapChainImageVk::UpdateSyncStateWithBarrier( CStudioAPICmdListVk* pCmdList, VkImageLayout vkDstImageLayout, VkAccessFlags vkDstAccessMask, VkPipelineStageFlags vkDstStageMask, uint32 dstQueueFamilyIndex )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	studioAPIImageMemoryBarrierVk_t imageMemoryBarrier					= {};
 	imageMemoryBarrier.vkImageMemoryBarrier.image						= vkImage;
 	imageMemoryBarrier.vkImageMemoryBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -121,7 +121,7 @@ CStudioAPISwapChainVk::Create
 */
 bool CStudioAPISwapChainVk::Create( windowHandle_t windowHandle, uint32 width, uint32 height, VkFormat vkPixelFormat, VkColorSpaceKHR vkColorSpace, bool bUseVSync )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// If swap chain already created, we have to destroy the one
 	bool bReCreate =
@@ -406,7 +406,7 @@ CStudioAPISwapChainVk::Destroy
 */
 void CStudioAPISwapChainVk::Destroy()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Free Vulkan resources
 	g_StudioAPIVk.GetMemoryMgr().FreeResource( [vkSwapChain = vkSwapChain, vkSurface = vkSurface]() {
@@ -463,7 +463,7 @@ CStudioAPISwapChainVk::Resize
 */
 void CStudioAPISwapChainVk::Resize( uint32 width, uint32 height )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Save the new size
 	size.x = width;
@@ -485,7 +485,7 @@ CStudioAPISwapChainVk::AcquireNextImage
 */
 bool CStudioAPISwapChainVk::AcquireNextImage()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Acquire the next image only if the swap chain is created
 	Assert( IsCreated() );
@@ -544,7 +544,7 @@ CStudioAPISwapChainVk::ReCreate
 */
 bool CStudioAPISwapChainVk::ReCreate()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Re-create the swap chain
 	vkDeviceWaitIdle( g_StudioAPIVk.GetDevice().GetVkLogicalDevice() );
@@ -560,7 +560,7 @@ CStudioAPISwapChainVk::Present
 */
 bool CStudioAPISwapChainVk::Present()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Present the frame if the swap chain is created
 	Assert( IsCreated() );

@@ -18,7 +18,7 @@ public:
 		: pathID( pNewPathID )
 		, path( pNewPath )
 	{
-		PROFILE_SCOPE();
+		PROFILER_SCOPE_FUNC();
 		if ( !S_IsAbsolutePath( pNewPath ) )
 		{
 			S_MakeAbsolutePath( pNewPath, path );

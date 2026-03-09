@@ -7,7 +7,7 @@ CStudioAPISwapChainImageVk::UpdateSyncState
 */
 FORCEINLINE void CStudioAPISwapChainImageVk::UpdateSyncState( VkImageLayout vkDstImageLayout, VkAccessFlags vkDstAccessMask, VkPipelineStageFlags vkDstStageMask, uint32 dstQueueFamilyIndex )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	VK_UpdateSyncStateImage( vkDstImageLayout, vkDstAccessMask, vkDstStageMask, dstQueueFamilyIndex, syncState );
 }
 

@@ -120,7 +120,7 @@ CStudioAPIBufferVk::CStudioAPIBufferVk( const byte* pData, uint64 dataSize, uint
 	, vmaAllocation( VK_NULL_HANDLE )
 	, pStudioAPIVkShutdownDelegate( NULL )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// The buffer size and data stride must be valid
 	Assert( dataSize > 0 );
@@ -175,7 +175,7 @@ CStudioAPIBufferVk::~CStudioAPIBufferVk
 */
 CStudioAPIBufferVk::~CStudioAPIBufferVk()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Destroy the buffer
 	if ( vkBuffer != VK_NULL_HANDLE )
@@ -242,7 +242,7 @@ CStudioAPIBufferVk::MapMemory
 */
 void CStudioAPIBufferVk::MapMemory( uint64 size, uint64 offset, studioAPIMappedBufferData_t& mappedData )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// We can use MapMemory only for CPU shared memory
 	AssertMsg( memoryFlags & STUDIOAPI_BUFFER_MEMORY_FLAG_CPU, "The buffer doesn't support the map memory, use IStudioAPICmdList::CopyBuffer" );
@@ -261,7 +261,7 @@ CStudioAPIBufferVk::UnmapMemory
 */
 void CStudioAPIBufferVk::UnmapMemory( studioAPIMappedBufferData_t& mappedData )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// For volatile buffers we can use UnmapMemory to read/write data in the buffer
 	Assert( mappedData.pData );
@@ -276,7 +276,7 @@ CStudioAPIBufferVk::UpdateData
 */
 void CStudioAPIBufferVk::UpdateData( IStudioAPICmdContext* pCmdContext, byte* pData, uint64 dataSize, uint64 offset /* = 0 */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Copy the data by CStudioAPIDataUploaderVk (only for GPU only memory)
 	Assert( pData && offset + dataSize <= size );
@@ -360,7 +360,7 @@ CStudioAPIBufferVk::UpdateSyncStateWithBarrier
 */
 void CStudioAPIBufferVk::UpdateSyncStateWithBarrier( CStudioAPICmdListVk* pCmdList, VkAccessFlags vkDstAccessMask, VkPipelineStageFlags vkDstStageMask, uint32 dstQueueFamilyIndex )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	studioAPIBufferMemoryBarrierVk_t bufferMemoryBarrier = {};
 	bufferMemoryBarrier.vkBufferMemoryBarrier.buffer	 = vkBuffer;
 	bufferMemoryBarrier.vkBufferMemoryBarrier.offset	 = bufferOffsets[currentBufferIndex];

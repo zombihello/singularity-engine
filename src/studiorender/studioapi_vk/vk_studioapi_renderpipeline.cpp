@@ -185,7 +185,7 @@ CStudioAPIRenderPipelineVk::CStudioAPIRenderPipelineVk( const studioAPIRenderPip
 	: vkPipeline( VK_NULL_HANDLE )
 	, pStudioAPIVkShutdownDelegate( NULL )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( createInfo.pBoundShaderState && createInfo.pRenderPass && ( createInfo.colorBlendState.attachmentCount == 0 || createInfo.colorBlendState.pAttachments ) );
 
 	// Viewport state sets the number of viewports and scissor used in this pipeline
@@ -355,7 +355,7 @@ CStudioAPIRenderPipelineVk::~CStudioAPIRenderPipelineVk
 */
 CStudioAPIRenderPipelineVk::~CStudioAPIRenderPipelineVk()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Broadcast event about deletion of the pipeline
 	onRenderPipelineDeleted.Broadcast( this );

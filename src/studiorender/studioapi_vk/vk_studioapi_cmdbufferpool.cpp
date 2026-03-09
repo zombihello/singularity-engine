@@ -31,7 +31,7 @@ CStudioAPICmdBufferPoolVk::Init
 */
 void CStudioAPICmdBufferPoolVk::Init()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Create the command pool
 	Assert( vkCommandPool == VK_NULL_HANDLE );
@@ -49,7 +49,7 @@ CStudioAPICmdBufferPoolVk::Shutdown
 */
 void CStudioAPICmdBufferPoolVk::Shutdown()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Destroy all command buffers
 	for ( auto it = cmdBuffers.begin(), itEnd = cmdBuffers.end(); it != itEnd; ++it )
@@ -79,7 +79,7 @@ CStudioAPICmdBufferPoolVk::CreateCmdBuffer
 */
 CStudioAPICmdBufferVk* CStudioAPICmdBufferPoolVk::CreateCmdBuffer()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Try to find the command buffer in the free list
 	CStudioAPICmdBufferVk* pCmdBuffer = NULL;
@@ -109,7 +109,7 @@ CStudioAPICmdBufferPoolVk::FreeUnusedCmdBuffers
 */
 void CStudioAPICmdBufferPoolVk::FreeUnusedCmdBuffers()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Reset the command pool
 	vkResetCommandPool( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), vkCommandPool, VK_COMMAND_POOL_RESET_RELEASE_RESOURCES_BIT );

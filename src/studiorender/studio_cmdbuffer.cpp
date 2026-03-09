@@ -38,7 +38,7 @@ CStudioCmdBuffer::GetAllocation
 */
 studioCmdAlloc_t CStudioCmdBuffer::GetAllocation( uint32 allocationSize )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	s_StudioCmdBufferMutex.Lock();
 
 	// Only allow a single allocation chunk at a time
@@ -49,7 +49,7 @@ studioCmdAlloc_t CStudioCmdBuffer::GetAllocation( uint32 allocationSize )
 
 	// Check that the allocation will fit in the buffer
 	const uint32 alignedAllocationSize = Align( allocationSize, alignment );
-	const uint32 bufferSize			   = ( uint32 )( pDataEnd - pData );
+	const uint32 bufferSize			   = (uint32)( pDataEnd - pData );
 	AssertMsg( alignedAllocationSize < bufferSize, "No enough space for the allocation in the command buffer" );
 
 	// Use the memory referenced by WritePointer for the allocation, wrapped around to the beginning of the buffer
@@ -58,7 +58,7 @@ studioCmdAlloc_t CStudioCmdBuffer::GetAllocation( uint32 allocationSize )
 
 	// If there isn't enough space left in the buffer to allocate the full size, allocate all the remaining bytes in the buffer
 	byte* pAllocationEnd		 = Min( pDataEnd, studioCmdAlloc.pAllocation + alignedAllocationSize );
-	studioCmdAlloc.allocatedSize = ( uint32 )( pAllocationEnd - studioCmdAlloc.pAllocation );
+	studioCmdAlloc.allocatedSize = (uint32)( pAllocationEnd - studioCmdAlloc.pAllocation );
 
 	// Wait until the reading thread has finished reading the area of the buffer we want to allocate
 	while ( true )
@@ -96,7 +96,7 @@ CStudioCmdBuffer::CommitAllocation
 */
 void CStudioCmdBuffer::CommitAllocation( studioCmdAlloc_t& allocContext )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	if ( allocContext.pAllocation )
 	{
 		// Advance the write pointer to the next unallocated byte
@@ -121,7 +121,7 @@ CStudioCmdBuffer::Flush
 */
 void CStudioCmdBuffer::Flush()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_WAIT );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_WAIT );
 	while ( !IsReadBufferEmpty() )
 	{
 		Thread_Yield();
@@ -135,7 +135,7 @@ CStudioCmdBuffer::BeginRead
 */
 bool CStudioCmdBuffer::BeginRead( void*& pReadPointer, uint32& readSize )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 
 	// Make a snapshot of a recent value of WritePointer
 	byte* pCurWritePointer = pWritePointer;
@@ -170,7 +170,7 @@ bool CStudioCmdBuffer::BeginRead( void*& pReadPointer, uint32& readSize )
 	if ( CStudioCmdBuffer::pReadPointer < pReadEndPointer )
 	{
 		pReadPointer = CStudioCmdBuffer::pReadPointer;
-		readSize	 = ( uint32 )( pReadEndPointer - CStudioCmdBuffer::pReadPointer );
+		readSize	 = (uint32)( pReadEndPointer - CStudioCmdBuffer::pReadPointer );
 		return true;
 	}
 
@@ -184,7 +184,7 @@ CStudioCmdBuffer::EndRead
 */
 void CStudioCmdBuffer::EndRead( uint32 readSize )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	pReadPointer += Align( readSize, alignment );
 }
 
@@ -195,7 +195,7 @@ CStudioCmdBuffer::WaitForRead
 */
 void CStudioCmdBuffer::WaitForRead( uint32 waitTime /* = -1 */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_WAIT );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_WAIT );
 
 	// If the buffer is empty, wait for the data-written event to be triggered
 	if ( pReadPointer == pWritePointer )

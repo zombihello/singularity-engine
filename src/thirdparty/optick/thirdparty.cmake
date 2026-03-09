@@ -1,1 +1,0 @@
-set( CMAKE_MODULE_PATH      "${OPTICK_PATH}/cmake/modules/" ${CMAKE_MODULE_PATH} )

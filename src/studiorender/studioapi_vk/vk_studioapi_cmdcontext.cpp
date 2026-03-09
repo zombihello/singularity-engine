@@ -52,7 +52,7 @@ CStudioAPICmdContextVk::Init
 */
 void CStudioAPICmdContextVk::Init()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Initialize groups of pending barriers
 	Mem_Memzero( &pendingBufferBarriers, sizeof( pendingBufferBarriers ) );
@@ -87,7 +87,7 @@ CStudioAPICmdContextVk::Shutdown
 */
 void CStudioAPICmdContextVk::Shutdown()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Destroy pending states
 	if ( pPendingRenderState )
@@ -125,7 +125,7 @@ CStudioAPICmdContextVk::BeginFrame
 */
 void CStudioAPICmdContextVk::BeginFrame()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Free unused command buffers in current pool
 	cmdBufferPools[g_StudioAPIVk.GetCurrentFrameInFlight()].FreeUnusedCmdBuffers();
@@ -138,7 +138,7 @@ CStudioAPICmdContextVk::EndFrame
 */
 void CStudioAPICmdContextVk::EndFrame()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Reset pending states
 	if ( pPendingRenderState )
@@ -161,7 +161,7 @@ CStudioAPICmdContextVk::SetRenderPipeline
 */
 void CStudioAPICmdContextVk::SetRenderPipeline( CStudioAPICmdListVk* pCmdList, CStudioAPIRenderPipelineVk* pRenderPipeline )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( pPendingRenderState );
 	if ( pPendingRenderState->SetRenderPipeline( pRenderPipeline, !pCmdList->HasPipeline() ) )
 	{
@@ -176,7 +176,7 @@ CStudioAPICmdContextVk::SetVertexBuffer
 */
 void CStudioAPICmdContextVk::SetVertexBuffer( CStudioAPICmdListVk* pCmdList, uint32 slot, CStudioAPIBufferVk* pVertexBuffer, uint64 offset )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( pPendingRenderState );
 	pPendingRenderState->SetVertexBuffer( pCmdList, slot, pVertexBuffer, offset );
 }
@@ -188,7 +188,7 @@ CStudioAPICmdContextVk::SetConstantBuffer
 */
 void CStudioAPICmdContextVk::SetConstantBuffer( CStudioAPICmdListVk* pCmdList, uint32 set, uint32 slot, CStudioAPIBufferVk* pConstantBuffer )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	pPendingRenderState->SetConstantBuffer( pCmdList, set, slot, pConstantBuffer );
 }
 
@@ -199,7 +199,7 @@ CStudioAPICmdContextVk::SetTexture
 */
 void CStudioAPICmdContextVk::SetTexture( CStudioAPICmdListVk* pCmdList, uint32 set, uint32 slot, CStudioAPITextureVk* pTexture )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	pPendingRenderState->SetTexture( pCmdList, set, slot, pTexture );
 }
 
@@ -210,7 +210,7 @@ CStudioAPICmdContextVk::SetSampler
 */
 void CStudioAPICmdContextVk::SetSampler( CStudioAPICmdListVk* pCmdList, uint32 set, uint32 slot, CStudioAPISamplerVk* pSampler )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	pPendingRenderState->SetSampler( pCmdList, set, slot, pSampler );
 }
 
@@ -221,7 +221,7 @@ CStudioAPICmdContextVk::SetViewport
 */
 void CStudioAPICmdContextVk::SetViewport( CStudioAPICmdListVk* pCmdList, float x, float y, float width, float height, float minDepth, float maxDepth )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( pPendingRenderState );
 	pPendingRenderState->SetViewport( x, y, width, height, minDepth, maxDepth );
 }
@@ -233,7 +233,7 @@ CStudioAPICmdContextVk::SetScissor
 */
 void CStudioAPICmdContextVk::SetScissor( CStudioAPICmdListVk* pCmdList, int32 x, int32 y, uint32 width, uint32 height )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( pPendingRenderState );
 	pPendingRenderState->SetScissor( true, x, y, width, height );
 }
@@ -245,7 +245,7 @@ CStudioAPICmdContextVk::Draw
 */
 void CStudioAPICmdContextVk::Draw( CStudioAPICmdListVk* pCmdList, uint32 baseVertexIndex, uint32 numVertices, uint32 numInstances /* = 1 */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( pPendingRenderState );
 	AssertMsg( pCmdList->HasPipeline() && pCmdList->GetState() == STUDIOAPI_VK_CMDLIST_STATE_IS_INSIDE_RENDER_PASS, "To draw must be set a render pass and a render pipeline" );
 	pPendingRenderState->PrepareForDraw( pCmdList );
@@ -259,7 +259,7 @@ CStudioAPICmdContextVk::DrawIndexed
 */
 void CStudioAPICmdContextVk::DrawIndexed( CStudioAPICmdListVk* pCmdList, CStudioAPIBufferVk* pIndexBuffer, uint32 baseVertexIndex, uint32 baseIndex, uint32 numIndices, uint32 numInstances /* = 1 */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( pPendingRenderState );
 	AssertMsg( pCmdList->HasPipeline() && pCmdList->GetState() == STUDIOAPI_VK_CMDLIST_STATE_IS_INSIDE_RENDER_PASS, "To draw must be set a render pass and a render pipeline" );
 	pPendingRenderState->SetIndexBuffer( pCmdList, pIndexBuffer, 0 );
@@ -274,7 +274,7 @@ CStudioAPICmdContextVk::AddPendingBufferBarriers
 */
 void CStudioAPICmdContextVk::AddPendingBufferBarriers( CStudioAPICmdListVk* pCmdList, uint32 numBufferBarriers, const VkBufferMemoryBarrier* pVkBufferMemoryBarriers, VkPipelineStageFlags vkSrcStageMask, VkPipelineStageFlags vkDstStageMask )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// If the context hasn't support of render commands then unset flags which only for a render pipeline
 	if ( !HasSupportQueueTypes( STUDIOAPI_VK_QUEUE_FLAG_GRAPHICS ) )
@@ -330,7 +330,7 @@ CStudioAPICmdContextVk::AddPendingImageBarriers
 */
 void CStudioAPICmdContextVk::AddPendingImageBarriers( CStudioAPICmdListVk* pCmdList, uint32 numImageBarriers, const VkImageMemoryBarrier* pVkImageMemoryBarrier, VkPipelineStageFlags vkSrcStageMask, VkPipelineStageFlags vkDstStageMask )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// If the context hasn't support of render commands then unset flags which only for a render pipeline
 	if ( !HasSupportQueueTypes( STUDIOAPI_VK_QUEUE_FLAG_GRAPHICS ) )
@@ -386,7 +386,7 @@ CStudioAPICmdContextVk::AddPendingMemoryBarriers
 */
 void CStudioAPICmdContextVk::AddPendingMemoryBarriers( CStudioAPICmdListVk* pCmdList, uint32 numMemoryBarriers, const VkMemoryBarrier* pVkMemoryBarrier, VkPipelineStageFlags vkSrcStageMask, VkPipelineStageFlags vkDstStageMask )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// If the context hasn't support of render commands then unset flags which only for a render pipeline
 	if ( !HasSupportQueueTypes( STUDIOAPI_VK_QUEUE_FLAG_GRAPHICS ) )
@@ -442,7 +442,7 @@ CStudioAPICmdContextVk::FlushPendingBarriers
 */
 void CStudioAPICmdContextVk::FlushPendingBarriers( CStudioAPICmdListVk* pCmdList )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	if ( pendingBufferBarriers.numPendingBarriers > 0 || pendingImageBarriers.numPendingBarriers > 0 || pendingMemoryBarriers.numPendingBarriers > 0 )
 	{

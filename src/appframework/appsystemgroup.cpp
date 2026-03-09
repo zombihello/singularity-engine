@@ -1,5 +1,5 @@
 #include "pch_appframework.h"
-#include "tier0/profile.h"
+#include "tier0/iprofiler.h"
 #include "appframework/application.h"
 #include "appframework/appsystemgroup.h"
 
@@ -163,7 +163,7 @@ CAppSystemGroup::FindSystem
 */
 void* CAppSystemGroup::FindSystem( const char* pInterfaceName ) const
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	auto it = systemDict.find( pInterfaceName );
 	if ( it != systemDict.end() )
 	{
@@ -338,7 +338,7 @@ CAppSystemGroup::FindSystemName
 */
 const char* CAppSystemGroup::FindSystemName( int32 sysIndex ) const
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	for ( auto it = systemDict.begin(), itEnd = systemDict.end(); it != itEnd; ++it )
 	{
 		if ( it->second == sysIndex )

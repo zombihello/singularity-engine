@@ -4,7 +4,7 @@
 	#include <mimalloc.h>
 	#include "tier0/memalloc_mimalloc.h"
 
-	#define MEMALLOC_MIMALLOC_NAME "MemAlloc Mimalloc"
+static const char* s_pMemAllocName = "MemAlloc Mimalloc";
 
 /*
 ==================
@@ -13,13 +13,11 @@ CMemAllocMimalloc::TryMalloc
 */
 void* CMemAllocMimalloc::TryMalloc( size numBytes, uint32 alignment /*= 0*/ )
 {
-	PROFILE_SCOPE()
 	alignment	  = GetAlignment( numBytes, alignment );
 	void* pNewPtr = mi_malloc_aligned( numBytes, alignment );
 	if ( pNewPtr )
 	{
-		// TODO BS yehor.pohuliaka - CIT-13 Integrate Tracy profiler
-		// PROFILER_MEM_ALLOC( pNewPtr, Align( numBytes, alignment ), MEMALLOC_MIMALLOC_NAME );
+		PROFILER_MEM_ALLOC( pNewPtr, Align( numBytes, alignment ), s_pMemAllocName );
 	}
 	return pNewPtr;
 }
@@ -31,7 +29,6 @@ CMemAllocMimalloc::TryRealloc
 */
 void* CMemAllocMimalloc::TryRealloc( void* pOriginal, size numBytes, uint32 alignment /*= 0*/ )
 {
-	PROFILE_SCOPE()
 	alignment	  = GetAlignment( numBytes, alignment );
 	void* pNewPtr = NULL;
 
@@ -50,13 +47,11 @@ void* CMemAllocMimalloc::TryRealloc( void* pOriginal, size numBytes, uint32 alig
 
 	if ( pOriginal )
 	{
-		// TODO BS yehor.pohuliaka - CIT-13 Integrate Tracy profiler
-		// PROFILER_MEM_FREE( pOriginal, MEMALLOC_MIMALLOC_NAME );
+		PROFILER_MEM_FREE( pOriginal, s_pMemAllocName );
 	}
 	if ( pNewPtr )
 	{
-		// TODO BS yehor.pohuliaka - CIT-13 Integrate Tracy profiler
-		// PROFILER_MEM_ALLOC( pNewPtr, Align( numBytes, alignment ), MEMALLOC_MIMALLOC_NAME );
+		PROFILER_MEM_ALLOC( pNewPtr, Align( numBytes, alignment ), s_pMemAllocName );
 	}
 	return pNewPtr;
 }
@@ -68,12 +63,10 @@ CMemAllocMimalloc::Free
 */
 void CMemAllocMimalloc::Free( void* pOriginal )
 {
-	PROFILE_SCOPE()
 	if ( pOriginal )
 	{
 		mi_free( pOriginal );
-		// TODO BS yehor.pohuliaka - CIT-13 Integrate Tracy profiler
-		// PROFILER_MEM_FREE( pOriginal, MEMALLOC_MIMALLOC_NAME );
+		PROFILER_MEM_FREE( pOriginal, s_pMemAllocName );
 	}
 }
 
@@ -84,7 +77,6 @@ CMemAllocMimalloc::Trim
 */
 void CMemAllocMimalloc::Trim( bool bTrimThreadCaches )
 {
-	PROFILE_SCOPE()
 	mi_collect( bTrimThreadCaches );
 }
 
@@ -105,7 +97,6 @@ CMemAllocMimalloc::GetAllocationSize
 */
 bool CMemAllocMimalloc::GetAllocationSize( void* pOriginal, size& numBytes ) const
 {
-	PROFILE_SCOPE()
 	numBytes = mi_malloc_size( pOriginal );
 	return true;
 }

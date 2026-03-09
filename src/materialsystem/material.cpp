@@ -151,7 +151,7 @@ CMaterial::R_UpdateBuffers
 */
 void CMaterial::R_UpdateBuffers( IStudioAPICmdContext* pCmdContext )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( pShader );
 
 	// Do nothing if buffers aren't dirty
@@ -183,7 +183,7 @@ CMaterial::R_Barrier
 */
 void CMaterial::R_Barrier( IStudioAPICmdList* pStudioAPICmdList )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( pShader );
 
 	// Update buffers
@@ -200,7 +200,7 @@ CMaterial::R_PrepareForDraw
 */
 void CMaterial::R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, studioRenderPassType_t renderPassType )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( pShader );
 
 	// Update buffers
@@ -217,7 +217,7 @@ CMaterial::SetShader
 */
 void CMaterial::SetShader( const char* pShaderName )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 
 	// Clear the material
 	Clear();

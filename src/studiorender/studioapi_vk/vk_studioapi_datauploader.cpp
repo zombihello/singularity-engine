@@ -104,7 +104,7 @@ CStudioAPIDataUploaderVk::SubmitCmdBuffer
 */
 void CStudioAPIDataUploaderVk::SubmitCmdBuffer( bool bWait /* = false */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Submit current staging buffer if it need
 	stagingBuffer_t& stagingBuffer = stagingBuffers[currentStagingBufferIndex];

@@ -75,7 +75,7 @@ private:
 	void		 ExecPendingFreeCmdBuffer( cmdBuffer_t& cmdBuffer ) const;
 
 #if STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
-	mutable uint64												memoryUsage;
+	mutable uint64												  memoryUsage;
 	mutable eastl::unordered_map<VmaAllocation, allocationInfo_t> allocationDict;
 #endif	// STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
 	VmaAllocator		vmaAllocator;

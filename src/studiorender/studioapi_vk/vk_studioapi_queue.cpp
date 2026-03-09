@@ -98,7 +98,7 @@ CStudioAPIQueueVk::Submit
 */
 void CStudioAPIQueueVk::Submit( VkSubmitInfo* pVkSubmitInfos, uint32 numVkSubmitInfos, CStudioAPIFenceVk* pFence /* = NULL */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	VkFence vkFence = pFence ? pFence->GetVkFence() : VK_NULL_HANDLE;
 	STUDIOAPI_VK_VERIFY_RESULT( vkQueueSubmit( vkQueue, numVkSubmitInfos, pVkSubmitInfos, vkFence ) );
 }

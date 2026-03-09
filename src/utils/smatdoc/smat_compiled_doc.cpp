@@ -1,5 +1,5 @@
 #include "utils/interfaces/interfaces.h"
-#include "tier0/profile.h"
+#include "tier0/iprofiler.h"
 #include "filesystem/ifilesystem.h"
 #include "utils/smatdoc/smat_compiled_doc.h"
 
@@ -19,7 +19,7 @@ CSMATCompiledMaterialDoc::SaveFile
 bool CSMATCompiledMaterialDoc::SaveFile( const char* pPath )
 {
 	// Do nothing if the file system isn't valid
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	Assert( g_pFileSystem );
 
 	// Try to open a file
@@ -150,7 +150,7 @@ CSMATCompiledMaterialDoc::LoadFromFile
 bool CSMATCompiledMaterialDoc::LoadFromFile( const char* pPath )
 {
 	// Do nothing if the file system isn't valid
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	Assert( g_pFileSystem );
 
 	// Try to open a file

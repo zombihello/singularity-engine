@@ -1,4 +1,4 @@
-#include "tier0/profile.h"
+#include "tier0/iprofiler.h"
 #include "tier0/ilogger.h"
 #include "tools/ecscompiler/ecscppgenerator.h"
 
@@ -18,29 +18,29 @@ static_assert( ARRAYSIZE( s_pEcsSystemStageNames ) == ECS_SYSTEM_NUM_STAGES, "Si
 
 // Table for convert profiler group to profileScopeGroup_t
 static eastl::pair<const char*, const char*> s_pProfilerScopeGroupNames[] = {
-	{ "none", "PROFILE_SCOPE_GROUP_NONE" },				 // PROFILE_SCOPE_GROUP_NONE
-	{ "ai", "PROFILE_SCOPE_GROUP_AI" },					 // PROFILE_SCOPE_GROUP_AI
-	{ "animation", "PROFILE_SCOPE_GROUP_ANIMATION" },	 // PROFILE_SCOPE_GROUP_ANIMATION
-	{ "audio", "PROFILE_SCOPE_GROUP_AUDIO" },			 // PROFILE_SCOPE_GROUP_AUDIO
-	{ "debug", "PROFILE_SCOPE_GROUP_DEBUG" },			 // PROFILE_SCOPE_GROUP_DEBUG
-	{ "camera", "PROFILE_SCOPE_GROUP_CAMERA" },			 // PROFILE_SCOPE_GROUP_CAMERA
-	{ "cloth", "PROFILE_SCOPE_GROUP_CLOTH" },			 // PROFILE_SCOPE_GROUP_CLOTH
-	{ "gamelogic", "PROFILE_SCOPE_GROUP_GAMELOGIC" },	 // PROFILE_SCOPE_GROUP_GAMELOGIC
-	{ "input", "PROFILE_SCOPE_GROUP_INPUT" },			 // PROFILE_SCOPE_GROUP_INPUT
-	{ "navigation", "PROFILE_SCOPE_GROUP_NAVIGATION" },	 // PROFILE_SCOPE_GROUP_NAVIGATION
-	{ "network", "PROFILE_SCOPE_GROUP_NETWORK" },		 // PROFILE_SCOPE_GROUP_NETWORK
-	{ "physics", "PROFILE_SCOPE_GROUP_PHYSICS" },		 // PROFILE_SCOPE_GROUP_PHYSICS
-	{ "rendering", "PROFILE_SCOPE_GROUP_PHYSICS" },		 // PROFILE_SCOPE_GROUP_PHYSICS
-	{ "scene", "PROFILE_SCOPE_GROUP_SCENE" },			 // PROFILE_SCOPE_GROUP_SCENE
-	{ "script", "PROFILE_SCOPE_GROUP_SCRIPT" },			 // PROFILE_SCOPE_GROUP_SCRIPT
-	{ "streaming", "PROFILE_SCOPE_GROUP_STREAMING" },	 // PROFILE_SCOPE_GROUP_STREAMING
-	{ "ui", "PROFILE_SCOPE_GROUP_UI" },					 // PROFILE_SCOPE_GROUP_UI
-	{ "vfx", "PROFILE_SCOPE_GROUP_VFX" },				 // PROFILE_SCOPE_GROUP_VFX
-	{ "visibility", "PROFILE_SCOPE_GROUP_VISIBILITY" },	 // PROFILE_SCOPE_GROUP_VISIBILITY
-	{ "wait", "PROFILE_SCOPE_GROUP_WAIT" },				 // PROFILE_SCOPE_GROUP_WAIT
-	{ "io", "PROFILE_SCOPE_GROUP_IO" }					 // PROFILE_SCOPE_GROUP_IO
+	{ "none", "PROFILER_SCOPE_GROUP_NONE" },			  // PROFILER_SCOPE_GROUP_NONE
+	{ "ai", "PROFILER_SCOPE_GROUP_AI" },				  // PROFILER_SCOPE_GROUP_AI
+	{ "animation", "PROFILER_SCOPE_GROUP_ANIMATION" },	  // PROFILER_SCOPE_GROUP_ANIMATION
+	{ "audio", "PROFILER_SCOPE_GROUP_AUDIO" },			  // PROFILER_SCOPE_GROUP_AUDIO
+	{ "debug", "PROFILER_SCOPE_GROUP_DEBUG" },			  // PROFILER_SCOPE_GROUP_DEBUG
+	{ "camera", "PROFILER_SCOPE_GROUP_CAMERA" },		  // PROFILER_SCOPE_GROUP_CAMERA
+	{ "cloth", "PROFILER_SCOPE_GROUP_CLOTH" },			  // PROFILER_SCOPE_GROUP_CLOTH
+	{ "gamelogic", "PROFILER_SCOPE_GROUP_GAMELOGIC" },	  // PROFILER_SCOPE_GROUP_GAMELOGIC
+	{ "input", "PROFILER_SCOPE_GROUP_INPUT" },			  // PROFILER_SCOPE_GROUP_INPUT
+	{ "navigation", "PROFILER_SCOPE_GROUP_NAVIGATION" },  // PROFILER_SCOPE_GROUP_NAVIGATION
+	{ "network", "PROFILER_SCOPE_GROUP_NETWORK" },		  // PROFILER_SCOPE_GROUP_NETWORK
+	{ "physics", "PROFILER_SCOPE_GROUP_PHYSICS" },		  // PROFILER_SCOPE_GROUP_PHYSICS
+	{ "rendering", "PROFILER_SCOPE_GROUP_RENDERING" },	  // PROFILER_SCOPE_GROUP_RENDERING
+	{ "scene", "PROFILER_SCOPE_GROUP_SCENE" },			  // PROFILER_SCOPE_GROUP_SCENE
+	{ "script", "PROFILER_SCOPE_GROUP_SCRIPT" },		  // PROFILER_SCOPE_GROUP_SCRIPT
+	{ "streaming", "PROFILER_SCOPE_GROUP_STREAMING" },	  // PROFILER_SCOPE_GROUP_STREAMING
+	{ "ui", "PROFILER_SCOPE_GROUP_UI" },				  // PROFILER_SCOPE_GROUP_UI
+	{ "vfx", "PROFILER_SCOPE_GROUP_VFX" },				  // PROFILER_SCOPE_GROUP_VFX
+	{ "visibility", "PROFILER_SCOPE_GROUP_VISIBILITY" },  // PROFILER_SCOPE_GROUP_VISIBILITY
+	{ "wait", "PROFILER_SCOPE_GROUP_WAIT" },			  // PROFILER_SCOPE_GROUP_WAIT
+	{ "io", "PROFILER_SCOPE_GROUP_IO" }					  // PROFILER_SCOPE_GROUP_IO
 };
-static_assert( ARRAYSIZE( s_pProfilerScopeGroupNames ) == PROFILE_SCOPE_NUM_GROUPS, "Size of s_pProfilerScopeGroupNames must be equal to PROFILE_SCOPE_NUM_GROUPS" );
+static_assert( ARRAYSIZE( s_pProfilerScopeGroupNames ) == PROFILER_SCOPE_NUM_GROUPS, "Size of s_pProfilerScopeGroupNames must be equal to PROFILER_SCOPE_NUM_GROUPS" );
 
 /*
 ==================
@@ -70,7 +70,7 @@ ConvTextToProfilerScopeGroup
 static bool ConvTextToProfilerScopeGroup( const char* pName, const char*& pProfilerScopeGroup )
 {
 	pProfilerScopeGroup = NULL;
-	for ( uint32 groupIdx = 0; groupIdx < PROFILE_SCOPE_NUM_GROUPS; ++groupIdx )
+	for ( uint32 groupIdx = 0; groupIdx < PROFILER_SCOPE_NUM_GROUPS; ++groupIdx )
 	{
 		if ( !S_Stricmp( pName, s_pProfilerScopeGroupNames[groupIdx].first ) )
 		{
@@ -547,7 +547,7 @@ eastl::string CEcsCppGenerator::GenerateRegistrarConstructor( CEcsStubModule* pE
 								 readWriteFuncs.c_str(),
 								 filterFuncs.c_str(),
 								 !updateParams.empty() ? S_Sprintf( ", %s", updateParams.c_str() ).c_str() : "",
-								 pProfilerScopeGroupName ? S_Sprintf( "\t\t\t\tPROFILE_SCOPE( %s );\n", pProfilerScopeGroupName ).c_str() : "",
+								 pProfilerScopeGroupName ? S_Sprintf( "\t\t\t\tPROFILER_SCOPE_FUNC_GROUP( %s );\n", pProfilerScopeGroupName ).c_str() : "",
 								 pEcsStubSystem->GetName(),
 								 !callUpdateParams.empty() ? S_Sprintf( ", %s", callUpdateParams.c_str() ).c_str() : "" );
 			if ( systemIdx + 1 < numSystems )
@@ -646,7 +646,7 @@ void CEcsCppGenerator::GenerateImplementationEcsReadDataFuncs( CEcsStubModule* p
 			buffer += "*/\n";
 			buffer += S_Sprintf( "static void EcsReadData( const CSENTEntityDescComponent& sentComponent, ecsComponent%s_t& component )\n"
 								 "{\n"
-								 "\tPROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );\n"
+								 "\tPROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );\n"
 								 "%s\n"
 								 "}\n",
 								 pEcsStubComponent->GetName(), sentReadDataFields.c_str() );

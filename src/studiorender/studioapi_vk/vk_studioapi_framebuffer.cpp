@@ -15,7 +15,7 @@ CStudioAPIFrameBufferVk::CStudioAPIFrameBufferVk( const studioAPIFrameBufferCrea
 	, pStudioAPIVkShutdownDelegate( NULL )
 	, numClearValues( 0 )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	uint32					numImageViews		   = 0;
 	CStudioAPIRenderPassVk* pStudioAPIRenderPassVk = (CStudioAPIRenderPassVk*)createInfo.pRenderPass;
 	VkImageView				vkImageViews[STUDIOAPI_MAX_SIMULTANEOUS_RENDER_TARGETS + 1];
@@ -99,7 +99,7 @@ CStudioAPIFrameBufferVk::~CStudioAPIFrameBufferVk
 */
 CStudioAPIFrameBufferVk::~CStudioAPIFrameBufferVk()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Destroy the Vulkan frame buffer
 	if ( vkFrameBuffer != VK_NULL_HANDLE )

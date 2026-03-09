@@ -19,7 +19,7 @@ void* operator new( size numBytes )
 operator delete
 ==================
 */
-void operator delete( void* pPtr ) noexcept
+void operator delete( void* pPtr )
 {
 	Mem_Free( pPtr );
 }
@@ -39,7 +39,7 @@ void* operator new[]( size numBytes )
 operator delete[]
 ==================
 */
-void operator delete[]( void* pPtr ) noexcept
+void operator delete[]( void* pPtr )
 {
 	Mem_Free( pPtr );
 }

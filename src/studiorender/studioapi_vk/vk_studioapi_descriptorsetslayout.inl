@@ -27,7 +27,7 @@ CStudioAPIDescriptorSetsLayoutVk::GetNumUsedDescriptorTypes
 */
 FORCEINLINE uint32 CStudioAPIDescriptorSetsLayoutVk::GetNumUsedDescriptorTypes( VkDescriptorType vkDescriptorType ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	auto it = numUsedDescriptorTypesDict.find( vkDescriptorType );
 	if ( it != numUsedDescriptorTypesDict.end() )
 	{

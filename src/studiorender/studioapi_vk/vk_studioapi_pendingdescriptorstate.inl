@@ -7,7 +7,7 @@ CStudioAPIDescriptorStateCommonVk::Reset
 */
 FORCEINLINE void CStudioAPIDescriptorStateCommonVk::Reset()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Mem_Memzero( descriptorSetWriteContainer.vkDescriptorBufferInfos.data(), descriptorSetWriteContainer.vkDescriptorBufferInfos.size() * sizeof( VkDescriptorBufferInfo ) );
 	Mem_Memzero( descriptorSetWriteContainer.vkDescriptorImageInfos.data(), descriptorSetWriteContainer.vkDescriptorImageInfos.size() * sizeof( VkDescriptorImageInfo ) );
 	for ( uint32 index = 0, count = (uint32)descriptorSetWriteContainer.studioAPIBuffers.size(); index < count; ++index )
@@ -34,7 +34,7 @@ CStudioAPIDescriptorStateRenderVk::BindDescriptorSets
 */
 FORCEINLINE void CStudioAPIDescriptorStateRenderVk::BindDescriptorSets( CStudioAPICmdListVk* pCmdList )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	if ( !vkDescriptorSets.empty() )
 	{
 		CStudioAPIBoundShaderStateVk* pBoundShaderState = pRenderPipeline->GetBoundShaderState();

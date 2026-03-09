@@ -27,7 +27,7 @@ CMaterial::DestroyBuffers
 */
 FORCEINLINE void CMaterial::DestroyBuffers()
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 
 	// Remove buffers, do they on the render thread to make sure that it will be destroyed at the render thread
 	if ( !studioAPIBuffers.empty() )

@@ -296,7 +296,7 @@ CInputSystem::OnInputEvent
 */
 void CInputSystem::OnInputEvent( void* pUserData, const inputEvent_t& inputEvent )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_INPUT );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_INPUT );
 	Assert( pUserData );
 	CInputSystem* pInputSystem = (CInputSystem*)pUserData;
 	if ( inputEvent.windowId != pInputSystem->windowId )
@@ -372,7 +372,7 @@ CInputSystem::OnWriteConCmdsToConfigFile
 */
 void CInputSystem::OnWriteConCmdsToConfigFile( void* pUserData, IStreamDataWriter* pStreamData )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	Assert( pUserData );
 	CInputSystem* pInputSystem = (CInputSystem*)pUserData;
 
@@ -452,7 +452,7 @@ CInputSystem::ExecCommand
 */
 void CInputSystem::ExecBindingCommand( buttonCode_t button )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_INPUT );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_INPUT );
 	Assert( button < BUTTON_CODE_COUNT );
 	if ( !binds[button].empty() )
 	{
@@ -646,7 +646,7 @@ Bind command
 */
 CON_COMMAND( bind, "Bind a key", FCVAR_NONE )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_INPUT );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_INPUT );
 	if ( argc < 2 || !argv )
 	{
 		Msg( "InputSystem: bind <key> <command> : Attach a command to a key" );
@@ -675,7 +675,7 @@ Unbind command
 */
 CON_COMMAND( unbind, "Unbind a key", FCVAR_NONE )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_INPUT );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_INPUT );
 	if ( argc < 1 || !argv )
 	{
 		Msg( "InputSystem: unbind <key> : Remove commands from a key" );
@@ -704,7 +704,7 @@ UnbindAll command
 */
 CON_COMMAND( unbindall, "Unbind all keys", FCVAR_NONE )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_INPUT );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_INPUT );
 	s_InputSystem.UnbindAll();
 	Msg( "InputSystem: unbindall: All keys has been unbind" );
 }

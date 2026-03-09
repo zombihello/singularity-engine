@@ -19,7 +19,7 @@ CStudioAPIPendingComputeStateVk::PrepareForDispatch
 */
 void CStudioAPIPendingComputeStateVk::PrepareForDispatch( CStudioAPICmdListVk* pCmdList )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Flush all pending barriers
 	cmdContext.FlushPendingBarriers( pCmdList );
@@ -50,7 +50,7 @@ CStudioAPIPendingRenderStateVk::~CStudioAPIPendingRenderStateVk
 */
 CStudioAPIPendingRenderStateVk::~CStudioAPIPendingRenderStateVk()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	for ( auto it = descriptorStatesDict.begin(), itEnd = descriptorStatesDict.end(); it != itEnd; ++it )
 	{
 		delete it->second.pRenderDescriptorState;
@@ -65,7 +65,7 @@ CStudioAPIPendingRenderStateVk::Reset
 */
 void CStudioAPIPendingRenderStateVk::Reset()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	pCurrentRenderPipeline		  = NULL;
 	pCurrentRenderDescriptorState = NULL;
 	bScissorEnabled				  = false;
@@ -88,7 +88,7 @@ CStudioAPIPendingRenderStateVk::SetVertexBuffer
 */
 void CStudioAPIPendingRenderStateVk::SetVertexBuffer( CStudioAPICmdListVk* pCmdList, uint32 slot, CStudioAPIBufferVk* pBuffer, uint64 offset )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	vertexBuffer_t& vertexBuffer = vertexBuffers[slot];
 	if ( vertexBuffer.pBuffer != pBuffer || vertexBuffer.offset != offset || vertexBuffer.pBuffer->GetVkBuffer() != pBuffer->GetVkBuffer() || vertexBuffer.pBuffer->GetOffset() != pBuffer->GetOffset() )
 	{
@@ -109,7 +109,7 @@ CStudioAPIPendingRenderStateVk::SetIndexBuffer
 */
 void CStudioAPIPendingRenderStateVk::SetIndexBuffer( CStudioAPICmdListVk* pCmdList, CStudioAPIBufferVk* pBuffer, uint64 offset )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	if ( indexBuffer.pBuffer != pBuffer || indexBuffer.offset != offset || indexBuffer.pBuffer->GetVkBuffer() != pBuffer->GetVkBuffer() || indexBuffer.pBuffer->GetOffset() != pBuffer->GetOffset() )
 	{
 		// Update a synchronization state of the buffer
@@ -129,7 +129,7 @@ CStudioAPIPendingRenderStateVk::SetConstantBuffer
 */
 void CStudioAPIPendingRenderStateVk::SetConstantBuffer( CStudioAPICmdListVk* pCmdList, uint32 set, uint32 slot, CStudioAPIBufferVk* pConstantBuffer )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( pCurrentRenderDescriptorState );
 	pCurrentRenderDescriptorState->SetConstantBuffer( pCmdList, set, slot, pConstantBuffer );
 }
@@ -141,7 +141,7 @@ CStudioAPIPendingRenderStateVk::SetTexture
 */
 void CStudioAPIPendingRenderStateVk::SetTexture( CStudioAPICmdListVk* pCmdList, uint32 set, uint32 slot, CStudioAPITextureVk* pTexture )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( pCurrentRenderDescriptorState );
 	pCurrentRenderDescriptorState->SetTexture( pCmdList, set, slot, pTexture );
 }
@@ -153,7 +153,7 @@ CStudioAPIPendingRenderStateVk::SetSampler
 */
 void CStudioAPIPendingRenderStateVk::SetSampler( CStudioAPICmdListVk* pCmdList, uint32 set, uint32 slot, CStudioAPISamplerVk* pSampler )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( pCurrentRenderDescriptorState );
 	pCurrentRenderDescriptorState->SetSampler( pCmdList, set, slot, pSampler );
 }
@@ -165,7 +165,7 @@ CStudioAPIPendingRenderStateVk::SetRenderPipeline
 */
 bool CStudioAPIPendingRenderStateVk::SetRenderPipeline( CStudioAPIRenderPipelineVk* pRenderPipeline, bool bForceReset )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Change a pipeline if different
 	bool bChanged = bForceReset;
@@ -210,7 +210,7 @@ CStudioAPIPendingRenderStateVk::UpdateDynamicStates
 */
 void CStudioAPIPendingRenderStateVk::UpdateDynamicStates( CStudioAPICmdListVk* pCmdList )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Update viewport if it need
 	bool bNeedUpdateViewport = !pCmdList->HasViewport() || Mem_Memcmp( &vkViewport, &pCmdList->GetVkCurrentViewport(), sizeof( VkViewport ) ) != 0;
@@ -239,7 +239,7 @@ CStudioAPIPendingRenderStateVk::PrepareForDraw
 */
 void CStudioAPIPendingRenderStateVk::PrepareForDraw( CStudioAPICmdListVk* pCmdList )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Update dynamic states
 	UpdateDynamicStates( pCmdList );
@@ -295,7 +295,7 @@ CStudioAPIPendingRenderStateVk::OndRenderPipelineDeleted
 */
 void CStudioAPIPendingRenderStateVk::OndRenderPipelineDeleted( void* pUserData, CStudioAPIRenderPipelineVk* pRenderPipeline )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	CStudioAPIPendingRenderStateVk* pPendingRenderState = (CStudioAPIPendingRenderStateVk*)pUserData;
 	auto							it					= pPendingRenderState->descriptorStatesDict.find( pRenderPipeline );
 	if ( it != pPendingRenderState->descriptorStatesDict.end() )

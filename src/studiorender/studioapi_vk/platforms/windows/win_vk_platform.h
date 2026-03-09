@@ -21,7 +21,7 @@
  */
 FORCEINLINE VkSurfaceKHR VK_Plat_CreateSurfaceKHR( VkInstance vkInstance, windowHandle_t windowHandle )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( windowHandle && vkCreateWin32SurfaceKHR );
 	VkSurfaceKHR vkSurface;
 

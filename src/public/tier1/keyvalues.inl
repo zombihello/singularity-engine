@@ -104,7 +104,7 @@ CKeyValues::LoadFromFile
 FORCEINLINE bool CKeyValues::LoadFromFile( const char* pPath )
 {
 	// Do nothing if file system isn't valid
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	Assert( g_pFileSystem );
 
 	// Try open file
@@ -125,7 +125,7 @@ CKeyValues::LoadFromBuffer
 */
 FORCEINLINE bool CKeyValues::LoadFromBuffer( const char* pBuffer, uint64 size )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	CStreamDataMemoryReader streamReader( (byte*)pBuffer, size );
 	return LoadFromStream( &streamReader );
 }
@@ -138,7 +138,7 @@ CKeyValues::SaveToFile
 FORCEINLINE bool CKeyValues::SaveToFile( const char* pPath ) const
 {
 	// Do nothing if file system isn't valid
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	Assert( g_pFileSystem );
 
 	// Try to open a file
@@ -161,7 +161,7 @@ CKeyValues::SaveToBuffer
 */
 FORCEINLINE void CKeyValues::SaveToBuffer( eastl::vector<byte>& buffer ) const
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	CStreamDataMemoryWriter streamWriter( buffer );
 	return SaveToStream( &streamWriter );
 }

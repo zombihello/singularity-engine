@@ -7,6 +7,11 @@
 // Pending free command buffer size
 #define STUDIOAPI_VK_PENDING_FREE_CMDBUFFER_SIZE 10 * 1024 * 1024  // 10MB
 
+// Vulkan memory allocator name
+#if STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
+static const char* s_pVmaName = "Vulkan Memory Allocator";
+#endif	// STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
+
 /*
 ==================
 CStudioAPIMemoryMgrVk::CStudioAPIMemoryMgrVk
@@ -107,7 +112,7 @@ CStudioAPIMemoryMgrVk::AllocateBuffer
 */
 VmaAllocation CStudioAPIMemoryMgrVk::AllocateBuffer( const char* pDebugTag, const VkBufferCreateInfo& vkBufferCreateInfo, const VmaAllocationCreateInfo& vmaAllocationCreateInfo, VkBuffer& vkBuffer, VkDeviceSize* pAllocatedSize /* = NULL */ ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Create a buffer
 	Assert( vkBufferCreateInfo.size > 0 );
@@ -148,6 +153,7 @@ VmaAllocation CStudioAPIMemoryMgrVk::AllocateBuffer( const char* pDebugTag, cons
 	allocationInfo.type				 = ALLOCATION_TYPE_BUFFER;
 	allocationInfo.size				 = vmaAllocationInfo.size;
 	memoryUsage += vmaAllocationInfo.size;
+	PROFILER_MEM_ALLOC( (void*)vkBuffer, allocationInfo.size, s_pVmaName );
 #endif	// STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
 
 	// We are done!
@@ -161,7 +167,7 @@ CStudioAPIMemoryMgrVk::AllocateImage
 */
 VmaAllocation CStudioAPIMemoryMgrVk::AllocateImage( const char* pDebugTag, const VkImageCreateInfo& vkImageCreateInfo, const VmaAllocationCreateInfo& vmaAllocationCreateInfo, VkImage& vkImage, VkDeviceSize* pAllocatedSize /* = NULL */ ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Create a image
 	VmaAllocationInfo vmaAllocationInfo = {};
@@ -203,6 +209,7 @@ VmaAllocation CStudioAPIMemoryMgrVk::AllocateImage( const char* pDebugTag, const
 	allocationInfo.type				 = ALLOCATION_TYPE_IMAGE;
 	allocationInfo.size				 = vmaAllocationInfo.size;
 	memoryUsage += vmaAllocationInfo.size;
+	PROFILER_MEM_ALLOC( (void*)vkImage, allocationInfo.size, s_pVmaName );
 #endif	// STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
 
 	// We are done!
@@ -216,7 +223,7 @@ CStudioAPIMemoryMgrVk::DestroyBuffer
 */
 void CStudioAPIMemoryMgrVk::DestroyBuffer( VkBuffer vkBuffer, VmaAllocation vmaAllocation ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Check that VMA allocation and Vulkan handle are valid
 	Assert( vkBuffer != VK_NULL_HANDLE );
@@ -233,6 +240,7 @@ void CStudioAPIMemoryMgrVk::DestroyBuffer( VkBuffer vkBuffer, VmaAllocation vmaA
 	{
 		memoryUsage -= it->second.size;
 		allocationDict.erase( it );
+		PROFILER_MEM_FREE( (void*)vkBuffer, s_pVmaName );
 	}
 	else
 	{
@@ -248,7 +256,7 @@ CStudioAPIMemoryMgrVk::DestroyImage
 */
 void CStudioAPIMemoryMgrVk::DestroyImage( VkImage vkImage, VmaAllocation vmaAllocation ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Check that VMA allocation and Vulkan handle are valid
 	Assert( vkImage != VK_NULL_HANDLE );
@@ -265,6 +273,7 @@ void CStudioAPIMemoryMgrVk::DestroyImage( VkImage vkImage, VmaAllocation vmaAllo
 	{
 		memoryUsage -= it->second.size;
 		allocationDict.erase( it );
+		PROFILER_MEM_FREE( (void*)vkImage, s_pVmaName );
 	}
 	else
 	{
@@ -284,7 +293,7 @@ studioAPIMemoryStatsVk_t CStudioAPIMemoryMgrVk::GetStats() const
 #if STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
 	// Get heap budgets
 	const VkPhysicalDeviceMemoryProperties& vkPhysicalDeviceMemoryProperties = g_StudioAPIVk.GetDevice().GetVkMemoryInfo();
-	eastl::vector<VmaBudget>					vmaBudgets( vkPhysicalDeviceMemoryProperties.memoryHeapCount );
+	eastl::vector<VmaBudget>				vmaBudgets( vkPhysicalDeviceMemoryProperties.memoryHeapCount );
 	vmaGetHeapBudgets( vmaAllocator, vmaBudgets.data() );
 
 	// Calculate total budget
@@ -383,7 +392,7 @@ CStudioAPIMemoryMgrVk::ExecPendingFreeCmdBuffer
 */
 void CStudioAPIMemoryMgrVk::ExecPendingFreeCmdBuffer( cmdBuffer_t& cmdBuffer ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	byte* pReadPtr = cmdBuffer.pBuffer;
 	for ( uint32 cmdIdx = 0; cmdIdx < cmdBuffer.numCmds; ++cmdIdx )
 	{

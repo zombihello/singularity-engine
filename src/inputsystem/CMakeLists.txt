@@ -1,17 +1,6 @@
 cmake_minimum_required( VERSION 3.19 )
 
 #
-# Find third parties
-#
-find_package( SDL3 REQUIRED )
-
-set( THIRDPARTY_INCLUDES					${SDL3_INCLUDE} )
-set( THIRDPARTY_LIBS						${SDL3_LIBS} )
-set( THIRDPARTY_INSTALL_DEBUG_DLLS			${SDL3_INSTALL_DLLS_DEBUG} )
-set( THIRDPARTY_INSTALL_RELEASE_DLLS		${SDL3_INSTALL_DLLS_RELEASE} )
-
-
-#
 # Project settings
 #
 set( SRC_DIR							${CMAKE_CURRENT_SOURCE_DIR} )
@@ -53,9 +42,7 @@ add_library( inputsystem SHARED 	                      	    			${FULL_SRC_FILES}
 target_precompile_headers( inputsystem PRIVATE 								pch_inputsystem.h )
 set_target_properties( inputsystem PROPERTIES FOLDER         				Engine )
 set_target_properties( inputsystem PROPERTIES PREFIX 						"" )
-
-target_include_directories( inputsystem PRIVATE             				${THIRDPARTY_INCLUDES} )
-target_link_libraries( inputsystem PRIVATE									tier0 tier1 interfaces ${THIRDPARTY_LIBS} ${CMAKE_DL_LIBS} )
+target_link_libraries( inputsystem PRIVATE									tier0 tier1 interfaces ${CMAKE_DL_LIBS} )
 add_common_target_defines( inputsystem )
 
 
@@ -63,11 +50,4 @@ add_common_target_defines( inputsystem )
 # Install
 #
 inherit_install_files( inputsystem										TARGETS tier0 tier1 interfaces )
-
-# Binaries
 install_files( inputsystem TARGETS RUNTIME inputsystem 					DESTINATION     bin/${PLATFORM_BIN_DIR}/ )
-install_files( inputsystem FILES ${THIRDPARTY_INSTALL_DEBUG_DLLS}		DESTINATION 	bin/${PLATFORM_BIN_DIR}/	CONFIGURATIONS 	Debug )
-install_files( inputsystem FILES ${THIRDPARTY_INSTALL_RELEASE_DLLS}		DESTINATION 	bin/${PLATFORM_BIN_DIR}/	CONFIGURATIONS 	Release Retail )
-
-# Linceses
-install_files( inputsystem FILES ${SDL3_INSTALL_LICENSES}				DESTINATION 	licenses/sdl3/ )

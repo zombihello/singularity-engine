@@ -218,7 +218,7 @@ CStudioAPISamplerVk::CStudioAPISamplerVk( const studioAPISamplerCreateInfo_t& cr
 	: vkSampler( VK_NULL_HANDLE )
 	, pStudioAPIVkShutdownDelegate( NULL )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	VkSamplerCreateInfo vkSamplerCreateInfo		= {};
 	vkSamplerCreateInfo.sType					= VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
 	vkSamplerCreateInfo.addressModeU			= VK_TranslateSamplerAddressMode( createInfo.addressModeU );
@@ -247,7 +247,7 @@ CStudioAPISamplerVk::~CStudioAPISamplerVk
 */
 CStudioAPISamplerVk::~CStudioAPISamplerVk()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Destroy the sampler
 	if ( vkSampler != VK_NULL_HANDLE )
@@ -298,7 +298,7 @@ CStudioAPITextureVk::CStudioAPITextureVk( studioAPITextureType_t type, uint32 si
 	, vmaAllocation( VK_NULL_HANDLE )
 	, pStudioAPIVkShutdownDelegate( NULL )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	AssertMsg( usageFlags & STUDIOAPI_TEXTURE_USAGE_FLAG_LINEAR ? numMips == 1 && numLayers == 1 : true, "A linear texture must have only 1 mip level and layer" );
 
 	// Convert usage flags into VMA memory usage and Vulkan image usage flags
@@ -438,7 +438,7 @@ CStudioAPITextureVk::~CStudioAPITextureVk
 */
 CStudioAPITextureVk::~CStudioAPITextureVk()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Destroy the image
 	if ( vkImage != VK_NULL_HANDLE )
@@ -470,7 +470,7 @@ CStudioAPITextureVk::UpdateData
 */
 void CStudioAPITextureVk::UpdateData( IStudioAPICmdContext* pCmdContext, byte* pData, uint32 startLayer /* = 0 */, uint32 startMip /* = 0 */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Copy the data by CStudioAPIDataUploaderVk (only for GPU only memory)
 	if ( !( memoryFlags & STUDIOAPI_TEXTURE_MEMORY_FLAG_CPU ) )
@@ -655,7 +655,7 @@ CStudioAPITextureVk::MapMemory
 */
 void CStudioAPITextureVk::MapMemory( uint32 layer, uint32 mip, studioAPIMappedTextureData_t& mappedData )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// We can use MapMemory only for CPU shared memory
 	AssertMsg( memoryFlags & STUDIOAPI_TEXTURE_MEMORY_FLAG_CPU, "The texture doesn't support the map memory, use IStudioAPICmdList::CopyTextureToBuffer" );
@@ -676,7 +676,7 @@ CStudioAPITextureVk::UnmapMemory
 */
 void CStudioAPITextureVk::UnmapMemory( studioAPIMappedTextureData_t& mappedData )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// For linear textures we can use UnmapMemory to read/write data in the texture
 	Assert( mappedData.pData );
@@ -691,7 +691,7 @@ CStudioAPITextureVk::UpdateSyncState
 */
 void CStudioAPITextureVk::UpdateSyncState( const CStudioAPIImageSubresourceRangeVk& subresourceRange, VkImageLayout vkDstImageLayout, VkAccessFlags vkDstAccessMask, VkPipelineStageFlags vkDstStageMask, uint32 dstQueueFamilyIndex )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	studioAPISyncStateImageVk_t& syncState0	   = syncStates[GetSyncStateIndex( subresourceRange.GetStartMip(), subresourceRange.GetStartLayer() )];
 	studioAPISyncStateImageVk_t	 oldSyncState0 = syncState0;
@@ -734,7 +734,7 @@ CStudioAPITextureVk::UpdateSyncStateWithBarrier
 */
 void CStudioAPITextureVk::UpdateSyncStateWithBarrier( CStudioAPICmdListVk* pCmdList, const CStudioAPIImageSubresourceRangeVk& subresourceRange, VkImageLayout vkDstImageLayout, VkAccessFlags vkDstAccessMask, VkPipelineStageFlags vkDstStageMask, uint32 dstQueueFamilyIndex )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Get subresource range
 	uint32 startMip	  = 0;

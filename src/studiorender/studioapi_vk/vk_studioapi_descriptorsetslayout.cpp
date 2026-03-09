@@ -38,7 +38,7 @@ CStudioAPIDescriptorSetsLayoutVk::Init
 */
 void CStudioAPIDescriptorSetsLayoutVk::Init( const studioAPIDescriptorSetLayoutVkDict_t& descriptorSetLayoutDict, const eastl::vector<VkPushConstantRange>& vkPushConstantRanges )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Check if we obey limits
 	for ( auto it = descriptorSetLayoutDict.begin(), itEnd = descriptorSetLayoutDict.end(); it != itEnd; ++it )
@@ -137,7 +137,7 @@ CStudioAPIDescriptorSetsLayoutVk::Destroy
 */
 void CStudioAPIDescriptorSetsLayoutVk::Destroy()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Broadcast about delete the layout
 	onDescriptorSetsLayoutDeleted.Broadcast( this );

@@ -3,7 +3,7 @@
 
 #include "utils/interfaces/interfaces.h"
 #include "tier0/tier0.h"
-#include "tier0/profile.h"
+#include "tier0/iprofiler.h"
 #include "tier1/tier1.h"
 #include "tier1/convar.h"
 #include "studiorender/studioapi/istudioapi.h"

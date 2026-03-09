@@ -30,7 +30,7 @@ CStudioRenderPassPresent::R_DrawPass
 */
 void CStudioRenderPassPresent::R_DrawPass( CStudioViewport* pViewport, CStudioRenderObjectQuad* pQuad )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	IStudioAPIBuffer*				pQuadVertexBuffer	  = pQuad->GetStudioAPIVertexBuffer();
 	IStudioAPIBuffer*				pQuadIndexBuffer	  = pQuad->GetStudioAPIIndexBuffer();
 	IMaterial*						pQuadMaterial		  = pQuad->GetMaterial();
@@ -77,7 +77,7 @@ CStudioRenderPassPresent::CreateStudioAPIRenderPipeline
 */
 TRefPtr<IStudioAPIRenderPipeline> CStudioRenderPassPresent::R_CreateStudioAPIRenderPipeline( CStudioViewport* pViewport, IStudioAPIBoundShaderState* pStudioAPIBoundShaderState )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( Studio_IsInRenderThread() && pViewport && pStudioAPIBoundShaderState );
 	Assert( pViewport->GetStudioAPIRenderPass() );
 
