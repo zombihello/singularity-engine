@@ -33,7 +33,7 @@ Exec command
 */
 CON_COMMAND( exec, "Execute a command file", FCVAR_NONE )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	if ( argc < 1 || !argv )
 	{
 		Msg( "Cvar: exec <path> : Execute a command file" );

@@ -13,7 +13,7 @@ CKeyValues::RemoveAllSubKeys
 */
 void CKeyValues::RemoveAllSubKeys( bool bDelete /* = true */ )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	if ( bDelete )
 	{
 		for ( auto it = subKeys.begin(), itEnd = subKeys.end(); it != itEnd; ++it )
@@ -36,7 +36,7 @@ CKeyValues::FindKey
 CKeyValues* CKeyValues::FindKey( const char* pName, bool bCreate /* = false */ )
 {
 	// Return the current key if a NULL subkey is asked for
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	if ( !pName || !pName[0] )
 	{
 		return this;
@@ -109,7 +109,7 @@ CKeyValues::SetParent
 void CKeyValues::SetParent( CKeyValues* pParentKey )
 {
 	// Do nothing if we already have the parent
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	if ( CKeyValues::pParentKey == pParentKey )
 	{
 		return;
@@ -179,7 +179,7 @@ CKeyValues::MigrateNamePool
 void CKeyValues::MigrateNamePool( namePool_t* pNamePool )
 {
 	// We don't do anything if it's the same pool
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	Assert( pNamePool );
 	if ( CKeyValues::pNamePool == pNamePool )
 	{
@@ -213,7 +213,7 @@ CKeyValues::LoadFromStream
 bool CKeyValues::LoadFromStream( IStreamDataReader* pStreamReader )
 {
 	// Do nothing if the stream isn't valid
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	Assert( pStreamReader );
 
 	// Parse key values from the stream
@@ -241,7 +241,7 @@ CKeyValues::SaveToStream
 void CKeyValues::SaveToStream( IStreamDataWriter* pStreamWriter ) const
 {
 	// Do nothing if the stream isn't valid
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	Assert( pStreamWriter );
 
 	// Write key values into the stream
@@ -257,7 +257,7 @@ CKeyValuesSubKeysIterator::Init
 void CKeyValuesSubKeysIterator::Init( CKeyValues* pKeyValues, const char* pKeyName, bool bAllowValues, bool bAllowSubKeys, bool bAllowEmpty )
 {
 	// We iterate over all subkeys and filter out only the required ones
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	Assert( pKeyValues );
 
 	// Reset key values in the iterator

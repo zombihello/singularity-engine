@@ -5,7 +5,7 @@
 #include "utils/interfaces/interfaces.h"
 #include "tier0/assert.h"
 #include "tier0/ilogger.h"
-#include "tier0/profile.h"
+#include "tier0/iprofiler.h"
 #include "tier1/tier1.h"
 #include "tier1/filetools.h"
 #include "filesystem/ifilesystem.h"

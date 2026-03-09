@@ -1,5 +1,5 @@
 #include "utils/interfaces/interfaces.h"
-#include "tier0/profile.h"
+#include "tier0/iprofiler.h"
 #include "tier1/keyvalues.h"
 #include "filesystem/ifilesystem.h"
 #include "utils/smatdoc/smat_source_doc.h"
@@ -81,7 +81,7 @@ CSMATSourceMaterialDoc::LoadFromFile
 bool CSMATSourceMaterialDoc::LoadFromFile( const char* pPath )
 {
 	// Load key values file
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	CKeyValues keyValues( "smat" );
 	if ( !keyValues.LoadFromFile( pPath ) )
 	{
@@ -169,7 +169,7 @@ CSMATSourceMaterialDoc::SaveFile
 bool CSMATSourceMaterialDoc::SaveFile( const char* pPath )
 {
 	// Create key values
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	CKeyValues	keyValues( "smat" );
 	CKeyValues* pShader = new CKeyValues( shaderName.c_str(), &keyValues );
 

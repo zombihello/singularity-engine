@@ -1,5 +1,5 @@
 #include "utils/interfaces/interfaces.h"
-#include "tier0/profile.h"
+#include "tier0/iprofiler.h"
 #include "tier0/ilogger.h"
 #include "filesystem/ifilesystem.h"
 #include "utils/shadercache/shadercache.h"
@@ -18,7 +18,7 @@ CShaderCacheDoc::shaderCache_t::Serialize
 */
 void CShaderCacheDoc::shaderCache_t::Serialize( IStreamDataWriter* pStreamWriter )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 
 	// Save the entry point name
 	uint32 entryPointNameSize = (uint32)entryPointName.size();
@@ -43,7 +43,7 @@ CShaderCacheDoc::shaderCache_t::Deserialize
 */
 void CShaderCacheDoc::shaderCache_t::Deserialize( IStreamDataReader* pStreamReader )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 
 	// Load the entry point name
 	uint32 entryPointNameSize = 0;
@@ -82,7 +82,7 @@ CShaderCacheDoc::SaveFile
 */
 bool CShaderCacheDoc::SaveFile( const char* pPath )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 
 	// Do nothing if file system isn't valid
 	Assert( g_pFileSystem );
@@ -126,7 +126,7 @@ CShaderCacheDoc::LoadFromFile
 */
 bool CShaderCacheDoc::LoadFromFile( const char* pPath )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 
 	// Do nothing if file system isn't valid
 	Assert( g_pFileSystem );

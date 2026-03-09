@@ -8,7 +8,7 @@ CKeyValuesWriter::Write
 */
 void CKeyValuesWriter::Write( CKeyValues* pKeyValues, IStreamDataWriter* pStreamWriter ) const
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	Assert( pKeyValues );
 	Assert( pStreamWriter );
 
@@ -47,7 +47,7 @@ CKeyValuesWriter::WriteKeyToBuffer
 */
 void CKeyValuesWriter::WriteKeyToBuffer( CKeyValues* pKeyValues, eastl::string& buffer, uint32 indentLevel ) const
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	Assert( pKeyValues );
 
 	// Write name, and write empty block if the key hasn't neither subKeys nor a data

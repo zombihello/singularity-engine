@@ -7,7 +7,7 @@ CStudioAPIBufferVk::UpdateSyncState
 */
 FORCEINLINE void CStudioAPIBufferVk::UpdateSyncState( VkAccessFlags vkDstAccessMask, VkPipelineStageFlags vkDstStageMask, uint32 dstQueueFamilyIndex )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	VK_UpdateSyncStateBuffer( vkDstAccessMask, vkDstStageMask, dstQueueFamilyIndex, syncState );
 }
 

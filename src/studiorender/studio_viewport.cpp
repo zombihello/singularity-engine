@@ -41,7 +41,7 @@ CStudioViewport::InitStudioAPI
 */
 void CStudioViewport::InitStudioAPI()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Create a new swap chain
 	if ( windowHandle )
@@ -66,7 +66,7 @@ CStudioViewport::ReleaseStudioAPI
 */
 void CStudioViewport::ReleaseStudioAPI()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Unsubscribe from a swap chain event
 	if ( pStudioAPISwapChain )
@@ -88,7 +88,7 @@ CStudioViewport::UpdateStudioAPI
 */
 void CStudioViewport::UpdateStudioAPI()
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 
 	// Re-create the swap chain if we have another the window handle or bUseVSync flag
 	if ( pStudioAPISwapChain->GetWindowHandle() != windowHandle || bUseVSync != pStudioAPISwapChain->IsUseVSync() )
@@ -204,7 +204,7 @@ CStudioViewport::Update
 */
 void CStudioViewport::Update( float deltaSeconds )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 
 	// Update logic of the viewport client
 	if ( pStudioViewportClient )
@@ -220,7 +220,7 @@ CStudioViewport::DrawFrame
 */
 void CStudioViewport::DrawFrame( bool bShouldPresent /* = true */, bool bFlushRenderCmds /* = true */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Do nothing if the studio resource isn't yet initialized or isn't valid
 	if ( !IsInitedResource() || !IsInited() )
@@ -257,7 +257,7 @@ CStudioViewport::R_DrawFrame
 */
 void CStudioViewport::R_DrawFrame( bool bShouldPresent )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Don't draw a new frame if the swap chain is invalid
 	if ( !pStudioAPISwapChain->IsValid() )

@@ -1,4 +1,4 @@
-#include "tier0/profile.h"
+#include "tier0/iprofiler.h"
 #include "utils/shadercache/shaderreflection.h"
 
 /*
@@ -8,7 +8,7 @@ shaderReflectionVar_t::Serialize
 */
 void shaderReflectionVar_t::Serialize( IStreamDataWriter* pStreamWriter )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	uint32 nameSize = (uint32)name.size();
 	pStreamWriter->Write( &nameSize, sizeof( uint32 ) );
 	pStreamWriter->Write( (byte*)name.c_str(), nameSize * sizeof( char ) );
@@ -24,7 +24,7 @@ shaderReflectionVar_t::Deserialize
 */
 void shaderReflectionVar_t::Deserialize( IStreamDataReader* pStreamReader )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	uint32 nameSize = 0;
 	pStreamReader->Read( &nameSize, sizeof( uint32 ) );
 	name.resize( nameSize );
@@ -41,7 +41,7 @@ shaderReflectionConstantBuffer_t::Serialize
 */
 void shaderReflectionConstantBuffer_t::Serialize( IStreamDataWriter* pStreamWriter )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	uint32 nameSize = (uint32)name.size();
 	pStreamWriter->Write( &nameSize, sizeof( uint32 ) );
 	pStreamWriter->Write( (byte*)name.c_str(), nameSize * sizeof( char ) );
@@ -63,7 +63,7 @@ shaderReflectionConstantBuffer_t::Deserialize
 */
 void shaderReflectionConstantBuffer_t::Deserialize( IStreamDataReader* pStreamReader )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	uint32 nameSize = 0;
 	pStreamReader->Read( &nameSize, sizeof( uint32 ) );
 	name.resize( nameSize );
@@ -87,7 +87,7 @@ shaderReflectionPushConstantBuffer_t::Serialize
 */
 void shaderReflectionPushConstantBuffer_t::Serialize( IStreamDataWriter* pStreamWriter )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	uint32 nameSize = (uint32)name.size();
 	pStreamWriter->Write( &nameSize, sizeof( uint32 ) );
 	pStreamWriter->Write( (byte*)name.c_str(), nameSize * sizeof( char ) );
@@ -108,7 +108,7 @@ shaderReflectionPushConstantBuffer_t::Deserialize
 */
 void shaderReflectionPushConstantBuffer_t::Deserialize( IStreamDataReader* pStreamReader )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	uint32 nameSize = 0;
 	pStreamReader->Read( &nameSize, sizeof( uint32 ) );
 	name.resize( nameSize );
@@ -131,7 +131,7 @@ shaderReflectionStorageBuffer_t::Serialize
 */
 void shaderReflectionStorageBuffer_t::Serialize( IStreamDataWriter* pStreamWriter )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	uint32 nameSize = (uint32)name.size();
 	pStreamWriter->Write( &nameSize, sizeof( uint32 ) );
 	pStreamWriter->Write( (byte*)name.c_str(), nameSize * sizeof( char ) );
@@ -146,7 +146,7 @@ shaderReflectionStorageBuffer_t::Deserialize
 */
 void shaderReflectionStorageBuffer_t::Deserialize( IStreamDataReader* pStreamReader )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	uint32 nameSize = 0;
 	pStreamReader->Read( &nameSize, sizeof( uint32 ) );
 	name.resize( nameSize );
@@ -162,7 +162,7 @@ shaderReflectionImageSampler_t::Serialize
 */
 void shaderReflectionImageSampler_t::Serialize( IStreamDataWriter* pStreamWriter )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	uint32 nameSize = (uint32)name.size();
 	pStreamWriter->Write( &nameSize, sizeof( uint32 ) );
 	pStreamWriter->Write( (byte*)name.c_str(), nameSize * sizeof( char ) );
@@ -178,7 +178,7 @@ shaderReflectionImageSampler_t::Deserialize
 */
 void shaderReflectionImageSampler_t::Deserialize( IStreamDataReader* pStreamReader )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	uint32 nameSize = 0;
 	pStreamReader->Read( &nameSize, sizeof( uint32 ) );
 	name.resize( nameSize );
@@ -195,7 +195,7 @@ shaderReflectionDescriptorSet_t::Serialize
 */
 void shaderReflectionDescriptorSet_t::Serialize( IStreamDataWriter* pStreamWriter )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 
 	// Save the constant buffer dictionary
 	uint32 numConstantBuffers = (uint32)constantBuffersDict.size();
@@ -259,7 +259,7 @@ shaderReflectionDescriptorSet_t::Deserialize
 */
 void shaderReflectionDescriptorSet_t::Deserialize( IStreamDataReader* pStreamReader )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 
 	// Load the constant buffer dictionary
 	uint32 numConstantBuffers = 0;
@@ -329,7 +329,7 @@ CShaderReflection::Serialize
 */
 void CShaderReflection::Serialize( IStreamDataWriter* pStreamWriter )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 
 	// Save the descriptor sets
 	uint32 numDescriptorSets = (uint32)descriptorSets.size();
@@ -363,7 +363,7 @@ CShaderReflection::Deserialize
 */
 void CShaderReflection::Deserialize( IStreamDataReader* pStreamReader )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 
 	// Read descriptor sets
 	uint32 numDescriptorSets = 0;
@@ -400,7 +400,7 @@ CShaderReflection::AddConstantBuffer
 */
 void CShaderReflection::AddConstantBuffer( const char* pName, uint64 size, uint32 bindingIndex, const shaderReflectionVar_t* pVars, uint32 numVars, uint32 descriptorSetIndex )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	if ( descriptorSetIndex >= (uint32)descriptorSets.size() )
 	{
 		descriptorSets.resize( descriptorSetIndex + 1 );
@@ -424,7 +424,7 @@ CShaderReflection::AddStorageBuffer
 */
 void CShaderReflection::AddStorageBuffer( const char* pName, uint64 size, uint32 bindingIndex, uint32 descriptorSetIndex )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	if ( descriptorSetIndex >= (uint32)descriptorSets.size() )
 	{
 		descriptorSets.resize( descriptorSetIndex + 1 );
@@ -453,7 +453,7 @@ CShaderReflection::AddPushConstantBuffer
 */
 void CShaderReflection::AddPushConstantBuffer( const char* pName, uint64 size, const shaderReflectionVar_t* pVars, uint32 numVars )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	uint64 bufferOffset = 0;
 	if ( !pushConstantRanges.empty() )
 	{
@@ -485,7 +485,7 @@ CShaderReflection::AddSampledImage
 */
 void CShaderReflection::AddSampledImage( const char* pName, uint32 bindingIndex, uint32 descriptorSetIndex, studioAPIShaderDimensionType_t dimensionType, uint32 arraySize )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	if ( descriptorSetIndex >= (uint32)descriptorSets.size() )
 	{
 		descriptorSets.resize( descriptorSetIndex + 1 );
@@ -511,7 +511,7 @@ CShaderReflection::AddSeparateImage
 */
 void CShaderReflection::AddSeparateImage( const char* pName, uint32 bindingIndex, uint32 descriptorSetIndex, studioAPIShaderDimensionType_t dimensionType, uint32 arraySize )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	if ( descriptorSetIndex >= (uint32)descriptorSets.size() )
 	{
 		descriptorSets.resize( descriptorSetIndex + 1 );
@@ -537,7 +537,7 @@ CShaderReflection::AddSeparateSampler
 */
 void CShaderReflection::AddSeparateSampler( const char* pName, uint32 bindingIndex, uint32 descriptorSetIndex, studioAPIShaderDimensionType_t dimensionType, uint32 arraySize )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	if ( descriptorSetIndex >= (uint32)descriptorSets.size() )
 	{
 		descriptorSets.resize( descriptorSetIndex + 1 );
@@ -563,7 +563,7 @@ CShaderReflection::AddStorageImage
 */
 void CShaderReflection::AddStorageImage( const char* pName, uint32 bindingIndex, uint32 descriptorSetIndex, studioAPIShaderDimensionType_t dimensionType, uint32 arraySize )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	if ( descriptorSetIndex >= (uint32)descriptorSets.size() )
 	{
 		descriptorSets.resize( descriptorSetIndex + 1 );

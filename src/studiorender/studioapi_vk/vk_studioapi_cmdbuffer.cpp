@@ -34,7 +34,7 @@ CStudioAPICmdBufferVk::Begin
 */
 void CStudioAPICmdBufferVk::Begin()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Begin write into the command buffer
 	VkCommandBufferBeginInfo vkCommandBufferBeginInfo = {};
@@ -50,7 +50,7 @@ CStudioAPICmdBufferVk::End
 */
 void CStudioAPICmdBufferVk::End()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	STUDIOAPI_VK_VERIFY_RESULT( vkEndCommandBuffer( vkCommandBuffer ) );
 }
 
@@ -61,7 +61,7 @@ CStudioAPICmdBufferVk::AcquirePoolSetAndDescriptorsIfNeed
 */
 bool CStudioAPICmdBufferVk::AcquirePoolSetAndDescriptorsIfNeed( const CStudioAPIDescriptorSetsLayoutVk& descriptorSetsLayout, bool bNeedDescriptorSets, VkDescriptorSet* pDestDescriptorSets )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Acquire a pool set container if we haven't it
 	if ( !pCurrentDescriptorPoolSetContainer )
@@ -87,7 +87,7 @@ CStudioAPICmdBufferVk::AllocMemory
 */
 void CStudioAPICmdBufferVk::AllocMemory()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Create the Vulkan command buffer
 	if ( !bIsAllocatedMemory )
@@ -110,7 +110,7 @@ CStudioAPICmdBufferVk::FreeMemory
 */
 void CStudioAPICmdBufferVk::FreeMemory()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Free allocated the Vulkan command buffer
 	if ( bIsAllocatedMemory )

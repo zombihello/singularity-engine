@@ -1,5 +1,5 @@
 #include "utils/interfaces/interfaces.h"
-#include "tier0/profile.h"
+#include "tier0/iprofiler.h"
 #include "tier1/keyvalues.h"
 #include "filesystem/ifilesystem.h"
 #include "utils/smapdoc/smap_source_doc.h"
@@ -12,7 +12,7 @@ CSMAPSourceMapDoc::LoadFromFile
 bool CSMAPSourceMapDoc::LoadFromFile( const char* pPath )
 {
 	// Load key values file
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	CKeyValues keyValues( "smap" );
 	if ( !keyValues.LoadFromFile( pPath ) )
 	{
@@ -58,7 +58,7 @@ CSMAPSourceMapDoc::SaveFile
 bool CSMAPSourceMapDoc::SaveFile( const char* pPath )
 {
 	// Create key values
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	CKeyValues keyValues( "smap" );
 	if ( !entities.empty() )
 	{

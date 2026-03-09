@@ -37,6 +37,7 @@
 #define DLL_EXPORT				  __declspec( dllexport )
 #define DLL_IMPORT				  __declspec( dllimport )
 #define FUNCSIG					  __FUNCSIG__
+#define FUNCTION				  __FUNCTION__
 #define TRUE					  1
 #define FALSE					  0
 #define NULL					  0

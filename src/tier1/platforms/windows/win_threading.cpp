@@ -495,7 +495,7 @@ DWORD STDCALL CWindowsThread::ThreadMain( LPVOID pThis )
 	// Initialize the thread
 	theThread->exitCode = -1;
 	bool bInitResult	= theThread->ThreadInit();
-	PROFILE_THREAD( theThread->GetName() );
+	PROFILER_THREAD( theThread->GetName() );
 
 	// Initialization has completed, release the sync event
 	theThread->pThreadInitSyncEvent->Trigger();

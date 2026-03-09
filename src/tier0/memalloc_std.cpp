@@ -1,7 +1,7 @@
 #include "pch_tier0.h"
 #include "tier0/memalloc_std.h"
 
-#define MEMALLOC_STD_NAME "MemAlloc Std"
+static const char* s_pMemAllocName = "MemAlloc Std";
 
 /*
 ==================
@@ -25,7 +25,6 @@ CMemAllocStd::TryMalloc
 */
 void* CMemAllocStd::TryMalloc( size numBytes, uint32 alignment /* = 0 */ )
 {
-	PROFILE_SCOPE()
 	alignment	  = GetAlignment( numBytes, alignment );
 	void* pResult = NULL;
 
@@ -44,8 +43,7 @@ void* CMemAllocStd::TryMalloc( size numBytes, uint32 alignment /* = 0 */ )
 
 	if ( pResult )
 	{
-		// TODO BS yehor.pohuliaka - CIT-13 Integrate Tracy profiler
-		// PROFILER_MEM_ALLOC( pResult, Align( numBytes, alignment ), MEMALLOC_STD_NAME );
+		PROFILER_MEM_ALLOC( pResult, Align( numBytes, alignment ), s_pMemAllocName );
 	}
 	return pResult;
 }
@@ -57,7 +55,6 @@ CMemAllocStd::TryRealloc
 */
 void* CMemAllocStd::TryRealloc( void* pOriginal, size numBytes, uint32 alignment /* = 0 */ )
 {
-	PROFILE_SCOPE()
 	alignment	  = GetAlignment( numBytes, alignment );
 	void* pResult = NULL;
 
@@ -97,13 +94,11 @@ void* CMemAllocStd::TryRealloc( void* pOriginal, size numBytes, uint32 alignment
 
 	if ( pOriginal )
 	{
-		// TODO BS yehor.pohuliaka - CIT-13 Integrate Tracy profiler
-		// PROFILER_MEM_FREE( pOriginal, MEMALLOC_STD_NAME );
+		PROFILER_MEM_FREE( pOriginal, s_pMemAllocName );
 	}
 	if ( pResult )
 	{
-		// TODO BS yehor.pohuliaka - CIT-13 Integrate Tracy profiler
-		// PROFILER_MEM_ALLOC( pResult, Align( numBytes, alignment ), MEMALLOC_STD_NAME );
+		PROFILER_MEM_ALLOC( pResult, Align( numBytes, alignment ), s_pMemAllocName );
 	}
 	return pResult;
 }
@@ -115,7 +110,6 @@ CMemAllocStd::Free
 */
 void CMemAllocStd::Free( void* pOriginal )
 {
-	PROFILE_SCOPE()
 	if ( pOriginal )
 	{
 #if PLATFORM_USE__ALIGNED_MALLOC
@@ -123,9 +117,7 @@ void CMemAllocStd::Free( void* pOriginal )
 #else
 		Mem_FreeSystem( *( (void**)( (uint8*)pOriginal - sizeof( void* ) ) ) );
 #endif	// PLATFORM_USE__ALIGNED_MALLOC
-
-		// TODO BS yehor.pohuliaka - CIT-13 Integrate Tracy profiler
-		// PROFILER_MEM_FREE( pOriginal, MEMALLOC_STD_NAME );
+		PROFILER_MEM_FREE( pOriginal, s_pMemAllocName );
 	}
 }
 
@@ -136,7 +128,6 @@ CMemAllocStd::GetAllocationSize
 */
 bool CMemAllocStd::GetAllocationSize( void* pOriginal, size& numBytes ) const
 {
-	PROFILE_SCOPE()
 	if ( !pOriginal )
 	{
 		return false;

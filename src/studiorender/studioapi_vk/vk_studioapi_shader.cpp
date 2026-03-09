@@ -128,7 +128,7 @@ CStudioAPIVertexDeclarationVk::CStudioAPIVertexDeclarationVk
 */
 CStudioAPIVertexDeclarationVk::CStudioAPIVertexDeclarationVk( const studioAPIVertexInputBuffer_t* pVertexInputBuffers, uint32 numVertexInputBuffers, const studioAPIVertexInputAttribute_t* pVertexInputAttributes, uint32 numVertexInputAttributes )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Check if we fit within the restrictions
 	Assert( numVertexInputBuffers <= STUDIOAPI_VK_MAX_VERTEX_ELEMENT_COUNT );
@@ -177,7 +177,7 @@ CStudioAPIShaderVk::CStudioAPIShaderVk( studioAPIShaderType_t type, const char* 
 	, vkShaderModule( VK_NULL_HANDLE )
 	, pStudioAPIVkShutdownDelegate( NULL )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Check on align to 4 bytes
 	if ( bytecodeSize % 4 != 0 || ( (uptrint)pBytecode & 3 ) != 0 )
@@ -365,7 +365,7 @@ CStudioAPIShaderVk::~CStudioAPIShaderVk
 */
 CStudioAPIShaderVk::~CStudioAPIShaderVk()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Destroy the shader module
 	if ( vkShaderModule != VK_NULL_HANDLE )
@@ -425,7 +425,7 @@ CStudioAPIBoundShaderStateVk::CStudioAPIBoundShaderStateVk( const CStudioAPIBoun
 	, pGeometryShader( pGeometryShader )
 	, pStudioAPIVkShutdownDelegate( NULL )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Grab descriptor set layouts and push constant ranges
 	studioAPIDescriptorSetLayoutVkDict_t descriptorSetLayoutDict;
@@ -507,7 +507,7 @@ CStudioAPIBoundShaderStateVk::~CStudioAPIBoundShaderStateVk
 */
 CStudioAPIBoundShaderStateVk::~CStudioAPIBoundShaderStateVk()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Destroy the descriptor sets layout
 	descriptorSetsLayout.Destroy();

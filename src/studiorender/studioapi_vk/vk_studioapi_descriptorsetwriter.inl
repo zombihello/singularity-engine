@@ -7,7 +7,7 @@ CStudioAPIDescriptorSetWriterVk::WriteConstantBuffer
 */
 FORCEINLINE bool CStudioAPIDescriptorSetWriterVk::WriteConstantBuffer( uint32 slot, CStudioAPIBufferVk* pConstantBuffer, uint64 offset, uint64 size )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return WriteDescriptorBufferInfo<VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER>( slot, pConstantBuffer, 0, 0 );
 }
 
@@ -18,7 +18,7 @@ CStudioAPIDescriptorSetWriterVk::WriteTexture
 */
 FORCEINLINE bool CStudioAPIDescriptorSetWriterVk::WriteTexture( uint32 slot, CStudioAPITextureVk* pTexture )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return WriteDescriptorImageInfo<VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE>( slot, pTexture );
 }
 
@@ -29,7 +29,7 @@ CStudioAPIDescriptorSetWriterVk::WriteSampler
 */
 FORCEINLINE bool CStudioAPIDescriptorSetWriterVk::WriteSampler( uint32 slot, CStudioAPISamplerVk* pSampler )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return WriteDescriptorImageInfo<VK_DESCRIPTOR_TYPE_SAMPLER>( slot, pSampler );
 }
 
@@ -40,7 +40,7 @@ CStudioAPIDescriptorSetWriterVk::SetVkDescriptorSet
 */
 FORCEINLINE void CStudioAPIDescriptorSetWriterVk::SetVkDescriptorSet( VkDescriptorSet vkDescriptorSet )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	for ( uint32 index = 0; index < numWriteDescriptorSets; ++index )
 	{
 		pVkWriteDescriptorSets[index].dstSet = vkDescriptorSet;
@@ -65,7 +65,7 @@ CStudioAPIDescriptorSetWriterVk::WriteDescriptorBufferInfo
 template<VkDescriptorType vkDescriptorType>
 FORCEINLINE bool CStudioAPIDescriptorSetWriterVk::WriteDescriptorBufferInfo( uint32 slot, CStudioAPIBufferVk* pBuffer, uint64 offset, uint64 size )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Get Vulkan write descriptor set index
 	if ( slot >= numSlots )
@@ -101,7 +101,7 @@ CStudioAPIDescriptorSetWriterVk::WriteDescriptorImageInfo
 template<VkDescriptorType vkDescriptorType>
 FORCEINLINE bool CStudioAPIDescriptorSetWriterVk::WriteDescriptorImageInfo( uint32 slot, CStudioAPITextureVk* pTexture )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Get Vulkan write descriptor set index
 	if ( slot >= numSlots )
@@ -141,7 +141,7 @@ CStudioAPIDescriptorSetWriterVk::WriteDescriptorImageInfo
 template<VkDescriptorType vkDescriptorType>
 FORCEINLINE bool CStudioAPIDescriptorSetWriterVk::WriteDescriptorImageInfo( uint32 slot, CStudioAPISamplerVk* pSampler )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Get Vulkan write descriptor set index
 	if ( slot >= numSlots )

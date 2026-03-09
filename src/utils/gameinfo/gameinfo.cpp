@@ -21,7 +21,7 @@ CGameInfoDoc::LoadFromStream
 bool CGameInfoDoc::LoadFromStream( IStreamDataReader* pStreamReader, const char* pGameInfoPath /* = "" */ )
 {
 	// Clear a game info data
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	Clear();
 
 	// Load key values
@@ -62,7 +62,7 @@ CGameInfoDoc::ReplaceMacros
 */
 void CGameInfoDoc::ReplaceMacros( eastl::string& string, const char* pGameInfoPath )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	enum gameInfoMacro_t
 	{
 		GAMEINFO_MACRO_PLATFORM_DIR,	  // |platform_dir|

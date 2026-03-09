@@ -175,30 +175,42 @@ CLauncherApp::Main
 */
 int32 CLauncherApp::Main()
 {
-	// Main game loop
-	PROFILE_INIT();
+#if ENABLE_LOGGING
+	IProfiler* pProfiler = Profiler();
+#endif	// ENABLE_LOGGING
 	while ( !Sys_IsRequestingExit() )
 	{
-		PROFILE_FRAME( "Main Thread" );
-		PROFILE_SCOPE( PROFILE_SCOPE_GROUP_GAMELOGIC );
-
 		// Process window events
+		PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
 		g_pWindowMgr->ProcessEvents();
-		if ( !bInFocus && !PROFILE_IS_RECORD() )
+
+		// Skip the frame if it need
+		bool bSkipFrame = !bInFocus;
+#if ENABLE_PROFILING
+		bSkipFrame &= !pProfiler->IsConnected();
+#endif	// ENABLE_PROFILING
+		if ( bSkipFrame )
 		{
 			continue;
 		}
 
+		// Update the profiler
+#if ENABLE_PROFILING
+		pProfiler->Update();
+#endif	// ENABLE_PROFILING
+
 		// Update a game logic frame and draw it
 		g_pGame->FrameUpdate();
 		pStudioViewport->DrawFrame();
+
+		// Go to next profiler frame
+#if ENABLE_PROFILING
+		pProfiler->NextFrame();
+#endif	// ENABLE_PROFILING
 	}
 
 	// Flush render thread commands before shutdown the application
 	Studio_FlushRenderCommands();
-
-	// Shutdown the profiler
-	PROFILE_SHUTDOWN();
 	return 0;
 }
 
@@ -276,7 +288,7 @@ CLauncherApp::OnWindowEvent
 */
 void CLauncherApp::OnWindowEvent( void* pUserData, const windowEvent_t& windowEvent )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	if ( windowEvent.windowId != g_pWindowMgr->GetMainWindowId() )
 	{
 		return;

@@ -22,7 +22,7 @@ CStudioAPIDescriptorStateCommonVk::SetConstantBuffer
 */
 void CStudioAPIDescriptorStateCommonVk::SetConstantBuffer( CStudioAPICmdListVk* pCmdList, uint32 set, uint32 slot, CStudioAPIBufferVk* pConstantBuffer )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Do nothing if the set isn't valid
 	if ( set >= (uint32)descriptorSetWriters.size() )
@@ -50,7 +50,7 @@ CStudioAPIDescriptorStateCommonVk::SetTexture
 */
 void CStudioAPIDescriptorStateCommonVk::SetTexture( CStudioAPICmdListVk* pCmdList, uint32 set, uint32 slot, CStudioAPITextureVk* pTexture )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Do nothing if the set isn't valid
 	if ( set >= (uint32)descriptorSetWriters.size() )
@@ -79,7 +79,7 @@ CStudioAPIDescriptorStateCommonVk::SetSampler
 */
 void CStudioAPIDescriptorStateCommonVk::SetSampler( CStudioAPICmdListVk* pCmdList, uint32 set, uint32 slot, CStudioAPISamplerVk* pSampler )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Do nothing if the set isn't valid
 	if ( set >= (uint32)descriptorSetWriters.size() )
@@ -100,7 +100,7 @@ CStudioAPIDescriptorStateCommonVk::InitDescriptorWriteInfos
 */
 void CStudioAPIDescriptorStateCommonVk::InitDescriptorWriteInfos()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Initialize descriptor set write container
 	Assert( pDescriptorSetsLayout );
@@ -188,7 +188,7 @@ CStudioAPIDescriptorStateRenderVk::UpdateDescriptorSets
 */
 bool CStudioAPIDescriptorStateRenderVk::UpdateDescriptorSets( CStudioAPICmdListVk* pCmdList )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Allocated a new descriptor sets
 	CStudioAPIBoundShaderStateVk* pBoundShaderState = pRenderPipeline->GetBoundShaderState();

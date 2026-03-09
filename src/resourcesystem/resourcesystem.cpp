@@ -131,7 +131,7 @@ CResourceSystem::CreateProceduralResource
 */
 TRefPtr<IResource> CResourceSystem::CreateProceduralResource( const char* pName, resourceType_t type )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	Assert( type < RESOURCE_NUM_TYPES );
 
 	IResourceFactory* pResourceFactory = pResourceFactories[type];
@@ -157,7 +157,7 @@ CResourceSystem::FindOrLoadResource
 */
 TRefPtr<IResource> CResourceSystem::FindOrLoadResource( const char* pPath, resourceType_t type, uint32 loadFlags /* = RESOURCE_LOAD_FLAG_NONE */ )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 
 	// Get a resource name in lower case
 	eastl::string resourceName;
@@ -209,7 +209,7 @@ CResourceSystem::RemoveUnusedResources
 */
 void CResourceSystem::RemoveUnusedResources()
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 
 	// TODO BS yehor.pohuliaka - Maybe need rework it like in CStudioAPIDescriptorPoolsMgrVk::FreeUnusedPoolSets
 	// Remove unused resources from the system

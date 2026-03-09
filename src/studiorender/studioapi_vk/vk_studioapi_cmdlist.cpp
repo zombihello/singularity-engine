@@ -105,7 +105,7 @@ CStudioAPICmdListVk::BeginRecord
 */
 void CStudioAPICmdListVk::BeginRecord()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Check the command list state, must be ready for begin
 	Assert( state == STUDIOAPI_VK_CMDLIST_STATE_READY_FOR_RECORD );
@@ -131,7 +131,7 @@ CStudioAPICmdListVk::EndRecord
 */
 void CStudioAPICmdListVk::EndRecord()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Flush all pending barriers and finish recording
 	Assert( state == STUDIOAPI_VK_CMDLIST_STATE_HAS_BEGUN_RECORD );
@@ -149,7 +149,7 @@ CStudioAPICmdListVk::BeginRenderPass
 */
 void CStudioAPICmdListVk::BeginRenderPass( IStudioAPIRenderPass* pRenderPass, IStudioAPIFrameBuffer* pFrameBuffer )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	AssertMsg( state == STUDIOAPI_VK_CMDLIST_STATE_HAS_BEGUN_RECORD, "Can't to begin a new render pass as already inside one (pCmdList: 0x%p, state: 0x%X)", this, state );
 	state = STUDIOAPI_VK_CMDLIST_STATE_IS_INSIDE_RENDER_PASS;
 
@@ -178,7 +178,7 @@ CStudioAPICmdListVk::EndRenderPass
 */
 void CStudioAPICmdListVk::EndRenderPass()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	AssertMsg( state == STUDIOAPI_VK_CMDLIST_STATE_IS_INSIDE_RENDER_PASS, "No rendering passes have begun yet (pCmdList: 0x%p, state: 0x%X)", this, state );
 	vkCmdEndRenderPass( pCmdBuffer->GetVkCommandBuffer() );
 	state = STUDIOAPI_VK_CMDLIST_STATE_HAS_BEGUN_RECORD;
@@ -191,7 +191,7 @@ CStudioAPICmdListVk::SetRenderPipeline
 */
 void CStudioAPICmdListVk::SetRenderPipeline( IStudioAPIRenderPipeline* pRenderPipeline )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	pCmdContext->SetRenderPipeline( this, (CStudioAPIRenderPipelineVk*)pRenderPipeline );
 }
 
@@ -202,7 +202,7 @@ CStudioAPICmdListVk::SetVertexBuffer
 */
 void CStudioAPICmdListVk::SetVertexBuffer( uint32 slot, IStudioAPIBuffer* pVertexBuffer, uint64 offset )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	pCmdContext->SetVertexBuffer( this, slot, (CStudioAPIBufferVk*)pVertexBuffer, offset );
 }
 
@@ -213,7 +213,7 @@ CStudioAPICmdListVk::SetConstantBuffer
 */
 void CStudioAPICmdListVk::SetConstantBuffer( uint32 set, uint32 slot, IStudioAPIBuffer* pConstantBuffer )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	pCmdContext->SetConstantBuffer( this, set, slot, (CStudioAPIBufferVk*)pConstantBuffer );
 }
 
@@ -224,7 +224,7 @@ CStudioAPICmdListVk::SetViewport
 */
 void CStudioAPICmdListVk::SetViewport( float minX, float minY, float minZ, float maxX, float maxY, float maxZ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	pCmdContext->SetViewport( this, minX, minY, minZ, maxX, maxY, maxZ );
 }
 
@@ -235,7 +235,7 @@ CStudioAPICmdListVk::SetScissor
 */
 void CStudioAPICmdListVk::SetScissor( int32 x, int32 y, uint32 width, uint32 height )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	pCmdContext->SetScissor( this, x, y, width, height );
 }
 
@@ -246,7 +246,7 @@ CStudioAPICmdListVk::SetTexture
 */
 void CStudioAPICmdListVk::SetTexture( uint32 set, uint32 slot, IStudioAPITexture* pTexture )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	pCmdContext->SetTexture( this, set, slot, (CStudioAPITextureVk*)pTexture );
 }
 
@@ -257,7 +257,7 @@ CStudioAPICmdListVk::SetSampler
 */
 void CStudioAPICmdListVk::SetSampler( uint32 set, uint32 slot, IStudioAPISampler* pSampler )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	pCmdContext->SetSampler( this, set, slot, (CStudioAPISamplerVk*)pSampler );
 }
 
@@ -268,7 +268,7 @@ CStudioAPICmdListVk::Draw
 */
 void CStudioAPICmdListVk::Draw( uint32 baseVertexIndex, uint32 numVertices, uint32 numInstances /* = 1 */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	pCmdContext->Draw( this, baseVertexIndex, numVertices, numInstances );
 }
 
@@ -279,7 +279,7 @@ CStudioAPICmdListVk::DrawIndexed
 */
 void CStudioAPICmdListVk::DrawIndexed( IStudioAPIBuffer* pIndexBuffer, uint32 baseVertexIndex, uint32 baseIndex, uint32 numIndices, uint32 numInstances /* = 1 */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	pCmdContext->DrawIndexed( this, (CStudioAPIBufferVk*)pIndexBuffer, baseVertexIndex, baseIndex, numIndices, numInstances );
 }
 
@@ -290,7 +290,7 @@ CStudioAPICmdListVk::Barrier
 */
 void CStudioAPICmdListVk::Barrier( const studioAPIBarrier_t* pBarriers, uint32 numBarriers, bool bFlush /* = false */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	AssertMsg( state != STUDIOAPI_VK_CMDLIST_STATE_IS_INSIDE_RENDER_PASS, "Can't make a barrier inside of a render pass" );
 	Assert( pBarriers );
 	for ( uint32 index = 0; index < numBarriers; ++index )
@@ -388,7 +388,7 @@ CStudioAPICmdListVk::CopyBuffer
 */
 void CStudioAPICmdListVk::CopyBuffer( IStudioAPIBuffer* pSrcBuffer, uint64 srcOffset, IStudioAPIBuffer* pDstBuffer, uint64 dstOffset, uint64 size )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	CStudioAPIBufferVk* pStudioAPISrcBuffer = (CStudioAPIBufferVk*)pSrcBuffer;
 	CStudioAPIBufferVk* pStudioAPIDstBuffer = (CStudioAPIBufferVk*)pDstBuffer;
 	AssertMsg( state != STUDIOAPI_VK_CMDLIST_STATE_IS_INSIDE_RENDER_PASS, "Can't copy inside of a render pass" );
@@ -416,7 +416,7 @@ CStudioAPICmdListVk::CopyBufferToTexture
 */
 void CStudioAPICmdListVk::CopyBufferToTexture( IStudioAPIBuffer* pSrcBuffer, uint64 srcOffset, IStudioAPITexture* pDstTexture, uint32 dstMip, const ivec3_t& dstOffset, const ivec3_t& dstSize, uint32 dstStartLayer /* = 0 */, uint32 dstNumLayers /* = -1 */, uint32 srcRowLength /* = 0 */, uint32 srcTextureHeight /* = 0 */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	CStudioAPIBufferVk*	 pStudioAPISrcBuffer  = (CStudioAPIBufferVk*)pSrcBuffer;
 	CStudioAPITextureVk* pStudioAPIDstTexture = (CStudioAPITextureVk*)pDstTexture;
 	AssertMsg( state != STUDIOAPI_VK_CMDLIST_STATE_IS_INSIDE_RENDER_PASS, "Can't copy inside of a render pass" );
@@ -457,7 +457,7 @@ CStudioAPICmdListVk::CopyTextureToBuffer
 */
 void CStudioAPICmdListVk::CopyTextureToBuffer( IStudioAPITexture* pSrcTexture, uint32 srcMip, const ivec3_t& srcOffset, const ivec3_t& srcSize, IStudioAPIBuffer* pDstBuffer, uint64 dstOffset, uint32 srcStartLayer /* = 0 */, uint32 srcNumLayers /* = -1 */, uint32 dstRowLength /* = 0 */, uint32 dstTextureHeight /* = 0 */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	CStudioAPITextureVk* pStudioAPISrcTexture = (CStudioAPITextureVk*)pSrcTexture;
 	CStudioAPIBufferVk*	 pStudioAPIDstBuffer  = (CStudioAPIBufferVk*)pDstBuffer;
 	AssertMsg( state != STUDIOAPI_VK_CMDLIST_STATE_IS_INSIDE_RENDER_PASS, "Can't copy inside of a render pass" );
@@ -498,7 +498,7 @@ CStudioAPICmdListVk::CopyTexture
 */
 void CStudioAPICmdListVk::CopyTexture( IStudioAPITexture* pSrcTexture, uint32 srcMip, const ivec3_t srcOffset, IStudioAPITexture* pDstTexture, uint32 dstMip, const ivec3_t dstOffset, const ivec3_t size, uint32 srcStartLayer /* = 0 */, uint32 dstStartLayer /* = 0 */, uint32 numLayers /* = 1 */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	CStudioAPITextureVk* pStudioAPISrcTexture = (CStudioAPITextureVk*)pSrcTexture;
 	CStudioAPITextureVk* pStudioAPIDstTexture = (CStudioAPITextureVk*)pDstTexture;
 	AssertMsg( state != STUDIOAPI_VK_CMDLIST_STATE_IS_INSIDE_RENDER_PASS, "Can't copy inside of a render pass" );
@@ -580,7 +580,7 @@ CStudioAPICmdListBatchVk::AddCmdList
 */
 void CStudioAPICmdListBatchVk::AddCmdList( IStudioAPICmdList* pCmdList )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	CStudioAPICmdListVk* pStudioAPICmdList = (CStudioAPICmdListVk*)pCmdList;
 	Assert( pStudioAPICmdList->GetCmdContext() == pCmdContext );
 	Assert( eastl::find( cmdLists.begin(), cmdLists.end(), pStudioAPICmdList ) == cmdLists.end() );
@@ -594,7 +594,7 @@ CStudioAPICmdListBatchVk::RemoveCmdList
 */
 void CStudioAPICmdListBatchVk::RemoveCmdList( IStudioAPICmdList* pCmdList )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	CStudioAPICmdListVk* pStudioAPICmdList = (CStudioAPICmdListVk*)pCmdList;
 	Assert( pStudioAPICmdList->GetCmdContext() == pCmdContext );
 	for ( uint32 index = 0, count = (uint32)cmdLists.size(); index < count; ++index )
@@ -625,7 +625,7 @@ CStudioAPICmdListBatchVk::SyncSignal
 */
 void CStudioAPICmdListBatchVk::SyncSignal( const char* pSyncName )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( pSyncName && pSyncName != "" );
 	syncSignals.emplace_back( g_StudioAPIVk.GetSyncMgr().FindOrCreateNamedSemaphore( pSyncName ) );
 }
@@ -637,7 +637,7 @@ CStudioAPICmdListBatchVk::SyncWait
 */
 void CStudioAPICmdListBatchVk::SyncWait( const char* pSyncName )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( pSyncName && pSyncName != "" );
 	syncWaits.emplace_back( g_StudioAPIVk.GetSyncMgr().FindOrCreateNamedSemaphore( pSyncName ) );
 }
@@ -649,7 +649,7 @@ CStudioAPICmdListBatchVk::SyncSwapChain
 */
 void CStudioAPICmdListBatchVk::SyncSwapChain( IStudioAPISwapChain* pSwapChain, uint8 syncFlags )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	if ( pSwapChain )
 	{
 		AssertMsg( syncFlags != 0, "Can't be zero if pSwapChain isn't NULL" );
@@ -669,7 +669,7 @@ CStudioAPICmdListBatchVk::RemoveSyncSignal
 */
 void CStudioAPICmdListBatchVk::RemoveSyncSignal( const char* pSyncName )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	for ( auto it = syncSignals.begin(), itEnd = syncSignals.end(); it != itEnd; ++it )
 	{
 		CStudioAPINamedSemaphoreVk* pNamedSemaphore = *it;
@@ -689,7 +689,7 @@ CStudioAPICmdListBatchVk::RemoveSyncWait
 */
 void CStudioAPICmdListBatchVk::RemoveSyncWait( const char* pSyncName )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	for ( auto it = syncWaits.begin(), itEnd = syncWaits.end(); it != itEnd; ++it )
 	{
 		CStudioAPINamedSemaphoreVk* pNamedSemaphore = *it;
@@ -709,7 +709,7 @@ CStudioAPICmdListBatchVk::RemoveSyncSwapChain
 */
 void CStudioAPICmdListBatchVk::RemoveSyncSwapChain()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	pSyncSwapChain	   = NULL;
 	syncSwapChainFlags = 0;
 }
@@ -721,7 +721,7 @@ CStudioAPICmdListBatchVk::RemoveAllSyncSignals
 */
 void CStudioAPICmdListBatchVk::RemoveAllSyncSignals()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	for ( auto it = syncSignals.begin(), itEnd = syncSignals.end(); it != itEnd; ++it )
 	{
 		g_StudioAPIVk.GetSyncMgr().ReleaseNamedSemaphore( *it );
@@ -736,7 +736,7 @@ CStudioAPICmdListBatchVk::RemoveAllSyncWaits
 */
 void CStudioAPICmdListBatchVk::RemoveAllSyncWaits()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	for ( auto it = syncWaits.begin(), itEnd = syncWaits.end(); it != itEnd; ++it )
 	{
 		g_StudioAPIVk.GetSyncMgr().ReleaseNamedSemaphore( *it );
@@ -810,7 +810,7 @@ CStudioAPICmdListBatchMgrVk::Shutdown
 */
 void CStudioAPICmdListBatchMgrVk::Shutdown()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Clear all submitted batches at current frame in-flight
 	ClearSubmittedBatches();
@@ -823,7 +823,7 @@ CStudioAPICmdListBatchMgrVk::Submit
 */
 void CStudioAPICmdListBatchMgrVk::Submit( CStudioAPICmdListBatchVk* pCmdListBatch, bool bWait /* = false */, uint64 waitTime /* = 0 */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Check that the batch has same queue type as the command context
 	Assert( pCmdListBatch->GetCmdContext() == &cmdContext );
@@ -884,7 +884,7 @@ CStudioAPICmdListBatchMgrVk::Wait
 */
 bool CStudioAPICmdListBatchMgrVk::Wait( CStudioAPICmdListBatchVk* pCmdListBatch, uint64 waitTime /* = 0 */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_WAIT );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_WAIT );
 	auto it = submittedBatchesDict.find( pCmdListBatch );
 	if ( it != submittedBatchesDict.end() )
 	{
@@ -906,7 +906,7 @@ CStudioAPICmdListBatchMgrVk::ClearSubmittedBatches
 */
 void CStudioAPICmdListBatchMgrVk::ClearSubmittedBatches()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Release all submitted fences
 	for ( auto it = submittedBatchesDict.begin(), itEnd = submittedBatchesDict.end(); it != itEnd; ++it )
@@ -923,7 +923,7 @@ CStudioAPICmdListBatchMgrVk::GrabVkSyncSignalsFromBatch
 */
 void CStudioAPICmdListBatchMgrVk::GrabVkSyncSignalsFromBatch( CStudioAPICmdListBatchVk* pCmdListBatch, eastl::vector<VkSemaphore>& vkSyncSignals ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Add general synchronization signals
 	for ( auto it = pCmdListBatch->syncSignals.begin(), itEnd = pCmdListBatch->syncSignals.end(); it != itEnd; ++it )
@@ -951,7 +951,7 @@ CStudioAPICmdListBatchMgrVk::GrabVkSyncWaitsFromBatch
 */
 void CStudioAPICmdListBatchMgrVk::GrabVkSyncWaitsFromBatch( CStudioAPICmdListBatchVk* pCmdListBatch, eastl::vector<VkSemaphore>& vkSyncWaits, eastl::vector<VkPipelineStageFlags>& vkSyncWaitStageMasks ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Add wait of general synchronization signals
 	for ( auto it = pCmdListBatch->syncWaits.begin(), itEnd = pCmdListBatch->syncWaits.end(); it != itEnd; ++it )
@@ -981,7 +981,7 @@ CStudioAPICmdListBatchMgrVk::GrabVkCmdBuffersFromBatch
 */
 void CStudioAPICmdListBatchMgrVk::GrabVkCmdBuffersFromBatch( CStudioAPICmdListBatchVk* pCmdListBatch, eastl::vector<VkCommandBuffer>& vkCmdBuffers ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Grab all command buffers from the batch
 	vkCmdBuffers.resize( pCmdListBatch->cmdLists.size() );

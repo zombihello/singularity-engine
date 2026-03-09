@@ -1,5 +1,5 @@
 #include "utils/interfaces/interfaces.h"
-#include "tier0/profile.h"
+#include "tier0/iprofiler.h"
 #include "filesystem/ifilesystem.h"
 #include "tier1/keyvalues.h"
 #include "utils/stexdoc/stex_source_doc.h"
@@ -225,7 +225,7 @@ CSTEXSourceTextureDoc::LoadFromFile
 bool CSTEXSourceTextureDoc::LoadFromFile( const char* pPath )
 {
 	// Load key values file
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	CKeyValues keyValues( "stex" );
 	if ( !keyValues.LoadFromFile( pPath ) )
 	{
@@ -322,7 +322,7 @@ CSTEXSourceTextureDoc::SaveFile
 bool CSTEXSourceTextureDoc::SaveFile( const char* pPath )
 {
 	// Validate source paths number
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	eastl::string validateMsg;
 	if ( !IsValidNumSourcePaths( type, (uint32)sourcePaths.size(), validateMsg ) )
 	{

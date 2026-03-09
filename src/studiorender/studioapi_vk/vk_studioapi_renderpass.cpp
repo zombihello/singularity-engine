@@ -70,7 +70,7 @@ CStudioAPIRenderPassVk::CStudioAPIRenderPassVk( const studioAPIRenderPassCreateI
 	: vkRenderPass( VK_NULL_HANDLE )
 	, pStudioAPIVkShutdownDelegate( NULL )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Fill information about attachments (render targets)
 	eastl::vector<VkAttachmentDescription> vkAttachments;
@@ -160,7 +160,7 @@ CStudioAPIRenderPassVk::CStudioAPIRenderPassVk
 */
 CStudioAPIRenderPassVk::~CStudioAPIRenderPassVk()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Destroy the Vulkan render pass
 	if ( vkRenderPass != VK_NULL_HANDLE )

@@ -44,7 +44,7 @@ CEcsMap::Init
 */
 void CEcsMap::Init( const CSMAPCompiledMapDoc& smapCompiledDoc )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_SCENE )
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_SCENE )
 	Reset();
 
 	// Create entities
@@ -113,7 +113,7 @@ CEcsMap::Reset
 */
 void CEcsMap::Reset()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_SCENE )
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_SCENE )
 	onMapReseted.Broadcast( this );
 
 	// TODO BS yehor.pohuliaka - Implement reload the map from the file system
@@ -128,7 +128,7 @@ CEcsMap::Update
 */
 void CEcsMap::Update( float deltaTime )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_SCENE )
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_SCENE )
 	ecsWorld.Update( deltaTime );
 }
 

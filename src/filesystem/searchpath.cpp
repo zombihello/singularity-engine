@@ -13,7 +13,7 @@ CSearchPathIterator::CSearchPathIterator
 CSearchPathIterator::CSearchPathIterator( const char* pFilePath, bool bForWrite, const char* pPathID /* = NULL */, uint32 lengthPathID /* = 0 */ )
 	: currentIndex( INVALID_INDEX )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	CFileSystem* pFileSystem = (CFileSystem*)g_pFileSystem;
 	Assert( pFileSystem );
 

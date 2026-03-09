@@ -27,7 +27,7 @@ CStudioAPIDescriptorSetWriterVk::SetupDescriptorSetWrites
 */
 void CStudioAPIDescriptorSetWriterVk::SetupDescriptorSetWrites( const studioAPIDescriptorSetInfoVk_t& descriptorSetInfo, VkWriteDescriptorSet* pVkWriteDescriptorSets, VkDescriptorBufferInfo* pVkDescriptorBufferInfos, VkDescriptorImageInfo* pVkDescriptorImageInfos, TRefPtr<CStudioAPIBufferVk>* pStudioAPIBuffers, studioAPITextureSamplerPairVk_t* pStudioAPITexturesSamplers, uint8* pSlotToWriteDescriptorSetMap )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Remember some data
 	CStudioAPIDescriptorSetWriterVk::pVkWriteDescriptorSets		  = pVkWriteDescriptorSets;

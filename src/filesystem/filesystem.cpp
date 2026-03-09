@@ -107,7 +107,7 @@ CFileSystem::CreateFileReader
 TRefPtr<IStreamDataReader> CFileSystem::CreateFileReader( const char* pPath, uint32 flags /* = FILE_READ_NONE */ )
 {
 	// Parse a path ID in pPath
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	const char* pFilePath	 = NULL;
 	const char* pPathID		 = NULL;
 	uint32		lengthPathID = 0;
@@ -146,7 +146,7 @@ CFileSystem::CreateFileWriter
 TRefPtr<IStreamDataWriter> CFileSystem::CreateFileWriter( const char* pPath, uint32 flags /* = FILE_WRITE_NONE */ )
 {
 	// Parse a path ID in pPath
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	const char* pFilePath	 = NULL;
 	const char* pPathID		 = NULL;
 	uint32		lengthPathID = 0;
@@ -194,7 +194,7 @@ CFileSystem::FindFiles
 TRefPtr<IPathArrayResult> CFileSystem::FindFiles( const char* pPath, const char* pPattern, bool bFiles, bool bDirectories, bool bLookAllPathIDs /* = true */ )
 {
 	// Parse a path ID in pPath
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	const char* pFilePath	 = NULL;
 	const char* pPathID		 = NULL;
 	uint32		lengthPathID = 0;
@@ -228,7 +228,7 @@ CFileSystem::LoadModule
 dllHandle_t CFileSystem::LoadModule( const char* pDLLName )
 {
 	// Parse a path ID in pPath
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	const char* pModulePath	 = NULL;
 	const char* pPathID		 = NULL;
 	uint32		lengthPathID = 0;
@@ -261,7 +261,7 @@ CFileSystem::UnloadModule
 */
 void CFileSystem::UnloadModule( dllHandle_t dllHandle )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	if ( dllHandle )
 	{
 		Sys_DLL_UnloadModule( dllHandle );
@@ -276,7 +276,7 @@ CFileSystem::DeleteFile
 bool CFileSystem::DeleteFile( const char* pPath, bool bDeleteAllPathIDs /* = false */, bool bEvenReadOnly /* = false */ )
 {
 	// Parse a path ID in pPath
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	const char* pFilePath	 = NULL;
 	const char* pPathID		 = NULL;
 	uint32		lengthPathID = 0;
@@ -318,7 +318,7 @@ CFileSystem::MakeDirectory
 bool CFileSystem::MakeDirectory( const char* pPath )
 {
 	// Parse a path ID in pPath
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	const char* pFilePath	 = NULL;
 	const char* pPathID		 = NULL;
 	uint32		lengthPathID = 0;
@@ -351,7 +351,7 @@ CFileSystem::DeleteDirectory
 bool CFileSystem::DeleteDirectory( const char* pPath, bool bDeleteAllPathIDs /* = false */, bool bEvenReadOnly /* = false */ )
 {
 	// Parse a path ID in pPath
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	const char* pFilePath	 = NULL;
 	const char* pPathID		 = NULL;
 	uint32		lengthPathID = 0;
@@ -393,7 +393,7 @@ CFileSystem::CopyFile
 copyMoveResult_t CFileSystem::CopyFile( const char* pSrcPath, const char* pDestPath, bool bReplaceExisting /* = false */, bool bEvenReadOnly /* = false */ )
 {
 	// Parse a path ID in pSrcPath
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	const char* pSrcFilePath	= NULL;
 	const char* pSrcPathID		= NULL;
 	uint32		lengthSrcPathID = 0;
@@ -458,7 +458,7 @@ CFileSystem::CopyDirectory
 copyMoveResult_t CFileSystem::CopyDirectory( const char* pSrcPath, const char* pDestPath, bool bCopyAllPathIDs /* = false */, bool bReplaceExisting /* = false */, bool bEvenReadOnly /* = false */ )
 {
 	// Parse a path ID in pSrcPath
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	const char* pSrcFilePath	= NULL;
 	const char* pSrcPathID		= NULL;
 	uint32		lengthSrcPathID = 0;
@@ -532,7 +532,7 @@ CFileSystem::MoveFile
 copyMoveResult_t CFileSystem::MoveFile( const char* pSrcPath, const char* pDestPath, bool bReplaceExisting /* = false */, bool bEvenReadOnly /* = false */ )
 {
 	// Parse a path ID in pSrcPath
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	const char* pSrcFilePath	= NULL;
 	const char* pSrcPathID		= NULL;
 	uint32		lengthSrcPathID = 0;
@@ -597,7 +597,7 @@ CFileSystem::MoveDirectory
 copyMoveResult_t CFileSystem::MoveDirectory( const char* pSrcPath, const char* pDestPath, bool bMoveAllPathIDs /* = false */, bool bReplaceExisting /* = false */, bool bEvenReadOnly /* = false */ )
 {
 	// Parse a path ID in pSrcPath
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	const char* pSrcFilePath	= NULL;
 	const char* pSrcPathID		= NULL;
 	uint32		lengthSrcPathID = 0;
@@ -671,7 +671,7 @@ CFileSystem::SetCurrentDirectory
 bool CFileSystem::SetCurrentDirectory( const char* pPath )
 {
 	// Parse a path ID in pPath
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	const char* pFilePath	 = NULL;
 	const char* pPathID		 = NULL;
 	uint32		lengthPathID = 0;
@@ -704,7 +704,7 @@ CFileSystem::IsFileExists
 bool CFileSystem::IsFileExists( const char* pPath ) const
 {
 	// Parse a path ID in pPath
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	const char* pFilePath	 = NULL;
 	const char* pPathID		 = NULL;
 	uint32		lengthPathID = 0;
@@ -736,7 +736,7 @@ CFileSystem::IsFileDirectory
 bool CFileSystem::IsFileDirectory( const char* pPath ) const
 {
 	// Parse a path ID in pPath
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	const char* pFilePath	 = NULL;
 	const char* pPathID		 = NULL;
 	uint32		lengthPathID = 0;
@@ -788,7 +788,7 @@ CFileSystem::MakeDirectoryInternal
 bool CFileSystem::MakeDirectoryInternal( const char* pPath )
 {
 	// Do nothing if the path is empty
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	if ( !pPath || pPath[0] == '\0' )
 	{
 		return false;
@@ -822,7 +822,7 @@ CFileSystem::DeleteDirectoryInternal
 bool CFileSystem::DeleteDirectoryInternal( const char* pPath, bool bEvenReadOnly /* = false */ )
 {
 	// Do nothing if the path is empty
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	if ( !pPath || pPath[0] == '\0' )
 	{
 		return false;
@@ -861,7 +861,7 @@ CFileSystem::CopyDirectoryInternal
 copyMoveResult_t CFileSystem::CopyDirectoryInternal( const char* pSrcPath, const char* pDestPath, bool bReplaceExisting /* = false */, bool bEvenReadOnly /* = false */ )
 {
 	// Do nothing if src or dest path is empty
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	if ( !pSrcPath || !pDestPath || pSrcPath[0] == '\0' || pDestPath[0] == '\0' )
 	{
 		return COPYMOVE_RESULT_MISC_FAIL;
@@ -918,7 +918,7 @@ CFileSystem::MoveDirectoryInternal
 copyMoveResult_t CFileSystem::MoveDirectoryInternal( const char* pSrcPath, const char* pDestPath, bool bReplaceExisting /* = false */, bool bEvenReadOnly /* = false */ )
 {
 	// Do nothing if src or dest path is empty
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	if ( !pSrcPath || !pDestPath || pSrcPath[0] == '\0' || pDestPath[0] == '\0' )
 	{
 		return COPYMOVE_RESULT_MISC_FAIL;

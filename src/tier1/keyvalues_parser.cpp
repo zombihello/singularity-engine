@@ -12,7 +12,7 @@ CKeyValuesParser::Setup
 void CKeyValuesParser::Setup( IStreamDataReader* pStreamReader )
 {
 	// Save the stream reader
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	Assert( pStreamReader );
 	buffer.SetStream( pStreamReader );
 
@@ -42,7 +42,7 @@ CKeyValuesParser::Parse
 */
 void CKeyValuesParser::Parse( CKeyValues* pKeyValues, IStreamDataReader* pStreamReader )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	Assert( pKeyValues );
 	Assert( pStreamReader );
 	Setup( pStreamReader );
@@ -57,7 +57,7 @@ CKeyValuesParser::ReadKeyValue
 bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValues )
 {
 	// Keep parsing until we hit the end of the buffer or a parse error
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	eastl::vector<CKeyValues*> includedKeys;
 	eastl::vector<CKeyValues*> baseKeys;
 	uint32					   blockScopeLevel = scopeLevel;
@@ -326,7 +326,7 @@ CKeyValuesParser::ReadConditionalBlock
 */
 bool CKeyValuesParser::ReadConditionalBlock( bool& bAccepted )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	Assert( g_pCvar );
 	static eastl::pair<const char*, bool> s_constantVars[] = {
 		eastl::make_pair( "$WINDOWS", PLATFORM_WINDOWS )
@@ -452,7 +452,7 @@ CKeyValuesParser::ReadIncludeKeys
 bool CKeyValuesParser::ReadIncludeKeys( eastl::vector<CKeyValues*>& includedKeys )
 {
 	// Read a file path
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	Assert( g_pFileSystem );
 
 	token_t token = ReadToken();
@@ -502,7 +502,7 @@ CKeyValuesParser::MergeBaseKeys
 */
 void CKeyValuesParser::MergeBaseKeys( CKeyValues* pNewKeyValues, CKeyValues* pBaseKeyValues )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	Assert( pNewKeyValues );
 	Assert( pBaseKeyValues );
 
@@ -539,7 +539,7 @@ CKeyValuesParser::SkipSpacesAndComments
 */
 void CKeyValuesParser::SkipSpacesAndComments()
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	while ( !buffer.IsEndOfBuffer() )
 	{
 		// Skip spaces
@@ -592,7 +592,7 @@ CKeyValuesParser::ReadToken
 void CKeyValuesParser::ReadToken( token_t& token )
 {
 	// Before read skip whitespaces and comments
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	SkipSpacesAndComments();
 	token.string.clear();
 	token.position = buffer.Tell();
@@ -688,7 +688,7 @@ CKeyValuesParser::CBuffer::Precache
 void CKeyValuesParser::CBuffer::Precache( uint32 requestedSize )
 {
 	// We don't do precache if we already have enough precached data size
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	Assert( requestedSize <= BUFFER_SIZE );
 	uint32 unusedPrecachedSize = precachedSize - bufferOffset;
 	if ( unusedPrecachedSize >= requestedSize )

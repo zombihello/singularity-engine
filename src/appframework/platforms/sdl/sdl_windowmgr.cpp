@@ -4,7 +4,7 @@
 #if PLATFORM_USE_SDL
 	#include <SDL3/SDL.h>
 
-	#include "tier0/profile.h"
+	#include "tier0/iprofiler.h"
 	#include "appframework/platforms/sdl/sdl_windowmgr.h"
 
 // Table for convert SDL scancode to engine button code
@@ -295,7 +295,7 @@ CWindowMgrSDL::ProcessEvents
 void CWindowMgrSDL::ProcessEvents()
 {
 	// Polls for currently pending SDL3 events
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	SDL_Event sdlEvent;
 	while ( SDL_PollEvent( &sdlEvent ) )
 	{

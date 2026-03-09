@@ -230,7 +230,7 @@ CStudioAPIVk::CreateCmdContext
 */
 TRefPtr<IStudioAPICmdContext> CStudioAPIVk::CreateCmdContext( studioAPIQueueType_t queueType ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	CStudioAPICmdContextVk* pImmediateCmdContext = (CStudioAPICmdContextVk*)GetImmediateCmdContext( queueType );
 	return new CStudioAPICmdContextVk( pImmediateCmdContext->GetQueue(), pImmediateCmdContext->GetSupportQueueTypes() );
 }
@@ -242,7 +242,7 @@ CStudioAPIVk::CreateCmdList
 */
 TRefPtr<IStudioAPICmdList> CStudioAPIVk::CreateCmdList( IStudioAPICmdContext* pCmdContext ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return new CStudioAPICmdListVk( (CStudioAPICmdContextVk*)pCmdContext );
 }
 
@@ -253,7 +253,7 @@ CStudioAPIVk::CreateCmdListBatch
 */
 TRefPtr<IStudioAPICmdListBatch> CStudioAPIVk::CreateCmdListBatch( IStudioAPICmdContext* pCmdContext ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return new CStudioAPICmdListBatchVk( (CStudioAPICmdContextVk*)pCmdContext );
 }
 
@@ -264,7 +264,7 @@ CStudioAPIVk::CreateSwapChain
 */
 TRefPtr<IStudioAPISwapChain> CStudioAPIVk::CreateSwapChain( windowHandle_t windowHandle, uint32 width, uint32 height, bool bUseVSync /* = false */ ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	TRefPtr<CStudioAPISwapChainVk> pStudioAPISwapChain = new CStudioAPISwapChainVk( S_Sprintf( "VkSwapChain [0x%X]", windowHandle ).c_str() );
 	if ( !pStudioAPISwapChain->Create( windowHandle, width, height, VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR, bUseVSync ) )
 	{
@@ -282,7 +282,7 @@ CStudioAPIVk::CreateVertexShader
 */
 TRefPtr<IStudioAPIShader> CStudioAPIVk::CreateVertexShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName /* = "" */ ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIVertexShaderVk( pEntryPointName, pBytecode, bytecodeSize, pReflectionData, reflectionDataSize, pDebugName );
 }
 
@@ -293,7 +293,7 @@ CStudioAPIVk::CreateHullShader
 */
 TRefPtr<IStudioAPIShader> CStudioAPIVk::CreateHullShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName /* = "" */ ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIHullShaderVk( pEntryPointName, pBytecode, bytecodeSize, pReflectionData, reflectionDataSize, pDebugName );
 }
 
@@ -304,7 +304,7 @@ CStudioAPIVk::CreateDomainShader
 */
 TRefPtr<IStudioAPIShader> CStudioAPIVk::CreateDomainShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName /* = "" */ ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIDomainShaderVk( pEntryPointName, pBytecode, bytecodeSize, pReflectionData, reflectionDataSize, pDebugName );
 }
 
@@ -315,7 +315,7 @@ CStudioAPIVk::CreateGeometryShader
 */
 TRefPtr<IStudioAPIShader> CStudioAPIVk::CreateGeometryShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName /* = "" */ ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIGeometryShaderVk( pEntryPointName, pBytecode, bytecodeSize, pReflectionData, reflectionDataSize, pDebugName );
 }
 
@@ -326,7 +326,7 @@ CStudioAPIVk::CreatePixelShader
 */
 TRefPtr<IStudioAPIShader> CStudioAPIVk::CreatePixelShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName /* = "" */ ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIPixelShaderVk( pEntryPointName, pBytecode, bytecodeSize, pReflectionData, reflectionDataSize, pDebugName );
 }
 
@@ -337,7 +337,7 @@ CStudioAPIVk::CreateComputeShader
 */
 TRefPtr<IStudioAPIShader> CStudioAPIVk::CreateComputeShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName /* = "" */ ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIComputeShaderVk( pEntryPointName, pBytecode, bytecodeSize, pReflectionData, reflectionDataSize, pDebugName );
 }
 
@@ -348,7 +348,7 @@ CStudioAPIVk::CreateRenderPipeline
 */
 TRefPtr<IStudioAPIBoundShaderState> CStudioAPIVk::FindOrCreateBoundShaderState( IStudioAPIVertexDeclaration* pVertexDeclaration, IStudioAPIShader* pVertexShader, IStudioAPIShader* pPixelShader, IStudioAPIShader* pHullShader /* = NULL */, IStudioAPIShader* pDomainShader /* = NULL */, IStudioAPIShader* pGeometryShader /* = NULL */ ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	CStudioAPIBoundShaderStateKeyVk key( (CStudioAPIVertexDeclarationVk*)pVertexDeclaration,
 										 (CStudioAPIVertexShaderVk*)pVertexShader,
 										 (CStudioAPIPixelShaderVk*)pPixelShader,
@@ -378,7 +378,7 @@ CStudioAPIVk::CreateRenderPipeline
 */
 TRefPtr<IStudioAPIRenderPipeline> CStudioAPIVk::CreateRenderPipeline( const studioAPIRenderPipelineCreateInfo_t& createInfo, const char* pDebugName /* = "" */ ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIRenderPipelineVk( createInfo, pDebugName );
 }
 
@@ -389,7 +389,7 @@ CStudioAPIVk::CreateVertexDeclaration
 */
 TRefPtr<IStudioAPIVertexDeclaration> CStudioAPIVk::CreateVertexDeclaration( const studioAPIVertexInputBuffer_t* pVertexInputBuffers, uint32 numVertexInputBuffers, const studioAPIVertexInputAttribute_t* pVertexInputAttributes, uint32 numVertexInputAttributes ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIVertexDeclarationVk( pVertexInputBuffers, numVertexInputBuffers, pVertexInputAttributes, numVertexInputAttributes );
 }
 
@@ -400,7 +400,7 @@ CStudioAPIVk::CreateVertexDeclaration
 */
 TRefPtr<IStudioAPIFrameBuffer> CStudioAPIVk::CreateFrameBuffer( const studioAPIFrameBufferCreateInfo_t& createInfo, const char* pDebugName /* = "" */ ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIFrameBufferVk( createInfo, pDebugName );
 }
 
@@ -411,7 +411,7 @@ CStudioAPIVk::CreateVertexDeclaration
 */
 TRefPtr<IStudioAPIRenderPass> CStudioAPIVk::CreateRenderPass( const studioAPIRenderPassCreateInfo_t& createInfo, const char* pDebugName /* = "" */ ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIRenderPassVk( createInfo, pDebugName );
 }
 
@@ -422,7 +422,7 @@ CStudioAPIVk::CreateBuffer
 */
 TRefPtr<IStudioAPIBuffer> CStudioAPIVk::CreateBuffer( const byte* pData, uint64 dataSize, uint32 dataStride, uint32 usageFlags, const char* pDebugName /* = "" */ ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIBufferVk( pData, dataSize, dataStride, usageFlags, pDebugName );
 }
 
@@ -433,7 +433,7 @@ CStudioAPIVk::CreateTexture
 */
 TRefPtr<IStudioAPITexture> CStudioAPIVk::CreateTexture( studioAPITextureType_t type, uint32 sizeX, uint32 sizeY, uint32 sizeZ, uint32 numLayers, uint32 numMips, uint32 usageFlags, studioAPIPixelFormat_t pixelFormat, const byte* pData /* = NULL */, const char* pDebugName /* = "" */ ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return new CStudioAPITextureVk( type, sizeX, sizeY, sizeZ, numLayers, numMips, usageFlags, pixelFormat, pData, pDebugName );
 }
 
@@ -444,7 +444,7 @@ CStudioAPIVk::CreateSampler
 */
 TRefPtr<IStudioAPISampler> CStudioAPIVk::CreateSampler( const studioAPISamplerCreateInfo_t& createInfo, const char* pDebugName /* = "" */ ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return new CStudioAPISamplerVk( createInfo, pDebugName );
 }
 
@@ -455,7 +455,7 @@ CStudioAPIVk::BeginDrawingFrame
 */
 void CStudioAPIVk::BeginDrawingFrame()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Increase the current frame number and current frame in-flight
 	currentFrameInFlight = ( currentFrameInFlight + 1 ) % STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT;
@@ -483,7 +483,7 @@ CStudioAPIVk::EndDrawingFrame
 */
 void CStudioAPIVk::EndDrawingFrame()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// End the frame in command contexts
 	pGraphicsCmdContext->EndFrame();
@@ -498,7 +498,7 @@ CStudioAPIVk::SubmitCmdListBatch
 */
 void CStudioAPIVk::SubmitCmdListBatch( IStudioAPICmdListBatch* pCmdListBatch, bool bWait /* = false */, uint64 waitTime /* = 0 */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Flush all upload data
 	dataUploader.Flush();
@@ -516,7 +516,7 @@ CStudioAPIVk::WaitCmdListBatch
 */
 bool CStudioAPIVk::WaitCmdListBatch( IStudioAPICmdListBatch* pCmdListBatch, uint64 waitTime /* = 0 */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_WAIT );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_WAIT );
 	CStudioAPICmdListBatchVk* pStudioAPICmdListBatch = (CStudioAPICmdListBatchVk*)pCmdListBatch;
 	CStudioAPICmdContextVk*	  pStudioAPICmdContext	 = (CStudioAPICmdContextVk*)pStudioAPICmdListBatch->GetCmdContext();
 	return pStudioAPICmdContext->GetCmdListBatchMgr().Wait( pStudioAPICmdListBatch, waitTime );

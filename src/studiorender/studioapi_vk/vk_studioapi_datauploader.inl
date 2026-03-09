@@ -8,7 +8,7 @@ CStudioAPIDataUploaderVk::Upload
 template<typename TUploadLambda>
 FORCEINLINE void CStudioAPIDataUploaderVk::Upload( uint64 dataSize, uint32 stagingBufferOffsetAlignment, TUploadLambda uploadLambda )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	CStudioAPICmdContextVk* pTransferCmdContext = (CStudioAPICmdContextVk*)g_StudioAPIVk.GetImmediateCmdContext( STUDIOAPI_QUEUE_TYPE_TRANSFER );
 	uint64					remainDataSize		= dataSize;
 	while ( remainDataSize > 0 )

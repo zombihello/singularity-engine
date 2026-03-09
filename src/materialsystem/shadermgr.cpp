@@ -383,7 +383,7 @@ CShaderMgr::FindShaderLib
 */
 uint32 CShaderMgr::FindShaderLib( const char* pPath ) const
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	for ( int32 index = (int32)shaderLibs.size(); --index >= 0; )
 	{
 		const shaderLibInfo_t& info = shaderLibs[index];
@@ -484,7 +484,7 @@ CShaderMgr::GetStudioAPIShader
 */
 IStudioAPIShader* CShaderMgr::GetStudioAPIShader( uint32 shaderLibIndex, studioAPIShaderType_t shaderType, uint64 shaderIndex ) const
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	Assert( shaderLibIndex < (uint32)shaderLibs.size() );
 	Assert( shaderType < STUDIOAPI_SHADER_NUM_TYPES );
 
@@ -500,7 +500,7 @@ CShaderMgr::FindShader
 */
 IShader* CShaderMgr::FindShader( const char* pShaderName ) const
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	for ( int32 shaderLibIdx = (int32)shaderLibs.size(); --shaderLibIdx >= 0; )
 	{
 		const shaderLibInfo_t& info	  = shaderLibs[shaderLibIdx];

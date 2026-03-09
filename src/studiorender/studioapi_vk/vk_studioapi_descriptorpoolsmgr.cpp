@@ -9,7 +9,7 @@ CStudioAPIDescriptorPoolVk::CStudioAPIDescriptorPoolVk
 CStudioAPIDescriptorPoolVk::CStudioAPIDescriptorPoolVk( const CStudioAPIDescriptorSetsLayoutVk& descriptorSetsLayout, uint32 maxSetsAllocations )
 	: vkDescriptorPool( VK_NULL_HANDLE )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// When we're hashing pools with types usage hash the descriptor pool can be used for different layouts so the initial layout does not make much sense
 	eastl::vector<VkDescriptorPoolSize> vkDescriptorPoolSizes;
@@ -42,7 +42,7 @@ CStudioAPIDescriptorPoolVk::~CStudioAPIDescriptorPoolVk
 */
 CStudioAPIDescriptorPoolVk::~CStudioAPIDescriptorPoolVk()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	if ( vkDescriptorPool != VK_NULL_HANDLE )
 	{
 		vkDestroyDescriptorPool( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), vkDescriptorPool, NULL );
@@ -57,7 +57,7 @@ CStudioAPIDescriptorPoolVk::Reset
 */
 void CStudioAPIDescriptorPoolVk::Reset()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	if ( vkDescriptorPool != VK_NULL_HANDLE )
 	{
 		STUDIOAPI_VK_VERIFY_RESULT( vkResetDescriptorPool( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), vkDescriptorPool, 0 ) );
@@ -71,7 +71,7 @@ CStudioAPIDescriptorPoolVk::AllocateDescriptorSets
 */
 bool CStudioAPIDescriptorPoolVk::AllocateDescriptorSets( const VkDescriptorSetAllocateInfo& vkDescriptorSetAllocateInfo, VkDescriptorSet* pDestDescriptorSets )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	if ( vkDescriptorPool != VK_NULL_HANDLE )
 	{
 		VkDescriptorSetAllocateInfo tmpVkDescriptorSetAllocateInfo = vkDescriptorSetAllocateInfo;
@@ -99,7 +99,7 @@ CStudioAPITypedDescriptorPoolSetVk::~CStudioAPITypedDescriptorPoolSetVk
 */
 CStudioAPITypedDescriptorPoolSetVk::~CStudioAPITypedDescriptorPoolSetVk()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	for ( auto it = poolList.begin(), itEnd = poolList.end(); it != itEnd; ++it )
 	{
 		delete *it;
@@ -113,7 +113,7 @@ CStudioAPITypedDescriptorPoolSetVk::Reset
 */
 void CStudioAPITypedDescriptorPoolSetVk::Reset()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	for ( auto it = poolList.begin(), itEnd = poolList.end(); it != itEnd; ++it )
 	{
 		( *it )->Reset();
@@ -128,7 +128,7 @@ CStudioAPITypedDescriptorPoolSetVk::AllocateDescriptorSets
 */
 bool CStudioAPITypedDescriptorPoolSetVk::AllocateDescriptorSets( const CStudioAPIDescriptorSetsLayoutVk& descriptorSetsLayout, VkDescriptorSet* pDestDescriptorSets )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	if ( !descriptorSetsLayout.GetVkDescriptorSetLayouts().empty() )
 	{
 		CStudioAPIDescriptorPoolVk* pPool = *poolCurrentIt;
@@ -149,7 +149,7 @@ CStudioAPITypedDescriptorPoolSetVk::GetFreePool
 */
 CStudioAPIDescriptorPoolVk* CStudioAPITypedDescriptorPoolSetVk::GetFreePool( bool bForceNewPool )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	if ( !bForceNewPool )
 	{
 		return *poolCurrentIt;
@@ -172,7 +172,7 @@ CStudioAPITypedDescriptorPoolSetVk::PushNewPool
 */
 CStudioAPIDescriptorPoolVk* CStudioAPITypedDescriptorPoolSetVk::PushNewPool()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Max number of descriptor sets layout allocations
 	const uint32 maxSetsAllocationsBase = 32;
@@ -204,7 +204,7 @@ CStudioAPIDescriptorPoolSetContainerVk::~CStudioAPIDescriptorPoolSetContainerVk
 */
 CStudioAPIDescriptorPoolSetContainerVk::~CStudioAPIDescriptorPoolSetContainerVk()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	for ( auto it = typedDescriptorPoolsDict.begin(), itEnd = typedDescriptorPoolsDict.end(); it != itEnd; ++it )
 	{
 		delete it->second;
@@ -249,7 +249,7 @@ CStudioAPIDescriptorPoolsMgrVk::Init
 */
 void CStudioAPIDescriptorPoolsMgrVk::Init()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Register in 'onStudioAPIVkShutodwn' for destroy Vulkan objects when the one is shutdown
 	pStudioAPIVkShutdownDelegate = g_StudioAPIVk.OnStudioAPIVkShutdown().AddFunc( &CStudioAPIDescriptorPoolsMgrVk::OnStudioAPIVkShutdown, this );
@@ -262,7 +262,7 @@ CStudioAPIDescriptorPoolsMgrVk::Shutdown
 */
 void CStudioAPIDescriptorPoolsMgrVk::Shutdown()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Delete all pool sets
 	for ( auto it = poolSets.begin(), itEnd = poolSets.end(); it != itEnd; ++it )
@@ -286,7 +286,7 @@ CStudioAPIDescriptorPoolsMgrVk::AcquirePoolSet
 */
 CStudioAPIDescriptorPoolSetContainerVk* CStudioAPIDescriptorPoolsMgrVk::AcquirePoolSet()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	for ( auto it = poolSets.begin(), itEnd = poolSets.end(); it != itEnd; ++it )
 	{
 		CStudioAPIDescriptorPoolSetContainerVk* pPoolSet = *it;
@@ -307,7 +307,7 @@ CStudioAPIDescriptorPoolsMgrVk::ReleasePoolSet
 */
 void CStudioAPIDescriptorPoolsMgrVk::ReleasePoolSet( CStudioAPIDescriptorPoolSetContainerVk* pPoolSet )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	if ( !poolSets.empty() )
 	{
 		Assert( pPoolSet );
@@ -322,7 +322,7 @@ CStudioAPIDescriptorPoolsMgrVk::FreeUnusedPoolSets
 */
 void CStudioAPIDescriptorPoolsMgrVk::FreeUnusedPoolSets()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	for ( auto it = poolSets.rbegin(), itEnd = poolSets.rend(); it != itEnd; ++it )
 	{
 		CStudioAPIDescriptorPoolSetContainerVk* pPoolSet = *it;

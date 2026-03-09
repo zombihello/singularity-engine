@@ -110,7 +110,7 @@ CBaseShader::R_PrepareForDraw
 */
 void CBaseShader::R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, studioRenderPassType_t renderPassType, IMaterialVar** pParams, IStudioAPIBuffer** pStudioAPConstantIBuffers /* = NULL */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Select a shader combination
 	shaderComboInfo_t comboInfo = {};

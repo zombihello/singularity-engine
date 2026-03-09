@@ -288,7 +288,7 @@ CCvar::RegisterCommand
 */
 void CCvar::RegisterCommand( IConCmdBase* pCommand )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 
 	// Do nothing if command already is registered
 	if ( pCommand->IsRegistered() )
@@ -392,7 +392,7 @@ CCvar::UnregisterCommand
 */
 void CCvar::UnregisterCommand( IConCmdBase* pCommand )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 
 	// Do nothing if command isn't registered
 	if ( !pCommand->IsRegistered() )
@@ -433,7 +433,7 @@ CCvar::UnregisterCommands
 */
 void CCvar::UnregisterCommands( cvarDLLIdentifier_t dllIdentifier )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	IConCmdBase* pNewList	 = NULL;
 	IConCmdBase *pCurCommand = pConCmdList, *pNextCommand = NULL;
 	while ( pCurCommand )
@@ -463,7 +463,7 @@ CCvar::ParseCommand
 */
 bool CCvar::ParseCommand( const char*& pCommand, const char separator /*= '$'*/ )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 
 	// Reset command buffers
 	commandArgc			 = 0;
@@ -606,7 +606,7 @@ CCvar::Exec
 */
 bool CCvar::Exec( const char* pCommand )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 
 	// Do nothing if a command is empty
 	if ( !pCommand || !pCommand[0] )
@@ -673,7 +673,7 @@ CCvar::FindCommandBase
 */
 IConCmdBase* CCvar::FindCommandBase( const char* pName, uint32 length ) const
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	for ( IConCmdBase* pCurCommand = pConCmdList; pCurCommand; pCurCommand = pCurCommand->GetNext() )
 	{
 		const char* pCommandName	  = pCurCommand->GetName();
@@ -704,7 +704,7 @@ CCvar::FindCommand
 */
 IConCmd* CCvar::FindCommand( const char* pName, uint32 length ) const
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	IConCmdBase* pConCmd = FindCommandBase( pName, length );
 	if ( !pConCmd || !pConCmd->IsCommand() )
 	{
@@ -731,7 +731,7 @@ CCvar::FindVar
 */
 IConVar* CCvar::FindVar( const char* pName, uint32 length ) const
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	IConCmdBase* pConVar = FindCommandBase( pName, length );
 	if ( !pConVar || pConVar->IsCommand() )
 	{
@@ -758,7 +758,7 @@ CCvar::ReadConfigFile
 */
 void CCvar::ReadConfigFile( const char* pConfigDir, bool bWriteConfigIfNotExist /* = true */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	eastl::string configPath = S_Sprintf( "%s/" CVAR_CONFIG_NAME ".cfg", pConfigDir );
 	if ( g_pFileSystem->IsFileExists( configPath.c_str() ) )
 	{
@@ -787,7 +787,7 @@ CCvar::WriteConfigFile
 */
 void CCvar::WriteConfigFile( const char* pConfigDir, bool bWriteDefaultConfig /* = false */ )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_IO );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 
 	// Open file to write
 	eastl::string			   configPath = S_Sprintf( !bWriteDefaultConfig ? "%s/" CVAR_CONFIG_NAME ".cfg" : "%s/" CVAR_DEFAULT_CONFIG_NAME ".cfg", pConfigDir );
@@ -865,7 +865,7 @@ CCvar::ResetFlaggedVars
 */
 void CCvar::ResetFlaggedVars( uint32 flags )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	for ( IConCmdBase* pCurVar = pConCmdList; pCurVar; pCurVar = pCurVar->GetNext() )
 	{
 		// Skip commands and cvars that no have a specific flags
@@ -913,7 +913,7 @@ CCvar::CallGlobalChangeCallback
 */
 void CCvar::CallGlobalChangeCallback( IConVar* pConVar )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	if ( pGlobalChangeCallbackFn )
 	{
 		pGlobalChangeCallbackFn( pConVar );
@@ -979,7 +979,7 @@ CheatsChanged
 */
 static void CheatsCVarChanged( IConVar* pConVar )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 
 	// Cheats were disabled, revert all cheat cvars to their default values
 	if ( g_pCvar && pConVar->GetInt() == 0 )

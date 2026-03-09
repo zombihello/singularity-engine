@@ -33,7 +33,7 @@ CStudioRenderPipelineSet::CRenderPipelineContainer::Init
 */
 void CStudioRenderPipelineSet::CRenderPipelineContainer::Init( studioRenderPassType_t renderPassType )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Initialize a data storage
 	AssertMsg( !pDataStorage, "The render pipeline container already initialized" );
@@ -58,7 +58,7 @@ CStudioRenderPipelineSet::CRenderPipelineContainer::Destroy
 */
 void CStudioRenderPipelineSet::CRenderPipelineContainer::Destroy()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	if ( pDataStorage )
 	{
 		if ( renderPassType != STUDIO_RENDERPASS_TYPE_PRESENT )
@@ -120,7 +120,7 @@ CStudioRenderPipelineSet::CRenderPipelineContainer::R_BakeRenderPipeline
 */
 IStudioAPIRenderPipeline* CStudioRenderPipelineSet::CRenderPipelineContainer::R_BakeRenderPipeline( const studioBakeRenderPipelineParams_t& bakeParams )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// For non-present passes we get the array as is
 	eastl::vector<TRefPtr<IStudioAPIRenderPipeline>>* pStudioAPIRenderPipelines = NULL;
@@ -191,7 +191,7 @@ CStudioRenderPipelineSet::CRenderPipelineContainer::GetStudioAPIRenderPipeline
 */
 IStudioAPIRenderPipeline* CStudioRenderPipelineSet::CRenderPipelineContainer::GetStudioAPIRenderPipeline( uint64 pipelineIdx ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Draw render pipelines
 	Assert( pDataStorage && renderPassType != STUDIO_RENDERPASS_NUM_TYPES );
@@ -221,7 +221,7 @@ CStudioRenderPipelineSet::CRenderPipelineContainer::OnReleaseViewportIndex
 */
 void CStudioRenderPipelineSet::CRenderPipelineContainer::OnReleaseViewportIndex( void* pUserData, CStudioViewport* pViewport )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	Assert( pUserData );
 	CRenderPipelineContainer* pRenderPipelineContainer = (CRenderPipelineContainer*)pUserData;
@@ -262,7 +262,7 @@ CStudioRenderPipelineSet::CRenderPipelineContainer::OnRenderPassUpdated
 */
 void CStudioRenderPipelineSet::CRenderPipelineContainer::OnRenderPassUpdated( void* pUserData, CStudioViewport* pViewport )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// If a viewport render pass was updated remove all cached pipelines for the viewport
 	Assert( pUserData );
@@ -290,7 +290,7 @@ CStudioRenderPipelineSet::Init
 */
 void CStudioRenderPipelineSet::Init()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Initialize containers
 	for ( uint32 renderPassType = 0; renderPassType < STUDIO_RENDERPASS_NUM_TYPES; ++renderPassType )
@@ -309,7 +309,7 @@ CStudioRenderPipelineSet::Shutdown
 */
 void CStudioRenderPipelineSet::Shutdown()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Destroy containers
 	for ( uint32 renderPassType = 0; renderPassType < STUDIO_RENDERPASS_NUM_TYPES; ++renderPassType )
@@ -328,7 +328,7 @@ CStudioVertexDeclarations::R_BakeRenderPipeline
 */
 IStudioAPIRenderPipeline* CStudioRenderPipelineSet::R_BakeRenderPipeline( const studioBakeRenderPipelineParams_t& bakeParams )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( Studio_IsInRenderThread() );
 	Assert( bakeParams.renderPassType < STUDIO_RENDERPASS_NUM_TYPES );
 	return renderPipelineContainers[bakeParams.renderPassType].R_BakeRenderPipeline( bakeParams );
@@ -341,7 +341,7 @@ CStudioVertexDeclarations::GetStudioAPIRenderPipeline
 */
 IStudioAPIRenderPipeline* CStudioRenderPipelineSet::GetStudioAPIRenderPipeline( studioRenderPassType_t renderPassType, uint64 pipelineIdx ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( renderPassType < STUDIO_RENDERPASS_NUM_TYPES );
 	return renderPipelineContainers[renderPassType].GetStudioAPIRenderPipeline( pipelineIdx );
 }

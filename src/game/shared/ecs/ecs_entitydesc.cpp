@@ -41,7 +41,7 @@ CEcsEntityDesc::Init
 */
 void CEcsEntityDesc::Init( const CSENTCompiledEntityDescDoc& sentCompiledDoc )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_SCENE )
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_SCENE )
 	Clear();
 
 	// Initialize new ECS component factories
@@ -64,7 +64,7 @@ CEcsEntityDesc::CreateEcsPrefab
 */
 uint32 CEcsEntityDesc::CreateEcsPrefab( CEcsMap* pEcsMap, const char* pName, uint32 ecsPrefabIdx /* = INVALID_INDEX */ ) const
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_SCENE );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_SCENE );
 	Assert( pEcsMap );
 	Assert( ecsPrefabIdx == INVALID_INDEX || ecsPrefabIdx < ecsPrefabs.size() );
 
@@ -100,7 +100,7 @@ CEcsEntityDesc::OnMapResetedOrUnloaded
 */
 void CEcsEntityDesc::OnMapResetedOrUnloaded( void* pUserData, IMap* pMap )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_SCENE )
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_SCENE )
 	CEcsEntityDesc* pEcsEntityDesc = (CEcsEntityDesc*)pUserData;
 	for ( uint32 ecsPrefabIdx = 0, numEcsPrefabs = (uint32)pEcsEntityDesc->ecsPrefabs.size(); ecsPrefabIdx < numEcsPrefabs; ++ecsPrefabIdx )
 	{
@@ -136,7 +136,7 @@ CEcsEntityDesc::Clear
 */
 void CEcsEntityDesc::Clear()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_SCENE )
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_SCENE )
 	for ( uint32 ecsPrefabIdx = 0, numEcsPrefabs = (uint32)ecsPrefabs.size(); ecsPrefabIdx < numEcsPrefabs; ++ecsPrefabIdx )
 	{
 		ecsPrefab_t& ecsPrefab = ecsPrefabs[ecsPrefabIdx];
@@ -164,7 +164,7 @@ CEcsEntityDesc::Create
 */
 ecsEntity_t CEcsEntityDesc::GetEcsPrefab( CEcsMap* pEcsMap )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_SCENE )
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_SCENE )
 	Assert( pEcsMap );
 
 	CEcsWorld& ecsWorld = pEcsMap->GetEcsWorld();

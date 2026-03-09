@@ -188,7 +188,7 @@ CStudioRender::BeginFrame
 */
 void CStudioRender::BeginFrame()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( Sys_IsInMainThread() );
 }
 
@@ -199,7 +199,7 @@ CStudioRender::EndFrame
 */
 void CStudioRender::EndFrame()
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( Sys_IsInMainThread() );
 	// TODO BS yehor.pohuliaka - Implement here synchronization the renderObjects between the main thread and the render thread
 }
@@ -212,7 +212,7 @@ CStudioRender::R_DrawFrame
 
 void CStudioRender::R_DrawFrame( CStudioViewport* pViewport )
 {
-	PROFILE_SCOPE( PROFILE_SCOPE_GROUP_RENDERING );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( Studio_IsInRenderThread() );
 	Assert( !renderObjects.empty() );
 	presentRenderPass.R_DrawPass( pViewport, (CStudioRenderObjectQuad*)renderObjects[0].GetPtr() );

@@ -8,7 +8,7 @@ TMulticastDelegate::AddFunc
 template<typename... TParamTypes>
 typename TMulticastDelegate<TParamTypes...>::funcDelegate_t* TMulticastDelegate<TParamTypes...>::AddFunc( delegateFn_t pDelegateFn, void* pUserData /*= NULL*/ )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	CScopeLock scopeLock( mutex );
 	return &funcDelegates.emplace_back( funcDelegate_t{ pUserData, pDelegateFn } );
 }
@@ -21,7 +21,7 @@ TMulticastDelegate::RemoveAll
 template<typename... TParamTypes>
 void TMulticastDelegate<TParamTypes...>::RemoveAll()
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	CScopeLock scopeLock( mutex );
 	funcDelegates.clear();
 }
@@ -34,7 +34,7 @@ TMulticastDelegate::RemoveFunc
 template<typename... TParamTypes>
 void TMulticastDelegate<TParamTypes...>::RemoveFunc( funcDelegate_t* pDelegate )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	if ( pDelegate )
 	{
 		CScopeLock scopeLock( mutex );
@@ -57,7 +57,7 @@ TMulticastDelegate::Broadcast
 template<typename... TParamTypes>
 void TMulticastDelegate<TParamTypes...>::Broadcast( TParamTypes... params ) const
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	CScopeLock scopeLock( mutex );
 	for ( auto it = funcDelegates.begin(), itEnd = funcDelegates.end(); it != itEnd; ++it )
 	{
@@ -99,7 +99,7 @@ TDelegate::Execute
 template<typename... TParamTypes>
 void TDelegate<TParamTypes...>::Execute( TParamTypes... params )
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	CScopeLock scopeLock( mutex );
 	( *funcDelegate.pFunc )( funcDelegate.pUserData, params... );
 }

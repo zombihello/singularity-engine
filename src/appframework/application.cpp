@@ -1,6 +1,6 @@
 #include "pch_appframework.h"
 #include "tier0/icommandline.h"
-#include "tier0/profile.h"
+#include "tier0/iprofiler.h"
 #include "tier1/filetools.h"
 #include "tier1/convar.h"
 #include "appframework/application.h"
@@ -118,6 +118,11 @@ void CApplication::Init()
 	S_AppendPathSeparator( exePath );
 	g_pFileSystem->AddSearchPath( exePath.c_str(), "enginebin" );
 	g_pFileSystem->AddSearchPath( "core", "core" );
+
+	// Initialize the profiler
+#if ENABLE_PROFILING
+	Profiler()->Init();
+#endif	// ENABLE_PROFILING
 }
 
 /*
@@ -127,7 +132,12 @@ CApplication::Shutdown
 */
 void CApplication::Shutdown()
 {
-// Remove the log output file
+	// Shutdown the profiler
+#if ENABLE_PROFILING
+	Profiler()->Shutdown();
+#endif	// ENABLE_PROFILING
+
+	// Remove the log output file
 #if ENABLE_LOGGING
 	{
 		CLogOutputFile& logOutputFile = GetLogOutputFile();
@@ -201,7 +211,7 @@ CApplication::FindSystem
 */
 void* CApplication::FindSystem( const char* pInterfaceName ) const
 {
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	for ( int32 index = (int32)systemGroups.size(); --index >= 0; )
 	{
 		void* pInterface = systemGroups[index]->FindSystem( pInterfaceName );

@@ -5,6 +5,8 @@
 #define PLATFORM_IS_ANSI_MALLOC_THREADSAFE 0
 #define PLATFORM_SUPPORTS_MIMALLOC		   0
 #define PLATFORM_USE_SDL				   0
+#define PLATFORM_USE_TRACY_PROFILER		   0
+#define PLATFORM_USE_NULL_PROFILER		   1
 
 // Platform specific definitions
 #if PLATFORM_WINDOWS  // Windows platform

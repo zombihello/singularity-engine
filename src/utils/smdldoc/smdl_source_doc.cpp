@@ -1,5 +1,5 @@
 #include "utils/interfaces/interfaces.h"
-#include "tier0/profile.h"
+#include "tier0/iprofiler.h"
 #include "tier1/keyvalues.h"
 #include "filesystem/ifilesystem.h"
 #include "utils/smdldoc/smdl_source_doc.h"
@@ -65,7 +65,7 @@ CSMDLSourceModelDoc::LoadFromFile
 bool CSMDLSourceModelDoc::LoadFromFile( const char* pPath )
 {
 	// Load key values file
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	CKeyValues keyValues( "smdl" );
 	if ( !keyValues.LoadFromFile( pPath ) )
 	{
@@ -136,7 +136,7 @@ CSMDLSourceModelDoc::SaveFile
 bool CSMDLSourceModelDoc::SaveFile( const char* pPath )
 {
 	// Create key values
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	CKeyValues keyValues( "smdl" );
 	keyValues.SetBool( "combine_models", bCombineModels );
 	keyValues.SetString( "axis_up", ConvAxisUpToText( axisUp ) );

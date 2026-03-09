@@ -1,5 +1,5 @@
 #include "utils/interfaces/interfaces.h"
-#include "tier0/profile.h"
+#include "tier0/iprofiler.h"
 #include "tier1/keyvalues.h"
 #include "filesystem/ifilesystem.h"
 #include "utils/sentdoc/sent_source_doc.h"
@@ -79,7 +79,7 @@ CSENTSourceEntityDescDoc::LoadFromFile
 bool CSENTSourceEntityDescDoc::LoadFromFile( const char* pPath )
 {
 	// Load key values file
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	CKeyValues keyValues( "sent" );
 	if ( !keyValues.LoadFromFile( pPath ) )
 	{
@@ -160,7 +160,7 @@ CSENTSourceEntityDescDoc::SaveFile
 bool CSENTSourceEntityDescDoc::SaveFile( const char* pPath )
 {
 	// Create key values
-	PROFILE_SCOPE();
+	PROFILER_SCOPE_FUNC();
 	CKeyValues keyValues( "sent" );
 	if ( !components.empty() )
 	{
