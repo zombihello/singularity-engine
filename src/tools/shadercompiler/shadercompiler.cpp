@@ -1,6 +1,5 @@
 #include "pch_shadercompiler.h"
 #include "tier0/icommandline.h"
-#include "tier0/crashdump.h"
 #include "cvar/icvar.h"
 #include "appframework/application.h"
 #include "utils/shadercache/shadercache.h"

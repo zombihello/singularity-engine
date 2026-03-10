@@ -1,5 +1,5 @@
 #include "pch_tier0.h"
-#include "tier0/crashdump_internal.h"
+#include "tier0/icrashdump_handler.h"
 #include "tier0/assert.h"
 #include "tier0/debug.h"
 
@@ -39,7 +39,7 @@ bool Sys_AssertFailed( const char* pExpr, const char* pFile, int32 line, const c
 	Sys_ShowMessageBox( "Singularity Error", fullMessage.c_str(), MESSAGE_BOX_ERROR );
 
 	// Set crash dump message
-	CrashDump_SetMessage( fullMessage.c_str() );
+	CrashDumpHandler()->SetMessage( fullMessage.c_str() );
 
 	// Shutdown application
 	Sys_RequestExit( true );

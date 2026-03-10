@@ -42,12 +42,12 @@ void CApplication::Init()
 	#endif	// DEBUG
 #endif		// ENABLE_LOGGING
 
-	// Initialize the main thread and the command line
-	Sys_InitMainThread();
+	// Initialize Tier0 and the command line
+	InitTier0();
 	CommandLine()->Init( pCommandLine );
 
 	// Setup application information for the crash dump
-	CrashDump_SetAppInfo( GetCrashDumpInfo() );
+	CrashDumpHandler()->SetAppInfo( GetCrashDumpInfo() );
 
 	// Attach a console for I/O if it need (only for window apps)
 #if ENABLE_LOGGING
@@ -86,7 +86,7 @@ void CApplication::Init()
 		TRefPtr<IStreamDataWriter> pLogFile		 = logOutputFile.BeginLoggingToFile( S_Sprintf( "//base_path/logs/%s.log", appInfo.pAppName ).c_str() );
 		if ( pLogFile )
 		{
-			CrashDump_AddLogFile( pLogFile->GetPath() );
+			CrashDumpHandler()->AddLogFile( pLogFile->GetPath() );
 			Logger()->AddOutput( &logOutputFile );
 		}
 	}
@@ -121,7 +121,12 @@ void CApplication::Init()
 
 	// Initialize the profiler
 #if ENABLE_PROFILING
-	Profiler()->Init();
+	IProfiler* pProfiler = Profiler();
+	pProfiler->Init();
+	while ( CommandLine()->HasParam( "wait-profiler" ) && !pProfiler->IsConnected() )
+	{
+		Thread_Yield();
+	}
 #endif	// ENABLE_PROFILING
 }
 
@@ -154,7 +159,10 @@ void CApplication::Shutdown()
 	tier1SystemGroup.Shutdown();
 	systemGroups.clear();
 
-// Remove the log output stdout
+	// Shutdown Tier0
+	ShutdownTier0();
+
+	// Remove the log output stdout
 #if ENABLE_LOGGING
 	Logger()->RemoveOutput( &GetLogOutputStdOut() );
 #endif	// ENABLE_LOGGING

@@ -1,6 +1,6 @@
 #pragma once
 #include "tier0/tier0.h"
-#include "tier0/crashdump.h"
+#include "tier0/icrashdump_handler.h"
 #include "tier1/tier1_logoutputs.h"
 #include "appframework/appsystemgroup_tier1.h"
 #include "appframework/appsystemgroup.h"
