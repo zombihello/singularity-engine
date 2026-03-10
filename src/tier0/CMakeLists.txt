@@ -74,6 +74,9 @@ set_target_properties( tier0 PROPERTIES PREFIX 						"" )
 target_include_directories( tier0 PRIVATE             				${THIRDPARTY_INCLUDES} )
 target_compile_definitions( tier0 PRIVATE							${THIRDPARTY_DEFINES} )
 target_link_libraries( tier0 PRIVATE 								tier1 ${THIRDPARTY_LIBS} ${CMAKE_DL_LIBS} )
+if ( PLATFORM_WINDOWS )
+	target_link_libraries( tier0 PRIVATE 							dbghelp )
+endif()
 add_common_target_defines( tier0 )
 
 

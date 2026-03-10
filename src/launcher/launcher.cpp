@@ -99,7 +99,7 @@ void CLauncherApp::Init()
 	crashDumpAppInfo.pAppVersion		= gameInfo.GetVersion().c_str();
 	crashDumpAppInfo.pSupportEmail		= gameInfo.GetSupportEmail().c_str();
 	crashDumpAppInfo.pSupportURL		= gameInfo.GetSupportURL().c_str();
-	CrashDump_SetAppInfo( crashDumpAppInfo );
+	CrashDumpHandler()->SetAppInfo( crashDumpAppInfo );
 
 	// Connect WindowMgr, Engine and Game groups
 	AddGroup( &windowMgrSystemGroup );

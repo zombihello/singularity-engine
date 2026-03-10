@@ -1,5 +1,5 @@
 #include "pch_tier1.h"
-#include "tier0/crashdump.h"
+#include "tier0/icrashdump_handler.h"
 #include "tier1/threading.h"
 
 /*
@@ -487,8 +487,8 @@ DWORD STDCALL CWindowsThread::ThreadMain( LPVOID pThis )
 {
 	CWindowsThread* theThread = (CWindowsThread*)pThis;
 
-	// Notify the crash dumper about thread startup, set thread priority and debug name
-	CrashDump_OnThreadRun();
+	// Notify the crash dump handler about thread startup, set thread priority and debug name
+	CrashDumpHandler()->OnThreadRun();
 	Thread_SetPriority( theThread->handle, theThread->threadPriority );
 	Thread_SetName( theThread->handle, theThread->GetName() );
 
@@ -519,8 +519,8 @@ DWORD STDCALL CWindowsThread::ThreadMain( LPVOID pThis )
 	// Allow any allocated resources to be cleaned up
 	theThread->ThreadExit();
 
-	// Notify the crash dumper about thread stop
-	CrashDump_OnThreadStop();
+	// Notify the crash dump handler about thread stop
+	CrashDumpHandler()->OnThreadStop();
 
 	// Clean ourselves up without waiting
 	// Now clean up the thread handle so we don't leak

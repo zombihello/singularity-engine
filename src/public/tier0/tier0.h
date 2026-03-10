@@ -25,9 +25,9 @@ enum procPriority_t
 	PROC_PRIORITY_HIGH
 };
 
-// Functions to initialize the main thread
-TIER0_INTERFACE void Sys_InitMainThread();
-TIER0_INTERFACE bool Sys_IsInMainThread();
+// Functions to initialize and shutdown Tier0
+TIER0_INTERFACE void InitTier0();
+TIER0_INTERFACE void ShutdownTier0();
 
 // Functions to work with a process
 TIER0_INTERFACE procHandle_t Sys_CreateProc( const char* pPath, const char* pParams, bool bLaunchDetached, bool bLaunchHidden, procPriority_t priority = PROC_PRIORITY_NORMAL, uint64* pProcessId = nullptr );
@@ -44,6 +44,7 @@ TIER0_INTERFACE void*		Sys_DLL_GetProcAddress( dllHandle_t pDLLHandle, const cha
 // Indicates that MainLoop should be exited at the end of the current iteration
 TIER0_INTERFACE void Sys_RequestExit( bool bForce );
 TIER0_INTERFACE bool Sys_IsRequestingExit();
+TIER0_INTERFACE bool Sys_IsInMainThread();
 
 // Print critical error and to shutdown application
 TIER0_INTERFACE void		Sys_Error( const char* pFormat, ... );

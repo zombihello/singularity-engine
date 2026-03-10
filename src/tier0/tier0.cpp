@@ -1,6 +1,6 @@
 #include "pch_tier0.h"
 #include "tier0/tier0_internal.h"
-#include "tier0/crashdump_internal.h"
+#include "tier0/icrashdump_handler.h"
 #include "tier0/debug.h"
 #include "tier1/threading.h"
 
@@ -34,7 +34,7 @@ void Sys_Error( const char* pFormat, ... )
 	Sys_ShowMessageBox( "Singularity Error", message.c_str(), MESSAGE_BOX_ERROR );
 
 	// Set crash dump message
-	CrashDump_SetMessage( message.c_str() );
+	CrashDumpHandler()->SetMessage( message.c_str() );
 
 	// Shutdown application
 	Sys_RequestExit( true );
@@ -52,15 +52,35 @@ bool Sys_IsRequestingExit()
 
 /*
  ==================
- Sys_InitMainThread
+ InitTier0
  ==================
  */
-void Sys_InitMainThread()
+void InitTier0()
 {
-	CrashDump_OnThreadRun();
-	CrashDump_SetupExceptionHandler();
+	// Initialize the crash dump handler
+	ICrashDumpHandler* pCrashDumpHandler = CrashDumpHandler();
+	pCrashDumpHandler->Init();
+	pCrashDumpHandler->OnThreadRun();
+
+	// Initialize the main thread
 	Thread_SetName( Thread_GetCurrentThreadHandle(), "Main Thread" );
 	s_MainThreadId = Thread_GetCurrentThreadId();
+}
+
+/*
+ ==================
+ ShutdownTier0
+ ==================
+ */
+void ShutdownTier0()
+{
+	// Shutdown the crash dump handler
+	ICrashDumpHandler* pCrashDumpHandler = CrashDumpHandler();
+	pCrashDumpHandler->OnThreadStop();
+	pCrashDumpHandler->Shutdown();
+
+	// Shutdown the main thread
+	s_MainThreadId = INVALID_THREAD_ID;
 }
 
 /*
