@@ -83,7 +83,7 @@ studioCmdAlloc_t CStudioCmdBuffer::GetAllocation( uint32 allocationSize )
 			}
 		}
 
-		Thread_Yield();
+		Sys_Yield();
 	}
 
 	return studioCmdAlloc;
@@ -124,7 +124,7 @@ void CStudioCmdBuffer::Flush()
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_WAIT );
 	while ( !IsReadBufferEmpty() )
 	{
-		Thread_Yield();
+		Sys_Yield();
 	}
 }
 

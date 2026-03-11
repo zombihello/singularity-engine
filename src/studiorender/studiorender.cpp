@@ -225,7 +225,7 @@ CStudioRender::GetCommandBuffer
 */
 IStudioCmdBuffer* CStudioRender::GetCommandBuffer() const
 {
-	return &g_StudioCmdBuffer;
+	return &g_studioCmdBuffer;
 }
 
 /*

@@ -2,10 +2,30 @@
 
 /*
 ==================
-Thread_SetPriority
+Sys_Yield
 ==================
 */
-FORCEINLINE void Thread_SetPriority( threadHandle_t threadHandle, threadPriority_t threadPriority )
+FORCEINLINE void Sys_Yield()
+{
+	Sleep( 0 );
+}
+
+/*
+==================
+Sys_Sleep
+==================
+*/
+FORCEINLINE void Sys_Sleep( float seconds )
+{
+	Sleep( (DWORD)( seconds * 1000.0 ) );
+}
+
+/*
+==================
+Sys_SetThreadPriority
+==================
+*/
+FORCEINLINE void Sys_SetThreadPriority( threadHandle_t threadHandle, threadPriority_t threadPriority )
 {
 	int32 winapiThreadPriority = THREAD_PRIORITY_NORMAL;
 	switch ( threadPriority )
@@ -26,10 +46,10 @@ FORCEINLINE void Thread_SetPriority( threadHandle_t threadHandle, threadPriority
 
 /*
 ==================
-Thread_SetName
+Sys_SetThreadName
 ==================
 */
-FORCEINLINE void Thread_SetName( threadHandle_t threadHandle, const char* pThreadName )
+FORCEINLINE void Sys_SetThreadName( threadHandle_t threadHandle, const char* pThreadName )
 {
 	//-----------------------------------------------------------------------------
 	// Code setting the thread name for use in the debugger
@@ -67,40 +87,232 @@ FORCEINLINE void Thread_SetName( threadHandle_t threadHandle, const char* pThrea
 
 /*
 ==================
-Thread_GetCurrentThreadHandle
+Sys_GetCurrentThreadHandle
 ==================
 */
-FORCEINLINE threadHandle_t Thread_GetCurrentThreadHandle()
+FORCEINLINE threadHandle_t Sys_GetCurrentThreadHandle()
 {
 	return GetCurrentThread();
 }
 
 /*
 ==================
-Thread_GetCurrentThreadId
+Sys_GetCurrentThreadId
 ==================
 */
-FORCEINLINE threadId_t Thread_GetCurrentThreadId()
+FORCEINLINE threadId_t Sys_GetCurrentThreadId()
 {
 	return GetCurrentThreadId();
 }
 
 /*
 ==================
-Thread_Yield
+CThreadMutexWindows::CThreadMutexWindows
 ==================
 */
-FORCEINLINE void Thread_Yield()
+FORCEINLINE CThreadMutexWindows::CThreadMutexWindows()
 {
-	Sleep( 0 );
+	// Constructor that initializes the aggregated critical section
+	// MSDN: You can improve performance significantly by choosing a small spin count for a critical section
+	// of short duration. The heap manager uses a spin count of roughly 4000 for its per-heap critical sections.
+	// This gives great performance and scalability in almost all worst-case scenarios
+	const int32 spinCount = 4000;
+
+	InitializeCriticalSection( &criticalSection );
+	SetCriticalSectionSpinCount( &criticalSection, spinCount );
 }
 
 /*
 ==================
-Thread_Sleep
+CThreadMutexWindows::~CThreadMutexWindows
 ==================
 */
-FORCEINLINE void Thread_Sleep( float seconds )
+FORCEINLINE CThreadMutexWindows::~CThreadMutexWindows()
 {
-	Sleep( (DWORD)( seconds * 1000.0 ) );
+	DeleteCriticalSection( &criticalSection );
+}
+
+/*
+==================
+CThreadMutexWindows::Lock
+==================
+*/
+FORCEINLINE void CThreadMutexWindows::Lock()
+{
+	// Spin first before entering critical section, causing ring-0 transition and context switch.
+	if ( TryEnterCriticalSection( &criticalSection ) == 0 )
+	{
+		EnterCriticalSection( &criticalSection );
+	}
+}
+
+/*
+==================
+CThreadMutexWindows::Lock
+==================
+*/
+FORCEINLINE void CThreadMutexWindows::Lock() const
+{
+	const_cast<CThreadMutexWindows*>( this )->Lock();
+}
+
+/*
+==================
+CThreadMutexWindows::Unlock
+==================
+*/
+FORCEINLINE void CThreadMutexWindows::Unlock()
+{
+	LeaveCriticalSection( &criticalSection );
+}
+
+/*
+==================
+CThreadMutexWindows::Unlock
+==================
+*/
+FORCEINLINE void CThreadMutexWindows::Unlock() const
+{
+	const_cast<CThreadMutexWindows*>( this )->Unlock();
+}
+
+/*
+==================
+CThreadEventWindows::CThreadEventWindows
+==================
+*/
+FORCEINLINE CThreadEventWindows::CThreadEventWindows( bool bManualReset /* = false */, const char* pName /* = NULL */ )
+	: handle( NULL )
+{
+	handle = CreateEventA( NULL, bManualReset, 0, pName );
+	AssertMsg( handle, "Failed to create event (GetLastError 0x%X)", GetLastError() );
+}
+
+/*
+==================
+CThreadEventWindows::~CThreadEventWindows
+==================
+*/
+FORCEINLINE CThreadEventWindows::~CThreadEventWindows()
+{
+	CloseHandle( handle );
+}
+
+/*
+==================
+CThreadEventWindows::Trigger
+==================
+*/
+FORCEINLINE void CThreadEventWindows::Trigger()
+{
+	SetEvent( handle );
+}
+
+/*
+==================
+CThreadEventWindows::Reset
+==================
+*/
+FORCEINLINE void CThreadEventWindows::Reset()
+{
+	ResetEvent( handle );
+}
+
+/*
+==================
+CThreadEventWindows::Pulse
+==================
+*/
+FORCEINLINE void CThreadEventWindows::Pulse()
+{
+	PulseEvent( handle );
+}
+
+/*
+==================
+CThreadEventWindows::Wait
+==================
+*/
+FORCEINLINE bool CThreadEventWindows::Wait( uint32 waitTime /* = -1 */ )
+{
+	return WaitForSingleObject( handle, waitTime ) == WAIT_OBJECT_0;
+}
+
+/*
+==================
+CThreadSemaphoreWindows::CThreadSemaphoreWindows
+==================
+*/
+FORCEINLINE CThreadSemaphoreWindows::CThreadSemaphoreWindows( uint32 initialValue, uint32 maxValue, const char* pName /* = NULL */ )
+	: handle( NULL )
+{
+	AssertMsg( maxValue > 0, "Invalid max value for semaphore" );
+	AssertMsg( initialValue >= 0 && initialValue <= maxValue, "Invalid initial value for semaphore" );
+	handle = CreateSemaphoreA( NULL, initialValue, maxValue, pName );
+	AssertMsg( handle, "Failed to create semaphore (GetLastError 0x%X)", GetLastError() );
+}
+
+/*
+==================
+CThreadSemaphoreWindows::~CThreadSemaphoreWindows
+==================
+*/
+FORCEINLINE CThreadSemaphoreWindows::~CThreadSemaphoreWindows()
+{
+	CloseHandle( handle );
+}
+
+/*
+==================
+CThreadSemaphoreWindows::Signal
+==================
+*/
+FORCEINLINE bool CThreadSemaphoreWindows::Signal()
+{
+	return Post( 1 );
+}
+
+/*
+==================
+CThreadSemaphoreWindows::Post
+==================
+*/
+FORCEINLINE bool CThreadSemaphoreWindows::Post( uint32 value )
+{
+	bool bResult = ReleaseSemaphore( handle, value, NULL );
+	AssertMsg( bResult, "Failed to post semaphore (GetLastError 0x%X)", GetLastError() );
+	return bResult;
+}
+
+/*
+==================
+CThreadSemaphoreWindows::Wait
+==================
+*/
+FORCEINLINE void CThreadSemaphoreWindows::Wait()
+{
+	uint32 result = WaitForSingleObject( handle, INFINITE );
+	Assert( result == WAIT_OBJECT_0 );
+}
+
+/*
+==================
+CThreadSemaphoreWindows::Wait
+==================
+*/
+FORCEINLINE bool CThreadSemaphoreWindows::Wait( uint32 milliseconds )
+{
+	uint32 result = WaitForSingleObject( handle, milliseconds );
+	Assert( result != WAIT_FAILED );
+	return result != WAIT_TIMEOUT;
+}
+
+/*
+==================
+CThreadSemaphoreWindows::TryWait
+==================
+*/
+FORCEINLINE bool CThreadSemaphoreWindows::TryWait()
+{
+	return Wait( 0 );
 }

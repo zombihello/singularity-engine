@@ -17,94 +17,66 @@ enum threadPriority_t
 //-----------------------------------------------------------------------------
 // Thread functions
 //-----------------------------------------------------------------------------
-void		   Thread_SetPriority( threadHandle_t threadHandle, threadPriority_t threadPriority );
-void		   Thread_SetName( threadHandle_t threadHandle, const char* pThreadName );
-threadHandle_t Thread_GetCurrentThreadHandle();
-threadId_t	   Thread_GetCurrentThreadId();
-void		   Thread_Yield();
-void		   Thread_Sleep( float seconds );
+void		   Sys_SetThreadPriority( threadHandle_t threadHandle, threadPriority_t threadPriority );
+void		   Sys_SetThreadName( threadHandle_t threadHandle, const char* pThreadName );
+threadHandle_t Sys_GetCurrentThreadHandle();
+threadId_t	   Sys_GetCurrentThreadId();
+void		   Sys_Yield();
+void		   Sys_Sleep( float seconds );
 
 //-----------------------------------------------------------------------------
-// Thread mutex interface
+// Thread base class
 //-----------------------------------------------------------------------------
-class IThreadMutex
+// A runnable object is an object that is "run" on an arbitrary thread
+class CRunnableObject
 {
 public:
-	virtual ~IThreadMutex() {}
+	virtual ~CRunnableObject() {}
 
-	virtual void Lock()			= 0;
-	virtual void Lock() const	= 0;
-	virtual void Unlock()		= 0;
-	virtual void Unlock() const = 0;
+	virtual bool   Init();
+	virtual uint32 Run() = 0;
+	virtual void   Stop();
+	virtual void   Exit();
 };
 
-//-----------------------------------------------------------------------------
-// Thread event interface
-//-----------------------------------------------------------------------------
-class IThreadEvent
+class CThreadBase
 {
 public:
-	virtual ~IThreadEvent() {}
+	CThreadBase();
+	virtual ~CThreadBase() {}
 
-	virtual void Trigger()					  = 0;
-	virtual void Reset()					  = 0;
-	virtual void Pulse()					  = 0;
-	virtual bool Wait( uint32 waitTime = -1 ) = 0;
-};
+	virtual bool Start( CRunnableObject* pRunnableObject, uint32 stackSize = 0 ) = 0;
+	virtual void Stop( bool bShouldWait = false, int32 exitCode = 0 )			 = 0;
+	virtual void Suspend( bool bShouldPause = true )							 = 0;
+	virtual void WaitForCompletion()											 = 0;
 
-//-----------------------------------------------------------------------------
-// Thread semaphore interface
-//-----------------------------------------------------------------------------
-class IThreadSemaphore
-{
-public:
-	virtual ~IThreadSemaphore() {}
+	void SetName( const char* pName );
+	void SetPriority( threadPriority_t priority );
 
-	virtual bool Signal()					 = 0;
-	virtual bool Post( uint32 value )		 = 0;
-	virtual void Wait()						 = 0;
-	virtual bool Wait( uint32 milliseconds ) = 0;
-	virtual bool TryWait()					 = 0;
-};
-
-//-----------------------------------------------------------------------------
-// Thread interface
-//-----------------------------------------------------------------------------
-class IThread
-{
-public:
-	virtual ~IThread() {}
-
-	virtual bool Start( uint32 stackSize = 0 )						  = 0;
-	virtual void Stop( bool bShouldWait = false, int32 exitCode = 0 ) = 0;
-	virtual void Suspend( bool bShouldPause = true )				  = 0;
-	virtual void WaitForCompletion()								  = 0;
-
-	virtual void SetName( const char* pName )			  = 0;
-	virtual void SetPriority( threadPriority_t priority ) = 0;
-
-	virtual bool			 IsAlive() const		 = 0;
-	virtual const char*		 GetName() const		 = 0;
-	virtual threadPriority_t GetPriority() const	 = 0;
-	virtual threadHandle_t	 GetThreadHandle() const = 0;
-	virtual threadId_t		 GetThreadId() const	 = 0;
-	virtual int32			 GetExitCode() const	 = 0;
+	bool			 IsAlive() const;
+	const char*		 GetName() const;
+	threadPriority_t GetPriority() const;
+	threadHandle_t	 GetHandle() const;
+	threadId_t		 GetId() const;
+	int32			 GetExitCode() const;
 
 protected:
-	virtual bool   ThreadInit() = 0;
-	virtual uint32 ThreadRun()	= 0;
-	virtual void   ThreadStop() = 0;
-	virtual void   ThreadExit() = 0;
+	int32			 exitCode;
+	threadId_t		 id;
+	threadHandle_t	 handle;
+	CRunnableObject* pRunnableObject;
+	threadPriority_t priority;
+	char			 name[64];
 };
 
 // Include platform specific implementation of interfaces
 #if PLATFORM_WINDOWS
 	#include "tier1/platforms/windows/win_threading.h"
 
-typedef CWindowsThreadMutex		CThreadMutex;
-typedef CWindowsThreadEvent		CThreadEvent;
-typedef CWindowsThreadSemaphore CThreadSemaphore;
-typedef CWindowsThread			CThread;
+typedef CThreadMutexWindows		CThreadMutex;
+typedef CThreadEventWindows		CThreadEvent;
+typedef CThreadSemaphoreWindows CThreadSemaphore;
+typedef CThreadWindows			CThread;
 #else
 	#error Unknown platform
 #endif	// PLATFORM_WINDOWS
@@ -112,47 +84,14 @@ typedef CWindowsThread			CThread;
 //-----------------------------------------------------------------------------
 // This is a utility class that handles scope level locking
 //-----------------------------------------------------------------------------
-class CScopeLock
+class CScopeLock : public CNonCopyable
 {
 public:
-	CScopeLock( CThreadMutex* pMutex )
-		: pSyncObject( pMutex )
-	{
-		Assert( pSyncObject );
-		pSyncObject->Lock();
-	}
-	CScopeLock( CThreadMutex& mutex )
-		: pSyncObject( &mutex )
-	{
-		Assert( pSyncObject );
-		pSyncObject->Lock();
-	}
-	~CScopeLock()
-	{
-		Assert( pSyncObject );
-		pSyncObject->Unlock();
-	}
+	CScopeLock( CThreadMutex& mutex );
+	~CScopeLock();
 
 private:
-	CScopeLock()
-		: pSyncObject( NULL )
-	{
-	}
-	CScopeLock( CScopeLock& scopeLock )
-		: pSyncObject( NULL )
-	{
-	}
-
-	FORCEINLINE CScopeLock& operator=( CScopeLock& scopeLock )
-	{
-		return *this;
-	}
-
-	CThreadMutex* pSyncObject;
+	CThreadMutex& syncObject;
 };
 
-#if PLATFORM_WINDOWS
-	#include "tier1/platforms/windows/win_threading.inl"
-#else
-	#error Unknown platform
-#endif	// PLATFORM_WINDOWS
+#include "tier1/threading.inl"
