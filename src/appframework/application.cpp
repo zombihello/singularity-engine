@@ -125,7 +125,7 @@ void CApplication::Init()
 	pProfiler->Init();
 	while ( CommandLine()->HasParam( "wait-profiler" ) && !pProfiler->IsConnected() )
 	{
-		Thread_Yield();
+		Sys_Yield();
 	}
 #endif	// ENABLE_PROFILING
 }

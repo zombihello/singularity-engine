@@ -5,7 +5,7 @@
 #include "tier1/threading.h"
 
 bool			  g_bRequestingExit = false;
-static threadId_t s_MainThreadId	= INVALID_THREAD_ID;
+static threadId_t s_mainThreadId	= INVALID_THREAD_ID;
 
 /*
 ==================
@@ -63,8 +63,8 @@ void InitTier0()
 	pCrashDumpHandler->OnThreadRun();
 
 	// Initialize the main thread
-	Thread_SetName( Thread_GetCurrentThreadHandle(), "Main Thread" );
-	s_MainThreadId = Thread_GetCurrentThreadId();
+	Sys_SetThreadName( Sys_GetCurrentThreadHandle(), "Main Thread" );
+	s_mainThreadId = Sys_GetCurrentThreadId();
 }
 
 /*
@@ -80,7 +80,7 @@ void ShutdownTier0()
 	pCrashDumpHandler->Shutdown();
 
 	// Shutdown the main thread
-	s_MainThreadId = INVALID_THREAD_ID;
+	s_mainThreadId = INVALID_THREAD_ID;
 }
 
 /*
@@ -90,5 +90,5 @@ void ShutdownTier0()
  */
 bool Sys_IsInMainThread()
 {
-	return s_MainThreadId == INVALID_THREAD_ID || s_MainThreadId == Thread_GetCurrentThreadId();
+	return s_mainThreadId == INVALID_THREAD_ID || s_mainThreadId == Sys_GetCurrentThreadId();
 }

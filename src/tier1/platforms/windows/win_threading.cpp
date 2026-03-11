@@ -4,237 +4,20 @@
 
 /*
 ==================
-CWindowsThreadMutex::CWindowsThreadMutex
+CThreadWindows::CThreadWindows
 ==================
 */
-CWindowsThreadMutex::CWindowsThreadMutex()
+CThreadWindows::CThreadWindows()
+	: pThreadInitSyncEvent( NULL )
 {
-	// Constructor that initializes the aggregated critical section
-	// MSDN: You can improve performance significantly by choosing a small spin count for a critical section
-	// of short duration. The heap manager uses a spin count of roughly 4000 for its per-heap critical sections.
-	// This gives great performance and scalability in almost all worst-case scenarios
-	const int32 SPIN_COUNT = 4000;
-
-	InitializeCriticalSection( &criticalSection );
-	SetCriticalSectionSpinCount( &criticalSection, SPIN_COUNT );
 }
 
 /*
 ==================
-CWindowsThreadMutex::~CWindowsThreadMutex
+CThreadWindows::~CThreadWindows
 ==================
 */
-CWindowsThreadMutex::~CWindowsThreadMutex()
-{
-	DeleteCriticalSection( &criticalSection );
-}
-
-/*
-==================
-CWindowsThreadMutex::Lock
-==================
-*/
-void CWindowsThreadMutex::Lock()
-{
-	// Spin first before entering critical section, causing ring-0 transition and context switch.
-	if ( TryEnterCriticalSection( &criticalSection ) == 0 )
-	{
-		EnterCriticalSection( &criticalSection );
-	}
-}
-
-/*
-==================
-CWindowsThreadMutex::Lock
-==================
-*/
-void CWindowsThreadMutex::Lock() const
-{
-	const_cast<CWindowsThreadMutex*>( this )->Lock();
-}
-
-/*
-==================
-CWindowsThreadMutex::Unlock
-==================
-*/
-void CWindowsThreadMutex::Unlock()
-{
-	LeaveCriticalSection( &criticalSection );
-}
-
-/*
-==================
-CWindowsThreadMutex::Unlock
-==================
-*/
-void CWindowsThreadMutex::Unlock() const
-{
-	const_cast<CWindowsThreadMutex*>( this )->Unlock();
-}
-
-/*
-==================
-CWindowsThreadEvent::CWindowsThreadEvent
-==================
-*/
-CWindowsThreadEvent::CWindowsThreadEvent( bool bManualReset /* = false */, const char* pName /* = NULL */ )
-	: handle( NULL )
-{
-	handle = CreateEventA( NULL, bManualReset, 0, pName );
-	AssertMsg( handle, "Failed to create event (GetLastError 0x%X)", GetLastError() );
-}
-
-/*
-==================
-CWindowsThreadEvent::~CWindowsThreadEvent
-==================
-*/
-CWindowsThreadEvent::~CWindowsThreadEvent()
-{
-	CloseHandle( handle );
-}
-
-/*
-==================
-CWindowsThreadEvent::Trigger
-==================
-*/
-void CWindowsThreadEvent::Trigger()
-{
-	SetEvent( handle );
-}
-
-/*
-==================
-CWindowsThreadEvent::Reset
-==================
-*/
-void CWindowsThreadEvent::Reset()
-{
-	ResetEvent( handle );
-}
-
-/*
-==================
-CWindowsThreadEvent::Pulse
-==================
-*/
-void CWindowsThreadEvent::Pulse()
-{
-	PulseEvent( handle );
-}
-
-/*
-==================
-CWindowsThreadEvent::Wait
-==================
-*/
-bool CWindowsThreadEvent::Wait( uint32 waitTime /* = -1 */ )
-{
-	return WaitForSingleObject( handle, waitTime ) == WAIT_OBJECT_0;
-}
-
-/*
-==================
-CWindowsThreadSemaphore::CWindowsThreadSemaphore
-==================
-*/
-CWindowsThreadSemaphore::CWindowsThreadSemaphore( uint32 initialValue, uint32 maxValue, const char* pName /* = NULL */ )
-	: handle( NULL )
-{
-	AssertMsg( maxValue > 0, "Invalid max value for semaphore" );
-	AssertMsg( initialValue >= 0 && initialValue <= maxValue, "Invalid initial value for semaphore" );
-	handle = CreateSemaphoreA( NULL, initialValue, maxValue, pName );
-	AssertMsg( handle, "Failed to create semaphore (GetLastError 0x%X)", GetLastError() );
-}
-
-/*
-==================
-CWindowsThreadSemaphore::~CWindowsThreadSemaphore
-==================
-*/
-CWindowsThreadSemaphore::~CWindowsThreadSemaphore()
-{
-	CloseHandle( handle );
-}
-
-/*
-==================
-CWindowsThreadSemaphore::Signal
-==================
-*/
-bool CWindowsThreadSemaphore::Signal()
-{
-	return Post( 1 );
-}
-
-/*
-==================
-CWindowsThreadSemaphore::Post
-==================
-*/
-bool CWindowsThreadSemaphore::Post( uint32 value )
-{
-	bool bResult = ReleaseSemaphore( handle, value, NULL );
-	AssertMsg( bResult, "Failed to post semaphore (GetLastError 0x%X)", GetLastError() );
-	return bResult;
-}
-
-/*
-==================
-CWindowsThreadSemaphore::Wait
-==================
-*/
-void CWindowsThreadSemaphore::Wait()
-{
-	uint32 result = WaitForSingleObject( handle, INFINITE );
-	Assert( result == WAIT_OBJECT_0 );
-}
-
-/*
-==================
-CWindowsThreadSemaphore::Wait
-==================
-*/
-bool CWindowsThreadSemaphore::Wait( uint32 milliseconds )
-{
-	uint32 result = WaitForSingleObject( handle, milliseconds );
-	Assert( result != WAIT_FAILED );
-	return result != WAIT_TIMEOUT;
-}
-
-/*
-==================
-CWindowsThreadSemaphore::TryWait
-==================
-*/
-bool CWindowsThreadSemaphore::TryWait()
-{
-	return Wait( 0 );
-}
-
-/*
-==================
-CWindowsThread::CWindowsThread
-==================
-*/
-CWindowsThread::CWindowsThread()
-	: exitCode( -1 )
-	, threadPriority( THREAD_PRIOR_NORMAL )
-	, handle( INVALID_THREAD_HANDLE )
-	, id( INVALID_THREAD_ID )
-	, pThreadInitSyncEvent( NULL )
-{
-	name[0] = '\0';
-}
-
-/*
-==================
-CWindowsThread::~CWindowsThread
-==================
-*/
-CWindowsThread::~CWindowsThread()
+CThreadWindows::~CThreadWindows()
 {
 	// Stop the thread if it is alive
 	if ( IsAlive() )
@@ -245,12 +28,13 @@ CWindowsThread::~CWindowsThread()
 
 /*
 ==================
-CWindowsThread::Start
+CThreadWindows::Start
 ==================
 */
-bool CWindowsThread::Start( uint32 stackSize /* = 0 */ )
+bool CThreadWindows::Start( CRunnableObject* pRunnableObject, uint32 stackSize /* = 0 */ )
 {
 	// We can't to start a thread who already started
+	AssertMsg( pRunnableObject, "Runnable object must be valid" );
 	if ( IsAlive() )
 	{
 		AssertMsg( false, "Tried to create a thread that has already been created!" );
@@ -258,10 +42,11 @@ bool CWindowsThread::Start( uint32 stackSize /* = 0 */ )
 	}
 
 	// Create a sync event to guarantee Init() function is called first
-	pThreadInitSyncEvent = new CWindowsThreadEvent( true );
+	pThreadInitSyncEvent			= new CThreadEventWindows( true );
+	CThreadWindows::pRunnableObject = pRunnableObject;
 
 	// Create a new thread
-	handle = CreateThread( NULL, stackSize, &CWindowsThread::ThreadMain, this, 0, NULL );
+	handle = CreateThread( NULL, stackSize, &CThreadWindows::ThreadMain, this, 0, NULL );
 	if ( !handle )
 	{
 		AssertMsg( false, "Failed to create thread (GetLastError 0x%x)", GetLastError() );
@@ -282,10 +67,10 @@ bool CWindowsThread::Start( uint32 stackSize /* = 0 */ )
 
 /*
 ==================
-CWindowsThread::Stop
+CThreadWindows::Stop
 ==================
 */
-void CWindowsThread::Stop( bool bShouldWait /* = false */, int32 exitCode /* = 0 */ )
+void CThreadWindows::Stop( bool bShouldWait /* = false */, int32 exitCode /* = 0 */ )
 {
 	// Do nothing if the thread isn't alive
 	if ( !IsAlive() )
@@ -294,8 +79,8 @@ void CWindowsThread::Stop( bool bShouldWait /* = false */, int32 exitCode /* = 0
 	}
 
 	// Let the thread have a chance to stop without brute force killing
-	CWindowsThread::exitCode = exitCode;
-	ThreadStop();
+	CThreadWindows::exitCode = exitCode;
+	pRunnableObject->Stop();
 
 	// If waiting was specified, wait the amount of time. If that fails,
 	// brute force kill that thread. Very bad as that might leak
@@ -311,17 +96,18 @@ void CWindowsThread::Stop( bool bShouldWait /* = false */, int32 exitCode /* = 0
 
 	// Now clean up the thread handle so we don't leak
 	CloseHandle( handle );
-	handle	= INVALID_THREAD_HANDLE;
-	id		= INVALID_THREAD_ID;
-	name[0] = '\0';
+	handle			= INVALID_THREAD_HANDLE;
+	id				= INVALID_THREAD_ID;
+	pRunnableObject = NULL;
+	name[0]			= '\0';
 }
 
 /*
 ==================
-CWindowsThread::Suspend
+CThreadWindows::Suspend
 ==================
 */
-void CWindowsThread::Suspend( bool bShouldPause /* = true */ )
+void CThreadWindows::Suspend( bool bShouldPause /* = true */ )
 {
 	// Do nothing if the thread isn't alive
 	if ( !IsAlive() )
@@ -343,10 +129,10 @@ void CWindowsThread::Suspend( bool bShouldPause /* = true */ )
 
 /*
 ==================
-CWindowsThread::WaitForCompletion
+CThreadWindows::WaitForCompletion
 ==================
 */
-void CWindowsThread::WaitForCompletion()
+void CThreadWindows::WaitForCompletion()
 {
 	if ( IsAlive() )
 	{
@@ -357,178 +143,56 @@ void CWindowsThread::WaitForCompletion()
 
 /*
 ==================
-CWindowsThread::IsAlive
+CThreadWindows::ThreadMain
 ==================
 */
-bool CWindowsThread::IsAlive() const
+DWORD STDCALL CThreadWindows::ThreadMain( LPVOID pData )
 {
-	return !!handle;
-}
-
-/*
-==================
-CWindowsThread::SetName
-==================
-*/
-void CWindowsThread::SetName( const char* pName )
-{
-	S_Strncpy( name, pName, sizeof( name ) - 1 );
-	name[sizeof( name ) - 1] = '\0';
-	if ( IsAlive() )
-	{
-		Thread_SetName( handle, name );
-	}
-}
-
-/*
-==================
-CWindowsThread::GetName
-==================
-*/
-const char* CWindowsThread::GetName() const
-{
-	if ( !name[0] )
-	{
-		char* pName = const_cast<char*>( name );
-		S_Snprintf( pName, sizeof( name ) - 1, "Thread(%p/%p)", this, handle );
-		pName[sizeof( name ) - 1] = '\0';
-	}
-	return name;
-}
-
-/*
-==================
-CWindowsThread::SetPriority
-==================
-*/
-void CWindowsThread::SetPriority( threadPriority_t priority )
-{
-	threadPriority = priority;
-	if ( IsAlive() )
-	{
-		Thread_SetPriority( handle, priority );
-	}
-}
-
-/*
-==================
-CWindowsThread::GetPriority
-==================
-*/
-threadPriority_t CWindowsThread::GetPriority() const
-{
-	return threadPriority;
-}
-
-/*
-==================
-CWindowsThread::GetThreadHandle
-==================
-*/
-threadHandle_t CWindowsThread::GetThreadHandle() const
-{
-	return handle;
-}
-
-/*
-==================
-CWindowsThread::GetThreadId
-==================
-*/
-threadId_t CWindowsThread::GetThreadId() const
-{
-	return id;
-}
-
-/*
-==================
-CWindowsThread::GetExitCode
-==================
-*/
-int32 CWindowsThread::GetExitCode() const
-{
-	return exitCode;
-}
-
-/*
-==================
-CWindowsThread::ThreadInit
-==================
-*/
-bool CWindowsThread::ThreadInit()
-{
-	return true;
-}
-
-/*
-==================
-CWindowsThread::ThreadStop
-==================
-*/
-void CWindowsThread::ThreadStop()
-{
-}
-
-/*
-==================
-CWindowsThread::ThreadExit
-==================
-*/
-void CWindowsThread::ThreadExit()
-{
-}
-
-/*
-==================
-CWindowsThread::ThreadMain
-==================
-*/
-DWORD STDCALL CWindowsThread::ThreadMain( LPVOID pThis )
-{
-	CWindowsThread* theThread = (CWindowsThread*)pThis;
-
 	// Notify the crash dump handler about thread startup, set thread priority and debug name
+	CThreadWindows* pTheThread = (CThreadWindows*)pData;
 	CrashDumpHandler()->OnThreadRun();
-	Thread_SetPriority( theThread->handle, theThread->threadPriority );
-	Thread_SetName( theThread->handle, theThread->GetName() );
+	Sys_SetThreadName( pTheThread->handle, pTheThread->GetName() );
+	Sys_SetThreadPriority( pTheThread->handle, pTheThread->priority );
+	PROFILER_THREAD( pTheThread->GetName() );
 
 	// Initialize the thread
-	theThread->exitCode = -1;
-	bool bInitResult	= theThread->ThreadInit();
-	PROFILER_THREAD( theThread->GetName() );
+	pTheThread->exitCode = -1;
+	Assert( pTheThread->pRunnableObject );
+	bool bInitResult = pTheThread->pRunnableObject->Init();
 
 	// Initialization has completed, release the sync event
-	theThread->pThreadInitSyncEvent->Trigger();
+	pTheThread->pThreadInitSyncEvent->Trigger();
 
 	// If the thread has not been initialized, close the thread
 	if ( !bInitResult )
 	{
-		Warning( "Tier1: Thread '%s' failed to initialize", theThread->GetName() );
-		return theThread->exitCode;
+		Warning( "Tier1: Thread '%s' failed to initialize", pTheThread->GetName() );
+		return pTheThread->exitCode;
 	}
 
 	// Now run the task that needs to be done
 	try
 	{
-		theThread->exitCode = theThread->ThreadRun();
+		pTheThread->exitCode = pTheThread->pRunnableObject->Run();
 	}
 	catch ( ... )
 	{
 	}
 
 	// Allow any allocated resources to be cleaned up
-	theThread->ThreadExit();
+	pTheThread->pRunnableObject->Exit();
 
 	// Notify the crash dump handler about thread stop
 	CrashDumpHandler()->OnThreadStop();
 
 	// Clean ourselves up without waiting
 	// Now clean up the thread handle so we don't leak
-	CloseHandle( theThread->handle );
-	theThread->handle  = INVALID_THREAD_HANDLE;
-	theThread->id	   = INVALID_THREAD_ID;
-	theThread->name[0] = '\0';
+	CloseHandle( pTheThread->handle );
+	pTheThread->handle			= INVALID_THREAD_HANDLE;
+	pTheThread->id				= INVALID_THREAD_ID;
+	pTheThread->pRunnableObject = NULL;
+	pTheThread->name[0]			= '\0';
 
 	// Return from the thread with the exit code
-	return theThread->exitCode;
+	return pTheThread->exitCode;
 }
