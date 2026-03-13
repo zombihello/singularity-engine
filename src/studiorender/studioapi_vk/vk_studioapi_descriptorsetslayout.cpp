@@ -140,7 +140,7 @@ void CStudioAPIDescriptorSetsLayoutVk::Destroy()
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Broadcast about delete the layout
-	onDescriptorSetsLayoutDeleted.Broadcast( this );
+	onDescriptorSetsLayoutDeleted.Invoke( this );
 
 	// Free Vulkan resources
 	g_StudioAPIVk.GetMemoryMgr().FreeResource( [vkPipelineLayout = vkPipelineLayout, vkDescriptorSetLayouts = vkDescriptorSetLayouts]()

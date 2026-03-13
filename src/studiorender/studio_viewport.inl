@@ -69,5 +69,5 @@ FORCEINLINE void CStudioViewport::ReleaseIndex( uint32 viewportIndex )
 {
 	CScopeLock scopeLock( s_ViewportIndexMutex );
 	s_FreeViewportIndices.emplace_back( viewportIndex );
-	onReleaseViewportIndex.Broadcast( this );
+	onReleaseViewportIndex.Invoke( this );
 }

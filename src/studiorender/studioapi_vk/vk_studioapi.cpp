@@ -146,8 +146,8 @@ void CStudioAPIVk::Shutdown()
 	vkDeviceWaitIdle( device.GetVkLogicalDevice() );
 
 	// Broadcast what we shutdown StudioAPI
-	onStudioAPIVkShutdown.Broadcast();
-	onStudioAPIVkShutdown.RemoveAll();
+	onStudioAPIVkShutdown.Invoke();
+	onStudioAPIVkShutdown.Clear();
 
 	// Clear the bound shader state cache
 	boundShaderStateCache.RemoveAll();

@@ -22,15 +22,15 @@ private:
 	{
 		viewportRenderPipelines_t()
 			: pViewport( NULL )
-			, pReleaseViewportIndexDelegate( NULL )
-			, pRenderPassUpdatedDelegate( NULL )
+			, onReleaseViewportIndexHandle( INVALID_HANDLE )
+			, onRenderPassUpdatedHandle( INVALID_HANDLE )
 		{
 		}
 
-		CStudioViewport*										  pViewport;
-		CStudioViewport::COnReleaseViewportIndex::funcDelegate_t* pReleaseViewportIndexDelegate;
-		CStudioViewport::COnRenderPassUpdated::funcDelegate_t*	  pRenderPassUpdatedDelegate;
-		eastl::vector<CRefPtr<IStudioAPIRenderPipeline>>		  studioAPIRenderPipelines;
+		CStudioViewport*								   pViewport;
+		CStudioViewport::COnReleaseViewportIndex::handle_t onReleaseViewportIndexHandle;
+		CStudioViewport::COnRenderPassUpdated::handle_t	   onRenderPassUpdatedHandle;
+		eastl::vector<CRefPtr<IStudioAPIRenderPipeline>>   studioAPIRenderPipelines;
 	};
 
 	struct dataStorageDrawRenderPasses_t

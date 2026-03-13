@@ -1,8 +1,12 @@
 #pragma once
+#include <gtx/quaternion.hpp>
+#include <gtc/type_ptr.hpp>
+#include <gtx/transform.hpp>
+#include <gtx/compatibility.hpp>
+
 #include "tier0/defines.h"
 #include "tier0/types.h"
 #include "tier1/template.h"
-#include "tier1/math/axis.h"
 #include "tier1/math/math_types.h"
 
 //-----------------------------------------------------------------------------

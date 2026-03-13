@@ -41,9 +41,8 @@ CStudioAPISwapChainImageVk::~CStudioAPISwapChainImageVk()
 	// Destroy the image view
 	if ( vkImageView != VK_NULL_HANDLE )
 	{
-		g_StudioAPIVk.GetMemoryMgr().FreeResource( [vkImageView = vkImageView]() {
-			vkDestroyImageView( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), vkImageView, NULL );
-		} );
+		g_StudioAPIVk.GetMemoryMgr().FreeResource( [vkImageView = vkImageView]()
+												   { vkDestroyImageView( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), vkImageView, NULL ); } );
 		vkImageView = VK_NULL_HANDLE;
 	}
 }
@@ -98,7 +97,7 @@ CStudioAPISwapChainVk::CStudioAPISwapChainVk( const char* pDebugName /* = "" */ 
 	, vkSwapChain( VK_NULL_HANDLE )
 	, size( 0, 0 )
 	, currentImageIndex( 0 )
-	, pStudioAPIVkShutdownDelegate( NULL )
+	, onStudioAPIVkShutdownHandle( INVALID_HANDLE )
 {
 	Mem_Memzero( pImageAvailableSemaphores, STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT * sizeof( CStudioAPISemaphoreVk* ) );
 	Mem_Memzero( &vkSurfaceFormat, sizeof( VkSurfaceFormatKHR ) );
@@ -343,7 +342,7 @@ bool CStudioAPISwapChainVk::Create( windowHandle_t windowHandle, uint32 width, u
 	vkSwapChain = vkNewSwapChain;
 
 	// Initialize all swap chain images
-	uint32				 numImages = 0;
+	uint32				   numImages = 0;
 	eastl::vector<VkImage> vkImages;
 	vkGetSwapchainImagesKHR( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), vkSwapChain, &numImages, NULL );
 	vkImages.resize( numImages );
@@ -389,12 +388,12 @@ bool CStudioAPISwapChainVk::Create( windowHandle_t windowHandle, uint32 width, u
 	}
 
 	// Broadcast about re-create event
-	onReCreated.Broadcast( this, vkSurfaceFormat.format != vkOldSurfaceFormat.format );
+	onReCreated.Invoke( this, vkSurfaceFormat.format != vkOldSurfaceFormat.format );
 
 	// Register in 'onStudioDeviceVkShutodwn' for destroy Vulkan objects when the one is shutdown (only for non re-create case)
 	if ( !bReCreate )
 	{
-		pStudioAPIVkShutdownDelegate = g_StudioAPIVk.OnStudioAPIVkShutdown().AddFunc( &CStudioAPISwapChainVk::OnStudioAPIVkShutdown, this );
+		onStudioAPIVkShutdownHandle = g_StudioAPIVk.OnStudioAPIVkShutdown().Subscribe( &CStudioAPISwapChainVk::OnStudioAPIVkShutdown, this );
 	}
 	return true;
 }
@@ -409,7 +408,8 @@ void CStudioAPISwapChainVk::Destroy()
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Free Vulkan resources
-	g_StudioAPIVk.GetMemoryMgr().FreeResource( [vkSwapChain = vkSwapChain, vkSurface = vkSurface]() {
+	g_StudioAPIVk.GetMemoryMgr().FreeResource( [vkSwapChain = vkSwapChain, vkSurface = vkSurface]()
+											   {
 		// Destroy the Vulkan swap chain
 		if ( vkSwapChain != VK_NULL_HANDLE )
 		{
@@ -420,8 +420,7 @@ void CStudioAPISwapChainVk::Destroy()
 		if ( vkSurface != VK_NULL_HANDLE )
 		{
 			vkDestroySurfaceKHR( g_StudioAPIVk.GetDevice().GetVkInstance(), vkSurface, NULL );
-		}
-	} );
+		} } );
 	// Destroy swap chain images
 	for ( uint32 swapChainImageIdx = 0, numSwapChainImages = (uint32)swapChainImages.size(); swapChainImageIdx < numSwapChainImages; ++swapChainImageIdx )
 	{
@@ -449,10 +448,10 @@ void CStudioAPISwapChainVk::Destroy()
 	windowHandle	  = INVALID_WINDOW_HANDLE;
 	bUseVSync		  = false;
 
-	if ( pStudioAPIVkShutdownDelegate )
+	if ( onStudioAPIVkShutdownHandle != INVALID_HANDLE )
 	{
-		g_StudioAPIVk.OnStudioAPIVkShutdown().RemoveFunc( pStudioAPIVkShutdownDelegate );
-		pStudioAPIVkShutdownDelegate = NULL;
+		g_StudioAPIVk.OnStudioAPIVkShutdown().Unsubscribe( onStudioAPIVkShutdownHandle );
+		onStudioAPIVkShutdownHandle = INVALID_HANDLE;
 	}
 }
 
@@ -670,8 +669,8 @@ CStudioAPISwapChainVk::OnStudioAPIVkShutdown
 void CStudioAPISwapChainVk::OnStudioAPIVkShutdown( void* pUserData )
 {
 	Assert( pUserData );
-	CStudioAPISwapChainVk* pStudioAPISwapChain		  = (CStudioAPISwapChainVk*)pUserData;
-	pStudioAPISwapChain->pStudioAPIVkShutdownDelegate = NULL;
+	CStudioAPISwapChainVk* pStudioAPISwapChain		 = (CStudioAPISwapChainVk*)pUserData;
+	pStudioAPISwapChain->onStudioAPIVkShutdownHandle = INVALID_HANDLE;
 	pStudioAPISwapChain->Destroy();
 }
 

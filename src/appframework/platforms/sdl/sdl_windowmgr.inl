@@ -19,7 +19,7 @@ FORCEINLINE void CWindowMgrSDL::ChangeMainWindow( windowId_t newMainWindowId )
 {
 	Assert( newMainWindowId != INVALID_INDEX );
 	mainWindowId = newMainWindowId;
-	onChangedMainWindow.Broadcast( newMainWindowId );
+	onChangedMainWindow.Invoke( newMainWindowId );
 }
 
 /*

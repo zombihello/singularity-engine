@@ -164,8 +164,8 @@ public:
 
 	virtual vector2_t GetMouseLocation() const override;
 	virtual vector2_t GetMouseOffset() const override;
-	virtual float  GetMouseOffset( buttonCode_t mouseAxis ) const override;
-	virtual float  GetMouseSensitivity() const override;
+	virtual float	  GetMouseOffset( buttonCode_t mouseAxis ) const override;
+	virtual float	  GetMouseSensitivity() const override;
 
 	virtual buttonEvent_t GetButtonEvent( buttonCode_t buttonCode ) const override;
 	virtual buttonCode_t  GetButtonCodeByName( const char* pButtonName ) const override;
@@ -177,13 +177,13 @@ private:
 	static void OnInputEvent( void* pUserData, const inputEvent_t& inputEvent );
 	static void OnWriteConCmdsToConfigFile( void* pUserData, IStreamDataWriter* pStreamData );
 
-	windowId_t									 windowId;	// A window that was attached the input system
-	IWindowMgr::IOnInputEvent::funcDelegate_t*	 pInputEventDelegate;
-	IOnWriteConCmdsToConfigFile::funcDelegate_t* pWriteConCmdsDelegate;
-	buttonEvent_t								 buttonEvents[BUTTON_CODE_COUNT];
-	vector2_t										 mouseLocation;
-	vector2_t										 mouseOffset;
-	eastl::string								 binds[BUTTON_CODE_COUNT];
+	windowId_t							  windowId;	 // A window that was attached the input system
+	IWindowMgr::IOnInputEvent::handle_t	  onInputEventHandle;
+	IOnWriteConCmdsToConfigFile::handle_t onWriteConCmdsHandle;
+	buttonEvent_t						  buttonEvents[BUTTON_CODE_COUNT];
+	vector2_t							  mouseLocation;
+	vector2_t							  mouseOffset;
+	eastl::string						  binds[BUTTON_CODE_COUNT];
 };
 
 // Input system singleton
@@ -197,8 +197,8 @@ CInputSystem::CInputSystem
 */
 CInputSystem::CInputSystem()
 	: windowId( INVALID_WINDOW_ID )
-	, pInputEventDelegate( NULL )
-	, pWriteConCmdsDelegate( NULL )
+	, onInputEventHandle( INVALID_HANDLE )
+	, onWriteConCmdsHandle( INVALID_HANDLE )
 	, mouseLocation( g_vector000 )
 	, mouseOffset( g_vector000 )
 {
@@ -234,7 +234,7 @@ bool CInputSystem::Connect( createInterfaceFn_t pFactory )
 	}
 
 	ConVar_Register();
-	pWriteConCmdsDelegate = g_pCvar->OnWriteConCmdsToConfigFile()->AddFunc( &CInputSystem::OnWriteConCmdsToConfigFile, this );
+	onWriteConCmdsHandle = g_pCvar->OnWriteConCmdsToConfigFile()->Subscribe( &CInputSystem::OnWriteConCmdsToConfigFile, this );
 	return true;
 }
 
@@ -246,11 +246,8 @@ CInputSystem::Disconnect
 void CInputSystem::Disconnect()
 {
 	DetachFromWindow();
-	if ( pWriteConCmdsDelegate )
-	{
-		g_pCvar->OnWriteConCmdsToConfigFile()->RemoveFunc( pWriteConCmdsDelegate );
-		pWriteConCmdsDelegate = NULL;
-	}
+	g_pCvar->OnWriteConCmdsToConfigFile()->Unsubscribe( onWriteConCmdsHandle );
+	onWriteConCmdsHandle = INVALID_HANDLE;
 
 	ConVar_Unregister();
 	DisconnectTier1();
@@ -264,9 +261,9 @@ CInputSystem::AttachToWindow
 void CInputSystem::AttachToWindow( windowId_t windowId )
 {
 	CInputSystem::windowId = windowId;
-	if ( !pInputEventDelegate )
+	if ( onInputEventHandle == INVALID_HANDLE )
 	{
-		pInputEventDelegate = g_pWindowMgr->OnInputEvent()->AddFunc( &CInputSystem::OnInputEvent, this );
+		onInputEventHandle = g_pWindowMgr->OnInputEvent()->Subscribe( &CInputSystem::OnInputEvent, this );
 	}
 
 	Msg( "InputSystem: Attached to a window (windowId: %i)", windowId );
@@ -279,13 +276,13 @@ CInputSystem::DetachFromWindow
 */
 void CInputSystem::DetachFromWindow()
 {
-	windowId = INVALID_WINDOW_ID;
-	if ( pInputEventDelegate )
+	if ( onInputEventHandle != INVALID_HANDLE )
 	{
-		g_pWindowMgr->OnInputEvent()->RemoveFunc( pInputEventDelegate );
-		pInputEventDelegate = NULL;
+		g_pWindowMgr->OnInputEvent()->Unsubscribe( onInputEventHandle );
+		onInputEventHandle = INVALID_HANDLE;
 	}
 
+	windowId = INVALID_WINDOW_ID;
 	Msg( "InputSystem: Detached from a window" );
 }
 

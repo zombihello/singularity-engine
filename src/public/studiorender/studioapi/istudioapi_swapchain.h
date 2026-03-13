@@ -1,6 +1,6 @@
 #pragma once
 #include "tier1/math/math.h"
-#include "tier1/delegate.h"
+#include "tier1/event.h"
 #include "studiorender/studioapi/istudioapi_framebuffer.h"
 #include "studiorender/studioapi/istudioapi_renderpass.h"
 
@@ -25,7 +25,7 @@ public:
 class IStudioAPISwapChain : public IStudioAPIResource
 {
 public:
-	DECLARE_MULTICAST_DELEGATE_INTERFACE( IOnReCreated, IStudioAPISwapChain* /* pStudioAPISwapChain */, bool /* bChangedImageFormat */ );
+	DECLARE_EVENT_INTERFACE( IOnReCreated, IStudioAPISwapChain* /* pStudioAPISwapChain */, bool /* bChangedImageFormat */ );
 
 	virtual ~IStudioAPISwapChain() {}
 
@@ -36,7 +36,7 @@ public:
 
 	virtual bool					  IsUseVSync() const			 = 0;
 	virtual bool					  IsValid() const				 = 0;
-	virtual vector2i_t					  GetSize() const				 = 0;
+	virtual vector2i_t				  GetSize() const				 = 0;
 	virtual uint32					  GetCurrentImageIndex() const	 = 0;
 	virtual IStudioAPISwapChainImage* GetCurrentImage() const		 = 0;
 	virtual uint32					  GetNumImages() const			 = 0;

@@ -62,8 +62,8 @@ public:
 	uint64 GetLastFrameUsed() const;
 
 private:
-	bool															  bUsed;
-	uint64															  lastFrameUsed;
+	bool															bUsed;
+	uint64															lastFrameUsed;
 	eastl::unordered_map<hash, CStudioAPITypedDescriptorPoolSetVk*> typedDescriptorPoolsDict;
 };
 
@@ -87,7 +87,7 @@ private:
 	static void OnStudioAPIVkShutdown( void* pUserData );
 
 	eastl::list<CStudioAPIDescriptorPoolSetContainerVk*> poolSets;
-	COnStudioAPIVkShutdown::funcDelegate_t*				 pStudioAPIVkShutdownDelegate;
+	COnStudioAPIVkShutdown::handle_t					 onStudioAPIVkShutdownHandle;
 };
 
 #include "studiorender/studioapi_vk/vk_studioapi_descriptorpoolsmgr.inl"

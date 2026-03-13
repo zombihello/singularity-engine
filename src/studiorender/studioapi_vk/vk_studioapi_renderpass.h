@@ -19,6 +19,6 @@ public:
 private:
 	static void OnStudioAPIVkShutdown( void* pUserData );
 
-	VkRenderPass							vkRenderPass;
-	COnStudioAPIVkShutdown::funcDelegate_t* pStudioAPIVkShutdownDelegate;
+	VkRenderPass					 vkRenderPass;
+	COnStudioAPIVkShutdown::handle_t onStudioAPIVkShutdownHandle;
 };

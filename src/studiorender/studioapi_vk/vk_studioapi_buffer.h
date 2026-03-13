@@ -55,17 +55,17 @@ private:
 	static void	  OnStudioAPIVkShutdown( void* pUserData );
 	static uint32 GetNumBuffersFromUsage( uint32 usageFlags );
 
-	uint32									usageFlags;
-	uint8									memoryFlags;
-	uint64									size;
-	uint32									stride;
-	uint8									numBuffers;
-	uint8									currentBufferIndex;
-	uint64									bufferOffsets[NUM_BUFFERS];
-	VkBuffer								vkBuffer;
-	VmaAllocation							vmaAllocation;
-	studioAPISyncStateBufferVk_t			syncState;
-	COnStudioAPIVkShutdown::funcDelegate_t* pStudioAPIVkShutdownDelegate;
+	uint32							 usageFlags;
+	uint8							 memoryFlags;
+	uint64							 size;
+	uint32							 stride;
+	uint8							 numBuffers;
+	uint8							 currentBufferIndex;
+	uint64							 bufferOffsets[NUM_BUFFERS];
+	VkBuffer						 vkBuffer;
+	VmaAllocation					 vmaAllocation;
+	studioAPISyncStateBufferVk_t	 syncState;
+	COnStudioAPIVkShutdown::handle_t onStudioAPIVkShutdownHandle;
 };
 
 #include "studiorender/studioapi_vk/vk_studioapi_buffer.inl"

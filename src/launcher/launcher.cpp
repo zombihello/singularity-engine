@@ -50,8 +50,8 @@ private:
 	CGameViewportClient		 gameViewportClient;
 	CRefPtr<IStudioViewport> pStudioViewport;
 
-	IWindowMgr::IOnWindowEvent::funcDelegate_t*		  pWindowEventDelegate;
-	IWindowMgr::IOnChangedMainWindow::funcDelegate_t* pChangedMainWindowDelegate;
+	IWindowMgr::IOnWindowEvent::handle_t	   onWindowEventHandle;
+	IWindowMgr::IOnChangedMainWindow::handle_t onChangedMainWindowHandle;
 };
 
 /*
@@ -63,8 +63,8 @@ CLauncherApp::CLauncherApp( const char* pCommandLine, const char* pDefaultGameDi
 	: CApplication( pCommandLine, hInstance )
 	, bInFocus( false )
 	, pDefaultGameDir( pDefaultGameDir )
-	, pWindowEventDelegate( NULL )
-	, pChangedMainWindowDelegate( NULL )
+	, onWindowEventHandle( INVALID_HANDLE )
+	, onChangedMainWindowHandle( INVALID_HANDLE )
 {
 }
 
@@ -75,9 +75,8 @@ CLauncherApp::Init
 */
 void CLauncherApp::Init()
 {
-	BaseClass::Init();
-
 	// Load gameinfo.txt
+	BaseClass::Init();
 	const char* pGameDir = CommandLine()->HasParam( "game" ) ? CommandLine()->GetFirstValue( "game" ) : pDefaultGameDir;
 	if ( !gameInfo.LoadFromFile( S_Sprintf( "//base_path/%s/gameinfo.txt", pGameDir ).c_str() ) )
 	{
@@ -164,8 +163,8 @@ void CLauncherApp::Init()
 	OnChangedMainWindow( this, g_pWindowMgr->GetMainWindowId() );
 
 	// Subscribe on window events
-	pWindowEventDelegate	   = g_pWindowMgr->OnWindowEvent()->AddFunc( &CLauncherApp::OnWindowEvent, this );
-	pChangedMainWindowDelegate = g_pWindowMgr->OnChangedMainWindow()->AddFunc( &CLauncherApp::OnChangedMainWindow, this );
+	onWindowEventHandle		  = g_pWindowMgr->OnWindowEvent()->Subscribe( &CLauncherApp::OnWindowEvent, this );
+	onChangedMainWindowHandle = g_pWindowMgr->OnChangedMainWindow()->Subscribe( &CLauncherApp::OnChangedMainWindow, this );
 }
 
 /*
@@ -225,15 +224,15 @@ void CLauncherApp::Shutdown()
 	g_pInputSystem->DetachFromWindow();
 
 	// Describe from window events
-	if ( pWindowEventDelegate )
+	if ( onWindowEventHandle != INVALID_HANDLE )
 	{
-		g_pWindowMgr->OnWindowEvent()->RemoveFunc( pWindowEventDelegate );
-		pWindowEventDelegate = NULL;
+		g_pWindowMgr->OnWindowEvent()->Unsubscribe( onWindowEventHandle );
+		onWindowEventHandle = INVALID_HANDLE;
 	}
-	if ( pChangedMainWindowDelegate )
+	if ( onChangedMainWindowHandle != INVALID_HANDLE )
 	{
-		g_pWindowMgr->OnChangedMainWindow()->RemoveFunc( pChangedMainWindowDelegate );
-		pChangedMainWindowDelegate = NULL;
+		g_pWindowMgr->OnChangedMainWindow()->Unsubscribe( onChangedMainWindowHandle );
+		onChangedMainWindowHandle = INVALID_HANDLE;
 	}
 
 	// Shutdown the viewport

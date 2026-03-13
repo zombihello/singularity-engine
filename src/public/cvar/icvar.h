@@ -2,7 +2,7 @@
 #include "appframework/iappsystem.h"
 #include "cvar/iconcmd.h"
 #include "cvar/iconvar.h"
-#include "tier1/delegate.h"
+#include "tier1/event.h"
 #include "tier1/math/color.h"
 
 //-----------------------------------------------------------------------------
@@ -13,7 +13,7 @@ class IStreamDataWriter;
 //-----------------------------------------------------------------------------
 // Cvar delegate interfaces
 //-----------------------------------------------------------------------------
-DECLARE_MULTICAST_DELEGATE_INTERFACE( IOnWriteConCmdsToConfigFile, IStreamDataWriter* /* pStreamData */ );
+DECLARE_EVENT_INTERFACE( IOnWriteConCmdsToConfigFile, IStreamDataWriter* /* pStreamData */ );
 
 //-----------------------------------------------------------------------------
 // Applications can implement this to modify behavior in ICvar

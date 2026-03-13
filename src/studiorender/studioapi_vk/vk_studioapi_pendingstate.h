@@ -75,12 +75,12 @@ private:
 	{
 		descriptorStateCache_t()
 			: pRenderDescriptorState( NULL )
-			, pRenderPipelineDeletedDelegate( NULL )
+			, onRenderPipelineDeletedHandle( INVALID_HANDLE )
 		{
 		}
 
-		CStudioAPIDescriptorStateRenderVk*					 pRenderDescriptorState;
-		COnStudioAPIRenderPipelineDeletedVk::funcDelegate_t* pRenderPipelineDeletedDelegate;
+		CStudioAPIDescriptorStateRenderVk*			  pRenderDescriptorState;
+		COnStudioAPIRenderPipelineDeletedVk::handle_t onRenderPipelineDeletedHandle;
 	};
 
 	static void OndRenderPipelineDeleted( void* pUserData, CStudioAPIRenderPipelineVk* pRenderPipeline );

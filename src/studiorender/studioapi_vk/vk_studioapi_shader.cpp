@@ -73,7 +73,7 @@ VK_ShaderReflectionCalcHash
 static FORCEINLINE hash VK_ShaderReflectionCalcHash( const shaderReflectionImageSampler_t& shaderReflectionImageSampler )
 {
 	hash hash = FastHash( shaderReflectionImageSampler.name.c_str(), (uint64)shaderReflectionImageSampler.name.size() * sizeof( char ) );
-	hash		= FastHash( shaderReflectionImageSampler.dimensionType, hash );
+	hash	  = FastHash( shaderReflectionImageSampler.dimensionType, hash );
 	return FastHash( shaderReflectionImageSampler.arraySize, hash );
 }
 
@@ -175,7 +175,7 @@ CStudioAPIShaderVk::CStudioAPIShaderVk
 CStudioAPIShaderVk::CStudioAPIShaderVk( studioAPIShaderType_t type, const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName /* = "" */ )
 	: type( type )
 	, vkShaderModule( VK_NULL_HANDLE )
-	, pStudioAPIVkShutdownDelegate( NULL )
+	, onStudioAPIVkShutdownHandle( INVALID_HANDLE )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
@@ -355,7 +355,7 @@ CStudioAPIShaderVk::CStudioAPIShaderVk( studioAPIShaderType_t type, const char* 
 	}
 
 	// Register in 'onStudioAPIVkShutodwn' for destroy Vulkan objects when the one is shutdown
-	pStudioAPIVkShutdownDelegate = g_StudioAPIVk.OnStudioAPIVkShutdown().AddFunc( &CStudioAPIShaderVk::OnStudioAPIVkShutdown, this );
+	onStudioAPIVkShutdownHandle = g_StudioAPIVk.OnStudioAPIVkShutdown().Subscribe( &CStudioAPIShaderVk::OnStudioAPIVkShutdown, this );
 }
 
 /*
@@ -380,10 +380,10 @@ CStudioAPIShaderVk::~CStudioAPIShaderVk()
 	vkPushConstantRanges.clear();
 
 	// Remove CStudioAPIShaderVk::OnStudioAPIVkShutdown from event 'onStudioAPIVkShutodwn'
-	if ( pStudioAPIVkShutdownDelegate )
+	if ( onStudioAPIVkShutdownHandle != INVALID_HANDLE )
 	{
-		g_StudioAPIVk.OnStudioAPIVkShutdown().RemoveFunc( pStudioAPIVkShutdownDelegate );
-		pStudioAPIVkShutdownDelegate = NULL;
+		g_StudioAPIVk.OnStudioAPIVkShutdown().Unsubscribe( onStudioAPIVkShutdownHandle );
+		onStudioAPIVkShutdownHandle = INVALID_HANDLE;
 	}
 }
 
@@ -405,8 +405,8 @@ CStudioAPIShaderVk::OnStudioAPIVkShutdown
 void CStudioAPIShaderVk::OnStudioAPIVkShutdown( void* pUserData )
 {
 	Assert( pUserData );
-	CStudioAPIShaderVk* pStudioAPIShader		   = (CStudioAPIShaderVk*)pUserData;
-	pStudioAPIShader->pStudioAPIVkShutdownDelegate = NULL;
+	CStudioAPIShaderVk* pStudioAPIShader		  = (CStudioAPIShaderVk*)pUserData;
+	pStudioAPIShader->onStudioAPIVkShutdownHandle = INVALID_HANDLE;
 	pStudioAPIShader->~CStudioAPIShaderVk();
 }
 
@@ -423,7 +423,7 @@ CStudioAPIBoundShaderStateVk::CStudioAPIBoundShaderStateVk( const CStudioAPIBoun
 	, pHullShader( pHullShader )
 	, pDomainShader( pDomainShader )
 	, pGeometryShader( pGeometryShader )
-	, pStudioAPIVkShutdownDelegate( NULL )
+	, onStudioAPIVkShutdownHandle( INVALID_HANDLE )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
@@ -497,7 +497,7 @@ CStudioAPIBoundShaderStateVk::CStudioAPIBoundShaderStateVk( const CStudioAPIBoun
 	descriptorSetsLayout.Init( descriptorSetLayoutDict, vkPushConstantRanges );
 
 	// Register in 'onStudioAPIVkShutodwn' for destroy Vulkan objects when the one is shutdown
-	pStudioAPIVkShutdownDelegate = g_StudioAPIVk.OnStudioAPIVkShutdown().AddFunc( &CStudioAPIBoundShaderStateVk::OnStudioAPIVkShutdown, this );
+	onStudioAPIVkShutdownHandle = g_StudioAPIVk.OnStudioAPIVkShutdown().Subscribe( &CStudioAPIBoundShaderStateVk::OnStudioAPIVkShutdown, this );
 }
 
 /*
@@ -516,10 +516,10 @@ CStudioAPIBoundShaderStateVk::~CStudioAPIBoundShaderStateVk()
 	g_StudioAPIVk.GetBoundShaderStateCache().Remove( key );
 
 	// Remove CStudioAPIBoundShaderStateVk::OnStudioAPIVkShutdown from event 'onStudioAPIVkShutodwn'
-	if ( pStudioAPIVkShutdownDelegate )
+	if ( onStudioAPIVkShutdownHandle != INVALID_HANDLE )
 	{
-		g_StudioAPIVk.OnStudioAPIVkShutdown().RemoveFunc( pStudioAPIVkShutdownDelegate );
-		pStudioAPIVkShutdownDelegate = NULL;
+		g_StudioAPIVk.OnStudioAPIVkShutdown().Unsubscribe( onStudioAPIVkShutdownHandle );
+		onStudioAPIVkShutdownHandle = INVALID_HANDLE;
 	}
 }
 
@@ -592,6 +592,6 @@ void CStudioAPIBoundShaderStateVk::OnStudioAPIVkShutdown( void* pUserData )
 {
 	Assert( pUserData );
 	CStudioAPIBoundShaderStateVk* pStudioAPIBoundShaderState = (CStudioAPIBoundShaderStateVk*)pUserData;
-	pStudioAPIBoundShaderState->pStudioAPIVkShutdownDelegate = NULL;
+	pStudioAPIBoundShaderState->onStudioAPIVkShutdownHandle	 = INVALID_HANDLE;
 	pStudioAPIBoundShaderState->~CStudioAPIBoundShaderStateVk();
 }

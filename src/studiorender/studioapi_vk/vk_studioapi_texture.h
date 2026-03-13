@@ -56,8 +56,8 @@ public:
 private:
 	static void OnStudioAPIVkShutdown( void* pUserData );
 
-	VkSampler								vkSampler;
-	COnStudioAPIVkShutdown::funcDelegate_t* pStudioAPIVkShutdownDelegate;
+	VkSampler						 vkSampler;
+	COnStudioAPIVkShutdown::handle_t onStudioAPIVkShutdownHandle;
 };
 
 //-----------------------------------------------------------------------------
@@ -137,7 +137,7 @@ private:
 	uint32									   numMips;
 	VkImage									   vkImage;
 	VmaAllocation							   vmaAllocation;
-	COnStudioAPIVkShutdown::funcDelegate_t*	   pStudioAPIVkShutdownDelegate;
+	COnStudioAPIVkShutdown::handle_t		   onStudioAPIVkShutdownHandle;
 	eastl::vector<studioAPISyncStateImageVk_t> syncStates;
 	eastl::vector<VkImageView>				   vkImageViews;
 };

@@ -11,8 +11,8 @@ CEcsEntity::CEcsEntity
 CEcsEntity::CEcsEntity( ecsEntity_t ecsEntity, CEcsMap* pEcsMap )
 	: ecsEntity( ecsEntity )
 	, pEcsMap( pEcsMap )
-	, pOnMapResetedDelegate( pEcsMap->OnMapReseted()->AddFunc( &CEcsEntity::OnMapResetedOrUnloaded, this ) )
-	, pOnMapUnloadedDelegate( pEcsMap->OnMapUnloaded()->AddFunc( &CEcsEntity::OnMapResetedOrUnloaded, this ) )
+	, onMapResetedHandle( pEcsMap->OnMapReseted()->Subscribe( &CEcsEntity::OnMapResetedOrUnloaded, this ) )
+	, onMapUnloadedHandle( pEcsMap->OnMapUnloaded()->Subscribe( &CEcsEntity::OnMapResetedOrUnloaded, this ) )
 {
 	Assert( pEcsMap );
 }
@@ -57,7 +57,7 @@ void CEcsEntity::OnMapResetedOrUnloaded( void* pUserData, IMap* pMap )
 	CEcsEntity* pEcsEntity = (CEcsEntity*)pUserData;
 	if ( pEcsEntity->pEcsMap == pMap )
 	{
-		pEcsEntity->DestroyEcsEntity( false );
+		pEcsEntity->DestroyEcsEntity();
 	}
 }
 
@@ -66,7 +66,7 @@ void CEcsEntity::OnMapResetedOrUnloaded( void* pUserData, IMap* pMap )
 CEcsEntity::DestroyEcsEntity
 ==================
 */
-void CEcsEntity::DestroyEcsEntity( bool bRemoveEcsMapDelegates /* = true */ )
+void CEcsEntity::DestroyEcsEntity()
 {
 	if ( pEcsMap )
 	{
@@ -76,14 +76,17 @@ void CEcsEntity::DestroyEcsEntity( bool bRemoveEcsMapDelegates /* = true */ )
 			ecsWorld.DestroyEntity( ecsEntity );
 		}
 
-		if ( bRemoveEcsMapDelegates )
+		if ( onMapResetedHandle != INVALID_HANDLE )
 		{
-			pEcsMap->OnMapReseted()->RemoveFunc( pOnMapResetedDelegate );
-			pEcsMap->OnMapUnloaded()->RemoveFunc( pOnMapUnloadedDelegate );
+			pEcsMap->OnMapReseted()->Unsubscribe( onMapResetedHandle );
+			onMapResetedHandle = INVALID_HANDLE;
+		}
+		if ( onMapUnloadedHandle != INVALID_HANDLE )
+		{
+			pEcsMap->OnMapUnloaded()->Unsubscribe( onMapUnloadedHandle );
+			onMapUnloadedHandle = INVALID_HANDLE;
 		}
 
-		pEcsMap				   = NULL;
-		pOnMapResetedDelegate  = NULL;
-		pOnMapUnloadedDelegate = NULL;
+		pEcsMap = NULL;
 	}
 }

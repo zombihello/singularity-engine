@@ -1,5 +1,6 @@
 #pragma once
 #include "tier0/tier0.h"
+#include "tier1/math/axis.h"
 
 //-----------------------------------------------------------------------------
 // Helper for work with source SMDL (Singularity Model) files

@@ -54,7 +54,7 @@ CStudioAPIPendingRenderStateVk::~CStudioAPIPendingRenderStateVk()
 	for ( auto it = descriptorStatesDict.begin(), itEnd = descriptorStatesDict.end(); it != itEnd; ++it )
 	{
 		delete it->second.pRenderDescriptorState;
-		it->first->OnRenderPipelineDeleted().RemoveFunc( it->second.pRenderPipelineDeletedDelegate );
+		it->first->OnRenderPipelineDeleted().Unsubscribe( it->second.onRenderPipelineDeletedHandle );
 	}
 }
 
@@ -184,9 +184,9 @@ bool CStudioAPIPendingRenderStateVk::SetRenderPipeline( CStudioAPIRenderPipeline
 		else
 		{
 			descriptorStateCache_t descriptorStateCache;
-			descriptorStateCache.pRenderDescriptorState			= new CStudioAPIDescriptorStateRenderVk( cmdContext, pRenderPipeline );
-			descriptorStateCache.pRenderPipelineDeletedDelegate = pRenderPipeline->OnRenderPipelineDeleted().AddFunc( &CStudioAPIPendingRenderStateVk::OndRenderPipelineDeleted, this );
-			pCurrentRenderDescriptorState						= descriptorStateCache.pRenderDescriptorState;
+			descriptorStateCache.pRenderDescriptorState		   = new CStudioAPIDescriptorStateRenderVk( cmdContext, pRenderPipeline );
+			descriptorStateCache.onRenderPipelineDeletedHandle = pRenderPipeline->OnRenderPipelineDeleted().Subscribe( &CStudioAPIPendingRenderStateVk::OndRenderPipelineDeleted, this );
+			pCurrentRenderDescriptorState					   = descriptorStateCache.pRenderDescriptorState;
 			descriptorStatesDict.insert( eastl::make_pair( pRenderPipeline, descriptorStateCache ) );
 		}
 

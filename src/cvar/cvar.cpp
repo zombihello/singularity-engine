@@ -10,7 +10,7 @@
 //-----------------------------------------------------------------------------
 // Cvar delegates
 //-----------------------------------------------------------------------------
-DECLARE_MULTICAST_DELEGATE( COnWriteConCmdsToConfigFile, IStreamDataWriter* /* pStreamData */ );
+DECLARE_EVENT( COnWriteConCmdsToConfigFile, IStreamDataWriter* /* pStreamData */ );
 
 //-----------------------------------------------------------------------------
 // Cvars
@@ -799,7 +799,7 @@ void CCvar::WriteConfigFile( const char* pConfigDir, bool bWriteDefaultConfig /*
 	}
 
 	// Broadcast an event that causes other subsystems to write concmds to the file (i.g: 'bind q quit', 'exec subconfig.cfg')
-	onWriteConCmdsToConfigFile.Broadcast( pFile );
+	onWriteConCmdsToConfigFile.Invoke( pFile );
 
 	// Write cvars
 	eastl::string buffer;

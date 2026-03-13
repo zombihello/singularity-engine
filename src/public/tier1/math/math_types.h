@@ -1,9 +1,5 @@
 #pragma once
 #include <glm.hpp>
-#include <gtx/quaternion.hpp>
-#include <gtc/type_ptr.hpp>
-#include <gtx/transform.hpp>
-#include <gtx/compatibility.hpp>
 
 //-----------------------------------------------------------------------------
 // Math types

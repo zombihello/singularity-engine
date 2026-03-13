@@ -118,7 +118,7 @@ CStudioAPIBufferVk::CStudioAPIBufferVk( const byte* pData, uint64 dataSize, uint
 	, currentBufferIndex( 0 )
 	, vkBuffer( VK_NULL_HANDLE )
 	, vmaAllocation( VK_NULL_HANDLE )
-	, pStudioAPIVkShutdownDelegate( NULL )
+	, onStudioAPIVkShutdownHandle( INVALID_HANDLE )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
@@ -165,7 +165,7 @@ CStudioAPIBufferVk::CStudioAPIBufferVk( const byte* pData, uint64 dataSize, uint
 	}
 
 	// Register in 'onStudioAPIVkShutodwn' for destroy Vulkan objects when the one is shutdown
-	pStudioAPIVkShutdownDelegate = g_StudioAPIVk.OnStudioAPIVkShutdown().AddFunc( &CStudioAPIBufferVk::OnStudioAPIVkShutdown, this );
+	onStudioAPIVkShutdownHandle = g_StudioAPIVk.OnStudioAPIVkShutdown().Subscribe( &CStudioAPIBufferVk::OnStudioAPIVkShutdown, this );
 }
 
 /*
@@ -180,18 +180,17 @@ CStudioAPIBufferVk::~CStudioAPIBufferVk()
 	// Destroy the buffer
 	if ( vkBuffer != VK_NULL_HANDLE )
 	{
-		g_StudioAPIVk.GetMemoryMgr().FreeResource( [vkBuffer = vkBuffer, vmaAllocation = vmaAllocation]() {
-			g_StudioAPIVk.GetMemoryMgr().DestroyBuffer( vkBuffer, vmaAllocation );
-		} );
+		g_StudioAPIVk.GetMemoryMgr().FreeResource( [vkBuffer = vkBuffer, vmaAllocation = vmaAllocation]()
+												   { g_StudioAPIVk.GetMemoryMgr().DestroyBuffer( vkBuffer, vmaAllocation ); } );
 		vkBuffer	  = VK_NULL_HANDLE;
 		vmaAllocation = VK_NULL_HANDLE;
 	}
 
 	// Remove CStudioAPIBufferVk::OnStudioAPIVkShutdown from event 'onStudioAPIVkShutodwn'
-	if ( pStudioAPIVkShutdownDelegate )
+	if ( onStudioAPIVkShutdownHandle != INVALID_HANDLE )
 	{
-		g_StudioAPIVk.OnStudioAPIVkShutdown().RemoveFunc( pStudioAPIVkShutdownDelegate );
-		pStudioAPIVkShutdownDelegate = NULL;
+		g_StudioAPIVk.OnStudioAPIVkShutdown().Unsubscribe( onStudioAPIVkShutdownHandle );
+		onStudioAPIVkShutdownHandle = INVALID_HANDLE;
 	}
 }
 
@@ -300,7 +299,8 @@ void CStudioAPIBufferVk::UpdateData( IStudioAPICmdContext* pCmdContext, byte* pD
 		vkBufferMemoryBarrier.size					   = size;
 		CStudioAPIDataUploaderVk& dataUploader		   = g_StudioAPIVk.GetDataUploader();
 		dataUploader.Upload( dataSize, STUDIOAPI_VK_BUFFER_OFFSET_ALIGNMENT,
-							 [this, offset, &vkBufferMemoryBarrier, bNeedOwnershipTransfer, pStudioAPICmdContext, pTransferCmdContext, pData, dataSize]( const CStudioAPIDataUploaderVk::uploadParams_t& uploadParams ) {
+							 [this, offset, &vkBufferMemoryBarrier, bNeedOwnershipTransfer, pStudioAPICmdContext, pTransferCmdContext, pData, dataSize]( const CStudioAPIDataUploaderVk::uploadParams_t& uploadParams )
+							 {
 								 // Copy the data into the staging buffer
 								 uint64 uploadOffset = dataSize - uploadParams.remainSizeToUpload;
 								 Mem_Memcpy( uploadParams.pStagingBufferData, pData + uploadOffset, uploadParams.partialUploadSize );
@@ -380,7 +380,7 @@ CStudioAPIBufferVk::OnStudioAPIVkShutdown
 void CStudioAPIBufferVk::OnStudioAPIVkShutdown( void* pUserData )
 {
 	Assert( pUserData );
-	CStudioAPIBufferVk* pStudioAPIMultiBuffer			= (CStudioAPIBufferVk*)pUserData;
-	pStudioAPIMultiBuffer->pStudioAPIVkShutdownDelegate = NULL;
+	CStudioAPIBufferVk* pStudioAPIMultiBuffer		   = (CStudioAPIBufferVk*)pUserData;
+	pStudioAPIMultiBuffer->onStudioAPIVkShutdownHandle = INVALID_HANDLE;
 	pStudioAPIMultiBuffer->~CStudioAPIBufferVk();
 }

@@ -1,5 +1,5 @@
 #pragma once
-#include "tier1/delegate.h"
+#include "tier1/event.h"
 #include "studiorender/studioapi_vk/vk_studioapi_queue.h"
 
 //-----------------------------------------------------------------------------

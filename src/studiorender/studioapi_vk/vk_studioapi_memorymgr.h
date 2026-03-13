@@ -37,6 +37,7 @@ public:
 	void		  DestroyBuffer( VkBuffer vkBuffer, VmaAllocation vmaAllocation ) const;
 	void		  DestroyImage( VkImage vkImage, VmaAllocation vmaAllocation ) const;
 
+	// TODO BS yehor.pohuliaka - Fix crash in Retail configuration. Need rework pending free Vulkan resources in CStudioAPIMemoryMgrVk::Shutdown
 	template<typename TFreeLambda>
 	void FreeResource( TFreeLambda&& freeLambda ) const;
 	void FreePendingResources( uint32 indexFrameInFlight ) const;

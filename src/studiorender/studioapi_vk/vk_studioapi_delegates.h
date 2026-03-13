@@ -1,5 +1,5 @@
 #pragma once
-#include "tier1/delegate.h"
+#include "tier1/event.h"
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -10,6 +10,6 @@ class CStudioAPIDescriptorSetsLayoutVk;
 //-----------------------------------------------------------------------------
 // Vulkan delegates
 //-----------------------------------------------------------------------------
-DECLARE_MULTICAST_DELEGATE( COnStudioAPIVkShutdown );
-DECLARE_MULTICAST_DELEGATE( COnStudioAPIRenderPipelineDeletedVk, CStudioAPIRenderPipelineVk* /* pRenderPipeline */ );
-DECLARE_MULTICAST_DELEGATE( COnStudioAPIDescriptorSetsLayoutDeletedVk, CStudioAPIDescriptorSetsLayoutVk* /* pDescriptorSetsLayout */ );
+DECLARE_EVENT( COnStudioAPIVkShutdown );
+DECLARE_EVENT( COnStudioAPIRenderPipelineDeletedVk, CStudioAPIRenderPipelineVk* /* pRenderPipeline */ );
+DECLARE_EVENT( COnStudioAPIDescriptorSetsLayoutDeletedVk, CStudioAPIDescriptorSetsLayoutVk* /* pDescriptorSetsLayout */ );

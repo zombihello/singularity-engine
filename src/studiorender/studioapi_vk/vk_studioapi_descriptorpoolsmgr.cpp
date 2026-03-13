@@ -228,7 +228,7 @@ CStudioAPIDescriptorPoolsMgrVk::CStudioAPIDescriptorPoolsMgrVk
 ==================
 */
 CStudioAPIDescriptorPoolsMgrVk::CStudioAPIDescriptorPoolsMgrVk()
-	: pStudioAPIVkShutdownDelegate( NULL )
+	: onStudioAPIVkShutdownHandle( INVALID_HANDLE )
 {
 }
 
@@ -252,7 +252,7 @@ void CStudioAPIDescriptorPoolsMgrVk::Init()
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Register in 'onStudioAPIVkShutodwn' for destroy Vulkan objects when the one is shutdown
-	pStudioAPIVkShutdownDelegate = g_StudioAPIVk.OnStudioAPIVkShutdown().AddFunc( &CStudioAPIDescriptorPoolsMgrVk::OnStudioAPIVkShutdown, this );
+	onStudioAPIVkShutdownHandle = g_StudioAPIVk.OnStudioAPIVkShutdown().Subscribe( &CStudioAPIDescriptorPoolsMgrVk::OnStudioAPIVkShutdown, this );
 }
 
 /*
@@ -272,10 +272,10 @@ void CStudioAPIDescriptorPoolsMgrVk::Shutdown()
 	poolSets.clear();
 
 	// Remove CStudioAPIDescriptorPoolsMgrVk::OnStudioAPIVkShutdown from event 'onStudioAPIVkShutodwn'
-	if ( pStudioAPIVkShutdownDelegate )
+	if ( onStudioAPIVkShutdownHandle != INVALID_HANDLE )
 	{
-		g_StudioAPIVk.OnStudioAPIVkShutdown().RemoveFunc( pStudioAPIVkShutdownDelegate );
-		pStudioAPIVkShutdownDelegate = NULL;
+		g_StudioAPIVk.OnStudioAPIVkShutdown().Unsubscribe( onStudioAPIVkShutdownHandle );
+		onStudioAPIVkShutdownHandle = INVALID_HANDLE;
 	}
 }
 
@@ -344,6 +344,6 @@ void CStudioAPIDescriptorPoolsMgrVk::OnStudioAPIVkShutdown( void* pUserData )
 {
 	Assert( pUserData );
 	CStudioAPIDescriptorPoolsMgrVk* pStudioAPIDescriptorPoolsMgr = (CStudioAPIDescriptorPoolsMgrVk*)pUserData;
-	pStudioAPIDescriptorPoolsMgr->pStudioAPIVkShutdownDelegate	 = NULL;
+	pStudioAPIDescriptorPoolsMgr->onStudioAPIVkShutdownHandle	 = INVALID_HANDLE;
 	pStudioAPIDescriptorPoolsMgr->Shutdown();
 }

@@ -15,8 +15,8 @@ public:
 	const VkPipelineVertexInputStateCreateInfo& GetVkPipelineVertexInputStateInfo() const;
 
 private:
-	VkPipelineVertexInputStateCreateInfo		   vkPipelineVertexInputStateInfo;
-	eastl::vector<VkVertexInputBindingDescription>   vkVertexInputBindingDescriptions;
+	VkPipelineVertexInputStateCreateInfo			 vkPipelineVertexInputStateInfo;
+	eastl::vector<VkVertexInputBindingDescription>	 vkVertexInputBindingDescriptions;
 	eastl::vector<VkVertexInputAttributeDescription> vkVertexInputAttributeDescriptions;
 };
 
@@ -34,20 +34,20 @@ public:
 
 	VkShaderModule								GetVkShaderModule() const;
 	const VkPipelineShaderStageCreateInfo&		GetVkPipelineShaderStageInfo() const;
-	const eastl::string&							GetEntryPointName() const;
+	const eastl::string&						GetEntryPointName() const;
 	const studioAPIDescriptorSetLayoutVkDict_t& GetDescriptorSetLayoutDict() const;
-	const eastl::vector<VkPushConstantRange>&		GetVkPushConstantRanges() const;
+	const eastl::vector<VkPushConstantRange>&	GetVkPushConstantRanges() const;
 
 private:
 	static void OnStudioAPIVkShutdown( void* pUserData );
 
-	studioAPIShaderType_t					type;
-	VkShaderModule							vkShaderModule;
-	VkPipelineShaderStageCreateInfo			vkPipelineShaderStageInfo;
-	COnStudioAPIVkShutdown::funcDelegate_t* pStudioAPIVkShutdownDelegate;
-	eastl::string								entryPointName;
-	studioAPIDescriptorSetLayoutVkDict_t	descriptorSetLayoutDict;
-	eastl::vector<VkPushConstantRange>		vkPushConstantRanges;
+	studioAPIShaderType_t				 type;
+	VkShaderModule						 vkShaderModule;
+	VkPipelineShaderStageCreateInfo		 vkPipelineShaderStageInfo;
+	COnStudioAPIVkShutdown::handle_t	 onStudioAPIVkShutdownHandle;
+	eastl::string						 entryPointName;
+	studioAPIDescriptorSetLayoutVkDict_t descriptorSetLayoutDict;
+	eastl::vector<VkPushConstantRange>	 vkPushConstantRanges;
 };
 
 //-----------------------------------------------------------------------------
@@ -145,15 +145,15 @@ public:
 private:
 	static void OnStudioAPIVkShutdown( void* pUserData );
 
-	CStudioAPIBoundShaderStateKeyVk			key;
-	CRefPtr<CStudioAPIVertexDeclarationVk>	pVertexDeclaration;
-	CRefPtr<CStudioAPIVertexShaderVk>		pVertexShader;
-	CRefPtr<CStudioAPIPixelShaderVk>		pPixelShader;
-	CRefPtr<CStudioAPIHullShaderVk>			pHullShader;
-	CRefPtr<CStudioAPIDomainShaderVk>		pDomainShader;
-	CRefPtr<CStudioAPIGeometryShaderVk>		pGeometryShader;
-	CStudioAPIDescriptorSetsLayoutVk		descriptorSetsLayout;
-	COnStudioAPIVkShutdown::funcDelegate_t* pStudioAPIVkShutdownDelegate;
+	CStudioAPIBoundShaderStateKeyVk		   key;
+	CRefPtr<CStudioAPIVertexDeclarationVk> pVertexDeclaration;
+	CRefPtr<CStudioAPIVertexShaderVk>	   pVertexShader;
+	CRefPtr<CStudioAPIPixelShaderVk>	   pPixelShader;
+	CRefPtr<CStudioAPIHullShaderVk>		   pHullShader;
+	CRefPtr<CStudioAPIDomainShaderVk>	   pDomainShader;
+	CRefPtr<CStudioAPIGeometryShaderVk>	   pGeometryShader;
+	CStudioAPIDescriptorSetsLayoutVk	   descriptorSetsLayout;
+	COnStudioAPIVkShutdown::handle_t	   onStudioAPIVkShutdownHandle;
 };
 
 #include "studiorender/studioapi_vk/vk_studioapi_shader.inl"
