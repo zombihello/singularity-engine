@@ -2,11 +2,33 @@
 
 /*
 ==================
+CRefCounted::CRefCounted
+==================
+*/
+template<class TBaseClass>
+FORCEINLINE CRefCounted<TBaseClass>::CRefCounted()
+{
+	countReferences.store( 0, eastl::memory_order_release );
+}
+
+/*
+==================
+CRefCounted::~CRefCounted
+==================
+*/
+template<class TBaseClass>
+FORCEINLINE CRefCounted<TBaseClass>::~CRefCounted()
+{
+	Assert( GetRefCount() == 0 );
+}
+
+/*
+==================
 CRefCounted::AddRef
 ==================
 */
 template<class TBaseClass>
-void CRefCounted<TBaseClass>::AddRef()
+FORCEINLINE void CRefCounted<TBaseClass>::AddRef()
 {
 	// Reference increment does not require synchronization with other data, relaxed is enough
 	countReferences.fetch_add( 1, eastl::memory_order_relaxed );
@@ -18,7 +40,7 @@ CRefCounted::ReleaseRef
 ==================
 */
 template<class TBaseClass>
-void CRefCounted<TBaseClass>::ReleaseRef()
+FORCEINLINE void CRefCounted<TBaseClass>::ReleaseRef()
 {
 	// Release on decrement publishes all records made by ref holders.
 	// If we are the last owner, before delete do acquire-fence
@@ -36,9 +58,80 @@ CRefCounted::GetRefCount
 ==================
 */
 template<class TBaseClass>
-uint32 CRefCounted<TBaseClass>::GetRefCount() const
+FORCEINLINE uint32 CRefCounted<TBaseClass>::GetRefCount() const
 {
 	return countReferences.load( eastl::memory_order_relaxed );
+}
+
+/*
+==================
+CRefPtr::CRefPtr
+==================
+*/
+template<typename TPtrType>
+FORCEINLINE CRefPtr<TPtrType>::CRefPtr()
+	: pPtr( NULL )
+{
+}
+
+/*
+==================
+CRefPtr::CRefPtr
+==================
+*/
+template<typename TPtrType>
+FORCEINLINE CRefPtr<TPtrType>::CRefPtr( TPtrType* pPtr )
+	: pPtr( pPtr )
+{
+	if ( pPtr )
+	{
+		pPtr->AddRef();
+	}
+}
+
+/*
+==================
+CRefPtr::CRefPtr
+==================
+*/
+template<typename TPtrType>
+FORCEINLINE CRefPtr<TPtrType>::CRefPtr( const CRefPtr& other )
+	: pPtr( other.pPtr )
+{
+	if ( pPtr )
+	{
+		pPtr->AddRef();
+	}
+}
+
+/*
+==================
+CRefPtr::CRefPtr
+==================
+*/
+template<typename TPtrType>
+template<typename TBasePtrType>
+FORCEINLINE CRefPtr<TPtrType>::CRefPtr( const CRefPtr<TBasePtrType>& other )
+	: pPtr( (TPtrType*)other.GetRawPtr() )
+{
+	if ( pPtr )
+	{
+		pPtr->AddRef();
+	}
+}
+
+/*
+==================
+CRefPtr::~CRefPtr
+==================
+*/
+template<typename TPtrType>
+FORCEINLINE CRefPtr<TPtrType>::~CRefPtr()
+{
+	if ( pPtr )
+	{
+		pPtr->ReleaseRef();
+	}
 }
 
 /*
@@ -110,7 +203,7 @@ FORCEINLINE CRefPtr<TPtrType>& CRefPtr<TPtrType>::operator=( const CRefPtr<TBase
 		pPtr->ReleaseRef();
 	}
 
-	pPtr = (TPtrType*)( copy.GetPtr() );
+	pPtr = (TPtrType*)( copy.GetRawPtr() );
 
 	if ( pPtr )
 	{
@@ -267,17 +360,6 @@ FORCEINLINE TPtrType** CRefPtr<TPtrType>::operator&()
 
 /*
 ==================
-CRefPtr<TPtrType>::SafeRelease
-==================
-*/
-template<typename TPtrType>
-FORCEINLINE void CRefPtr<TPtrType>::SafeRelease()
-{
-	*this = NULL;
-}
-
-/*
-==================
 CRefPtr::IsValid
 ==================
 */
@@ -305,11 +387,11 @@ FORCEINLINE uint32 CRefPtr<TPtrType>::GetRefCount() const
 
 /*
 ==================
-CRefPtr::GetPtr
+CRefPtr::GetRawPtr
 ==================
 */
 template<typename TPtrType>
-FORCEINLINE TPtrType* CRefPtr<TPtrType>::GetPtr() const
+FORCEINLINE TPtrType* CRefPtr<TPtrType>::GetRawPtr() const
 {
 	return pPtr;
 }

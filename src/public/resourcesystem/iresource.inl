@@ -140,11 +140,11 @@ FORCEINLINE TResourceClass* CResourcePtr<TResourceClass>::operator*() const
 
 /*
 ==================
-CResourcePtr::GetPtr
+CResourcePtr::GetRawPtr
 ==================
 */
 template<class TResourceClass>
-FORCEINLINE IResource* CResourcePtr<TResourceClass>::GetPtr() const
+FORCEINLINE IResource* CResourcePtr<TResourceClass>::GetRawPtr() const
 {
 	return pPtr;
 }

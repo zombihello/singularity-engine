@@ -215,7 +215,7 @@ void CStudioRender::R_DrawFrame( CStudioViewport* pViewport )
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( Studio_IsInRenderThread() );
 	Assert( !renderObjects.empty() );
-	presentRenderPass.R_DrawPass( pViewport, (CStudioRenderObjectQuad*)renderObjects[0].GetPtr() );
+	presentRenderPass.R_DrawPass( pViewport, (CStudioRenderObjectQuad*)renderObjects[0].GetRawPtr() );
 }
 
 /*
