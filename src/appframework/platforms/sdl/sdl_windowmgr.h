@@ -11,9 +11,9 @@
 class CWindowMgrSDL : public CBaseAppSystem<IWindowMgr>
 {
 public:
-	DECLARE_MULTICAST_DELEGATE( COnChangedMainWindow, windowId_t /* newMainWindowId */ );
-	DECLARE_MULTICAST_DELEGATE( COnWindowEvent, const windowEvent_t& /* windowEvent */ );
-	DECLARE_MULTICAST_DELEGATE( COnInputEvent, const inputEvent_t& /* inputEvent */ );
+	DECLARE_EVENT( COnChangedMainWindow, windowId_t /* newMainWindowId */ );
+	DECLARE_EVENT( COnWindowEvent, const windowEvent_t& /* windowEvent */ );
+	DECLARE_EVENT( COnInputEvent, const inputEvent_t& /* inputEvent */ );
 
 	// IAppSystem interface
 	virtual bool Init() override;

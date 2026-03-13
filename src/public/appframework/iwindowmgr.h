@@ -1,5 +1,5 @@
 #pragma once
-#include "tier1/delegate.h"
+#include "tier1/event.h"
 #include "appframework/iappsystem.h"
 #include "appframework/iwindow.h"
 #include "appframework/windowevent.h"
@@ -12,9 +12,9 @@
 class IWindowMgr : public IAppSystem
 {
 public:
-	DECLARE_MULTICAST_DELEGATE_INTERFACE( IOnChangedMainWindow, windowId_t /* newMainWindowId */ );
-	DECLARE_MULTICAST_DELEGATE_INTERFACE( IOnWindowEvent, const windowEvent_t& /* windowEvent */ );
-	DECLARE_MULTICAST_DELEGATE_INTERFACE( IOnInputEvent, const inputEvent_t& /* inputEvent */ );
+	DECLARE_EVENT_INTERFACE( IOnChangedMainWindow, windowId_t /* newMainWindowId */ );
+	DECLARE_EVENT_INTERFACE( IOnWindowEvent, const windowEvent_t& /* windowEvent */ );
+	DECLARE_EVENT_INTERFACE( IOnInputEvent, const inputEvent_t& /* inputEvent */ );
 
 	// Functions to work with windows
 	virtual IWindow*   CreateWindow()								  = 0;

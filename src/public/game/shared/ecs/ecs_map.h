@@ -8,8 +8,8 @@
 //-----------------------------------------------------------------------------
 // ECS map delegates
 //-----------------------------------------------------------------------------
-DECLARE_MULTICAST_DELEGATE( COnMapReseted, IMap* /* pMap */ );
-DECLARE_MULTICAST_DELEGATE( COnMapUnloaded, IMap* /* pMap */ );
+DECLARE_EVENT( COnMapReseted, IMap* /* pMap */ );
+DECLARE_EVENT( COnMapUnloaded, IMap* /* pMap */ );
 
 //-----------------------------------------------------------------------------
 // Forward declarations

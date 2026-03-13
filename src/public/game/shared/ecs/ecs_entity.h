@@ -23,10 +23,10 @@ public:
 
 private:
 	static void OnMapResetedOrUnloaded( void* pUserData, IMap* pMap );
-	void		DestroyEcsEntity( bool bRemoveEcsMapDelegates = true );
+	void		DestroyEcsEntity();
 
-	ecsEntity_t						ecsEntity;
-	CEcsMap*						pEcsMap;
-	IOnMapReseted::funcDelegate_t*	pOnMapResetedDelegate;
-	IOnMapUnloaded::funcDelegate_t* pOnMapUnloadedDelegate;
+	ecsEntity_t				 ecsEntity;
+	CEcsMap*				 pEcsMap;
+	IOnMapReseted::handle_t	 onMapResetedHandle;
+	IOnMapUnloaded::handle_t onMapUnloadedHandle;
 };

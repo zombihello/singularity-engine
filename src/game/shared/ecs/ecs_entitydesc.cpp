@@ -84,11 +84,11 @@ uint32 CEcsEntityDesc::CreateEcsPrefab( CEcsMap* pEcsMap, const char* pName, uin
 		return ecsPrefabIdx;
 	}
 
-	ecsPrefab_t ecsPrefab			 = {};
-	ecsPrefab.pEcsMap				 = pEcsMap;
-	ecsPrefab.ecsEntity				 = ecsEntity;
-	ecsPrefab.pOnMapResetedDelegate	 = pEcsMap->OnMapReseted()->AddFunc( &CEcsEntityDesc::OnMapResetedOrUnloaded, (void*)this );
-	ecsPrefab.pOnMapUnloadedDelegate = pEcsMap->OnMapUnloaded()->AddFunc( &CEcsEntityDesc::OnMapResetedOrUnloaded, (void*)this );
+	ecsPrefab_t ecsPrefab		  = {};
+	ecsPrefab.pEcsMap			  = pEcsMap;
+	ecsPrefab.ecsEntity			  = ecsEntity;
+	ecsPrefab.onMapResetedHandle  = pEcsMap->OnMapReseted()->Subscribe( &CEcsEntityDesc::OnMapResetedOrUnloaded, (void*)this );
+	ecsPrefab.onMapUnloadedHandle = pEcsMap->OnMapUnloaded()->Subscribe( &CEcsEntityDesc::OnMapResetedOrUnloaded, (void*)this );
 	ecsPrefabs.emplace_back( ecsPrefab );
 	return (uint32)ecsPrefabs.size() - 1;
 }
@@ -146,8 +146,8 @@ void CEcsEntityDesc::Clear()
 			ecsWorld.DestroyEntity( ecsPrefab.ecsEntity );
 		}
 
-		ecsPrefab.pEcsMap->OnMapReseted()->RemoveFunc( ecsPrefab.pOnMapResetedDelegate );
-		ecsPrefab.pEcsMap->OnMapUnloaded()->RemoveFunc( ecsPrefab.pOnMapUnloadedDelegate );
+		ecsPrefab.pEcsMap->OnMapReseted()->Unsubscribe( ecsPrefab.onMapResetedHandle );
+		ecsPrefab.pEcsMap->OnMapUnloaded()->Unsubscribe( ecsPrefab.onMapUnloadedHandle );
 	}
 
 	// Clear ECS component factories, prefabs and update GUID

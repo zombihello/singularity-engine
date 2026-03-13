@@ -19,16 +19,16 @@ public:
 	CStudioAPIFrameBufferVk( const studioAPIFrameBufferCreateInfo_t& createInfo, const char* pDebugName = "" );
 	~CStudioAPIFrameBufferVk();
 
-	FORCEINLINE VkFramebuffer GetVkFrameBuffer() const { return vkFrameBuffer; }
-	FORCEINLINE uint8		  GetNumClearValues() const { return numClearValues; }
+	FORCEINLINE VkFramebuffer		GetVkFrameBuffer() const { return vkFrameBuffer; }
+	FORCEINLINE uint8				GetNumClearValues() const { return numClearValues; }
 	FORCEINLINE const VkClearValue* GetVkClearValues() const { return vkClearValues; }
 
 private:
 	static void OnStudioAPIVkShutdown( void* pUserData );
 
-	vector2i_t									size;
-	VkFramebuffer							vkFrameBuffer;
-	COnStudioAPIVkShutdown::funcDelegate_t* pStudioAPIVkShutdownDelegate;
-	uint8									numClearValues;
-	VkClearValue							vkClearValues[STUDIOAPI_MAX_SIMULTANEOUS_RENDER_TARGETS + 1];
+	vector2i_t						 size;
+	VkFramebuffer					 vkFrameBuffer;
+	COnStudioAPIVkShutdown::handle_t onStudioAPIVkShutdownHandle;
+	uint8							 numClearValues;
+	VkClearValue					 vkClearValues[STUDIOAPI_MAX_SIMULTANEOUS_RENDER_TARGETS + 1];
 };

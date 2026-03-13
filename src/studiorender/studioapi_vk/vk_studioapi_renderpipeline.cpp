@@ -183,7 +183,7 @@ CStudioAPIRenderPipelineVk::CStudioAPIRenderPipelineVk
 */
 CStudioAPIRenderPipelineVk::CStudioAPIRenderPipelineVk( const studioAPIRenderPipelineCreateInfo_t& createInfo, const char* pDebugName /* = "" */ )
 	: vkPipeline( VK_NULL_HANDLE )
-	, pStudioAPIVkShutdownDelegate( NULL )
+	, onStudioAPIVkShutdownHandle( INVALID_HANDLE )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( createInfo.pBoundShaderState && createInfo.pRenderPass && ( createInfo.colorBlendState.attachmentCount == 0 || createInfo.colorBlendState.pAttachments ) );
@@ -345,7 +345,7 @@ CStudioAPIRenderPipelineVk::CStudioAPIRenderPipelineVk( const studioAPIRenderPip
 	STUDIOAPI_VK_VERIFY_RESULT( vkCreateGraphicsPipelines( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), VK_NULL_HANDLE, 1, &vkGraphicsPipelineCreateInfo, NULL, &vkPipeline ) );
 
 	// Register in 'onStudioAPIVkShutodwn' for destroy Vulkan objects when the one is shutdown
-	pStudioAPIVkShutdownDelegate = g_StudioAPIVk.OnStudioAPIVkShutdown().AddFunc( &CStudioAPIRenderPipelineVk::OnStudioAPIVkShutdown, this );
+	onStudioAPIVkShutdownHandle = g_StudioAPIVk.OnStudioAPIVkShutdown().Subscribe( &CStudioAPIRenderPipelineVk::OnStudioAPIVkShutdown, this );
 }
 
 /*
@@ -358,7 +358,7 @@ CStudioAPIRenderPipelineVk::~CStudioAPIRenderPipelineVk()
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Broadcast event about deletion of the pipeline
-	onRenderPipelineDeleted.Broadcast( this );
+	onRenderPipelineDeleted.Invoke( this );
 
 	// Destroy the Vulkan pipeline
 	if ( vkPipeline != VK_NULL_HANDLE )
@@ -372,10 +372,10 @@ CStudioAPIRenderPipelineVk::~CStudioAPIRenderPipelineVk()
 	pBoundShaderState = NULL;
 
 	// Remove CStudioAPIShaderVk::OnStudioAPIVkShutdown from event 'onStudioAPIVkShutodwn'
-	if ( pStudioAPIVkShutdownDelegate )
+	if ( onStudioAPIVkShutdownHandle != INVALID_HANDLE )
 	{
-		g_StudioAPIVk.OnStudioAPIVkShutdown().RemoveFunc( pStudioAPIVkShutdownDelegate );
-		pStudioAPIVkShutdownDelegate = NULL;
+		g_StudioAPIVk.OnStudioAPIVkShutdown().Unsubscribe( onStudioAPIVkShutdownHandle );
+		onStudioAPIVkShutdownHandle = INVALID_HANDLE;
 	}
 }
 
@@ -387,7 +387,7 @@ CStudioAPIRenderPipelineVk::OnStudioAPIVkShutdown
 void CStudioAPIRenderPipelineVk::OnStudioAPIVkShutdown( void* pUserData )
 {
 	Assert( pUserData );
-	CStudioAPIRenderPipelineVk* pStudioAPIRenderPipeline   = (CStudioAPIRenderPipelineVk*)pUserData;
-	pStudioAPIRenderPipeline->pStudioAPIVkShutdownDelegate = NULL;
+	CStudioAPIRenderPipelineVk* pStudioAPIRenderPipeline  = (CStudioAPIRenderPipelineVk*)pUserData;
+	pStudioAPIRenderPipeline->onStudioAPIVkShutdownHandle = INVALID_HANDLE;
 	pStudioAPIRenderPipeline->~CStudioAPIRenderPipelineVk();
 }

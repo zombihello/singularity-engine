@@ -12,7 +12,7 @@ CStudioAPIFrameBufferVk::CStudioAPIFrameBufferVk
 CStudioAPIFrameBufferVk::CStudioAPIFrameBufferVk( const studioAPIFrameBufferCreateInfo_t& createInfo, const char* pDebugName /* = "" */ )
 	: size( createInfo.size )
 	, vkFrameBuffer( VK_NULL_HANDLE )
-	, pStudioAPIVkShutdownDelegate( NULL )
+	, onStudioAPIVkShutdownHandle( INVALID_HANDLE )
 	, numClearValues( 0 )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
@@ -86,10 +86,7 @@ CStudioAPIFrameBufferVk::CStudioAPIFrameBufferVk( const studioAPIFrameBufferCrea
 	STUDIOAPI_VK_VERIFY_RESULT( vkCreateFramebuffer( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), &vkFramebufferCreateInfo, NULL, &vkFrameBuffer ) );
 
 	// Register in 'onStudioAPIVkShutodwn' for destroy Vulkan objects when the one is shutdown
-	if ( !pStudioAPIVkShutdownDelegate )
-	{
-		pStudioAPIVkShutdownDelegate = g_StudioAPIVk.OnStudioAPIVkShutdown().AddFunc( &CStudioAPIFrameBufferVk::OnStudioAPIVkShutdown, this );
-	}
+	onStudioAPIVkShutdownHandle = g_StudioAPIVk.OnStudioAPIVkShutdown().Subscribe( &CStudioAPIFrameBufferVk::OnStudioAPIVkShutdown, this );
 }
 
 /*
@@ -110,10 +107,10 @@ CStudioAPIFrameBufferVk::~CStudioAPIFrameBufferVk()
 	}
 
 	// Remove CStudioAPIFrameBufferVk::OnStudioAPIVkShutdown from event 'onStudioAPIVkShutodwn'
-	if ( pStudioAPIVkShutdownDelegate )
+	if ( onStudioAPIVkShutdownHandle != INVALID_HANDLE )
 	{
-		g_StudioAPIVk.OnStudioAPIVkShutdown().RemoveFunc( pStudioAPIVkShutdownDelegate );
-		pStudioAPIVkShutdownDelegate = NULL;
+		g_StudioAPIVk.OnStudioAPIVkShutdown().Unsubscribe( onStudioAPIVkShutdownHandle );
+		onStudioAPIVkShutdownHandle = INVALID_HANDLE;
 	}
 }
 
@@ -135,7 +132,7 @@ CStudioAPIFrameBufferVk::OnStudioAPIVkShutdown
 void CStudioAPIFrameBufferVk::OnStudioAPIVkShutdown( void* pUserData )
 {
 	Assert( pUserData );
-	CStudioAPIFrameBufferVk* pStudioAPIFrameBuffer		= (CStudioAPIFrameBufferVk*)pUserData;
-	pStudioAPIFrameBuffer->pStudioAPIVkShutdownDelegate = NULL;
+	CStudioAPIFrameBufferVk* pStudioAPIFrameBuffer	   = (CStudioAPIFrameBufferVk*)pUserData;
+	pStudioAPIFrameBuffer->onStudioAPIVkShutdownHandle = INVALID_HANDLE;
 	pStudioAPIFrameBuffer->~CStudioAPIFrameBufferVk();
 }

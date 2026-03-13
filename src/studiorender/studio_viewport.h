@@ -1,5 +1,5 @@
 #pragma once
-#include "tier1/delegate.h"
+#include "tier1/event.h"
 #include "studiorender/istudio_viewport.h"
 #include "studiorender/studio_renderthread.h"
 #include "studiorender/istudio_renderresource.h"
@@ -23,7 +23,7 @@ public:
 	virtual bool				   IsInited() const override;
 	virtual bool				   IsUseVSync() const override;
 	virtual IStudioViewportClient* GetViewportClient() const override;
-	virtual vector2i_t				   GetSize() const override;
+	virtual vector2i_t			   GetSize() const override;
 	virtual IStudioAPISwapChain*   GetStudioAPISwapChain() const override;
 
 	// The function returns a StudioAPI render pass for draw into the viewport
@@ -32,8 +32,8 @@ public:
 	// The function returns a StudioAPI frame buffers for render into the viewport (valid only per a frame, because the viewport can use double/triple/etc buffering)
 	virtual IStudioAPIFrameBuffer* GetStudioAPIFrameBuffer() const override;
 
-	DECLARE_MULTICAST_DELEGATE( COnReleaseViewportIndex, CStudioViewport* /* pViewport */ );
-	DECLARE_MULTICAST_DELEGATE( COnRenderPassUpdated, CStudioViewport* /* pViewport */ );
+	DECLARE_EVENT( COnReleaseViewportIndex, CStudioViewport* /* pViewport */ );
+	DECLARE_EVENT( COnRenderPassUpdated, CStudioViewport* /* pViewport */ );
 
 	CStudioViewport();
 	~CStudioViewport();
@@ -57,21 +57,21 @@ private:
 	uint32 AcquireIndex();
 	void   ReleaseIndex( uint32 viewportIndex );
 
-	bool											   bUseVSync;
-	uint32											   index;
-	windowHandle_t									   windowHandle;
-	IStudioViewportClient*							   pStudioViewportClient;
-	vector2i_t											   size;
-	CRefPtr<IStudioAPISwapChain>					   pStudioAPISwapChain;
-	CRefPtr<IStudioAPIRenderPass>					   pStudioAPIRenderPass;
-	IStudioAPISwapChain::IOnReCreated::funcDelegate_t* pSwapChainReCreatedDelegate;
-	mutable COnReleaseViewportIndex					   onReleaseViewportIndex;
-	mutable COnRenderPassUpdated					   onRenderPassUpdated;
-	eastl::vector<CRefPtr<IStudioAPIFrameBuffer>>	   studioAPIFrameBuffers;
-	static CRefPtr<CStudioViewport>					   s_pActiveViewport;
-	static CThreadMutex								   s_ViewportIndexMutex;
-	static uint32									   s_LastViewportIndex;
-	static eastl::list<uint32>						   s_FreeViewportIndices;
+	bool										  bUseVSync;
+	uint32										  index;
+	windowHandle_t								  windowHandle;
+	IStudioViewportClient*						  pStudioViewportClient;
+	vector2i_t									  size;
+	CRefPtr<IStudioAPISwapChain>				  pStudioAPISwapChain;
+	CRefPtr<IStudioAPIRenderPass>				  pStudioAPIRenderPass;
+	IStudioAPISwapChain::IOnReCreated::handle_t	  onSwapChainReCreatedHandle;
+	mutable COnReleaseViewportIndex				  onReleaseViewportIndex;
+	mutable COnRenderPassUpdated				  onRenderPassUpdated;
+	eastl::vector<CRefPtr<IStudioAPIFrameBuffer>> studioAPIFrameBuffers;
+	static CRefPtr<CStudioViewport>				  s_pActiveViewport;
+	static CThreadMutex							  s_ViewportIndexMutex;
+	static uint32								  s_LastViewportIndex;
+	static eastl::list<uint32>					  s_FreeViewportIndices;
 };
 
 #include "studiorender/studio_viewport.inl"

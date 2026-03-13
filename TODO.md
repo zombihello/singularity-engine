@@ -65,8 +65,8 @@
 	- [ ] ECS compiler: Add support queries
 	- [X] ECS compiler: Add generate code for load component variables from SENT file
 	- [ ] Add possible to fly on scene
-- [ ] Migrate from STL to EASTL
-- [ ] Enable SIMD in GLM (#define GLM_FORCE_SSE2 and #define GLM_FORCE_ALIGNED)
+- [X] Migrate from STL to EASTL
+- [X] Enable SIMD in GLM (#define GLM_FORCE_SSE2 and #define GLM_FORCE_ALIGNED)
 - [ ] Fix crush in Retail configuration. Need rework pending free Vulkan resources in CStudioAPIMemoryMgrVk::Shutdown
 - [X] Clear code from unnecessary Doxygen comments 
 - [X] Move loading game.dll to launcher.dll

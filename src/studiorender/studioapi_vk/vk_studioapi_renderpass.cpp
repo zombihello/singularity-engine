@@ -68,16 +68,16 @@ CStudioAPIRenderPassVk::CStudioAPIRenderPassVk
 */
 CStudioAPIRenderPassVk::CStudioAPIRenderPassVk( const studioAPIRenderPassCreateInfo_t& createInfo, const char* pDebugName /* = "" */ )
 	: vkRenderPass( VK_NULL_HANDLE )
-	, pStudioAPIVkShutdownDelegate( NULL )
+	, onStudioAPIVkShutdownHandle( INVALID_HANDLE )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Fill information about attachments (render targets)
 	eastl::vector<VkAttachmentDescription> vkAttachments;
-	eastl::vector<VkAttachmentReference>	 vkColorAttachmentReferences;
-	VkAttachmentReference				 vkDepthStencilAttachmentReference = {};
-	bool								 bHasDepthStencilAttachment		   = false;
-	bool								 bHasColorAttachments			   = false;
+	eastl::vector<VkAttachmentReference>   vkColorAttachmentReferences;
+	VkAttachmentReference				   vkDepthStencilAttachmentReference = {};
+	bool								   bHasDepthStencilAttachment		 = false;
+	bool								   bHasColorAttachments				 = false;
 
 	// Color attachments
 	for ( uint32 renderTargetIdx = 0; renderTargetIdx < STUDIOAPI_MAX_SIMULTANEOUS_RENDER_TARGETS; ++renderTargetIdx )
@@ -126,7 +126,7 @@ CStudioAPIRenderPassVk::CStudioAPIRenderPassVk( const studioAPIRenderPassCreateI
 
 	// Fill information about main sub-pass
 	eastl::vector<VkSubpassDescription> vkSubpassDescriptions;
-	eastl::vector<VkSubpassDependency>  vkSubpassDependencies;
+	eastl::vector<VkSubpassDependency>	vkSubpassDependencies;
 	{
 		VkSubpassDescription& vkSubpassDescription	 = vkSubpassDescriptions.emplace_back();
 		vkSubpassDescription.pipelineBindPoint		 = VK_PIPELINE_BIND_POINT_GRAPHICS;
@@ -147,10 +147,7 @@ CStudioAPIRenderPassVk::CStudioAPIRenderPassVk( const studioAPIRenderPassCreateI
 	STUDIOAPI_VK_VERIFY_RESULT( vkCreateRenderPass( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), &vkRenderPassCreateInfo, NULL, &vkRenderPass ) );
 
 	// Register in 'onStudioAPIVkShutodwn' for destroy Vulkan objects when the one is shutdown
-	if ( !pStudioAPIVkShutdownDelegate )
-	{
-		pStudioAPIVkShutdownDelegate = g_StudioAPIVk.OnStudioAPIVkShutdown().AddFunc( &CStudioAPIRenderPassVk::OnStudioAPIVkShutdown, this );
-	}
+	onStudioAPIVkShutdownHandle = g_StudioAPIVk.OnStudioAPIVkShutdown().Subscribe( &CStudioAPIRenderPassVk::OnStudioAPIVkShutdown, this );
 }
 
 /*
@@ -165,17 +162,16 @@ CStudioAPIRenderPassVk::~CStudioAPIRenderPassVk()
 	// Destroy the Vulkan render pass
 	if ( vkRenderPass != VK_NULL_HANDLE )
 	{
-		g_StudioAPIVk.GetMemoryMgr().FreeResource( [vkRenderPass = vkRenderPass]() {
-			vkDestroyRenderPass( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), vkRenderPass, NULL );
-		} );
+		g_StudioAPIVk.GetMemoryMgr().FreeResource( [vkRenderPass = vkRenderPass]()
+												   { vkDestroyRenderPass( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), vkRenderPass, NULL ); } );
 		vkRenderPass = VK_NULL_HANDLE;
 	}
 
 	// Remove CStudioAPIRenderPassVk::OnStudioAPIVkShutdown from event 'onStudioAPIVkShutodwn'
-	if ( pStudioAPIVkShutdownDelegate )
+	if ( onStudioAPIVkShutdownHandle != INVALID_HANDLE )
 	{
-		g_StudioAPIVk.OnStudioAPIVkShutdown().RemoveFunc( pStudioAPIVkShutdownDelegate );
-		pStudioAPIVkShutdownDelegate = NULL;
+		g_StudioAPIVk.OnStudioAPIVkShutdown().Unsubscribe( onStudioAPIVkShutdownHandle );
+		onStudioAPIVkShutdownHandle = INVALID_HANDLE;
 	}
 }
 
@@ -187,7 +183,7 @@ CStudioAPIRenderPassVk::OnStudioAPIVkShutdown
 void CStudioAPIRenderPassVk::OnStudioAPIVkShutdown( void* pUserData )
 {
 	Assert( pUserData );
-	CStudioAPIRenderPassVk* pStudioAPIRenderPass	   = (CStudioAPIRenderPassVk*)pUserData;
-	pStudioAPIRenderPass->pStudioAPIVkShutdownDelegate = NULL;
+	CStudioAPIRenderPassVk* pStudioAPIRenderPass	  = (CStudioAPIRenderPassVk*)pUserData;
+	pStudioAPIRenderPass->onStudioAPIVkShutdownHandle = INVALID_HANDLE;
 	pStudioAPIRenderPass->~CStudioAPIRenderPassVk();
 }

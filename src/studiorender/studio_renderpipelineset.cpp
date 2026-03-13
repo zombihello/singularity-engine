@@ -80,20 +80,19 @@ void CStudioRenderPipelineSet::CRenderPipelineContainer::Destroy()
 				viewportRenderPipelines_t& viewportRenderPipelines = pDataStoragePresent->viewports[viewportIdx];
 				if ( !viewportRenderPipelines.pViewport )
 				{
-					Assert( !viewportRenderPipelines.pReleaseViewportIndexDelegate && !viewportRenderPipelines.pRenderPassUpdatedDelegate && viewportRenderPipelines.studioAPIRenderPipelines.empty() );
+					Assert( viewportRenderPipelines.onReleaseViewportIndexHandle == INVALID_HANDLE && viewportRenderPipelines.onRenderPassUpdatedHandle == INVALID_HANDLE && viewportRenderPipelines.studioAPIRenderPipelines.empty() );
 					continue;
 				}
 
-				if ( viewportRenderPipelines.pReleaseViewportIndexDelegate )
+				if ( viewportRenderPipelines.onReleaseViewportIndexHandle != INVALID_HANDLE )
 				{
-					viewportRenderPipelines.pViewport->OnReleaseViewportIndex().RemoveFunc( viewportRenderPipelines.pReleaseViewportIndexDelegate );
-					viewportRenderPipelines.pReleaseViewportIndexDelegate = NULL;
+					viewportRenderPipelines.pViewport->OnReleaseViewportIndex().Unsubscribe( viewportRenderPipelines.onReleaseViewportIndexHandle );
+					viewportRenderPipelines.onReleaseViewportIndexHandle = INVALID_HANDLE;
 				}
-
-				if ( viewportRenderPipelines.pRenderPassUpdatedDelegate )
+				if ( viewportRenderPipelines.onRenderPassUpdatedHandle != INVALID_HANDLE )
 				{
-					viewportRenderPipelines.pViewport->OnRenderPassUpdated().RemoveFunc( viewportRenderPipelines.pRenderPassUpdatedDelegate );
-					viewportRenderPipelines.pRenderPassUpdatedDelegate = NULL;
+					viewportRenderPipelines.pViewport->OnRenderPassUpdated().Unsubscribe( viewportRenderPipelines.onRenderPassUpdatedHandle );
+					viewportRenderPipelines.onRenderPassUpdatedHandle = INVALID_HANDLE;
 				}
 
 				// Remove render pipelines, do it on the render thread to make sure that they will be destroyed at the render thread
@@ -124,7 +123,7 @@ IStudioAPIRenderPipeline* CStudioRenderPipelineSet::CRenderPipelineContainer::R_
 
 	// For non-present passes we get the array as is
 	eastl::vector<CRefPtr<IStudioAPIRenderPipeline>>* pStudioAPIRenderPipelines = NULL;
-	CStudioViewport*								pActiveViewport			  = CStudioViewport::R_GetActiveViewport();
+	CStudioViewport*								  pActiveViewport			= CStudioViewport::R_GetActiveViewport();
 	if ( renderPassType != STUDIO_RENDERPASS_TYPE_PRESENT )
 	{
 		dataStorageDrawRenderPasses_t* pDataStorageDraw = (dataStorageDrawRenderPasses_t*)pDataStorage;
@@ -141,11 +140,11 @@ IStudioAPIRenderPipeline* CStudioRenderPipelineSet::CRenderPipelineContainer::R_
 		if ( viewportIndex >= (uint32)pDataStoragePresent->viewports.size() )
 		{
 			pDataStoragePresent->viewports.resize( viewportIndex + 1 );
-			viewportRenderPipelines_t* pViewportRenderPipelines		= &pDataStoragePresent->viewports[viewportIndex];
-			pStudioAPIRenderPipelines								= &pViewportRenderPipelines->studioAPIRenderPipelines;
-			pViewportRenderPipelines->pViewport						= pActiveViewport;
-			pViewportRenderPipelines->pReleaseViewportIndexDelegate = pActiveViewport->OnReleaseViewportIndex().AddFunc( &CRenderPipelineContainer::OnReleaseViewportIndex, this );
-			pViewportRenderPipelines->pRenderPassUpdatedDelegate	= pActiveViewport->OnRenderPassUpdated().AddFunc( &CRenderPipelineContainer::OnRenderPassUpdated, this );
+			viewportRenderPipelines_t* pViewportRenderPipelines	   = &pDataStoragePresent->viewports[viewportIndex];
+			pStudioAPIRenderPipelines							   = &pViewportRenderPipelines->studioAPIRenderPipelines;
+			pViewportRenderPipelines->pViewport					   = pActiveViewport;
+			pViewportRenderPipelines->onReleaseViewportIndexHandle = pActiveViewport->OnReleaseViewportIndex().Subscribe( &CRenderPipelineContainer::OnReleaseViewportIndex, this );
+			pViewportRenderPipelines->onRenderPassUpdatedHandle	   = pActiveViewport->OnRenderPassUpdated().Subscribe( &CRenderPipelineContainer::OnRenderPassUpdated, this );
 		}
 		else
 		{
@@ -234,16 +233,16 @@ void CStudioRenderPipelineSet::CRenderPipelineContainer::OnReleaseViewportIndex(
 		// Remove all delegates
 		viewportRenderPipelines_t& viewportRenderPipelines = pDataStoragePresent->viewports[viewportIndex];
 		Assert( viewportRenderPipelines.pViewport == pViewport );
-		if ( viewportRenderPipelines.pReleaseViewportIndexDelegate )
-		{
-			// We not remove delegate for event 'OnReleaseViewportIndex' because the event is calls in destructor of a viewport
-			viewportRenderPipelines.pReleaseViewportIndexDelegate = NULL;
-		}
 
-		if ( viewportRenderPipelines.pRenderPassUpdatedDelegate )
+		if ( viewportRenderPipelines.onReleaseViewportIndexHandle != INVALID_HANDLE )
 		{
-			viewportRenderPipelines.pViewport->OnRenderPassUpdated().RemoveFunc( viewportRenderPipelines.pRenderPassUpdatedDelegate );
-			viewportRenderPipelines.pRenderPassUpdatedDelegate = NULL;
+			viewportRenderPipelines.pViewport->OnReleaseViewportIndex().Unsubscribe( viewportRenderPipelines.onReleaseViewportIndexHandle );
+			viewportRenderPipelines.onReleaseViewportIndexHandle = INVALID_HANDLE;
+		}
+		if ( viewportRenderPipelines.onRenderPassUpdatedHandle != INVALID_HANDLE )
+		{
+			viewportRenderPipelines.pViewport->OnRenderPassUpdated().Unsubscribe( viewportRenderPipelines.onRenderPassUpdatedHandle );
+			viewportRenderPipelines.onRenderPassUpdatedHandle = INVALID_HANDLE;
 		}
 		viewportRenderPipelines.pViewport = NULL;
 

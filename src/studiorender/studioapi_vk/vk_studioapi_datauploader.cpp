@@ -10,7 +10,7 @@ CStudioAPIDataUploaderVk::CStudioAPIDataUploaderVk
 */
 CStudioAPIDataUploaderVk::CStudioAPIDataUploaderVk()
 	: currentStagingBufferIndex( 0 )
-	, pStudioAPIVkShutdownDelegate( NULL )
+	, onStudioAPIVkShutdownHandle( INVALID_HANDLE )
 {
 }
 
@@ -60,7 +60,7 @@ void CStudioAPIDataUploaderVk::Init()
 	}
 
 	// Register in 'onStudioAPIVkShutodwn' for destroy Vulkan objects when the one is shutdown
-	pStudioAPIVkShutdownDelegate = g_StudioAPIVk.OnStudioAPIVkShutdown().AddFunc( &CStudioAPIDataUploaderVk::OnStudioAPIVkShutdown, this );
+	onStudioAPIVkShutdownHandle = g_StudioAPIVk.OnStudioAPIVkShutdown().Subscribe( &CStudioAPIDataUploaderVk::OnStudioAPIVkShutdown, this );
 }
 
 /*
@@ -90,10 +90,10 @@ void CStudioAPIDataUploaderVk::Shutdown()
 	}
 
 	// Remove CStudioAPIDataUploaderVk::OnStudioAPIVkShutdown from event 'onStudioAPIVkShutodwn'
-	if ( pStudioAPIVkShutdownDelegate )
+	if ( onStudioAPIVkShutdownHandle != INVALID_HANDLE )
 	{
-		g_StudioAPIVk.OnStudioAPIVkShutdown().RemoveFunc( pStudioAPIVkShutdownDelegate );
-		pStudioAPIVkShutdownDelegate = NULL;
+		g_StudioAPIVk.OnStudioAPIVkShutdown().Unsubscribe( onStudioAPIVkShutdownHandle );
+		onStudioAPIVkShutdownHandle = INVALID_HANDLE;
 	}
 }
 
@@ -152,7 +152,7 @@ CStudioAPIDataUploaderVk::OnStudioAPIVkShutdown
 void CStudioAPIDataUploaderVk::OnStudioAPIVkShutdown( void* pUserData )
 {
 	Assert( pUserData );
-	CStudioAPIDataUploaderVk* pStudioAPIBufferUploaderVk	 = (CStudioAPIDataUploaderVk*)pUserData;
-	pStudioAPIBufferUploaderVk->pStudioAPIVkShutdownDelegate = NULL;
+	CStudioAPIDataUploaderVk* pStudioAPIBufferUploaderVk	= (CStudioAPIDataUploaderVk*)pUserData;
+	pStudioAPIBufferUploaderVk->onStudioAPIVkShutdownHandle = INVALID_HANDLE;
 	pStudioAPIBufferUploaderVk->Shutdown();
 }

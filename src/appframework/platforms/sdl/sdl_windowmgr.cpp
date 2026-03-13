@@ -231,8 +231,8 @@ void CWindowMgrSDL::Shutdown()
 		windowPool.Free( windowIds[index] );
 	}
 
-	onWindowEvent.RemoveAll();
-	onInputEvent.RemoveAll();
+	onWindowEvent.Clear();
+	onInputEvent.Clear();
 	SDL_Quit();
 
 	windowIds.clear();
@@ -253,7 +253,7 @@ IWindow* CWindowMgrSDL::CreateWindow()
 	if ( mainWindowId == INVALID_INDEX )
 	{
 		mainWindowId = windowId;
-		onChangedMainWindow.Broadcast( mainWindowId );
+		onChangedMainWindow.Invoke( mainWindowId );
 	}
 	return pWindow;
 }
@@ -283,7 +283,7 @@ void CWindowMgrSDL::DestroyWindow( windowId_t windowId )
 	if ( mainWindowId == windowId )
 	{
 		mainWindowId = !windowIds.empty() ? windowIds[0] : INVALID_INDEX;
-		onChangedMainWindow.Broadcast( mainWindowId );
+		onChangedMainWindow.Invoke( mainWindowId );
 	}
 }
 
@@ -441,13 +441,13 @@ void CWindowMgrSDL::ProcessEvents()
 		// Broadcast process the window event
 		if ( windowEvent.type != WINDOW_EVENT_TYPE_NONE )
 		{
-			onWindowEvent.Broadcast( windowEvent );
+			onWindowEvent.Invoke( windowEvent );
 		}
 
 		// Broadcast process the input event
 		if ( inputEvent.type != INPUT_EVENT_TYPE_NONE )
 		{
-			onInputEvent.Broadcast( inputEvent );
+			onInputEvent.Invoke( inputEvent );
 		}
 	}
 }

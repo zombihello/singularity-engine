@@ -216,7 +216,7 @@ CStudioAPISamplerVk::CStudioAPISamplerVk
 */
 CStudioAPISamplerVk::CStudioAPISamplerVk( const studioAPISamplerCreateInfo_t& createInfo, const char* pDebugName /* = "" */ )
 	: vkSampler( VK_NULL_HANDLE )
-	, pStudioAPIVkShutdownDelegate( NULL )
+	, onStudioAPIVkShutdownHandle( INVALID_HANDLE )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	VkSamplerCreateInfo vkSamplerCreateInfo		= {};
@@ -237,7 +237,7 @@ CStudioAPISamplerVk::CStudioAPISamplerVk( const studioAPISamplerCreateInfo_t& cr
 	STUDIOAPI_VK_VERIFY_RESULT( vkCreateSampler( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), &vkSamplerCreateInfo, NULL, &vkSampler ) );
 
 	// Register in 'onStudioAPIVkShutodwn' for destroy Vulkan objects when the one is shutdown
-	pStudioAPIVkShutdownDelegate = g_StudioAPIVk.OnStudioAPIVkShutdown().AddFunc( &CStudioAPISamplerVk::OnStudioAPIVkShutdown, this );
+	onStudioAPIVkShutdownHandle = g_StudioAPIVk.OnStudioAPIVkShutdown().Subscribe( &CStudioAPISamplerVk::OnStudioAPIVkShutdown, this );
 }
 
 /*
@@ -258,10 +258,10 @@ CStudioAPISamplerVk::~CStudioAPISamplerVk()
 	}
 
 	// Remove CStudioAPITextureVk::OnStudioAPIVkShutdown from event 'onStudioAPIVkShutodwn'
-	if ( pStudioAPIVkShutdownDelegate )
+	if ( onStudioAPIVkShutdownHandle != INVALID_HANDLE )
 	{
-		g_StudioAPIVk.OnStudioAPIVkShutdown().RemoveFunc( pStudioAPIVkShutdownDelegate );
-		pStudioAPIVkShutdownDelegate = NULL;
+		g_StudioAPIVk.OnStudioAPIVkShutdown().Unsubscribe( onStudioAPIVkShutdownHandle );
+		onStudioAPIVkShutdownHandle = INVALID_HANDLE;
 	}
 }
 
@@ -273,8 +273,8 @@ CStudioAPISamplerVk::OnStudioAPIVkShutdown
 void CStudioAPISamplerVk::OnStudioAPIVkShutdown( void* pUserData )
 {
 	Assert( pUserData );
-	CStudioAPISamplerVk* pStudioAPISamplerVk		  = (CStudioAPISamplerVk*)pUserData;
-	pStudioAPISamplerVk->pStudioAPIVkShutdownDelegate = NULL;
+	CStudioAPISamplerVk* pStudioAPISamplerVk		 = (CStudioAPISamplerVk*)pUserData;
+	pStudioAPISamplerVk->onStudioAPIVkShutdownHandle = INVALID_HANDLE;
 	pStudioAPISamplerVk->~CStudioAPISamplerVk();
 }
 
@@ -296,7 +296,7 @@ CStudioAPITextureVk::CStudioAPITextureVk( studioAPITextureType_t type, uint32 si
 	, numMips( numMips )
 	, vkImage( VK_NULL_HANDLE )
 	, vmaAllocation( VK_NULL_HANDLE )
-	, pStudioAPIVkShutdownDelegate( NULL )
+	, onStudioAPIVkShutdownHandle( INVALID_HANDLE )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	AssertMsg( usageFlags & STUDIOAPI_TEXTURE_USAGE_FLAG_LINEAR ? numMips == 1 && numLayers == 1 : true, "A linear texture must have only 1 mip level and layer" );
@@ -428,7 +428,7 @@ CStudioAPITextureVk::CStudioAPITextureVk( studioAPITextureType_t type, uint32 si
 	}
 
 	// Register in 'onStudioAPIVkShutodwn' for destroy Vulkan objects when the one is shutdown
-	pStudioAPIVkShutdownDelegate = g_StudioAPIVk.OnStudioAPIVkShutdown().AddFunc( &CStudioAPITextureVk::OnStudioAPIVkShutdown, this );
+	onStudioAPIVkShutdownHandle = g_StudioAPIVk.OnStudioAPIVkShutdown().Subscribe( &CStudioAPITextureVk::OnStudioAPIVkShutdown, this );
 }
 
 /*
@@ -456,10 +456,10 @@ CStudioAPITextureVk::~CStudioAPITextureVk()
 	}
 
 	// Remove CStudioAPITextureVk::OnStudioAPIVkShutdown from event 'onStudioAPIVkShutodwn'
-	if ( pStudioAPIVkShutdownDelegate )
+	if ( onStudioAPIVkShutdownHandle != INVALID_HANDLE )
 	{
-		g_StudioAPIVk.OnStudioAPIVkShutdown().RemoveFunc( pStudioAPIVkShutdownDelegate );
-		pStudioAPIVkShutdownDelegate = NULL;
+		g_StudioAPIVk.OnStudioAPIVkShutdown().Unsubscribe( onStudioAPIVkShutdownHandle );
+		onStudioAPIVkShutdownHandle = INVALID_HANDLE;
 	}
 }
 
@@ -583,7 +583,7 @@ void CStudioAPITextureVk::UpdateData( IStudioAPICmdContext* pCmdContext, byte* p
 									 vkBufferImageCopy.imageOffset.y				   = uploadState.currentMipRow * blockSizeY;
 									 vkBufferImageCopy.imageOffset.z				   = uploadState.currentMipDepth;
 									 vkBufferImageCopy.imageExtent.width			   = mipSizeX;
-									 vkBufferImageCopy.imageExtent.height			   = S_Min( numRowsToUpload * blockSizeY, mipSizeY );	 // Handle textures with height is not multiple of block size
+									 vkBufferImageCopy.imageExtent.height			   = S_Min( numRowsToUpload * blockSizeY, mipSizeY );  // Handle textures with height is not multiple of block size
 									 vkBufferImageCopy.imageExtent.depth			   = depthGranularity;
 									 vkCmdCopyBufferToImage( uploadParams.pCmdBuffer->GetVkCommandBuffer(), uploadParams.vkStagingBuffer, vkImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &vkBufferImageCopy );
 
@@ -933,7 +933,7 @@ CStudioAPITextureVk::OnStudioAPIVkShutdown
 void CStudioAPITextureVk::OnStudioAPIVkShutdown( void* pUserData )
 {
 	Assert( pUserData );
-	CStudioAPITextureVk* pStudioAPITextureVk		  = (CStudioAPITextureVk*)pUserData;
-	pStudioAPITextureVk->pStudioAPIVkShutdownDelegate = NULL;
+	CStudioAPITextureVk* pStudioAPITextureVk		 = (CStudioAPITextureVk*)pUserData;
+	pStudioAPITextureVk->onStudioAPIVkShutdownHandle = INVALID_HANDLE;
 	pStudioAPITextureVk->~CStudioAPITextureVk();
 }

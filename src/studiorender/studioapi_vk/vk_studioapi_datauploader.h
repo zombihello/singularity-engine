@@ -79,9 +79,9 @@ private:
 	void		WaitUpload( uint8 stagingBufferIndex );
 	static void OnStudioAPIVkShutdown( void* pUserData );
 
-	uint8									currentStagingBufferIndex;
-	stagingBuffer_t							stagingBuffers[NUM_STAGING_BUFFERS];
-	COnStudioAPIVkShutdown::funcDelegate_t* pStudioAPIVkShutdownDelegate;
+	uint8							 currentStagingBufferIndex;
+	stagingBuffer_t					 stagingBuffers[NUM_STAGING_BUFFERS];
+	COnStudioAPIVkShutdown::handle_t onStudioAPIVkShutdownHandle;
 };
 
 #include "studiorender/studioapi_vk/vk_studioapi_datauploader.inl"

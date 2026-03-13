@@ -32,8 +32,6 @@ CEcsMap::~CEcsMap
 */
 CEcsMap::~CEcsMap()
 {
-	onMapUnloaded.Broadcast( this );
-	onMapReseted.RemoveAll();
 	Reset();
 }
 
@@ -114,7 +112,7 @@ CEcsMap::Reset
 void CEcsMap::Reset()
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_SCENE )
-	onMapReseted.Broadcast( this );
+	onMapReseted.Invoke( this );
 
 	// TODO BS yehor.pohuliaka - Implement reload the map from the file system
 	ecsWorld.Reset();

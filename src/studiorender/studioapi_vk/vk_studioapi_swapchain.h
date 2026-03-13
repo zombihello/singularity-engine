@@ -59,7 +59,7 @@ public:
 
 	virtual bool					  IsUseVSync() const override;
 	virtual bool					  IsValid() const override;
-	virtual vector2i_t					  GetSize() const override;
+	virtual vector2i_t				  GetSize() const override;
 	virtual uint32					  GetCurrentImageIndex() const override;
 	virtual IStudioAPISwapChainImage* GetCurrentImage() const override;
 	virtual uint32					  GetNumImages() const override;
@@ -68,7 +68,7 @@ public:
 
 	virtual IOnReCreated* OnReCreated() const override;
 
-	DECLARE_MULTICAST_DELEGATE( COnReCreated, IStudioAPISwapChain* /* pStudioAPISwapChain */, bool /* bChangedImageFormat */ );
+	DECLARE_EVENT( COnReCreated, IStudioAPISwapChain* /* pStudioAPISwapChain */, bool /* bChangedImageFormat */ );
 
 	CStudioAPISwapChainVk( const char* pDebugName = "" );
 	~CStudioAPISwapChainVk();
@@ -91,17 +91,17 @@ public:
 private:
 	static void OnStudioAPIVkShutdown( void* pUserData );
 
-	bool									 bUseVSync;
-	windowHandle_t							 windowHandle;
-	VkSurfaceKHR							 vkSurface;
-	VkSwapchainKHR							 vkSwapChain;
-	VkSurfaceFormatKHR						 vkSurfaceFormat;
-	vector2i_t									 size;
-	uint32									 currentImageIndex;
-	COnStudioAPIVkShutdown::funcDelegate_t*	 pStudioAPIVkShutdownDelegate;
-	COnReCreated							 onReCreated;
-	CStudioAPISemaphoreVk*					 pImageAvailableSemaphores[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];
-	eastl::vector<CStudioAPISemaphoreVk*>		 renderFinishedSemaphores;
+	bool									   bUseVSync;
+	windowHandle_t							   windowHandle;
+	VkSurfaceKHR							   vkSurface;
+	VkSwapchainKHR							   vkSwapChain;
+	VkSurfaceFormatKHR						   vkSurfaceFormat;
+	vector2i_t								   size;
+	uint32									   currentImageIndex;
+	COnStudioAPIVkShutdown::handle_t		   onStudioAPIVkShutdownHandle;
+	COnReCreated							   onReCreated;
+	CStudioAPISemaphoreVk*					   pImageAvailableSemaphores[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];
+	eastl::vector<CStudioAPISemaphoreVk*>	   renderFinishedSemaphores;
 	eastl::vector<CStudioAPISwapChainImageVk*> swapChainImages;
 };
 

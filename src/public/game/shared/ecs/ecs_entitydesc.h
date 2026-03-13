@@ -28,10 +28,10 @@ public:
 private:
 	struct ecsPrefab_t
 	{
-		CEcsMap*						pEcsMap;
-		ecsEntity_t						ecsEntity;
-		IOnMapReseted::funcDelegate_t*	pOnMapResetedDelegate;
-		IOnMapUnloaded::funcDelegate_t* pOnMapUnloadedDelegate;
+		CEcsMap*				 pEcsMap;
+		ecsEntity_t				 ecsEntity;
+		IOnMapReseted::handle_t	 onMapResetedHandle;
+		IOnMapUnloaded::handle_t onMapUnloadedHandle;
 	};
 
 	void		Init( const CSENTCompiledEntityDescDoc& sentCompiledDoc );

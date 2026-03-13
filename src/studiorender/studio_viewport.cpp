@@ -20,7 +20,7 @@ CStudioViewport::CStudioViewport()
 	, windowHandle( INVALID_WINDOW_HANDLE )
 	, pStudioViewportClient( NULL )
 	, size( 0.f, 0.f )
-	, pSwapChainReCreatedDelegate( NULL )
+	, onSwapChainReCreatedHandle( INVALID_HANDLE )
 {
 }
 
@@ -52,7 +52,7 @@ void CStudioViewport::InitStudioAPI()
 	// Subscribe on a swap chain event
 	if ( pStudioAPISwapChain )
 	{
-		pSwapChainReCreatedDelegate = pStudioAPISwapChain->OnReCreated()->AddFunc( &CStudioViewport::OnSwapChainReCreated, this );
+		onSwapChainReCreatedHandle = pStudioAPISwapChain->OnReCreated()->Subscribe( &CStudioViewport::OnSwapChainReCreated, this );
 	}
 
 	// Trigger the delegate to create a render pass and frame buffers for each swap chain image
@@ -69,10 +69,10 @@ void CStudioViewport::ReleaseStudioAPI()
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Unsubscribe from a swap chain event
-	if ( pStudioAPISwapChain )
+	if ( pStudioAPISwapChain && onSwapChainReCreatedHandle != INVALID_HANDLE )
 	{
-		pStudioAPISwapChain->OnReCreated()->RemoveFunc( pSwapChainReCreatedDelegate );
-		pSwapChainReCreatedDelegate = NULL;
+		pStudioAPISwapChain->OnReCreated()->Unsubscribe( onSwapChainReCreatedHandle );
+		onSwapChainReCreatedHandle = INVALID_HANDLE;
 	}
 
 	// Release StudioAPI resources
@@ -141,7 +141,7 @@ void CStudioViewport::OnSwapChainReCreated( void* pUserData, IStudioAPISwapChain
 	// If a render pass was re-created broadcast the event
 	if ( bChangedImageFormat )
 	{
-		pStudioViewport->onRenderPassUpdated.Broadcast( pStudioViewport );
+		pStudioViewport->onRenderPassUpdated.Invoke( pStudioViewport );
 	}
 }
 
