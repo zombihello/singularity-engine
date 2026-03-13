@@ -24,8 +24,8 @@ struct studioSimpleElementVertex_t
 		return position == other.position && texCoord == other.texCoord && color == other.color;
 	}
 
-	vec4_t position;
-	vec2_t texCoord;
+	vector4_t position;
+	vector2_t texCoord;
 	CColor color;
 };
 
@@ -39,9 +39,9 @@ struct studioModelVertex_t
 		return position == other.position && texCoord == other.texCoord && normal == other.normal && tangent == other.tangent && binormal == other.binormal;
 	}
 
-	vec4_t position;
-	vec2_t texCoord;
-	vec4_t normal;
-	vec4_t tangent;
-	vec4_t binormal;
+	vector4_t position;
+	vector2_t texCoord;
+	vector4_t normal;
+	vector4_t tangent;
+	vector4_t binormal;
 };

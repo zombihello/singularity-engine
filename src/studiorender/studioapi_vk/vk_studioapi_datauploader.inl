@@ -19,8 +19,8 @@ FORCEINLINE void CStudioAPIDataUploaderVk::Upload( uint64 dataSize, uint32 stagi
 
 		// Initialize upload parameters
 		uploadParams_t uploadParams		 = {};
-		uint32		   offset			 = Align( stagingBuffer.currentOffset, stagingBufferOffsetAlignment );
-		uploadParams.partialUploadSize	 = Min( STAGING_BUFFER_SIZE - (int32)offset, (int32)remainDataSize );
+		uint32		   offset			 = S_Align( stagingBuffer.currentOffset, stagingBufferOffsetAlignment );
+		uploadParams.partialUploadSize	 = S_Min( STAGING_BUFFER_SIZE - (int32)offset, (int32)remainDataSize );
 		uploadParams.remainSizeToUpload	 = remainDataSize;
 		uploadParams.vkStagingBuffer	 = stagingBuffer.vkBuffer;
 		uploadParams.stagingBufferOffset = offset;

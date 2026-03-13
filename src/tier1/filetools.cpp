@@ -459,7 +459,7 @@ bool S_GetFileBaseName( const char* pPath, char* pFileName, uint32 maxLen )
 	}
 
 	// Copy partial string
-	uint32 maxCharsToCopy = Min<uint32>( length, maxLen );
+	uint32 maxCharsToCopy = S_Min<uint32>( length, maxLen );
 	S_Strncpy( pFileName, &pPath[startId], maxCharsToCopy );
 	return true;
 }
@@ -545,7 +545,7 @@ bool S_GetFilePath( const char* pSrcPath, char* pDestPath, uint32 maxLen )
 	}
 
 	// Copy partial string
-	uint32 maxCharsToCopy = Min<uint32>( length, maxLen );
+	uint32 maxCharsToCopy = S_Min<uint32>( length, maxLen );
 	S_Strncpy( pDestPath, pSrcPath, maxCharsToCopy );
 	return true;
 }

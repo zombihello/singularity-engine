@@ -11,7 +11,7 @@ class CEcsMap;
 //-----------------------------------------------------------------------------
 // ECS entity
 //-----------------------------------------------------------------------------
-class CEcsEntity : public TRefCounted<IEntity>
+class CEcsEntity : public CRefCounted<IEntity>
 {
 public:
 	// IEntity interface

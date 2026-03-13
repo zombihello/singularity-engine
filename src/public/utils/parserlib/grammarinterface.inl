@@ -2,11 +2,11 @@
 
 /*
 ==================
-TGrammarInterface::GetNextToken
+CGrammarInterface::GetNextToken
 ==================
 */
 template<class TFileParserClass, typename TGrammarContextType>
-FORCEINLINE uint32 TGrammarInterface<TFileParserClass, TGrammarContextType>::GetNextToken( TGrammarContextType* pContext )
+FORCEINLINE uint32 CGrammarInterface<TFileParserClass, TGrammarContextType>::GetNextToken( TGrammarContextType* pContext )
 {
 	if ( pTokens->IsEndOfStream() )
 	{
@@ -28,33 +28,33 @@ FORCEINLINE uint32 TGrammarInterface<TFileParserClass, TGrammarContextType>::Get
 
 /*
 ==================
-TGrammarInterface::EmitError
+CGrammarInterface::EmitError
 ==================
 */
 template<class TFileParserClass, typename TGrammarContextType>
-FORCEINLINE void TGrammarInterface<TFileParserClass, TGrammarContextType>::EmitError( const char* pMessage, TGrammarContextType* pContext )
+FORCEINLINE void CGrammarInterface<TFileParserClass, TGrammarContextType>::EmitError( const char* pMessage, TGrammarContextType* pContext )
 {
 	pFileParser->EmitError( pContext->pContext, S_Sprintf( "%s, near '%s'", pMessage, !pContext->token.empty() ? pContext->token.data() : "<TOKEN_EMPTY>" ).c_str() );
 }
 
 /*
 ==================
-TGrammarInterface::GetFileParser
+CGrammarInterface::GetFileParser
 ==================
 */
 template<class TFileParserClass, typename TGrammarContextType>
-FORCEINLINE TFileParserClass* TGrammarInterface<TFileParserClass, TGrammarContextType>::GetFileParser() const
+FORCEINLINE TFileParserClass* CGrammarInterface<TFileParserClass, TGrammarContextType>::GetFileParser() const
 {
 	return pFileParser;
 }
 
 /*
 ==================
-TGrammarInterface::GetCurrentTokenLine
+CGrammarInterface::GetCurrentTokenLine
 ==================
 */
 template<class TFileParserClass, typename TGrammarContextType>
-FORCEINLINE int32 TGrammarInterface<TFileParserClass, TGrammarContextType>::GetCurrentTokenLine() const
+FORCEINLINE int32 CGrammarInterface<TFileParserClass, TGrammarContextType>::GetCurrentTokenLine() const
 {
 	if ( !pCurrentToken )
 	{
@@ -65,11 +65,11 @@ FORCEINLINE int32 TGrammarInterface<TFileParserClass, TGrammarContextType>::GetC
 
 /*
 ==================
-TGrammarInterface::GetLastTokenLine
+CGrammarInterface::GetLastTokenLine
 ==================
 */
 template<class TFileParserClass, typename TGrammarContextType>
-FORCEINLINE int32 TGrammarInterface<TFileParserClass, TGrammarContextType>::GetLastTokenLine() const
+FORCEINLINE int32 CGrammarInterface<TFileParserClass, TGrammarContextType>::GetLastTokenLine() const
 {
 	if ( pTokens->IsEmpty() )
 	{

@@ -22,7 +22,7 @@ class CStudioAPIPendingComputeStateVk;
 // Tracks pipeline state and records command lists.
 // This is where the actual rendering commands are recorded
 //-----------------------------------------------------------------------------
-class CStudioAPICmdContextVk : public TRefCounted<IStudioAPICmdContext>
+class CStudioAPICmdContextVk : public CRefCounted<IStudioAPICmdContext>
 {
 public:
 	// IStudioAPICmdContext interface

@@ -11,7 +11,7 @@ class CStudioAPICmdListVk;
 //-----------------------------------------------------------------------------
 // Vulkan StudioAPI buffer
 //-----------------------------------------------------------------------------
-class CStudioAPIBufferVk : public TRefCounted<IStudioAPIBuffer>
+class CStudioAPIBufferVk : public CRefCounted<IStudioAPIBuffer>
 {
 public:
 	enum

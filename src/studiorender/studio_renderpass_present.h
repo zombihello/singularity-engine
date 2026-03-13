@@ -20,7 +20,7 @@ public:
 	void Shutdown();
 
 	void									 R_DrawPass( CStudioViewport* pViewport, CStudioRenderObjectQuad* pQuad );
-	static TRefPtr<IStudioAPIRenderPipeline> R_CreateStudioAPIRenderPipeline( CStudioViewport* pViewport, IStudioAPIBoundShaderState* pStudioAPIBoundShaderState );
+	static CRefPtr<IStudioAPIRenderPipeline> R_CreateStudioAPIRenderPipeline( CStudioViewport* pViewport, IStudioAPIBoundShaderState* pStudioAPIBoundShaderState );
 
 private:
 };

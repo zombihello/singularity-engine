@@ -47,7 +47,7 @@ CStudioAPIFrameBufferVk::CStudioAPIFrameBufferVk( const studioAPIFrameBufferCrea
 			if ( createInfo.bClearColor )
 			{
 				VkClearValue& vkClearValue	  = vkClearValues[numClearValues++];
-				vec4_t		  normalizedColor = createInfo.clearColor.AsNormalizedVector4D();
+				vector4_t	  normalizedColor = createInfo.clearColor.ToVector4();
 				Mem_Memzero( &vkClearValue, sizeof( VkClearValue ) );
 				Mem_Memcpy( vkClearValue.color.float32, &normalizedColor.x, 4 * sizeof( float ) );
 			}
@@ -104,9 +104,8 @@ CStudioAPIFrameBufferVk::~CStudioAPIFrameBufferVk()
 	// Destroy the Vulkan frame buffer
 	if ( vkFrameBuffer != VK_NULL_HANDLE )
 	{
-		g_StudioAPIVk.GetMemoryMgr().FreeResource( [vkFrameBuffer = vkFrameBuffer]() {
-			vkDestroyFramebuffer( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), vkFrameBuffer, NULL );
-		} );
+		g_StudioAPIVk.GetMemoryMgr().FreeResource( [vkFrameBuffer = vkFrameBuffer]()
+												   { vkDestroyFramebuffer( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), vkFrameBuffer, NULL ); } );
 		vkFrameBuffer = VK_NULL_HANDLE;
 	}
 
@@ -123,7 +122,7 @@ CStudioAPIFrameBufferVk::~CStudioAPIFrameBufferVk()
 CStudioAPIFrameBufferVk::GetSize
 ==================
 */
-ivec2_t CStudioAPIFrameBufferVk::GetSize() const
+vector2i_t CStudioAPIFrameBufferVk::GetSize() const
 {
 	return size;
 }

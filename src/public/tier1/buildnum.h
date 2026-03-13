@@ -7,10 +7,10 @@
 // dateOfBeginning	Data of beginning to count build numbers (in days)
 //-----------------------------------------------------------------------------
 template<uint32 dateOfBeginning>
-class TBuildNumber
+class CBuildNumber
 {
 public:
-	TBuildNumber()
+	CBuildNumber()
 		: buildNumber( 0 )
 	{
 		ComputeBuildNumber();

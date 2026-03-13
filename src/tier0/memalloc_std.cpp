@@ -35,7 +35,7 @@ void* CMemAllocStd::TryMalloc( size numBytes, uint32 alignment /* = 0 */ )
 	void* pPtr = Mem_MallocSystem( numBytes + alignment + sizeof( void* ) + sizeof( size ) );
 	if ( pPtr )
 	{
-		pResult															   = Align( (uint8*)pPtr + sizeof( void* ) + sizeof( size ), alignment );
+		pResult															   = S_Align( (uint8*)pPtr + sizeof( void* ) + sizeof( size ), alignment );
 		*( (void**)( (uint8*)pResult - sizeof( void* ) ) )				   = pPtr;
 		*( (size*)( (uint8*)pResult - sizeof( void* ) - sizeof( size ) ) ) = numBytes;
 	}
@@ -43,7 +43,7 @@ void* CMemAllocStd::TryMalloc( size numBytes, uint32 alignment /* = 0 */ )
 
 	if ( pResult )
 	{
-		PROFILER_MEM_ALLOC( pResult, Align( numBytes, alignment ), s_pMemAllocName );
+		PROFILER_MEM_ALLOC( pResult, S_Align( numBytes, alignment ), s_pMemAllocName );
 	}
 	return pResult;
 }
@@ -79,7 +79,7 @@ void* CMemAllocStd::TryRealloc( void* pOriginal, size numBytes, uint32 alignment
 		size ptrSize = 0;
 		bool bResult = GetAllocationSize( pOriginal, ptrSize );
 		Assert( ptrSize );
-		Mem_Memcpy( pResult, pOriginal, Min( numBytes, ptrSize ) );
+		Mem_Memcpy( pResult, pOriginal, S_Min( numBytes, ptrSize ) );
 		Free( pOriginal );
 	}
 	else if ( !pOriginal )
@@ -98,7 +98,7 @@ void* CMemAllocStd::TryRealloc( void* pOriginal, size numBytes, uint32 alignment
 	}
 	if ( pResult )
 	{
-		PROFILER_MEM_ALLOC( pResult, Align( numBytes, alignment ), s_pMemAllocName );
+		PROFILER_MEM_ALLOC( pResult, S_Align( numBytes, alignment ), s_pMemAllocName );
 	}
 	return pResult;
 }

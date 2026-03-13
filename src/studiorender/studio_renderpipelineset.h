@@ -7,7 +7,7 @@
 //-----------------------------------------------------------------------------
 // A studio render pipeline set
 //-----------------------------------------------------------------------------
-class CStudioRenderPipelineSet : public TRefCounted<IStudioRenderPipelineSet>, public TStudioRenderResource<IStudioRenderResource>
+class CStudioRenderPipelineSet : public CRefCounted<IStudioRenderPipelineSet>, public CStudioRenderResource<IStudioRenderResource>
 {
 public:
 	// IStudioRenderPipelineSet interface
@@ -30,12 +30,12 @@ private:
 		CStudioViewport*										  pViewport;
 		CStudioViewport::COnReleaseViewportIndex::funcDelegate_t* pReleaseViewportIndexDelegate;
 		CStudioViewport::COnRenderPassUpdated::funcDelegate_t*	  pRenderPassUpdatedDelegate;
-		eastl::vector<TRefPtr<IStudioAPIRenderPipeline>>		  studioAPIRenderPipelines;
+		eastl::vector<CRefPtr<IStudioAPIRenderPipeline>>		  studioAPIRenderPipelines;
 	};
 
 	struct dataStorageDrawRenderPasses_t
 	{
-		eastl::vector<TRefPtr<IStudioAPIRenderPipeline>> studioAPIRenderPipelines;
+		eastl::vector<CRefPtr<IStudioAPIRenderPipeline>> studioAPIRenderPipelines;
 	};
 
 	struct dataStoragePresentPass_t

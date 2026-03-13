@@ -10,8 +10,8 @@
 //-----------------------------------------------------------------------------
 struct studioAPITextureSamplerPairVk_t
 {
-	TRefPtr<CStudioAPITextureVk> pStudioAPITexture;
-	TRefPtr<CStudioAPISamplerVk> pStudioAPISampler;
+	CRefPtr<CStudioAPITextureVk> pStudioAPITexture;
+	CRefPtr<CStudioAPISamplerVk> pStudioAPISampler;
 };
 
 struct studioAPIDescriptorSetWriteContainerVk_t
@@ -19,7 +19,7 @@ struct studioAPIDescriptorSetWriteContainerVk_t
 	eastl::vector<VkWriteDescriptorSet>			 vkWriteDescriptorSets;
 	eastl::vector<VkDescriptorBufferInfo>			 vkDescriptorBufferInfos;
 	eastl::vector<VkDescriptorImageInfo>			 vkDescriptorImageInfos;
-	eastl::vector<TRefPtr<CStudioAPIBufferVk>>	 studioAPIBuffers;
+	eastl::vector<CRefPtr<CStudioAPIBufferVk>>	 studioAPIBuffers;
 	eastl::vector<studioAPITextureSamplerPairVk_t> studioAPITexturesSamplers;
 	eastl::vector<uint8>							 slotToWriteDescriptorSetMap;
 };
@@ -33,7 +33,7 @@ class CStudioAPIDescriptorSetWriterVk
 public:
 	CStudioAPIDescriptorSetWriterVk();
 
-	void SetupDescriptorSetWrites( const studioAPIDescriptorSetInfoVk_t& descriptorSetInfo, VkWriteDescriptorSet* pVkWriteDescriptorSets, VkDescriptorBufferInfo* pVkDescriptorBufferInfos, VkDescriptorImageInfo* pVkDescriptorImageInfos, TRefPtr<CStudioAPIBufferVk>* pStudioAPIBuffers, studioAPITextureSamplerPairVk_t* pStudioAPITexturesSamplers, uint8* pSlotToWriteDescriptorSetMap );
+	void SetupDescriptorSetWrites( const studioAPIDescriptorSetInfoVk_t& descriptorSetInfo, VkWriteDescriptorSet* pVkWriteDescriptorSets, VkDescriptorBufferInfo* pVkDescriptorBufferInfos, VkDescriptorImageInfo* pVkDescriptorImageInfos, CRefPtr<CStudioAPIBufferVk>* pStudioAPIBuffers, studioAPITextureSamplerPairVk_t* pStudioAPITexturesSamplers, uint8* pSlotToWriteDescriptorSetMap );
 
 	bool WriteConstantBuffer( uint32 slot, CStudioAPIBufferVk* pConstantBuffer, uint64 offset, uint64 size );
 	bool WriteTexture( uint32 slot, CStudioAPITextureVk* pTexture );
@@ -59,7 +59,7 @@ private:
 	VkWriteDescriptorSet*			 pVkWriteDescriptorSets;		// A view into someone else's Vulkan descriptor set writes
 	VkDescriptorBufferInfo*			 pVkDescriptorBufferInfos;		// A view into someone else's Vulkan descriptor buffer infos
 	VkDescriptorImageInfo*			 pVkDescriptorImageInfos;		// A view into someone else's Vulkan descriptor image infos
-	TRefPtr<CStudioAPIBufferVk>*	 pStudioAPIBuffers;				// A view into someone else's StudioAPI buffers
+	CRefPtr<CStudioAPIBufferVk>*	 pStudioAPIBuffers;				// A view into someone else's StudioAPI buffers
 	studioAPITextureSamplerPairVk_t* pStudioAPITexturesSamplers;	// A view into someone else's StudioAPI textures and samplers
 	uint8*							 pSlotToWriteDescriptorSetMap;	// A view into someone else's slot to write descriptor set map
 };

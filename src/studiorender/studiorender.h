@@ -16,8 +16,8 @@ class CStudioViewport;
 //-----------------------------------------------------------------------------
 struct studioSceneView_t
 {
-	mat4_t viewMatrix;
-	mat4_t projectionMatrix;
+	matrix4x4_t viewMatrix;
+	matrix4x4_t projectionMatrix;
 };
 
 //-----------------------------------------------------------------------------
@@ -60,6 +60,6 @@ public:
 private:
 	CStudioRenderPassPresent				  presentRenderPass;
 	studioSceneView_t						  sceneView;
-	eastl::vector<TRefPtr<IStudioRenderObject>> renderObjects;
+	eastl::vector<CRefPtr<IStudioRenderObject>> renderObjects;
 };
 extern CStudioRender g_StudioRender;

@@ -1,86 +1,61 @@
 #pragma once
 #include "tier1/math/math.h"
-#include "tier0/assert.h"
+#include "tier1/math/axis.h"
 
 //-----------------------------------------------------------------------------
-// Class for work with transform
+// A transform
 //-----------------------------------------------------------------------------
 class CTransform
 {
 public:
-	CTransform()
-		: bDirtyMatrix( true )
-		, translation( g_vectorZero )
-		, rotation( g_quaternionZero )
-		, scale( g_vectorOne )
-		, matrix( g_matrixIdentity )
-	{
-	}
-	explicit CTransform( const vec3_t& translation )
-		: bDirtyMatrix( true )
-		, translation( translation )
-		, rotation( g_quaternionZero )
-		, scale( g_vectorOne )
-		, matrix( g_matrixIdentity )
-	{
-	}
-	explicit CTransform( const quat_t& rotation )
-		: bDirtyMatrix( true )
-		, translation( g_vectorZero )
-		, rotation( rotation )
-		, scale( g_vectorOne )
-		, matrix( g_matrixIdentity )
-	{
-	}
-	CTransform( const quat_t& rotation, const vec3_t& translation, const vec3_t& scale = g_vectorOne )
-		: bDirtyMatrix( true )
-		, translation( translation )
-		, rotation( rotation )
-		, scale( scale )
-		, matrix( g_matrixIdentity )
-	{
-	}
+	CTransform();
+	CTransform( const vector3_t& location, const quaternion_t& rotation = g_quaternionIdentity, const vector3_t& scale = g_vector111 );
+	CTransform( const quaternion_t& rotation );
+	CTransform( const CTransform& copy );
 
-	void AddToTranslation( const vec3_t& deltaTranslation );
-	void AddToRotation( const quat_t& deltaRotation );
-	void AddToScale( const vec3_t& deltaScale );
-	void Add( const CTransform& other );
+	static CTransform Make( const vector3_t& location, const quaternion_t& rotation = g_quaternionIdentity, const vector3_t& scale = g_vector111 );
+	static CTransform Make( const quaternion_t& rotation );
 
-	void SubtractFromTranslation( const vec3_t& deltaTranslation );
-	void SubtractFromRotation( const quat_t& deltaRotation );
-	void SubtractFromScale( const vec3_t& deltaScale );
-	void Subtract( const CTransform& other );
+	void Translate( const vector3_t& deltaLocation );
+	void Rotate( const quaternion_t& deltaRotation );
+	void Scale( const vector3_t& deltaScale );
 
-	void CopyTranslation( const CTransform& other );
-	void CopyRotation( const CTransform& other );
-	void CopyScale( const CTransform& other );
+	vector3_t TranslateVector( const vector3_t& vector ) const;
+	void	  TranslateVector( const vector3_t& vector, vector3_t& result ) const;
+	vector3_t RotateVector( const vector3_t& vector ) const;
+	void	  RotateVector( const vector3_t& vector, vector3_t& result ) const;
+	vector3_t ScaleVector( const vector3_t& vector ) const;
+	void	  ScaleVector( const vector3_t& vector, vector3_t& result ) const;
+	vector3_t TransformVector( const vector3_t& vector ) const;
+	void	  TransformVector( const vector3_t& vector, vector3_t& result ) const;
 
-	vec3_t RotateVector( const vec3_t& vector ) const;
+	void Identity();
+	void Inverse();
+	void SetLocation( const vector3_t& location );
+	void SetRotation( const quaternion_t& rotation );
+	void SetScale( const vector3_t& scale );
 
-	bool MatchesNoScale( const CTransform& otherTransform ) const;
-	bool Matches( const CTransform& otherTransform ) const;
+	matrix4x4_t ToMatrix() const;
+	void		ToMatrix( matrix4x4_t& result ) const;
 
-	void SetIdentity();
-	void SetLocation( const vec3_t& newLocation );
-	void SetRotation( const quat_t& newRotation );
-	void SetScale( const vec3_t& newScale );
+	vector3_t			GetUnitAxis( axis_t axis ) const;
+	void				GetUnitAxis( axis_t axis, vector3_t& result ) const;
+	CTransform			GetInverse() const;
+	void				GetInverse( CTransform& result ) const;
+	const vector3_t&	GetLocation() const;
+	const quaternion_t& GetRotation() const;
+	const vector3_t&	GetScale() const;
 
-	const mat4_t& AsMatrix() const;
-	void		  AsMatrix( mat4_t& destMatrix ) const;
-	vec3_t		  GetUnitAxis( axis_t axis ) const;
-	vec3_t		  GetLocation() const;
-	quat_t		  GetRotation() const;
-	vec3_t		  GetScale() const;
+	CTransform& operator=( const CTransform& right );
+	vector3_t	operator*( const vector3_t& right ) const;	// This will be equivalent to a transform vector
+	CTransform	operator*( const CTransform& right ) const;
+	bool		operator==( const CTransform& right ) const;
+	bool		operator!=( const CTransform& right ) const;
 
-	CTransform operator+( const CTransform& other ) const;
-	CTransform operator-( const CTransform& other ) const;
-
-protected:
-	mutable bool   bDirtyMatrix;
-	vec3_t		   translation;
-	quat_t		   rotation;
-	vec3_t		   scale;
-	mutable mat4_t matrix;
+private:
+	quaternion_t rotation;
+	vector3_t	 location;
+	vector3_t	 scale;
 };
 
 #include "tier1/math/transform.inl"

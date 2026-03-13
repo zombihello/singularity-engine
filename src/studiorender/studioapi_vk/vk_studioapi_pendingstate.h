@@ -54,7 +54,7 @@ private:
 
 		void Clear();
 
-		TRefPtr<CStudioAPIBufferVk> pBuffer;
+		CRefPtr<CStudioAPIBufferVk> pBuffer;
 		VkDeviceSize				offset;
 	};
 
@@ -67,7 +67,7 @@ private:
 
 		void Clear();
 
-		TRefPtr<CStudioAPIBufferVk> pBuffer;
+		CRefPtr<CStudioAPIBufferVk> pBuffer;
 		VkDeviceSize				offset;
 	};
 
@@ -91,7 +91,7 @@ private:
 	VkViewport																  vkViewport;
 	VkRect2D																  vkScissor;
 	CStudioAPICmdContextVk&													  cmdContext;
-	TRefPtr<CStudioAPIRenderPipelineVk>										  pCurrentRenderPipeline;
+	CRefPtr<CStudioAPIRenderPipelineVk>										  pCurrentRenderPipeline;
 	CStudioAPIDescriptorStateRenderVk*										  pCurrentRenderDescriptorState;
 	indexBuffer_t															  indexBuffer;
 	vertexBuffer_t															  vertexBuffers[STUDIOAPI_VK_MAX_VERTEX_ELEMENT_COUNT];

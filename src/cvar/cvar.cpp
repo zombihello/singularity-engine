@@ -791,7 +791,7 @@ void CCvar::WriteConfigFile( const char* pConfigDir, bool bWriteDefaultConfig /*
 
 	// Open file to write
 	eastl::string			   configPath = S_Sprintf( !bWriteDefaultConfig ? "%s/" CVAR_CONFIG_NAME ".cfg" : "%s/" CVAR_DEFAULT_CONFIG_NAME ".cfg", pConfigDir );
-	TRefPtr<IStreamDataWriter> pFile	  = g_pFileSystem->CreateFileWriter( configPath.c_str() );
+	CRefPtr<IStreamDataWriter> pFile	  = g_pFileSystem->CreateFileWriter( configPath.c_str() );
 	if ( !pFile )
 	{
 		Warning( "Cvar: Failed to create file configuration '%s'", configPath.c_str() );

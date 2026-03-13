@@ -175,7 +175,7 @@ public:
 		Mem_Memzero( pShadercIncludeResult, sizeof( shaderc_include_result ) );
 
 		// Try to find file in the file system
-		TRefPtr<IStreamDataReader> pFile;
+		CRefPtr<IStreamDataReader> pFile;
 
 		// For absolute path we simple try to create a reader by the path
 		if ( S_IsAbsolutePath( pRequestedSource ) )
@@ -275,7 +275,7 @@ CShaderCompilerBackendVk::CompileShader
 bool CShaderCompilerBackendVk::CompileShader( const char* pSrcFileName, const char* pFunctionName, studioAPIShaderType_t type, IShaderCompilerEnvironment* pEnvironment, IShaderCompilerOutput* pOutput )
 {
 	// Load source shader file
-	TRefPtr<IStreamDataReader> pShaderFile = g_pFileSystem->CreateFileReader( pSrcFileName );
+	CRefPtr<IStreamDataReader> pShaderFile = g_pFileSystem->CreateFileReader( pSrcFileName );
 	if ( !pShaderFile )
 	{
 		pOutput->SetErrorMsg( S_Sprintf( "Failed to open shader file '%s'", pSrcFileName ).c_str() );

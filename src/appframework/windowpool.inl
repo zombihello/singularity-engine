@@ -2,11 +2,11 @@
 
 /*
 ==================
-TWindowPool::~TWindowPool
+CWindowPool::~CWindowPool
 ==================
 */
 template<typename T>
-FORCEINLINE TWindowPool<T>::~TWindowPool()
+FORCEINLINE CWindowPool<T>::~CWindowPool()
 {
 	for ( size index = 0, count = windows.size(); index < count; ++index )
 	{
@@ -16,11 +16,11 @@ FORCEINLINE TWindowPool<T>::~TWindowPool()
 
 /*
 ==================
-TWindowPool::Create
+CWindowPool::Create
 ==================
 */
 template<typename T>
-FORCEINLINE T* TWindowPool<T>::Create()
+FORCEINLINE T* CWindowPool<T>::Create()
 {
 	windowId_t id = INVALID_INDEX;
 	if ( !freeIds.empty() )
@@ -43,11 +43,11 @@ FORCEINLINE T* TWindowPool<T>::Create()
 
 /*
 ==================
-TWindowPool::Free
+CWindowPool::Free
 ==================
 */
 template<typename T>
-FORCEINLINE void TWindowPool<T>::Free( windowId_t id )
+FORCEINLINE void CWindowPool<T>::Free( windowId_t id )
 {
 	Assert( id < windows.size() );
 	T*& pWindow = windows[id];
@@ -58,11 +58,11 @@ FORCEINLINE void TWindowPool<T>::Free( windowId_t id )
 
 /*
 ==================
-TWindowPool::Get
+CWindowPool::Get
 ==================
 */
 template<typename T>
-FORCEINLINE T* TWindowPool<T>::Get( windowId_t id ) const
+FORCEINLINE T* CWindowPool<T>::Get( windowId_t id ) const
 {
 	Assert( id < windows.size() && windows[id] );
 	return windows[id];

@@ -52,7 +52,7 @@ void CEcsMap::Init( const CSMAPCompiledMapDoc& smapCompiledDoc )
 	for ( uint32 entityIdx = 0, numEntities = (uint32)smapEntities.size(); entityIdx < numEntities; ++entityIdx )
 	{
 		const CSMAPEntity&		  smapEntity  = smapEntities[entityIdx];
-		TResourcePtr<IEntityDesc> pEntityDesc = g_pResourceSystem->FindOrLoadResource( smapEntity.GetClassName(), RESOURCE_TYPE_ENTITY_DESC );
+		CResourcePtr<IEntityDesc> pEntityDesc = g_pResourceSystem->FindOrLoadResource( smapEntity.GetClassName(), RESOURCE_TYPE_ENTITY_DESC );
 		if ( !pEntityDesc )
 		{
 			Warning( "Game: Entity descriptor '%s' not found for entity %i (name: '%s')", smapEntity.GetClassName(), entityIdx, smapEntity.GetName() );
@@ -70,7 +70,7 @@ CEcsMap::SpawnEntity
 */
 IEntity* CEcsMap::SpawnEntity( IEntityDesc* pEntityDesc, const char* pName /* = "" */ )
 {
-	TRefPtr<CEcsEntity> pNewEcsEntity;
+	CRefPtr<CEcsEntity> pNewEcsEntity;
 	if ( pEntityDesc )
 	{
 		CEcsEntityDesc* pEcsEntityDesc = (CEcsEntityDesc*)pEntityDesc;

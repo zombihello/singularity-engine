@@ -3,55 +3,85 @@
 #include "tier0/types.h"
 #include "tier1/template.h"
 #include "tier1/math/axis.h"
-#include "tier1/math/types.h"
+#include "tier1/math/math_types.h"
 
 //-----------------------------------------------------------------------------
-// Global variables
+// Forward declarations
 //-----------------------------------------------------------------------------
-extern const vec3_t			  g_vectorZero;
-extern const vec3_t			  g_vectorOne;
-extern const quat_t			  g_quaternionZero;
-extern const class CRotator	  g_rotatorZero;
-extern const mat4_t			  g_matrixIdentity;
-extern const class CTransform g_transformZero;
-extern const vec3_t			  g_vectorForward;
-extern const vec3_t			  g_vectorRight;
-extern const vec3_t			  g_vectorUp;
+class CRotator;
+class CTransform;
+
+//-----------------------------------------------------------------------------
+// Math constants
+//-----------------------------------------------------------------------------
+#undef PI
+#undef SMALL_NUMBER
+#undef KINDA_SMALL_NUMBER
+#undef BIG_NUMBER
+#undef EULERS_NUMBER
+
+#define PI				   ( 3.1415926535897932 )
+#define SMALL_NUMBER	   ( 1.e-8 )
+#define KINDA_SMALL_NUMBER ( 1.e-4 )
+#define BIG_NUMBER		   ( 3.4e+38f )
+#define EULERS_NUMBER	   ( 2.71828182845904523536 )
+
+extern const vector3_t	  g_vector000;
+extern const vector3_t	  g_vector100;
+extern const vector3_t	  g_vector010;
+extern const vector3_t	  g_vector001;
+extern const vector3_t	  g_vector111;
+extern const vector3_t	  g_vectorForward;
+extern const vector3_t	  g_vectorRight;
+extern const vector3_t	  g_vectorUp;
+extern const CRotator	  g_rotatorIdentity;
+extern const CTransform	  g_transformIdentity;
+extern const quaternion_t g_quaternionIdentity;
+extern const matrix4x4_t  g_matrixIdentity;
 
 //-----------------------------------------------------------------------------
 // General math functions
 //-----------------------------------------------------------------------------
-float  S_RadiansToDegrees( float radians );
-float  S_DegreesToRadians( float degrees );
-float  S_Pow( float a, float b );
-float  S_Log2( float a );
-float  S_Loge( float a );
-float  S_LogX( float base, float value );
-float  S_Trunc( float a );
-float  S_Round( float a );
-float  S_Sin( float a );
-float  S_Cos( float a );
-float  S_ASin( float a );
-float  S_ATan( float a );
-float  S_ATan2( float y, float x );
-float  S_Sqrt( float a );
-float  S_Floor( float a );
-float  S_Clamp( float x, float min, float max );
-float  S_Abs( float x );
-float  S_Lerp( float x, float y, float a );
-bool   S_IsNearlyZero( float value, float errorTolerance = SMALL_NUMBER );
-bool   S_IsNearlyZero( const vec2_t& value, float errorTolerance = SMALL_NUMBER );
-bool   S_IsNearlyZero( const vec3_t& value, float errorTolerance = SMALL_NUMBER );
-bool   S_IsNearlyZero( const vec4_t& value, float errorTolerance = SMALL_NUMBER );
-float  S_Fmod( float x, float y );
-float  S_GridSnap( float value, float grid );
-vec2_t S_GridSnap( const vec2_t& value, float grid );
-void   S_GridSnap( const vec2_t& value, float grid, vec2_t& resultValue );
-vec3_t S_GridSnap( const vec3_t& value, float grid );
-void   S_GridSnap( const vec3_t& value, float grid, vec3_t& resultValue );
-vec4_t S_GridSnap( const vec4_t& value, float grid );
-void   S_GridSnap( const vec4_t& value, float grid, vec4_t& resultValue );
+float	  S_RadiansToDegrees( float radians );
+float	  S_DegreesToRadians( float degrees );
+float	  S_Pow( float a, float b );
+float	  S_Log2( float a );
+float	  S_LogE( float a );
+float	  S_LogX( float base, float value );
+float	  S_Trunc( float a );
+float	  S_Round( float a );
+float	  S_Sin( float a );
+float	  S_Cos( float a );
+float	  S_Asin( float a );
+float	  S_Atan( float a );
+float	  S_Atan2( float y, float x );
+float	  S_Sqrt( float a );
+float	  S_Floor( float a );
+float	  S_Abs( float x );
+float	  S_Lerp( float x, float y, float a );
+float	  S_Fmod( float x, float y );
+bool	  S_IsNearlyZero( float value, float errorTolerance = SMALL_NUMBER );
+bool	  S_IsNearlyZero( const vector2_t& value, float errorTolerance = SMALL_NUMBER );
+bool	  S_IsNearlyZero( const vector3_t& value, float errorTolerance = SMALL_NUMBER );
+bool	  S_IsNearlyZero( const vector4_t& value, float errorTolerance = SMALL_NUMBER );
+float	  S_GridSnap( float value, float grid );
+vector2_t S_GridSnap( const vector2_t& value, float grid );
+void	  S_GridSnap( const vector2_t& value, float grid, vector2_t& result );
+vector3_t S_GridSnap( const vector3_t& value, float grid );
+void	  S_GridSnap( const vector3_t& value, float grid, vector3_t& result );
+vector4_t S_GridSnap( const vector4_t& value, float grid );
+void	  S_GridSnap( const vector4_t& value, float grid, vector4_t& result );
 
+template<typename TType>
+TType S_Max( const TType& a, const TType& b );
+template<typename TType>
+TType S_Min( const TType& a, const TType& b );
+template<typename TType>
+TType S_Align( const TType& value, uint64 alignment );
+template<typename TType>
+TType S_Clamp( const TType& x, const TType& min, const TType& max );
+template<typename TType>
+void S_Swap( TType& a, TType& b );
 template<typename TType>
 constexpr TType S_MinValue();
 template<typename TType>
@@ -67,79 +97,99 @@ constexpr bool S_IsFinite( const TType& value );
 // Vector functions
 //-----------------------------------------------------------------------------
 template<typename TVectorType>
-TVectorType	  S_VectorCreate( const char* pString );
-void		  S_VectorCreate( const char* pString, vec2_t& vector );
-void		  S_VectorCreate( const char* pString, vec3_t& vector );
-void		  S_VectorCreate( const char* pString, vec4_t& vector );
-vec2_t		  S_VectorCreate( float x, float y );
-vec3_t		  S_VectorCreate( float x, float y, float z );
-vec4_t		  S_VectorCreate( float x, float y, float z, float w );
-void		  S_VectorCreate( float x, float y, vec2_t& vector );
-void		  S_VectorCreate( float x, float y, float z, vec3_t& vector );
-void		  S_VectorCreate( float x, float y, float z, float w, vec4_t& vector );
-eastl::string S_VectorToString( const vec2_t& vector );
-eastl::string S_VectorToString( const vec3_t& vector );
-eastl::string S_VectorToString( const vec4_t& vector );
-void		  S_VectorToString( const vec2_t& vector, eastl::string& result );
-void		  S_VectorToString( const vec3_t& vector, eastl::string& result );
-void		  S_VectorToString( const vec4_t& vector, eastl::string& result );
-float		  S_VectorDotProduct( const vec3_t& x, const vec3_t& y );
-vec2_t		  S_VectorNormalize( const vec2_t& vector );
-vec3_t		  S_VectorNormalize( const vec3_t& vector );
-vec4_t		  S_VectorNormalize( const vec4_t& vector );
-float		  S_VectorLength( const vec2_t& vector );
-float		  S_VectorLength( const vec3_t& vector );
-float		  S_VectorLength( const vec4_t& vector );
-void		  S_VectorCross( const vec3_t& vectorA, const vec3_t& vectorB, vec3_t& resultVector );
-vec3_t		  S_VectorCross( const vec3_t& vectorA, const vec3_t& vectorB );
-float		  S_VectorDistance( const vec3_t& vectorA, const vec3_t& vectorB );
+TVectorType S_VectorFromString( const char* pString );
+template<typename TVectorType>
+void S_VectorFromString( const char* pString, TVectorType& vector );
+template<typename TVectorType>
+eastl::string S_VectorToString( const TVectorType& vector );
+template<typename TVectorType>
+void S_VectorToString( const TVectorType& vector, eastl::string& result );
+
+template<typename TVectorType>
+float S_VectorDotProduct( const TVectorType& x, const TVectorType& y );
+template<typename TVectorType>
+TVectorType S_VectorNormalize( const TVectorType& vector );
+template<typename TVectorType>
+void S_VectorNormalize( const TVectorType& vector, TVectorType& result );
+template<typename TVectorType>
+float S_VectorLength( const TVectorType& vector );
+template<typename TVectorType>
+void S_VectorCrossProduct( const TVectorType& x, const TVectorType& y, TVectorType& result );
+template<typename TVectorType>
+TVectorType S_VectorCrossProduct( const TVectorType& x, const TVectorType& y );
+template<typename TVectorType>
+float S_VectorDistance( const TVectorType& x, const TVectorType& y );
+
+template<typename TVectorBoolType>
+bool S_VectorAll( const TVectorBoolType& x );
+template<typename TVectorType>
+void S_VectorLessThan( const TVectorType& x, const TVectorType& y, typename vectorBoolType_t<TVectorType>::type_t& result );
+template<typename TVectorType>
+typename vectorBoolType_t<TVectorType>::type_t S_VectorLessThan( const TVectorType& x, const TVectorType& y );
+template<typename TVectorType>
+void S_VectorLessThanEqual( const TVectorType& x, const TVectorType& y, typename vectorBoolType_t<TVectorType>::type_t& result );
+template<typename TVectorType>
+typename vectorBoolType_t<TVectorType>::type_t S_VectorLessThanEqual( const TVectorType& x, const TVectorType& y );
+template<typename TVectorType>
+void S_VectorGreaterThan( const TVectorType& x, const TVectorType& y, typename vectorBoolType_t<TVectorType>::type_t& result );
+template<typename TVectorType>
+typename vectorBoolType_t<TVectorType>::type_t S_VectorGreaterThan( const TVectorType& x, const TVectorType& y );
+template<typename TVectorType>
+void S_VectorGreaterThanEqual( const TVectorType& x, const TVectorType& y, typename vectorBoolType_t<TVectorType>::type_t& result );
+template<typename TVectorType>
+typename vectorBoolType_t<TVectorType>::type_t S_VectorGreaterThanEqual( const TVectorType& x, const TVectorType& y );
 
 //-----------------------------------------------------------------------------
 // Quaternion functions
 //-----------------------------------------------------------------------------
-quat_t		  S_QuaternionCreate( const char* pString );
-void		  S_QuaternionCreate( const char* pString, quat_t& quaternion );
-quat_t		  S_QuaternionCreate( float x, float y, float z, float w );
-void		  S_QuaternionCreate( float x, float y, float z, float w, quat_t& quaternion );
-eastl::string S_QuaternionToString( const quat_t& quaternion );
-void		  S_QuaternionToString( const quat_t& quaternion, eastl::string& result );
-quat_t		  S_AnglesToQuaternionYZX( float eulerAngleX, float eulerAngleY, float eulerAngleZ );
-quat_t		  S_AnglesToQuaternionZYX( float eulerAngleX, float eulerAngleY, float eulerAngleZ );
-quat_t		  S_AnglesToQuaternionYZX( const vec3_t& eulerAngles );
-quat_t		  S_AnglesToQuaternionZYX( const vec3_t& eulerAngles );
-vec3_t		  S_QuaternionToAngles( const quat_t& quaternion );
-mat4_t		  S_QuaternionToMatrix( const quat_t& quaternion );
-void		  S_QuaternionInverse( const quat_t& srcQuaternion, quat_t& destQuaternion );
-quat_t		  S_QuaternionInverse( const quat_t& quaternion );
-quat_t		  S_QuatenrionLookAt( const vec3_t& lookFrom, const vec3_t& lookTo, const vec3_t& up, const vec3_t& globalUp );
-quat_t		  S_QuaternionNormalize( const quat_t& quaternion );
+quaternion_t  S_QuaternionFromString( const char* pString );
+void		  S_QuaternionFromString( const char* pString, quaternion_t& quaternion );
+eastl::string S_QuaternionToString( const quaternion_t& quaternion );
+void		  S_QuaternionToString( const quaternion_t& quaternion, eastl::string& result );
+
+void		 S_QuaternionIdentity( quaternion_t& quaternion );
+quaternion_t S_QuaternionIdentity();
+quaternion_t S_AnglesToQuaternionYZX( float eulerAngleX, float eulerAngleY, float eulerAngleZ );
+quaternion_t S_AnglesToQuaternionYZX( const vector3_t& eulerAngles );
+void		 S_AnglesToQuaternionYZX( float eulerAngleX, float eulerAngleY, float eulerAngleZ, quaternion_t& result );
+void		 S_AnglesToQuaternionYZX( const vector3_t& eulerAngles, quaternion_t& result );
+quaternion_t S_AnglesToQuaternionZYX( float eulerAngleX, float eulerAngleY, float eulerAngleZ );
+quaternion_t S_AnglesToQuaternionZYX( const vector3_t& eulerAngles );
+void		 S_AnglesToQuaternionZYX( float eulerAngleX, float eulerAngleY, float eulerAngleZ, quaternion_t& result );
+void		 S_AnglesToQuaternionZYX( const vector3_t& eulerAngles, quaternion_t& result );
+vector3_t	 S_QuaternionToAngles( const quaternion_t& quaternion );
+void		 S_QuaternionToAngles( const quaternion_t& quaternion, vector3_t& result );
+matrix4x4_t	 S_QuaternionToMatrix( const quaternion_t& quaternion );
+void		 S_QuaternionToMatrix( const quaternion_t& quaternion, matrix4x4_t& result );
+quaternion_t S_QuaternionInverse( const quaternion_t& quaternion );
+void		 S_QuaternionInverse( const quaternion_t& quaternion, quaternion_t& result );
+quaternion_t S_QuatenrionLookAt( const vector3_t& lookFrom, const vector3_t& lookTo, const vector3_t& up, const vector3_t& globalUp );
+void		 S_QuatenrionLookAt( const vector3_t& lookFrom, const vector3_t& lookTo, const vector3_t& up, const vector3_t& globalUp, quaternion_t& result );
+quaternion_t S_QuaternionNormalize( const quaternion_t& quaternion );
+void		 S_QuaternionNormalize( const quaternion_t& quaternion, quaternion_t& result );
 
 //-----------------------------------------------------------------------------
 // Matrix functions
 //-----------------------------------------------------------------------------
-mat4_t		  S_MatrixCreate( const char* pString );
-void		  S_MatrixCreate( const char* pString, mat4_t& matrix );
-mat4_t		  S_MatrixCreate( const vec4_t& row0, const vec4_t& row1, const vec4_t& row2, const vec4_t& row3 );
-void		  S_MatrixCreate( const vec4_t& row0, const vec4_t& row1, const vec4_t& row2, const vec4_t& row3, mat4_t& matrix );
-eastl::string S_MatrixToString( const mat4_t& matrix );
-void		  S_MatrixToString( const mat4_t& matrix, eastl::string& result );
-void		  S_MatrixIdentity( mat4_t& matrix );
-mat4_t		  S_MatrixIdentity();
-void		  S_MatrixOrigin( const mat4_t& matrix, vec3_t& origin );
-vec3_t		  S_MatrixOrigin( const mat4_t& matrix );
-void		  S_MatrixTranslate( const vec3_t& location, mat4_t& matrix );
-void		  S_MatrixTranslate( const vec3_t& location, const mat4_t& initMatrix, mat4_t& matrix );
-mat4_t		  S_MatrixTranslate( const vec3_t& location, const mat4_t& initMatrix = mat4_t( 1.f ) );
-void		  S_MatrixScale( const vec3_t& scale, mat4_t& matrix );
-void		  S_MatrixScale( const vec3_t& scale, const mat4_t& initMatrix, mat4_t& matrix );
-mat4_t		  S_MatrixScale( const vec3_t& scale, const mat4_t& initMatrix = mat4_t( 1.f ) );
-void		  S_MatrixInverse( const mat4_t& srcMatrix, mat4_t& destMatrix );
-mat4_t		  S_MatrixInverse( const mat4_t& matrix );
-mat4_t		  S_MatrixPerspective( float fieldOfView, float aspectRatio, float nearClipPlane, float farClipPlane );
-void		  S_MatrixPerspective( float fieldOfView, float aspectRatio, float nearClipPlane, float farClipPlane, mat4_t& matrix );
-mat4_t		  S_MatrixOrtho( float left, float right, float bottom, float top, float nearClipPlane, float farClipPlane );
-void		  S_MatrixOrtho( float left, float right, float bottom, float top, float nearClipPlane, float farClipPlane, mat4_t& matrix );
-mat4_t		  S_MatrixLookAt( const vec3_t& location, const vec3_t& direction, const vec3_t& axisUp );
-void		  S_MatrixLookAt( const vec3_t& location, const vec3_t& direction, const vec3_t& axisUp, mat4_t& matrix );
+matrix4x4_t	  S_MatrixFromString( const char* pString );
+void		  S_MatrixFromString( const char* pString, matrix4x4_t& matrix );
+eastl::string S_MatrixToString( const matrix4x4_t& matrix );
+void		  S_MatrixToString( const matrix4x4_t& matrix, eastl::string& result );
+void		  S_MatrixIdentity( matrix4x4_t& matrix );
+matrix4x4_t	  S_MatrixIdentity();
+void		  S_MatrixOrigin( const matrix4x4_t& matrix, vector3_t& origin );
+vector3_t	  S_MatrixOrigin( const matrix4x4_t& matrix );
+void		  S_MatrixTranslate( const vector3_t& location, matrix4x4_t& matrix );
+matrix4x4_t	  S_MatrixTranslate( const vector3_t& location );
+void		  S_MatrixScale( const vector3_t& scale, matrix4x4_t& matrix );
+matrix4x4_t	  S_MatrixScale( const vector3_t& scale );
+void		  S_MatrixInverse( const matrix4x4_t& srcMatrix, matrix4x4_t& destMatrix );
+matrix4x4_t	  S_MatrixInverse( const matrix4x4_t& matrix );
+matrix4x4_t	  S_MatrixPerspective( float fieldOfView, float aspectRatio, float nearClipPlane, float farClipPlane );
+void		  S_MatrixPerspective( float fieldOfView, float aspectRatio, float nearClipPlane, float farClipPlane, matrix4x4_t& matrix );
+matrix4x4_t	  S_MatrixOrtho( float left, float right, float bottom, float top, float nearClipPlane, float farClipPlane );
+void		  S_MatrixOrtho( float left, float right, float bottom, float top, float nearClipPlane, float farClipPlane, matrix4x4_t& matrix );
+matrix4x4_t	  S_MatrixLookAt( const vector3_t& location, const vector3_t& direction, const vector3_t& axisUp );
+void		  S_MatrixLookAt( const vector3_t& location, const vector3_t& direction, const vector3_t& axisUp, matrix4x4_t& matrix );
 
 #include "tier1/math/math.inl"

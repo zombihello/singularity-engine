@@ -17,14 +17,14 @@ public:
 	virtual bool UnRegisterResourceFactory( resourceType_t type )							= 0;
 
 	// NOTE: The path to the resource in the file system can be without file extension, or its name if it is a procedural resource
-	virtual TRefPtr<IResource> FindOrLoadResource( const char* pPath, resourceType_t type, uint32 loadFlags = RESOURCE_LOAD_FLAG_NONE ) = 0;
-	virtual TRefPtr<IResource> CreateProceduralResource( const char* pName, resourceType_t type )										 = 0;
+	virtual CRefPtr<IResource> FindOrLoadResource( const char* pPath, resourceType_t type, uint32 loadFlags = RESOURCE_LOAD_FLAG_NONE ) = 0;
+	virtual CRefPtr<IResource> CreateProceduralResource( const char* pName, resourceType_t type )										 = 0;
 
 	// This function delete any resource that has a refcount <= 1 (one reference in the resource system)
 	virtual void RemoveUnusedResources() = 0;
 
 	// Return a default resource by its type. If the type isn't registered or not have a default resource return NULL
-	virtual TRefPtr<IResource> GetDefaultResource( resourceType_t type ) const = 0;
+	virtual CRefPtr<IResource> GetDefaultResource( resourceType_t type ) const = 0;
 
 	virtual bool			  HasResourceFactory( resourceType_t type ) const = 0;
 	virtual IResourceFactory* GetResourceFactory( resourceType_t type ) const = 0;

@@ -29,10 +29,10 @@ struct resourceToolMaterialVar_t
 		bool		boolValue;
 		int32		intValue;
 		float		floatValue;
-		vec2_t		vector2DValue;
-		vec3_t		vector3DValue;
-		vec4_t		vector4DValue;
-		mat4_t		matrixValue;
+		vector2_t		vector2DValue;
+		vector3_t		vector3DValue;
+		vector4_t		vector4DValue;
+		matrix4x4_t		matrixValue;
 		const char* pStringValue;
 		const char* pTextureValue;
 		const char* pMaterialValue;

@@ -9,7 +9,7 @@
 //-----------------------------------------------------------------------------
 // The application object for apps that use resource tools
 //-----------------------------------------------------------------------------
-class CAppSystemGroupResourceTools : public TDefaultAppSystemGroup<CAppSystemGroup>
+class CAppSystemGroupResourceTools : public CDefaultAppSystemGroup<CAppSystemGroup>
 {
 protected:
 	virtual bool		Create() override;

@@ -9,10 +9,10 @@ component Quad
 		pIndexBuffer( Quad().GetStudioAPIIndexBuffer() ),
 		pMaterial( Quad().GetMaterial() );
 		
-	TRefPtr<IStudioAPIBuffer>		pVertexBuffer;
-	TRefPtr<IStudioAPIBuffer>		pIndexBuffer;
+	CRefPtr<IStudioAPIBuffer>		pVertexBuffer;
+	CRefPtr<IStudioAPIBuffer>		pIndexBuffer;
 	[serialize][name="Material"] 
-	TResourcePtr<IMaterial>			pMaterial;
+	CResourcePtr<IMaterial>			pMaterial;
 }
 
 [stage="on_update", profiler_group="scene"]

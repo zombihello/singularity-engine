@@ -104,7 +104,7 @@ void CFileSystem::Shutdown()
 CFileSystem::CreateFileReader
 ==================
 */
-TRefPtr<IStreamDataReader> CFileSystem::CreateFileReader( const char* pPath, uint32 flags /* = FILE_READ_NONE */ )
+CRefPtr<IStreamDataReader> CFileSystem::CreateFileReader( const char* pPath, uint32 flags /* = FILE_READ_NONE */ )
 {
 	// Parse a path ID in pPath
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
@@ -121,7 +121,7 @@ TRefPtr<IStreamDataReader> CFileSystem::CreateFileReader( const char* pPath, uin
 		ComputeFullPath( pFilePath, *it, finalPath );
 
 		// Create file reader
-		TRefPtr<IStreamDataReader> pFileReader = Plat_CreateFileReader( finalPath.c_str(), flags );
+		CRefPtr<IStreamDataReader> pFileReader = Plat_CreateFileReader( finalPath.c_str(), flags );
 		if ( pFileReader )
 		{
 			return pFileReader;
@@ -143,7 +143,7 @@ TRefPtr<IStreamDataReader> CFileSystem::CreateFileReader( const char* pPath, uin
 CFileSystem::CreateFileWriter
 ==================
 */
-TRefPtr<IStreamDataWriter> CFileSystem::CreateFileWriter( const char* pPath, uint32 flags /* = FILE_WRITE_NONE */ )
+CRefPtr<IStreamDataWriter> CFileSystem::CreateFileWriter( const char* pPath, uint32 flags /* = FILE_WRITE_NONE */ )
 {
 	// Parse a path ID in pPath
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
@@ -169,7 +169,7 @@ TRefPtr<IStreamDataWriter> CFileSystem::CreateFileWriter( const char* pPath, uin
 		}
 
 		// Create file writer
-		TRefPtr<IStreamDataWriter> pFileWriter = Plat_CreateFileWriter( finalPath.c_str(), flags );
+		CRefPtr<IStreamDataWriter> pFileWriter = Plat_CreateFileWriter( finalPath.c_str(), flags );
 		if ( pFileWriter )
 		{
 			return pFileWriter;
@@ -191,7 +191,7 @@ TRefPtr<IStreamDataWriter> CFileSystem::CreateFileWriter( const char* pPath, uin
 CFileSystem::FindFiles
 ==================
 */
-TRefPtr<IPathArrayResult> CFileSystem::FindFiles( const char* pPath, const char* pPattern, bool bFiles, bool bDirectories, bool bLookAllPathIDs /* = true */ )
+CRefPtr<IPathArrayResult> CFileSystem::FindFiles( const char* pPath, const char* pPattern, bool bFiles, bool bDirectories, bool bLookAllPathIDs /* = true */ )
 {
 	// Parse a path ID in pPath
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
@@ -1016,7 +1016,7 @@ void CFileSystem::RemoveSearchPath( const char* pPathID )
 CFileSystem::GetSearchPath
 ==================
 */
-TRefPtr<IPathArrayResult> CFileSystem::GetSearchPath( const char* pPathID ) const
+CRefPtr<IPathArrayResult> CFileSystem::GetSearchPath( const char* pPathID ) const
 {
 	eastl::vector<eastl::string> result;
 	for ( uint32 index = 0, count = (uint32)searchPaths.size(); index < count; ++index )

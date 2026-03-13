@@ -45,7 +45,7 @@ private:
 //-----------------------------------------------------------------------------
 // Vulkan StudioAPI sampler
 //-----------------------------------------------------------------------------
-class CStudioAPISamplerVk : public TRefCounted<IStudioAPISampler>
+class CStudioAPISamplerVk : public CRefCounted<IStudioAPISampler>
 {
 public:
 	CStudioAPISamplerVk( const studioAPISamplerCreateInfo_t& createInfo, const char* pDebugName = "" );
@@ -63,7 +63,7 @@ private:
 //-----------------------------------------------------------------------------
 // Vulkan StudioAPI texture
 //-----------------------------------------------------------------------------
-class CStudioAPITextureVk : public TRefCounted<IStudioAPITexture>
+class CStudioAPITextureVk : public CRefCounted<IStudioAPITexture>
 {
 public:
 	// IStudioAPITexture interface

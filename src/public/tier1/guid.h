@@ -1,6 +1,6 @@
 #pragma once
 #include "tier1/strtools.h"
-#include "tier1/hashing/fasthash.h"
+#include "tier1/fasthash.h"
 
 //-----------------------------------------------------------------------------
 // Guid
@@ -12,7 +12,7 @@ public:
 	struct keyFunc_t
 	{
 		size operator()( const CGuid& guid ) const;
-		bool   operator()( const CGuid& a, const CGuid& b ) const;
+		bool operator()( const CGuid& a, const CGuid& b ) const;
 	};
 
 	CGuid()

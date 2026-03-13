@@ -6,7 +6,7 @@
 //-----------------------------------------------------------------------------
 // Studio vertex declaration for each vertex type
 //-----------------------------------------------------------------------------
-class CStudioVertexDeclarations : public TStudioRenderResource<IStudioRenderResource, true>
+class CStudioVertexDeclarations : public CStudioRenderResource<IStudioRenderResource, true>
 {
 public:
 	FORCEINLINE void Init()
@@ -32,6 +32,6 @@ private:
 	virtual void InitStudioAPI() override;
 	virtual void ReleaseStudioAPI() override;
 
-	TRefPtr<IStudioAPIVertexDeclaration> pStudioAPIVertexDeclarations[STUDIO_VERTEX_NUM_TYPES];
+	CRefPtr<IStudioAPIVertexDeclaration> pStudioAPIVertexDeclarations[STUDIO_VERTEX_NUM_TYPES];
 };
 extern CStudioVertexDeclarations g_StudioVertexDeclarations;

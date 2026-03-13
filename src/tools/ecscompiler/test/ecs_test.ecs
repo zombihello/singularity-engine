@@ -9,7 +9,7 @@ component TestComponent
 
 resource TestResource
 {
-	TRefPtr<IStudioScene>	pStudioScene;
+	CRefPtr<IStudioScene>	pStudioScene;
 }
 
 [name="component_with_defaults"]

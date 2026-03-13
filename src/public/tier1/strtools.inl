@@ -672,11 +672,11 @@ FORCEINLINE char* CWCHARToANSI_Convert::Convert( const wchar_t* pSrcData, char* 
 
 /*
 ==================
-TStringConversion::operator TConverTo*
+CStringConversion::operator TConverTo*
 ==================
 */
 template<typename TConverTo, typename TConvertFrom, typename TBaseConverter, uint32 defaultConversionSize /*= 128*/>
-FORCEINLINE TStringConversion<TConverTo, TConvertFrom, TBaseConverter, defaultConversionSize>::operator TConverTo*() const
+FORCEINLINE CStringConversion<TConverTo, TConvertFrom, TBaseConverter, defaultConversionSize>::operator TConverTo*() const
 {
 	return pConvertedString;
 }

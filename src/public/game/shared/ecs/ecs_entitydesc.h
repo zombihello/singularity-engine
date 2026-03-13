@@ -15,7 +15,7 @@ class CEcsMap;
 // ECS entity descriptor
 // By this you can create an ECS entity
 //-----------------------------------------------------------------------------
-class CEcsEntityDesc : public TRefCounted<IEntityDesc>
+class CEcsEntityDesc : public CRefCounted<IEntityDesc>
 {
 public:
 	CEcsEntityDesc();
@@ -39,7 +39,7 @@ private:
 	static void OnMapResetedOrUnloaded( void* pUserData, IMap* pMap );
 
 	mutable eastl::vector<ecsPrefab_t>			 ecsPrefabs;
-	eastl::vector<TRefPtr<IEcsComponentFactory>> ecsComponentFactories;
+	eastl::vector<CRefPtr<IEcsComponentFactory>> ecsComponentFactories;
 	CGuid										 guid;
 	mutable uint32								 lastUsedEcsPrefabIdx;
 };

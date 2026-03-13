@@ -48,7 +48,7 @@ private:
 //-----------------------------------------------------------------------------
 // Vulkan StudioAPI swap chain
 //-----------------------------------------------------------------------------
-class CStudioAPISwapChainVk : public TRefCounted<IStudioAPISwapChain>
+class CStudioAPISwapChainVk : public CRefCounted<IStudioAPISwapChain>
 {
 public:
 	// IStudioAPISwapChain interface
@@ -59,7 +59,7 @@ public:
 
 	virtual bool					  IsUseVSync() const override;
 	virtual bool					  IsValid() const override;
-	virtual ivec2_t					  GetSize() const override;
+	virtual vector2i_t					  GetSize() const override;
 	virtual uint32					  GetCurrentImageIndex() const override;
 	virtual IStudioAPISwapChainImage* GetCurrentImage() const override;
 	virtual uint32					  GetNumImages() const override;
@@ -96,7 +96,7 @@ private:
 	VkSurfaceKHR							 vkSurface;
 	VkSwapchainKHR							 vkSwapChain;
 	VkSurfaceFormatKHR						 vkSurfaceFormat;
-	ivec2_t									 size;
+	vector2i_t									 size;
 	uint32									 currentImageIndex;
 	COnStudioAPIVkShutdown::funcDelegate_t*	 pStudioAPIVkShutdownDelegate;
 	COnReCreated							 onReCreated;

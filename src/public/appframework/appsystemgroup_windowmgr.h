@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 // The application object for apps that use IWindowMgr
 //-----------------------------------------------------------------------------
-class CAppSystemGroupWindowMgr : public TDefaultAppSystemGroup<CAppSystemGroup>
+class CAppSystemGroupWindowMgr : public CDefaultAppSystemGroup<CAppSystemGroup>
 {
 protected:
 	virtual bool		Create() override;

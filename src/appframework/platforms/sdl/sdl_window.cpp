@@ -173,7 +173,7 @@ void CWindowSDL::UpdateDisplayMode()
 	case WINDOW_MODE_EXCLUSIVE_FULLSCREEN:
 	{
 		SDL_DisplayMode sdlDisplayMode;
-		ivec2_t			size = IWindow::GetSizeInPixels();
+		vector2i_t			size = IWindow::GetSizeInPixels();
 		if ( SDL_GetClosestFullscreenDisplayMode( SDL_GetDisplayForWindow( pSDLWindow ), size.x, size.y, refreshRate, true, &sdlDisplayMode ) )
 		{
 			refreshRate = sdlDisplayMode.refresh_rate;

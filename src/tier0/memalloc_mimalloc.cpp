@@ -17,7 +17,7 @@ void* CMemAllocMimalloc::TryMalloc( size numBytes, uint32 alignment /*= 0*/ )
 	void* pNewPtr = mi_malloc_aligned( numBytes, alignment );
 	if ( pNewPtr )
 	{
-		PROFILER_MEM_ALLOC( pNewPtr, Align( numBytes, alignment ), s_pMemAllocName );
+		PROFILER_MEM_ALLOC( pNewPtr, S_Align( numBytes, alignment ), s_pMemAllocName );
 	}
 	return pNewPtr;
 }
@@ -51,7 +51,7 @@ void* CMemAllocMimalloc::TryRealloc( void* pOriginal, size numBytes, uint32 alig
 	}
 	if ( pNewPtr )
 	{
-		PROFILER_MEM_ALLOC( pNewPtr, Align( numBytes, alignment ), s_pMemAllocName );
+		PROFILER_MEM_ALLOC( pNewPtr, S_Align( numBytes, alignment ), s_pMemAllocName );
 	}
 	return pNewPtr;
 }

@@ -303,7 +303,7 @@ bool CShaderCompilerApp::GenerateShaderCppClass()
 		}
 
 		// Save buffer into file
-		TRefPtr<IStreamDataWriter> file = g_pFileSystem->CreateFileWriter( filePath.c_str() );
+		CRefPtr<IStreamDataWriter> file = g_pFileSystem->CreateFileWriter( filePath.c_str() );
 		if ( file )
 		{
 			file->Write( (void*)buffer.data(), buffer.size() * sizeof( char ) );

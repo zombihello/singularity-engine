@@ -48,7 +48,7 @@ studioCmdAlloc_t CStudioCmdBuffer::GetAllocation( uint32 allocationSize )
 	Mem_Memzero( &studioCmdAlloc, sizeof( studioCmdAlloc_t ) );
 
 	// Check that the allocation will fit in the buffer
-	const uint32 alignedAllocationSize = Align( allocationSize, alignment );
+	const uint32 alignedAllocationSize = S_Align( allocationSize, alignment );
 	const uint32 bufferSize			   = (uint32)( pDataEnd - pData );
 	AssertMsg( alignedAllocationSize < bufferSize, "No enough space for the allocation in the command buffer" );
 
@@ -57,7 +57,7 @@ studioCmdAlloc_t CStudioCmdBuffer::GetAllocation( uint32 allocationSize )
 	studioCmdAlloc.pAllocation = pWritePointer != pDataEnd ? pWritePointer : pData;
 
 	// If there isn't enough space left in the buffer to allocate the full size, allocate all the remaining bytes in the buffer
-	byte* pAllocationEnd		 = Min( pDataEnd, studioCmdAlloc.pAllocation + alignedAllocationSize );
+	byte* pAllocationEnd		 = S_Min( pDataEnd, studioCmdAlloc.pAllocation + alignedAllocationSize );
 	studioCmdAlloc.allocatedSize = (uint32)( pAllocationEnd - studioCmdAlloc.pAllocation );
 
 	// Wait until the reading thread has finished reading the area of the buffer we want to allocate
@@ -185,7 +185,7 @@ CStudioCmdBuffer::EndRead
 void CStudioCmdBuffer::EndRead( uint32 readSize )
 {
 	PROFILER_SCOPE_FUNC();
-	pReadPointer += Align( readSize, alignment );
+	pReadPointer += S_Align( readSize, alignment );
 }
 
 /*

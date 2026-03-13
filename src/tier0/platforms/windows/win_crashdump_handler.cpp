@@ -67,7 +67,7 @@ CCrashDumpHandlerWindows::SetAppInfo
 */
 void CCrashDumpHandlerWindows::SetAppInfo( const crashDumpAppInfo_t& appInfo )
 {
-	TBuildNumber<ENGINE_GOLDDATE> engineBuildNumber;
+	CBuildNumber<ENGINE_GOLDDATE> engineBuildNumber;
 	bool						  bValidAppName		 = appInfo.pAppName && S_Strlen( appInfo.pAppName ) > 0;
 	bool						  bValidAppVersion	 = appInfo.pAppVersion && S_Strlen( appInfo.pAppVersion ) > 0;
 	bool						  bValidSupportEmail = appInfo.pSupportEmail && S_Strlen( appInfo.pSupportEmail ) > 0;

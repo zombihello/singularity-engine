@@ -6,7 +6,7 @@
 //-----------------------------------------------------------------------------
 // The application object for apps that use tier1
 //-----------------------------------------------------------------------------
-class CAppSystemGroupTier1 : public TDefaultAppSystemGroup<CAppSystemGroup>
+class CAppSystemGroupTier1 : public CDefaultAppSystemGroup<CAppSystemGroup>
 {
 protected:
 	virtual bool		Create() override;

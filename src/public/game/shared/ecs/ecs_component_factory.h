@@ -19,14 +19,14 @@ public:
 };
 
 template<typename TEcsComponent, void ( *pParserSENTComponentVarsFunc )( const CSENTEntityDescComponent& /*sentComponent*/, TEcsComponent& /*ecsComponent*/ )>
-class TEcsComponentFactory : public TRefCounted<IEcsComponentFactory>
+class CEcsComponentFactory : public CRefCounted<IEcsComponentFactory>
 {
 public:
 	// IEcsComponentFactory interface
 	virtual void Create( CEcsWorld ecsWorld, ecsEntity_t ecsEntity ) override;
 
-	TEcsComponentFactory( const CSENTEntityDescComponent& sentComponent );
-	TEcsComponentFactory( const TEcsComponentFactory& other );
+	CEcsComponentFactory( const CSENTEntityDescComponent& sentComponent );
+	CEcsComponentFactory( const CEcsComponentFactory& other );
 
 private:
 	TEcsComponent ecsArchetypeComponent;

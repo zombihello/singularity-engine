@@ -12,12 +12,12 @@ public:
 	// ILogOutput interface
 	virtual void Print( const logContext_t& context, const char* pMessage ) override;
 
-	TRefPtr<IStreamDataWriter> BeginLoggingToFile( const char* pPath );
+	CRefPtr<IStreamDataWriter> BeginLoggingToFile( const char* pPath );
 	void					   EndLoggingToFile();
-	TRefPtr<IStreamDataWriter> GetFile() const;
+	CRefPtr<IStreamDataWriter> GetFile() const;
 
 private:
-	TRefPtr<IStreamDataWriter> pFile;
+	CRefPtr<IStreamDataWriter> pFile;
 };
 
 #include "tier1/tier1_logoutputs.inl"

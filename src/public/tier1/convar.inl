@@ -2,11 +2,11 @@
 
 /*
 ==================
-TConCmdBase::IsCommand
+CConCmdBase::IsCommand
 ==================
 */
 template<class TBaseClass>
-bool TConCmdBase<TBaseClass>::IsCommand() const
+bool CConCmdBase<TBaseClass>::IsCommand() const
 {
 	Assert( false );
 	return false;
@@ -14,121 +14,121 @@ bool TConCmdBase<TBaseClass>::IsCommand() const
 
 /*
 ==================
-TConCmdBase::IsFlagSet
+CConCmdBase::IsFlagSet
 ==================
 */
 template<class TBaseClass>
-bool TConCmdBase<TBaseClass>::IsFlagSet( uint32 flag ) const
+bool CConCmdBase<TBaseClass>::IsFlagSet( uint32 flag ) const
 {
 	return ( flags & flag ) ? true : false;
 }
 
 /*
 ==================
-TConCmdBase::GetFlags
+CConCmdBase::GetFlags
 ==================
 */
 template<class TBaseClass>
-uint32 TConCmdBase<TBaseClass>::GetFlags() const
+uint32 CConCmdBase<TBaseClass>::GetFlags() const
 {
 	return flags;
 }
 
 /*
 ==================
-TConCmdBase::AddFlags
+CConCmdBase::AddFlags
 ==================
 */
 template<class TBaseClass>
-void TConCmdBase<TBaseClass>::AddFlags( uint32 flags )
+void CConCmdBase<TBaseClass>::AddFlags( uint32 flags )
 {
-	TConCmdBase::flags |= flags;
+	CConCmdBase::flags |= flags;
 }
 
 /*
 ==================
-TConCmdBase::GetName
+CConCmdBase::GetName
 ==================
 */
 template<class TBaseClass>
-const char* TConCmdBase<TBaseClass>::GetName() const
+const char* CConCmdBase<TBaseClass>::GetName() const
 {
 	return pName;
 }
 
 /*
 ==================
-TConCmdBase::SetHelpText
+CConCmdBase::SetHelpText
 ==================
 */
 template<class TBaseClass>
-void TConCmdBase<TBaseClass>::SetHelpText( const char* pHelpText )
+void CConCmdBase<TBaseClass>::SetHelpText( const char* pHelpText )
 {
-	TConCmdBase::pHelpText = pHelpText ? pHelpText : "";
+	CConCmdBase::pHelpText = pHelpText ? pHelpText : "";
 }
 
 /*
 ==================
-TConCmdBase::GetHelpText
+CConCmdBase::GetHelpText
 ==================
 */
 template<class TBaseClass>
-const char* TConCmdBase<TBaseClass>::GetHelpText() const
+const char* CConCmdBase<TBaseClass>::GetHelpText() const
 {
 	return pHelpText;
 }
 
 /*
 ==================
-TConCmdBase::SetNext
+CConCmdBase::SetNext
 ==================
 */
 template<class TBaseClass>
-void TConCmdBase<TBaseClass>::SetNext( IConCmdBase* pNext )
+void CConCmdBase<TBaseClass>::SetNext( IConCmdBase* pNext )
 {
-	TConCmdBase::pNext = pNext;
+	CConCmdBase::pNext = pNext;
 }
 
 /*
 ==================
-TConCmdBase::GetNext
+CConCmdBase::GetNext
 ==================
 */
 template<class TBaseClass>
-IConCmdBase* TConCmdBase<TBaseClass>::GetNext() const
+IConCmdBase* CConCmdBase<TBaseClass>::GetNext() const
 {
 	return pNext;
 }
 
 /*
 ==================
-TConCmdBase::SetRegistered
+CConCmdBase::SetRegistered
 ==================
 */
 template<class TBaseClass>
-void TConCmdBase<TBaseClass>::SetRegistered( bool bRegistered )
+void CConCmdBase<TBaseClass>::SetRegistered( bool bRegistered )
 {
-	TConCmdBase::bRegistered = bRegistered;
+	CConCmdBase::bRegistered = bRegistered;
 }
 
 /*
 ==================
-TConCmdBase::IsRegistered
+CConCmdBase::IsRegistered
 ==================
 */
 template<class TBaseClass>
-bool TConCmdBase<TBaseClass>::IsRegistered() const
+bool CConCmdBase<TBaseClass>::IsRegistered() const
 {
 	return bRegistered;
 }
 
 /*
 ==================
-TConCmdBase::GetDLLIdentifier
+CConCmdBase::GetDLLIdentifier
 ==================
 */
 template<class TBaseClass>
-cvarDLLIdentifier_t TConCmdBase<TBaseClass>::GetDLLIdentifier() const
+cvarDLLIdentifier_t CConCmdBase<TBaseClass>::GetDLLIdentifier() const
 {
 	return CCvarLocalRegister::s_dllIdentifier;
 }

@@ -2,11 +2,11 @@
 
 /*
 ==================
-TParserStringBuffer::Clear
+CParserStringBuffer::Clear
 ==================
 */
 template<typename TCharType, class TCharContainerType>
-FORCEINLINE void TParserStringBuffer<TCharType, TCharContainerType>::Clear()
+FORCEINLINE void CParserStringBuffer<TCharType, TCharContainerType>::Clear()
 {
 	if ( pBuffer )
 	{
@@ -17,44 +17,44 @@ FORCEINLINE void TParserStringBuffer<TCharType, TCharContainerType>::Clear()
 
 /*
 ==================
-TParserStringBuffer<char, eastl::string>::AsChar
+CParserStringBuffer<char, eastl::string>::AsChar
 ==================
 */
 template<>
-FORCEINLINE const char* TParserStringBuffer<char, eastl::string>::AsChar() const
+FORCEINLINE const char* CParserStringBuffer<char, eastl::string>::AsChar() const
 {
 	return pBuffer ? pBuffer->text.c_str() : "";
 }
 
 /*
 ==================
-TParserStringBuffer<wchar_t, eastl::wstring>::AsChar
+CParserStringBuffer<wchar_t, eastl::wstring>::AsChar
 ==================
 */
 template<>
-FORCEINLINE const wchar_t* TParserStringBuffer<wchar_t, eastl::wstring>::AsChar() const
+FORCEINLINE const wchar_t* CParserStringBuffer<wchar_t, eastl::wstring>::AsChar() const
 {
 	return pBuffer ? pBuffer->text.c_str() : L"";
 }
 
 /*
 ==================
-TParserStringBuffer::Clear
+CParserStringBuffer::Clear
 ==================
 */
 template<typename TCharType, class TCharContainerType>
-FORCEINLINE bool TParserStringBuffer<TCharType, TCharContainerType>::IsEmpty() const
+FORCEINLINE bool CParserStringBuffer<TCharType, TCharContainerType>::IsEmpty() const
 {
 	return pBuffer;
 }
 
 /*
 ==================
-TParserStringBuffer::operator=
+CParserStringBuffer::operator=
 ==================
 */
 template<typename TCharType, class TCharContainerType>
-FORCEINLINE TParserStringBuffer<TCharType, TCharContainerType>& TParserStringBuffer<TCharType, TCharContainerType>::operator=( const TParserStringBuffer& other )
+FORCEINLINE CParserStringBuffer<TCharType, TCharContainerType>& CParserStringBuffer<TCharType, TCharContainerType>::operator=( const CParserStringBuffer& other )
 {
 	if ( this != &other )
 	{
@@ -74,11 +74,11 @@ FORCEINLINE TParserStringBuffer<TCharType, TCharContainerType>& TParserStringBuf
 
 /*
 ==================
-TParserStringBuffer::operator=
+CParserStringBuffer::operator=
 ==================
 */
 template<typename TCharType, class TCharContainerType>
-FORCEINLINE TParserStringBuffer<TCharType, TCharContainerType>& TParserStringBuffer<TCharType, TCharContainerType>::operator=( const TCharContainerType& string )
+FORCEINLINE CParserStringBuffer<TCharType, TCharContainerType>& CParserStringBuffer<TCharType, TCharContainerType>::operator=( const TCharContainerType& string )
 {
 	if ( pBuffer )
 	{
@@ -99,11 +99,11 @@ FORCEINLINE TParserStringBuffer<TCharType, TCharContainerType>& TParserStringBuf
 
 /*
 ==================
-TParserStringBuffer::operator=
+CParserStringBuffer::operator=
 ==================
 */
 template<typename TCharType, class TCharContainerType>
-FORCEINLINE TParserStringBuffer<TCharType, TCharContainerType>& TParserStringBuffer<TCharType, TCharContainerType>::operator=( const TCharType* pString )
+FORCEINLINE CParserStringBuffer<TCharType, TCharContainerType>& CParserStringBuffer<TCharType, TCharContainerType>::operator=( const TCharType* pString )
 {
 	if ( pString )
 	{
@@ -124,11 +124,11 @@ FORCEINLINE TParserStringBuffer<TCharType, TCharContainerType>& TParserStringBuf
 
 /*
 ==================
-TParserStringBuffer::operator==
+CParserStringBuffer::operator==
 ==================
 */
 template<typename TCharType, class TCharContainerType>
-FORCEINLINE bool TParserStringBuffer<TCharType, TCharContainerType>::operator==( const TParserStringBuffer& other ) const
+FORCEINLINE bool CParserStringBuffer<TCharType, TCharContainerType>::operator==( const CParserStringBuffer& other ) const
 {
 	if ( pBuffer == other.pBuffer )
 	{
@@ -139,33 +139,33 @@ FORCEINLINE bool TParserStringBuffer<TCharType, TCharContainerType>::operator==(
 
 /*
 ==================
-TParserStringBuffer::operator==
+CParserStringBuffer::operator==
 ==================
 */
 template<typename TCharType, class TCharContainerType>
-FORCEINLINE bool TParserStringBuffer<TCharType, TCharContainerType>::operator==( const TCharType* pString ) const
+FORCEINLINE bool CParserStringBuffer<TCharType, TCharContainerType>::operator==( const TCharType* pString ) const
 {
 	return !S_Strcmp( AsChar(), pString );
 }
 
 /*
 ==================
-TParserStringBuffer::operator!=
+CParserStringBuffer::operator!=
 ==================
 */
 template<typename TCharType, class TCharContainerType>
-FORCEINLINE bool TParserStringBuffer<TCharType, TCharContainerType>::operator!=( const TParserStringBuffer& other ) const
+FORCEINLINE bool CParserStringBuffer<TCharType, TCharContainerType>::operator!=( const CParserStringBuffer& other ) const
 {
 	return !( operator==( other ) );
 }
 
 /*
 ==================
-TParserStringBuffer::operator!=
+CParserStringBuffer::operator!=
 ==================
 */
 template<typename TCharType, class TCharContainerType>
-FORCEINLINE bool TParserStringBuffer<TCharType, TCharContainerType>::operator!=( const TCharType* pString ) const
+FORCEINLINE bool CParserStringBuffer<TCharType, TCharContainerType>::operator!=( const TCharType* pString ) const
 {
 	return !( operator!=( pString ) );
 }

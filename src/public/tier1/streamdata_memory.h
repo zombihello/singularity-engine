@@ -9,7 +9,7 @@
 // The base class for read/write memory stream data
 //-----------------------------------------------------------------------------
 template<class TBaseClass>
-class CBaseStreamDataMemory : public TRefCounted<TBaseClass>
+class CBaseStreamDataMemory : public CRefCounted<TBaseClass>
 {
 public:
 	CBaseStreamDataMemory()

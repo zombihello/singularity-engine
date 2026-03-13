@@ -13,7 +13,7 @@ class CMaterialVar;
 //-----------------------------------------------------------------------------
 // Material
 //-----------------------------------------------------------------------------
-class CMaterial : public TRefCounted<IMaterial>
+class CMaterial : public CRefCounted<IMaterial>
 {
 public:
 	// IMaterial interface
@@ -60,7 +60,7 @@ private:
 	IShader*								 pShader;
 	eastl::vector<CMaterialVar*>			 vars;
 	materialVarsDict_t						 varsDict;
-	eastl::vector<TRefPtr<IStudioAPIBuffer>> studioAPIBuffers;
+	eastl::vector<CRefPtr<IStudioAPIBuffer>> studioAPIBuffers;
 };
 
 #include "materialsystem/material.inl"

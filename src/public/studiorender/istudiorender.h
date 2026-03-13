@@ -17,8 +17,8 @@ class IStudioRenderObject;
 //-----------------------------------------------------------------------------
 struct studioCameraView_t
 {
-	vec3_t location;
-	quat_t rotation;
+	vector3_t location;
+	quaternion_t rotation;
 	float  fieldOfView;
 	float  nearClipPlane;
 	float  farClipPlane;

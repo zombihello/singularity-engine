@@ -48,7 +48,7 @@ public:
 
 private:
 	windowId_t					 mainWindowId;
-	TWindowPool<CWindowSDL>		 windowPool;
+	CWindowPool<CWindowSDL>		 windowPool;
 	eastl::vector<windowId_t>	 windowIds;
 	mutable COnChangedMainWindow onChangedMainWindow;
 	mutable COnWindowEvent		 onWindowEvent;

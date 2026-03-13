@@ -4,7 +4,7 @@
 //-----------------------------------------------------------------------------
 // Resource
 //-----------------------------------------------------------------------------
-class CResource : public TRefCounted<IResource>
+class CResource : public CRefCounted<IResource>
 {
 public:
 	CResource( const char* pPath, IRefCounted* pData, resourceType_t type, bool bProcedural = false );
@@ -22,7 +22,7 @@ private:
 	bool				 bProcedural;
 	resourceType_t		 type;
 	eastl::string			 path;
-	TRefPtr<IRefCounted> pData;
+	CRefPtr<IRefCounted> pData;
 };
 
 #include "resourcesystem/resource.inl"

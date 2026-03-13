@@ -49,7 +49,7 @@ public:
 
 private:
 	typedef uint16			  id_t;
-	static TStringPool<id_t>& GetStringPool();
+	static CStringPool<id_t>& GetStringPool();
 	id_t					  id;
 };
 

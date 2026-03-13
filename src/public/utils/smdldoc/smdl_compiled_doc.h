@@ -9,11 +9,11 @@
 //-----------------------------------------------------------------------------
 struct smdlVertex_t
 {
-	vec4_t position;
-	vec2_t texCoord;
-	vec4_t normal;
-	vec4_t tangent;
-	vec4_t binormal;
+	vector4_t position;
+	vector2_t texCoord;
+	vector4_t normal;
+	vector4_t tangent;
+	vector4_t binormal;
 };
 
 struct smdlSurface_t

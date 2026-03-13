@@ -52,24 +52,24 @@ public:
 	virtual void ReleaseThreadOwnership() = 0;
 
 	// Create Studio API resources
-	virtual TRefPtr<IStudioAPICmdContext>		 CreateCmdContext( studioAPIQueueType_t queueType ) const																																																						= 0;
-	virtual TRefPtr<IStudioAPICmdList>			 CreateCmdList( IStudioAPICmdContext* pCmdContext ) const																																																						= 0;
-	virtual TRefPtr<IStudioAPICmdListBatch>		 CreateCmdListBatch( IStudioAPICmdContext* pCmdContext ) const																																																					= 0;
-	virtual TRefPtr<IStudioAPISwapChain>		 CreateSwapChain( windowHandle_t windowHandle, uint32 width, uint32 height, bool bUseVSync = false ) const																																										= 0;
-	virtual TRefPtr<IStudioAPIShader>			 CreateVertexShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName = "" ) const																						= 0;
-	virtual TRefPtr<IStudioAPIShader>			 CreateHullShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName = "" ) const																						= 0;
-	virtual TRefPtr<IStudioAPIShader>			 CreateDomainShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName = "" ) const																						= 0;
-	virtual TRefPtr<IStudioAPIShader>			 CreateGeometryShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName = "" ) const																					= 0;
-	virtual TRefPtr<IStudioAPIShader>			 CreatePixelShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName = "" ) const																						= 0;
-	virtual TRefPtr<IStudioAPIShader>			 CreateComputeShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName = "" ) const																					= 0;
-	virtual TRefPtr<IStudioAPIBoundShaderState>	 FindOrCreateBoundShaderState( IStudioAPIVertexDeclaration* pVertexDeclaration, IStudioAPIShader* pVertexShader, IStudioAPIShader* pPixelShader, IStudioAPIShader* pHullShader = NULL, IStudioAPIShader* pDomainShader = NULL, IStudioAPIShader* pGeometryShader = NULL ) const = 0;
-	virtual TRefPtr<IStudioAPIRenderPipeline>	 CreateRenderPipeline( const studioAPIRenderPipelineCreateInfo_t& createInfo, const char* pDebugName = "" ) const																																								= 0;
-	virtual TRefPtr<IStudioAPIVertexDeclaration> CreateVertexDeclaration( const studioAPIVertexInputBuffer_t* pVertexInputBuffers, uint32 numVertexInputBuffers, const studioAPIVertexInputAttribute_t* pVertexInputAttributes, uint32 numVertexInputAttributes ) const															= 0;
-	virtual TRefPtr<IStudioAPIFrameBuffer>		 CreateFrameBuffer( const studioAPIFrameBufferCreateInfo_t& createInfo, const char* pDebugName = "" ) const																																									= 0;
-	virtual TRefPtr<IStudioAPIRenderPass>		 CreateRenderPass( const studioAPIRenderPassCreateInfo_t& createInfo, const char* pDebugName = "" ) const																																										= 0;
-	virtual TRefPtr<IStudioAPIBuffer>			 CreateBuffer( const byte* pData, uint64 dataSize, uint32 dataStride, uint32 usageFlags, const char* pDebugName = "" ) const																																					= 0;
-	virtual TRefPtr<IStudioAPITexture>			 CreateTexture( studioAPITextureType_t type, uint32 sizeX, uint32 sizeY, uint32 sizeZ, uint32 numLayers, uint32 numMips, uint32 usageFlags, studioAPIPixelFormat_t pixelFormat, const byte* pData = NULL, const char* pDebugName = "" ) const									= 0;
-	virtual TRefPtr<IStudioAPISampler>			 CreateSampler( const studioAPISamplerCreateInfo_t& createInfo, const char* pDebugName = "" ) const																																											= 0;
+	virtual CRefPtr<IStudioAPICmdContext>		 CreateCmdContext( studioAPIQueueType_t queueType ) const																																																						= 0;
+	virtual CRefPtr<IStudioAPICmdList>			 CreateCmdList( IStudioAPICmdContext* pCmdContext ) const																																																						= 0;
+	virtual CRefPtr<IStudioAPICmdListBatch>		 CreateCmdListBatch( IStudioAPICmdContext* pCmdContext ) const																																																					= 0;
+	virtual CRefPtr<IStudioAPISwapChain>		 CreateSwapChain( windowHandle_t windowHandle, uint32 width, uint32 height, bool bUseVSync = false ) const																																										= 0;
+	virtual CRefPtr<IStudioAPIShader>			 CreateVertexShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName = "" ) const																						= 0;
+	virtual CRefPtr<IStudioAPIShader>			 CreateHullShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName = "" ) const																						= 0;
+	virtual CRefPtr<IStudioAPIShader>			 CreateDomainShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName = "" ) const																						= 0;
+	virtual CRefPtr<IStudioAPIShader>			 CreateGeometryShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName = "" ) const																					= 0;
+	virtual CRefPtr<IStudioAPIShader>			 CreatePixelShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName = "" ) const																						= 0;
+	virtual CRefPtr<IStudioAPIShader>			 CreateComputeShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName = "" ) const																					= 0;
+	virtual CRefPtr<IStudioAPIBoundShaderState>	 FindOrCreateBoundShaderState( IStudioAPIVertexDeclaration* pVertexDeclaration, IStudioAPIShader* pVertexShader, IStudioAPIShader* pPixelShader, IStudioAPIShader* pHullShader = NULL, IStudioAPIShader* pDomainShader = NULL, IStudioAPIShader* pGeometryShader = NULL ) const = 0;
+	virtual CRefPtr<IStudioAPIRenderPipeline>	 CreateRenderPipeline( const studioAPIRenderPipelineCreateInfo_t& createInfo, const char* pDebugName = "" ) const																																								= 0;
+	virtual CRefPtr<IStudioAPIVertexDeclaration> CreateVertexDeclaration( const studioAPIVertexInputBuffer_t* pVertexInputBuffers, uint32 numVertexInputBuffers, const studioAPIVertexInputAttribute_t* pVertexInputAttributes, uint32 numVertexInputAttributes ) const															= 0;
+	virtual CRefPtr<IStudioAPIFrameBuffer>		 CreateFrameBuffer( const studioAPIFrameBufferCreateInfo_t& createInfo, const char* pDebugName = "" ) const																																									= 0;
+	virtual CRefPtr<IStudioAPIRenderPass>		 CreateRenderPass( const studioAPIRenderPassCreateInfo_t& createInfo, const char* pDebugName = "" ) const																																										= 0;
+	virtual CRefPtr<IStudioAPIBuffer>			 CreateBuffer( const byte* pData, uint64 dataSize, uint32 dataStride, uint32 usageFlags, const char* pDebugName = "" ) const																																					= 0;
+	virtual CRefPtr<IStudioAPITexture>			 CreateTexture( studioAPITextureType_t type, uint32 sizeX, uint32 sizeY, uint32 sizeZ, uint32 numLayers, uint32 numMips, uint32 usageFlags, studioAPIPixelFormat_t pixelFormat, const byte* pData = NULL, const char* pDebugName = "" ) const									= 0;
+	virtual CRefPtr<IStudioAPISampler>			 CreateSampler( const studioAPISamplerCreateInfo_t& createInfo, const char* pDebugName = "" ) const																																											= 0;
 
 	// Begin/end drawing a frame
 	virtual void BeginDrawingFrame() = 0;

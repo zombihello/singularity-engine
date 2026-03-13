@@ -43,7 +43,7 @@ void CEcsEntityDescFactory::Shutdown()
 CEcsEntityDescFactory::CreateProceduralResource
 ==================
 */
-TRefPtr<IRefCounted> CEcsEntityDescFactory::CreateProceduralResource() const
+CRefPtr<IRefCounted> CEcsEntityDescFactory::CreateProceduralResource() const
 {
 	return new CEcsEntityDesc();
 }
@@ -53,7 +53,7 @@ TRefPtr<IRefCounted> CEcsEntityDescFactory::CreateProceduralResource() const
 CEcsEntityDescFactory::LoadResource
 ==================
 */
-TRefPtr<IRefCounted> CEcsEntityDescFactory::LoadResource( const char* pPath, uint32 loadFlags /* = RESOURCE_LOAD_FLAG_NONE */ ) const
+CRefPtr<IRefCounted> CEcsEntityDescFactory::LoadResource( const char* pPath, uint32 loadFlags /* = RESOURCE_LOAD_FLAG_NONE */ ) const
 {
 	CSENTCompiledEntityDescDoc sentCompiledEntityDescDoc;
 	if ( !sentCompiledEntityDescDoc.LoadFromFile( S_GetFileExtension( pPath ) ? pPath : S_Sprintf( "%s.sent_c", pPath ).c_str() ) )
@@ -80,7 +80,7 @@ void CEcsEntityDescFactory::UnloadResource( IRefCounted* pResoruce ) const
 CEcsEntityDescFactory::GetDefaultResource
 ==================
 */
-TRefPtr<IResource> CEcsEntityDescFactory::GetDefaultResource() const
+CRefPtr<IResource> CEcsEntityDescFactory::GetDefaultResource() const
 {
 	return pDefaultEntityDesc;
 }

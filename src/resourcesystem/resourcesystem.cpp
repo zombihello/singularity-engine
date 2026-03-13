@@ -60,7 +60,7 @@ void CResourceSystem::Shutdown()
 	// Remove all resources
 	for ( uint32 resourceTypeIdx = 0; resourceTypeIdx < RESOURCE_NUM_TYPES; ++resourceTypeIdx )
 	{
-		eastl::unordered_map<eastl::string, TRefPtr<CResource>>& resourcesDict = resourcesDicts[resourceTypeIdx];
+		eastl::unordered_map<eastl::string, CRefPtr<CResource>>& resourcesDict = resourcesDicts[resourceTypeIdx];
 		AssertMsg( resourcesDict.empty(), "Before shutdown of the resource system all resource factories must be unregistered" );
 	}
 
@@ -109,7 +109,7 @@ bool CResourceSystem::UnRegisterResourceFactory( resourceType_t type )
 		}
 
 		// Unload all resource of the type
-		eastl::unordered_map<eastl::string, TRefPtr<CResource>>& resourcesDict = resourcesDicts[type];
+		eastl::unordered_map<eastl::string, CRefPtr<CResource>>& resourcesDict = resourcesDicts[type];
 		for ( auto it = resourcesDict.begin(); it != resourcesDict.end(); ++it )
 		{
 			pResourceFactory->UnloadResource( it->second->GetData() );
@@ -129,7 +129,7 @@ bool CResourceSystem::UnRegisterResourceFactory( resourceType_t type )
 CResourceSystem::CreateProceduralResource
 ==================
 */
-TRefPtr<IResource> CResourceSystem::CreateProceduralResource( const char* pName, resourceType_t type )
+CRefPtr<IResource> CResourceSystem::CreateProceduralResource( const char* pName, resourceType_t type )
 {
 	PROFILER_SCOPE_FUNC();
 	Assert( type < RESOURCE_NUM_TYPES );
@@ -144,7 +144,7 @@ TRefPtr<IResource> CResourceSystem::CreateProceduralResource( const char* pName,
 	eastl::string resourceName = pName;
 	S_Strlwr( resourceName.data() );
 
-	TRefPtr<CResource> pResource	   = new CResource( "", pResourceFactory->CreateProceduralResource(), type, true );
+	CRefPtr<CResource> pResource	   = new CResource( "", pResourceFactory->CreateProceduralResource(), type, true );
 	resourcesDicts[type][resourceName] = pResource;
 	Msg( "ResourceSystem: Created procedural resource '%s' (type: 0x%X)", pName, type );
 	return pResource;
@@ -155,7 +155,7 @@ TRefPtr<IResource> CResourceSystem::CreateProceduralResource( const char* pName,
 CResourceSystem::FindOrLoadResource
 ==================
 */
-TRefPtr<IResource> CResourceSystem::FindOrLoadResource( const char* pPath, resourceType_t type, uint32 loadFlags /* = RESOURCE_LOAD_FLAG_NONE */ )
+CRefPtr<IResource> CResourceSystem::FindOrLoadResource( const char* pPath, resourceType_t type, uint32 loadFlags /* = RESOURCE_LOAD_FLAG_NONE */ )
 {
 	PROFILER_SCOPE_FUNC();
 
@@ -181,7 +181,7 @@ TRefPtr<IResource> CResourceSystem::FindOrLoadResource( const char* pPath, resou
 	}
 
 	// Do nothing if we won't load a new resource
-	TRefPtr<IResource> pDefaultResource = !( loadFlags & RESOURCE_LOAD_FLAG_WITHOUT_DEFAULT ) ? pResourceFactory->GetDefaultResource() : NULL;
+	CRefPtr<IResource> pDefaultResource = !( loadFlags & RESOURCE_LOAD_FLAG_WITHOUT_DEFAULT ) ? pResourceFactory->GetDefaultResource() : NULL;
 	if ( loadFlags & RESOURCE_LOAD_FLAG_ONLY_FIND )
 	{
 		// In the case we return a default resource or NULL
@@ -189,14 +189,14 @@ TRefPtr<IResource> CResourceSystem::FindOrLoadResource( const char* pPath, resou
 		return pDefaultResource;
 	}
 
-	TRefPtr<IRefCounted> pData = pResourceFactory->LoadResource( pPath, loadFlags );
+	CRefPtr<IRefCounted> pData = pResourceFactory->LoadResource( pPath, loadFlags );
 	if ( !pData )
 	{
 		Error( "ResourceSystem: Failed to load resource '%s' (type: 0x%X)", pPath, type );
 		return pDefaultResource;
 	}
 
-	TRefPtr<CResource> pResource	   = new CResource( pPath, pData, type );
+	CRefPtr<CResource> pResource	   = new CResource( pPath, pData, type );
 	resourcesDicts[type][resourceName] = pResource;
 	Msg( "ResourceSystem: Loaded resource '%s' (type: 0x%X)", pPath, type );
 	return pResource;
@@ -217,7 +217,7 @@ void CResourceSystem::RemoveUnusedResources()
 	{
 		IResourceFactory*									 pResourceFactory = pResourceFactories[resourceTypeIdx];
 		IResource*											 pDefaultResource = pResourceFactory->GetDefaultResource();
-		eastl::unordered_map<eastl::string, TRefPtr<CResource>>& resourcesDict	  = resourcesDicts[resourceTypeIdx];
+		eastl::unordered_map<eastl::string, CRefPtr<CResource>>& resourcesDict	  = resourcesDicts[resourceTypeIdx];
 		for ( auto it = resourcesDict.begin(); it != resourcesDict.end(); )
 		{
 			// Remove a resource if it hasn't more then 1 reference count and it isn't a default resource
@@ -241,7 +241,7 @@ void CResourceSystem::RemoveUnusedResources()
 CResourceSystem::GetDefaultResource
 ==================
 */
-TRefPtr<IResource> CResourceSystem::GetDefaultResource( resourceType_t type ) const
+CRefPtr<IResource> CResourceSystem::GetDefaultResource( resourceType_t type ) const
 {
 	Assert( type < RESOURCE_NUM_TYPES );
 	IResourceFactory* pResourceFactory = pResourceFactories[type];

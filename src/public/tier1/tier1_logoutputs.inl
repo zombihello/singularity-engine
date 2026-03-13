@@ -5,7 +5,7 @@
 CLogOutputFile::BeginLoggingToFile
 ==================
 */
-FORCEINLINE TRefPtr<IStreamDataWriter> CLogOutputFile::BeginLoggingToFile( const char* pPath )
+FORCEINLINE CRefPtr<IStreamDataWriter> CLogOutputFile::BeginLoggingToFile( const char* pPath )
 {
 	EndLoggingToFile();
 	pFile = g_pFileSystem->CreateFileWriter( pPath );
@@ -31,7 +31,7 @@ FORCEINLINE void CLogOutputFile::EndLoggingToFile()
 CLogOutputFile::GetFile
 ==================
 */
-FORCEINLINE TRefPtr<IStreamDataWriter> CLogOutputFile::GetFile() const
+FORCEINLINE CRefPtr<IStreamDataWriter> CLogOutputFile::GetFile() const
 {
 	return pFile;
 }

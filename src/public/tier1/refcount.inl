@@ -2,11 +2,11 @@
 
 /*
 ==================
-TRefCounted::AddRef
+CRefCounted::AddRef
 ==================
 */
 template<class TBaseClass>
-void TRefCounted<TBaseClass>::AddRef()
+void CRefCounted<TBaseClass>::AddRef()
 {
 	// Reference increment does not require synchronization with other data, relaxed is enough
 	countReferences.fetch_add( 1, eastl::memory_order_relaxed );
@@ -14,11 +14,11 @@ void TRefCounted<TBaseClass>::AddRef()
 
 /*
 ==================
-TRefCounted::ReleaseRef
+CRefCounted::ReleaseRef
 ==================
 */
 template<class TBaseClass>
-void TRefCounted<TBaseClass>::ReleaseRef()
+void CRefCounted<TBaseClass>::ReleaseRef()
 {
 	// Release on decrement publishes all records made by ref holders.
 	// If we are the last owner, before delete do acquire-fence
@@ -32,55 +32,55 @@ void TRefCounted<TBaseClass>::ReleaseRef()
 
 /*
 ==================
-TRefCounted::GetRefCount
+CRefCounted::GetRefCount
 ==================
 */
 template<class TBaseClass>
-uint32 TRefCounted<TBaseClass>::GetRefCount() const
+uint32 CRefCounted<TBaseClass>::GetRefCount() const
 {
 	return countReferences.load( eastl::memory_order_relaxed );
 }
 
 /*
 ==================
-TRefPtr::hashFunction_t::operator()
+CRefPtr::hashFunction_t::operator()
 ==================
 */
 template<typename TPtrType>
-FORCEINLINE size TRefPtr<TPtrType>::hashFunction_t::operator()( const TRefPtr& refPtr ) const
+FORCEINLINE size CRefPtr<TPtrType>::hashFunction_t::operator()( const CRefPtr& refPtr ) const
 {
 	return FastHash( refPtr );
 }
 
 /*
 ==================
-TRefPtr::operator=
+CRefPtr::operator=
 ==================
 */
 template<typename TPtrType>
-FORCEINLINE TRefPtr<TPtrType>& TRefPtr<TPtrType>::operator=( TPtrType* pPtr )
+FORCEINLINE CRefPtr<TPtrType>& CRefPtr<TPtrType>::operator=( TPtrType* pPtr )
 {
-	if ( TRefPtr::pPtr )
+	if ( CRefPtr::pPtr )
 	{
-		TRefPtr::pPtr->ReleaseRef();
+		CRefPtr::pPtr->ReleaseRef();
 	}
 
-	TRefPtr::pPtr = pPtr;
+	CRefPtr::pPtr = pPtr;
 
-	if ( TRefPtr::pPtr )
+	if ( CRefPtr::pPtr )
 	{
-		TRefPtr::pPtr->AddRef();
+		CRefPtr::pPtr->AddRef();
 	}
 	return *this;
 }
 
 /*
 ==================
-TRefPtr::operator=
+CRefPtr::operator=
 ==================
 */
 template<typename TPtrType>
-FORCEINLINE TRefPtr<TPtrType>& TRefPtr<TPtrType>::operator=( const TRefPtr& copy )
+FORCEINLINE CRefPtr<TPtrType>& CRefPtr<TPtrType>::operator=( const CRefPtr& copy )
 {
 	if ( pPtr )
 	{
@@ -98,12 +98,12 @@ FORCEINLINE TRefPtr<TPtrType>& TRefPtr<TPtrType>::operator=( const TRefPtr& copy
 
 /*
 ==================
-TRefPtr::operator=
+CRefPtr::operator=
 ==================
 */
 template<typename TPtrType>
 template<typename TBasePtrType>
-FORCEINLINE TRefPtr<TPtrType>& TRefPtr<TPtrType>::operator=( const TRefPtr<TBasePtrType>& copy )
+FORCEINLINE CRefPtr<TPtrType>& CRefPtr<TPtrType>::operator=( const CRefPtr<TBasePtrType>& copy )
 {
 	if ( pPtr )
 	{
@@ -121,121 +121,121 @@ FORCEINLINE TRefPtr<TPtrType>& TRefPtr<TPtrType>::operator=( const TRefPtr<TBase
 
 /*
 ==================
-TRefPtr::operator==
+CRefPtr::operator==
 ==================
 */
 template<typename TPtrType>
-FORCEINLINE bool TRefPtr<TPtrType>::operator==( const TRefPtr& right ) const
+FORCEINLINE bool CRefPtr<TPtrType>::operator==( const CRefPtr& right ) const
 {
 	return pPtr == right.pPtr;
 }
 
 /*
 ==================
-TRefPtr::operator==
+CRefPtr::operator==
 ==================
 */
 template<typename TPtrType>
-FORCEINLINE bool TRefPtr<TPtrType>::operator==( TPtrType* pRight ) const
+FORCEINLINE bool CRefPtr<TPtrType>::operator==( TPtrType* pRight ) const
 {
 	return pPtr == pRight;
 }
 
 /*
 ==================
-TRefPtr::operator!=
+CRefPtr::operator!=
 ==================
 */
 template<typename TPtrType>
-FORCEINLINE bool TRefPtr<TPtrType>::operator!=( const TRefPtr& right ) const
+FORCEINLINE bool CRefPtr<TPtrType>::operator!=( const CRefPtr& right ) const
 {
 	return pPtr != right.pPtr;
 }
 
 /*
 ==================
-TRefPtr::operator!=
+CRefPtr::operator!=
 ==================
 */
 template<typename TPtrType>
-FORCEINLINE bool TRefPtr<TPtrType>::operator!=( TPtrType* pRight ) const
+FORCEINLINE bool CRefPtr<TPtrType>::operator!=( TPtrType* pRight ) const
 {
 	return pPtr != pRight;
 }
 
 /*
 ==================
-TRefPtr::operator bool
+CRefPtr::operator bool
 ==================
 */
 template<typename TPtrType>
-FORCEINLINE TRefPtr<TPtrType>::operator bool() const
+FORCEINLINE CRefPtr<TPtrType>::operator bool() const
 {
 	return !!pPtr;
 }
 
 /*
 ==================
-TRefPtr::operator ptrint
+CRefPtr::operator ptrint
 ==================
 */
 template<typename TPtrType>
-FORCEINLINE TRefPtr<TPtrType>::operator ptrint() const
+FORCEINLINE CRefPtr<TPtrType>::operator ptrint() const
 {
 	return (ptrint)pPtr;
 }
 
 /*
 ==================
-TRefPtr::operator uptrint
+CRefPtr::operator uptrint
 ==================
 */
 template<typename TPtrType>
-FORCEINLINE TRefPtr<TPtrType>::operator uptrint() const
+FORCEINLINE CRefPtr<TPtrType>::operator uptrint() const
 {
 	return (uptrint)pPtr;
 }
 
 /*
 ==================
-TRefPtr::operator TPtrType&
+CRefPtr::operator TPtrType&
 ==================
 */
 template<typename TPtrType>
-FORCEINLINE TRefPtr<TPtrType>::operator TPtrType&() const
+FORCEINLINE CRefPtr<TPtrType>::operator TPtrType&() const
 {
 	return *pPtr;
 }
 
 /*
 ==================
-TRefPtr::operator TPtrType*
+CRefPtr::operator TPtrType*
 ==================
 */
 template<typename TPtrType>
-FORCEINLINE TRefPtr<TPtrType>::operator TPtrType*() const
+FORCEINLINE CRefPtr<TPtrType>::operator TPtrType*() const
 {
 	return pPtr;
 }
 
 /*
 ==================
-TRefPtr::operator TPtrType*&
+CRefPtr::operator TPtrType*&
 ==================
 */
 template<typename TPtrType>
-FORCEINLINE TRefPtr<TPtrType>::operator TPtrType*&()
+FORCEINLINE CRefPtr<TPtrType>::operator TPtrType*&()
 {
 	return pPtr;
 }
 
 /*
 ==================
-TRefPtr::operator->
+CRefPtr::operator->
 ==================
 */
 template<typename TPtrType>
-FORCEINLINE TPtrType* TRefPtr<TPtrType>::operator->() const
+FORCEINLINE TPtrType* CRefPtr<TPtrType>::operator->() const
 {
 	Assert( pPtr );
 	return pPtr;
@@ -243,11 +243,11 @@ FORCEINLINE TPtrType* TRefPtr<TPtrType>::operator->() const
 
 /*
 ==================
-TRefPtr::operator*
+CRefPtr::operator*
 ==================
 */
 template<typename TPtrType>
-FORCEINLINE TPtrType& TRefPtr<TPtrType>::operator*()
+FORCEINLINE TPtrType& CRefPtr<TPtrType>::operator*()
 {
 	Assert( pPtr );
 	return *pPtr;
@@ -255,11 +255,11 @@ FORCEINLINE TPtrType& TRefPtr<TPtrType>::operator*()
 
 /*
 ==================
-TRefPtr::operator&
+CRefPtr::operator&
 ==================
 */
 template<typename TPtrType>
-FORCEINLINE TPtrType** TRefPtr<TPtrType>::operator&()
+FORCEINLINE TPtrType** CRefPtr<TPtrType>::operator&()
 {
 	Assert( pPtr );
 	return &pPtr;
@@ -267,33 +267,33 @@ FORCEINLINE TPtrType** TRefPtr<TPtrType>::operator&()
 
 /*
 ==================
-TRefPtr<TPtrType>::SafeRelease
+CRefPtr<TPtrType>::SafeRelease
 ==================
 */
 template<typename TPtrType>
-FORCEINLINE void TRefPtr<TPtrType>::SafeRelease()
+FORCEINLINE void CRefPtr<TPtrType>::SafeRelease()
 {
 	*this = NULL;
 }
 
 /*
 ==================
-TRefPtr::IsValid
+CRefPtr::IsValid
 ==================
 */
 template<typename TPtrType>
-FORCEINLINE bool TRefPtr<TPtrType>::IsValid() const
+FORCEINLINE bool CRefPtr<TPtrType>::IsValid() const
 {
 	return !!pPtr;
 }
 
 /*
 ==================
-TRefPtr::GetRefCount
+CRefPtr::GetRefCount
 ==================
 */
 template<typename TPtrType>
-FORCEINLINE uint32 TRefPtr<TPtrType>::GetRefCount() const
+FORCEINLINE uint32 CRefPtr<TPtrType>::GetRefCount() const
 {
 	if ( !pPtr )
 	{
@@ -305,11 +305,11 @@ FORCEINLINE uint32 TRefPtr<TPtrType>::GetRefCount() const
 
 /*
 ==================
-TRefPtr::GetPtr
+CRefPtr::GetPtr
 ==================
 */
 template<typename TPtrType>
-FORCEINLINE TPtrType* TRefPtr<TPtrType>::GetPtr() const
+FORCEINLINE TPtrType* CRefPtr<TPtrType>::GetPtr() const
 {
 	return pPtr;
 }

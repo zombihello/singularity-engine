@@ -126,7 +126,7 @@ void CStudioAPIDescriptorStateCommonVk::InitDescriptorWriteInfos()
 	VkWriteDescriptorSet*			 pCurrentVkWriteDescriptorSet		 = descriptorSetWriteContainer.vkWriteDescriptorSets.data();
 	VkDescriptorBufferInfo*			 pCurrentVkDescriptorBufferInfo		 = descriptorSetWriteContainer.vkDescriptorBufferInfos.data();
 	VkDescriptorImageInfo*			 pCurrentVkDescriptorImageInfo		 = descriptorSetWriteContainer.vkDescriptorImageInfos.data();
-	TRefPtr<CStudioAPIBufferVk>*	 pCurrentStudioAPIBuffer			 = descriptorSetWriteContainer.studioAPIBuffers.data();
+	CRefPtr<CStudioAPIBufferVk>*	 pCurrentStudioAPIBuffer			 = descriptorSetWriteContainer.studioAPIBuffers.data();
 	studioAPITextureSamplerPairVk_t* pCurrentStudioAPITexturesSamplers	 = descriptorSetWriteContainer.studioAPITexturesSamplers.data();
 	uint8*							 pCurrentSlotToWriteDescriptorSetMap = descriptorSetWriteContainer.slotToWriteDescriptorSetMap.data();
 	for ( uint32 set = 0; set < numDescriptorSets; ++set )

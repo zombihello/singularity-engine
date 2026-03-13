@@ -9,7 +9,7 @@
 //-----------------------------------------------------------------------------
 // The application object for apps that use engine systems
 //-----------------------------------------------------------------------------
-class CAppSystemGroupEngine : public TDefaultAppSystemGroup<CAppSystemGroup>
+class CAppSystemGroupEngine : public CDefaultAppSystemGroup<CAppSystemGroup>
 {
 protected:
 	virtual bool		Create() override;

@@ -37,3 +37,9 @@ set_target_properties( pixelformatinfos PROPERTIES PREFIX   "" )
 
 target_link_libraries( pixelformatinfos PUBLIC 				tier1 )
 add_common_target_defines( pixelformatinfos )
+
+
+#
+# Install
+#
+inherit_install_files( pixelformatinfos						TARGETS tier1 )

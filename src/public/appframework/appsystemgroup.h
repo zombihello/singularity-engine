@@ -91,7 +91,7 @@ private:
 // Helper empty decorator implementation of an IAppSystemGroup
 //-----------------------------------------------------------------------------
 template<class TBaseClass>
-class TDefaultAppSystemGroup : public TBaseClass
+class CDefaultAppSystemGroup : public TBaseClass
 {
 	typedef TBaseClass BaseClass;
 

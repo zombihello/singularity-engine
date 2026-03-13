@@ -32,21 +32,21 @@ FORCEINLINE appSystemGroupState_t CAppSystemGroup::GetState() const
 
 /*
 ==================
-TDefaultAppSystemGroup::Create
+CDefaultAppSystemGroup::Create
 ==================
 */
 template<class TBaseClass>
-FORCEINLINE bool TDefaultAppSystemGroup<TBaseClass>::Create()
+FORCEINLINE bool CDefaultAppSystemGroup<TBaseClass>::Create()
 {
 	return true;
 }
 
 /*
 ==================
-TDefaultAppSystemGroup::Destroy
+CDefaultAppSystemGroup::Destroy
 ==================
 */
 template<class TBaseClass>
-FORCEINLINE void TDefaultAppSystemGroup<TBaseClass>::Destroy()
+FORCEINLINE void CDefaultAppSystemGroup<TBaseClass>::Destroy()
 {
 }

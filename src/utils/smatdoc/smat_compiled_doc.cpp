@@ -23,7 +23,7 @@ bool CSMATCompiledMaterialDoc::SaveFile( const char* pPath )
 	Assert( g_pFileSystem );
 
 	// Try to open a file
-	TRefPtr<IStreamDataWriter> pFile = g_pFileSystem->CreateFileWriter( pPath );
+	CRefPtr<IStreamDataWriter> pFile = g_pFileSystem->CreateFileWriter( pPath );
 	if ( !pFile )
 	{
 		Error( "SMATDoc: Failed to open file '%s'", pPath );
@@ -79,32 +79,32 @@ bool CSMATCompiledMaterialDoc::SaveFile( const char* pPath )
 
 		case SMAT_MATERIAL_VAR_TYPE_VECTOR_2D:
 		{
-			vec2_t value = { 0.f, 0.f };
+			vector2_t value = { 0.f, 0.f };
 			var.GetVecValue( &value.x, 2 );
-			pFile->Write( &value, sizeof( vec2_t ) );
+			pFile->Write( &value, sizeof( vector2_t ) );
 			break;
 		}
 
 		case SMAT_MATERIAL_VAR_TYPE_VECTOR_3D:
 		{
-			vec3_t value = { 0.f, 0.f, 0.f };
+			vector3_t value = { 0.f, 0.f, 0.f };
 			var.GetVecValue( &value.x, 3 );
-			pFile->Write( &value, sizeof( vec3_t ) );
+			pFile->Write( &value, sizeof( vector3_t ) );
 			break;
 		}
 
 		case SMAT_MATERIAL_VAR_TYPE_VECTOR_4D:
 		{
-			vec4_t value = { 0.f, 0.f, 0.f, 0.f };
+			vector4_t value = { 0.f, 0.f, 0.f, 0.f };
 			var.GetVecValue( &value.x, 4 );
-			pFile->Write( &value, sizeof( vec4_t ) );
+			pFile->Write( &value, sizeof( vector4_t ) );
 			break;
 		}
 
 		case SMAT_MATERIAL_VAR_TYPE_MATRIX:
 		{
-			mat4_t value = var.GetMatrixValue();
-			pFile->Write( &value, sizeof( mat4_t ) );
+			matrix4x4_t value = var.GetMatrixValue();
+			pFile->Write( &value, sizeof( matrix4x4_t ) );
 			break;
 		}
 
@@ -154,7 +154,7 @@ bool CSMATCompiledMaterialDoc::LoadFromFile( const char* pPath )
 	Assert( g_pFileSystem );
 
 	// Try to open a file
-	TRefPtr<IStreamDataReader> pFile = g_pFileSystem->CreateFileReader( pPath );
+	CRefPtr<IStreamDataReader> pFile = g_pFileSystem->CreateFileReader( pPath );
 	if ( !pFile )
 	{
 		Error( "SMATDoc: Failed to open file '%s'", pPath );
@@ -232,32 +232,32 @@ bool CSMATCompiledMaterialDoc::LoadFromFile( const char* pPath )
 
 		case SMAT_MATERIAL_VAR_TYPE_VECTOR_2D:
 		{
-			vec2_t value;
-			pFile->Read( &value, sizeof( vec2_t ) );
+			vector2_t value;
+			pFile->Read( &value, sizeof( vector2_t ) );
 			var.SetVecValue( value );
 			break;
 		}
 
 		case SMAT_MATERIAL_VAR_TYPE_VECTOR_3D:
 		{
-			vec3_t value;
-			pFile->Read( &value, sizeof( vec3_t ) );
+			vector3_t value;
+			pFile->Read( &value, sizeof( vector3_t ) );
 			var.SetVecValue( value );
 			break;
 		}
 
 		case SMAT_MATERIAL_VAR_TYPE_VECTOR_4D:
 		{
-			vec4_t value;
-			pFile->Read( &value, sizeof( vec4_t ) );
+			vector4_t value;
+			pFile->Read( &value, sizeof( vector4_t ) );
 			var.SetVecValue( value );
 			break;
 		}
 
 		case SMAT_MATERIAL_VAR_TYPE_MATRIX:
 		{
-			mat4_t value;
-			pFile->Read( &value, sizeof( mat4_t ) );
+			matrix4x4_t value;
+			pFile->Read( &value, sizeof( matrix4x4_t ) );
 			var.SetMatrixValue( value );
 			break;
 		}

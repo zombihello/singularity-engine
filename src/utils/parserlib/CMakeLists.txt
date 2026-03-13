@@ -38,3 +38,9 @@ set_target_properties( parserlib PROPERTIES PREFIX 		"" )
 
 target_link_libraries( parserlib PUBLIC 				tier1 )
 add_common_target_defines( parserlib )
+
+
+#
+# Install
+#
+inherit_install_files( parserlib						TARGETS tier1 )

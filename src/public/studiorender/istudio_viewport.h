@@ -23,7 +23,7 @@ public:
 	virtual bool				   IsInited() const				 = 0;
 	virtual bool				   IsUseVSync() const			 = 0;
 	virtual IStudioViewportClient* GetViewportClient() const	 = 0;
-	virtual ivec2_t				   GetSize() const				 = 0;
+	virtual vector2i_t				   GetSize() const				 = 0;
 	virtual IStudioAPISwapChain*   GetStudioAPISwapChain() const = 0;
 
 	// The function returns a StudioAPI render pass for draw into the viewport

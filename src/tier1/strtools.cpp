@@ -87,7 +87,7 @@ char* S_Strncat( char* pDest, const char* pSrc, uint32 destBufferSize, int32 max
 	}
 	else
 	{
-		charsToCopy = Min( (uint32)maxCharsToCopy, srcLen );
+		charsToCopy = S_Min( (uint32)maxCharsToCopy, srcLen );
 	}
 
 	// Make sure what we won't out of bounds
@@ -128,7 +128,7 @@ wchar_t* S_Strncat( wchar_t* pDest, const wchar_t* pSrc, uint32 destBufferSize, 
 	}
 	else
 	{
-		charsToCopy = Min( (uint32)maxCharsToCopy, srcLen );
+		charsToCopy = S_Min( (uint32)maxCharsToCopy, srcLen );
 	}
 
 	// Make sure what we won't out of bounds

@@ -470,7 +470,7 @@ bool CKeyValuesParser::ReadIncludeKeys( eastl::vector<CKeyValues*>& includedKeys
 	Mem_Memcpy( fullPath.data() + offset, token.string.data(), token.string.size() );
 
 	// Try open the file
-	TRefPtr<IStreamDataReader> pFile = g_pFileSystem->CreateFileReader( fullPath.c_str() );
+	CRefPtr<IStreamDataReader> pFile = g_pFileSystem->CreateFileReader( fullPath.c_str() );
 	if ( !pFile )
 	{
 		EmitError( token.position, "Failed to load keyvalue file '%s'", fullPath.c_str() );
@@ -719,7 +719,7 @@ void CKeyValuesParser::CBuffer::Precache( uint32 requestedSize )
 
 	// Now we have the tail at the beginning, and there's free space at the end
 	// We load exactly as much as we need
-	uint32 restRequestedSize = Min( BUFFER_SIZE - precachedSize, (uint32)( pStreamReader->GetSize() - streamOffset ) );
+	uint32 restRequestedSize = S_Min( BUFFER_SIZE - precachedSize, (uint32)( pStreamReader->GetSize() - streamOffset ) );
 	pStreamReader->Read( pBuffer + precachedSize, restRequestedSize );
 	precachedSize += restRequestedSize;
 }

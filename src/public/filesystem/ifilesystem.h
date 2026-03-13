@@ -52,13 +52,13 @@ class IFileSystem : public IAppSystem
 {
 public:
 	// This is method looks file in the search paths and first opened returns
-	virtual TRefPtr<IStreamDataReader> CreateFileReader( const char* pPath, uint32 flags = FILE_READ_NONE ) = 0;
+	virtual CRefPtr<IStreamDataReader> CreateFileReader( const char* pPath, uint32 flags = FILE_READ_NONE ) = 0;
 
 	// This is method looks file in the search paths and at the first one create a new file
-	virtual TRefPtr<IStreamDataWriter> CreateFileWriter( const char* pPath, uint32 flags = FILE_WRITE_NONE ) = 0;
+	virtual CRefPtr<IStreamDataWriter> CreateFileWriter( const char* pPath, uint32 flags = FILE_WRITE_NONE ) = 0;
 
 	// This is method looks files in the search paths or in the first if it set
-	virtual TRefPtr<IPathArrayResult> FindFiles( const char* pPath, const char* pPattern, bool bFiles, bool bDirectories, bool bLookAllPathIDs = true ) = 0;
+	virtual CRefPtr<IPathArrayResult> FindFiles( const char* pPath, const char* pPattern, bool bFiles, bool bDirectories, bool bLookAllPathIDs = true ) = 0;
 
 	// This is method looks a DLL module in the search paths and first opened returns
 	virtual dllHandle_t LoadModule( const char* pDLLName )	  = 0;
@@ -108,7 +108,7 @@ public:
 	virtual void					  AddSearchPath( const char* pSearchPath, const char* pPathID ) = 0;
 	virtual void					  RemoveAllSearchPaths()										= 0;
 	virtual void					  RemoveSearchPath( const char* pPathID )						= 0;
-	virtual TRefPtr<IPathArrayResult> GetSearchPath( const char* pPathID ) const					= 0;
+	virtual CRefPtr<IPathArrayResult> GetSearchPath( const char* pPathID ) const					= 0;
 	virtual uint32					  GetNumSearchPaths() const										= 0;
 };
 

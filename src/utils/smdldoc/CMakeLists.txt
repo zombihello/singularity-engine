@@ -37,3 +37,9 @@ set_target_properties( smdldoc PROPERTIES PREFIX 		"" )
 
 target_link_libraries( smdldoc PUBLIC 					tier1 )
 add_common_target_defines( smdldoc )
+
+
+#
+# Install
+#
+inherit_install_files( smdldoc							TARGETS tier1 )

@@ -2,10 +2,109 @@
 
 /*
 ==================
+CRotator::CRotator
+==================
+*/
+FORCEINLINE CRotator::CRotator()
+{
+}
+
+/*
+==================
+CRotator::CRotator
+==================
+*/
+FORCEINLINE CRotator::CRotator( float value )
+	: pitch( value )
+	, yaw( value )
+	, roll( value )
+{
+}
+
+/*
+==================
+CRotator::CRotator
+==================
+*/
+FORCEINLINE CRotator::CRotator( float pitch, float yaw, float roll )
+	: pitch( pitch )
+	, yaw( yaw )
+	, roll( roll )
+{
+}
+
+/*
+==================
+CRotator::CRotator
+==================
+*/
+FORCEINLINE CRotator::CRotator( const vector3_t& angles )
+	: pitch( angles.x )
+	, yaw( angles.y )
+	, roll( angles.z )
+{
+}
+
+/*
+==================
+CRotator::CRotator
+==================
+*/
+FORCEINLINE CRotator::CRotator( const quaternion_t& quaternion )
+{
+	vector3_t angles;
+	S_QuaternionToAngles( quaternion, angles );
+	pitch = angles.x;
+	yaw	  = angles.y;
+	roll  = angles.z;
+}
+
+/*
+==================
+CRotator::Make
+==================
+*/
+FORCEINLINE CRotator CRotator::Make( float value )
+{
+	return CRotator( value );
+}
+
+/*
+==================
+CRotator::Make
+==================
+*/
+FORCEINLINE CRotator CRotator::Make( float pitch, float yaw, float roll )
+{
+	return CRotator( pitch, yaw, roll );
+}
+
+/*
+==================
+CRotator::Make
+==================
+*/
+FORCEINLINE CRotator CRotator::Make( const vector3_t& angles )
+{
+	return CRotator( angles );
+}
+
+/*
+==================
+CRotator::Make
+==================
+*/
+FORCEINLINE CRotator CRotator::Make( const quaternion_t& quaternion )
+{
+	return CRotator( quaternion );
+}
+
+/*
+==================
 CRotator::IsNearlyZero
 ==================
 */
-FORCEINLINE bool CRotator::IsNearlyZero( float tolerance /*= KINDA_SMALL_NUMBER*/ ) const
+FORCEINLINE bool CRotator::IsNearlyZero( float tolerance ) const
 {
 	return S_Abs( NormalizeAxis( pitch ) ) <= tolerance && S_Abs( NormalizeAxis( yaw ) ) <= tolerance && S_Abs( NormalizeAxis( roll ) ) <= tolerance;
 }
@@ -25,7 +124,7 @@ FORCEINLINE bool CRotator::IsZero() const
 CRotator::Equals
 ==================
 */
-FORCEINLINE bool CRotator::Equals( const CRotator& other, float tolerance /*= KINDA_SMALL_NUMBER*/ ) const
+FORCEINLINE bool CRotator::Equals( const CRotator& other, float tolerance ) const
 {
 	return S_Abs( NormalizeAxis( pitch - other.pitch ) ) <= tolerance && S_Abs( NormalizeAxis( yaw - other.yaw ) ) <= tolerance && S_Abs( NormalizeAxis( roll - other.roll ) ) <= tolerance;
 }
@@ -45,32 +144,14 @@ FORCEINLINE CRotator CRotator::Add( float deltaPitch, float deltaYaw, float delt
 
 /*
 ==================
-CRotator::GetInverse
+CRotator::RotateVector
 ==================
 */
-FORCEINLINE CRotator CRotator::GetInverse() const
+FORCEINLINE vector3_t CRotator::RotateVector( const vector3_t& vector ) const
 {
-	return CRotator( S_QuaternionToAngles( S_QuaternionInverse( AsQuaternion() ) ) );
-}
-
-/*
-==================
-CRotator::AsQuaternion
-==================
-*/
-FORCEINLINE quat_t CRotator::AsQuaternion() const
-{
-	return S_AnglesToQuaternionYZX( pitch, yaw, roll );
-}
-
-/*
-==================
-CRotator::AsEuler
-==================
-*/
-FORCEINLINE vec3_t CRotator::AsEuler() const
-{
-	return vec3_t( pitch, yaw, roll );
+	vector3_t result;
+	RotateVector( vector, result );
+	return result;
 }
 
 /*
@@ -78,57 +159,9 @@ FORCEINLINE vec3_t CRotator::AsEuler() const
 CRotator::RotateVector
 ==================
 */
-FORCEINLINE vec3_t CRotator::RotateVector( const vec3_t& vector ) const
+FORCEINLINE void CRotator::RotateVector( const vector3_t& vector, vector3_t& result ) const
 {
-	return AsQuaternion() * vector;
-}
-
-/*
-==================
-CRotator::Clamp
-==================
-*/
-FORCEINLINE CRotator CRotator::Clamp() const
-{
-	return CRotator( ClampAxis( pitch ), ClampAxis( yaw ), ClampAxis( roll ) );
-}
-
-/*
-==================
-CRotator::GetNormalized
-==================
-*/
-FORCEINLINE CRotator CRotator::GetNormalized() const
-{
-	CRotator rotator = *this;
-	rotator.Normalize();
-	return rotator;
-}
-
-/*
-==================
-CRotator::GetDenormalized
-==================
-*/
-FORCEINLINE CRotator CRotator::GetDenormalized() const
-{
-	CRotator rotator = *this;
-	rotator.pitch	 = ClampAxis( rotator.pitch );
-	rotator.yaw		 = ClampAxis( rotator.yaw );
-	rotator.roll	 = ClampAxis( rotator.roll );
-	return rotator;
-}
-
-/*
-==================
-CRotator::Normalize
-==================
-*/
-FORCEINLINE void CRotator::Normalize()
-{
-	pitch = NormalizeAxis( pitch );
-	yaw	  = NormalizeAxis( yaw );
-	roll  = NormalizeAxis( roll );
+	result = ToQuaternion() * vector;
 }
 
 /*
@@ -169,22 +202,129 @@ FORCEINLINE float CRotator::NormalizeAxis( float angle )
 
 /*
 ==================
-CRotator::MakeFromEuler
+CRotator::ToQuaternion
 ==================
 */
-FORCEINLINE CRotator CRotator::MakeFromEuler( const vec3_t& euler )
+FORCEINLINE quaternion_t CRotator::ToQuaternion() const
 {
-	return CRotator( euler.x, euler.y, euler.z );
+	return S_AnglesToQuaternionYZX( pitch, yaw, roll );
 }
 
 /*
 ==================
-CRotator::MakeFromEuler
+CRotator::ToVector3
 ==================
 */
-FORCEINLINE CRotator CRotator::MakeFromEuler( float eulerX, float eulerY, float eulerZ )
+FORCEINLINE vector3_t CRotator::ToVector3() const
 {
-	return CRotator( eulerX, eulerY, eulerZ );
+	return vector3_t( pitch, yaw, roll );
+}
+
+/*
+==================
+CRotator::Inverse
+==================
+*/
+FORCEINLINE void CRotator::Inverse()
+{
+	quaternion_t invQuaternion = S_QuaternionInverse( ToQuaternion() );
+	vector3_t	 angles		   = S_QuaternionToAngles( invQuaternion );
+	pitch					   = angles.x;
+	yaw						   = angles.y;
+	roll					   = angles.z;
+}
+
+/*
+==================
+CRotator::GetInversed
+==================
+*/
+FORCEINLINE CRotator CRotator::GetInversed() const
+{
+	CRotator result;
+	GetInversed( result );
+	return result;
+}
+
+/*
+==================
+CRotator::GetInversed
+==================
+*/
+FORCEINLINE void CRotator::GetInversed( CRotator& result ) const
+{
+	result = *this;
+	result.Inverse();
+}
+
+/*
+==================
+CRotator::Clamp
+==================
+*/
+FORCEINLINE void CRotator::Clamp()
+{
+	pitch = ClampAxis( pitch );
+	yaw	  = ClampAxis( yaw );
+	roll  = ClampAxis( roll );
+}
+
+/*
+==================
+CRotator::GetClamped
+==================
+*/
+FORCEINLINE CRotator CRotator::GetClamped() const
+{
+	CRotator result;
+	GetClamped( result );
+	return result;
+}
+
+/*
+==================
+CRotator::GetClamped
+==================
+*/
+FORCEINLINE void CRotator::GetClamped( CRotator& result ) const
+{
+	result = *this;
+	result.Clamp();
+}
+
+/*
+==================
+CRotator::Normalize
+==================
+*/
+FORCEINLINE void CRotator::Normalize()
+{
+	pitch = NormalizeAxis( pitch );
+	yaw	  = NormalizeAxis( yaw );
+	roll  = NormalizeAxis( roll );
+}
+
+/*
+==================
+CRotator::GetNormalized
+==================
+*/
+FORCEINLINE CRotator CRotator::GetNormalized() const
+{
+	CRotator result = *this;
+	GetNormalized( result );
+	return result;
+}
+
+/*
+==================
+CRotator::GetNormalized
+==================
+*/
+FORCEINLINE void CRotator::GetNormalized( CRotator& result ) const
+{
+	result = *this;
+	result.Normalize();
 }
 
 /*
@@ -192,9 +332,9 @@ FORCEINLINE CRotator CRotator::MakeFromEuler( float eulerX, float eulerY, float 
 CRotator::operator+
 ==================
 */
-FORCEINLINE CRotator CRotator::operator+( const CRotator& other ) const
+FORCEINLINE CRotator CRotator::operator+( const CRotator& right ) const
 {
-	return CRotator( pitch + other.pitch, yaw + other.yaw, roll + other.roll );
+	return CRotator( pitch + right.pitch, yaw + right.yaw, roll + right.roll );
 }
 
 /*
@@ -202,9 +342,9 @@ FORCEINLINE CRotator CRotator::operator+( const CRotator& other ) const
 CRotator::operator-
 ==================
 */
-FORCEINLINE CRotator CRotator::operator-( const CRotator& other ) const
+FORCEINLINE CRotator CRotator::operator-( const CRotator& right ) const
 {
-	return CRotator( pitch - other.pitch, yaw - other.yaw, roll - other.roll );
+	return CRotator( pitch - right.pitch, yaw - right.yaw, roll - right.roll );
 }
 
 /*
@@ -212,9 +352,9 @@ FORCEINLINE CRotator CRotator::operator-( const CRotator& other ) const
 CRotator::operator==
 ==================
 */
-FORCEINLINE bool CRotator::operator==( const CRotator& other ) const
+FORCEINLINE bool CRotator::operator==( const CRotator& right ) const
 {
-	return pitch == other.pitch && yaw == other.yaw && roll == other.roll;
+	return pitch == right.pitch && yaw == right.yaw && roll == right.roll;
 }
 
 /*
@@ -222,9 +362,9 @@ FORCEINLINE bool CRotator::operator==( const CRotator& other ) const
 CRotator::operator!=
 ==================
 */
-FORCEINLINE bool CRotator::operator!=( const CRotator& other ) const
+FORCEINLINE bool CRotator::operator!=( const CRotator& right ) const
 {
-	return pitch != other.pitch || yaw != other.yaw || roll != other.roll;
+	return pitch != right.pitch || yaw != right.yaw || roll != right.roll;
 }
 
 /*
@@ -232,11 +372,11 @@ FORCEINLINE bool CRotator::operator!=( const CRotator& other ) const
 CRotator::operator+=
 ==================
 */
-FORCEINLINE CRotator CRotator::operator+=( const CRotator& other )
+FORCEINLINE CRotator& CRotator::operator+=( const CRotator& right )
 {
-	pitch += other.pitch;
-	yaw += other.yaw;
-	roll += other.roll;
+	pitch += right.pitch;
+	yaw += right.yaw;
+	roll += right.roll;
 	return *this;
 }
 
@@ -245,117 +385,10 @@ FORCEINLINE CRotator CRotator::operator+=( const CRotator& other )
 CRotator::operator-=
 ==================
 */
-FORCEINLINE CRotator CRotator::operator-=( const CRotator& other )
+FORCEINLINE CRotator& CRotator::operator-=( const CRotator& right )
 {
-	pitch -= other.pitch;
-	yaw -= other.yaw;
-	roll -= other.roll;
+	pitch -= right.pitch;
+	yaw -= right.yaw;
+	roll -= right.roll;
 	return *this;
-}
-
-/*
-==================
-rotationConversionCache_t::RotatorToQuat
-==================
-*/
-FORCEINLINE quat_t rotationConversionCache_t::RotatorToQuat( const CRotator& rotator ) const
-{
-	if ( cachedRotator != rotator )
-	{
-		cachedRotator = rotator.GetNormalized();
-		cachedQuat	  = cachedRotator.AsQuaternion();
-	}
-	return cachedQuat;
-}
-
-/*
-==================
-rotationConversionCache_t::RotatorToQuat_ReadOnly
-==================
-*/
-FORCEINLINE quat_t rotationConversionCache_t::RotatorToQuat_ReadOnly( const CRotator& rotator ) const
-{
-	if ( cachedRotator == rotator )
-	{
-		return cachedQuat;
-	}
-	return rotator.AsQuaternion();
-}
-
-/*
-==================
-rotationConversionCache_t::QuatToRotator
-==================
-*/
-FORCEINLINE CRotator rotationConversionCache_t::QuatToRotator( const quat_t& quat ) const
-{
-	if ( cachedQuat != quat )
-	{
-		cachedQuat	  = S_QuaternionNormalize( quat );
-		cachedRotator = CRotator( S_QuaternionToAngles( cachedQuat ) );
-	}
-	return cachedRotator;
-}
-
-/*
-==================
-rotationConversionCache_t::QuatToRotator_ReadOnly
-==================
-*/
-FORCEINLINE CRotator rotationConversionCache_t::QuatToRotator_ReadOnly( const quat_t& quat ) const
-{
-	if ( cachedQuat == quat )
-	{
-		return cachedRotator;
-	}
-	return CRotator( S_QuaternionToAngles( S_QuaternionNormalize( quat ) ) );
-}
-
-/*
-==================
-rotationConversionCache_t::NormalizedQuatToRotator
-==================
-*/
-FORCEINLINE CRotator rotationConversionCache_t::NormalizedQuatToRotator( const quat_t& normalizedQuat ) const
-{
-	if ( cachedQuat != normalizedQuat )
-	{
-		cachedQuat	  = normalizedQuat;
-		cachedRotator = CRotator( S_QuaternionToAngles( normalizedQuat ) );
-	}
-	return cachedRotator;
-}
-
-/*
-==================
-rotationConversionCache_t::NormalizedQuatToRotator_ReadOnly
-==================
-*/
-FORCEINLINE CRotator rotationConversionCache_t::NormalizedQuatToRotator_ReadOnly( const quat_t& normalizedQuat ) const
-{
-	if ( cachedQuat == normalizedQuat )
-	{
-		return cachedRotator;
-	}
-	return CRotator( S_QuaternionToAngles( normalizedQuat ) );
-}
-
-/*
-==================
-rotationConversionCache_t::GetCachedQuat
-==================
-*/
-FORCEINLINE quat_t rotationConversionCache_t::GetCachedQuat() const
-{
-	return cachedQuat;
-}
-
-/*
-==================
-rotationConversionCache_t::GetCachedRotator
-==================
-*/
-FORCEINLINE CRotator rotationConversionCache_t::GetCachedRotator() const
-{
-	return cachedRotator;
 }

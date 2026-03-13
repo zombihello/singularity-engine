@@ -4,7 +4,7 @@
 #include "studiorender/studiorender.h"
 
 // Static fields
-TRefPtr<CStudioViewport> CStudioViewport::s_pActiveViewport;
+CRefPtr<CStudioViewport> CStudioViewport::s_pActiveViewport;
 CThreadMutex			 CStudioViewport::s_ViewportIndexMutex;
 uint32					 CStudioViewport::s_LastViewportIndex = (uint32)-1;
 eastl::list<uint32>		 CStudioViewport::s_FreeViewportIndices;
@@ -134,7 +134,7 @@ void CStudioViewport::OnSwapChainReCreated( void* pUserData, IStudioAPISwapChain
 		studioAPIRenderTarget.flags										= STUDIOAPI_RENDER_TARGET_FLAG_SWAPCHAIN_IMAGE;
 		studioAPIFrameBufferCreateInfo.size								= pStudioAPISwapChain->GetSize();
 		studioAPIFrameBufferCreateInfo.bClearColor						= true;
-		studioAPIFrameBufferCreateInfo.clearColor						= CColor::black;
+		studioAPIFrameBufferCreateInfo.clearColor						= CLinearColor::Make( 0.f, 0.f, 0.f );
 		pStudioViewport->studioAPIFrameBuffers[swapChainImageIdx]		= g_pStudioAPI->CreateFrameBuffer( studioAPIFrameBufferCreateInfo, "SwapChain FrameBuffer" );
 	}
 
@@ -158,7 +158,7 @@ void CStudioViewport::Init( windowHandle_t windowHandle, uint32 width, uint32 he
 	// Update the viewport attributes
 	CStudioViewport::bUseVSync	  = bUseVSync;
 	CStudioViewport::windowHandle = windowHandle;
-	size						  = ivec2_t( width, height );
+	size						  = vector2i_t( width, height );
 
 	// Begin the StudioAPI resource if it need
 	if ( bUpdateStudioAPISwapChain )
@@ -192,7 +192,7 @@ void CStudioViewport::Resize( uint32 newWidth, uint32 newHeight )
 	if ( IsInited() && ( size.x != newWidth || size.y != newHeight ) )
 	{
 		// Save the new viewport size and update StudioAPI resources
-		size = ivec2_t( newWidth, newHeight );
+		size = vector2i_t( newWidth, newHeight );
 		Studio_BeginUpdateResourceSafe<CStudioViewport>( this );
 	}
 }
@@ -342,7 +342,7 @@ IStudioViewportClient* CStudioViewport::GetViewportClient() const
 CStudioViewport::GetSize
 ==================
 */
-ivec2_t CStudioViewport::GetSize() const
+vector2i_t CStudioViewport::GetSize() const
 {
 	return size;
 }

@@ -33,4 +33,4 @@ hash FastHashStringInsensitive( const eastl::basic_string_view<TType>& string, h
 template<typename TType>
 hash FastHashItem( const TType& data, hash hash = 0 );
 
-#include "tier1/hashing/fasthash.inl"
+#include "tier1/fasthash.inl"

@@ -162,8 +162,8 @@ public:
 	virtual bool IsMouseWheel( buttonCode_t wheel ) const override;
 	virtual bool IsMouseMoved( buttonCode_t mouseAxis ) const override;
 
-	virtual vec2_t GetMouseLocation() const override;
-	virtual vec2_t GetMouseOffset() const override;
+	virtual vector2_t GetMouseLocation() const override;
+	virtual vector2_t GetMouseOffset() const override;
 	virtual float  GetMouseOffset( buttonCode_t mouseAxis ) const override;
 	virtual float  GetMouseSensitivity() const override;
 
@@ -181,8 +181,8 @@ private:
 	IWindowMgr::IOnInputEvent::funcDelegate_t*	 pInputEventDelegate;
 	IOnWriteConCmdsToConfigFile::funcDelegate_t* pWriteConCmdsDelegate;
 	buttonEvent_t								 buttonEvents[BUTTON_CODE_COUNT];
-	vec2_t										 mouseLocation;
-	vec2_t										 mouseOffset;
+	vector2_t										 mouseLocation;
+	vector2_t										 mouseOffset;
 	eastl::string								 binds[BUTTON_CODE_COUNT];
 };
 
@@ -199,8 +199,8 @@ CInputSystem::CInputSystem()
 	: windowId( INVALID_WINDOW_ID )
 	, pInputEventDelegate( NULL )
 	, pWriteConCmdsDelegate( NULL )
-	, mouseLocation( g_vectorZero )
-	, mouseOffset( g_vectorZero )
+	, mouseLocation( g_vector000 )
+	, mouseOffset( g_vector000 )
 {
 	Mem_Memset( &buttonEvents, BUTTON_EVENT_NONE, sizeof( buttonEvent_t ) * BUTTON_CODE_COUNT );
 }
@@ -408,7 +408,7 @@ void CInputSystem::ClearInputState()
 		}
 	}
 
-	mouseOffset = g_vectorZero;
+	mouseOffset = g_vector000;
 }
 
 /*
@@ -555,7 +555,7 @@ bool CInputSystem::IsMouseMoved( buttonCode_t mouseAxis ) const
 CInputSystem::GetMouseLocation
 ==================
 */
-vec2_t CInputSystem::GetMouseLocation() const
+vector2_t CInputSystem::GetMouseLocation() const
 {
 	return mouseLocation;
 }
@@ -565,7 +565,7 @@ vec2_t CInputSystem::GetMouseLocation() const
 CInputSystem::GetMouseOffset
 ==================
 */
-vec2_t CInputSystem::GetMouseOffset() const
+vector2_t CInputSystem::GetMouseOffset() const
 {
 	return mouseOffset;
 }

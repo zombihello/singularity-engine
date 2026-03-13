@@ -9,7 +9,8 @@ template<typename TFreeLambda>
 FORCEINLINE void CStudioAPIMemoryMgrVk::FreeResource( TFreeLambda&& freeLambda ) const
 {
 	cmdBuffer_t& currentCmdBuffer	= GetCurrentPendingFreeCmdBuffer();
-	auto		 pendingFreeCmdFunc = []( void* pUserData ) {
+	auto		 pendingFreeCmdFunc = []( void* pUserData )
+	{
 		auto pFunc = (TFreeLambda*)pUserData;
 		( *pFunc )();
 		pFunc->~TFreeLambda();
@@ -22,7 +23,7 @@ FORCEINLINE void CStudioAPIMemoryMgrVk::FreeResource( TFreeLambda&& freeLambda )
 	*(uint32*)currentCmdBuffer.pWritePtr = sizeof( TFreeLambda );
 	currentCmdBuffer.pWritePtr += sizeof( uint32 );
 
-	new ( currentCmdBuffer.pWritePtr ) TFreeLambda( eastl::forward<TFreeLambda>( ( TFreeLambda && ) freeLambda ) );
+	new ( currentCmdBuffer.pWritePtr ) TFreeLambda( eastl::forward<TFreeLambda>( (TFreeLambda&&)freeLambda ) );
 	currentCmdBuffer.pWritePtr += sizeof( TFreeLambda );
 	++currentCmdBuffer.numCmds;
 }

@@ -2,127 +2,110 @@
 
 /*
 ==================
-CTransform::CopyTranslation
+CTransform::CTransform
 ==================
 */
-FORCEINLINE void CTransform::CopyTranslation( const CTransform& other )
+FORCEINLINE CTransform::CTransform()
+	: rotation( g_quaternionIdentity )
+	, location( g_vector000 )
+	, scale( g_vector111 )
 {
-	translation	 = other.translation;
-	bDirtyMatrix = true;
 }
 
 /*
 ==================
-CTransform::AddToTranslation
+CTransform::CTransform
 ==================
 */
-FORCEINLINE void CTransform::AddToTranslation( const vec3_t& deltaTranslation )
+FORCEINLINE CTransform::CTransform( const vector3_t& location, const quaternion_t& rotation /* = g_quaternionIdentity */, const vector3_t& scale /* = g_vector111 */ )
+	: rotation( rotation )
+	, location( location )
+	, scale( scale )
 {
-	translation += deltaTranslation;
-	bDirtyMatrix = true;
 }
 
 /*
 ==================
-CTransform::SubtractFromTranslation
+CTransform::CTransform
 ==================
 */
-FORCEINLINE void CTransform::SubtractFromTranslation( const vec3_t& deltaTranslation )
+FORCEINLINE CTransform::CTransform( const CTransform& copy )
+	: rotation( copy.rotation )
+	, location( copy.location )
+	, scale( copy.scale )
 {
-	translation -= deltaTranslation;
-	bDirtyMatrix = true;
 }
 
 /*
 ==================
-CTransform::AddToRotation
+CTransform::Make
 ==================
 */
-FORCEINLINE void CTransform::AddToRotation( const quat_t& deltaRotation )
+FORCEINLINE CTransform CTransform::Make( const vector3_t& location, const quaternion_t& rotation /* = g_quaternionIdentity */, const vector3_t& scale /* = g_vector111 */ )
 {
-	rotation	 = deltaRotation * rotation;
-	bDirtyMatrix = true;
+	return CTransform( location, rotation, scale );
 }
 
 /*
 ==================
-CTransform::SubtractFromRotation
+CTransform::Make
 ==================
 */
-FORCEINLINE void CTransform::SubtractFromRotation( const quat_t& deltaRotation )
+FORCEINLINE CTransform CTransform::Make( const quaternion_t& rotation )
 {
-	rotation	 = S_QuaternionInverse( deltaRotation ) * rotation;
-	bDirtyMatrix = true;
+	return CTransform( rotation );
 }
 
 /*
 ==================
-CTransform::AddToScale
+CTransform::Translate
 ==================
 */
-FORCEINLINE void CTransform::AddToScale( const vec3_t& deltaScale )
+FORCEINLINE void CTransform::Translate( const vector3_t& deltaLocation )
 {
-	scale += deltaScale;
-	bDirtyMatrix = true;
+	location += deltaLocation;
 }
 
 /*
 ==================
-CTransform::SubtractFromScale
+CTransform::Rotate
 ==================
 */
-FORCEINLINE void CTransform::SubtractFromScale( const vec3_t& deltaScale )
+FORCEINLINE void CTransform::Rotate( const quaternion_t& deltaRotation )
 {
-	scale -= deltaScale;
-	bDirtyMatrix = true;
+	rotation = deltaRotation * rotation;
 }
 
 /*
 ==================
-CTransform::CopyRotation
+CTransform::Scale
 ==================
 */
-FORCEINLINE void CTransform::CopyRotation( const CTransform& other )
+FORCEINLINE void CTransform::Scale( const vector3_t& deltaScale )
 {
-	rotation	 = other.rotation;
-	bDirtyMatrix = true;
+	scale *= deltaScale;
 }
 
 /*
 ==================
-CTransform::CopyScale
+CTransform::TranslateVector
 ==================
 */
-FORCEINLINE void CTransform::CopyScale( const CTransform& other )
+FORCEINLINE vector3_t CTransform::TranslateVector( const vector3_t& vector ) const
 {
-	scale		 = other.scale;
-	bDirtyMatrix = true;
+	vector3_t result;
+	TranslateVector( vector, result );
+	return result;
 }
 
 /*
 ==================
-CTransform::Add
+CTransform::TranslateVector
 ==================
 */
-FORCEINLINE void CTransform::Add( const CTransform& other )
+FORCEINLINE void CTransform::TranslateVector( const vector3_t& vector, vector3_t& result ) const
 {
-	translation += other.translation;
-	rotation = other.rotation * rotation;
-	scale += other.scale;
-	bDirtyMatrix = true;
-}
-
-/*
-==================
-CTransform::Subtract
-==================
-*/
-FORCEINLINE void CTransform::Subtract( const CTransform& other )
-{
-	translation -= other.translation;
-	rotation = S_QuaternionInverse( other.rotation ) * rotation;
-	scale -= other.scale;
-	bDirtyMatrix = true;
+	result = location + vector;
 }
 
 /*
@@ -130,29 +113,96 @@ FORCEINLINE void CTransform::Subtract( const CTransform& other )
 CTransform::RotateVector
 ==================
 */
-FORCEINLINE vec3_t CTransform::RotateVector( const vec3_t& vector ) const
+FORCEINLINE vector3_t CTransform::RotateVector( const vector3_t& vector ) const
 {
-	return rotation * vector;
+	vector3_t result;
+	RotateVector( vector, result );
+	return result;
 }
 
 /*
 ==================
-CTransform::MatchesNoScale
+CTransform::RotateVector
 ==================
 */
-FORCEINLINE bool CTransform::MatchesNoScale( const CTransform& otherTransform ) const
+FORCEINLINE void CTransform::RotateVector( const vector3_t& vector, vector3_t& result ) const
 {
-	return translation == otherTransform.translation && rotation == otherTransform.rotation;
+	result = rotation * vector;
 }
 
 /*
 ==================
-CTransform::Matches
+CTransform::ScaleVector
 ==================
 */
-FORCEINLINE bool CTransform::Matches( const CTransform& otherTransform ) const
+FORCEINLINE vector3_t CTransform::ScaleVector( const vector3_t& vector ) const
 {
-	return MatchesNoScale( otherTransform ) && scale == otherTransform.scale;
+	vector3_t result;
+	ScaleVector( vector, result );
+	return result;
+}
+
+/*
+==================
+CTransform::ScaleVector
+==================
+*/
+FORCEINLINE void CTransform::ScaleVector( const vector3_t& vector, vector3_t& result ) const
+{
+	result = scale * vector;
+}
+
+/*
+==================
+CTransform::TransformVector
+==================
+*/
+FORCEINLINE vector3_t CTransform::TransformVector( const vector3_t& vector ) const
+{
+	vector3_t result;
+	TransformVector( vector, result );
+	return result;
+}
+
+/*
+==================
+CTransform::TransformVector
+==================
+*/
+FORCEINLINE void CTransform::TransformVector( const vector3_t& vector, vector3_t& result ) const
+{
+	result = rotation * ( scale * vector ) + location;
+}
+
+/*
+==================
+CTransform::Identity
+==================
+*/
+FORCEINLINE void CTransform::Identity()
+{
+	location = g_vector000;
+	rotation = g_quaternionIdentity;
+	scale	 = g_vector111;
+}
+
+/*
+==================
+CTransform::Inverse
+==================
+*/
+FORCEINLINE void CTransform::Inverse()
+{
+	quaternion_t invRotation;
+	vector3_t	 invScale( 1.f / scale.x, 1.f / scale.y, 1.f / scale.z );
+	S_QuaternionInverse( rotation, invRotation );
+
+	vector3_t newLocation = invScale * location;
+	newLocation			  = invRotation * newLocation;
+
+	newLocation = -newLocation;
+	rotation	= invRotation;
+	scale		= invScale;
 }
 
 /*
@@ -160,10 +210,9 @@ FORCEINLINE bool CTransform::Matches( const CTransform& otherTransform ) const
 CTransform::SetLocation
 ==================
 */
-FORCEINLINE void CTransform::SetLocation( const vec3_t& newLocation )
+FORCEINLINE void CTransform::SetLocation( const vector3_t& location )
 {
-	translation	 = newLocation;
-	bDirtyMatrix = true;
+	CTransform::location = location;
 }
 
 /*
@@ -171,10 +220,9 @@ FORCEINLINE void CTransform::SetLocation( const vec3_t& newLocation )
 CTransform::SetRotation
 ==================
 */
-FORCEINLINE void CTransform::SetRotation( const quat_t& newRotation )
+FORCEINLINE void CTransform::SetRotation( const quaternion_t& rotation )
 {
-	rotation	 = newRotation;
-	bDirtyMatrix = true;
+	CTransform::rotation = rotation;
 }
 
 /*
@@ -182,23 +230,31 @@ FORCEINLINE void CTransform::SetRotation( const quat_t& newRotation )
 CTransform::SetScale
 ==================
 */
-FORCEINLINE void CTransform::SetScale( const vec3_t& newScale )
+FORCEINLINE void CTransform::SetScale( const vector3_t& scale )
 {
-	scale		 = newScale;
-	bDirtyMatrix = true;
+	CTransform::scale = scale;
 }
 
 /*
 ==================
-CTransform::SetIdentity
+CTransform::ToMatrix
 ==================
 */
-FORCEINLINE void CTransform::SetIdentity()
+FORCEINLINE matrix4x4_t CTransform::ToMatrix() const
 {
-	translation	 = g_vectorZero;
-	rotation	 = g_quaternionZero;
-	scale		 = g_vectorOne;
-	bDirtyMatrix = true;
+	matrix4x4_t result;
+	ToMatrix( result );
+	return result;
+}
+
+/*
+==================
+CTransform::ToMatrix
+==================
+*/
+FORCEINLINE void CTransform::ToMatrix( matrix4x4_t& result ) const
+{
+	result = S_MatrixTranslate( location ) * S_QuaternionToMatrix( rotation ) * S_MatrixScale( scale );
 }
 
 /*
@@ -206,17 +262,53 @@ FORCEINLINE void CTransform::SetIdentity()
 CTransform::GetUnitAxis
 ==================
 */
-FORCEINLINE vec3_t CTransform::GetUnitAxis( axis_t axis ) const
+FORCEINLINE vector3_t CTransform::GetUnitAxis( axis_t axis ) const
+{
+	vector3_t result;
+	GetUnitAxis( axis, result );
+	return result;
+}
+
+/*
+==================
+CTransform::GetUnitAxis
+==================
+*/
+FORCEINLINE void CTransform::GetUnitAxis( axis_t axis, vector3_t& result ) const
 {
 	switch ( axis )
 	{
-	case AXIS_X: return RotateVector( vec3_t( 1.f, 0.f, 0.f ) ); break;
-	case AXIS_Y: return RotateVector( vec3_t( 0.f, 1.f, 0.f ) ); break;
-	case AXIS_Z: return RotateVector( vec3_t( 0.f, 0.f, 1.f ) ); break;
-	default: Assert( false ); break;
+	case AXIS_X: RotateVector( g_vector100, result ); break;
+	case AXIS_Y: RotateVector( g_vector010, result ); break;
+	case AXIS_Z: RotateVector( g_vector001, result ); break;
+	default:
+		AssertMsg( false, "Unknown axis 0x%X", axis );
+		result = g_vector000;
+		break;
 	}
+}
 
-	return g_vectorZero;
+/*
+==================
+CTransform::GetInverse
+==================
+*/
+FORCEINLINE CTransform CTransform::GetInverse() const
+{
+	CTransform result;
+	GetInverse( result );
+	return result;
+}
+
+/*
+==================
+CTransform::GetInverse
+==================
+*/
+FORCEINLINE void CTransform::GetInverse( CTransform& result ) const
+{
+	result = *this;
+	result.Inverse();
 }
 
 /*
@@ -224,9 +316,9 @@ FORCEINLINE vec3_t CTransform::GetUnitAxis( axis_t axis ) const
 CTransform::GetLocation
 ==================
 */
-FORCEINLINE vec3_t CTransform::GetLocation() const
+FORCEINLINE const vector3_t& CTransform::GetLocation() const
 {
-	return translation;
+	return location;
 }
 
 /*
@@ -234,7 +326,7 @@ FORCEINLINE vec3_t CTransform::GetLocation() const
 CTransform::GetRotation
 ==================
 */
-FORCEINLINE quat_t CTransform::GetRotation() const
+FORCEINLINE const quaternion_t& CTransform::GetRotation() const
 {
 	return rotation;
 }
@@ -244,57 +336,62 @@ FORCEINLINE quat_t CTransform::GetRotation() const
 CTransform::GetScale
 ==================
 */
-FORCEINLINE vec3_t CTransform::GetScale() const
+FORCEINLINE const vector3_t& CTransform::GetScale() const
 {
 	return scale;
 }
 
 /*
 ==================
-CTransform::AsMatrix
+CTransform::operator=
 ==================
 */
-FORCEINLINE const mat4_t& CTransform::AsMatrix() const
+FORCEINLINE CTransform& CTransform::operator=( const CTransform& right )
 {
-	if ( bDirtyMatrix )
-	{
-		AsMatrix( matrix );
-		bDirtyMatrix = false;
-	}
-	return matrix;
+	location = right.location;
+	rotation = right.rotation;
+	scale	 = right.scale;
+	return *this;
 }
 
 /*
 ==================
-CTransform::AsMatrix
+CTransform::operator*
 ==================
 */
-FORCEINLINE void CTransform::AsMatrix( mat4_t& destMatrix ) const
+FORCEINLINE vector3_t CTransform::operator*( const vector3_t& right ) const
 {
-	if ( bDirtyMatrix )
-	{
-		matrix		 = S_MatrixTranslate( translation ) * S_QuaternionToMatrix( rotation ) * S_MatrixScale( scale );
-		bDirtyMatrix = false;
-	}
-	destMatrix = matrix;
+	vector3_t result;
+	TransformVector( right, result );
+	return result;
 }
 
 /*
 ==================
-CTransform::operator+
+CTransform::operator*
 ==================
 */
-FORCEINLINE CTransform CTransform::operator+( const CTransform& other ) const
+FORCEINLINE CTransform CTransform::operator*( const CTransform& right ) const
 {
-	return CTransform( other.rotation * rotation, translation + other.translation, scale + other.scale );
+	return CTransform( right.rotation * ( right.scale * location ) + right.location, right.rotation * rotation, right.scale * scale );
 }
 
 /*
 ==================
-CTransform::operator-
+CTransform::operator==
 ==================
 */
-FORCEINLINE CTransform CTransform::operator-( const CTransform& other ) const
+FORCEINLINE bool CTransform::operator==( const CTransform& right ) const
 {
-	return CTransform( S_QuaternionInverse( other.rotation ) * rotation, translation - other.translation, scale - other.scale );
+	return location == right.location && rotation == right.rotation && scale == right.scale;
+}
+
+/*
+==================
+CTransform::operator!=
+==================
+*/
+FORCEINLINE bool CTransform::operator!=( const CTransform& right ) const
+{
+	return location != right.location || rotation != right.rotation || scale != right.scale;
 }

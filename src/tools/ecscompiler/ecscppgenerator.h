@@ -33,9 +33,9 @@ private:
 
 	void		GenerateHeader( CEcsStubModule* pEcsStubModule );
 	void		GenerateSource( CEcsStubModule* pEcsStubModule );
-	void		GenerateUsings( const eastl::vector<TRefPtr<CEcsStubUsing>>& ecsStubUsings );
-	void		GenerateStructs( const eastl::vector<TRefPtr<CEcsStubDataType>>& ecsStubDataTypes, ecsStructType_t structsType );
-	void		GenerateSystems( const eastl::vector<TRefPtr<CEcsStubSystem>>& ecsStubSystems );
+	void		GenerateUsings( const eastl::vector<CRefPtr<CEcsStubUsing>>& ecsStubUsings );
+	void		GenerateStructs( const eastl::vector<CRefPtr<CEcsStubDataType>>& ecsStubDataTypes, ecsStructType_t structsType );
+	void		GenerateSystems( const eastl::vector<CRefPtr<CEcsStubSystem>>& ecsStubSystems );
 	void		GenerateRegistrar( CEcsStubModule* pEcsStubModule );
 	eastl::string GenerateRegistrarConstructor( CEcsStubModule* pEcsStubModule );
 	eastl::string GenerateRegistrarDestructor( CEcsStubModule* pEcsStubModule );

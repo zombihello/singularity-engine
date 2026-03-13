@@ -61,7 +61,7 @@ void CTextureFactory::Shutdown()
 CTextureFactory::CreateProceduralResource
 ==================
 */
-TRefPtr<IRefCounted> CTextureFactory::CreateProceduralResource() const
+CRefPtr<IRefCounted> CTextureFactory::CreateProceduralResource() const
 {
 	return new CTexture();
 }
@@ -71,7 +71,7 @@ TRefPtr<IRefCounted> CTextureFactory::CreateProceduralResource() const
 CTextureFactory::LoadResource
 ==================
 */
-TRefPtr<IRefCounted> CTextureFactory::LoadResource( const char* pPath, uint32 loadFlags /* = RESOURCE_LOAD_FLAG_NONE */ ) const
+CRefPtr<IRefCounted> CTextureFactory::LoadResource( const char* pPath, uint32 loadFlags /* = RESOURCE_LOAD_FLAG_NONE */ ) const
 {
 	CSTEXCompiledTextureDoc stexCompiledTextureDoc;
 	if ( !stexCompiledTextureDoc.LoadFromFile( S_GetFileExtension( pPath ) ? pPath : S_Sprintf( "%s.stex_c", pPath ).c_str() ) )
@@ -103,7 +103,7 @@ TRefPtr<IRefCounted> CTextureFactory::LoadResource( const char* pPath, uint32 lo
 	studioAPISamplerInfo.maxLod						  = FLT_MAX;
 
 	// Create a new texture and initialize it
-	TRefPtr<CTexture> pTexture = new CTexture();
+	CRefPtr<CTexture> pTexture = new CTexture();
 	pTexture->SetData( stexCompiledTextureDoc.GetType(), stexCompiledTextureDoc.GetPixelFormat(), stexCompiledTextureDoc.GetNumLayers(), mipmaps.data(), stexCompiledTextureDoc.GetNumMips(), studioAPISamplerInfo, data.data(), (uint32)data.size() );
 	return pTexture;
 }
@@ -124,7 +124,7 @@ void CTextureFactory::UnloadResource( IRefCounted* pResoruce ) const
 CTextureFactory::GetDefaultResource
 ==================
 */
-TRefPtr<IResource> CTextureFactory::GetDefaultResource() const
+CRefPtr<IResource> CTextureFactory::GetDefaultResource() const
 {
 	return pDefaultTexture;
 }

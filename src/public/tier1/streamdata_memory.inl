@@ -19,7 +19,7 @@ CBaseStreamDataMemory::Seek
 template<class TBaseClass>
 void CBaseStreamDataMemory<TBaseClass>::Seek( uint64 position )
 {
-	offset = Min( position, GetSize() );
+	offset = S_Min( position, GetSize() );
 }
 
 /*

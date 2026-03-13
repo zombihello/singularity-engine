@@ -8,10 +8,10 @@
 // A window pool
 //-----------------------------------------------------------------------------
 template<typename T>
-class TWindowPool
+class CWindowPool
 {
 public:
-	~TWindowPool();
+	~CWindowPool();
 
 	T*	 Create();
 	void Free( windowId_t id );

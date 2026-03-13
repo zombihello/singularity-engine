@@ -116,7 +116,7 @@ CEcsCompilerApp::ParseEcsFiles
 bool CEcsCompilerApp::ParseEcsFiles( const eastl::string& dir, const eastl::string rootDir, CEcsSystemStub& stubs )
 {
 	bool					  bResult = true;
-	TRefPtr<IPathArrayResult> pFiles  = g_pFileSystem->FindFiles( dir.c_str(), "*", true, true );
+	CRefPtr<IPathArrayResult> pFiles  = g_pFileSystem->FindFiles( dir.c_str(), "*", true, true );
 	for ( uint32 fileIdx = 0, numFiles = pFiles->GetNum(); fileIdx < numFiles; ++fileIdx )
 	{
 		// If the file is a directory look in
@@ -146,7 +146,7 @@ CEcsCompilerApp::ParseEcsFile
 bool CEcsCompilerApp::ParseEcsFile( const char* pPath, CEcsSystemStub& stubs )
 {
 	// Read whole the file
-	TRefPtr<IStreamDataReader> pFileReader = g_pFileSystem->CreateFileReader( pPath );
+	CRefPtr<IStreamDataReader> pFileReader = g_pFileSystem->CreateFileReader( pPath );
 	if ( !pFileReader )
 	{
 		Error( "EcsCompiler: Failed to open ECS file '%s'", pPath );
@@ -175,7 +175,7 @@ CEcsCompilerApp::GenerateCppFiles
 */
 bool CEcsCompilerApp::GenerateCppFiles( const char* pRootDir, const char* pOutputDir, const CEcsSystemStub& stubs, ecsCppFileType_t cppFileType )
 {
-	const eastl::vector<TRefPtr<CEcsStubModule>>& ecsStubModules = stubs.GetModules();
+	const eastl::vector<CRefPtr<CEcsStubModule>>& ecsStubModules = stubs.GetModules();
 	CEcsCppGenerator							  ecsCppGenerator;
 
 	// Get file extension and type name
@@ -239,7 +239,7 @@ bool CEcsCompilerApp::GenerateCppFiles( const char* pRootDir, const char* pOutpu
 		}
 
 		// Save buffer into the file
-		TRefPtr<IStreamDataWriter> pFileWriter = g_pFileSystem->CreateFileWriter( filePath.c_str() );
+		CRefPtr<IStreamDataWriter> pFileWriter = g_pFileSystem->CreateFileWriter( filePath.c_str() );
 		if ( pFileWriter )
 		{
 			pFileWriter->Write( (void*)buffer.data(), buffer.size() * sizeof( char ) );

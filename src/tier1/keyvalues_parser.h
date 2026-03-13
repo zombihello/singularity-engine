@@ -60,7 +60,7 @@ private:
 		uint32					   bufferOffset;
 		uint64					   streamOffset;
 		char*					   pBuffer;
-		TRefPtr<IStreamDataReader> pStreamReader;
+		CRefPtr<IStreamDataReader> pStreamReader;
 	};
 
 	bool	ReadKeyValues( CKeyValues* pKeyValues );

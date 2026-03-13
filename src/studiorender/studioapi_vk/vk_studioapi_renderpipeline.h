@@ -7,7 +7,7 @@
 //-----------------------------------------------------------------------------
 // Vulkan Studio API render pipeline
 //-----------------------------------------------------------------------------
-class CStudioAPIRenderPipelineVk : public TRefCounted<IStudioAPIRenderPipeline>
+class CStudioAPIRenderPipelineVk : public CRefCounted<IStudioAPIRenderPipeline>
 {
 public:
 	CStudioAPIRenderPipelineVk( const studioAPIRenderPipelineCreateInfo_t& createInfo, const char* pDebugName = "" );
@@ -22,6 +22,6 @@ private:
 
 	VkPipeline									vkPipeline;
 	COnStudioAPIVkShutdown::funcDelegate_t*		pStudioAPIVkShutdownDelegate;
-	TRefPtr<CStudioAPIBoundShaderStateVk>		pBoundShaderState;
+	CRefPtr<CStudioAPIBoundShaderStateVk>		pBoundShaderState;
 	mutable COnStudioAPIRenderPipelineDeletedVk onRenderPipelineDeleted;
 };

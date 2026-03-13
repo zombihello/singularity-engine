@@ -24,7 +24,7 @@ public:
 // Base implementation of a studio viewport client
 //-----------------------------------------------------------------------------
 template<class TBaseClass>
-class TBaseStudioViewportClient : public TBaseClass
+class CBaseStudioViewportClient : public TBaseClass
 {
 public:
 	virtual void Update( float deltaSeconds ) override {}

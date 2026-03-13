@@ -178,7 +178,7 @@ CStudioAPIDescriptorPoolVk* CStudioAPITypedDescriptorPoolSetVk::PushNewPool()
 	const uint32 maxSetsAllocationsBase = 32;
 
 	// Allow max 128 sets per pool (32 << 2)
-	const uint32 maxSetsAllocations = maxSetsAllocationsBase << Min<uint32>( (uint32)poolList.size(), 2 );
+	const uint32 maxSetsAllocations = maxSetsAllocationsBase << S_Min<uint32>( (uint32)poolList.size(), 2 );
 
 	// Allocate a new descriptor pool
 	CStudioAPIDescriptorPoolVk* pNewPool = poolList.emplace_back( new CStudioAPIDescriptorPoolVk( descriptorSetsLayout, maxSetsAllocations ) );

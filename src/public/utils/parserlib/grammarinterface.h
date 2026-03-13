@@ -5,10 +5,10 @@
 // Grammar interface
 //-----------------------------------------------------------------------------
 template<class TFileParserClass, typename TGrammarContextType>
-class TGrammarInterface
+class CGrammarInterface
 {
 public:
-	TGrammarInterface( CParserTokenStream& tokens, TFileParserClass& fileParser )
+	CGrammarInterface( CParserTokenStream& tokens, TFileParserClass& fileParser )
 		: pTokens( &tokens )
 		, pFileParser( &fileParser )
 		, pCurrentToken( NULL )

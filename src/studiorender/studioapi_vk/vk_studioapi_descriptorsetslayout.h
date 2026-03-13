@@ -2,7 +2,7 @@
 #include <EASTL/vector.h>
 #include <EASTL/unordered_map.h>
 
-#include "tier1/hashing/fasthash.h"
+#include "tier1/fasthash.h"
 #include "studiorender/studioapi_vk/vk_studioapi_device.h"
 #include "studiorender/studioapi_vk/vk_studioapi_delegates.h"
 

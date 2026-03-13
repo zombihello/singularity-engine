@@ -6,7 +6,7 @@
 // The base class for file stream data
 //-----------------------------------------------------------------------------
 template<class TBaseClass>
-class CBaseStreamDataFile : public TRefCounted<TBaseClass>
+class CBaseStreamDataFile : public CRefCounted<TBaseClass>
 {
 public:
 	CBaseStreamDataFile( const eastl::string& path )

@@ -18,7 +18,7 @@ struct shaderLibInfo_t
 	IShaderLib*								 pShaderLib;
 	bool									 bGameShaderLib;  // TRUE if this is a game's shader library, in which case it's not allowed to override any existing shader names
 	shadersDict_t							 shadersDict;
-	eastl::vector<TRefPtr<IStudioAPIShader>> shaderCaches[STUDIOAPI_SHADER_NUM_TYPES];
+	eastl::vector<CRefPtr<IStudioAPIShader>> shaderCaches[STUDIOAPI_SHADER_NUM_TYPES];
 };
 
 //-----------------------------------------------------------------------------
@@ -277,7 +277,7 @@ bool CShaderMgr::LoadShaderCaches( uint32 index )
 			{
 				// Load the shader cache for the vertex type
 				const CShaderCacheDoc::shaderCache_t& shaderCache = shaderCacheDoc.GetCache( cacheIdx );
-				TRefPtr<IStudioAPIShader>			  pStudioAPIShader;
+				CRefPtr<IStudioAPIShader>			  pStudioAPIShader;
 				switch ( shaderType )
 				{
 				case STUDIOAPI_SHADER_TYPE_VERTEX: pStudioAPIShader = g_pStudioAPI->CreateVertexShader( shaderCache.entryPointName.c_str(), shaderCache.bytecode.data(), shaderCache.bytecode.size(), shaderCache.reflectionData.data(), shaderCache.reflectionData.size() ); break;

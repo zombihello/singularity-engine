@@ -7,7 +7,7 @@
 
 struct shaderParamsBuffer_t
 {
-	vec4_t color;
+	vector4_t color;
 };
 
 BEGIN_SHADER( Wireframe, "Default shader" )
@@ -26,7 +26,7 @@ BEGIN_SHADER( Wireframe, "Default shader" )
 
 	SHADER_INIT_PARAMS
 	{
-		pParams[COLOR]->SetVecValue( vec4_t( 1.f, 1.f, 1.f, 1.f ) );
+		pParams[COLOR]->SetVecValue( vector4_t( 1.f, 1.f, 1.f, 1.f ) );
 	}
 
 	SHADER_UPDATE_BUFFERS

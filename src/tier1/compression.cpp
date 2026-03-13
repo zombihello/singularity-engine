@@ -163,7 +163,7 @@ void CompressStreamData( compressionType_t compressionType, IStreamDataWriter* p
 	void*  pCompressedBuffer	= Mem_Malloc( compressedBufferSize );
 	while ( bytesRemaining > 0 )
 	{
-		uint32 bytesToCompress = Min<uint32>( (uint32)bytesRemaining, COMPRESS_CHUNK_SIZE );
+		uint32 bytesToCompress = S_Min<uint32>( (uint32)bytesRemaining, COMPRESS_CHUNK_SIZE );
 		uint32 compressedSize  = compressedBufferSize;
 		bool   bResult		   = CompressMemory( compressionType, pCompressedBuffer, compressedSize, pSrc, bytesToCompress );
 		Assert( bResult );
@@ -241,7 +241,7 @@ void UncompressStreamData( compressionType_t compressionType, IStreamDataReader*
 	for ( uint64 chunkIndex = 0; chunkIndex < totalChunkCount; chunkIndex++ )
 	{
 		pStreamReader->Read( &pCompressionChunks[chunkIndex], sizeof( compressedChunkInfo_t ) );
-		maxCompressedSize = Max( pCompressionChunks[chunkIndex].compressedSize, maxCompressedSize );
+		maxCompressedSize = S_Max( pCompressionChunks[chunkIndex].compressedSize, maxCompressedSize );
 	}
 
 	// Set up destination pointer and allocate memory for compressed chunks (one at a time)
