@@ -227,7 +227,7 @@ bool CStudioAPISwapChainVk::Create( windowHandle_t windowHandle, uint32 width, u
 			Destroy();
 		}
 
-		size = ivec2_t( 0, 0 );
+		size = vector2i_t( 0, 0 );
 		return false;
 	}
 
@@ -444,7 +444,7 @@ void CStudioAPISwapChainVk::Destroy()
 
 	// Reset values
 	Mem_Memzero( &vkSurfaceFormat, sizeof( VkSurfaceFormatKHR ) );
-	size			  = ivec2_t( 0, 0 );
+	size			  = vector2i_t( 0, 0 );
 	currentImageIndex = 0;
 	windowHandle	  = INVALID_WINDOW_HANDLE;
 	bUseVSync		  = false;
@@ -602,7 +602,7 @@ bool CStudioAPISwapChainVk::Present()
 CStudioAPISwapChainVk::GetSize
 ==================
 */
-ivec2_t CStudioAPISwapChainVk::GetSize() const
+vector2i_t CStudioAPISwapChainVk::GetSize() const
 {
 	return size;
 }

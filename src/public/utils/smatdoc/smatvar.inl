@@ -100,9 +100,9 @@ FORCEINLINE void CSMATMaterialVar::SetVecValue( const float* pValue, uint32 numC
 {
 	switch ( numComps )
 	{
-	case 2: SetVecValue( *(vec2_t*)pValue ); break;
-	case 3: SetVecValue( *(vec3_t*)pValue ); break;
-	case 4: SetVecValue( *(vec4_t*)pValue ); break;
+	case 2: SetVecValue( *(vector2_t*)pValue ); break;
+	case 3: SetVecValue( *(vector3_t*)pValue ); break;
+	case 4: SetVecValue( *(vector4_t*)pValue ); break;
 	default:
 		AssertMsg( false, "A material variable can take only in range from 2 to 4" );
 		break;
@@ -114,7 +114,7 @@ FORCEINLINE void CSMATMaterialVar::SetVecValue( const float* pValue, uint32 numC
 CSMATMaterialVar::SetVecValue
 ==================
 */
-FORCEINLINE void CSMATMaterialVar::SetVecValue( const vec2_t& value )
+FORCEINLINE void CSMATMaterialVar::SetVecValue( const vector2_t& value )
 {
 	vector2DValue = value;
 	type		  = SMAT_MATERIAL_VAR_TYPE_VECTOR_2D;
@@ -125,7 +125,7 @@ FORCEINLINE void CSMATMaterialVar::SetVecValue( const vec2_t& value )
 CSMATMaterialVar::SetVecValue
 ==================
 */
-FORCEINLINE void CSMATMaterialVar::SetVecValue( const vec3_t& value )
+FORCEINLINE void CSMATMaterialVar::SetVecValue( const vector3_t& value )
 {
 	vector3DValue = value;
 	type		  = SMAT_MATERIAL_VAR_TYPE_VECTOR_3D;
@@ -136,7 +136,7 @@ FORCEINLINE void CSMATMaterialVar::SetVecValue( const vec3_t& value )
 CSMATMaterialVar::SetVecValue
 ==================
 */
-FORCEINLINE void CSMATMaterialVar::SetVecValue( const vec4_t& value )
+FORCEINLINE void CSMATMaterialVar::SetVecValue( const vector4_t& value )
 {
 	vector4DValue = value;
 	type		  = SMAT_MATERIAL_VAR_TYPE_VECTOR_4D;
@@ -178,7 +178,7 @@ FORCEINLINE void CSMATMaterialVar::GetVecValue( float* pValue, uint32 numComps )
 CSMATMaterialVar::SetMatrixValue
 ==================
 */
-FORCEINLINE void CSMATMaterialVar::SetMatrixValue( const mat4_t& value )
+FORCEINLINE void CSMATMaterialVar::SetMatrixValue( const matrix4x4_t& value )
 {
 	matrixValue = value;
 	type		= SMAT_MATERIAL_VAR_TYPE_MATRIX;
@@ -189,7 +189,7 @@ FORCEINLINE void CSMATMaterialVar::SetMatrixValue( const mat4_t& value )
 CSMATMaterialVar::GetMatrixValue
 ==================
 */
-FORCEINLINE mat4_t CSMATMaterialVar::GetMatrixValue() const
+FORCEINLINE matrix4x4_t CSMATMaterialVar::GetMatrixValue() const
 {
 	return type == SMAT_MATERIAL_VAR_TYPE_MATRIX ? matrixValue : g_matrixIdentity;
 }

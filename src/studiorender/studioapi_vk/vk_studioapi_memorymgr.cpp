@@ -352,8 +352,8 @@ uint64 CStudioAPIMemoryMgrVk::GetBufferAlignmentFromVkUsageFlags( VkBufferUsageF
 	uint64 alignment = 1;
 	if ( bIsTexelBuffer || bIsStorageBuffer )
 	{
-		alignment = Max( alignment, vkDeviceLimits.minTexelBufferOffsetAlignment );
-		alignment = Max( alignment, vkDeviceLimits.minStorageBufferOffsetAlignment );
+		alignment = S_Max( alignment, vkDeviceLimits.minTexelBufferOffsetAlignment );
+		alignment = S_Max( alignment, vkDeviceLimits.minStorageBufferOffsetAlignment );
 	}
 	else if ( bIsVertexOrIndexBuffer )
 	{
@@ -365,7 +365,7 @@ uint64 CStudioAPIMemoryMgrVk::GetBufferAlignmentFromVkUsageFlags( VkBufferUsageF
 	}
 	else if ( bIsUniformBuffer )
 	{
-		alignment = Max( alignment, vkDeviceLimits.minUniformBufferOffsetAlignment );
+		alignment = S_Max( alignment, vkDeviceLimits.minUniformBufferOffsetAlignment );
 	}
 	else
 	{

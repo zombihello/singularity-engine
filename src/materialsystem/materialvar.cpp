@@ -125,9 +125,9 @@ void CMaterialVar::SetVecValue( const float* pValue, uint32 numComps )
 {
 	switch ( numComps )
 	{
-	case 2: SetVecValue( *(vec2_t*)pValue ); break;
-	case 3: SetVecValue( *(vec3_t*)pValue ); break;
-	case 4: SetVecValue( *(vec4_t*)pValue ); break;
+	case 2: SetVecValue( *(vector2_t*)pValue ); break;
+	case 3: SetVecValue( *(vector3_t*)pValue ); break;
+	case 4: SetVecValue( *(vector4_t*)pValue ); break;
 	default:
 		AssertMsg( false, "A material variable can take only in range from 2 to 4" );
 		break;
@@ -144,7 +144,7 @@ void CMaterialVar::SetVecValue( const float* pValue, uint32 numComps )
 CMaterialVar::SetVecValue
 ==================
 */
-void CMaterialVar::SetVecValue( const vec2_t& value )
+void CMaterialVar::SetVecValue( const vector2_t& value )
 {
 	vector2DValue = value;
 	type		  = MATERIALVAR_TYPE_VECTOR_2D;
@@ -159,7 +159,7 @@ void CMaterialVar::SetVecValue( const vec2_t& value )
 CMaterialVar::SetVecValue
 ==================
 */
-void CMaterialVar::SetVecValue( const vec3_t& value )
+void CMaterialVar::SetVecValue( const vector3_t& value )
 {
 	vector3DValue = value;
 	type		  = MATERIALVAR_TYPE_VECTOR_3D;
@@ -174,7 +174,7 @@ void CMaterialVar::SetVecValue( const vec3_t& value )
 CMaterialVar::SetVecValue
 ==================
 */
-void CMaterialVar::SetVecValue( const vec4_t& value )
+void CMaterialVar::SetVecValue( const vector4_t& value )
 {
 	vector4DValue = value;
 	type		  = MATERIALVAR_TYPE_VECTOR_4D;
@@ -220,7 +220,7 @@ void CMaterialVar::GetVecValue( float* pValue, uint32 numComps ) const
 CMaterialVar::SetMatrixValue
 ==================
 */
-void CMaterialVar::SetMatrixValue( const mat4_t& value )
+void CMaterialVar::SetMatrixValue( const matrix4x4_t& value )
 {
 	matrixValue = value;
 	type		= MATERIALVAR_TYPE_MATRIX;
@@ -235,7 +235,7 @@ void CMaterialVar::SetMatrixValue( const mat4_t& value )
 CMaterialVar::GetMatrixValue
 ==================
 */
-mat4_t CMaterialVar::GetMatrixValue() const
+matrix4x4_t CMaterialVar::GetMatrixValue() const
 {
 	return type == MATERIALVAR_TYPE_MATRIX ? matrixValue : g_matrixIdentity;
 }

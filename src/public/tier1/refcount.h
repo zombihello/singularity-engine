@@ -3,7 +3,7 @@
 
 #include "tier0/defines.h"
 #include "tier0/types.h"
-#include "tier1/hashing/fasthash.h"
+#include "tier1/fasthash.h"
 #include "tier1/threading.h"
 
 //-----------------------------------------------------------------------------
@@ -21,14 +21,14 @@ public:
 // Base classes to implement reference counting
 //-----------------------------------------------------------------------------
 template<class TBaseClass>
-class TRefCounted : public TBaseClass
+class CRefCounted : public TBaseClass
 {
 public:
-	TRefCounted()
+	CRefCounted()
 	{
 		countReferences.store( 0, eastl::memory_order_release );
 	}
-	virtual ~TRefCounted()
+	virtual ~CRefCounted()
 	{
 		Assert( GetRefCount() == 0 );
 	}
@@ -45,20 +45,20 @@ private:
 // Reference-counting pointer
 //-----------------------------------------------------------------------------
 template<typename TPtrType>
-class TRefPtr
+class CRefPtr
 {
 public:
 	// Hash function for STL containers
 	struct hashFunction_t
 	{
-		size operator()( const TRefPtr& refPtr ) const;
+		size operator()( const CRefPtr& refPtr ) const;
 	};
 
-	TRefPtr()
+	CRefPtr()
 		: pPtr( NULL )
 	{
 	}
-	TRefPtr( TPtrType* pPtr )
+	CRefPtr( TPtrType* pPtr )
 		: pPtr( pPtr )
 	{
 		if ( pPtr )
@@ -66,7 +66,7 @@ public:
 			pPtr->AddRef();
 		}
 	}
-	TRefPtr( const TRefPtr& copy )
+	CRefPtr( const CRefPtr& copy )
 		: pPtr( copy.pPtr )
 	{
 		if ( pPtr )
@@ -76,7 +76,7 @@ public:
 	}
 
 	template<typename TBasePtrType>
-	TRefPtr( const TRefPtr<TBasePtrType>& copy )
+	CRefPtr( const CRefPtr<TBasePtrType>& copy )
 		: pPtr( (TPtrType*)( copy.GetPtr() ) )
 	{
 		if ( pPtr )
@@ -84,7 +84,7 @@ public:
 			pPtr->AddRef();
 		}
 	}
-	~TRefPtr()
+	~CRefPtr()
 	{
 		if ( pPtr )
 		{
@@ -98,12 +98,12 @@ public:
 	TPtrType* GetPtr() const;
 
 	template<typename TBasePtrType>
-	TRefPtr&   operator=( const TRefPtr<TBasePtrType>& copy );
-	TRefPtr&   operator=( TPtrType* pPtr );
-	TRefPtr&   operator=( const TRefPtr& copy );
-	bool	   operator==( const TRefPtr& right ) const;
+	CRefPtr&   operator=( const CRefPtr<TBasePtrType>& copy );
+	CRefPtr&   operator=( TPtrType* pPtr );
+	CRefPtr&   operator=( const CRefPtr& copy );
+	bool	   operator==( const CRefPtr& right ) const;
 	bool	   operator==( TPtrType* pRight ) const;
-	bool	   operator!=( const TRefPtr& right ) const;
+	bool	   operator!=( const CRefPtr& right ) const;
 	bool	   operator!=( TPtrType* pRight ) const;
 			   operator bool() const;
 			   operator ptrint() const;

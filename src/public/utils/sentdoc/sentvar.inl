@@ -96,7 +96,7 @@ FORCEINLINE float CSENTEntityDescVar::GetFloatValue( float defaultValue /* = 0.f
 CSENTEntityDescVar::SetVec2Value
 ==================
 */
-FORCEINLINE void CSENTEntityDescVar::SetVec2Value( const vec2_t& value )
+FORCEINLINE void CSENTEntityDescVar::SetVec2Value( const vector2_t& value )
 {
 	vector2DValue = value;
 	type		  = SENT_ENTITY_DESC_VAR_TYPE_VECTOR_2D;
@@ -107,7 +107,7 @@ FORCEINLINE void CSENTEntityDescVar::SetVec2Value( const vec2_t& value )
 CSENTEntityDescVar::SetVec3Value
 ==================
 */
-FORCEINLINE void CSENTEntityDescVar::SetVec3Value( const vec3_t& value )
+FORCEINLINE void CSENTEntityDescVar::SetVec3Value( const vector3_t& value )
 {
 	vector3DValue = value;
 	type		  = SENT_ENTITY_DESC_VAR_TYPE_VECTOR_3D;
@@ -118,7 +118,7 @@ FORCEINLINE void CSENTEntityDescVar::SetVec3Value( const vec3_t& value )
 CSENTEntityDescVar::SetVecValue
 ==================
 */
-FORCEINLINE void CSENTEntityDescVar::SetVec4Value( const vec4_t& value )
+FORCEINLINE void CSENTEntityDescVar::SetVec4Value( const vector4_t& value )
 {
 	vector4DValue = value;
 	type		  = SENT_ENTITY_DESC_VAR_TYPE_VECTOR_4D;
@@ -129,7 +129,7 @@ FORCEINLINE void CSENTEntityDescVar::SetVec4Value( const vec4_t& value )
 CSENTEntityDescVar::GetVec2Value
 ==================
 */
-FORCEINLINE vec2_t CSENTEntityDescVar::GetVec2Value( const vec2_t& defaultValue /* = vec2_t( 0.f, 0.f ) */ ) const
+FORCEINLINE vector2_t CSENTEntityDescVar::GetVec2Value( const vector2_t& defaultValue /* = vector2_t( 0.f, 0.f ) */ ) const
 {
 	switch ( type )
 	{
@@ -145,11 +145,11 @@ FORCEINLINE vec2_t CSENTEntityDescVar::GetVec2Value( const vec2_t& defaultValue 
 CSENTEntityDescVar::GetVec3Value
 ==================
 */
-FORCEINLINE vec3_t CSENTEntityDescVar::GetVec3Value( const vec3_t& defaultValue /* = vec3_t( 0.f, 0.f, 0.f ) */ ) const
+FORCEINLINE vector3_t CSENTEntityDescVar::GetVec3Value( const vector3_t& defaultValue /* = vector3_t( 0.f, 0.f, 0.f ) */ ) const
 {
 	switch ( type )
 	{
-	case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_2D: return vec3_t( vector2DValue.x, vector2DValue.y, defaultValue.z );
+	case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_2D: return vector3_t( vector2DValue.x, vector2DValue.y, defaultValue.z );
 	case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_3D: return vector3DValue;
 	case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_4D: return vector4DValue;
 	default: return defaultValue;
@@ -161,12 +161,12 @@ FORCEINLINE vec3_t CSENTEntityDescVar::GetVec3Value( const vec3_t& defaultValue 
 CSENTEntityDescVar::GetVec4Value
 ==================
 */
-FORCEINLINE vec4_t CSENTEntityDescVar::GetVec4Value( const vec4_t& defaultValue /* = vec4_t( 0.f, 0.f, 0.f, 0.f ) */ ) const
+FORCEINLINE vector4_t CSENTEntityDescVar::GetVec4Value( const vector4_t& defaultValue /* = vector4_t( 0.f, 0.f, 0.f, 0.f ) */ ) const
 {
 	switch ( type )
 	{
-	case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_2D: return vec4_t( vector2DValue.x, vector2DValue.y, defaultValue.z, defaultValue.w );
-	case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_3D: return vec4_t( vector3DValue.x, vector3DValue.y, vector3DValue.z, defaultValue.w );
+	case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_2D: return vector4_t( vector2DValue.x, vector2DValue.y, defaultValue.z, defaultValue.w );
+	case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_3D: return vector4_t( vector3DValue.x, vector3DValue.y, vector3DValue.z, defaultValue.w );
 	case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_4D: return vector4DValue;
 	default: return defaultValue;
 	}
@@ -177,7 +177,7 @@ FORCEINLINE vec4_t CSENTEntityDescVar::GetVec4Value( const vec4_t& defaultValue 
 CSENTEntityDescVar::SetMatrixValue
 ==================
 */
-FORCEINLINE void CSENTEntityDescVar::SetMatrixValue( const mat4_t& value )
+FORCEINLINE void CSENTEntityDescVar::SetMatrixValue( const matrix4x4_t& value )
 {
 	matrixValue = value;
 	type		= SENT_ENTITY_DESC_VAR_TYPE_MATRIX;
@@ -188,7 +188,7 @@ FORCEINLINE void CSENTEntityDescVar::SetMatrixValue( const mat4_t& value )
 CSENTEntityDescVar::GetMatrixValue
 ==================
 */
-FORCEINLINE mat4_t CSENTEntityDescVar::GetMatrixValue( const mat4_t& defaultValue /* = g_matrixIdentity */ ) const
+FORCEINLINE matrix4x4_t CSENTEntityDescVar::GetMatrixValue( const matrix4x4_t& defaultValue /* = g_matrixIdentity */ ) const
 {
 	return type == SENT_ENTITY_DESC_VAR_TYPE_MATRIX ? matrixValue : defaultValue;
 }

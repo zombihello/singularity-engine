@@ -57,7 +57,7 @@
         eastl::string           string;
     };
 
-    typedef TGrammarInterface<CEcsFileParser, ecsTypeFile_t>        ecsGrammarInterface_t;
+    typedef CGrammarInterface<CEcsFileParser, ecsTypeFile_t>        ecsGrammarInterface_t;
     #define g_pFileContext                                          ( ( ecsGrammarInterface_t* )param )
     #define g_pFileParser                                           ( ( ( ecsGrammarInterface_t* )param )->GetFileParser() )
 

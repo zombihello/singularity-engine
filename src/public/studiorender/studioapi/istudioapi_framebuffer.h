@@ -34,11 +34,11 @@ struct studioAPIFrameBufferCreateInfo_t
 	IStudioAPIRenderPass*	pRenderPass;
 	studioAPIRenderTarget_t colorRenderTargets[STUDIOAPI_MAX_SIMULTANEOUS_RENDER_TARGETS];
 	studioAPIRenderTarget_t depthStencilRenderTarget;
-	ivec2_t					size;
+	vector2i_t				size;
 	uint32					renderTargetMip;
 	uint32					renderTargetLayer;
 	bool					bClearColor;
-	CColor					clearColor;
+	CLinearColor			clearColor;
 	bool					bDepthStencilClearValue;
 	float					depthClearValue;
 	uint32					stencilClearValue;
@@ -51,5 +51,5 @@ class IStudioAPIFrameBuffer : public IStudioAPIResource
 {
 public:
 	virtual ~IStudioAPIFrameBuffer() {}
-	virtual ivec2_t GetSize() const = 0;
+	virtual vector2i_t GetSize() const = 0;
 };

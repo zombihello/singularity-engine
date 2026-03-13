@@ -17,9 +17,9 @@ public:
 	FORCEINLINE IResource* GetMaterial() const { return pMaterial ? pMaterial : NULL; }
 
 private:
-	TRefPtr<IStudioAPIBuffer> pStudioAPIVertexBuffer;
-	TRefPtr<IStudioAPIBuffer> pStudioAPIIndexBuffer;
-	TResourcePtr<IMaterial>	  pMaterial;
+	CRefPtr<IStudioAPIBuffer> pStudioAPIVertexBuffer;
+	CRefPtr<IStudioAPIBuffer> pStudioAPIIndexBuffer;
+	CResourcePtr<IMaterial>	  pMaterial;
 };
 
 CQuad& Quad();

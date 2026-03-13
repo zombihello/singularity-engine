@@ -49,7 +49,7 @@ void CEcsEntityDesc::Init( const CSENTCompiledEntityDescDoc& sentCompiledDoc )
 	const eastl::vector<CSENTEntityDescComponent>& sentComponents	 = sentCompiledDoc.GetComponents();
 	for ( uint32 componentIdx = 0, numComponents = sentCompiledDoc.GetNumComponents(); componentIdx < numComponents; ++componentIdx )
 	{
-		TRefPtr<IEcsComponentFactory> pEcsComponentFactory = ecsComponentTypes.CreateFactory( sentComponents[componentIdx] );
+		CRefPtr<IEcsComponentFactory> pEcsComponentFactory = ecsComponentTypes.CreateFactory( sentComponents[componentIdx] );
 		if ( pEcsComponentFactory )
 		{
 			ecsComponentFactories.emplace_back( pEcsComponentFactory );

@@ -48,10 +48,10 @@ Studio_BeginInitResourceSafe
 ==================
 */
 template<class TStudioRenderResourceClass>
-FORCEINLINE void Studio_BeginInitResourceSafe( TRefPtr<TStudioRenderResourceClass> pResource )
+FORCEINLINE void Studio_BeginInitResourceSafe( CRefPtr<TStudioRenderResourceClass> pResource )
 {
 	Assert( pResource );
-	UNIQUE_RENDER_COMMAND_ONEPARAMETER( CStudioInitResourceCmd, TRefPtr<TStudioRenderResourceClass>, pResource, pResource,
+	UNIQUE_RENDER_COMMAND_ONEPARAMETER( CStudioInitResourceCmd, CRefPtr<TStudioRenderResourceClass>, pResource, pResource,
 										{
 											pResource->InitResource();
 										} );
@@ -63,10 +63,10 @@ Studio_BeginUpdateResourceSafe
 ==================
 */
 template<class TStudioRenderResourceClass>
-FORCEINLINE void Studio_BeginUpdateResourceSafe( TRefPtr<TStudioRenderResourceClass> pResource )
+FORCEINLINE void Studio_BeginUpdateResourceSafe( CRefPtr<TStudioRenderResourceClass> pResource )
 {
 	Assert( pResource );
-	UNIQUE_RENDER_COMMAND_ONEPARAMETER( CStudioReleaseResourceCmd, TRefPtr<TStudioRenderResourceClass>, pResource, pResource,
+	UNIQUE_RENDER_COMMAND_ONEPARAMETER( CStudioReleaseResourceCmd, CRefPtr<TStudioRenderResourceClass>, pResource, pResource,
 										{
 											pResource->UpdateResource();
 										} );
@@ -78,10 +78,10 @@ Studio_BeginReleaseResourceSafe
 ==================
 */
 template<class TStudioRenderResourceClass>
-FORCEINLINE void Studio_BeginReleaseResourceSafe( TRefPtr<TStudioRenderResourceClass> pResource )
+FORCEINLINE void Studio_BeginReleaseResourceSafe( CRefPtr<TStudioRenderResourceClass> pResource )
 {
 	Assert( pResource );
-	UNIQUE_RENDER_COMMAND_ONEPARAMETER( CStudioUpdateResourceCmd, TRefPtr<TStudioRenderResourceClass>, pResource, pResource,
+	UNIQUE_RENDER_COMMAND_ONEPARAMETER( CStudioUpdateResourceCmd, CRefPtr<TStudioRenderResourceClass>, pResource, pResource,
 										{
 											pResource->ReleaseResource();
 										} );
@@ -163,11 +163,11 @@ FORCEINLINE CThreadMutex& CStudioGlobalRenderResources::GetThreadMutex()
 
 /*
 ==================
-TStudioRenderResource::InitResource
+CStudioRenderResource::InitResource
 ==================
 */
 template<class TBaseClass, bool bGlobal /*= false*/>
-void TStudioRenderResource<TBaseClass, bGlobal>::InitResource()
+void CStudioRenderResource<TBaseClass, bGlobal>::InitResource()
 {
 	if ( bInitedResource )
 	{
@@ -181,11 +181,11 @@ void TStudioRenderResource<TBaseClass, bGlobal>::InitResource()
 
 /*
 ==================
-TStudioRenderResource::ReleaseResource
+CStudioRenderResource::ReleaseResource
 ==================
 */
 template<class TBaseClass, bool bGlobal /*= false*/>
-void TStudioRenderResource<TBaseClass, bGlobal>::ReleaseResource()
+void CStudioRenderResource<TBaseClass, bGlobal>::ReleaseResource()
 {
 	if ( !bInitedResource )
 	{
@@ -199,11 +199,11 @@ void TStudioRenderResource<TBaseClass, bGlobal>::ReleaseResource()
 
 /*
 ==================
-TStudioRenderResource::UpdateResource
+CStudioRenderResource::UpdateResource
 ==================
 */
 template<class TBaseClass, bool bGlobal /*= false*/>
-void TStudioRenderResource<TBaseClass, bGlobal>::UpdateResource()
+void CStudioRenderResource<TBaseClass, bGlobal>::UpdateResource()
 {
 	if ( !bInitedResource )
 	{
@@ -217,42 +217,42 @@ void TStudioRenderResource<TBaseClass, bGlobal>::UpdateResource()
 
 /*
 ==================
-TStudioRenderResource::IsInitedResource
+CStudioRenderResource::IsInitedResource
 ==================
 */
 template<class TBaseClass, bool bGlobal /*= false*/>
-bool TStudioRenderResource<TBaseClass, bGlobal>::IsInitedResource() const
+bool CStudioRenderResource<TBaseClass, bGlobal>::IsInitedResource() const
 {
 	return bInitedResource;
 }
 
 /*
 ==================
-TStudioRenderResource::InitStudioAPI
+CStudioRenderResource::InitStudioAPI
 ==================
 */
 template<class TBaseClass, bool bGlobal /*= false*/>
-void TStudioRenderResource<TBaseClass, bGlobal>::InitStudioAPI()
+void CStudioRenderResource<TBaseClass, bGlobal>::InitStudioAPI()
 {
 }
 
 /*
 ==================
-TStudioRenderResource::ReleaseStudioAPI
+CStudioRenderResource::ReleaseStudioAPI
 ==================
 */
 template<class TBaseClass, bool bGlobal /*= false*/>
-void TStudioRenderResource<TBaseClass, bGlobal>::ReleaseStudioAPI()
+void CStudioRenderResource<TBaseClass, bGlobal>::ReleaseStudioAPI()
 {
 }
 
 /*
 ==================
-TStudioRenderResource::UpdateStudioAPI
+CStudioRenderResource::UpdateStudioAPI
 ==================
 */
 template<class TBaseClass, bool bGlobal /*= false*/>
-void TStudioRenderResource<TBaseClass, bGlobal>::UpdateStudioAPI()
+void CStudioRenderResource<TBaseClass, bGlobal>::UpdateStudioAPI()
 {
 	ReleaseStudioAPI();
 	InitStudioAPI();

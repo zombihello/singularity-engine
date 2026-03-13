@@ -9,9 +9,9 @@
 // Helper macros to declare delegates
 //-----------------------------------------------------------------------------
 #define DECLARE_MULTICAST_DELEGATE_INTERFACE( DelegateInterfaceName, ... ) typedef IMulticastDelegate<__VA_ARGS__> DelegateInterfaceName;
-#define DECLARE_MULTICAST_DELEGATE( DelegateName, ... )					   typedef TMulticastDelegate<__VA_ARGS__> DelegateName;
+#define DECLARE_MULTICAST_DELEGATE( DelegateName, ... )					   typedef CMulticastDelegate<__VA_ARGS__> DelegateName;
 #define DECLARE_DELEGATE_INTERFACE( DelegateInterfaceName, ... )		   typedef IDelegate<__VA_ARGS__> DelegateInterfaceName;
-#define DECLARE_DELEGATE( DelegateName, ... )							   typedef TDelegate<__VA_ARGS__> DelegateName;
+#define DECLARE_DELEGATE( DelegateName, ... )							   typedef CDelegate<__VA_ARGS__> DelegateName;
 
 //-----------------------------------------------------------------------------
 // Delegate interfaces
@@ -52,7 +52,7 @@ public:
 // Delegate implementations
 //-----------------------------------------------------------------------------
 template<typename... TParamTypes>
-class TMulticastDelegate : public IMulticastDelegate<TParamTypes...>
+class CMulticastDelegate : public IMulticastDelegate<TParamTypes...>
 {
 public:
 	using typename IMulticastDelegate<TParamTypes...>::funcDelegate_t;
@@ -69,7 +69,7 @@ private:
 };
 
 template<typename... TParamTypes>
-class TDelegate : public IDelegate<TParamTypes...>
+class CDelegate : public IDelegate<TParamTypes...>
 {
 public:
 	using typename IDelegate<TParamTypes...>::delegateFn_t;

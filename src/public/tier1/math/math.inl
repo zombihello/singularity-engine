@@ -27,7 +27,7 @@ S_Pow
 */
 FORCEINLINE float S_Pow( float a, float b )
 {
-	return powf( a, b );
+	return glm::pow( a, b );
 }
 
 /*
@@ -37,17 +37,17 @@ S_Log2
 */
 FORCEINLINE float S_Log2( float a )
 {
-	return log2( a );
+	return glm::log2( a );
 }
 
 /*
 ==================
-S_Loge
+S_LogE
 ==================
 */
-FORCEINLINE float S_Loge( float a )
+FORCEINLINE float S_LogE( float a )
 {
-	return logf( a );
+	return glm::log( a );
 }
 
 /*
@@ -57,7 +57,7 @@ S_LogX
 */
 FORCEINLINE float S_LogX( float base, float value )
 {
-	return S_Loge( value ) / S_Loge( base );
+	return S_LogE( value ) / S_LogE( base );
 }
 
 /*
@@ -67,7 +67,7 @@ S_Trunc
 */
 FORCEINLINE float S_Trunc( float a )
 {
-	return truncf( a );
+	return glm::trunc( a );
 }
 
 /*
@@ -77,7 +77,7 @@ S_Round
 */
 FORCEINLINE float S_Round( float a )
 {
-	return roundf( a );
+	return glm::round( a );
 }
 
 /*
@@ -87,7 +87,7 @@ S_Sin
 */
 FORCEINLINE float S_Sin( float a )
 {
-	return sinf( a );
+	return glm::sin( a );
 }
 
 /*
@@ -97,37 +97,37 @@ S_Cos
 */
 FORCEINLINE float S_Cos( float a )
 {
-	return cosf( a );
+	return glm::cos( a );
 }
 
 /*
 ==================
-S_ASin
+S_Asin
 ==================
 */
-FORCEINLINE float S_ASin( float a )
+FORCEINLINE float S_Asin( float a )
 {
-	return asinf( a );
+	return glm::asin( a );
 }
 
 /*
 ==================
-S_ATan
+S_Atan
 ==================
 */
-FORCEINLINE float S_ATan( float a )
+FORCEINLINE float S_Atan( float a )
 {
-	return atanf( a );
+	return glm::atan( a );
 }
 
 /*
 ==================
-S_ATan2
+S_Atan2
 ==================
 */
-FORCEINLINE float S_ATan2( float y, float x )
+FORCEINLINE float S_Atan2( float y, float x )
 {
-	return atan2f( y, x );
+	return glm::atan( y, x );
 }
 
 /*
@@ -137,7 +137,7 @@ S_Sqrt
 */
 FORCEINLINE float S_Sqrt( float a )
 {
-	return sqrtf( a );
+	return glm::sqrt( a );
 }
 
 /*
@@ -147,17 +147,7 @@ S_Floor
 */
 FORCEINLINE float S_Floor( float a )
 {
-	return floorf( a );
-}
-
-/*
-==================
-S_Clamp
-==================
-*/
-FORCEINLINE float S_Clamp( float x, float min, float max )
-{
-	return ::Clamp( x, min, max );
+	return glm::floor( a );
 }
 
 /*
@@ -167,7 +157,7 @@ S_Abs
 */
 FORCEINLINE float S_Abs( float x )
 {
-	return abs( x );
+	return glm::abs( x );
 }
 
 /*
@@ -178,6 +168,16 @@ S_Lerp
 FORCEINLINE float S_Lerp( float x, float y, float a )
 {
 	return glm::lerp( x, y, a );
+}
+
+/*
+==================
+S_Fmod
+==================
+*/
+FORCEINLINE float S_Fmod( float x, float y )
+{
+	return fmod( x, y );
 }
 
 /*
@@ -195,9 +195,9 @@ FORCEINLINE bool S_IsNearlyZero( float value, float errorTolerance /*/*= SMALL_N
 S_IsNearlyZero
 ==================
 */
-FORCEINLINE bool S_IsNearlyZero( const vec2_t& value, float errorTolerance /*/*= SMALL_NUMBER*/ )
+FORCEINLINE bool S_IsNearlyZero( const vector2_t& value, float errorTolerance /*/*= SMALL_NUMBER*/ )
 {
-	return S_Abs( value.x ) < errorTolerance && S_Abs( value.y ) < errorTolerance;
+	return S_IsNearlyZero( value.x, errorTolerance ) && S_IsNearlyZero( value.y, errorTolerance );
 }
 
 /*
@@ -205,9 +205,9 @@ FORCEINLINE bool S_IsNearlyZero( const vec2_t& value, float errorTolerance /*/*=
 S_IsNearlyZero
 ==================
 */
-FORCEINLINE bool S_IsNearlyZero( const vec3_t& value, float errorTolerance /*= SMALL_NUMBER*/ )
+FORCEINLINE bool S_IsNearlyZero( const vector3_t& value, float errorTolerance /*= SMALL_NUMBER*/ )
 {
-	return S_Abs( value.x ) < errorTolerance && S_Abs( value.y ) < errorTolerance && S_Abs( value.z ) < errorTolerance;
+	return S_IsNearlyZero( value.x, errorTolerance ) && S_IsNearlyZero( value.y, errorTolerance ) && S_IsNearlyZero( value.z, errorTolerance );
 }
 
 /*
@@ -215,19 +215,9 @@ FORCEINLINE bool S_IsNearlyZero( const vec3_t& value, float errorTolerance /*= S
 S_IsNearlyZero
 ==================
 */
-FORCEINLINE bool S_IsNearlyZero( const vec4_t& value, float errorTolerance /*= SMALL_NUMBER*/ )
+FORCEINLINE bool S_IsNearlyZero( const vector4_t& value, float errorTolerance /*= SMALL_NUMBER*/ )
 {
-	return S_Abs( value.x ) < errorTolerance && S_Abs( value.y ) < errorTolerance && S_Abs( value.z ) < errorTolerance && S_Abs( value.w ) < errorTolerance;
-}
-
-/*
-==================
-S_Fmod
-==================
-*/
-FORCEINLINE float S_Fmod( float x, float y )
-{
-	return fmod( x, y );
+	return S_IsNearlyZero( value.x, errorTolerance ) && S_IsNearlyZero( value.y, errorTolerance ) && S_IsNearlyZero( value.z, errorTolerance ) && S_IsNearlyZero( value.w, errorTolerance );
 }
 
 /*
@@ -237,14 +227,7 @@ S_GridSnap
 */
 FORCEINLINE float S_GridSnap( float value, float grid )
 {
-	if ( grid == 0.f )
-	{
-		return value;
-	}
-	else
-	{
-		return S_Floor( ( value + 0.5f * grid ) / grid ) * grid;
-	}
+	return grid != 0.f ? S_Floor( ( value + 0.5f * grid ) / grid ) * grid : value;
 }
 
 /*
@@ -252,9 +235,9 @@ FORCEINLINE float S_GridSnap( float value, float grid )
 S_GridSnap
 ==================
 */
-FORCEINLINE vec2_t S_GridSnap( const vec2_t& value, float grid )
+FORCEINLINE vector2_t S_GridSnap( const vector2_t& value, float grid )
 {
-	vec2_t retVec;
+	vector2_t retVec;
 	S_GridSnap( value, grid, retVec );
 	return retVec;
 }
@@ -264,9 +247,10 @@ FORCEINLINE vec2_t S_GridSnap( const vec2_t& value, float grid )
 S_GridSnap
 ==================
 */
-FORCEINLINE void S_GridSnap( const vec2_t& value, float grid, vec2_t& resultValue )
+FORCEINLINE void S_GridSnap( const vector2_t& value, float grid, vector2_t& result )
 {
-	resultValue = vec2_t( S_GridSnap( value.x, grid ), S_GridSnap( value.y, grid ) );
+	result.x = S_GridSnap( value.x, grid );
+	result.y = S_GridSnap( value.y, grid );
 }
 
 /*
@@ -274,9 +258,9 @@ FORCEINLINE void S_GridSnap( const vec2_t& value, float grid, vec2_t& resultValu
 S_GridSnap
 ==================
 */
-FORCEINLINE vec3_t S_GridSnap( const vec3_t& value, float grid )
+FORCEINLINE vector3_t S_GridSnap( const vector3_t& value, float grid )
 {
-	vec3_t retVec;
+	vector3_t retVec;
 	S_GridSnap( value, grid, retVec );
 	return retVec;
 }
@@ -286,9 +270,11 @@ FORCEINLINE vec3_t S_GridSnap( const vec3_t& value, float grid )
 S_GridSnap
 ==================
 */
-FORCEINLINE void S_GridSnap( const vec3_t& value, float grid, vec3_t& resultValue )
+FORCEINLINE void S_GridSnap( const vector3_t& value, float grid, vector3_t& result )
 {
-	resultValue = vec3_t( S_GridSnap( value.x, grid ), S_GridSnap( value.y, grid ), S_GridSnap( value.z, grid ) );
+	result.x = S_GridSnap( value.x, grid );
+	result.y = S_GridSnap( value.y, grid );
+	result.z = S_GridSnap( value.z, grid );
 }
 
 /*
@@ -296,9 +282,9 @@ FORCEINLINE void S_GridSnap( const vec3_t& value, float grid, vec3_t& resultValu
 S_GridSnap
 ==================
 */
-FORCEINLINE vec4_t S_GridSnap( const vec4_t& value, float grid )
+FORCEINLINE vector4_t S_GridSnap( const vector4_t& value, float grid )
 {
-	vec4_t retVec;
+	vector4_t retVec;
 	S_GridSnap( value, grid, retVec );
 	return retVec;
 }
@@ -308,9 +294,69 @@ FORCEINLINE vec4_t S_GridSnap( const vec4_t& value, float grid )
 S_GridSnap
 ==================
 */
-FORCEINLINE void S_GridSnap( const vec4_t& value, float grid, vec4_t& resultValue )
+FORCEINLINE void S_GridSnap( const vector4_t& value, float grid, vector4_t& result )
 {
-	resultValue = vec4_t( S_GridSnap( value.x, grid ), S_GridSnap( value.y, grid ), S_GridSnap( value.z, grid ), S_GridSnap( value.w, grid ) );
+	result.x = S_GridSnap( value.x, grid );
+	result.y = S_GridSnap( value.y, grid );
+	result.z = S_GridSnap( value.z, grid );
+	result.w = S_GridSnap( value.w, grid );
+}
+
+/*
+==================
+S_Max
+==================
+*/
+template<typename TType>
+FORCEINLINE TType S_Max( const TType& a, const TType& b )
+{
+	return ( a >= b ) ? a : b;
+}
+
+/*
+==================
+S_Min
+==================
+*/
+template<typename TType>
+FORCEINLINE TType S_Min( const TType& a, const TType& b )
+{
+	return ( a <= b ) ? a : b;
+}
+
+/*
+==================
+S_Align
+==================
+*/
+template<typename TType>
+FORCEINLINE TType S_Align( const TType& value, uint64 alignment )
+{
+	return (TType)( ( (ptrint)value + alignment - 1 ) & ~( (ptrint)alignment - 1 ) );
+}
+
+/*
+==================
+S_Clamp
+==================
+*/
+template<typename TType>
+FORCEINLINE TType S_Clamp( const TType& x, const TType& min, const TType& max )
+{
+	return S_Min( S_Max( x, min ), max );
+}
+
+/*
+==================
+S_Swap
+==================
+*/
+template<typename TType>
+FORCEINLINE void S_Swap( TType& a, TType& b )
+{
+	TType tmp = eastl::move( a );
+	a		  = eastl::move( b );
+	b		  = eastl::move( tmp );
 }
 
 /*
@@ -370,117 +416,143 @@ constexpr FORCEINLINE bool S_IsFinite( const TType& value )
 
 /*
 ==================
-S_VectorCreate
+S_VectorFromString
 ==================
 */
 template<typename TVectorType>
-FORCEINLINE TVectorType S_VectorCreate( const char* pString )
+FORCEINLINE TVectorType S_VectorFromString( const char* pString )
 {
 	TVectorType result;
-	S_VectorCreate( pString, result );
+	S_VectorFromString( pString, result );
 	return result;
 }
 
 /*
 ==================
-S_VectorCreate
+S_VectorFromString
 ==================
 */
-FORCEINLINE void S_VectorCreate( const char* pString, vec2_t& vector )
+template<typename TVectorType>
+FORCEINLINE void S_VectorFromString( const char* pString, TVectorType& vector )
+{
+	static_assert( false, "Unknown type to create a vector from a string" );
+}
+
+/*
+==================
+S_VectorFromString
+==================
+*/
+template<>
+FORCEINLINE void S_VectorFromString<vector2_t>( const char* pString, vector2_t& vector )
 {
 	S_Sscanf( pString, "%f %f", &vector.x, &vector.y );
 }
 
 /*
 ==================
-S_VectorCreate
+S_VectorFromString
 ==================
 */
-FORCEINLINE void S_VectorCreate( const char* pString, vec3_t& vector )
+template<>
+FORCEINLINE void S_VectorFromString<vector2i_t>( const char* pString, vector2i_t& vector )
+{
+	S_Sscanf( pString, "%i %i", &vector.x, &vector.y );
+}
+
+/*
+==================
+S_VectorFromString
+==================
+*/
+template<>
+FORCEINLINE void S_VectorFromString<vector2b_t>( const char* pString, vector2b_t& vector )
+{
+	int32 x = 0;
+	int32 y = 0;
+	S_Sscanf( pString, "%i %i", &x, &y );
+	vector.x = x > 0;
+	vector.y = y > 0;
+}
+
+/*
+==================
+S_VectorFromString
+==================
+*/
+template<>
+FORCEINLINE void S_VectorFromString<vector3_t>( const char* pString, vector3_t& vector )
 {
 	S_Sscanf( pString, "%f %f %f", &vector.x, &vector.y, &vector.z );
 }
 
 /*
 ==================
-S_VectorCreate
+S_VectorFromString
 ==================
 */
-FORCEINLINE void S_VectorCreate( const char* pString, vec4_t& vector )
+template<>
+FORCEINLINE void S_VectorFromString<vector3i_t>( const char* pString, vector3i_t& vector )
+{
+	S_Sscanf( pString, "%i %i %i", &vector.x, &vector.y, &vector.z );
+}
+
+/*
+==================
+S_VectorFromString
+==================
+*/
+template<>
+FORCEINLINE void S_VectorFromString<vector3b_t>( const char* pString, vector3b_t& vector )
+{
+	int32 x = 0;
+	int32 y = 0;
+	int32 z = 0;
+	S_Sscanf( pString, "%i %i %i", &x, &y, &z );
+	vector.x = x > 0;
+	vector.y = y > 0;
+	vector.z = z > 0;
+}
+
+/*
+==================
+S_VectorFromString
+==================
+*/
+template<>
+FORCEINLINE void S_VectorFromString<vector4_t>( const char* pString, vector4_t& vector )
 {
 	S_Sscanf( pString, "%f %f %f %f", &vector.x, &vector.y, &vector.z, &vector.w );
 }
 
 /*
 ==================
-S_VectorCreate
+S_VectorFromString
 ==================
 */
-FORCEINLINE vec2_t S_VectorCreate( float x, float y )
+template<>
+FORCEINLINE void S_VectorFromString<vector4i_t>( const char* pString, vector4i_t& vector )
 {
-	vec2_t result;
-	S_VectorCreate( x, y, result );
-	return result;
+	S_Sscanf( pString, "%i %i %i %i", &vector.x, &vector.y, &vector.z, &vector.w );
 }
 
 /*
 ==================
-S_VectorCreate
+S_VectorFromString
 ==================
 */
-FORCEINLINE vec3_t S_VectorCreate( float x, float y, float z )
+template<>
+FORCEINLINE void S_VectorFromString<vector4b_t>( const char* pString, vector4b_t& vector )
 {
-	vec3_t result;
-	S_VectorCreate( x, y, z, result );
-	return result;
-}
-
-/*
-==================
-S_VectorCreate
-==================
-*/
-FORCEINLINE vec4_t S_VectorCreate( float x, float y, float z, float w )
-{
-	vec4_t result;
-	S_VectorCreate( x, y, z, w, result );
-	return result;
-}
-
-/*
-==================
-S_VectorCreate
-==================
-*/
-FORCEINLINE void S_VectorCreate( float x, float y, vec2_t& vector )
-{
-	vector.x = x;
-	vector.y = y;
-}
-
-/*
-==================
-S_VectorCreate
-==================
-*/
-FORCEINLINE void S_VectorCreate( float x, float y, float z, vec3_t& vector )
-{
-	vector.x = x;
-	vector.y = y;
-	vector.z = z;
-}
-
-/*
-==================
-S_VectorCreate
-==================
-*/
-FORCEINLINE void S_VectorCreate( float x, float y, float z, float w, vec4_t& vector )
-{
-	vector.x = x;
-	vector.y = y;
-	vector.z = z;
-	vector.w = w;
+	int32 x = 0;
+	int32 y = 0;
+	int32 z = 0;
+	int32 w = 0;
+	S_Sscanf( pString, "%i %i %i %i", &x, &y, &z, &w );
+	vector.x = x > 0;
+	vector.y = y > 0;
+	vector.z = z > 0;
+	vector.w = w > 0;
 }
 
 /*
@@ -488,7 +560,8 @@ FORCEINLINE void S_VectorCreate( float x, float y, float z, float w, vec4_t& vec
 S_VectorToString
 ==================
 */
-FORCEINLINE eastl::string S_VectorToString( const vec2_t& vector )
+template<typename TVectorType>
+FORCEINLINE eastl::string S_VectorToString( const TVectorType& vector )
 {
 	eastl::string result;
 	S_VectorToString( vector, result );
@@ -500,11 +573,10 @@ FORCEINLINE eastl::string S_VectorToString( const vec2_t& vector )
 S_VectorToString
 ==================
 */
-FORCEINLINE eastl::string S_VectorToString( const vec3_t& vector )
+template<typename TVectorType>
+FORCEINLINE void S_VectorToString( const TVectorType& vector, eastl::string& result )
 {
-	eastl::string result;
-	S_VectorToString( vector, result );
-	return result;
+	static_assert( false, "Unknown type to create a string from a vector" );
 }
 
 /*
@@ -512,19 +584,8 @@ FORCEINLINE eastl::string S_VectorToString( const vec3_t& vector )
 S_VectorToString
 ==================
 */
-FORCEINLINE eastl::string S_VectorToString( const vec4_t& vector )
-{
-	eastl::string result;
-	S_VectorToString( vector, result );
-	return result;
-}
-
-/*
-==================
-S_VectorToString
-==================
-*/
-FORCEINLINE void S_VectorToString( const vec2_t& vector, eastl::string& result )
+template<>
+FORCEINLINE void S_VectorToString<vector2_t>( const vector2_t& vector, eastl::string& result )
 {
 	result = S_Sprintf( "%f %f", vector.x, vector.y );
 }
@@ -534,7 +595,30 @@ FORCEINLINE void S_VectorToString( const vec2_t& vector, eastl::string& result )
 S_VectorToString
 ==================
 */
-FORCEINLINE void S_VectorToString( const vec3_t& vector, eastl::string& result )
+template<>
+FORCEINLINE void S_VectorToString<vector2i_t>( const vector2i_t& vector, eastl::string& result )
+{
+	result = S_Sprintf( "%i %i", vector.x, vector.y );
+}
+
+/*
+==================
+S_VectorToString
+==================
+*/
+template<>
+FORCEINLINE void S_VectorToString<vector2b_t>( const vector2b_t& vector, eastl::string& result )
+{
+	result = S_Sprintf( "%i %i", vector.x, vector.y );
+}
+
+/*
+==================
+S_VectorToString
+==================
+*/
+template<>
+FORCEINLINE void S_VectorToString<vector3_t>( const vector3_t& vector, eastl::string& result )
 {
 	result = S_Sprintf( "%f %f %f", vector.x, vector.y, vector.z );
 }
@@ -544,9 +628,54 @@ FORCEINLINE void S_VectorToString( const vec3_t& vector, eastl::string& result )
 S_VectorToString
 ==================
 */
-FORCEINLINE void S_VectorToString( const vec4_t& vector, eastl::string& result )
+template<>
+FORCEINLINE void S_VectorToString<vector3i_t>( const vector3i_t& vector, eastl::string& result )
+{
+	result = S_Sprintf( "%i %i %i", vector.x, vector.y, vector.z );
+}
+
+/*
+==================
+S_VectorToString
+==================
+*/
+template<>
+FORCEINLINE void S_VectorToString<vector3b_t>( const vector3b_t& vector, eastl::string& result )
+{
+	result = S_Sprintf( "%i %i %i", vector.x, vector.y, vector.z );
+}
+
+/*
+==================
+S_VectorToString
+==================
+*/
+template<>
+FORCEINLINE void S_VectorToString<vector4_t>( const vector4_t& vector, eastl::string& result )
 {
 	result = S_Sprintf( "%f %f %f %f", vector.x, vector.y, vector.z, vector.w );
+}
+
+/*
+==================
+S_VectorToString
+==================
+*/
+template<>
+FORCEINLINE void S_VectorToString<vector4i_t>( const vector4i_t& vector, eastl::string& result )
+{
+	result = S_Sprintf( "%i %i %i %i", vector.x, vector.y, vector.z, vector.w );
+}
+
+/*
+==================
+S_VectorToString
+==================
+*/
+template<>
+FORCEINLINE void S_VectorToString<vector4b_t>( const vector4b_t& vector, eastl::string& result )
+{
+	result = S_Sprintf( "%i %i %i %i", vector.x, vector.y, vector.z, vector.w );
 }
 
 /*
@@ -554,7 +683,8 @@ FORCEINLINE void S_VectorToString( const vec4_t& vector, eastl::string& result )
 S_VectorDotProduct
 ==================
 */
-FORCEINLINE float S_VectorDotProduct( const vec3_t& x, const vec3_t& y )
+template<typename TVectorType>
+FORCEINLINE float S_VectorDotProduct( const TVectorType& x, const TVectorType& y )
 {
 	return glm::dot( x, y );
 }
@@ -564,7 +694,8 @@ FORCEINLINE float S_VectorDotProduct( const vec3_t& x, const vec3_t& y )
 S_VectorNormalize
 ==================
 */
-FORCEINLINE vec2_t S_VectorNormalize( const vec2_t& vector )
+template<typename TVectorType>
+FORCEINLINE TVectorType S_VectorNormalize( const TVectorType& vector )
 {
 	return glm::normalize( vector );
 }
@@ -574,19 +705,10 @@ FORCEINLINE vec2_t S_VectorNormalize( const vec2_t& vector )
 S_VectorNormalize
 ==================
 */
-FORCEINLINE vec3_t S_VectorNormalize( const vec3_t& vector )
+template<typename TVectorType>
+FORCEINLINE void S_VectorNormalize( const TVectorType& vector, TVectorType& result )
 {
-	return glm::normalize( vector );
-}
-
-/*
-==================
-S_VectorNormalize
-==================
-*/
-FORCEINLINE vec4_t S_VectorNormalize( const vec4_t& vector )
-{
-	return glm::normalize( vector );
+	result = S_VectorNormalize( vector );
 }
 
 /*
@@ -594,50 +716,33 @@ FORCEINLINE vec4_t S_VectorNormalize( const vec4_t& vector )
 S_VectorLength
 ==================
 */
-FORCEINLINE float S_VectorLength( const vec2_t& vector )
+template<typename TVectorType>
+FORCEINLINE float S_VectorLength( const TVectorType& vector )
 {
 	return glm::length( vector );
 }
 
 /*
 ==================
-S_VectorLength
+S_VectorCrossProduct
 ==================
 */
-FORCEINLINE float S_VectorLength( const vec3_t& vector )
+template<typename TVectorType>
+FORCEINLINE void S_VectorCrossProduct( const TVectorType& x, const TVectorType& y, TVectorType& result )
 {
-	return glm::length( vector );
+	result = glm::cross( x, y );
 }
 
 /*
 ==================
-S_VectorLength
+S_VectorCrossProduct
 ==================
 */
-FORCEINLINE float S_VectorLength( const vec4_t& vector )
+template<typename TVectorType>
+FORCEINLINE TVectorType S_VectorCrossProduct( const TVectorType& x, const TVectorType& y )
 {
-	return glm::length( vector );
-}
-
-/*
-==================
-S_VectorCross
-==================
-*/
-FORCEINLINE void S_VectorCross( const vec3_t& vectorA, const vec3_t& vectorB, vec3_t& resultVector )
-{
-	resultVector = glm::cross( vectorA, vectorB );
-}
-
-/*
-==================
-S_VectorCross
-==================
-*/
-FORCEINLINE vec3_t S_VectorCross( const vec3_t& vectorA, const vec3_t& vectorB )
-{
-	vec3_t result;
-	S_VectorCross( vectorA, vectorB, result );
+	TVectorType result;
+	S_VectorCrossProduct( x, y, result );
 	return result;
 }
 
@@ -646,56 +751,139 @@ FORCEINLINE vec3_t S_VectorCross( const vec3_t& vectorA, const vec3_t& vectorB )
 S_VectorDistance
 ==================
 */
-FORCEINLINE float S_VectorDistance( const vec3_t& vectorA, const vec3_t& vectorB )
+template<typename TVectorType>
+FORCEINLINE float S_VectorDistance( const TVectorType& x, const TVectorType& y )
 {
-	return glm::distance( vectorA, vectorB );
+	return glm::distance( x, y );
 }
 
 /*
 ==================
-S_QuaternionCreate
+S_VectorAll
 ==================
 */
-FORCEINLINE quat_t S_QuaternionCreate( const char* pString )
+template<typename TVectorBoolType>
+FORCEINLINE bool S_VectorAll( const TVectorBoolType& x )
 {
-	quat_t result;
-	S_QuaternionCreate( pString, result );
+	return glm::all( x );
+}
+
+/*
+==================
+S_VectorLessThan
+==================
+*/
+template<typename TVectorType>
+FORCEINLINE void S_VectorLessThan( const TVectorType& x, const TVectorType& y, typename vectorBoolType_t<TVectorType>::type_t& result )
+{
+	result = glm::lessThan( x, y );
+}
+
+/*
+==================
+S_VectorLessThan
+==================
+*/
+template<typename TVectorType>
+FORCEINLINE typename vectorBoolType_t<TVectorType>::type_t S_VectorLessThan( const TVectorType& x, const TVectorType& y )
+{
+	typename vectorBoolType_t<TVectorType>::type_t result;
+	S_VectorLessThan( x, y, result );
 	return result;
 }
 
 /*
 ==================
-S_QuaternionCreate
+S_VectorLessThanEqual
 ==================
 */
-FORCEINLINE void S_QuaternionCreate( const char* pString, quat_t& quaternion )
+template<typename TVectorType>
+FORCEINLINE void S_VectorLessThanEqual( const TVectorType& x, const TVectorType& y, typename vectorBoolType_t<TVectorType>::type_t& result )
+{
+	result = glm::lessThanEqual( x, y );
+}
+
+/*
+==================
+S_VectorLessThanEqual
+==================
+*/
+template<typename TVectorType>
+FORCEINLINE typename vectorBoolType_t<TVectorType>::type_t S_VectorLessThanEqual( const TVectorType& x, const TVectorType& y )
+{
+	typename vectorBoolType_t<TVectorType>::type_t result;
+	S_VectorLessThanEqual( x, y, result );
+	return result;
+}
+
+/*
+==================
+S_VectorGreaterThan
+==================
+*/
+template<typename TVectorType>
+FORCEINLINE void S_VectorGreaterThan( const TVectorType& x, const TVectorType& y, typename vectorBoolType_t<TVectorType>::type_t& result )
+{
+	result = glm::greaterThan( x, y );
+}
+
+/*
+==================
+S_VectorGreaterThan
+==================
+*/
+template<typename TVectorType>
+FORCEINLINE typename vectorBoolType_t<TVectorType>::type_t S_VectorGreaterThan( const TVectorType& x, const TVectorType& y )
+{
+	typename vectorBoolType_t<TVectorType>::type_t result;
+	S_VectorGreaterThan( x, y, result );
+	return result;
+}
+
+/*
+==================
+S_VectorGreaterThanEqual
+==================
+*/
+template<typename TVectorType>
+FORCEINLINE void S_VectorGreaterThanEqual( const TVectorType& x, const TVectorType& y, typename vectorBoolType_t<TVectorType>::type_t& result )
+{
+	result = glm::greaterThanEqual( x, y );
+}
+
+/*
+==================
+S_VectorGreaterThanEqual
+==================
+*/
+template<typename TVectorType>
+FORCEINLINE typename vectorBoolType_t<TVectorType>::type_t S_VectorGreaterThanEqual( const TVectorType& x, const TVectorType& y )
+{
+	typename vectorBoolType_t<TVectorType>::type_t result;
+	S_VectorGreaterThanEqual( x, y, result );
+	return result;
+}
+
+/*
+==================
+S_QuaternionFromString
+==================
+*/
+FORCEINLINE quaternion_t S_QuaternionFromString( const char* pString )
+{
+	quaternion_t result;
+	S_QuaternionFromString( pString, result );
+	return result;
+}
+
+/*
+==================
+S_QuaternionFromString
+==================
+*/
+FORCEINLINE void S_QuaternionFromString( const char* pString, quaternion_t& quaternion )
 {
 	S_Sscanf( pString, "%f %f %f %f", &quaternion.x, &quaternion.y, &quaternion.z, &quaternion.w );
-}
-
-/*
-==================
-S_QuaternionCreate
-==================
-*/
-FORCEINLINE quat_t S_QuaternionCreate( float x, float y, float z, float w )
-{
-	quat_t result;
-	S_QuaternionCreate( x, y, z, w, result );
-	return result;
-}
-
-/*
-==================
-S_QuaternionCreate
-==================
-*/
-FORCEINLINE void S_QuaternionCreate( float x, float y, float z, float w, quat_t& quaternion )
-{
-	quaternion.x = x;
-	quaternion.y = y;
-	quaternion.z = z;
-	quaternion.w = w;
 }
 
 /*
@@ -703,7 +891,7 @@ FORCEINLINE void S_QuaternionCreate( float x, float y, float z, float w, quat_t&
 S_QuaternionToString
 ==================
 */
-FORCEINLINE eastl::string S_QuaternionToString( const quat_t& quaternion )
+FORCEINLINE eastl::string S_QuaternionToString( const quaternion_t& quaternion )
 {
 	eastl::string result;
 	S_QuaternionToString( quaternion, result );
@@ -715,19 +903,74 @@ FORCEINLINE eastl::string S_QuaternionToString( const quat_t& quaternion )
 S_QuaternionToString
 ==================
 */
-FORCEINLINE void S_QuaternionToString( const quat_t& quaternion, eastl::string& result )
+FORCEINLINE void S_QuaternionToString( const quaternion_t& quaternion, eastl::string& result )
 {
 	result = S_Sprintf( "%f %f %f %f", quaternion.x, quaternion.y, quaternion.z, quaternion.w );
 }
 
 /*
 ==================
+S_QuaternionIdentity
+==================
+*/
+FORCEINLINE void S_QuaternionIdentity( quaternion_t& quaternion )
+{
+	quaternion = glm::identity<quaternion_t>();
+}
+
+/*
+==================
+S_QuaternionIdentity
+==================
+*/
+FORCEINLINE quaternion_t S_QuaternionIdentity()
+{
+	return glm::identity<quaternion_t>();
+}
+
+/*
+==================
 S_AnglesToQuaternionYZX
 ==================
 */
-FORCEINLINE quat_t S_AnglesToQuaternionYZX( float eulerAngleX, float eulerAngleY, float eulerAngleZ )
+FORCEINLINE quaternion_t S_AnglesToQuaternionYZX( float eulerAngleX, float eulerAngleY, float eulerAngleZ )
 {
-	return glm::angleAxis( S_DegreesToRadians( eulerAngleY ), vec3_t( 0.f, 1.f, 0.f ) ) * glm::angleAxis( S_DegreesToRadians( eulerAngleZ ), vec3_t( 0.f, 0.f, 1.f ) ) * glm::angleAxis( S_DegreesToRadians( eulerAngleX ), vec3_t( 1.f, 0.f, 0.f ) );
+	quaternion_t result;
+	S_AnglesToQuaternionYZX( eulerAngleX, eulerAngleY, eulerAngleZ, result );
+	return result;
+}
+
+/*
+==================
+S_AnglesToQuaternionYZX
+==================
+*/
+FORCEINLINE quaternion_t S_AnglesToQuaternionYZX( const vector3_t& eulerAngles )
+{
+	quaternion_t result;
+	S_AnglesToQuaternionYZX( eulerAngles.x, eulerAngles.y, eulerAngles.z, result );
+	return result;
+}
+
+/*
+==================
+S_AnglesToQuaternionYZX
+==================
+*/
+FORCEINLINE void S_AnglesToQuaternionYZX( float eulerAngleX, float eulerAngleY, float eulerAngleZ, quaternion_t& result )
+{
+	result =
+		glm::angleAxis( S_DegreesToRadians( eulerAngleY ), g_vector010 ) * glm::angleAxis( S_DegreesToRadians( eulerAngleZ ), g_vector001 ) * glm::angleAxis( S_DegreesToRadians( eulerAngleX ), g_vector100 );
+}
+
+/*
+==================
+S_AnglesToQuaternionYZX
+==================
+*/
+FORCEINLINE void S_AnglesToQuaternionYZX( const vector3_t& eulerAngles, quaternion_t& result )
+{
+	S_AnglesToQuaternionYZX( eulerAngles.x, eulerAngles.y, eulerAngles.z, result );
 }
 
 /*
@@ -735,19 +978,11 @@ FORCEINLINE quat_t S_AnglesToQuaternionYZX( float eulerAngleX, float eulerAngleY
 S_AnglesToQuaternionZYX
 ==================
 */
-FORCEINLINE quat_t S_AnglesToQuaternionZYX( float eulerAngleX, float eulerAngleY, float eulerAngleZ )
+FORCEINLINE quaternion_t S_AnglesToQuaternionZYX( float eulerAngleX, float eulerAngleY, float eulerAngleZ )
 {
-	return glm::angleAxis( S_DegreesToRadians( eulerAngleZ ), vec3_t( 0.f, 0.f, 1.f ) ) * glm::angleAxis( S_DegreesToRadians( eulerAngleY ), vec3_t( 0.f, 1.f, 0.f ) ) * glm::angleAxis( S_DegreesToRadians( eulerAngleX ), vec3_t( 1.f, 0.f, 0.f ) );
-}
-
-/*
-==================
-S_AnglesToQuaternionYZX
-==================
-*/
-FORCEINLINE quat_t S_AnglesToQuaternionYZX( const vec3_t& eulerAngles )
-{
-	return S_AnglesToQuaternionYZX( eulerAngles.x, eulerAngles.y, eulerAngles.z );
+	quaternion_t result;
+	S_AnglesToQuaternionZYX( eulerAngleX, eulerAngleY, eulerAngleZ, result );
+	return result;
 }
 
 /*
@@ -755,9 +990,32 @@ FORCEINLINE quat_t S_AnglesToQuaternionYZX( const vec3_t& eulerAngles )
 S_AnglesToQuaternionZYX
 ==================
 */
-FORCEINLINE quat_t S_AnglesToQuaternionZYX( const vec3_t& eulerAngles )
+FORCEINLINE quaternion_t S_AnglesToQuaternionZYX( const vector3_t& eulerAngles )
 {
-	return S_AnglesToQuaternionZYX( eulerAngles.x, eulerAngles.y, eulerAngles.z );
+	quaternion_t result;
+	S_AnglesToQuaternionZYX( eulerAngles.x, eulerAngles.y, eulerAngles.z, result );
+	return result;
+}
+
+/*
+==================
+S_AnglesToQuaternionZYX
+==================
+*/
+FORCEINLINE void S_AnglesToQuaternionZYX( float eulerAngleX, float eulerAngleY, float eulerAngleZ, quaternion_t& result )
+{
+	result =
+		glm::angleAxis( S_DegreesToRadians( eulerAngleZ ), g_vector001 ) * glm::angleAxis( S_DegreesToRadians( eulerAngleY ), g_vector010 ) * glm::angleAxis( S_DegreesToRadians( eulerAngleX ), g_vector100 );
+}
+
+/*
+==================
+S_AnglesToQuaternionZYX
+==================
+*/
+FORCEINLINE void S_AnglesToQuaternionZYX( const vector3_t& eulerAngles, quaternion_t& result )
+{
+	S_AnglesToQuaternionZYX( eulerAngles.x, eulerAngles.y, eulerAngles.z, result );
 }
 
 /*
@@ -765,7 +1023,19 @@ FORCEINLINE quat_t S_AnglesToQuaternionZYX( const vec3_t& eulerAngles )
 S_QuaternionToAngles
 ==================
 */
-FORCEINLINE vec3_t S_QuaternionToAngles( const quat_t& quaternion )
+FORCEINLINE vector3_t S_QuaternionToAngles( const quaternion_t& quaternion )
+{
+	vector3_t result;
+	S_QuaternionToAngles( quaternion, result );
+	return result;
+}
+
+/*
+==================
+S_QuaternionToAngles
+==================
+*/
+FORCEINLINE void S_QuaternionToAngles( const quaternion_t& quaternion, vector3_t& result )
 {
 	float quatSquareW	  = S_Pow( quaternion.w, 2.f );
 	float quatSquareX	  = S_Pow( quaternion.x, 2.f );
@@ -777,31 +1047,33 @@ FORCEINLINE vec3_t S_QuaternionToAngles( const quat_t& quaternion )
 	// Reference
 	// http://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
 	// http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/
-	const float SINGULARITY_THRESHOLD = 0.4999995f;
-	float		pitch, yaw, roll;
+	constexpr float singularityThreshold = 0.4999995f;
+	float			pitch, yaw, roll;
 
 	// Singularity at north pole
-	if ( singularityTest > SINGULARITY_THRESHOLD * normalizeFactor )
+	if ( singularityTest > singularityThreshold * normalizeFactor )
 	{
 		pitch = 0.f;
-		yaw	  = 2.f * S_ATan2( quaternion.x, quaternion.w );
+		yaw	  = 2.f * S_Atan2( quaternion.x, quaternion.w );
 		roll  = PI / 2.f;
 	}
 	// Singularity at south pole
-	else if ( singularityTest < -SINGULARITY_THRESHOLD * normalizeFactor )
+	else if ( singularityTest < -singularityThreshold * normalizeFactor )
 	{
 		pitch = 0.f;
-		yaw	  = -2.f * S_ATan2( quaternion.x, quaternion.w );
+		yaw	  = -2.f * S_Atan2( quaternion.x, quaternion.w );
 		roll  = -PI / 2.f;
 	}
 	else
 	{
-		pitch = S_ATan2( 2.f * quaternion.x * quaternion.w - 2.f * quaternion.y * quaternion.z, -quatSquareX + quatSquareY - quatSquareZ + quatSquareW );
-		yaw	  = S_ATan2( 2.f * quaternion.y * quaternion.w - 2.f * quaternion.x * quaternion.z, quatSquareX - quatSquareY - quatSquareZ + quatSquareW );
-		roll  = S_ASin( 2.f * singularityTest / normalizeFactor );
+		pitch = S_Atan2( 2.f * quaternion.x * quaternion.w - 2.f * quaternion.y * quaternion.z, -quatSquareX + quatSquareY - quatSquareZ + quatSquareW );
+		yaw	  = S_Atan2( 2.f * quaternion.y * quaternion.w - 2.f * quaternion.x * quaternion.z, quatSquareX - quatSquareY - quatSquareZ + quatSquareW );
+		roll  = S_Asin( 2.f * singularityTest / normalizeFactor );
 	}
 
-	return vec3_t( S_RadiansToDegrees( pitch ), S_RadiansToDegrees( yaw ), S_RadiansToDegrees( roll ) );
+	result.x = S_RadiansToDegrees( pitch );
+	result.y = S_RadiansToDegrees( yaw );
+	result.z = S_RadiansToDegrees( roll );
 }
 
 /*
@@ -809,9 +1081,21 @@ FORCEINLINE vec3_t S_QuaternionToAngles( const quat_t& quaternion )
 S_QuaternionToMatrix
 ==================
 */
-FORCEINLINE mat4_t S_QuaternionToMatrix( const quat_t& quaternion )
+FORCEINLINE matrix4x4_t S_QuaternionToMatrix( const quaternion_t& quaternion )
 {
-	return glm::mat4_cast( quaternion );
+	matrix4x4_t result;
+	S_QuaternionToMatrix( quaternion, result );
+	return result;
+}
+
+/*
+==================
+S_QuaternionToMatrix
+==================
+*/
+FORCEINLINE void S_QuaternionToMatrix( const quaternion_t& quaternion, matrix4x4_t& result )
+{
+	result = glm::mat4_cast( quaternion );
 }
 
 /*
@@ -819,20 +1103,32 @@ FORCEINLINE mat4_t S_QuaternionToMatrix( const quat_t& quaternion )
 S_QuaternionInverse
 ==================
 */
-FORCEINLINE void S_QuaternionInverse( const quat_t& srcQuaternion, quat_t& destQuaternion )
+FORCEINLINE quaternion_t S_QuaternionInverse( const quaternion_t& quaternion )
 {
-	destQuaternion = glm::inverse( srcQuaternion );
-}
-
-/*
-==================
-S_QuaternionInverse
-==================
-*/
-FORCEINLINE quat_t S_QuaternionInverse( const quat_t& quaternion )
-{
-	quat_t result;
+	quaternion_t result;
 	S_QuaternionInverse( quaternion, result );
+	return result;
+}
+
+/*
+==================
+S_QuaternionInverse
+==================
+*/
+FORCEINLINE void S_QuaternionInverse( const quaternion_t& quaternion, quaternion_t& result )
+{
+	result = glm::inverse( quaternion );
+}
+
+/*
+==================
+S_QuatenrionLookAt
+==================
+*/
+FORCEINLINE quaternion_t S_QuatenrionLookAt( const vector3_t& lookFrom, const vector3_t& lookTo, const vector3_t& up, const vector3_t& globalUp )
+{
+	quaternion_t result;
+	S_QuatenrionLookAt( lookFrom, lookTo, up, globalUp, result );
 	return result;
 }
 
@@ -841,28 +1137,21 @@ FORCEINLINE quat_t S_QuaternionInverse( const quat_t& quaternion )
 S_QuatenrionLookAt
 ==================
 */
-FORCEINLINE quat_t S_QuatenrionLookAt( const vec3_t& lookFrom, const vec3_t& lookTo, const vec3_t& up, const vec3_t& globalUp )
+FORCEINLINE void S_QuatenrionLookAt( const vector3_t& lookFrom, const vector3_t& lookTo, const vector3_t& up, const vector3_t& globalUp, quaternion_t& result )
 {
-	vec3_t direction	   = lookTo - lookFrom;
-	float  directionLength = S_VectorLength( direction );
-	direction			   = S_VectorNormalize( direction );
+	vector3_t direction		  = lookTo - lookFrom;
+	float	  directionLength = S_VectorLength( direction );
+	S_VectorNormalize( direction, direction );
 
 	// Check if the direction is valid; Also deals with NaN
 	if ( directionLength <= 0.0001f )
 	{
-		return quat_t( 1.f, 0.f, 0.f, 0.f );  // Just return identity
+		result = g_quaternionIdentity;	// Just return identity
+		return;
 	}
 
-	// Is the normal up (nearly) parallel to direction?
-	if ( S_Abs( S_VectorDotProduct( direction, up ) ) > 0.9999f )
-	{
-		// Use alternative up
-		return glm::quatLookAt( direction, globalUp ) * glm::angleAxis( S_DegreesToRadians( 90.f ), vec3_t( 1.f, 0.f, 0.f ) );
-	}
-	else
-	{
-		return glm::quatLookAt( direction, up ) * glm::angleAxis( S_DegreesToRadians( 90.f ), vec3_t( 1.f, 0.f, 0.f ) );
-	}
+	// NOTE: Use global up if is the normal up (nearly) parallel to direction
+	result = glm::quatLookAt( direction, S_Abs( S_VectorDotProduct( direction, up ) ) > 0.9999f ? globalUp : up ) * glm::angleAxis( S_DegreesToRadians( 90.f ), g_vector100 );
 }
 
 /*
@@ -870,29 +1159,41 @@ FORCEINLINE quat_t S_QuatenrionLookAt( const vec3_t& lookFrom, const vec3_t& loo
 S_QuaternionNormalize
 ==================
 */
-FORCEINLINE quat_t S_QuaternionNormalize( const quat_t& quaternion )
+FORCEINLINE quaternion_t S_QuaternionNormalize( const quaternion_t& quaternion )
 {
-	return glm::normalize( quaternion );
-}
-
-/*
-==================
-S_MatrixCreate
-==================
-*/
-FORCEINLINE mat4_t S_MatrixCreate( const char* pString )
-{
-	mat4_t result;
-	S_MatrixCreate( pString, result );
+	quaternion_t result;
+	S_QuaternionNormalize( quaternion, result );
 	return result;
 }
 
 /*
 ==================
-S_MatrixCreate
+S_QuaternionNormalize
 ==================
 */
-FORCEINLINE void S_MatrixCreate( const char* pString, mat4_t& matrix )
+FORCEINLINE void S_QuaternionNormalize( const quaternion_t& quaternion, quaternion_t& result )
+{
+	result = glm::normalize( quaternion );
+}
+
+/*
+==================
+S_MatrixFromString
+==================
+*/
+FORCEINLINE matrix4x4_t S_MatrixFromString( const char* pString )
+{
+	matrix4x4_t result;
+	S_MatrixFromString( pString, result );
+	return result;
+}
+
+/*
+==================
+S_MatrixFromString
+==================
+*/
+FORCEINLINE void S_MatrixFromString( const char* pString, matrix4x4_t& matrix )
 {
 	S_Sscanf( pString, "%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f",
 			  &matrix[0].x, &matrix[0].y, &matrix[0].z, &matrix[0].w,
@@ -903,35 +1204,10 @@ FORCEINLINE void S_MatrixCreate( const char* pString, mat4_t& matrix )
 
 /*
 ==================
-S_MatrixCreate
-==================
-*/
-FORCEINLINE mat4_t S_MatrixCreate( const vec4_t& row0, const vec4_t& row1, const vec4_t& row2, const vec4_t& row3 )
-{
-	mat4_t result;
-	S_MatrixCreate( row0, row1, row2, row3, result );
-	return result;
-}
-
-/*
-==================
-S_MatrixCreate
-==================
-*/
-FORCEINLINE void S_MatrixCreate( const vec4_t& row0, const vec4_t& row1, const vec4_t& row2, const vec4_t& row3, mat4_t& matrix )
-{
-	matrix[0] = row0;
-	matrix[1] = row1;
-	matrix[2] = row2;
-	matrix[3] = row3;
-}
-
-/*
-==================
 S_MatrixToString
 ==================
 */
-FORCEINLINE eastl::string S_MatrixToString( const mat4_t& matrix )
+FORCEINLINE eastl::string S_MatrixToString( const matrix4x4_t& matrix )
 {
 	eastl::string result;
 	S_MatrixToString( matrix, result );
@@ -943,7 +1219,7 @@ FORCEINLINE eastl::string S_MatrixToString( const mat4_t& matrix )
 S_MatrixToString
 ==================
 */
-FORCEINLINE void S_MatrixToString( const mat4_t& matrix, eastl::string& result )
+FORCEINLINE void S_MatrixToString( const matrix4x4_t& matrix, eastl::string& result )
 {
 	result = S_Sprintf( "%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f",
 						matrix[0].x, matrix[0].y, matrix[0].z, matrix[0].w,
@@ -957,9 +1233,9 @@ FORCEINLINE void S_MatrixToString( const mat4_t& matrix, eastl::string& result )
 S_MatrixIdentity
 ==================
 */
-FORCEINLINE void S_MatrixIdentity( mat4_t& matrix )
+FORCEINLINE void S_MatrixIdentity( matrix4x4_t& matrix )
 {
-	matrix = glm::identity<mat4_t>();
+	matrix = glm::identity<matrix4x4_t>();
 }
 
 /*
@@ -967,9 +1243,9 @@ FORCEINLINE void S_MatrixIdentity( mat4_t& matrix )
 S_MatrixIdentity
 ==================
 */
-FORCEINLINE mat4_t S_MatrixIdentity()
+FORCEINLINE matrix4x4_t S_MatrixIdentity()
 {
-	return glm::identity<mat4_t>();
+	return glm::identity<matrix4x4_t>();
 }
 
 /*
@@ -977,7 +1253,7 @@ FORCEINLINE mat4_t S_MatrixIdentity()
 S_MatrixOrigin
 ==================
 */
-FORCEINLINE void S_MatrixOrigin( const mat4_t& matrix, vec3_t& origin )
+FORCEINLINE void S_MatrixOrigin( const matrix4x4_t& matrix, vector3_t& origin )
 {
 	origin.x = matrix[3].x;
 	origin.y = matrix[3].y;
@@ -989,9 +1265,9 @@ FORCEINLINE void S_MatrixOrigin( const mat4_t& matrix, vec3_t& origin )
 S_MatrixOrigin
 ==================
 */
-FORCEINLINE vec3_t S_MatrixOrigin( const mat4_t& matrix )
+FORCEINLINE vector3_t S_MatrixOrigin( const matrix4x4_t& matrix )
 {
-	vec3_t result;
+	vector3_t result;
 	S_MatrixOrigin( matrix, result );
 	return result;
 }
@@ -1001,7 +1277,7 @@ FORCEINLINE vec3_t S_MatrixOrigin( const mat4_t& matrix )
 S_MatrixTranslate
 ==================
 */
-FORCEINLINE void S_MatrixTranslate( const vec3_t& location, mat4_t& matrix )
+FORCEINLINE void S_MatrixTranslate( const vector3_t& location, matrix4x4_t& matrix )
 {
 	matrix[3].x = location.x;
 	matrix[3].y = location.y;
@@ -1013,19 +1289,9 @@ FORCEINLINE void S_MatrixTranslate( const vec3_t& location, mat4_t& matrix )
 S_MatrixTranslate
 ==================
 */
-FORCEINLINE void S_MatrixTranslate( const vec3_t& location, const mat4_t& initMatrix, mat4_t& matrix )
+FORCEINLINE matrix4x4_t S_MatrixTranslate( const vector3_t& location )
 {
-	matrix = glm::translate( initMatrix, location );
-}
-
-/*
-==================
-S_MatrixTranslate
-==================
-*/
-FORCEINLINE mat4_t S_MatrixTranslate( const vec3_t& location, const mat4_t& initMatrix /*= mat4_t( 1.f )*/ )
-{
-	return glm::translate( initMatrix, location );
+	return glm::translate( g_matrixIdentity, location );
 }
 
 /*
@@ -1033,7 +1299,7 @@ FORCEINLINE mat4_t S_MatrixTranslate( const vec3_t& location, const mat4_t& init
 S_MatrixScale
 ==================
 */
-FORCEINLINE void S_MatrixScale( const vec3_t& scale, mat4_t& matrix )
+FORCEINLINE void S_MatrixScale( const vector3_t& scale, matrix4x4_t& matrix )
 {
 	matrix[0].x = scale.x;
 	matrix[1].y = scale.y;
@@ -1045,19 +1311,9 @@ FORCEINLINE void S_MatrixScale( const vec3_t& scale, mat4_t& matrix )
 S_MatrixScale
 ==================
 */
-FORCEINLINE void S_MatrixScale( const vec3_t& scale, const mat4_t& initMatrix, mat4_t& matrix )
+FORCEINLINE matrix4x4_t S_MatrixScale( const vector3_t& scale )
 {
-	matrix = glm::scale( initMatrix, scale );
-}
-
-/*
-==================
-S_MatrixScale
-==================
-*/
-FORCEINLINE mat4_t S_MatrixScale( const vec3_t& scale, const mat4_t& initMatrix /*= mat4_t( 1.f )*/ )
-{
-	return glm::scale( initMatrix, scale );
+	return glm::scale( g_matrixIdentity, scale );
 }
 
 /*
@@ -1065,7 +1321,7 @@ FORCEINLINE mat4_t S_MatrixScale( const vec3_t& scale, const mat4_t& initMatrix 
 S_MatrixInverse
 ==================
 */
-FORCEINLINE void S_MatrixInverse( const mat4_t& srcMatrix, mat4_t& destMatrix )
+FORCEINLINE void S_MatrixInverse( const matrix4x4_t& srcMatrix, matrix4x4_t& destMatrix )
 {
 	destMatrix = glm::inverse( srcMatrix );
 }
@@ -1075,9 +1331,9 @@ FORCEINLINE void S_MatrixInverse( const mat4_t& srcMatrix, mat4_t& destMatrix )
 S_MatrixInverse
 ==================
 */
-FORCEINLINE mat4_t S_MatrixInverse( const mat4_t& matrix )
+FORCEINLINE matrix4x4_t S_MatrixInverse( const matrix4x4_t& matrix )
 {
-	mat4_t result;
+	matrix4x4_t result;
 	S_MatrixInverse( matrix, result );
 	return result;
 }
@@ -1087,9 +1343,9 @@ FORCEINLINE mat4_t S_MatrixInverse( const mat4_t& matrix )
 S_MatrixPerspective
 ==================
 */
-FORCEINLINE mat4_t S_MatrixPerspective( float fieldOfView, float aspectRatio, float nearClipPlane, float farClipPlane )
+FORCEINLINE matrix4x4_t S_MatrixPerspective( float fieldOfView, float aspectRatio, float nearClipPlane, float farClipPlane )
 {
-	mat4_t result;
+	matrix4x4_t result;
 	S_MatrixPerspective( fieldOfView, aspectRatio, nearClipPlane, farClipPlane, result );
 	return result;
 }
@@ -1099,7 +1355,7 @@ FORCEINLINE mat4_t S_MatrixPerspective( float fieldOfView, float aspectRatio, fl
 S_MatrixPerspective
 ==================
 */
-FORCEINLINE void S_MatrixPerspective( float fieldOfView, float aspectRatio, float nearClipPlane, float farClipPlane, mat4_t& matrix )
+FORCEINLINE void S_MatrixPerspective( float fieldOfView, float aspectRatio, float nearClipPlane, float farClipPlane, matrix4x4_t& matrix )
 {
 	matrix = glm::perspective( S_DegreesToRadians( fieldOfView ), aspectRatio, nearClipPlane, farClipPlane );
 }
@@ -1109,9 +1365,9 @@ FORCEINLINE void S_MatrixPerspective( float fieldOfView, float aspectRatio, floa
 S_MatrixOrtho
 ==================
 */
-FORCEINLINE mat4_t S_MatrixOrtho( float left, float right, float bottom, float top, float nearClipPlane, float farClipPlane )
+FORCEINLINE matrix4x4_t S_MatrixOrtho( float left, float right, float bottom, float top, float nearClipPlane, float farClipPlane )
 {
-	mat4_t result;
+	matrix4x4_t result;
 	S_MatrixOrtho( left, right, bottom, top, nearClipPlane, farClipPlane, result );
 	return result;
 }
@@ -1121,7 +1377,7 @@ FORCEINLINE mat4_t S_MatrixOrtho( float left, float right, float bottom, float t
 S_MatrixOrtho
 ==================
 */
-FORCEINLINE void S_MatrixOrtho( float left, float right, float bottom, float top, float nearClipPlane, float farClipPlane, mat4_t& matrix )
+FORCEINLINE void S_MatrixOrtho( float left, float right, float bottom, float top, float nearClipPlane, float farClipPlane, matrix4x4_t& matrix )
 {
 	matrix = glm::ortho( left, right, bottom, top, nearClipPlane, farClipPlane );
 }
@@ -1131,9 +1387,9 @@ FORCEINLINE void S_MatrixOrtho( float left, float right, float bottom, float top
 S_MatrixLookAt
 ==================
 */
-FORCEINLINE mat4_t S_MatrixLookAt( const vec3_t& location, const vec3_t& direction, const vec3_t& axisUp )
+FORCEINLINE matrix4x4_t S_MatrixLookAt( const vector3_t& location, const vector3_t& direction, const vector3_t& axisUp )
 {
-	mat4_t result;
+	matrix4x4_t result;
 	S_MatrixLookAt( location, direction, axisUp, result );
 	return result;
 }
@@ -1143,7 +1399,7 @@ FORCEINLINE mat4_t S_MatrixLookAt( const vec3_t& location, const vec3_t& directi
 S_MatrixLookAt
 ==================
 */
-FORCEINLINE void S_MatrixLookAt( const vec3_t& location, const vec3_t& direction, const vec3_t& axisUp, mat4_t& matrix )
+FORCEINLINE void S_MatrixLookAt( const vector3_t& location, const vector3_t& direction, const vector3_t& axisUp, matrix4x4_t& matrix )
 {
 	matrix = glm::lookAt( location, direction, axisUp );
 }

@@ -50,7 +50,7 @@ EcsReadData
 ==================
 */
 template<>
-FORCEINLINE void EcsReadData<vec2_t>( vec2_t& data, const CSENTEntityDescVar& sentVar, const vec2_t& defaultValue /*= vec2_t( 0.f, 0.f )*/ )
+FORCEINLINE void EcsReadData<vector2_t>( vector2_t& data, const CSENTEntityDescVar& sentVar, const vector2_t& defaultValue /*= vector2_t( 0.f, 0.f )*/ )
 {
 	data = sentVar.GetVec2Value( defaultValue );
 }
@@ -61,7 +61,7 @@ EcsReadData
 ==================
 */
 template<>
-FORCEINLINE void EcsReadData<vec3_t>( vec3_t& data, const CSENTEntityDescVar& sentVar, const vec3_t& defaultValue /*= vec3_t( 0.f, 0.f, 0.f )*/ )
+FORCEINLINE void EcsReadData<vector3_t>( vector3_t& data, const CSENTEntityDescVar& sentVar, const vector3_t& defaultValue /*= vector3_t( 0.f, 0.f, 0.f )*/ )
 {
 	data = sentVar.GetVec3Value( defaultValue );
 }
@@ -72,7 +72,7 @@ EcsReadData
 ==================
 */
 template<>
-FORCEINLINE void EcsReadData<vec4_t>( vec4_t& data, const CSENTEntityDescVar& sentVar, const vec4_t& defaultValue /*= vec4_t( 0.f, 0.f, 0.f, 0.f )*/ )
+FORCEINLINE void EcsReadData<vector4_t>( vector4_t& data, const CSENTEntityDescVar& sentVar, const vector4_t& defaultValue /*= vector4_t( 0.f, 0.f, 0.f, 0.f )*/ )
 {
 	data = sentVar.GetVec4Value( defaultValue );
 }
@@ -83,7 +83,7 @@ EcsReadData
 ==================
 */
 template<>
-FORCEINLINE void EcsReadData<mat4_t>( mat4_t& data, const CSENTEntityDescVar& sentVar, const mat4_t& defaultValue /*= mat4_t( 0.f )*/ )
+FORCEINLINE void EcsReadData<matrix4x4_t>( matrix4x4_t& data, const CSENTEntityDescVar& sentVar, const matrix4x4_t& defaultValue /*= matrix4x4_t( 0.f )*/ )
 {
 	data = sentVar.GetMatrixValue( defaultValue );
 }
@@ -105,7 +105,7 @@ EcsReadData
 ==================
 */
 template<>
-FORCEINLINE void EcsReadData<TResourcePtr<ITexture>>( TResourcePtr<ITexture>& data, const CSENTEntityDescVar& sentVar, const TResourcePtr<ITexture>& pDefaultValue )
+FORCEINLINE void EcsReadData<CResourcePtr<ITexture>>( CResourcePtr<ITexture>& data, const CSENTEntityDescVar& sentVar, const CResourcePtr<ITexture>& pDefaultValue )
 {
 	data = NULL;
 	if ( sentVar.IsA( SENT_ENTITY_DESC_VAR_TYPE_STRING ) )
@@ -125,7 +125,7 @@ EcsReadData
 ==================
 */
 template<>
-FORCEINLINE void EcsReadData<TResourcePtr<IMaterial>>( TResourcePtr<IMaterial>& data, const CSENTEntityDescVar& sentVar, const TResourcePtr<IMaterial>& pDefaultValue )
+FORCEINLINE void EcsReadData<CResourcePtr<IMaterial>>( CResourcePtr<IMaterial>& data, const CSENTEntityDescVar& sentVar, const CResourcePtr<IMaterial>& pDefaultValue )
 {
 	data = NULL;
 	if ( sentVar.IsA( SENT_ENTITY_DESC_VAR_TYPE_STRING ) )
@@ -145,7 +145,7 @@ EcsReadData
 ==================
 */
 template<>
-FORCEINLINE void EcsReadData<TResourcePtr<IEntityDesc>>( TResourcePtr<IEntityDesc>& data, const CSENTEntityDescVar& sentVar, const TResourcePtr<IEntityDesc>& pDefaultValue )
+FORCEINLINE void EcsReadData<CResourcePtr<IEntityDesc>>( CResourcePtr<IEntityDesc>& data, const CSENTEntityDescVar& sentVar, const CResourcePtr<IEntityDesc>& pDefaultValue )
 {
 	if ( sentVar.IsA( SENT_ENTITY_DESC_VAR_TYPE_STRING ) )
 	{

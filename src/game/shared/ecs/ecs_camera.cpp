@@ -14,7 +14,7 @@ void CEcsSystemCameraInit::OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity, con
 	if ( camera.bAutoViewData )
 	{
 		// TODO BS yehor.pohuliaka - Implement handle resize the window
-		ivec2_t	 size;
+		vector2i_t	 size;
 		IWindow* pMainWindow = windowMgr.pWindowMgr->GetOrCreateMainWindow();
 		pMainWindow->GetSize( size );
 		camera.aspectRatio = (float)size.x / size.y;

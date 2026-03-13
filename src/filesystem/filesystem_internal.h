@@ -13,8 +13,8 @@
 //-----------------------------------------------------------------------------
 // Platform specific functions
 //-----------------------------------------------------------------------------
-TRefPtr<IStreamDataReader> Plat_CreateFileReader( const char* pPath, uint32 flags = FILE_READ_NONE );
-TRefPtr<IStreamDataWriter> Plat_CreateFileWriter( const char* pPath, uint32 flags = FILE_WRITE_NONE );
+CRefPtr<IStreamDataReader> Plat_CreateFileReader( const char* pPath, uint32 flags = FILE_READ_NONE );
+CRefPtr<IStreamDataWriter> Plat_CreateFileWriter( const char* pPath, uint32 flags = FILE_WRITE_NONE );
 bool					   Plat_MakeDirectory( const char* pPath );
 bool					   Plat_DeleteDirectory( const char* pPath, bool bEvenReadOnly = false );
 bool					   Plat_FindFiles( const char* pPath, const char* pPattern, bool bFiles, bool bDirectories, eastl::vector<eastl::string>& foundFiles );

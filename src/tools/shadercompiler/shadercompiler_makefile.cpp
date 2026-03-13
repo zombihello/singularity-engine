@@ -129,7 +129,7 @@ bool CShaderCompilerMakeFile::LoadShader( const char* pPath, const char* pBaseDi
 			// Make sure what min and max range is valid. If not we fix it
 			if ( flag.minValue > flag.maxValue )
 			{
-				Swap( flag.minValue, flag.maxValue );
+				S_Swap( flag.minValue, flag.maxValue );
 			}
 
 			// Make sure what default value in the range

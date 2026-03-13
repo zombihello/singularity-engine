@@ -70,8 +70,8 @@ private:
 		VkBuffer						  vkBuffer;
 		VmaAllocation					  vmaAllocation;
 		uint32							  currentOffset;
-		TRefPtr<CStudioAPICmdListBatchVk> pCmdListBatch;
-		TRefPtr<CStudioAPICmdListVk>	  pCmdList;
+		CRefPtr<CStudioAPICmdListBatchVk> pCmdListBatch;
+		CRefPtr<CStudioAPICmdListVk>	  pCmdList;
 		byte*							  pBufferData;
 	};
 

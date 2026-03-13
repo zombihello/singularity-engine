@@ -1,6 +1,6 @@
-# GLM
+# OpenGL Mathematics (GLM)
 
-**GLM** is a header only C++ mathematics library for graphics software based on the OpenGL Shading Language (GLSL) specifications.
+**OpenGL Mathematics (GLM)** is a header only C++ mathematics library for graphics software based on the OpenGL Shading Language (GLSL) specifications.
 
 ## Download Sources & Binaries
 
@@ -14,4 +14,4 @@
 
 ## Version
 
-1.0.0
+1.0.2

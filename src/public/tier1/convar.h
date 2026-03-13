@@ -60,11 +60,11 @@ protected:
 // The base console invoked command/variable
 //-----------------------------------------------------------------------------
 template<class TBaseClass>
-class TConCmdBase : public TBaseClass, public CCvarLocalRegister
+class CConCmdBase : public TBaseClass, public CCvarLocalRegister
 {
 public:
 	// NOTE: pName and pHelpTest must be static strings
-	TConCmdBase( const char* pName, const char* pHelpText = "", uint32 flags = FCVAR_NONE )
+	CConCmdBase( const char* pName, const char* pHelpText = "", uint32 flags = FCVAR_NONE )
 		: bRegistered( false )
 		, flags( flags )
 		, pName( pName )
@@ -83,7 +83,7 @@ public:
 			s_pAccessor->RegisterCommand( this );
 		}
 	}
-	~TConCmdBase()
+	~CConCmdBase()
 	{
 		if ( g_pCvar )
 		{
@@ -122,7 +122,7 @@ private:
 //-----------------------------------------------------------------------------
 // The console invoked command
 //-----------------------------------------------------------------------------
-class CConCmd : public TConCmdBase<IConCmd>
+class CConCmd : public CConCmdBase<IConCmd>
 {
 public:
 	CConCmd( const char* pName, conCmdExecFn_t pExecFn, const char* pHelpText = "", uint32 flags = FCVAR_NONE );
@@ -140,7 +140,7 @@ private:
 //-----------------------------------------------------------------------------
 // The console variable
 //-----------------------------------------------------------------------------
-class CConVar : public TConCmdBase<IConVar>
+class CConVar : public CConCmdBase<IConVar>
 {
 public:
 	CConVar( const char* pName, const char* pDefaultValue, const char* pHelpText = "", uint32 flags = FCVAR_NONE, conVarChangeCallbackFn_t pChangeCallbackFn = NULL );

@@ -40,5 +40,5 @@ private:
 	CEcsStubDataType*		  pCurrentComponent;
 	CEcsStubDataType*		  pCurrentResource;
 	CEcsStubSystem*			  pCurrentSystem;
-	TRefPtr<CEcsStubMetadata> pCurrentMetadata;
+	CRefPtr<CEcsStubMetadata> pCurrentMetadata;
 };

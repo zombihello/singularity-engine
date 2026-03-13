@@ -12,7 +12,7 @@ FORCEINLINE bool CGameInfoDoc::LoadFromFile( const char* pPath )
 	Assert( g_pFileSystem );
 
 	// Try to open the file
-	TRefPtr<IStreamDataReader> pFile = g_pFileSystem->CreateFileReader( pPath );
+	CRefPtr<IStreamDataReader> pFile = g_pFileSystem->CreateFileReader( pPath );
 	if ( !pFile )
 	{
 		return false;

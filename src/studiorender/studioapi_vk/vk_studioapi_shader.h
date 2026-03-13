@@ -7,7 +7,7 @@
 //-----------------------------------------------------------------------------
 // Vulkan StudioAPI vertex declaration
 //-----------------------------------------------------------------------------
-class CStudioAPIVertexDeclarationVk : public TRefCounted<IStudioAPIVertexDeclaration>
+class CStudioAPIVertexDeclarationVk : public CRefCounted<IStudioAPIVertexDeclaration>
 {
 public:
 	CStudioAPIVertexDeclarationVk( const studioAPIVertexInputBuffer_t* pVertexInputBuffers, uint32 numVertexInputBuffers, const studioAPIVertexInputAttribute_t* pVertexInputAttributes, uint32 numVertexInputAttributes );
@@ -23,7 +23,7 @@ private:
 //-----------------------------------------------------------------------------
 // Base vulkan StudioAPI shader
 //-----------------------------------------------------------------------------
-class CStudioAPIShaderVk : public TRefCounted<IStudioAPIShader>
+class CStudioAPIShaderVk : public CRefCounted<IStudioAPIShader>
 {
 public:
 	// IStudioAPIShader interface
@@ -125,7 +125,7 @@ public:
 //-----------------------------------------------------------------------------
 // Vulkan StudioAPI bound shader state
 //-----------------------------------------------------------------------------
-class CStudioAPIBoundShaderStateVk : public TRefCounted<IStudioAPIBoundShaderState>
+class CStudioAPIBoundShaderStateVk : public CRefCounted<IStudioAPIBoundShaderState>
 {
 public:
 	// IStudioAPIBoundShaderState interface
@@ -146,12 +146,12 @@ private:
 	static void OnStudioAPIVkShutdown( void* pUserData );
 
 	CStudioAPIBoundShaderStateKeyVk			key;
-	TRefPtr<CStudioAPIVertexDeclarationVk>	pVertexDeclaration;
-	TRefPtr<CStudioAPIVertexShaderVk>		pVertexShader;
-	TRefPtr<CStudioAPIPixelShaderVk>		pPixelShader;
-	TRefPtr<CStudioAPIHullShaderVk>			pHullShader;
-	TRefPtr<CStudioAPIDomainShaderVk>		pDomainShader;
-	TRefPtr<CStudioAPIGeometryShaderVk>		pGeometryShader;
+	CRefPtr<CStudioAPIVertexDeclarationVk>	pVertexDeclaration;
+	CRefPtr<CStudioAPIVertexShaderVk>		pVertexShader;
+	CRefPtr<CStudioAPIPixelShaderVk>		pPixelShader;
+	CRefPtr<CStudioAPIHullShaderVk>			pHullShader;
+	CRefPtr<CStudioAPIDomainShaderVk>		pDomainShader;
+	CRefPtr<CStudioAPIGeometryShaderVk>		pGeometryShader;
 	CStudioAPIDescriptorSetsLayoutVk		descriptorSetsLayout;
 	COnStudioAPIVkShutdown::funcDelegate_t* pStudioAPIVkShutdownDelegate;
 };

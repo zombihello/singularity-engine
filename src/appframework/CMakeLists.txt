@@ -64,6 +64,8 @@ add_common_target_defines( appframework )
 #
 # Install
 #
+inherit_install_files( appframework										TARGETS tier1 )
+
 # Binaries
 install_files( appframework FILES ${THIRDPARTY_INSTALL_DEBUG_DLLS}		DESTINATION 	bin/${PLATFORM_BIN_DIR}/	CONFIGURATIONS 	Debug )
 install_files( appframework FILES ${THIRDPARTY_INSTALL_RELEASE_DLLS}	DESTINATION 	bin/${PLATFORM_BIN_DIR}/	CONFIGURATIONS 	Release Retail )

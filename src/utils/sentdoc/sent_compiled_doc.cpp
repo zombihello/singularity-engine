@@ -23,7 +23,7 @@ bool CSENTCompiledEntityDescDoc::SaveFile( const char* pPath )
 	Assert( g_pFileSystem );
 
 	// Try to open a file
-	TRefPtr<IStreamDataWriter> pFile = g_pFileSystem->CreateFileWriter( pPath );
+	CRefPtr<IStreamDataWriter> pFile = g_pFileSystem->CreateFileWriter( pPath );
 	if ( !pFile )
 	{
 		Error( "SENTDoc: Failed to open file '%s'", pPath );
@@ -87,29 +87,29 @@ bool CSENTCompiledEntityDescDoc::SaveFile( const char* pPath )
 
 			case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_2D:
 			{
-				vec2_t value = var.GetVec2Value();
-				pFile->Write( &value, sizeof( vec2_t ) );
+				vector2_t value = var.GetVec2Value();
+				pFile->Write( &value, sizeof( vector2_t ) );
 				break;
 			}
 
 			case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_3D:
 			{
-				vec3_t value = var.GetVec3Value();
-				pFile->Write( &value, sizeof( vec3_t ) );
+				vector3_t value = var.GetVec3Value();
+				pFile->Write( &value, sizeof( vector3_t ) );
 				break;
 			}
 
 			case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_4D:
 			{
-				vec4_t value = var.GetVec4Value();
-				pFile->Write( &value, sizeof( vec4_t ) );
+				vector4_t value = var.GetVec4Value();
+				pFile->Write( &value, sizeof( vector4_t ) );
 				break;
 			}
 
 			case SENT_ENTITY_DESC_VAR_TYPE_MATRIX:
 			{
-				mat4_t value = var.GetMatrixValue();
-				pFile->Write( &value, sizeof( mat4_t ) );
+				matrix4x4_t value = var.GetMatrixValue();
+				pFile->Write( &value, sizeof( matrix4x4_t ) );
 				break;
 			}
 
@@ -144,7 +144,7 @@ bool CSENTCompiledEntityDescDoc::LoadFromFile( const char* pPath )
 	Assert( g_pFileSystem );
 
 	// Try to open a file
-	TRefPtr<IStreamDataReader> pFile = g_pFileSystem->CreateFileReader( pPath );
+	CRefPtr<IStreamDataReader> pFile = g_pFileSystem->CreateFileReader( pPath );
 	if ( !pFile )
 	{
 		Error( "SENTDoc: Failed to open file '%s'", pPath );
@@ -231,32 +231,32 @@ bool CSENTCompiledEntityDescDoc::LoadFromFile( const char* pPath )
 
 			case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_2D:
 			{
-				vec2_t value;
-				pFile->Read( &value, sizeof( vec2_t ) );
+				vector2_t value;
+				pFile->Read( &value, sizeof( vector2_t ) );
 				var.SetVec2Value( value );
 				break;
 			}
 
 			case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_3D:
 			{
-				vec3_t value;
-				pFile->Read( &value, sizeof( vec3_t ) );
+				vector3_t value;
+				pFile->Read( &value, sizeof( vector3_t ) );
 				var.SetVec3Value( value );
 				break;
 			}
 
 			case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_4D:
 			{
-				vec4_t value;
-				pFile->Read( &value, sizeof( vec4_t ) );
+				vector4_t value;
+				pFile->Read( &value, sizeof( vector4_t ) );
 				var.SetVec4Value( value );
 				break;
 			}
 
 			case SENT_ENTITY_DESC_VAR_TYPE_MATRIX:
 			{
-				mat4_t value;
-				pFile->Read( &value, sizeof( mat4_t ) );
+				matrix4x4_t value;
+				pFile->Read( &value, sizeof( matrix4x4_t ) );
 				var.SetMatrixValue( value );
 				break;
 			}

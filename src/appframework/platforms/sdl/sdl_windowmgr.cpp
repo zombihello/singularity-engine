@@ -464,7 +464,7 @@ uint32 CWindowMgrSDL::GetDisplays( display_t* pDisplays, uint32 maxNumDisplays )
 	if ( numDisplays > 0 )
 	{
 		SDL_Rect sdlRect;
-		uint32	 numDisplaysToWrite = Min( numDisplays, pDisplays ? maxNumDisplays : 0 );
+		uint32	 numDisplaysToWrite = S_Min( numDisplays, pDisplays ? maxNumDisplays : 0 );
 		for ( uint32 index = 0; index < numDisplaysToWrite; ++index )
 		{
 			SDL_DisplayID sdlDisplayId = pSDLDisplayIds[index];
@@ -619,7 +619,7 @@ uint32 CWindowMgrSDL::GetDisplayModes( displayHandle_t displayHandle, displayMod
 			}
 		}
 
-		uint32 numDisplayModesToWrite = Min( numDisplayModes, pDisplayModes ? maxNumDisplayModes : 0 );
+		uint32 numDisplayModesToWrite = S_Min( numDisplayModes, pDisplayModes ? maxNumDisplayModes : 0 );
 		for ( uint32 index = 0; index < numDisplayModesToWrite; ++index )
 		{
 			SDL_DisplayMode* pSDLDisplayMode = ppSDLDisplayModes[pSDLDisplayModeIds[index]];

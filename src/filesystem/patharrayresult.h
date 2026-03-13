@@ -7,7 +7,7 @@
 //-----------------------------------------------------------------------------
 // This is simple array who contains path elements
 //-----------------------------------------------------------------------------
-class CPathArrayResult : public TRefCounted<IPathArrayResult>
+class CPathArrayResult : public CRefCounted<IPathArrayResult>
 {
 public:
 	CPathArrayResult( const eastl::vector<eastl::string>& pathArray );

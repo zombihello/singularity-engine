@@ -12,7 +12,7 @@
 Plat_CreateFileReader
 ==================
 */
-TRefPtr<IStreamDataReader> Plat_CreateFileReader( const char* pPath, uint32 flags /*= FILE_READ_NONE*/ )
+CRefPtr<IStreamDataReader> Plat_CreateFileReader( const char* pPath, uint32 flags /*= FILE_READ_NONE*/ )
 {
 	// Open a file
 #if PLATFORM_USE_STD_FILE
@@ -36,7 +36,7 @@ TRefPtr<IStreamDataReader> Plat_CreateFileReader( const char* pPath, uint32 flag
 Plat_CreateFileWriter
 ==================
 */
-TRefPtr<IStreamDataWriter> Plat_CreateFileWriter( const char* pPath, uint32 flags /*= FILE_WRITE_NONE*/ )
+CRefPtr<IStreamDataWriter> Plat_CreateFileWriter( const char* pPath, uint32 flags /*= FILE_WRITE_NONE*/ )
 {
 	// Translate flags into eastl flags
 #if PLATFORM_USE_STD_FILE

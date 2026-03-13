@@ -223,9 +223,9 @@ FORCEINLINE uint32 CStudioAPITextureVk::GetMipSize( uint32 mip ) const
 	uint32			   blockSizeY		= pPixelFormatInfo->blockSizeY;
 	uint32			   blockSizeZ		= pPixelFormatInfo->blockSizeZ;
 	uint32			   blockBytes		= pPixelFormatInfo->blockBytes;
-	uint32			   mipSizeX			= Max( sizeX >> mip, blockSizeX );
-	uint32			   mipSizeY			= Max( sizeY >> mip, blockSizeY );
-	uint32			   mipSizeZ			= Max( sizeZ >> mip, blockSizeZ );
+	uint32			   mipSizeX			= S_Max( sizeX >> mip, blockSizeX );
+	uint32			   mipSizeY			= S_Max( sizeY >> mip, blockSizeY );
+	uint32			   mipSizeZ			= S_Max( sizeZ >> mip, blockSizeZ );
 	uint32			   numBlocksX		= ( mipSizeX + blockSizeX - 1 ) / blockSizeX;
 	uint32			   numBlocksY		= ( mipSizeY + blockSizeY - 1 ) / blockSizeY;
 	uint32			   numBlocksZ		= ( mipSizeZ + blockSizeZ - 1 ) / blockSizeZ;
@@ -242,7 +242,7 @@ FORCEINLINE uint32 CStudioAPITextureVk::GetMipRowPitch( uint32 mip ) const
 	pixelFormatInfo_t* pPixelFormatInfo = &g_PixelFormatInfos[pixelFormat];
 	uint32			   blockSizeX		= pPixelFormatInfo->blockSizeX;
 	uint32			   blockBytes		= pPixelFormatInfo->blockBytes;
-	uint32			   mipSizeX			= Max( sizeX >> mip, blockSizeX );
+	uint32			   mipSizeX			= S_Max( sizeX >> mip, blockSizeX );
 	uint32			   numBlocksX		= ( mipSizeX + blockSizeX - 1 ) / blockSizeX;
 	return numBlocksX * blockBytes;
 }
@@ -258,8 +258,8 @@ FORCEINLINE uint32 CStudioAPITextureVk::GetMipDepthPitch( uint32 mip ) const
 	uint32			   blockSizeX		= pPixelFormatInfo->blockSizeX;
 	uint32			   blockSizeY		= pPixelFormatInfo->blockSizeY;
 	uint32			   blockBytes		= pPixelFormatInfo->blockBytes;
-	uint32			   mipSizeX			= Max( sizeX >> mip, blockSizeX );
-	uint32			   mipSizeY			= Max( sizeY >> mip, blockSizeY );
+	uint32			   mipSizeX			= S_Max( sizeX >> mip, blockSizeX );
+	uint32			   mipSizeY			= S_Max( sizeY >> mip, blockSizeY );
 	uint32			   numBlocksX		= ( mipSizeX + blockSizeX - 1 ) / blockSizeX;
 	uint32			   numBlocksY		= ( mipSizeY + blockSizeY - 1 ) / blockSizeY;
 	return numBlocksX * numBlocksY * blockBytes;

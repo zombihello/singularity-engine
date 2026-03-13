@@ -228,7 +228,7 @@ void CStudioAPIVk::ReleaseThreadOwnership()
 CStudioAPIVk::CreateCmdContext
 ==================
 */
-TRefPtr<IStudioAPICmdContext> CStudioAPIVk::CreateCmdContext( studioAPIQueueType_t queueType ) const
+CRefPtr<IStudioAPICmdContext> CStudioAPIVk::CreateCmdContext( studioAPIQueueType_t queueType ) const
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	CStudioAPICmdContextVk* pImmediateCmdContext = (CStudioAPICmdContextVk*)GetImmediateCmdContext( queueType );
@@ -240,7 +240,7 @@ TRefPtr<IStudioAPICmdContext> CStudioAPIVk::CreateCmdContext( studioAPIQueueType
 CStudioAPIVk::CreateCmdList
 ==================
 */
-TRefPtr<IStudioAPICmdList> CStudioAPIVk::CreateCmdList( IStudioAPICmdContext* pCmdContext ) const
+CRefPtr<IStudioAPICmdList> CStudioAPIVk::CreateCmdList( IStudioAPICmdContext* pCmdContext ) const
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return new CStudioAPICmdListVk( (CStudioAPICmdContextVk*)pCmdContext );
@@ -251,7 +251,7 @@ TRefPtr<IStudioAPICmdList> CStudioAPIVk::CreateCmdList( IStudioAPICmdContext* pC
 CStudioAPIVk::CreateCmdListBatch
 ==================
 */
-TRefPtr<IStudioAPICmdListBatch> CStudioAPIVk::CreateCmdListBatch( IStudioAPICmdContext* pCmdContext ) const
+CRefPtr<IStudioAPICmdListBatch> CStudioAPIVk::CreateCmdListBatch( IStudioAPICmdContext* pCmdContext ) const
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return new CStudioAPICmdListBatchVk( (CStudioAPICmdContextVk*)pCmdContext );
@@ -262,10 +262,10 @@ TRefPtr<IStudioAPICmdListBatch> CStudioAPIVk::CreateCmdListBatch( IStudioAPICmdC
 CStudioAPIVk::CreateSwapChain
 ==================
 */
-TRefPtr<IStudioAPISwapChain> CStudioAPIVk::CreateSwapChain( windowHandle_t windowHandle, uint32 width, uint32 height, bool bUseVSync /* = false */ ) const
+CRefPtr<IStudioAPISwapChain> CStudioAPIVk::CreateSwapChain( windowHandle_t windowHandle, uint32 width, uint32 height, bool bUseVSync /* = false */ ) const
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-	TRefPtr<CStudioAPISwapChainVk> pStudioAPISwapChain = new CStudioAPISwapChainVk( S_Sprintf( "VkSwapChain [0x%X]", windowHandle ).c_str() );
+	CRefPtr<CStudioAPISwapChainVk> pStudioAPISwapChain = new CStudioAPISwapChainVk( S_Sprintf( "VkSwapChain [0x%X]", windowHandle ).c_str() );
 	if ( !pStudioAPISwapChain->Create( windowHandle, width, height, VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR, bUseVSync ) )
 	{
 		Sys_Error( "Failed to create the swap chain (%ux%u)", width, height );
@@ -280,7 +280,7 @@ TRefPtr<IStudioAPISwapChain> CStudioAPIVk::CreateSwapChain( windowHandle_t windo
 CStudioAPIVk::CreateVertexShader
 ==================
 */
-TRefPtr<IStudioAPIShader> CStudioAPIVk::CreateVertexShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName /* = "" */ ) const
+CRefPtr<IStudioAPIShader> CStudioAPIVk::CreateVertexShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName /* = "" */ ) const
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIVertexShaderVk( pEntryPointName, pBytecode, bytecodeSize, pReflectionData, reflectionDataSize, pDebugName );
@@ -291,7 +291,7 @@ TRefPtr<IStudioAPIShader> CStudioAPIVk::CreateVertexShader( const char* pEntryPo
 CStudioAPIVk::CreateHullShader
 ==================
 */
-TRefPtr<IStudioAPIShader> CStudioAPIVk::CreateHullShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName /* = "" */ ) const
+CRefPtr<IStudioAPIShader> CStudioAPIVk::CreateHullShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName /* = "" */ ) const
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIHullShaderVk( pEntryPointName, pBytecode, bytecodeSize, pReflectionData, reflectionDataSize, pDebugName );
@@ -302,7 +302,7 @@ TRefPtr<IStudioAPIShader> CStudioAPIVk::CreateHullShader( const char* pEntryPoin
 CStudioAPIVk::CreateDomainShader
 ==================
 */
-TRefPtr<IStudioAPIShader> CStudioAPIVk::CreateDomainShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName /* = "" */ ) const
+CRefPtr<IStudioAPIShader> CStudioAPIVk::CreateDomainShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName /* = "" */ ) const
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIDomainShaderVk( pEntryPointName, pBytecode, bytecodeSize, pReflectionData, reflectionDataSize, pDebugName );
@@ -313,7 +313,7 @@ TRefPtr<IStudioAPIShader> CStudioAPIVk::CreateDomainShader( const char* pEntryPo
 CStudioAPIVk::CreateGeometryShader
 ==================
 */
-TRefPtr<IStudioAPIShader> CStudioAPIVk::CreateGeometryShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName /* = "" */ ) const
+CRefPtr<IStudioAPIShader> CStudioAPIVk::CreateGeometryShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName /* = "" */ ) const
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIGeometryShaderVk( pEntryPointName, pBytecode, bytecodeSize, pReflectionData, reflectionDataSize, pDebugName );
@@ -324,7 +324,7 @@ TRefPtr<IStudioAPIShader> CStudioAPIVk::CreateGeometryShader( const char* pEntry
 CStudioAPIVk::CreatePixelShader
 ==================
 */
-TRefPtr<IStudioAPIShader> CStudioAPIVk::CreatePixelShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName /* = "" */ ) const
+CRefPtr<IStudioAPIShader> CStudioAPIVk::CreatePixelShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName /* = "" */ ) const
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIPixelShaderVk( pEntryPointName, pBytecode, bytecodeSize, pReflectionData, reflectionDataSize, pDebugName );
@@ -335,7 +335,7 @@ TRefPtr<IStudioAPIShader> CStudioAPIVk::CreatePixelShader( const char* pEntryPoi
 CStudioAPIVk::CreateComputeShader
 ==================
 */
-TRefPtr<IStudioAPIShader> CStudioAPIVk::CreateComputeShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName /* = "" */ ) const
+CRefPtr<IStudioAPIShader> CStudioAPIVk::CreateComputeShader( const char* pEntryPointName, const byte* pBytecode, uint64 bytecodeSize, const byte* pReflectionData, uint64 reflectionDataSize, const char* pDebugName /* = "" */ ) const
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIComputeShaderVk( pEntryPointName, pBytecode, bytecodeSize, pReflectionData, reflectionDataSize, pDebugName );
@@ -346,7 +346,7 @@ TRefPtr<IStudioAPIShader> CStudioAPIVk::CreateComputeShader( const char* pEntryP
 CStudioAPIVk::CreateRenderPipeline
 ==================
 */
-TRefPtr<IStudioAPIBoundShaderState> CStudioAPIVk::FindOrCreateBoundShaderState( IStudioAPIVertexDeclaration* pVertexDeclaration, IStudioAPIShader* pVertexShader, IStudioAPIShader* pPixelShader, IStudioAPIShader* pHullShader /* = NULL */, IStudioAPIShader* pDomainShader /* = NULL */, IStudioAPIShader* pGeometryShader /* = NULL */ ) const
+CRefPtr<IStudioAPIBoundShaderState> CStudioAPIVk::FindOrCreateBoundShaderState( IStudioAPIVertexDeclaration* pVertexDeclaration, IStudioAPIShader* pVertexShader, IStudioAPIShader* pPixelShader, IStudioAPIShader* pHullShader /* = NULL */, IStudioAPIShader* pDomainShader /* = NULL */, IStudioAPIShader* pGeometryShader /* = NULL */ ) const
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	CStudioAPIBoundShaderStateKeyVk key( (CStudioAPIVertexDeclarationVk*)pVertexDeclaration,
@@ -376,7 +376,7 @@ TRefPtr<IStudioAPIBoundShaderState> CStudioAPIVk::FindOrCreateBoundShaderState( 
 CStudioAPIVk::CreateRenderPipeline
 ==================
 */
-TRefPtr<IStudioAPIRenderPipeline> CStudioAPIVk::CreateRenderPipeline( const studioAPIRenderPipelineCreateInfo_t& createInfo, const char* pDebugName /* = "" */ ) const
+CRefPtr<IStudioAPIRenderPipeline> CStudioAPIVk::CreateRenderPipeline( const studioAPIRenderPipelineCreateInfo_t& createInfo, const char* pDebugName /* = "" */ ) const
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIRenderPipelineVk( createInfo, pDebugName );
@@ -387,7 +387,7 @@ TRefPtr<IStudioAPIRenderPipeline> CStudioAPIVk::CreateRenderPipeline( const stud
 CStudioAPIVk::CreateVertexDeclaration
 ==================
 */
-TRefPtr<IStudioAPIVertexDeclaration> CStudioAPIVk::CreateVertexDeclaration( const studioAPIVertexInputBuffer_t* pVertexInputBuffers, uint32 numVertexInputBuffers, const studioAPIVertexInputAttribute_t* pVertexInputAttributes, uint32 numVertexInputAttributes ) const
+CRefPtr<IStudioAPIVertexDeclaration> CStudioAPIVk::CreateVertexDeclaration( const studioAPIVertexInputBuffer_t* pVertexInputBuffers, uint32 numVertexInputBuffers, const studioAPIVertexInputAttribute_t* pVertexInputAttributes, uint32 numVertexInputAttributes ) const
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIVertexDeclarationVk( pVertexInputBuffers, numVertexInputBuffers, pVertexInputAttributes, numVertexInputAttributes );
@@ -398,7 +398,7 @@ TRefPtr<IStudioAPIVertexDeclaration> CStudioAPIVk::CreateVertexDeclaration( cons
 CStudioAPIVk::CreateVertexDeclaration
 ==================
 */
-TRefPtr<IStudioAPIFrameBuffer> CStudioAPIVk::CreateFrameBuffer( const studioAPIFrameBufferCreateInfo_t& createInfo, const char* pDebugName /* = "" */ ) const
+CRefPtr<IStudioAPIFrameBuffer> CStudioAPIVk::CreateFrameBuffer( const studioAPIFrameBufferCreateInfo_t& createInfo, const char* pDebugName /* = "" */ ) const
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIFrameBufferVk( createInfo, pDebugName );
@@ -409,7 +409,7 @@ TRefPtr<IStudioAPIFrameBuffer> CStudioAPIVk::CreateFrameBuffer( const studioAPIF
 CStudioAPIVk::CreateVertexDeclaration
 ==================
 */
-TRefPtr<IStudioAPIRenderPass> CStudioAPIVk::CreateRenderPass( const studioAPIRenderPassCreateInfo_t& createInfo, const char* pDebugName /* = "" */ ) const
+CRefPtr<IStudioAPIRenderPass> CStudioAPIVk::CreateRenderPass( const studioAPIRenderPassCreateInfo_t& createInfo, const char* pDebugName /* = "" */ ) const
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIRenderPassVk( createInfo, pDebugName );
@@ -420,7 +420,7 @@ TRefPtr<IStudioAPIRenderPass> CStudioAPIVk::CreateRenderPass( const studioAPIRen
 CStudioAPIVk::CreateBuffer
 ==================
 */
-TRefPtr<IStudioAPIBuffer> CStudioAPIVk::CreateBuffer( const byte* pData, uint64 dataSize, uint32 dataStride, uint32 usageFlags, const char* pDebugName /* = "" */ ) const
+CRefPtr<IStudioAPIBuffer> CStudioAPIVk::CreateBuffer( const byte* pData, uint64 dataSize, uint32 dataStride, uint32 usageFlags, const char* pDebugName /* = "" */ ) const
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return new CStudioAPIBufferVk( pData, dataSize, dataStride, usageFlags, pDebugName );
@@ -431,7 +431,7 @@ TRefPtr<IStudioAPIBuffer> CStudioAPIVk::CreateBuffer( const byte* pData, uint64 
 CStudioAPIVk::CreateTexture
 ==================
 */
-TRefPtr<IStudioAPITexture> CStudioAPIVk::CreateTexture( studioAPITextureType_t type, uint32 sizeX, uint32 sizeY, uint32 sizeZ, uint32 numLayers, uint32 numMips, uint32 usageFlags, studioAPIPixelFormat_t pixelFormat, const byte* pData /* = NULL */, const char* pDebugName /* = "" */ ) const
+CRefPtr<IStudioAPITexture> CStudioAPIVk::CreateTexture( studioAPITextureType_t type, uint32 sizeX, uint32 sizeY, uint32 sizeZ, uint32 numLayers, uint32 numMips, uint32 usageFlags, studioAPIPixelFormat_t pixelFormat, const byte* pData /* = NULL */, const char* pDebugName /* = "" */ ) const
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return new CStudioAPITextureVk( type, sizeX, sizeY, sizeZ, numLayers, numMips, usageFlags, pixelFormat, pData, pDebugName );
@@ -442,7 +442,7 @@ TRefPtr<IStudioAPITexture> CStudioAPIVk::CreateTexture( studioAPITextureType_t t
 CStudioAPIVk::CreateSampler
 ==================
 */
-TRefPtr<IStudioAPISampler> CStudioAPIVk::CreateSampler( const studioAPISamplerCreateInfo_t& createInfo, const char* pDebugName /* = "" */ ) const
+CRefPtr<IStudioAPISampler> CStudioAPIVk::CreateSampler( const studioAPISamplerCreateInfo_t& createInfo, const char* pDebugName /* = "" */ ) const
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	return new CStudioAPISamplerVk( createInfo, pDebugName );

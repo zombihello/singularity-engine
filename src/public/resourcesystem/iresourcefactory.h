@@ -30,10 +30,10 @@ enum resourceFactoryFlag_t
 class IResourceFactory
 {
 public:
-	virtual TRefPtr<IRefCounted> CreateProceduralResource() const													  = 0;
-	virtual TRefPtr<IRefCounted> LoadResource( const char* pPath, uint32 loadFlags = RESOURCE_LOAD_FLAG_NONE ) const = 0;
+	virtual CRefPtr<IRefCounted> CreateProceduralResource() const													  = 0;
+	virtual CRefPtr<IRefCounted> LoadResource( const char* pPath, uint32 loadFlags = RESOURCE_LOAD_FLAG_NONE ) const = 0;
 	virtual void				 UnloadResource( IRefCounted* pResoruce ) const										  = 0;
-	virtual TRefPtr<IResource>	 GetDefaultResource() const															  = 0;
+	virtual CRefPtr<IResource>	 GetDefaultResource() const															  = 0;
 	virtual const char*		 GetFormatType() const																  = 0;
 	virtual uint8				 GetFlags() const																	  = 0;
 };

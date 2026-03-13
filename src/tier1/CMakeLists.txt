@@ -8,10 +8,11 @@ find_package( EASTL REQUIRED )
 find_package( Zlib REQUIRED )
 
 set( THIRDPARTY_INCLUDES					${GLM_INCLUDE} ${EASTL_INCLUDE} ${ZLIB_INCLUDE} )
+set( THIRDPARTY_DEFINES						${GLM_DEFINES} )
 set( THIRDPARTY_LIBS						${EASTL_LIBS} ${ZLIB_LIBS} )
 set( THIRDPARTY_INSTALL_DEBUG_DLLS			${ZLIB_INSTALL_DLLS_DEBUG} )
 set( THIRDPARTY_INSTALL_RELEASE_DLLS		${ZLIB_INSTALL_DLLS_RELEASE} )
-set( THIRDPARTY_VISUALIZERS					${EASTL_VISUALIZERS} )
+set( THIRDPARTY_VISUALIZERS					${GLM_VISUALIZERS} ${EASTL_VISUALIZERS} )
 
 
 #
@@ -52,6 +53,7 @@ set_target_properties( tier1 PROPERTIES FOLDER				Engine/Tiers )
 set_target_properties( tier1 PROPERTIES PREFIX 				"" )
 
 target_include_directories( tier1 PUBLIC					${THIRDPARTY_INCLUDES} )
+target_compile_definitions( tier1 PUBLIC					${THIRDPARTY_DEFINES} )
 target_link_libraries( tier1 PUBLIC 						interfaces ${THIRDPARTY_LIBS} )
 add_common_target_defines( tier1 )
 

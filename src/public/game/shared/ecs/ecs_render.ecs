@@ -9,5 +9,5 @@ resource StudioRender
 
 component StudioRenderObject
 {
-	TRefPtr<IStudioRenderObject>	pStudioRenderObject;
+	CRefPtr<IStudioRenderObject>	pStudioRenderObject;
 }

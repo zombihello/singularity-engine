@@ -34,11 +34,11 @@ void CStudioRenderPassPresent::R_DrawPass( CStudioViewport* pViewport, CStudioRe
 	IStudioAPIBuffer*				pQuadVertexBuffer	  = pQuad->GetStudioAPIVertexBuffer();
 	IStudioAPIBuffer*				pQuadIndexBuffer	  = pQuad->GetStudioAPIIndexBuffer();
 	IMaterial*						pQuadMaterial		  = pQuad->GetMaterial();
-	ivec2_t							viewportSize		  = pViewport->GetSize();
+	vector2i_t							viewportSize		  = pViewport->GetSize();
 	IStudioAPISwapChain*			pStudioAPISwapChain	  = pViewport->GetStudioAPISwapChain();
-	TRefPtr<IStudioAPICmdContext>	pGraphicsCmdContext	  = g_pStudioAPI->GetImmediateCmdContext( STUDIOAPI_QUEUE_TYPE_GRAPHICS );
-	TRefPtr<IStudioAPICmdListBatch> pGraphicsCmdListBatch = g_pStudioAPI->CreateCmdListBatch( pGraphicsCmdContext );
-	TRefPtr<IStudioAPICmdList>		pGraphicsCmdList	  = g_pStudioAPI->CreateCmdList( pGraphicsCmdContext );
+	CRefPtr<IStudioAPICmdContext>	pGraphicsCmdContext	  = g_pStudioAPI->GetImmediateCmdContext( STUDIOAPI_QUEUE_TYPE_GRAPHICS );
+	CRefPtr<IStudioAPICmdListBatch> pGraphicsCmdListBatch = g_pStudioAPI->CreateCmdListBatch( pGraphicsCmdContext );
+	CRefPtr<IStudioAPICmdList>		pGraphicsCmdList	  = g_pStudioAPI->CreateCmdList( pGraphicsCmdContext );
 	pGraphicsCmdList->BeginRecord();
 	pGraphicsCmdList->SetViewport( 0.f, 0.f, (float)viewportSize.x, (float)viewportSize.y, 0.f, 1.f );
 	pGraphicsCmdList->SetScissor( 0, 0, viewportSize.x, viewportSize.y );
@@ -75,7 +75,7 @@ void CStudioRenderPassPresent::R_DrawPass( CStudioViewport* pViewport, CStudioRe
 CStudioRenderPassPresent::CreateStudioAPIRenderPipeline
 ==================
 */
-TRefPtr<IStudioAPIRenderPipeline> CStudioRenderPassPresent::R_CreateStudioAPIRenderPipeline( CStudioViewport* pViewport, IStudioAPIBoundShaderState* pStudioAPIBoundShaderState )
+CRefPtr<IStudioAPIRenderPipeline> CStudioRenderPassPresent::R_CreateStudioAPIRenderPipeline( CStudioViewport* pViewport, IStudioAPIBoundShaderState* pStudioAPIBoundShaderState )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( Studio_IsInRenderThread() && pViewport && pStudioAPIBoundShaderState );
@@ -96,7 +96,7 @@ TRefPtr<IStudioAPIRenderPipeline> CStudioRenderPassPresent::R_CreateStudioAPIRen
 	studioAPIRenderPipelineCreateInfo.stencilState.bTestEnable			  = false;
 	studioAPIRenderPipelineCreateInfo.colorBlendState.attachmentCount	  = 1;
 	studioAPIRenderPipelineCreateInfo.colorBlendState.pAttachments		  = &studioAPIColorBlendAttachmentState;
-	studioAPIRenderPipelineCreateInfo.colorBlendState.blendConstants	  = vec4_t( 0.f, 0.f, 0.f, 0.f );
+	studioAPIRenderPipelineCreateInfo.colorBlendState.blendConstants	  = vector4_t( 0.f, 0.f, 0.f, 0.f );
 	studioAPIRenderPipelineCreateInfo.pRenderPass						  = pViewport->GetStudioAPIRenderPass();
 	return g_pStudioAPI->CreateRenderPipeline( studioAPIRenderPipelineCreateInfo );
 }

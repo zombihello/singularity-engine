@@ -27,10 +27,10 @@ public:
 	virtual float		   GetRefreshRate() const				  = 0;
 	virtual float		   GetPixelDensity() const				  = 0;
 	virtual float		   GetDisplayScale() const				  = 0;
-	virtual void		   GetSize( ivec2_t& size ) const		  = 0;
-	virtual void		   GetSizeInPixels( ivec2_t& size ) const = 0;
-	ivec2_t				   GetSize() const;
-	ivec2_t				   GetSizeInPixels() const;
+	virtual void		   GetSize( vector2i_t& size ) const		  = 0;
+	virtual void		   GetSizeInPixels( vector2i_t& size ) const = 0;
+	vector2i_t				   GetSize() const;
+	vector2i_t				   GetSizeInPixels() const;
 	virtual windowHandle_t GetHandle() const = 0;
 	virtual windowId_t	   GetId() const	 = 0;
 };

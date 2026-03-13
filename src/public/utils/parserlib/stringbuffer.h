@@ -6,15 +6,15 @@
 // Parser string buffer (shared string)
 //-----------------------------------------------------------------------------
 template<typename TCharType, class TCharContainerType>
-class TParserStringBuffer
+class CParserStringBuffer
 {
 public:
-	TParserStringBuffer()
+	CParserStringBuffer()
 		: pBuffer( NULL )
 	{
 	}
 
-	TParserStringBuffer( const TCharType* pString )
+	CParserStringBuffer( const TCharType* pString )
 		: pBuffer( NULL )
 	{
 		if ( pString && *pString )
@@ -24,7 +24,7 @@ public:
 		}
 	}
 
-	TParserStringBuffer( const TCharContainerType& string )
+	CParserStringBuffer( const TCharContainerType& string )
 		: pBuffer( NULL )
 	{
 		if ( !string.empty() )
@@ -34,7 +34,7 @@ public:
 		}
 	}
 
-	TParserStringBuffer( const TParserStringBuffer& other )
+	CParserStringBuffer( const CParserStringBuffer& other )
 		: pBuffer( other.pBuffer )
 	{
 		if ( pBuffer )
@@ -43,7 +43,7 @@ public:
 		}
 	}
 
-	~TParserStringBuffer()
+	~CParserStringBuffer()
 	{
 		if ( pBuffer )
 		{
@@ -55,16 +55,16 @@ public:
 	bool			 IsEmpty() const;
 	const TCharType* AsChar() const;
 
-	TParserStringBuffer& operator=( const TParserStringBuffer& other );
-	TParserStringBuffer& operator=( const TCharContainerType& string );
-	TParserStringBuffer& operator=( const TCharType* pString );
-	bool				 operator==( const TParserStringBuffer& other ) const;
+	CParserStringBuffer& operator=( const CParserStringBuffer& other );
+	CParserStringBuffer& operator=( const TCharContainerType& string );
+	CParserStringBuffer& operator=( const TCharType* pString );
+	bool				 operator==( const CParserStringBuffer& other ) const;
 	bool				 operator==( const TCharType* pString ) const;
-	bool				 operator!=( const TParserStringBuffer& other ) const;
+	bool				 operator!=( const CParserStringBuffer& other ) const;
 	bool				 operator!=( const TCharType* pString ) const;
 
 private:
-	class CBuffer : public TRefCounted<IRefCounted>
+	class CBuffer : public CRefCounted<IRefCounted>
 	{
 	public:
 		CBuffer( const TCharContainerType& string )
@@ -86,7 +86,7 @@ private:
 //-----------------------------------------------------------------------------
 // Default types of ANSI and Unicode string buffer
 //-----------------------------------------------------------------------------
-typedef TParserStringBuffer<char, eastl::string>	 parserStringBufferANSI_t;
-typedef TParserStringBuffer<wchar_t, eastl::wstring> parserStringBufferWCHAR_t;
+typedef CParserStringBuffer<char, eastl::string>	 parserStringBufferANSI_t;
+typedef CParserStringBuffer<wchar_t, eastl::wstring> parserStringBufferWCHAR_t;
 
 #include "utils/parserlib/stringbuffer.inl"

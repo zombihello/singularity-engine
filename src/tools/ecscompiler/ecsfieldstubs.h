@@ -55,7 +55,7 @@ struct ecsScopeStub_t
 	parserFileContext_t endContext;
 };
 
-class CEcsStubBase : public TRefCounted<IRefCounted>
+class CEcsStubBase : public CRefCounted<IRefCounted>
 {
 public:
 	CEcsStubBase( const parserFileContext_t& context, const char* pName );
@@ -92,7 +92,7 @@ public:
 	CEcsStubMetadata( const parserFileContext_t& context );
 
 	FORCEINLINE void  AddValue( CEcsStubMetadataValue* pValue ) { valuesDict[pValue->GetType()] = pValue; }
-	FORCEINLINE const eastl::unordered_map<ecsMetadataType_t, TRefPtr<CEcsStubMetadataValue>>& GetValues() const { return valuesDict; }
+	FORCEINLINE const eastl::unordered_map<ecsMetadataType_t, CRefPtr<CEcsStubMetadataValue>>& GetValues() const { return valuesDict; }
 	FORCEINLINE ecsScopeStub_t&																   GetScope() { return scope; }
 	FORCEINLINE bool																		   HasValue( ecsMetadataType_t type ) const { return valuesDict.find( type ) != valuesDict.end(); }
 	FORCEINLINE CEcsStubMetadataValue*														   GetValue( ecsMetadataType_t type ) const
@@ -107,7 +107,7 @@ public:
 
 private:
 	ecsScopeStub_t															scope;
-	eastl::unordered_map<ecsMetadataType_t, TRefPtr<CEcsStubMetadataValue>> valuesDict;
+	eastl::unordered_map<ecsMetadataType_t, CRefPtr<CEcsStubMetadataValue>> valuesDict;
 };
 
 class CEcsStubDefaultFieldValue : public CEcsStubBase
@@ -135,7 +135,7 @@ public:
 private:
 	parserFileContext_t		  typeContext;
 	eastl::string			  type;
-	TRefPtr<CEcsStubMetadata> pMetadata;
+	CRefPtr<CEcsStubMetadata> pMetadata;
 };
 
 class CEcsStubDataType : public CEcsStubBase
@@ -160,16 +160,16 @@ public:
 		return defaultFieldValues[itFind->second];
 	}
 
-	FORCEINLINE const eastl::vector<TRefPtr<CEcsStubDefaultFieldValue>>& GetDefaultFieldValues() const { return defaultFieldValues; }
-	FORCEINLINE const eastl::vector<TRefPtr<CEcsStubField>>& GetFields() const { return fields; }
+	FORCEINLINE const eastl::vector<CRefPtr<CEcsStubDefaultFieldValue>>& GetDefaultFieldValues() const { return defaultFieldValues; }
+	FORCEINLINE const eastl::vector<CRefPtr<CEcsStubField>>& GetFields() const { return fields; }
 	FORCEINLINE CEcsStubMetadata*							 GetMetadata() const { return pMetadata; }
 	FORCEINLINE ecsScopeStub_t&								 GetScope() { return scope; }
 
 private:
 	ecsScopeStub_t									  scope;
-	TRefPtr<CEcsStubMetadata>						  pMetadata;
-	eastl::vector<TRefPtr<CEcsStubDefaultFieldValue>> defaultFieldValues;
-	eastl::vector<TRefPtr<CEcsStubField>>			  fields;
+	CRefPtr<CEcsStubMetadata>						  pMetadata;
+	eastl::vector<CRefPtr<CEcsStubDefaultFieldValue>> defaultFieldValues;
+	eastl::vector<CRefPtr<CEcsStubField>>			  fields;
 	eastl::unordered_map<eastl::string, uint32>		  defaultFieldValuesDict;
 };
 
@@ -197,14 +197,14 @@ public:
 	FORCEINLINE bool			  HasFilters( ecsSystemFilterType_t filterType ) const { return !filters[filterType].empty(); }
 	FORCEINLINE ecsScopeStub_t&	  GetScope() { return scope; }
 	FORCEINLINE CEcsStubMetadata* GetMetadata() const { return pMetadata; }
-	FORCEINLINE const eastl::vector<TRefPtr<CEcsStubField>>& GetFields( ecsFieldAccessType_t accessType ) const { return fields[accessType]; }
-	FORCEINLINE const eastl::vector<TRefPtr<CEcsStubSystemFilter>>& GetFilters( ecsSystemFilterType_t filterType ) const { return filters[filterType]; }
+	FORCEINLINE const eastl::vector<CRefPtr<CEcsStubField>>& GetFields( ecsFieldAccessType_t accessType ) const { return fields[accessType]; }
+	FORCEINLINE const eastl::vector<CRefPtr<CEcsStubSystemFilter>>& GetFilters( ecsSystemFilterType_t filterType ) const { return filters[filterType]; }
 
 private:
 	ecsScopeStub_t								 scope;
-	TRefPtr<CEcsStubMetadata>					 pMetadata;
-	eastl::vector<TRefPtr<CEcsStubField>>		 fields[ECS_FIELD_NUM_ACCESS_TYPES];
-	eastl::vector<TRefPtr<CEcsStubSystemFilter>> filters[ECS_SYSTEM_NUM_FILTER_TYPES];
+	CRefPtr<CEcsStubMetadata>					 pMetadata;
+	eastl::vector<CRefPtr<CEcsStubField>>		 fields[ECS_FIELD_NUM_ACCESS_TYPES];
+	eastl::vector<CRefPtr<CEcsStubSystemFilter>> filters[ECS_SYSTEM_NUM_FILTER_TYPES];
 };
 
 class CEcsStubModule : public CEcsStubBase
@@ -216,26 +216,26 @@ public:
 	FORCEINLINE void  AddComponent( CEcsStubDataType* pComponent ) { components.emplace_back( pComponent ); }
 	FORCEINLINE void  AddSystem( CEcsStubSystem* pSystem ) { systems.emplace_back( pSystem ); }
 	FORCEINLINE void  AddResource( CEcsStubDataType* pResource ) { resources.emplace_back( pResource ); }
-	FORCEINLINE const eastl::vector<TRefPtr<CEcsStubUsing>>& GetUsings() const { return usings; }
-	FORCEINLINE const eastl::vector<TRefPtr<CEcsStubDataType>>& GetComponents() const { return components; }
-	FORCEINLINE const eastl::vector<TRefPtr<CEcsStubSystem>>& GetSystems() const { return systems; }
-	FORCEINLINE const eastl::vector<TRefPtr<CEcsStubDataType>>& GetResources() const { return resources; }
+	FORCEINLINE const eastl::vector<CRefPtr<CEcsStubUsing>>& GetUsings() const { return usings; }
+	FORCEINLINE const eastl::vector<CRefPtr<CEcsStubDataType>>& GetComponents() const { return components; }
+	FORCEINLINE const eastl::vector<CRefPtr<CEcsStubSystem>>& GetSystems() const { return systems; }
+	FORCEINLINE const eastl::vector<CRefPtr<CEcsStubDataType>>& GetResources() const { return resources; }
 	FORCEINLINE ecsScopeStub_t&									GetScope() { return scope; }
 
 private:
 	ecsScopeStub_t							 scope;
-	eastl::vector<TRefPtr<CEcsStubUsing>>	 usings;
-	eastl::vector<TRefPtr<CEcsStubDataType>> components;
-	eastl::vector<TRefPtr<CEcsStubDataType>> resources;
-	eastl::vector<TRefPtr<CEcsStubSystem>>	 systems;
+	eastl::vector<CRefPtr<CEcsStubUsing>>	 usings;
+	eastl::vector<CRefPtr<CEcsStubDataType>> components;
+	eastl::vector<CRefPtr<CEcsStubDataType>> resources;
+	eastl::vector<CRefPtr<CEcsStubSystem>>	 systems;
 };
 
 class CEcsSystemStub
 {
 public:
 	FORCEINLINE void  AddModule( CEcsStubModule* pModule ) { modules.emplace_back( pModule ); }
-	FORCEINLINE const eastl::vector<TRefPtr<CEcsStubModule>>& GetModules() const { return modules; }
+	FORCEINLINE const eastl::vector<CRefPtr<CEcsStubModule>>& GetModules() const { return modules; }
 
 private:
-	eastl::vector<TRefPtr<CEcsStubModule>> modules;
+	eastl::vector<CRefPtr<CEcsStubModule>> modules;
 };

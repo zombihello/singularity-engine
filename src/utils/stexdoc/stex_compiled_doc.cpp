@@ -43,7 +43,7 @@ bool CSTEXCompiledTextureDoc::SaveFile( const char* pPath )
 	Assert( g_pFileSystem );
 
 	// Try to open a file
-	TRefPtr<IStreamDataWriter> pFile = g_pFileSystem->CreateFileWriter( pPath );
+	CRefPtr<IStreamDataWriter> pFile = g_pFileSystem->CreateFileWriter( pPath );
 	if ( !pFile )
 	{
 		Error( "STEXDoc: Failed to open file '%s'", pPath );
@@ -90,7 +90,7 @@ bool CSTEXCompiledTextureDoc::LoadFromFile( const char* pPath )
 	Assert( g_pFileSystem );
 
 	// Try to open a file
-	TRefPtr<IStreamDataReader> pFile = g_pFileSystem->CreateFileReader( pPath );
+	CRefPtr<IStreamDataReader> pFile = g_pFileSystem->CreateFileReader( pPath );
 	if ( !pFile )
 	{
 		Error( "STEXDoc: Failed to open file '%s'", pPath );

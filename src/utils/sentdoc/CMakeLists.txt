@@ -37,3 +37,9 @@ set_target_properties( sentdoc PROPERTIES PREFIX 		"" )
 
 target_link_libraries( sentdoc PUBLIC 					tier1 )
 add_common_target_defines( sentdoc )
+
+
+#
+# Install
+#
+inherit_install_files( sentdoc							TARGETS tier1 )

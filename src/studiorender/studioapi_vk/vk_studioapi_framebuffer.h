@@ -10,11 +10,11 @@ class CStudioAPIRenderPassVk;
 //-----------------------------------------------------------------------------
 // Vulkan Studio API frame buffer
 //-----------------------------------------------------------------------------
-class CStudioAPIFrameBufferVk : public TRefCounted<IStudioAPIFrameBuffer>
+class CStudioAPIFrameBufferVk : public CRefCounted<IStudioAPIFrameBuffer>
 {
 public:
 	// IStudioAPIFrameBuffer interface
-	virtual ivec2_t GetSize() const override;
+	virtual vector2i_t GetSize() const override;
 
 	CStudioAPIFrameBufferVk( const studioAPIFrameBufferCreateInfo_t& createInfo, const char* pDebugName = "" );
 	~CStudioAPIFrameBufferVk();
@@ -26,7 +26,7 @@ public:
 private:
 	static void OnStudioAPIVkShutdown( void* pUserData );
 
-	ivec2_t									size;
+	vector2i_t									size;
 	VkFramebuffer							vkFrameBuffer;
 	COnStudioAPIVkShutdown::funcDelegate_t* pStudioAPIVkShutdownDelegate;
 	uint8									numClearValues;

@@ -12,7 +12,7 @@ Version command
 */
 CON_COMMAND( version, "Print version info string", FCVAR_NONE )
 {
-	TBuildNumber<ENGINE_GOLDDATE> engineBuildNumber;
+	CBuildNumber<ENGINE_GOLDDATE> engineBuildNumber;
 	Msg( "Singularity Engine " ENGINE_VERSION_STRING " build %i (" __DATE__ " " __TIME__ ")", engineBuildNumber.GetBuildNumber() );
 }
 
@@ -41,7 +41,7 @@ CON_COMMAND( exec, "Execute a command file", FCVAR_NONE )
 	}
 
 	// Open a command file
-	TRefPtr<IStreamDataReader> file = g_pFileSystem->CreateFileReader( argv[0] );
+	CRefPtr<IStreamDataReader> file = g_pFileSystem->CreateFileReader( argv[0] );
 	if ( file )
 	{
 		// Read whole file into buffer

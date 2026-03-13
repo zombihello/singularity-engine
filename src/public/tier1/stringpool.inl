@@ -2,11 +2,11 @@
 
 /*
 ==================
-TStringPool::~TStringPool
+CStringPool::~CStringPool
 ==================
 */
 template<typename TIdType>
-FORCEINLINE TStringPool<TIdType>::~TStringPool()
+FORCEINLINE CStringPool<TIdType>::~CStringPool()
 {
 	for ( size index = 0, count = strings.size(); index < count; ++index )
 	{
@@ -16,11 +16,11 @@ FORCEINLINE TStringPool<TIdType>::~TStringPool()
 
 /*
 ==================
-TStringPool::Find
+CStringPool::Find
 ==================
 */
 template<typename TIdType>
-FORCEINLINE TIdType TStringPool<TIdType>::Find( const char* pString, uint64 length ) const
+FORCEINLINE TIdType CStringPool<TIdType>::Find( const char* pString, uint64 length ) const
 {
 	CScopeLock scopeLock( mutex );
 	auto	   it = storageDict.find( eastl::string_view( pString, length ) );
@@ -29,11 +29,11 @@ FORCEINLINE TIdType TStringPool<TIdType>::Find( const char* pString, uint64 leng
 
 /*
 ==================
-TStringPool::FindOrAdd
+CStringPool::FindOrAdd
 ==================
 */
 template<typename TIdType>
-FORCEINLINE TIdType TStringPool<TIdType>::FindOrAdd( const char* pString, uint64 length )
+FORCEINLINE TIdType CStringPool<TIdType>::FindOrAdd( const char* pString, uint64 length )
 {
 	CScopeLock scopeLock( mutex );
 	TIdType	   id = Find( pString, length );
@@ -60,11 +60,11 @@ FORCEINLINE TIdType TStringPool<TIdType>::FindOrAdd( const char* pString, uint64
 
 /*
 ==================
-TStringPool::GetString
+CStringPool::GetString
 ==================
 */
 template<typename TIdType>
-FORCEINLINE const char* TStringPool<TIdType>::GetString( TIdType id ) const
+FORCEINLINE const char* CStringPool<TIdType>::GetString( TIdType id ) const
 {
 	CScopeLock scopeLock( mutex );
 	return strings[id];

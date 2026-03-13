@@ -2,7 +2,7 @@
 #include "tier0/defines.h"
 #include "tier0/types.h"
 #include "tier1/strtools.h"
-#include "tier1/hashing/fasthash.h"
+#include "tier1/fasthash.h"
 
 //-----------------------------------------------------------------------------
 // Calculate a hash for a string to use it in eastl::unordered_map

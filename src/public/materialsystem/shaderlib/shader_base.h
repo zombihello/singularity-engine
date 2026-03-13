@@ -82,7 +82,7 @@
 			{                                                                                                                                     \
 				return index;                                                                                                                     \
 			}                                                                                                                                     \
-			FORCEINLINE void UpdateBuffer( IStudioAPICmdContext* pStudioAPICmdContext, byte* pData, TRefPtr<IStudioAPIBuffer>& pStudioAPIBuffer ) \
+			FORCEINLINE void UpdateBuffer( IStudioAPICmdContext* pStudioAPICmdContext, byte* pData, CRefPtr<IStudioAPIBuffer>& pStudioAPIBuffer ) \
 			{                                                                                                                                     \
 				/** If we haven't a buffer or size isn't equal create a new buffer */                                                             \
 				if ( !pStudioAPIBuffer || pStudioAPIBuffer->GetSize() != size )                                                                   \
@@ -206,7 +206,7 @@
 #define SHADER_FALLBACK		  virtual const char* GetFallbackShader() const override
 #define SHADER_SELECT_COMBO	  virtual void R_SelectCombo( IMaterialVar** pParams, shaderComboInfo_t& comboInfo ) override
 #define SHADER_DRAW			  virtual void R_OnDraw( IStudioAPICmdList* pStudioAPICmdList, IMaterialVar** pParams, IStudioAPIBuffer** pStudioAPIBuffers = NULL ) override
-#define SHADER_UPDATE_BUFFERS virtual void R_UpdateBuffers( IStudioAPICmdContext* pStudioAPICmdContext, TRefPtr<IStudioAPIBuffer>* pStudioAPIBuffers, IMaterialVar** pParams ) const override
+#define SHADER_UPDATE_BUFFERS virtual void R_UpdateBuffers( IStudioAPICmdContext* pStudioAPICmdContext, CRefPtr<IStudioAPIBuffer>* pStudioAPIBuffers, IMaterialVar** pParams ) const override
 #define SHADER_BARRIER		  virtual void R_Barrier( IStudioAPICmdList* pStudioAPICmdList, IMaterialVar** pParams, IStudioAPIBuffer** pStudioAPIBuffers ) const override
 
 //-----------------------------------------------------------------------------
@@ -248,7 +248,7 @@ public:
 	virtual void Shutdown() override;
 
 	// NOTE: pStudioAPIBuffers and pParams must be array size equal to shader buffer and parameters count
-	virtual void R_UpdateBuffers( IStudioAPICmdContext* pStudioAPICmdContext, TRefPtr<IStudioAPIBuffer>* pStudioAPIBuffers, IMaterialVar** pParams ) const override;
+	virtual void R_UpdateBuffers( IStudioAPICmdContext* pStudioAPICmdContext, CRefPtr<IStudioAPIBuffer>* pStudioAPIBuffers, IMaterialVar** pParams ) const override;
 	virtual void R_Barrier( IStudioAPICmdList* pStudioAPICmdList, IMaterialVar** pParams, IStudioAPIBuffer** pStudioAPIBuffers ) const override;
 	virtual void R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, studioRenderPassType_t renderPassType, IMaterialVar** pParams, IStudioAPIBuffer** pStudioAPIBuffers = NULL ) override;
 
@@ -280,7 +280,7 @@ private:
 	// pCacheIndices must be array size STUDIOAPI_SHADER_NUM_DRAW_TYPES
 	uint64 GetPipelineIndex( const uint64* pCacheIndices ) const;
 
-	TRefPtr<IStudioRenderPipelineSet> pStudioRenderPipelineSet;
+	CRefPtr<IStudioRenderPipelineSet> pStudioRenderPipelineSet;
 	shaderCacheInfoInternal_t		  cacheInfos[STUDIOAPI_SHADER_NUM_DRAW_TYPES];
 };
 

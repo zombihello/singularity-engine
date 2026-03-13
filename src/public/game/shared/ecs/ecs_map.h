@@ -47,7 +47,7 @@ private:
 	CEcsWorld						   ecsWorld;
 	COnMapReseted					   onMapReseted;
 	COnMapUnloaded					   onMapUnloaded;
-	eastl::vector<TRefPtr<CEcsEntity>> ecsEntities;
+	eastl::vector<CRefPtr<CEcsEntity>> ecsEntities;
 };
 
 #include "game/shared/ecs/ecs_map.inl"

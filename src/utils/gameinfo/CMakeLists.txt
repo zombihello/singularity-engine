@@ -37,3 +37,9 @@ set_target_properties( gameinfo PROPERTIES PREFIX 		"" )
 
 target_link_libraries( gameinfo PUBLIC 					tier1 )
 add_common_target_defines( gameinfo )
+
+
+#
+# Install
+#
+inherit_install_files( gameinfo							TARGETS tier1 )

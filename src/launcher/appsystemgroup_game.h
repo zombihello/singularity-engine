@@ -4,7 +4,7 @@
 //-----------------------------------------------------------------------------
 // The application object for apps that use game systems
 //-----------------------------------------------------------------------------
-class CAppSystemGroupGame : public TDefaultAppSystemGroup<CAppSystemGroup>
+class CAppSystemGroupGame : public CDefaultAppSystemGroup<CAppSystemGroup>
 {
 public:
 	CAppSystemGroupGame();

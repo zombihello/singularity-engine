@@ -35,8 +35,8 @@ public:
 	virtual const char* GetGameDescription() const override;
 
 private:
-	TRefPtr<IEntity> pQuadEntity;
-	TRefPtr<IEntity> pPlayerEntity;
+	CRefPtr<IEntity> pQuadEntity;
+	CRefPtr<IEntity> pPlayerEntity;
 };
 
 EXPOSE_INTERFACE_FN( Game, IGame, GAME_INTERFACE_VERSION );
@@ -110,9 +110,9 @@ bool CCitadelGame::Init()
 														   { { -0.5f, 0.5f, 0.f, 1.f }, { -1.f, 1.f }, { 255, 255, 255 } } };
 			uint16						quadIndices[]  = { 0, 1, 2, 2, 3, 0 };
 
-			TResourcePtr<IMaterial>	  pMaterial				 = g_pResourceSystem->FindOrLoadResource( "materials/nelson", RESOURCE_TYPE_MATERIAL );
-			TRefPtr<IStudioAPIBuffer> pStudioAPIVertexBuffer = g_pStudioAPI->CreateBuffer( (byte*)&quadVerteces[0], ARRAYSIZE( quadVerteces ) * sizeof( studioSimpleElementVertex_t ), sizeof( studioSimpleElementVertex_t ), STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_VERTEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
-			TRefPtr<IStudioAPIBuffer> pStudioAPIIndexBuffer	 = g_pStudioAPI->CreateBuffer( (byte*)&quadIndices[0], ARRAYSIZE( quadIndices ) * sizeof( uint16 ), sizeof( uint16 ), STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_INDEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
+			CResourcePtr<IMaterial>	  pMaterial				 = g_pResourceSystem->FindOrLoadResource( "materials/nelson", RESOURCE_TYPE_MATERIAL );
+			CRefPtr<IStudioAPIBuffer> pStudioAPIVertexBuffer = g_pStudioAPI->CreateBuffer( (byte*)&quadVerteces[0], ARRAYSIZE( quadVerteces ) * sizeof( studioSimpleElementVertex_t ), sizeof( studioSimpleElementVertex_t ), STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_VERTEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
+			CRefPtr<IStudioAPIBuffer> pStudioAPIIndexBuffer	 = g_pStudioAPI->CreateBuffer( (byte*)&quadIndices[0], ARRAYSIZE( quadIndices ) * sizeof( uint16 ), sizeof( uint16 ), STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_INDEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
 			Quad().Init( pStudioAPIVertexBuffer, pStudioAPIIndexBuffer, pMaterial );
 		}
 	};

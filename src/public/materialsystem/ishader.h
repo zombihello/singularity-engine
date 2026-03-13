@@ -71,7 +71,7 @@ public:
 	virtual void Shutdown()											= 0;
 
 	// NOTE: pStudioAPIBuffers and pParams Must be size equal to shader parameters and buffers count
-	virtual void R_UpdateBuffers( IStudioAPICmdContext* pStudioAPICmdContext, TRefPtr<IStudioAPIBuffer>* pStudioAPIBuffers, IMaterialVar** pParams ) const							  = 0;
+	virtual void R_UpdateBuffers( IStudioAPICmdContext* pStudioAPICmdContext, CRefPtr<IStudioAPIBuffer>* pStudioAPIBuffers, IMaterialVar** pParams ) const							  = 0;
 	virtual void R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, studioRenderPassType_t renderPassType, IMaterialVar** pParams, IStudioAPIBuffer** pStudioAPIBuffers = NULL ) = 0;
 
 	// Place barriers into a command list

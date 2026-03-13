@@ -176,7 +176,7 @@ FORCEINLINE float CWindowSDL::GetDisplayScale() const
 CWindowSDL::GetSize
 ==================
 */
-FORCEINLINE void CWindowSDL::GetSize( ivec2_t& size ) const
+FORCEINLINE void CWindowSDL::GetSize( vector2i_t& size ) const
 {
 	Assert( pSDLWindow );
 	SDL_GetWindowSize( pSDLWindow, (int32*)&size.x, (int32*)&size.y );
@@ -187,7 +187,7 @@ FORCEINLINE void CWindowSDL::GetSize( ivec2_t& size ) const
 CWindowSDL::GetSizeInPixels
 ==================
 */
-FORCEINLINE void CWindowSDL::GetSizeInPixels( ivec2_t& size ) const
+FORCEINLINE void CWindowSDL::GetSizeInPixels( vector2i_t& size ) const
 {
 	Assert( pSDLWindow );
 	SDL_GetWindowSizeInPixels( pSDLWindow, (int32*)&size.x, (int32*)&size.y );

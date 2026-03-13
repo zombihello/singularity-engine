@@ -54,9 +54,9 @@ public:
 	virtual void CopyBuffer( IStudioAPIBuffer* pSrcBuffer, uint64 srcOffset, IStudioAPIBuffer* pDstBuffer, uint64 dstOffset, uint64 size )			 = 0;
 
 	// NOTE: To copy textures must be in STUDIOAPI_TEXTURE_LAYOUT_TRANSFER_SRC and STUDIOAPI_TEXTURE_LAYOUT_TRANSFER_DST layout
-	virtual void CopyBufferToTexture( IStudioAPIBuffer* pSrcBuffer, uint64 srcOffset, IStudioAPITexture* pDstTexture, uint32 dstMip, const ivec3_t& dstOffset, const ivec3_t& dstSize, uint32 dstStartLayer = 0, uint32 dstNumLayers = -1, uint32 srcRowLength = 0, uint32 srcTextureHeight = 0 ) = 0;
-	virtual void CopyTextureToBuffer( IStudioAPITexture* pSrcTexture, uint32 srcMip, const ivec3_t& srcOffset, const ivec3_t& srcSize, IStudioAPIBuffer* pDstBuffer, uint64 dstOffset, uint32 srcStartLayer = 0, uint32 srcNumLayers = -1, uint32 dstRowLength = 0, uint32 dstTextureHeight = 0 ) = 0;
-	virtual void CopyTexture( IStudioAPITexture* pSrcTexture, uint32 srcMip, const ivec3_t srcOffset, IStudioAPITexture* pDstTexture, uint32 dstMip, const ivec3_t dstOffset, const ivec3_t size, uint32 srcStartLayer = 0, uint32 dstStartLayer = 0, uint32 numLayers = 1 )					  = 0;
+	virtual void CopyBufferToTexture( IStudioAPIBuffer* pSrcBuffer, uint64 srcOffset, IStudioAPITexture* pDstTexture, uint32 dstMip, const vector3i_t& dstOffset, const vector3i_t& dstSize, uint32 dstStartLayer = 0, uint32 dstNumLayers = -1, uint32 srcRowLength = 0, uint32 srcTextureHeight = 0 ) = 0;
+	virtual void CopyTextureToBuffer( IStudioAPITexture* pSrcTexture, uint32 srcMip, const vector3i_t& srcOffset, const vector3i_t& srcSize, IStudioAPIBuffer* pDstBuffer, uint64 dstOffset, uint32 srcStartLayer = 0, uint32 srcNumLayers = -1, uint32 dstRowLength = 0, uint32 dstTextureHeight = 0 ) = 0;
+	virtual void CopyTexture( IStudioAPITexture* pSrcTexture, uint32 srcMip, const vector3i_t srcOffset, IStudioAPITexture* pDstTexture, uint32 dstMip, const vector3i_t dstOffset, const vector3i_t size, uint32 srcStartLayer = 0, uint32 dstStartLayer = 0, uint32 numLayers = 1 )					  = 0;
 
 	virtual IStudioAPICmdContext* GetCmdContext() const = 0;
 };

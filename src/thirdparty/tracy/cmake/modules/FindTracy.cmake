@@ -12,6 +12,7 @@
 
 set( TRACY_FOUND 				OFF )
 set( TRACY_SEARCH_PATHS 		${TRACY_PATH} )
+set( TRACY_DEFINES 				TRACY_ENABLE TRACY_IMPORT TRACY_ON_DEMAND TRACY_NO_CRASH_HANDLER )
 
 
 #
@@ -46,10 +47,6 @@ else()
 	message( SEND_ERROR "Tracy :: Unknown platform" )
 	return()
 endif()
-
-
-# Set Tracy defines
-set( TRACY_DEFINES 		TRACY_ENABLE TRACY_IMPORT TRACY_ON_DEMAND TRACY_NO_CRASH_HANDLER )
 
 
 #

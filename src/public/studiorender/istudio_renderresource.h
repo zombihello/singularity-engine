@@ -33,13 +33,13 @@ void Studio_BeginUpdateResource( IStudioRenderResource* pResource );
 void Studio_BeginReleaseResource( IStudioRenderResource* pResource );
 
 template<class TStudioRenderResourceClass>
-void Studio_BeginInitResourceSafe( TRefPtr<TStudioRenderResourceClass> pResource );
+void Studio_BeginInitResourceSafe( CRefPtr<TStudioRenderResourceClass> pResource );
 
 template<class TStudioRenderResourceClass>
-void Studio_BeginUpdateResourceSafe( TRefPtr<TStudioRenderResourceClass> pResource );
+void Studio_BeginUpdateResourceSafe( CRefPtr<TStudioRenderResourceClass> pResource );
 
 template<class TStudioRenderResourceClass>
-void Studio_BeginReleaseResourceSafe( TRefPtr<TStudioRenderResourceClass> pResource );
+void Studio_BeginReleaseResourceSafe( CRefPtr<TStudioRenderResourceClass> pResource );
 
 //-----------------------------------------------------------------------------
 // Container for all global render resources in the module
@@ -63,7 +63,7 @@ private:
 // NOTE: For use g_pStudioAPI must be valid
 //-----------------------------------------------------------------------------
 template<class TBaseClass, bool bGlobal = false>
-class TStudioRenderResource : public TBaseClass
+class CStudioRenderResource : public TBaseClass
 {
 public:
 	// IStudioRenderResource interface
@@ -72,7 +72,7 @@ public:
 	virtual void UpdateResource() override;
 	virtual bool IsInitedResource() const override;
 
-	TStudioRenderResource()
+	CStudioRenderResource()
 		: bInitedResource( false )
 	{
 		if ( bGlobal )
@@ -80,7 +80,7 @@ public:
 			CStudioGlobalRenderResources::AddResource( this );
 		}
 	}
-	virtual ~TStudioRenderResource()
+	virtual ~CStudioRenderResource()
 	{
 		if ( bGlobal )
 		{

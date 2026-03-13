@@ -37,3 +37,9 @@ set_target_properties( smatdoc PROPERTIES PREFIX 		"" )
 
 target_link_libraries( smatdoc PUBLIC 					tier1 )
 add_common_target_defines( smatdoc )
+
+
+#
+# Install
+#
+inherit_install_files( smatdoc							TARGETS tier1 )

@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 // Vulkan Studio API render pass
 //-----------------------------------------------------------------------------
-class CStudioAPIRenderPassVk : public TRefCounted<IStudioAPIRenderPass>
+class CStudioAPIRenderPassVk : public CRefCounted<IStudioAPIRenderPass>
 {
 public:
 	CStudioAPIRenderPassVk( const studioAPIRenderPassCreateInfo_t& createInfo, const char* pDebugName = "" );

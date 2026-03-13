@@ -158,7 +158,7 @@ void CStudioAPICmdListVk::BeginRenderPass( IStudioAPIRenderPass* pRenderPass, IS
 
 	CStudioAPIRenderPassVk*	 pStudioAPIRenderPass  = (CStudioAPIRenderPassVk*)pRenderPass;
 	CStudioAPIFrameBufferVk* pStudioAPIFrameBuffer = (CStudioAPIFrameBufferVk*)pFrameBuffer;
-	ivec2_t					 frameBufferSize	   = pStudioAPIFrameBuffer->GetSize();
+	vector2i_t					 frameBufferSize	   = pStudioAPIFrameBuffer->GetSize();
 	VkRenderPassBeginInfo	 vkRenderPassBeginInfo = {};
 	vkRenderPassBeginInfo.sType					   = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 	vkRenderPassBeginInfo.renderPass			   = pStudioAPIRenderPass->GetVkRenderPass();
@@ -414,7 +414,7 @@ void CStudioAPICmdListVk::CopyBuffer( IStudioAPIBuffer* pSrcBuffer, uint64 srcOf
 CStudioAPICmdListVk::CopyBufferToTexture
 ==================
 */
-void CStudioAPICmdListVk::CopyBufferToTexture( IStudioAPIBuffer* pSrcBuffer, uint64 srcOffset, IStudioAPITexture* pDstTexture, uint32 dstMip, const ivec3_t& dstOffset, const ivec3_t& dstSize, uint32 dstStartLayer /* = 0 */, uint32 dstNumLayers /* = -1 */, uint32 srcRowLength /* = 0 */, uint32 srcTextureHeight /* = 0 */ )
+void CStudioAPICmdListVk::CopyBufferToTexture( IStudioAPIBuffer* pSrcBuffer, uint64 srcOffset, IStudioAPITexture* pDstTexture, uint32 dstMip, const vector3i_t& dstOffset, const vector3i_t& dstSize, uint32 dstStartLayer /* = 0 */, uint32 dstNumLayers /* = -1 */, uint32 srcRowLength /* = 0 */, uint32 srcTextureHeight /* = 0 */ )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	CStudioAPIBufferVk*	 pStudioAPISrcBuffer  = (CStudioAPIBufferVk*)pSrcBuffer;
@@ -455,7 +455,7 @@ void CStudioAPICmdListVk::CopyBufferToTexture( IStudioAPIBuffer* pSrcBuffer, uin
 CStudioAPICmdListVk::CopyTextureToBuffer
 ==================
 */
-void CStudioAPICmdListVk::CopyTextureToBuffer( IStudioAPITexture* pSrcTexture, uint32 srcMip, const ivec3_t& srcOffset, const ivec3_t& srcSize, IStudioAPIBuffer* pDstBuffer, uint64 dstOffset, uint32 srcStartLayer /* = 0 */, uint32 srcNumLayers /* = -1 */, uint32 dstRowLength /* = 0 */, uint32 dstTextureHeight /* = 0 */ )
+void CStudioAPICmdListVk::CopyTextureToBuffer( IStudioAPITexture* pSrcTexture, uint32 srcMip, const vector3i_t& srcOffset, const vector3i_t& srcSize, IStudioAPIBuffer* pDstBuffer, uint64 dstOffset, uint32 srcStartLayer /* = 0 */, uint32 srcNumLayers /* = -1 */, uint32 dstRowLength /* = 0 */, uint32 dstTextureHeight /* = 0 */ )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	CStudioAPITextureVk* pStudioAPISrcTexture = (CStudioAPITextureVk*)pSrcTexture;
@@ -496,7 +496,7 @@ void CStudioAPICmdListVk::CopyTextureToBuffer( IStudioAPITexture* pSrcTexture, u
 CStudioAPICmdListVk::CopyTexture
 ==================
 */
-void CStudioAPICmdListVk::CopyTexture( IStudioAPITexture* pSrcTexture, uint32 srcMip, const ivec3_t srcOffset, IStudioAPITexture* pDstTexture, uint32 dstMip, const ivec3_t dstOffset, const ivec3_t size, uint32 srcStartLayer /* = 0 */, uint32 dstStartLayer /* = 0 */, uint32 numLayers /* = 1 */ )
+void CStudioAPICmdListVk::CopyTexture( IStudioAPITexture* pSrcTexture, uint32 srcMip, const vector3i_t srcOffset, IStudioAPITexture* pDstTexture, uint32 dstMip, const vector3i_t dstOffset, const vector3i_t size, uint32 srcStartLayer /* = 0 */, uint32 dstStartLayer /* = 0 */, uint32 numLayers /* = 1 */ )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	CStudioAPITextureVk* pStudioAPISrcTexture = (CStudioAPITextureVk*)pSrcTexture;

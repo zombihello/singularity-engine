@@ -47,7 +47,7 @@ void CMaterialFactory::Shutdown()
 CMaterialFactory::CreateProceduralResource
 ==================
 */
-TRefPtr<IRefCounted> CMaterialFactory::CreateProceduralResource() const
+CRefPtr<IRefCounted> CMaterialFactory::CreateProceduralResource() const
 {
 	return new CMaterial();
 }
@@ -57,7 +57,7 @@ TRefPtr<IRefCounted> CMaterialFactory::CreateProceduralResource() const
 CMaterialFactory::LoadResource
 ==================
 */
-TRefPtr<IRefCounted> CMaterialFactory::LoadResource( const char* pPath, uint32 loadFlags /* = RESOURCE_LOAD_FLAG_NONE */ ) const
+CRefPtr<IRefCounted> CMaterialFactory::LoadResource( const char* pPath, uint32 loadFlags /* = RESOURCE_LOAD_FLAG_NONE */ ) const
 {
 	CSMATCompiledMaterialDoc smatCompiledMaterialDoc;
 	if ( !smatCompiledMaterialDoc.LoadFromFile( S_GetFileExtension( pPath ) ? pPath : S_Sprintf( "%s.smat_c", pPath ).c_str() ) )
@@ -84,7 +84,7 @@ void CMaterialFactory::UnloadResource( IRefCounted* pResoruce ) const
 CMaterialFactory::GetDefaultResource
 ==================
 */
-TRefPtr<IResource> CMaterialFactory::GetDefaultResource() const
+CRefPtr<IResource> CMaterialFactory::GetDefaultResource() const
 {
 	return pDefaultMaterial;
 }

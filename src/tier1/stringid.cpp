@@ -6,8 +6,8 @@
 CStringID::GetStringPool
 ==================
 */
-TStringPool<CStringID::id_t>& CStringID::GetStringPool()
+CStringPool<CStringID::id_t>& CStringID::GetStringPool()
 {
-	static TStringPool<id_t> s_stringPool;
+	static CStringPool<id_t> s_stringPool;
 	return s_stringPool;
 }

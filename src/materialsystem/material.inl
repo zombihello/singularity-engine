@@ -33,7 +33,7 @@ FORCEINLINE void CMaterial::DestroyBuffers()
 	if ( !studioAPIBuffers.empty() )
 	{
 		UNIQUE_RENDER_COMMAND_ONEPARAMETER( CRemoveStudioAPIBuffersCmd,
-											eastl::vector<TRefPtr<IStudioAPIBuffer>>, studioAPIBuffers, eastl::move( studioAPIBuffers ),
+											eastl::vector<CRefPtr<IStudioAPIBuffer>>, studioAPIBuffers, eastl::move( studioAPIBuffers ),
 											{
 												studioAPIBuffers.clear();
 											} );

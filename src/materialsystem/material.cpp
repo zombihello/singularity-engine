@@ -76,34 +76,34 @@ void CMaterial::Init( const CSMATCompiledMaterialDoc& smatCompiledDoc )
 			case SMAT_MATERIAL_VAR_TYPE_TEXTURE:
 			{
 				const char*		   pTexturePath = smatMatVar.GetTextureValue();
-				TResourcePtr<ITexture> pTexture		= g_pResourceSystem->FindOrLoadResource( pTexturePath, RESOURCE_TYPE_TEXTURE );
+				CResourcePtr<ITexture> pTexture		= g_pResourceSystem->FindOrLoadResource( pTexturePath, RESOURCE_TYPE_TEXTURE );
 				pVar->SetTextureValue( *pTexture );
 				break;
 			}
 			case SMAT_MATERIAL_VAR_TYPE_MATERIAL:
 			{
 				const char*			pMaterialPath = smatMatVar.GetMaterialValue();
-				TResourcePtr<IMaterial> pMaterial	  = g_pResourceSystem->FindOrLoadResource( pMaterialPath, RESOURCE_TYPE_MATERIAL );
+				CResourcePtr<IMaterial> pMaterial	  = g_pResourceSystem->FindOrLoadResource( pMaterialPath, RESOURCE_TYPE_MATERIAL );
 				pVar->SetMaterialValue( *pMaterial );
 				break;
 			}
 			case SMAT_MATERIAL_VAR_TYPE_VECTOR_2D:
 			{
-				vec2_t value = { 0.f, 0.f };
+				vector2_t value = { 0.f, 0.f };
 				smatMatVar.GetVecValue( &value.x, 2 );
 				pVar->SetVecValue( &value.x, 2 );
 				break;
 			}
 			case SMAT_MATERIAL_VAR_TYPE_VECTOR_3D:
 			{
-				vec3_t value = { 0.f, 0.f, 0.f };
+				vector3_t value = { 0.f, 0.f, 0.f };
 				smatMatVar.GetVecValue( &value.x, 3 );
 				pVar->SetVecValue( &value.x, 3 );
 				break;
 			}
 			case SMAT_MATERIAL_VAR_TYPE_VECTOR_4D:
 			{
-				vec4_t value = { 0.f, 0.f, 0.f, 0.f };
+				vector4_t value = { 0.f, 0.f, 0.f, 0.f };
 				smatMatVar.GetVecValue( &value.x, 4 );
 				pVar->SetVecValue( &value.x, 4 );
 				break;

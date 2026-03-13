@@ -400,7 +400,7 @@ void CTextureTool::GenerateMipmaps( CMP_MipSet& cmpMipSet, stexTextureMipMaps_t&
 	if ( mipmaps.empty() )
 	{
 		// Calculate mip count to request
-		uint32 maxSize		   = Max<uint32>( cmpMipSet.m_nDepth, Max<uint32>( cmpMipSet.m_nWidth, cmpMipSet.m_nHeight ) );
+		uint32 maxSize		   = S_Max<uint32>( cmpMipSet.m_nDepth, S_Max<uint32>( cmpMipSet.m_nWidth, cmpMipSet.m_nHeight ) );
 		uint32 requestMipCount = (uint32)S_Floor( S_Log2( (float)maxSize ) ) + 1;
 
 		// Calculate texture size for each mip level
@@ -408,16 +408,16 @@ void CTextureTool::GenerateMipmaps( CMP_MipSet& cmpMipSet, stexTextureMipMaps_t&
 		for ( uint32 mipIdx = 0; mipIdx < requestMipCount; ++mipIdx )
 		{
 			stexTextureMipMap_t& mipmap = mipmaps[mipIdx];
-			mipmap.sizeX				= Max( cmpMipSet.m_nWidth >> mipIdx, 1 );
-			mipmap.sizeY				= Max( cmpMipSet.m_nHeight >> mipIdx, 1 );
-			mipmap.sizeZ				= Max( cmpMipSet.m_nDepth >> mipIdx, 1 );
+			mipmap.sizeX				= S_Max( cmpMipSet.m_nWidth >> mipIdx, 1 );
+			mipmap.sizeY				= S_Max( cmpMipSet.m_nHeight >> mipIdx, 1 );
+			mipmap.sizeZ				= S_Max( cmpMipSet.m_nDepth >> mipIdx, 1 );
 		}
 	}
 
 	// Checks what the minimum image size will be for the requested mip levels
 	// if the request is too large, a adjusted minimum size will be returned
 	const stexTextureMipMap_t& lastMipmap = mipmaps[(uint32)mipmaps.size() - 1];
-	uint32					   minSize	  = Max( lastMipmap.sizeZ, Max( lastMipmap.sizeX, lastMipmap.sizeY ) );
+	uint32					   minSize	  = S_Max( lastMipmap.sizeZ, S_Max( lastMipmap.sizeX, lastMipmap.sizeY ) );
 
 	// Now that the minimum size is known, generate the miplevels
 	Msg( "TextureTool: Generating mipmaps.." );
@@ -484,7 +484,7 @@ CMP_ERROR CTextureTool::ConvertMipsData( CMP_MipSet& cmpMipSet, CMP_FORMAT cmpNe
 			uint32 numSrcChannels	  = TextureTool_GetNumChannels( cmpMipSet.m_format );
 			uint32 numDstChannels	  = TextureTool_GetNumChannels( cmpNewFormat );
 			uint32 numBytesPerChannel = TextureTool_GetNumBytesPerChannel( cmpNewFormat );
-			uint32 step				  = Max<uint32>( (uint32)S_Abs( (float)numSrcChannels - (float)numDstChannels ), 1 );
+			uint32 step				  = S_Max<uint32>( (uint32)S_Abs( (float)numSrcChannels - (float)numDstChannels ), 1 );
 			uint32 srcMipDataSize	  = pCmpMipLevel->m_nWidth * pCmpMipLevel->m_nHeight * numSrcChannels;
 			uint32 dstMipDataSize	  = pCmpMipLevel->m_nWidth * pCmpMipLevel->m_nHeight * numDstChannels * numBytesPerChannel;
 			data.resize( dstMipDataSize + dataOffset );

@@ -24,7 +24,7 @@ enum studioAPICmdListStateVk_t
 	STUDIOAPI_VK_CMDLIST_STATE_HAS_ENDED_RECORD
 };
 
-class CStudioAPICmdListVk : public TRefCounted<IStudioAPICmdList>
+class CStudioAPICmdListVk : public CRefCounted<IStudioAPICmdList>
 {
 public:
 	friend CStudioAPICmdListBatchMgrVk;
@@ -52,9 +52,9 @@ public:
 	virtual void CopyBuffer( IStudioAPIBuffer* pSrcBuffer, uint64 srcOffset, IStudioAPIBuffer* pDstBuffer, uint64 dstOffset, uint64 size ) override;
 
 	// NOTE: To copy textures must be in STUDIOAPI_TEXTURE_LAYOUT_TRANSFER_SRC and STUDIOAPI_TEXTURE_LAYOUT_TRANSFER_DST layout
-	virtual void CopyBufferToTexture( IStudioAPIBuffer* pSrcBuffer, uint64 srcOffset, IStudioAPITexture* pDstTexture, uint32 dstMip, const ivec3_t& dstOffset, const ivec3_t& dstSize, uint32 dstStartLayer = 0, uint32 dstNumLayers = -1, uint32 srcRowLength = 0, uint32 srcTextureHeight = 0 ) override;
-	virtual void CopyTextureToBuffer( IStudioAPITexture* pSrcTexture, uint32 srcMip, const ivec3_t& srcOffset, const ivec3_t& srcSize, IStudioAPIBuffer* pDstBuffer, uint64 dstOffset, uint32 srcStartLayer = 0, uint32 srcNumLayers = -1, uint32 dstRowLength = 0, uint32 dstTextureHeight = 0 ) override;
-	virtual void CopyTexture( IStudioAPITexture* pSrcTexture, uint32 srcMip, const ivec3_t srcOffset, IStudioAPITexture* pDstTexture, uint32 dstMip, const ivec3_t dstOffset, const ivec3_t size, uint32 srcStartLayer = 0, uint32 dstStartLayer = 0, uint32 numLayers = 1 ) override;
+	virtual void CopyBufferToTexture( IStudioAPIBuffer* pSrcBuffer, uint64 srcOffset, IStudioAPITexture* pDstTexture, uint32 dstMip, const vector3i_t& dstOffset, const vector3i_t& dstSize, uint32 dstStartLayer = 0, uint32 dstNumLayers = -1, uint32 srcRowLength = 0, uint32 srcTextureHeight = 0 ) override;
+	virtual void CopyTextureToBuffer( IStudioAPITexture* pSrcTexture, uint32 srcMip, const vector3i_t& srcOffset, const vector3i_t& srcSize, IStudioAPIBuffer* pDstBuffer, uint64 dstOffset, uint32 srcStartLayer = 0, uint32 srcNumLayers = -1, uint32 dstRowLength = 0, uint32 dstTextureHeight = 0 ) override;
+	virtual void CopyTexture( IStudioAPITexture* pSrcTexture, uint32 srcMip, const vector3i_t srcOffset, IStudioAPITexture* pDstTexture, uint32 dstMip, const vector3i_t dstOffset, const vector3i_t size, uint32 srcStartLayer = 0, uint32 dstStartLayer = 0, uint32 numLayers = 1 ) override;
 
 	virtual IStudioAPICmdContext* GetCmdContext() const override;
 
@@ -84,14 +84,14 @@ private:
 	studioAPICmdListStateVk_t		state;
 	VkViewport						vkCurrentViewport;
 	VkRect2D						vkCurrentScissor;
-	TRefPtr<CStudioAPICmdContextVk> pCmdContext;
+	CRefPtr<CStudioAPICmdContextVk> pCmdContext;
 	CStudioAPICmdBufferVk*			pCmdBuffer;
 };
 
 //-----------------------------------------------------------------------------
 // Vulkan StudioAPI command list batch
 //-----------------------------------------------------------------------------
-class CStudioAPICmdListBatchVk : public TRefCounted<IStudioAPICmdListBatch>
+class CStudioAPICmdListBatchVk : public CRefCounted<IStudioAPICmdListBatch>
 {
 public:
 	friend CStudioAPICmdListBatchMgrVk;
@@ -125,10 +125,10 @@ public:
 private:
 	uint8									  syncSwapChainFlags;
 	CStudioAPISwapChainVk*					  pSyncSwapChain;
-	TRefPtr<CStudioAPICmdContextVk>			  pCmdContext;
+	CRefPtr<CStudioAPICmdContextVk>			  pCmdContext;
 	eastl::list<CStudioAPINamedSemaphoreVk*>	  syncSignals;
 	eastl::list<CStudioAPINamedSemaphoreVk*>	  syncWaits;
-	eastl::vector<TRefPtr<CStudioAPICmdListVk>> cmdLists;
+	eastl::vector<CRefPtr<CStudioAPICmdListVk>> cmdLists;
 };
 
 //-----------------------------------------------------------------------------
@@ -148,7 +148,7 @@ public:
 	void ClearSubmittedBatches();
 
 private:
-	typedef eastl::unordered_map<TRefPtr<CStudioAPICmdListBatchVk>, CStudioAPIFenceVk*, TRefPtr<CStudioAPICmdListBatchVk>::hashFunction_t> submittedBatchesDict_t;
+	typedef eastl::unordered_map<CRefPtr<CStudioAPICmdListBatchVk>, CStudioAPIFenceVk*, CRefPtr<CStudioAPICmdListBatchVk>::hashFunction_t> submittedBatchesDict_t;
 
 	void GrabVkSyncSignalsFromBatch( CStudioAPICmdListBatchVk* pCmdListBatch, eastl::vector<VkSemaphore>& vkSyncSignals ) const;
 	void GrabVkSyncWaitsFromBatch( CStudioAPICmdListBatchVk* pCmdListBatch, eastl::vector<VkSemaphore>& vkSyncWaits, eastl::vector<VkPipelineStageFlags>& vkSyncWaitStageMasks ) const;

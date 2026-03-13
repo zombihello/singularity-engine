@@ -106,8 +106,8 @@ CStudioRender::SetCameraView
 void CStudioRender::SetCameraView( const studioCameraView_t& cameraView )
 {
 	// Calculate a view matrix
-	vec3_t targetDirection = cameraView.rotation * g_vectorForward;
-	vec3_t axisUp		   = cameraView.rotation * g_vectorUp;
+	vector3_t targetDirection = cameraView.rotation * g_vectorForward;
+	vector3_t axisUp		   = cameraView.rotation * g_vectorUp;
 	S_MatrixLookAt( cameraView.location, cameraView.location + targetDirection, axisUp, sceneView.viewMatrix );
 
 	// Calculate a perspective matrix

@@ -36,7 +36,7 @@ public:
 
 	virtual bool					  IsUseVSync() const			 = 0;
 	virtual bool					  IsValid() const				 = 0;
-	virtual ivec2_t					  GetSize() const				 = 0;
+	virtual vector2i_t					  GetSize() const				 = 0;
 	virtual uint32					  GetCurrentImageIndex() const	 = 0;
 	virtual IStudioAPISwapChainImage* GetCurrentImage() const		 = 0;
 	virtual uint32					  GetNumImages() const			 = 0;

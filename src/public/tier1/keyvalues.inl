@@ -108,7 +108,7 @@ FORCEINLINE bool CKeyValues::LoadFromFile( const char* pPath )
 	Assert( g_pFileSystem );
 
 	// Try open file
-	TRefPtr<IStreamDataReader> pFile = g_pFileSystem->CreateFileReader( pPath );
+	CRefPtr<IStreamDataReader> pFile = g_pFileSystem->CreateFileReader( pPath );
 	if ( !pFile )
 	{
 		return false;
@@ -142,7 +142,7 @@ FORCEINLINE bool CKeyValues::SaveToFile( const char* pPath ) const
 	Assert( g_pFileSystem );
 
 	// Try to open a file
-	TRefPtr<IStreamDataWriter> pFile = g_pFileSystem->CreateFileWriter( pPath );
+	CRefPtr<IStreamDataWriter> pFile = g_pFileSystem->CreateFileWriter( pPath );
 	if ( !pFile )
 	{
 		Warning( "KeyValues: Failed to create file '%s'", pPath );

@@ -34,8 +34,8 @@ public:
 	virtual float		   GetRefreshRate() const override;
 	virtual float		   GetPixelDensity() const override;
 	virtual float		   GetDisplayScale() const override;
-	virtual void		   GetSize( ivec2_t& size ) const override;
-	virtual void		   GetSizeInPixels( ivec2_t& size ) const override;
+	virtual void		   GetSize( vector2i_t& size ) const override;
+	virtual void		   GetSizeInPixels( vector2i_t& size ) const override;
 	virtual windowHandle_t GetHandle() const override;
 	virtual windowId_t	   GetId() const override;
 

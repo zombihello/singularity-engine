@@ -1,24 +1,24 @@
 #pragma once
 #include "tier1/math/math.h"
 
-template<typename T>
+template<typename TType>
 struct rect_t
 {
 public:
 	rect_t();
-	rect_t( const T& x, const T& y, const T& width, const T& height );
+	rect_t( const TType& x, const TType& y, const TType& width, const TType& height );
 	rect_t( const rect_t& copy );
 
-	static rect_t Make( const T& x, const T& y, const T& width, const T& height );
+	static rect_t Make( const TType& x, const TType& y, const TType& width, const TType& height );
 
 	rect_t& operator=( const rect_t& right );
 	bool	operator==( const rect_t& right ) const;
 	bool	operator!=( const rect_t& right ) const;
 
-	T x;
-	T y;
-	T width;
-	T height;
+	TType x;
+	TType y;
+	TType width;
+	TType height;
 };
 
 #include "tier1/math/rect.inl"

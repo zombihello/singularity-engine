@@ -128,11 +128,11 @@ public:
 // Class takes one type of string and converts it to another
 //-----------------------------------------------------------------------------
 template<typename TConverTo, typename TConvertFrom, typename TConverter, uint32 defaultConversionSize = 128>
-class TStringConversion
+class CStringConversion
 {
 public:
 	// Converts the data by using the Convert() method on the base class
-	TStringConversion( const TConvertFrom* pSrcData )
+	CStringConversion( const TConvertFrom* pSrcData )
 	{
 		if ( pSrcData )
 		{
@@ -144,7 +144,7 @@ public:
 			pConvertedString = NULL;
 		}
 	}
-	~TStringConversion()
+	~CStringConversion()
 	{
 		if ( !pConvertedString )
 		{
@@ -191,10 +191,10 @@ public:
 //-----------------------------------------------------------------------------
 // Converter types and macroses
 //-----------------------------------------------------------------------------
-typedef TStringConversion<wchar_t, char, CANSIToWCHAR_Convert> ansiToWchar_t;
-typedef TStringConversion<char, wchar_t, CWCHARToANSI_Convert> wcharToAnsi_t;
-typedef TStringConversion<wchar_t, char, CUTF8ToWCHAR_Convert> utf8ToWchar_t;
-typedef TStringConversion<char, wchar_t, CWCHARToUTF8_Convert> wcharToUtf8_t;
+typedef CStringConversion<wchar_t, char, CANSIToWCHAR_Convert> ansiToWchar_t;
+typedef CStringConversion<char, wchar_t, CWCHARToANSI_Convert> wcharToAnsi_t;
+typedef CStringConversion<wchar_t, char, CUTF8ToWCHAR_Convert> utf8ToWchar_t;
+typedef CStringConversion<char, wchar_t, CWCHARToUTF8_Convert> wcharToUtf8_t;
 
 #define ANSI_TO_WCHAR( String ) (wchar_t*)ansiToWchar_t( (const char*)String )
 #define WCHAR_TO_ANSI( String ) (char*)wcharToAnsi_t( (const wchar_t*)String )

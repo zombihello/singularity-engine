@@ -6,7 +6,7 @@
 // the memory returned in a function will stick around for the caller to use
 //-----------------------------------------------------------------------------
 #define Mem_Alloca( size )					 alloca( size )
-#define Mem_AllocaAligned( size, alignment ) alloca( Align( size, alignment ) )
+#define Mem_AllocaAligned( size, alignment ) alloca( S_Align( size, alignment ) )
 
 /*
  ==================

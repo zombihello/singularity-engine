@@ -97,7 +97,7 @@ S_LoadFileToArray
 FORCEINLINE bool S_LoadFileToArray( const char* pPath, eastl::vector<byte>& result, uint32 flags /* = FILE_READ_NONE */ )
 {
 	Assert( g_pFileSystem );
-	TRefPtr<IStreamDataReader> pFile = g_pFileSystem->CreateFileReader( pPath, flags );
+	CRefPtr<IStreamDataReader> pFile = g_pFileSystem->CreateFileReader( pPath, flags );
 	if ( !pFile )
 	{
 		Error( "Tier1: Failed to load file '%s'", pPath );
@@ -117,7 +117,7 @@ S_LoadFileToString
 FORCEINLINE bool S_LoadFileToString( const char* pPath, eastl::string& result, uint32 flags /* = FILE_READ_NONE */ )
 {
 	Assert( g_pFileSystem );
-	TRefPtr<IStreamDataReader> pFile = g_pFileSystem->CreateFileReader( pPath, flags );
+	CRefPtr<IStreamDataReader> pFile = g_pFileSystem->CreateFileReader( pPath, flags );
 	if ( !pFile )
 	{
 		Error( "Tier1: Failed to load file '%s'", pPath );
@@ -138,7 +138,7 @@ S_SaveArrayToFile
 FORCEINLINE bool S_SaveArrayToFile( const char* pPath, const eastl::vector<byte>& data, uint32 flags /* = FILE_WRITE_NONE */ )
 {
 	Assert( g_pFileSystem );
-	TRefPtr<IStreamDataWriter> pFile = g_pFileSystem->CreateFileWriter( pPath, flags );
+	CRefPtr<IStreamDataWriter> pFile = g_pFileSystem->CreateFileWriter( pPath, flags );
 	if ( !pFile )
 	{
 		Error( "Tier1: Failed to save file '%s'", pPath );
@@ -157,7 +157,7 @@ S_SaveStringToFile
 FORCEINLINE bool S_SaveStringToFile( const char* pPath, const eastl::string& data, uint32 flags /* = FILE_WRITE_NONE */ )
 {
 	Assert( g_pFileSystem );
-	TRefPtr<IStreamDataWriter> pFile = g_pFileSystem->CreateFileWriter( pPath, flags );
+	CRefPtr<IStreamDataWriter> pFile = g_pFileSystem->CreateFileWriter( pPath, flags );
 	if ( !pFile )
 	{
 		Error( "Tier1: Failed to save file '%s'", pPath );

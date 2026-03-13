@@ -53,7 +53,7 @@ static void ModelTool_ChangeAxisUp( aiVector3D& vector, axisUp_t axisUp )
 		vector.y = -vector.y;
 
 	case AXIS_UP_PLUS_X:
-		Swap( vector.y, vector.x );
+		S_Swap( vector.y, vector.x );
 		break;
 
 	case AXIS_UP_MINUS_Y:
@@ -66,7 +66,7 @@ static void ModelTool_ChangeAxisUp( aiVector3D& vector, axisUp_t axisUp )
 		vector.y = -vector.y;
 
 	case AXIS_UP_PLUS_Z:
-		Swap( vector.y, vector.z );
+		S_Swap( vector.y, vector.z );
 		break;
 	}
 }

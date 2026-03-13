@@ -81,7 +81,7 @@ CConCmd::CConCmd
 ==================
 */
 CConCmd::CConCmd( const char* pName, conCmdExecFn_t pExecFn, const char* pHelpText /* = "" */, uint32 flags /* = FCVAR_NONE */ )
-	: TConCmdBase<IConCmd>( pName, pHelpText, flags )
+	: CConCmdBase<IConCmd>( pName, pHelpText, flags )
 	, pExecFn( pExecFn )
 {
 }
@@ -115,7 +115,7 @@ CConVar::CConVar
 ==================
 */
 CConVar::CConVar( const char* pName, const char* pDefaultValue, const char* pHelpText /* = "" */, uint32 flags /* = FCVAR_NONE */, conVarChangeCallbackFn_t pChangeCallbackFn /* = nullptr */ )
-	: TConCmdBase<IConVar>( pName, pHelpText, flags )
+	: CConCmdBase<IConVar>( pName, pHelpText, flags )
 	, bHasMin( false )
 	, bHasMax( false )
 	, minValue( 0.f )
@@ -136,7 +136,7 @@ CConVar::CConVar
 ==================
 */
 CConVar::CConVar( const char* pName, const char* pDefaultValue, bool bHasMin, float min, bool bHasMax, float max, const char* pHelpText /* = "" */, uint32 flags /* = FCVAR_NONE */, conVarChangeCallbackFn_t pChangeCallbackFn /* = nullptr */ )
-	: TConCmdBase<IConVar>( pName, pHelpText, flags )
+	: CConCmdBase<IConVar>( pName, pHelpText, flags )
 	, bHasMin( bHasMin )
 	, bHasMax( bHasMax )
 	, minValue( min )

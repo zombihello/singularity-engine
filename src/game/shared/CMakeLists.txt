@@ -65,6 +65,8 @@ add_common_target_defines( game_shared )
 #
 # Install
 #
+inherit_install_files( game_shared										TARGETS tier1 )
+
 # Binaries
 install_files( game_shared FILES ${THIRDPARTY_INSTALL_DEBUG_DLLS}		DESTINATION 	bin/${PLATFORM_BIN_DIR}/	CONFIGURATIONS 	Debug )
 install_files( game_shared FILES ${THIRDPARTY_INSTALL_RELEASE_DLLS}		DESTINATION 	bin/${PLATFORM_BIN_DIR}/	CONFIGURATIONS 	Release Retail )

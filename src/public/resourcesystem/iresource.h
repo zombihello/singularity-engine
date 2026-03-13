@@ -40,18 +40,18 @@ template<class TClassType>
 bool ResourceSystem_IsValidClassForType( resourceType_t type );
 
 template<class TResourceClass>
-class TResourcePtr
+class CResourcePtr
 {
 public:
-	TResourcePtr()
+	CResourcePtr()
 	{
 	}
-	TResourcePtr( IResource* pPtr )
+	CResourcePtr( IResource* pPtr )
 		: pPtr( pPtr )
 	{
 		Assert( !pPtr || ResourceSystem_IsValidClassForType<TResourceClass>( pPtr->GetType() ) );
 	}
-	TResourcePtr( const TResourcePtr& copy )
+	CResourcePtr( const CResourcePtr& copy )
 		: pPtr( copy.pPtr )
 	{
 		Assert( !pPtr || ResourceSystem_IsValidClassForType<TResourceClass>( pPtr->GetType() ) );
@@ -59,11 +59,11 @@ public:
 
 	IResource* GetPtr() const;
 
-	TResourcePtr&	operator=( IResource* pPtr );
-	TResourcePtr&	operator=( const TResourcePtr& copy );
-	bool			operator==( const TResourcePtr& right ) const;
+	CResourcePtr&	operator=( IResource* pPtr );
+	CResourcePtr&	operator=( const CResourcePtr& copy );
+	bool			operator==( const CResourcePtr& right ) const;
 	bool			operator==( IResource* pRight ) const;
-	bool			operator!=( const TResourcePtr& right ) const;
+	bool			operator!=( const CResourcePtr& right ) const;
 	bool			operator!=( IResource* pRight ) const;
 					operator bool() const;
 					operator ptrint() const;
@@ -73,7 +73,7 @@ public:
 	TResourceClass* operator*() const;
 
 private:
-	TRefPtr<IResource> pPtr;
+	CRefPtr<IResource> pPtr;
 };
 
 #include "resourcesystem/iresource.inl"

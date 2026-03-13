@@ -93,7 +93,7 @@ bool CShaderCacheDoc::SaveFile( const char* pPath )
 	}
 
 	// Create shader cache file
-	TRefPtr<IStreamDataWriter> pFile = g_pFileSystem->CreateFileWriter( pPath );
+	CRefPtr<IStreamDataWriter> pFile = g_pFileSystem->CreateFileWriter( pPath );
 	if ( !pFile )
 	{
 		Error( "ShaderCacheDoc: Failed to create file '%s'", pPath );
@@ -139,7 +139,7 @@ bool CShaderCacheDoc::LoadFromFile( const char* pPath )
 	Clear();
 
 	// Try to open file
-	TRefPtr<IStreamDataReader> pFile = g_pFileSystem->CreateFileReader( pPath );
+	CRefPtr<IStreamDataReader> pFile = g_pFileSystem->CreateFileReader( pPath );
 	if ( !pFile )
 	{
 		return false;

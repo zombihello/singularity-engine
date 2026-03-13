@@ -2,11 +2,11 @@
 
 /*
 ==================
-TEcsComponentFactory::TEcsComponentFactory
+CEcsComponentFactory::CEcsComponentFactory
 ==================
 */
 template<typename TEcsComponent, void ( *pParserSENTComponentVarsFunc )( const CSENTEntityDescComponent&, TEcsComponent& )>
-TEcsComponentFactory<TEcsComponent, pParserSENTComponentVarsFunc>::TEcsComponentFactory( const CSENTEntityDescComponent& sentComponent )
+CEcsComponentFactory<TEcsComponent, pParserSENTComponentVarsFunc>::CEcsComponentFactory( const CSENTEntityDescComponent& sentComponent )
 {
 	if ( pParserSENTComponentVarsFunc )
 	{
@@ -16,22 +16,22 @@ TEcsComponentFactory<TEcsComponent, pParserSENTComponentVarsFunc>::TEcsComponent
 
 /*
 ==================
-TEcsComponentFactory::TEcsComponentFactory
+CEcsComponentFactory::CEcsComponentFactory
 ==================
 */
 template<typename TEcsComponent, void ( *pParserSENTComponentVarsFunc )( const CSENTEntityDescComponent&, TEcsComponent& )>
-TEcsComponentFactory<TEcsComponent, pParserSENTComponentVarsFunc>::TEcsComponentFactory( const TEcsComponentFactory& other )
+CEcsComponentFactory<TEcsComponent, pParserSENTComponentVarsFunc>::CEcsComponentFactory( const CEcsComponentFactory& other )
 	: ecsArchetypeComponent( other.ecsArchetypeComponent )
 {
 }
 
 /*
 ==================
-TEcsComponentFactory::Create
+CEcsComponentFactory::Create
 ==================
 */
 template<typename TEcsComponent, void ( *pParserSENTComponentVarsFunc )( const CSENTEntityDescComponent&, TEcsComponent& )>
-void TEcsComponentFactory<TEcsComponent, pParserSENTComponentVarsFunc>::Create( CEcsWorld ecsWorld, ecsEntity_t ecsEntity )
+void CEcsComponentFactory<TEcsComponent, pParserSENTComponentVarsFunc>::Create( CEcsWorld ecsWorld, ecsEntity_t ecsEntity )
 {
 	PROFILER_SCOPE_FUNC()
 	if ( !ecsWorld.IsRegisteredType<TEcsComponent>() )

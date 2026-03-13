@@ -83,7 +83,7 @@ void CApplication::Init()
 	if ( DEBUG || CommandLine()->HasParam( "log" ) )
 	{
 		CLogOutputFile&			   logOutputFile = GetLogOutputFile();
-		TRefPtr<IStreamDataWriter> pLogFile		 = logOutputFile.BeginLoggingToFile( S_Sprintf( "//base_path/logs/%s.log", appInfo.pAppName ).c_str() );
+		CRefPtr<IStreamDataWriter> pLogFile		 = logOutputFile.BeginLoggingToFile( S_Sprintf( "//base_path/logs/%s.log", appInfo.pAppName ).c_str() );
 		if ( pLogFile )
 		{
 			CrashDumpHandler()->AddLogFile( pLogFile->GetPath() );

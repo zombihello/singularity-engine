@@ -37,3 +37,9 @@ set_target_properties( stexdoc PROPERTIES PREFIX 		"" )
 
 target_link_libraries( stexdoc PUBLIC 					tier1 )
 add_common_target_defines( stexdoc )
+
+
+#
+# Install
+#
+inherit_install_files( stexdoc							TARGETS tier1 )

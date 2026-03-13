@@ -10,10 +10,10 @@
 // String Pool
 //-----------------------------------------------------------------------------
 template<typename TIdType>
-class TStringPool
+class CStringPool
 {
 public:
-	~TStringPool();
+	~CStringPool();
 
 	TIdType		Find( const char* pString, uint64 length ) const;
 	TIdType		FindOrAdd( const char* pString, uint64 length );

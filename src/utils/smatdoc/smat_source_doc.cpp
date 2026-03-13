@@ -143,10 +143,10 @@ bool CSMATSourceMaterialDoc::LoadFromFile( const char* pPath )
 		case SMAT_MATERIAL_VAR_TYPE_STRING: smatMaterialVar.SetStringValue( it->GetString( NULL ) ); break;
 		case SMAT_MATERIAL_VAR_TYPE_TEXTURE: smatMaterialVar.SetTextureValue( it->GetString( NULL ) ); break;
 		case SMAT_MATERIAL_VAR_TYPE_MATERIAL: smatMaterialVar.SetMaterialValue( it->GetString( NULL ) ); break;
-		case SMAT_MATERIAL_VAR_TYPE_VECTOR_2D: smatMaterialVar.SetVecValue( S_VectorCreate<vec2_t>( it->GetString( NULL ) ) ); break;
-		case SMAT_MATERIAL_VAR_TYPE_VECTOR_3D: smatMaterialVar.SetVecValue( S_VectorCreate<vec3_t>( it->GetString( NULL ) ) ); break;
-		case SMAT_MATERIAL_VAR_TYPE_VECTOR_4D: smatMaterialVar.SetVecValue( S_VectorCreate<vec4_t>( it->GetString( NULL ) ) ); break;
-		case SMAT_MATERIAL_VAR_TYPE_MATRIX: smatMaterialVar.SetMatrixValue( S_MatrixCreate( it->GetString( NULL ) ) ); break;
+		case SMAT_MATERIAL_VAR_TYPE_VECTOR_2D: smatMaterialVar.SetVecValue( S_VectorFromString<vector2_t>( it->GetString( NULL ) ) ); break;
+		case SMAT_MATERIAL_VAR_TYPE_VECTOR_3D: smatMaterialVar.SetVecValue( S_VectorFromString<vector3_t>( it->GetString( NULL ) ) ); break;
+		case SMAT_MATERIAL_VAR_TYPE_VECTOR_4D: smatMaterialVar.SetVecValue( S_VectorFromString<vector4_t>( it->GetString( NULL ) ) ); break;
+		case SMAT_MATERIAL_VAR_TYPE_MATRIX: smatMaterialVar.SetMatrixValue( S_MatrixFromString( it->GetString( NULL ) ) ); break;
 		default:
 			Error( "SMATDoc: Invalid SMAT, unknown SMAT value type '%s' in '%s/%s' (file: '%s')", ConvSMTMaterialVarTypeToText( smatMaterialVarType ), shaderName.c_str(), it->GetName(), pPath );
 			Assert( false );
@@ -189,21 +189,21 @@ bool CSMATSourceMaterialDoc::SaveFile( const char* pPath )
 			case SMAT_MATERIAL_VAR_TYPE_FLOAT: pShader->SetFloat( smatMaterialVar.GetName(), smatMaterialVar.GetFloatValue(), pSchema ); break;
 			case SMAT_MATERIAL_VAR_TYPE_VECTOR_2D:
 			{
-				vec2_t value;
+				vector2_t value;
 				smatMaterialVar.GetVecValue( &value.x, 2 );
 				pShader->SetString( smatMaterialVar.GetName(), S_VectorToString( value ).c_str(), pSchema );
 				break;
 			}
 			case SMAT_MATERIAL_VAR_TYPE_VECTOR_3D:
 			{
-				vec3_t value;
+				vector3_t value;
 				smatMaterialVar.GetVecValue( &value.x, 3 );
 				pShader->SetString( smatMaterialVar.GetName(), S_VectorToString( value ).c_str(), pSchema );
 				break;
 			}
 			case SMAT_MATERIAL_VAR_TYPE_VECTOR_4D:
 			{
-				vec4_t value;
+				vector4_t value;
 				smatMaterialVar.GetVecValue( &value.x, 4 );
 				pShader->SetString( smatMaterialVar.GetName(), S_VectorToString( value ).c_str(), pSchema );
 				break;

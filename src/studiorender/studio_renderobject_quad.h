@@ -6,7 +6,7 @@
 //-----------------------------------------------------------------------------
 // Quad Studio render object (FOR TEST ONLY!!)
 //-----------------------------------------------------------------------------
-class CStudioRenderObjectQuad : public TRefCounted<IStudioRenderObject>
+class CStudioRenderObjectQuad : public CRefCounted<IStudioRenderObject>
 {
 public:
 	CStudioRenderObjectQuad( IStudioAPIBuffer* pStudioAPIVertexBuffer, IStudioAPIBuffer* pStudioAPIIndexBuffer, IMaterial* pMaterial )
@@ -21,7 +21,7 @@ public:
 	FORCEINLINE IMaterial* GetMaterial() const { return pMaterial; }
 
 public:
-	TRefPtr<IStudioAPIBuffer> pStudioAPIVertexBuffer;
-	TRefPtr<IStudioAPIBuffer> pStudioAPIIndexBuffer;
-	TRefPtr<IMaterial>		  pMaterial;
+	CRefPtr<IStudioAPIBuffer> pStudioAPIVertexBuffer;
+	CRefPtr<IStudioAPIBuffer> pStudioAPIIndexBuffer;
+	CRefPtr<IMaterial>		  pMaterial;
 };

@@ -6,7 +6,7 @@
 
 struct shaderParamsBuffer_t
 {
-	vec4_t color;
+	vector4_t color;
 };
 
 BEGIN_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
@@ -28,7 +28,7 @@ BEGIN_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 
 	SHADER_INIT_PARAMS
 	{
-		pParams[COLOR]->SetVecValue( vec4_t( 1.f, 1.f, 1.f, 1.f ) );
+		pParams[COLOR]->SetVecValue( vector4_t( 1.f, 1.f, 1.f, 1.f ) );
 		pParams[BASETEXTURE]->SetTextureValue( (ITexture*)g_pResourceSystem->GetDefaultResource( RESOURCE_TYPE_TEXTURE )->GetData() );
 	}
 

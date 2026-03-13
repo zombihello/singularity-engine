@@ -90,7 +90,7 @@ void CBaseShader::InitDefaultParams( IMaterialVar** pParams ) const
 CBaseShader::R_UpdateBuffers
 ==================
 */
-void CBaseShader::R_UpdateBuffers( IStudioAPICmdContext* pStudioAPICmdContext, TRefPtr<IStudioAPIBuffer>* pStudioAPIBuffers, IMaterialVar** pParams ) const
+void CBaseShader::R_UpdateBuffers( IStudioAPICmdContext* pStudioAPICmdContext, CRefPtr<IStudioAPIBuffer>* pStudioAPIBuffers, IMaterialVar** pParams ) const
 {
 }
 

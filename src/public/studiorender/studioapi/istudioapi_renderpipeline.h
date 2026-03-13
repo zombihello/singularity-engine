@@ -159,7 +159,7 @@ struct studioAPIColorBlendStateInfo_t
 {
 	uint32											attachmentCount;
 	const studioAPIColorBlendAttachmentStateInfo_t* pAttachments;
-	vec4_t											blendConstants;
+	vector4_t											blendConstants;
 };
 
 struct studioAPIInputAssemblyStateInfo_t

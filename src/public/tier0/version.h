@@ -1,5 +1,5 @@
 #pragma once
-#define ENGINE_GOLDDATE		  45113	 // 45113 - Jul 07 2024 (Singularity Engine development start), used for generate a build number by TBuildNumber
+#define ENGINE_GOLDDATE		  45113	 // 45113 - Jul 07 2024 (Singularity Engine development start), used for generate a build number by CBuildNumber
 #define ENGINE_VERSION_MAJOR  0
 #define ENGINE_VERSION_MINOR  1
 #define ENGINE_VERSION_PATCH  0

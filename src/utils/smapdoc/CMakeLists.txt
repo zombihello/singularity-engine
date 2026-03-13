@@ -37,3 +37,9 @@ set_target_properties( smapdoc PROPERTIES PREFIX 		"" )
 
 target_link_libraries( smapdoc PUBLIC 					tier1 )
 add_common_target_defines( smapdoc )
+
+
+#
+# Install
+#
+inherit_install_files( smapdoc							TARGETS tier1 )

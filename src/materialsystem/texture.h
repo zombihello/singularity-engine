@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 // Texture
 //-----------------------------------------------------------------------------
-class CTexture : public TRefCounted<ITexture>, public TStudioRenderResource<IStudioRenderResource>
+class CTexture : public CRefCounted<ITexture>, public CStudioRenderResource<IStudioRenderResource>
 {
 public:
 	CTexture();
@@ -32,8 +32,8 @@ private:
 	studioAPIPixelFormat_t		 pixelFormat;
 	studioAPISamplerCreateInfo_t studioAPISamplerCreateInfo;
 	uint32						 numLayers;
-	TRefPtr<IStudioAPITexture>	 pStudioAPITexture;
-	TRefPtr<IStudioAPISampler>	 pStudioAPISampler;
+	CRefPtr<IStudioAPITexture>	 pStudioAPITexture;
+	CRefPtr<IStudioAPISampler>	 pStudioAPISampler;
 	eastl::vector<textureMipMap_t> mipmaps;
 	eastl::vector<byte>			 data;
 };

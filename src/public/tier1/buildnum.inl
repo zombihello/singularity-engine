@@ -2,22 +2,22 @@
 
 /*
 ==================
-TBuildNumber::GetBuildNumber
+CBuildNumber::GetBuildNumber
 ==================
 */
 template<uint32 dateOfBeginning>
-FORCEINLINE uint32 TBuildNumber<dateOfBeginning>::GetBuildNumber() const
+FORCEINLINE uint32 CBuildNumber<dateOfBeginning>::GetBuildNumber() const
 {
 	return buildNumber;
 }
 
 /*
 ==================
-TBuildNumber::ComputeBuildNumber
+CBuildNumber::ComputeBuildNumber
 ==================
 */
 template<uint32 dateOfBeginning>
-void TBuildNumber<dateOfBeginning>::ComputeBuildNumber()
+void CBuildNumber<dateOfBeginning>::ComputeBuildNumber()
 {
 	const char* pDate		   = __DATE__;
 	const char* month[12]	   = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };

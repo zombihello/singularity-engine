@@ -40,8 +40,8 @@ public:
 	virtual bool IsMouseWheel( buttonCode_t wheel ) const	  = 0;
 	virtual bool IsMouseMoved( buttonCode_t mouseAxis ) const = 0;
 
-	virtual vec2_t GetMouseLocation() const						  = 0;
-	virtual vec2_t GetMouseOffset() const						  = 0;
+	virtual vector2_t GetMouseLocation() const						  = 0;
+	virtual vector2_t GetMouseOffset() const						  = 0;
 	virtual float  GetMouseOffset( buttonCode_t mouseAxis ) const = 0;
 	virtual float  GetMouseSensitivity() const					  = 0;
 

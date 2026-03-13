@@ -39,10 +39,10 @@ public:
 	void SetIntValue( int32 value );
 	void SetFloatValue( float value );
 	void SetVecValue( const float* pValue, uint32 numComps );
-	void SetVecValue( const vec2_t& value );
-	void SetVecValue( const vec3_t& value );
-	void SetVecValue( const vec4_t& value );
-	void SetMatrixValue( const mat4_t& value );
+	void SetVecValue( const vector2_t& value );
+	void SetVecValue( const vector3_t& value );
+	void SetVecValue( const vector4_t& value );
+	void SetMatrixValue( const matrix4x4_t& value );
 	void SetStringValue( const char* pValue );
 	void SetTextureValue( const char* pValue );
 	void SetMaterialValue( const char* pValue );
@@ -54,7 +54,7 @@ public:
 	int32				  GetIntValue() const;
 	float				  GetFloatValue() const;
 	void				  GetVecValue( float* pValue, uint32 numComps ) const;
-	mat4_t				  GetMatrixValue() const;
+	matrix4x4_t				  GetMatrixValue() const;
 	const char*			  GetStringValue() const;
 	const char*			  GetTextureValue() const;
 	const char*			  GetMaterialValue() const;
@@ -70,10 +70,10 @@ private:
 		bool		boolValue;
 		int32		intValue;
 		float		floatValue;
-		vec2_t		vector2DValue;
-		vec3_t		vector3DValue;
-		vec4_t		vector4DValue;
-		mat4_t		matrixValue;
+		vector2_t		vector2DValue;
+		vector3_t		vector3DValue;
+		vector4_t		vector4DValue;
+		matrix4x4_t		matrixValue;
 		const char* pStringValue;
 		const char* pTextureValue;
 		const char* pMaterialValue;

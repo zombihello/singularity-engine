@@ -2,11 +2,11 @@
 
 /*
 ==================
-TMulticastDelegate::AddFunc
+CMulticastDelegate::AddFunc
 ==================
 */
 template<typename... TParamTypes>
-typename TMulticastDelegate<TParamTypes...>::funcDelegate_t* TMulticastDelegate<TParamTypes...>::AddFunc( delegateFn_t pDelegateFn, void* pUserData /*= NULL*/ )
+typename CMulticastDelegate<TParamTypes...>::funcDelegate_t* CMulticastDelegate<TParamTypes...>::AddFunc( delegateFn_t pDelegateFn, void* pUserData /*= NULL*/ )
 {
 	PROFILER_SCOPE_FUNC();
 	CScopeLock scopeLock( mutex );
@@ -15,11 +15,11 @@ typename TMulticastDelegate<TParamTypes...>::funcDelegate_t* TMulticastDelegate<
 
 /*
 ==================
-TMulticastDelegate::RemoveAll
+CMulticastDelegate::RemoveAll
 ==================
 */
 template<typename... TParamTypes>
-void TMulticastDelegate<TParamTypes...>::RemoveAll()
+void CMulticastDelegate<TParamTypes...>::RemoveAll()
 {
 	PROFILER_SCOPE_FUNC();
 	CScopeLock scopeLock( mutex );
@@ -28,11 +28,11 @@ void TMulticastDelegate<TParamTypes...>::RemoveAll()
 
 /*
 ==================
-TMulticastDelegate::RemoveFunc
+CMulticastDelegate::RemoveFunc
 ==================
 */
 template<typename... TParamTypes>
-void TMulticastDelegate<TParamTypes...>::RemoveFunc( funcDelegate_t* pDelegate )
+void CMulticastDelegate<TParamTypes...>::RemoveFunc( funcDelegate_t* pDelegate )
 {
 	PROFILER_SCOPE_FUNC();
 	if ( pDelegate )
@@ -51,11 +51,11 @@ void TMulticastDelegate<TParamTypes...>::RemoveFunc( funcDelegate_t* pDelegate )
 
 /*
 ==================
-TMulticastDelegate::Broadcast
+CMulticastDelegate::Broadcast
 ==================
 */
 template<typename... TParamTypes>
-void TMulticastDelegate<TParamTypes...>::Broadcast( TParamTypes... params ) const
+void CMulticastDelegate<TParamTypes...>::Broadcast( TParamTypes... params ) const
 {
 	PROFILER_SCOPE_FUNC();
 	CScopeLock scopeLock( mutex );
@@ -68,11 +68,11 @@ void TMulticastDelegate<TParamTypes...>::Broadcast( TParamTypes... params ) cons
 
 /*
 ==================
-TDelegate::BindFunc
+CDelegate::BindFunc
 ==================
 */
 template<typename... TParamTypes>
-void TDelegate<TParamTypes...>::BindFunc( delegateFn_t pDelegateFn, void* pUserData /*= NULL*/ )
+void CDelegate<TParamTypes...>::BindFunc( delegateFn_t pDelegateFn, void* pUserData /*= NULL*/ )
 {
 	CScopeLock scopeLock( mutex );
 	funcDelegate.pFunc	   = pDelegateFn;
@@ -81,11 +81,11 @@ void TDelegate<TParamTypes...>::BindFunc( delegateFn_t pDelegateFn, void* pUserD
 
 /*
 ==================
-TDelegate::Unbind
+CDelegate::Unbind
 ==================
 */
 template<typename... TParamTypes>
-void TDelegate<TParamTypes...>::Unbind()
+void CDelegate<TParamTypes...>::Unbind()
 {
 	CScopeLock scopeLock( mutex );
 	Mem_Memzero( &funcDelegate, sizeof( funcDelegate_t ) );
@@ -93,11 +93,11 @@ void TDelegate<TParamTypes...>::Unbind()
 
 /*
 ==================
-TDelegate::Execute
+CDelegate::Execute
 ==================
 */
 template<typename... TParamTypes>
-void TDelegate<TParamTypes...>::Execute( TParamTypes... params )
+void CDelegate<TParamTypes...>::Execute( TParamTypes... params )
 {
 	PROFILER_SCOPE_FUNC();
 	CScopeLock scopeLock( mutex );

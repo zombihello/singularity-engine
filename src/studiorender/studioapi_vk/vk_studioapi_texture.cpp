@@ -314,11 +314,11 @@ CStudioAPITextureVk::CStudioAPITextureVk( studioAPITextureType_t type, uint32 si
 	vkImageCreateInfo.sType				= VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 	vkImageCreateInfo.imageType			= VK_TranslateImageType( type );
 	vkImageCreateInfo.format			= vkFormat;
-	vkImageCreateInfo.extent.width		= Max<uint32>( sizeX, 1 );
-	vkImageCreateInfo.extent.height		= Max<uint32>( sizeY, 1 );
-	vkImageCreateInfo.extent.depth		= Max<uint32>( sizeZ, 1 );
-	vkImageCreateInfo.mipLevels			= Max<uint32>( numMips, 1 );
-	vkImageCreateInfo.arrayLayers		= Max<uint32>( numLayers, 1 );
+	vkImageCreateInfo.extent.width		= S_Max<uint32>( sizeX, 1 );
+	vkImageCreateInfo.extent.height		= S_Max<uint32>( sizeY, 1 );
+	vkImageCreateInfo.extent.depth		= S_Max<uint32>( sizeZ, 1 );
+	vkImageCreateInfo.mipLevels			= S_Max<uint32>( numMips, 1 );
+	vkImageCreateInfo.arrayLayers		= S_Max<uint32>( numLayers, 1 );
 	vkImageCreateInfo.samples			= VK_SAMPLE_COUNT_1_BIT;
 	vkImageCreateInfo.tiling			= usageFlags & STUDIOAPI_TEXTURE_USAGE_FLAG_LINEAR ? VK_IMAGE_TILING_LINEAR : VK_IMAGE_TILING_OPTIMAL;
 	vkImageCreateInfo.usage				= vkImageUsageFlags;
@@ -493,7 +493,7 @@ void CStudioAPITextureVk::UpdateData( IStudioAPICmdContext* pCmdContext, byte* p
 		//   the bufferOffset member of any element of pRegions must be a multiple of 4.
 		// * If srcImage does not have either a depth/stencil or a multi-planar format, then for each element of pRegions, bufferOffset must be a multiple of the format's texel block size
 		// * If srcImage is a blocked image, for each element of pRegions, bufferOffset must be a multiple of the compressed texel block size in bytes
-		uint32 bufferOffsetAlignment = Max<uint32>( g_PixelFormatInfos[pixelFormat].blockBytes, STUDIOAPI_VK_BUFFER_OFFSET_ALIGNMENT );
+		uint32 bufferOffsetAlignment = S_Max<uint32>( g_PixelFormatInfos[pixelFormat].blockBytes, STUDIOAPI_VK_BUFFER_OFFSET_ALIGNMENT );
 
 		// Copy data for each layer by CStudioAPIDataUploaderVk
 		uint32					  layerSize				 = GetLayerSize();
@@ -534,17 +534,17 @@ void CStudioAPITextureVk::UpdateData( IStudioAPICmdContext* pCmdContext, byte* p
 										 vkCmdPipelineBarrier( uploadParams.pCmdBuffer->GetVkCommandBuffer(), VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, NULL, 0, NULL, 1, &vkImageMemoryBarrier );
 									 }
 
-									 uint32 mipSizeX	 = Max<uint32>( sizeX >> uploadState.currentMip, 1 );
-									 uint32 mipSizeY	 = Max<uint32>( sizeY >> uploadState.currentMip, 1 );
-									 uint32 mipSizeZ	 = Max<uint32>( sizeZ >> uploadState.currentMip, 1 );
+									 uint32 mipSizeX	 = S_Max<uint32>( sizeX >> uploadState.currentMip, 1 );
+									 uint32 mipSizeY	 = S_Max<uint32>( sizeY >> uploadState.currentMip, 1 );
+									 uint32 mipSizeZ	 = S_Max<uint32>( sizeZ >> uploadState.currentMip, 1 );
 									 uint32 blockSizeY	 = g_PixelFormatInfos[pixelFormat].blockSizeY;
-									 uint32 numRowsInMip = Max<uint32>( ( mipSizeY + blockSizeY - 1 ) / blockSizeY, 1 );
+									 uint32 numRowsInMip = S_Max<uint32>( ( mipSizeY + blockSizeY - 1 ) / blockSizeY, 1 );
 
 									 // Calculate number of rows that fit into partialUploadSize bytes of memory,
 									 // we need take in to account granularity constraints
 									 uint32		rowPitch		 = GetMipRowPitch( uploadState.currentMip );
 									 VkExtent3D vkGranularity	 = pTransferCmdContext->GetQueue().GetVkQueueFamilyProperties().minImageTransferGranularity;
-									 uint32		depthGranularity = Min( mipSizeZ - uploadState.currentMipDepth, vkGranularity.depth );
+									 uint32		depthGranularity = S_Min( mipSizeZ - uploadState.currentMipDepth, vkGranularity.depth );
 									 uint32		numRowsToUpload	 = uploadParams.partialUploadSize / ( rowPitch * depthGranularity );
 									 if ( numRowsToUpload + uploadState.currentMipRow < numRowsInMip )
 									 {
@@ -583,7 +583,7 @@ void CStudioAPITextureVk::UpdateData( IStudioAPICmdContext* pCmdContext, byte* p
 									 vkBufferImageCopy.imageOffset.y				   = uploadState.currentMipRow * blockSizeY;
 									 vkBufferImageCopy.imageOffset.z				   = uploadState.currentMipDepth;
 									 vkBufferImageCopy.imageExtent.width			   = mipSizeX;
-									 vkBufferImageCopy.imageExtent.height			   = Min( numRowsToUpload * blockSizeY, mipSizeY );	 // Handle textures with height is not multiple of block size
+									 vkBufferImageCopy.imageExtent.height			   = S_Min( numRowsToUpload * blockSizeY, mipSizeY );	 // Handle textures with height is not multiple of block size
 									 vkBufferImageCopy.imageExtent.depth			   = depthGranularity;
 									 vkCmdCopyBufferToImage( uploadParams.pCmdBuffer->GetVkCommandBuffer(), uploadParams.vkStagingBuffer, vkImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &vkBufferImageCopy );
 

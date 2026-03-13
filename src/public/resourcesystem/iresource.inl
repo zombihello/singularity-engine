@@ -2,24 +2,24 @@
 
 /*
 ==================
-TResourcePtr::operator=
+CResourcePtr::operator=
 ==================
 */
 template<class TResourceClass>
-FORCEINLINE TResourcePtr<TResourceClass>& TResourcePtr<TResourceClass>::operator=( IResource* pPtr )
+FORCEINLINE CResourcePtr<TResourceClass>& CResourcePtr<TResourceClass>::operator=( IResource* pPtr )
 {
-	TResourcePtr::pPtr = pPtr;
+	CResourcePtr::pPtr = pPtr;
 	Assert( !pPtr || ResourceSystem_IsValidClassForType<TResourceClass>( pPtr->GetType() ) );
 	return *this;
 }
 
 /*
 ==================
-TResourcePtr::operator=
+CResourcePtr::operator=
 ==================
 */
 template<class TResourceClass>
-FORCEINLINE TResourcePtr<TResourceClass>& TResourcePtr<TResourceClass>::operator=( const TResourcePtr& copy )
+FORCEINLINE CResourcePtr<TResourceClass>& CResourcePtr<TResourceClass>::operator=( const CResourcePtr& copy )
 {
 	pPtr = copy.pPtr;
 	Assert( !pPtr || ResourceSystem_IsValidClassForType<TResourceClass>( pPtr->GetType() ) );
@@ -28,99 +28,99 @@ FORCEINLINE TResourcePtr<TResourceClass>& TResourcePtr<TResourceClass>::operator
 
 /*
 ==================
-TResourcePtr::operator==
+CResourcePtr::operator==
 ==================
 */
 template<class TResourceClass>
-FORCEINLINE bool TResourcePtr<TResourceClass>::operator==( const TResourcePtr& right ) const
+FORCEINLINE bool CResourcePtr<TResourceClass>::operator==( const CResourcePtr& right ) const
 {
 	return pPtr == right.pPtr;
 }
 
 /*
 ==================
-TResourcePtr::operator==
+CResourcePtr::operator==
 ==================
 */
 template<class TResourceClass>
-FORCEINLINE bool TResourcePtr<TResourceClass>::operator==( IResource* pRight ) const
+FORCEINLINE bool CResourcePtr<TResourceClass>::operator==( IResource* pRight ) const
 {
 	return pPtr == pRight;
 }
 
 /*
 ==================
-TResourcePtr::operator!=
+CResourcePtr::operator!=
 ==================
 */
 template<class TResourceClass>
-FORCEINLINE bool TResourcePtr<TResourceClass>::operator!=( const TResourcePtr& right ) const
+FORCEINLINE bool CResourcePtr<TResourceClass>::operator!=( const CResourcePtr& right ) const
 {
 	return pPtr != right.pPtr;
 }
 
 /*
 ==================
-TResourcePtr::operator!=
+CResourcePtr::operator!=
 ==================
 */
 template<class TResourceClass>
-FORCEINLINE bool TResourcePtr<TResourceClass>::operator!=( IResource* pRight ) const
+FORCEINLINE bool CResourcePtr<TResourceClass>::operator!=( IResource* pRight ) const
 {
 	return pPtr != pRight;
 }
 
 /*
 ==================
-TResourcePtr::operator bool
+CResourcePtr::operator bool
 ==================
 */
 template<class TResourceClass>
-FORCEINLINE TResourcePtr<TResourceClass>::operator bool() const
+FORCEINLINE CResourcePtr<TResourceClass>::operator bool() const
 {
 	return !!pPtr;
 }
 
 /*
 ==================
-TResourcePtr::operator ptrint
+CResourcePtr::operator ptrint
 ==================
 */
 template<class TResourceClass>
-FORCEINLINE TResourcePtr<TResourceClass>::operator ptrint() const
+FORCEINLINE CResourcePtr<TResourceClass>::operator ptrint() const
 {
 	return (ptrint)pPtr;
 }
 
 /*
 ==================
-TResourcePtr::operator uptrint
+CResourcePtr::operator uptrint
 ==================
 */
 template<class TResourceClass>
-FORCEINLINE TResourcePtr<TResourceClass>::operator uptrint() const
+FORCEINLINE CResourcePtr<TResourceClass>::operator uptrint() const
 {
 	return (uptrint)pPtr;
 }
 
 /*
 ==================
-TResourcePtr::operator IResource*
+CResourcePtr::operator IResource*
 ==================
 */
 template<class TResourceClass>
-FORCEINLINE TResourcePtr<TResourceClass>::operator IResource*() const
+FORCEINLINE CResourcePtr<TResourceClass>::operator IResource*() const
 {
 	return (IResource*)pPtr;
 }
 
 /*
 ==================
-TResourcePtr::operator->
+CResourcePtr::operator->
 ==================
 */
 template<class TResourceClass>
-FORCEINLINE TResourceClass* TResourcePtr<TResourceClass>::operator->() const
+FORCEINLINE TResourceClass* CResourcePtr<TResourceClass>::operator->() const
 {
 	Assert( pPtr );
 	return (TResourceClass*)pPtr->GetData();
@@ -128,11 +128,11 @@ FORCEINLINE TResourceClass* TResourcePtr<TResourceClass>::operator->() const
 
 /*
 ==================
-TResourcePtr::operator*
+CResourcePtr::operator*
 ==================
 */
 template<class TResourceClass>
-FORCEINLINE TResourceClass* TResourcePtr<TResourceClass>::operator*() const
+FORCEINLINE TResourceClass* CResourcePtr<TResourceClass>::operator*() const
 {
 	Assert( pPtr );
 	return (TResourceClass*)pPtr->GetData();
@@ -140,11 +140,11 @@ FORCEINLINE TResourceClass* TResourcePtr<TResourceClass>::operator*() const
 
 /*
 ==================
-TResourcePtr::GetPtr
+CResourcePtr::GetPtr
 ==================
 */
 template<class TResourceClass>
-FORCEINLINE IResource* TResourcePtr<TResourceClass>::GetPtr() const
+FORCEINLINE IResource* CResourcePtr<TResourceClass>::GetPtr() const
 {
 	return pPtr;
 }

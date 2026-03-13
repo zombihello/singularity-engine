@@ -78,7 +78,7 @@ public:
 
 private:
 	typedef uint16				  nameID_t;
-	typedef TStringPool<nameID_t> namePool_t;
+	typedef CStringPool<nameID_t> namePool_t;
 
 	void DetachFromParent();
 	void MigrateNamePool( namePool_t* pNamePool );

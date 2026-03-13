@@ -37,3 +37,9 @@ set_target_properties( shadercache PROPERTIES PREFIX 	"" )
 
 target_link_libraries( shadercache PUBLIC 				tier1 )
 add_common_target_defines( shadercache )
+
+
+#
+# Install
+#
+inherit_install_files( shadercache						TARGETS tier1 )

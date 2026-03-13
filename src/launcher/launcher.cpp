@@ -13,7 +13,7 @@
 //-----------------------------------------------------------------------------
 // Game viewport client
 //-----------------------------------------------------------------------------
-class CGameViewportClient : public TBaseStudioViewportClient<IStudioViewportClient>
+class CGameViewportClient : public CBaseStudioViewportClient<IStudioViewportClient>
 {
 public:
 };
@@ -48,7 +48,7 @@ private:
 	CAppSystemGroupGame		 gameSystemGroup;
 	CGameInfoDoc			 gameInfo;
 	CGameViewportClient		 gameViewportClient;
-	TRefPtr<IStudioViewport> pStudioViewport;
+	CRefPtr<IStudioViewport> pStudioViewport;
 
 	IWindowMgr::IOnWindowEvent::funcDelegate_t*		  pWindowEventDelegate;
 	IWindowMgr::IOnChangedMainWindow::funcDelegate_t* pChangedMainWindowDelegate;
@@ -333,7 +333,7 @@ void CLauncherApp::OnChangedMainWindow( void* pUserData, windowId_t newMainWindo
 {
 	CConVarRef	  r_vsyncRef( "r_vsync" );
 	IWindow*	  pMainWindow = g_pWindowMgr->GetWindow( newMainWindowId );
-	ivec2_t		  windowSize  = pMainWindow->GetSize();
+	vector2i_t	  windowSize  = pMainWindow->GetSize();
 	CLauncherApp* pApp		  = (CLauncherApp*)pUserData;
 
 	Assert( pApp->pStudioViewport );
