@@ -24,14 +24,8 @@ template<class TBaseClass>
 class CRefCounted : public TBaseClass
 {
 public:
-	CRefCounted()
-	{
-		countReferences.store( 0, eastl::memory_order_release );
-	}
-	virtual ~CRefCounted()
-	{
-		Assert( GetRefCount() == 0 );
-	}
+	CRefCounted();
+	virtual ~CRefCounted();
 
 	virtual void   AddRef() override;
 	virtual void   ReleaseRef() override;
@@ -54,48 +48,16 @@ public:
 		size operator()( const CRefPtr& refPtr ) const;
 	};
 
-	CRefPtr()
-		: pPtr( NULL )
-	{
-	}
-	CRefPtr( TPtrType* pPtr )
-		: pPtr( pPtr )
-	{
-		if ( pPtr )
-		{
-			pPtr->AddRef();
-		}
-	}
-	CRefPtr( const CRefPtr& copy )
-		: pPtr( copy.pPtr )
-	{
-		if ( pPtr )
-		{
-			pPtr->AddRef();
-		}
-	}
-
+	CRefPtr();
+	CRefPtr( TPtrType* pPtr );
+	CRefPtr( const CRefPtr& other );
 	template<typename TBasePtrType>
-	CRefPtr( const CRefPtr<TBasePtrType>& copy )
-		: pPtr( (TPtrType*)( copy.GetPtr() ) )
-	{
-		if ( pPtr )
-		{
-			pPtr->AddRef();
-		}
-	}
-	~CRefPtr()
-	{
-		if ( pPtr )
-		{
-			pPtr->ReleaseRef();
-		}
-	}
+	CRefPtr( const CRefPtr<TBasePtrType>& copy );
+	~CRefPtr();
 
-	void	  SafeRelease();
 	bool	  IsValid() const;
 	uint32	  GetRefCount() const;
-	TPtrType* GetPtr() const;
+	TPtrType* GetRawPtr() const;
 
 	template<typename TBasePtrType>
 	CRefPtr&   operator=( const CRefPtr<TBasePtrType>& copy );

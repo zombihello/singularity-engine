@@ -57,7 +57,7 @@ public:
 		Assert( !pPtr || ResourceSystem_IsValidClassForType<TResourceClass>( pPtr->GetType() ) );
 	}
 
-	IResource* GetPtr() const;
+	IResource* GetRawPtr() const;
 
 	CResourcePtr&	operator=( IResource* pPtr );
 	CResourcePtr&	operator=( const CResourcePtr& copy );

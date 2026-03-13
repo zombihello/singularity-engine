@@ -15,37 +15,20 @@ public:
 		bool operator()( const CGuid& a, const CGuid& b ) const;
 	};
 
-	CGuid()
-		: a( 0 )
-		, b( 0 )
-		, c( 0 )
-		, d( 0 )
-	{
-	}
-	CGuid( uint32 a, uint32 b, uint32 c, uint32 d )
-		: a( a )
-		, b( b )
-		, c( c )
-		, d( d )
-	{
-	}
-	CGuid( const CGuid& guid )
-		: a( guid.a )
-		, b( guid.b )
-		, c( guid.c )
-		, d( guid.d )
-	{
-	}
+	CGuid();
+	CGuid( uint32 a, uint32 b, uint32 c, uint32 d );
+	CGuid( const CGuid& other );
 
 	static CGuid Generate();
 	static void	 Generate( CGuid& guid );
 
 	void Set( uint32 a, uint32 b, uint32 c, uint32 d );
-	bool InitFromString( const eastl::string& string );
-	void Invalidate();
+	bool Set( const char* pString );
+	bool Set( const wchar_t* pString );
+	void Clear();
 
 	bool		  IsValid() const;
-	eastl::string AsString() const;
+	eastl::string ToString() const;
 	hash		  GetHash() const;
 
 	friend bool operator==( const CGuid& x, const CGuid& y );

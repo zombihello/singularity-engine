@@ -185,7 +185,7 @@ ecsEntity_t CEcsEntityDesc::GetEcsPrefab( CEcsMap* pEcsMap )
 		// Create a new ECS prefab if it wasn't found or isn't valid
 		if ( foundEcsPrefabIdx == INVALID_INDEX || !ecsWorld.IsValidEntity( ecsPrefabs[foundEcsPrefabIdx].ecsEntity ) )
 		{
-			lastUsedEcsPrefabIdx = CreateEcsPrefab( pEcsMap, S_Sprintf( "ecs_prefab_%s", guid.AsString().c_str() ).c_str(), foundEcsPrefabIdx );
+			lastUsedEcsPrefabIdx = CreateEcsPrefab( pEcsMap, S_Sprintf( "ecs_prefab_%s", guid.ToString().c_str() ).c_str(), foundEcsPrefabIdx );
 		}
 	}
 
