@@ -43,10 +43,11 @@ public:
 	virtual void UnregisterObject( IStudioRenderObject* pRenderObject ) override;
 	virtual void UnregisterAllObjects() override;
 
-	virtual IStudioViewport*		  CreateViewport() const override;
-	virtual IStudioRenderPipelineSet* CreateRenderPipelineSet() const override;
+	virtual CRefPtr<IStudioViewport>		  CreateViewport() const override;
+	virtual CRefPtr<IStudioRenderPipelineSet> CreateRenderPipelineSet() const override;
+
 	// NOTE: FOR TEST ONLY!
-	virtual IStudioRenderObject* CreateQuadRenderObject( IMaterial* pMaterial, IStudioAPIBuffer* pVertexBuffer, IStudioAPIBuffer* pIndexBuffer ) const override;
+	virtual CRefPtr<IStudioRenderObject> CreateQuadRenderObject( IMaterial* pMaterial, IStudioAPIBuffer* pVertexBuffer, IStudioAPIBuffer* pIndexBuffer ) const override;
 
 	// Returns a command buffer of the render thread. If return NULL it's mean what StudioRender don't use render thread
 	virtual IStudioCmdBuffer* GetCommandBuffer() const override;
@@ -58,8 +59,8 @@ public:
 	void R_DrawFrame( CStudioViewport* pViewport );
 
 private:
-	CStudioRenderPassPresent				  presentRenderPass;
-	studioSceneView_t						  sceneView;
+	CStudioRenderPassPresent					presentRenderPass;
+	studioSceneView_t							sceneView;
 	eastl::vector<CRefPtr<IStudioRenderObject>> renderObjects;
 };
 extern CStudioRender g_StudioRender;

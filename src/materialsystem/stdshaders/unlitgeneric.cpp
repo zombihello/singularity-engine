@@ -46,8 +46,9 @@ BEGIN_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 	{
 		// TODO BS yehor.pohuliaka - Add the ability to get the queue type from IStudioAPICmdList
 		ITexture*		   pTexture			   = (ITexture*)pParams[BASETEXTURE]->GetTextureValue();
+		ITextureResource*  pTextureResource	   = pTexture->GetStudioResource();
 		studioAPIBarrier_t studioAPIBarriers[] = {
-			StudioAPI_MakeTextureBarrier( pTexture->GetStudioAPITexture(), STUDIOAPI_TEXTURE_LAYOUT_SHADER_RESOURCE_READONLY, STUDIOAPI_QUEUE_TYPE_GRAPHICS ),
+			StudioAPI_MakeTextureBarrier( pTextureResource->GetStudioAPITexture(), STUDIOAPI_TEXTURE_LAYOUT_SHADER_RESOURCE_READONLY, STUDIOAPI_QUEUE_TYPE_GRAPHICS ),
 			StudioAPI_MakeBufferBarrier( pStudioAPIBuffers[RES_BUFFER0], STUDIOAPI_BUFFER_STATE_CONSTANT_BUFFER, STUDIOAPI_QUEUE_TYPE_GRAPHICS )
 		};
 		pStudioAPICmdList->Barrier( studioAPIBarriers, ARRAYSIZE( studioAPIBarriers ) );
@@ -67,9 +68,10 @@ BEGIN_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 
 	SHADER_DRAW
 	{
-		ITexture* pTexture = pParams[BASETEXTURE]->GetTextureValue();
-		RES_BASETEXTURE.SetTexture( pStudioAPICmdList, pTexture->GetStudioAPITexture() );
-		RES_BASESAMPLER.SetSampler( pStudioAPICmdList, pTexture->GetStudioAPISampler() );
+		ITexture*		  pTexture		   = pParams[BASETEXTURE]->GetTextureValue();
+		ITextureResource* pTextureResource = pTexture->GetStudioResource();
+		RES_BASETEXTURE.SetTexture( pStudioAPICmdList, pTextureResource->GetStudioAPITexture() );
+		RES_BASESAMPLER.SetSampler( pStudioAPICmdList, pTextureResource->GetStudioAPISampler() );
 		RES_BUFFER0.SetConstantBuffer( pStudioAPICmdList, pStudioAPIBuffers[RES_BUFFER0] );
 	}
 END_SHADER

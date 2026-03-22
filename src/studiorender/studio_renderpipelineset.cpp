@@ -185,10 +185,10 @@ IStudioAPIRenderPipeline* CStudioRenderPipelineSet::CRenderPipelineContainer::R_
 
 /*
 ==================
-CStudioRenderPipelineSet::CRenderPipelineContainer::GetStudioAPIRenderPipeline
+CStudioRenderPipelineSet::CRenderPipelineContainer::R_GetStudioAPIRenderPipeline
 ==================
 */
-IStudioAPIRenderPipeline* CStudioRenderPipelineSet::CRenderPipelineContainer::GetStudioAPIRenderPipeline( uint64 pipelineIdx ) const
+IStudioAPIRenderPipeline* CStudioRenderPipelineSet::CRenderPipelineContainer::R_GetStudioAPIRenderPipeline( uint64 pipelineIdx ) const
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
@@ -284,40 +284,30 @@ void CStudioRenderPipelineSet::CRenderPipelineContainer::OnRenderPassUpdated( vo
 
 /*
 ==================
-CStudioRenderPipelineSet::Init
+CStudioRenderPipelineSet::CStudioRenderPipelineSet
 ==================
 */
-void CStudioRenderPipelineSet::Init()
+CStudioRenderPipelineSet::CStudioRenderPipelineSet()
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-
-	// Initialize containers
 	for ( uint32 renderPassType = 0; renderPassType < STUDIO_RENDERPASS_NUM_TYPES; ++renderPassType )
 	{
 		renderPipelineContainers[renderPassType].Init( (studioRenderPassType_t)renderPassType );
 	}
-
-	// Initialize StudioAPI resources
-	Studio_BeginUpdateResourceSafe<CStudioRenderPipelineSet>( this );
 }
 
 /*
 ==================
-CStudioRenderPipelineSet::Shutdown
+CStudioRenderPipelineSet::~CStudioRenderPipelineSet
 ==================
 */
-void CStudioRenderPipelineSet::Shutdown()
+CStudioRenderPipelineSet::~CStudioRenderPipelineSet()
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-
-	// Destroy containers
 	for ( uint32 renderPassType = 0; renderPassType < STUDIO_RENDERPASS_NUM_TYPES; ++renderPassType )
 	{
 		renderPipelineContainers[renderPassType].Destroy();
 	}
-
-	// Release StudioAPI resources
-	Studio_BeginReleaseResourceSafe<CStudioRenderPipelineSet>( this );
 }
 
 /*
@@ -335,12 +325,12 @@ IStudioAPIRenderPipeline* CStudioRenderPipelineSet::R_BakeRenderPipeline( const 
 
 /*
 ==================
-CStudioVertexDeclarations::GetStudioAPIRenderPipeline
+CStudioVertexDeclarations::R_GetStudioAPIRenderPipeline
 ==================
 */
-IStudioAPIRenderPipeline* CStudioRenderPipelineSet::GetStudioAPIRenderPipeline( studioRenderPassType_t renderPassType, uint64 pipelineIdx ) const
+IStudioAPIRenderPipeline* CStudioRenderPipelineSet::R_GetStudioAPIRenderPipeline( studioRenderPassType_t renderPassType, uint64 pipelineIdx ) const
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( renderPassType < STUDIO_RENDERPASS_NUM_TYPES );
-	return renderPipelineContainers[renderPassType].GetStudioAPIRenderPipeline( pipelineIdx );
+	return renderPipelineContainers[renderPassType].R_GetStudioAPIRenderPipeline( pipelineIdx );
 }

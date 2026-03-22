@@ -1,4 +1,5 @@
 #pragma once
+#include <EASTL/atomic.h>
 #include <EASTL/unordered_set.h>
 
 #include "utils/interfaces/interfaces.h"
@@ -14,32 +15,24 @@
 class IStudioRenderResource
 {
 public:
-	virtual void InitResource()			  = 0;
-	virtual void ReleaseResource()		  = 0;
-	virtual void UpdateResource()		  = 0;
-	virtual bool IsInitedResource() const = 0;
+	virtual ~IStudioRenderResource() {}
+
+	// Render thread interface
+	virtual void InitResource()	   = 0;
+	virtual void ReleaseResource() = 0;
+	virtual void UpdateResource()  = 0;
+
+	// Queue/lifetime control
+	virtual void BeginEnqueueRenderOp()		   = 0;
+	virtual void EndEnqueueRenderOp()		   = 0;
+	virtual bool IsNeedDeferredDestroy() const = 0;
+	virtual bool IsInitedResource() const	   = 0;
 
 protected:
 	virtual void InitStudioAPI()	= 0;
 	virtual void ReleaseStudioAPI() = 0;
 	virtual void UpdateStudioAPI()	= 0;
 };
-
-//-----------------------------------------------------------------------------
-// Studio functions
-//-----------------------------------------------------------------------------
-void Studio_BeginInitResource( IStudioRenderResource* pResource );
-void Studio_BeginUpdateResource( IStudioRenderResource* pResource );
-void Studio_BeginReleaseResource( IStudioRenderResource* pResource );
-
-template<class TStudioRenderResourceClass>
-void Studio_BeginInitResourceSafe( CRefPtr<TStudioRenderResourceClass> pResource );
-
-template<class TStudioRenderResourceClass>
-void Studio_BeginUpdateResourceSafe( CRefPtr<TStudioRenderResourceClass> pResource );
-
-template<class TStudioRenderResourceClass>
-void Studio_BeginReleaseResourceSafe( CRefPtr<TStudioRenderResourceClass> pResource );
 
 //-----------------------------------------------------------------------------
 // Container for all global render resources in the module
@@ -70,31 +63,14 @@ public:
 	virtual void InitResource() override;
 	virtual void ReleaseResource() override;
 	virtual void UpdateResource() override;
+
+	virtual void BeginEnqueueRenderOp() override;
+	virtual void EndEnqueueRenderOp() override;
+	virtual bool IsNeedDeferredDestroy() const override;
 	virtual bool IsInitedResource() const override;
 
-	CStudioRenderResource()
-		: bInitedResource( false )
-	{
-		if ( bGlobal )
-		{
-			CStudioGlobalRenderResources::AddResource( this );
-		}
-	}
-	virtual ~CStudioRenderResource()
-	{
-		if ( bGlobal )
-		{
-			CStudioGlobalRenderResources::RemoveResource( this );
-		}
-
-		if ( !bInitedResource )
-		{
-			return;
-		}
-
-		// Deleting an initialized IStudioRenderResource will result in a crash later since it is still linked
-		AssertMsg( false, "An IStudioRenderResource was deleted without being released first!" );
-	}
+	CStudioRenderResource();
+	virtual ~CStudioRenderResource();
 
 protected:
 	virtual void InitStudioAPI() override;
@@ -102,7 +78,16 @@ protected:
 	virtual void UpdateStudioAPI() override;
 
 private:
-	volatile bool bInitedResource;
+	eastl::atomic<uint32> numPendingRenderOps;
+	eastl::atomic<bool>	  bInitedResource;
 };
+
+//-----------------------------------------------------------------------------
+// Functions to send a message to the rendering thread
+//-----------------------------------------------------------------------------
+void Studio_BeginInitResource( IStudioRenderResource* pResource );
+void Studio_BeginUpdateResource( IStudioRenderResource* pResource );
+void Studio_BeginReleaseResource( IStudioRenderResource* pResource );
+void Studio_BeginDeleteResource( IStudioRenderResource* pResource );
 
 #include "studiorender/istudio_renderresource.inl"

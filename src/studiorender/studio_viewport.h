@@ -7,12 +7,12 @@
 //-----------------------------------------------------------------------------
 // Studio viewport
 //-----------------------------------------------------------------------------
-class CStudioViewport : public CRefCounted<IStudioViewport>, public CStudioRenderResource<IStudioRenderResource>
+class CStudioViewport : public CRefCounted<IStudioViewport>, private CStudioRenderResource<IStudioRenderResource>
 {
 public:
 	// IStudioViewport interface
 	virtual void Init( windowHandle_t windowHandle, uint32 width, uint32 height, bool bUseVSync = false ) override;
-	virtual void Shutdown() override;
+	virtual void Destroy() override;
 
 	virtual void Resize( uint32 newWidth, uint32 newHeight ) override;
 	virtual void Update( float deltaSeconds ) override;
@@ -43,6 +43,10 @@ public:
 
 	COnReleaseViewportIndex& OnReleaseViewportIndex() const;
 	COnRenderPassUpdated&	 OnRenderPassUpdated() const;
+
+	// IRefCounted interface
+protected:
+	virtual void FinalRelease() override;
 
 private:
 	// IStudioRenderResource interface

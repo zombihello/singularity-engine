@@ -4,6 +4,7 @@
 #include "appframework/application.h"
 #include "appframework/appsystemgroup_windowmgr.h"
 #include "studiorender/istudio_viewport.h"
+#include "studiorender/istudio_renderresource.h"
 #include "game/igame.h"
 #include "launcher/convars.h"
 #include "launcher/appsystemgroup_engine.h"
@@ -238,7 +239,7 @@ void CLauncherApp::Shutdown()
 	// Shutdown the viewport
 	if ( pStudioViewport )
 	{
-		pStudioViewport->Shutdown();
+		pStudioViewport->Destroy();
 		pStudioViewport = NULL;
 	}
 

@@ -2,27 +2,27 @@
 #include "tier1/refcount.h"
 #include "appframework/iappsystem.h"
 #include "studiorender/istudio_cmdbuffer.h"
+#include "studiorender/istudio_viewport.h"
+#include "studiorender/istudio_renderpipelineset.h"
+#include "studiorender/istudio_renderobject.h"
 
 //-----------------------------------------------------------------------------
 // Forward declarations
 //-----------------------------------------------------------------------------
-class IStudioViewport;
-class IStudioRenderPipelineSet;
 class IMaterial;
 class IStudioAPIBuffer;
-class IStudioRenderObject;
 
 //-----------------------------------------------------------------------------
 // Studio camera view
 //-----------------------------------------------------------------------------
 struct studioCameraView_t
 {
-	vector3_t location;
+	vector3_t	 location;
 	quaternion_t rotation;
-	float  fieldOfView;
-	float  nearClipPlane;
-	float  farClipPlane;
-	float  aspectRatio;
+	float		 fieldOfView;
+	float		 nearClipPlane;
+	float		 farClipPlane;
+	float		 aspectRatio;
 };
 
 //-----------------------------------------------------------------------------
@@ -39,10 +39,12 @@ public:
 	virtual void UnregisterObject( IStudioRenderObject* pRenderObject ) = 0;
 	virtual void UnregisterAllObjects()									= 0;
 
-	virtual IStudioViewport*		  CreateViewport() const		  = 0;
-	virtual IStudioRenderPipelineSet* CreateRenderPipelineSet() const = 0;
+	// Functions to create a Studio object
+	virtual CRefPtr<IStudioViewport>		  CreateViewport() const		  = 0;
+	virtual CRefPtr<IStudioRenderPipelineSet> CreateRenderPipelineSet() const = 0;
+
 	// NOTE: FOR TEST ONLY!
-	virtual IStudioRenderObject* CreateQuadRenderObject( IMaterial* pMaterial, IStudioAPIBuffer* pVertexBuffer, IStudioAPIBuffer* pIndexBuffer ) const = 0;
+	virtual CRefPtr<IStudioRenderObject> CreateQuadRenderObject( IMaterial* pMaterial, IStudioAPIBuffer* pVertexBuffer, IStudioAPIBuffer* pIndexBuffer ) const = 0;
 
 	// Returns a command buffer of the render thread. If return NULL it's mean what StudioRender don't use render thread
 	virtual IStudioCmdBuffer* GetCommandBuffer() const = 0;

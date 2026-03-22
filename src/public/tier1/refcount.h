@@ -15,6 +15,9 @@ public:
 	virtual void   AddRef()			   = 0;
 	virtual void   ReleaseRef()		   = 0;
 	virtual uint32 GetRefCount() const = 0;
+
+protected:
+	virtual void FinalRelease() = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -30,6 +33,9 @@ public:
 	virtual void   AddRef() override;
 	virtual void   ReleaseRef() override;
 	virtual uint32 GetRefCount() const override;
+
+protected:
+	virtual void FinalRelease() override;
 
 private:
 	eastl::atomic<uint32> countReferences;

@@ -48,8 +48,19 @@ FORCEINLINE void CRefCounted<TBaseClass>::ReleaseRef()
 	if ( prevCountReferences <= 1 )
 	{
 		eastl::atomic_thread_fence( eastl::memory_order_acquire );
-		delete this;
+		FinalRelease();
 	}
+}
+
+/*
+==================
+CRefCounted::FinalRelease
+==================
+*/
+template<class TBaseClass>
+FORCEINLINE void CRefCounted<TBaseClass>::FinalRelease()
+{
+	delete this;
 }
 
 /*

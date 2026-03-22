@@ -9,18 +9,6 @@
 class CStudioVertexDeclarations : public CStudioRenderResource<IStudioRenderResource, true>
 {
 public:
-	FORCEINLINE void Init()
-	{
-		Assert( !IsInitedResource() );
-		Studio_BeginInitResource( this );
-	}
-
-	FORCEINLINE void Destroy()
-	{
-		Assert( IsInitedResource() );
-		Studio_BeginReleaseResource( this );
-	}
-
 	FORCEINLINE IStudioAPIVertexDeclaration* GetStudioAPIVertexDeclaration( studioVertexType_t vertexType ) const
 	{
 		Assert( vertexType < STUDIO_VERTEX_NUM_TYPES );

@@ -2,7 +2,6 @@
 #include "tier1/refcount.h"
 #include "tier1/math/math.h"
 #include "studiorender/studioapi/istudioapi_swapchain.h"
-#include "studiorender/istudio_renderresource.h"
 #include "studiorender/istudio_viewportclient.h"
 
 //-----------------------------------------------------------------------------
@@ -12,7 +11,7 @@ class IStudioViewport : public IRefCounted
 {
 public:
 	virtual void Init( windowHandle_t windowHandle, uint32 width, uint32 height, bool bUseVSync = false ) = 0;
-	virtual void Shutdown()																				  = 0;
+	virtual void Destroy()																				  = 0;
 
 	virtual void Resize( uint32 newWidth, uint32 newHeight )						   = 0;
 	virtual void Update( float deltaSeconds )										   = 0;
@@ -23,7 +22,7 @@ public:
 	virtual bool				   IsInited() const				 = 0;
 	virtual bool				   IsUseVSync() const			 = 0;
 	virtual IStudioViewportClient* GetViewportClient() const	 = 0;
-	virtual vector2i_t				   GetSize() const				 = 0;
+	virtual vector2i_t			   GetSize() const				 = 0;
 	virtual IStudioAPISwapChain*   GetStudioAPISwapChain() const = 0;
 
 	// The function returns a StudioAPI render pass for draw into the viewport

@@ -3,6 +3,146 @@
 
 /*
 ==================
+CTextureResource::CTextureResource
+==================
+*/
+CTextureResource::CTextureResource( studioAPITextureType_t type, studioAPIPixelFormat_t pixelFormat, uint32 sizeX, uint32 sizeY, uint32 sizeZ, uint32 numLayers, uint32 numMipmaps, const studioAPISamplerCreateInfo_t& samplerInfo, const byte* pData /* = NULL */, uint32 dataSize /* = 0 */ )
+	: type( type )
+	, pixelFormat( pixelFormat )
+	, studioAPISamplerCreateInfo( samplerInfo )
+	, sizeX( sizeX )
+	, sizeY( sizeY )
+	, sizeZ( sizeZ )
+	, numLayers( numLayers )
+	, numMipmaps( numMipmaps )
+{
+	data.resize( dataSize );
+	Mem_Memcpy( data.data(), pData, dataSize );
+}
+
+/*
+==================
+CTextureResource::InitStudioAPI
+==================
+*/
+void CTextureResource::InitStudioAPI()
+{
+	Assert( !data.empty() );
+	pStudioAPITexture = g_pStudioAPI->CreateTexture( type, sizeX, sizeY, sizeZ, numLayers, numMipmaps, STUDIOAPI_TEXTURE_USAGE_FLAG_TEXTURE, pixelFormat, data.data() );
+	pStudioAPISampler = g_pStudioAPI->CreateSampler( studioAPISamplerCreateInfo );
+	data.clear();
+}
+
+/*
+==================
+CTextureResource::ReleaseStudioAPI
+==================
+*/
+void CTextureResource::ReleaseStudioAPI()
+{
+	pStudioAPITexture = NULL;
+	pStudioAPISampler = NULL;
+}
+
+/*
+==================
+CTextureResource::FinalRelease
+==================
+*/
+void CTextureResource::FinalRelease()
+{
+	if ( IsNeedDeferredDestroy() )
+	{
+		Studio_BeginDeleteResource( this );
+	}
+	else
+	{
+		delete this;
+	}
+}
+
+/*
+==================
+CTextureResource::GetType
+==================
+*/
+studioAPITextureType_t CTextureResource::GetType() const
+{
+	return type;
+}
+
+/*
+==================
+CTextureResource::GetPixelFormat
+==================
+*/
+studioAPIPixelFormat_t CTextureResource::GetPixelFormat() const
+{
+	return pixelFormat;
+}
+
+/*
+==================
+CTextureResource::GetSizeX
+==================
+*/
+uint32 CTextureResource::GetSizeX() const
+{
+	return sizeX;
+}
+
+/*
+==================
+CTextureResource::GetSizeY
+==================
+*/
+uint32 CTextureResource::GetSizeY() const
+{
+	return sizeY;
+}
+
+/*
+==================
+CTextureResource::GetSizeZ
+==================
+*/
+uint32 CTextureResource::GetSizeZ() const
+{
+	return sizeZ;
+}
+
+/*
+==================
+CTextureResource::GetNumLayers
+==================
+*/
+uint32 CTextureResource::GetNumLayers() const
+{
+	return numLayers;
+}
+
+/*
+==================
+CTextureResource::GetStudioAPITexture
+==================
+*/
+IStudioAPITexture* CTextureResource::GetStudioAPITexture() const
+{
+	return pStudioAPITexture;
+}
+
+/*
+==================
+CTextureResource::GetStudioAPISampler
+==================
+*/
+IStudioAPISampler* CTextureResource::GetStudioAPISampler() const
+{
+	return pStudioAPISampler;
+}
+
+/*
+==================
 CTexture::CTexture
 ==================
 */
@@ -11,43 +151,39 @@ CTexture::CTexture()
 	, pixelFormat( STUDIOAPI_PIXEL_FORMAT_UNKNOWN )
 	, numLayers( 0 )
 {
-	Mem_Memzero( &studioAPISamplerCreateInfo, sizeof( studioAPISamplerCreateInfo_t ) );
 }
 
 /*
 ==================
-CTexture::InitStudioAPI
+CTexture::Init
 ==================
 */
-void CTexture::InitStudioAPI()
+void CTexture::Init( studioAPITextureType_t type, studioAPIPixelFormat_t pixelFormat, uint32 numLayers, const textureMipMap_t* pMipmaps, uint32 numMipmaps, const studioAPISamplerCreateInfo_t& samplerInfo, const byte* pData /* = NULL */, uint32 dataSize /* = 0 */ )
 {
-	// Create a StudioAPI texture
+	// Copy a new texture parameters
+	CTexture::type		  = type;
+	CTexture::pixelFormat = pixelFormat;
+	CTexture::numLayers	  = numLayers;
+
+	// Copy mipmaps information
+	mipmaps.clear();
+	mipmaps.resize( numMipmaps );
+	Mem_Memcpy( mipmaps.data(), pMipmaps, numMipmaps * sizeof( textureMipMap_t ) );
+
+	// Create a studio resource
 	Assert( !mipmaps.empty() );
 	const textureMipMap_t& mipmap0 = mipmaps[0];
-	pStudioAPITexture			   = g_pStudioAPI->CreateTexture( type, mipmap0.sizeX, mipmap0.sizeY, mipmap0.sizeZ, numLayers, (uint32)mipmaps.size(), STUDIOAPI_TEXTURE_USAGE_FLAG_TEXTURE, pixelFormat, data.data() );
-	data.clear();
-
-	// Create a StudioAPI sampler
-	pStudioAPISampler = g_pStudioAPI->CreateSampler( studioAPISamplerCreateInfo );
+	CScopeLock			   scopeLock( resourceCreationMutex );
+	pStudioResource = new CTextureResource( type, pixelFormat, mipmap0.sizeX, mipmap0.sizeY, mipmap0.sizeZ, numLayers, (uint32)mipmaps.size(), samplerInfo, pData, dataSize );
+	Studio_BeginInitResource( pStudioResource );
 }
 
 /*
 ==================
-CTexture::ReleaseStudioAPI
+CTexture::Destroy
 ==================
 */
-void CTexture::ReleaseStudioAPI()
-{
-	pStudioAPITexture = NULL;
-	pStudioAPISampler = NULL;
-}
-
-/*
-==================
-CTexture::Clear
-==================
-*/
-void CTexture::Clear()
+void CTexture::Destroy()
 {
 	// Clear some fields
 	type		= STUDIOAPI_TEXTURE_TYPE_1D;
@@ -55,35 +191,20 @@ void CTexture::Clear()
 	numLayers	= 0;
 	mipmaps.clear();
 
-	// Release StudioAPI resources
-	Studio_BeginReleaseResourceSafe<CTexture>( this );
+	// Release the studio resource
+	CScopeLock scopeLock( resourceCreationMutex );
+	Studio_BeginReleaseResource( pStudioResource );
+	pStudioResource = NULL;
 }
 
 /*
 ==================
-CTexture::SetData
+CTexture::GetType
 ==================
 */
-void CTexture::SetData( studioAPITextureType_t type, studioAPIPixelFormat_t pixelFormat, uint32 numLayers, const textureMipMap_t* pMipmaps, uint32 numMipmaps, const studioAPISamplerCreateInfo_t& samplerInfo, const byte* pData /* = NULL */, uint32 dataSize /* = 0 */ )
+studioAPITextureType_t CTexture::GetType() const
 {
-	// Copy mipmaps information
-	mipmaps.clear();
-	mipmaps.resize( numMipmaps );
-	Mem_Memcpy( mipmaps.data(), pMipmaps, numMipmaps * sizeof( textureMipMap_t ) );
-
-	// Copy a new texture parameters
-	CTexture::type			   = type;
-	CTexture::pixelFormat	   = pixelFormat;
-	CTexture::numLayers		   = numLayers;
-	studioAPISamplerCreateInfo = samplerInfo;
-
-	// Copy a texture data
-	data.clear();
-	data.resize( dataSize );
-	Mem_Memcpy( data.data(), pData, dataSize );
-
-	// Initialize StudioAPI resources
-	Studio_BeginUpdateResourceSafe<CTexture>( this );
+	return type;
 }
 
 /*
@@ -94,16 +215,6 @@ CTexture::GetPixelFormat
 studioAPIPixelFormat_t CTexture::GetPixelFormat() const
 {
 	return pixelFormat;
-}
-
-/*
-==================
-CTexture::GetNumLayers
-==================
-*/
-uint32 CTexture::GetNumLayers() const
-{
-	return numLayers;
 }
 
 /*
@@ -129,30 +240,21 @@ const textureMipMap_t& CTexture::GetMip( uint32 mipLevel ) const
 
 /*
 ==================
-CTexture::GetType
+CTexture::GetNumLayers
 ==================
 */
-studioAPITextureType_t CTexture::GetType() const
+uint32 CTexture::GetNumLayers() const
 {
-	return type;
+	return numLayers;
 }
 
 /*
 ==================
-CTexture::GetStudioAPITexture
+CTexture::GetStudioResource
 ==================
 */
-IStudioAPITexture* CTexture::GetStudioAPITexture() const
+ITextureResource* CTexture::GetStudioResource() const
 {
-	return pStudioAPITexture;
-}
-
-/*
-==================
-CTexture::GetStudioAPISampler
-==================
-*/
-IStudioAPISampler* CTexture::GetStudioAPISampler() const
-{
-	return pStudioAPISampler;
+	CScopeLock scopeLock( resourceCreationMutex );
+	return pStudioResource;
 }

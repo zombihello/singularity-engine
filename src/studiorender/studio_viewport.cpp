@@ -36,6 +36,23 @@ CStudioViewport::~CStudioViewport()
 
 /*
 ==================
+CStudioViewport::FinalRelease
+==================
+*/
+void CStudioViewport::FinalRelease()
+{
+	if ( IsNeedDeferredDestroy() )
+	{
+		Studio_BeginDeleteResource( this );
+	}
+	else
+	{
+		delete this;
+	}
+}
+
+/*
+==================
 CStudioViewport::InitStudioAPI
 ==================
 */
@@ -163,22 +180,20 @@ void CStudioViewport::Init( windowHandle_t windowHandle, uint32 width, uint32 he
 	// Begin the StudioAPI resource if it need
 	if ( bUpdateStudioAPISwapChain )
 	{
-		Studio_BeginUpdateResourceSafe<CStudioViewport>( this );
+		Studio_BeginUpdateResource( this );
 	}
 }
 
 /*
 ==================
-CStudioViewport::Shutdown
+CStudioViewport::Destroy
 ==================
 */
-void CStudioViewport::Shutdown()
+void CStudioViewport::Destroy()
 {
-	// If we have valid StudioAPI resource destroy they
-	if ( pStudioAPISwapChain )
-	{
-		Studio_BeginReleaseResourceSafe<CStudioViewport>( this );
-	}
+	windowHandle = INVALID_WINDOW_HANDLE;
+	size		 = vector2i_t( 0, 0 );
+	Studio_BeginReleaseResource( this );
 }
 
 /*
@@ -189,11 +204,11 @@ CStudioViewport::Resize
 void CStudioViewport::Resize( uint32 newWidth, uint32 newHeight )
 {
 	// Resize the viewport if only it is valid and width or height isn't munch
-	if ( IsInited() && ( size.x != newWidth || size.y != newHeight ) )
+	if ( windowHandle != INVALID_WINDOW_HANDLE && ( size.x != newWidth || size.y != newHeight ) )
 	{
 		// Save the new viewport size and update StudioAPI resources
 		size = vector2i_t( newWidth, newHeight );
-		Studio_BeginUpdateResourceSafe<CStudioViewport>( this );
+		Studio_BeginUpdateResource( this );
 	}
 }
 

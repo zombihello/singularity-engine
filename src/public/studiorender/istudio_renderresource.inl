@@ -2,100 +2,32 @@
 
 /*
 ==================
-Studio_BeginInitResource
+CStudioGlobalRenderResources::InitResources
 ==================
 */
-FORCEINLINE void Studio_BeginInitResource( IStudioRenderResource* pResource )
+FORCEINLINE void CStudioGlobalRenderResources::InitResources()
 {
-	Assert( pResource );
-	UNIQUE_RENDER_COMMAND_ONEPARAMETER( CStudioInitResourceCmd, IStudioRenderResource*, pResource, pResource,
-										{
-											pResource->InitResource();
-										} );
+	CScopeLock									  scopeLock( GetThreadMutex() );
+	eastl::unordered_set<IStudioRenderResource*>& globalResources = GetResourceList();
+	for ( auto it = globalResources.begin(), itEnd = globalResources.end(); it != itEnd; ++it )
+	{
+		Studio_BeginInitResource( *it );
+	}
 }
 
 /*
 ==================
-Studio_BeginUpdateResource
+CStudioGlobalRenderResources::ReleaseResources
 ==================
 */
-FORCEINLINE void Studio_BeginUpdateResource( IStudioRenderResource* pResource )
+FORCEINLINE void CStudioGlobalRenderResources::ReleaseResources()
 {
-	Assert( pResource );
-	UNIQUE_RENDER_COMMAND_ONEPARAMETER( CStudioReleaseResourceCmd, IStudioRenderResource*, pResource, pResource,
-										{
-											pResource->UpdateResource();
-										} );
-}
-
-/*
-==================
-Studio_BeginReleaseResource
-==================
-*/
-FORCEINLINE void Studio_BeginReleaseResource( IStudioRenderResource* pResource )
-{
-	Assert( pResource );
-	UNIQUE_RENDER_COMMAND_ONEPARAMETER( CStudioUpdateResourceCmd, IStudioRenderResource*, pResource, pResource,
-										{
-											pResource->ReleaseResource();
-										} );
-}
-
-/*
-==================
-Studio_BeginInitResourceSafe
-==================
-*/
-template<class TStudioRenderResourceClass>
-FORCEINLINE void Studio_BeginInitResourceSafe( CRefPtr<TStudioRenderResourceClass> pResource )
-{
-	Assert( pResource );
-	UNIQUE_RENDER_COMMAND_ONEPARAMETER( CStudioInitResourceCmd, CRefPtr<TStudioRenderResourceClass>, pResource, pResource,
-										{
-											pResource->InitResource();
-										} );
-}
-
-/*
-==================
-Studio_BeginUpdateResourceSafe
-==================
-*/
-template<class TStudioRenderResourceClass>
-FORCEINLINE void Studio_BeginUpdateResourceSafe( CRefPtr<TStudioRenderResourceClass> pResource )
-{
-	Assert( pResource );
-	UNIQUE_RENDER_COMMAND_ONEPARAMETER( CStudioReleaseResourceCmd, CRefPtr<TStudioRenderResourceClass>, pResource, pResource,
-										{
-											pResource->UpdateResource();
-										} );
-}
-
-/*
-==================
-Studio_BeginReleaseResourceSafe
-==================
-*/
-template<class TStudioRenderResourceClass>
-FORCEINLINE void Studio_BeginReleaseResourceSafe( CRefPtr<TStudioRenderResourceClass> pResource )
-{
-	Assert( pResource );
-	UNIQUE_RENDER_COMMAND_ONEPARAMETER( CStudioUpdateResourceCmd, CRefPtr<TStudioRenderResourceClass>, pResource, pResource,
-										{
-											pResource->ReleaseResource();
-										} );
-}
-
-/*
-==================
-CStudioGlobalRenderResources::GetResourceList
-==================
-*/
-FORCEINLINE eastl::unordered_set<IStudioRenderResource*>& CStudioGlobalRenderResources::GetResourceList()
-{
-	static eastl::unordered_set<IStudioRenderResource*> s_studioGlobalResources;
-	return s_studioGlobalResources;
+	CScopeLock									  scopeLock( GetThreadMutex() );
+	eastl::unordered_set<IStudioRenderResource*>& globalResources = GetResourceList();
+	for ( auto it = globalResources.begin(), itEnd = globalResources.end(); it != itEnd; ++it )
+	{
+		Studio_BeginReleaseResource( *it );
+	}
 }
 
 /*
@@ -122,32 +54,13 @@ FORCEINLINE void CStudioGlobalRenderResources::RemoveResource( IStudioRenderReso
 
 /*
 ==================
-CStudioGlobalRenderResources::InitResources
+CStudioGlobalRenderResources::GetResourceList
 ==================
 */
-FORCEINLINE void CStudioGlobalRenderResources::InitResources()
+FORCEINLINE eastl::unordered_set<IStudioRenderResource*>& CStudioGlobalRenderResources::GetResourceList()
 {
-	CScopeLock									scopeLock( GetThreadMutex() );
-	eastl::unordered_set<IStudioRenderResource*>& globalResources = GetResourceList();
-	for ( auto it = globalResources.begin(), itEnd = globalResources.end(); it != itEnd; ++it )
-	{
-		Studio_BeginInitResource( *it );
-	}
-}
-
-/*
-==================
-CStudioGlobalRenderResources::ReleaseResources
-==================
-*/
-FORCEINLINE void CStudioGlobalRenderResources::ReleaseResources()
-{
-	CScopeLock									scopeLock( GetThreadMutex() );
-	eastl::unordered_set<IStudioRenderResource*>& globalResources = GetResourceList();
-	for ( auto it = globalResources.begin(), itEnd = globalResources.end(); it != itEnd; ++it )
-	{
-		Studio_BeginReleaseResource( *it );
-	}
+	static eastl::unordered_set<IStudioRenderResource*> s_studioGlobalResources;
+	return s_studioGlobalResources;
 }
 
 /*
@@ -163,20 +76,55 @@ FORCEINLINE CThreadMutex& CStudioGlobalRenderResources::GetThreadMutex()
 
 /*
 ==================
+CStudioRenderResource::CStudioRenderResource
+==================
+*/
+template<class TBaseClass, bool bGlobal /*= false*/>
+FORCEINLINE CStudioRenderResource<TBaseClass, bGlobal>::CStudioRenderResource()
+{
+	if ( bGlobal )
+	{
+		CStudioGlobalRenderResources::AddResource( this );
+	}
+
+	numPendingRenderOps.store( 0, eastl::memory_order_release );
+	bInitedResource.store( false, eastl::memory_order_release );
+}
+
+/*
+==================
+CStudioRenderResource::~CStudioRenderResource
+==================
+*/
+template<class TBaseClass, bool bGlobal /*= false*/>
+FORCEINLINE CStudioRenderResource<TBaseClass, bGlobal>::~CStudioRenderResource()
+{
+	if ( bGlobal )
+	{
+		CStudioGlobalRenderResources::RemoveResource( this );
+	}
+
+	// Deleting an initialized/in-use IStudioRenderResource may cause a crash later
+	AssertMsg( !IsInitedResource(), "An IStudioRenderResource was deleted without being released first!" );
+	AssertMsg( numPendingRenderOps.load( eastl::memory_order_acquire ) == 0, "An IStudioRenderResource was deleted when some render ops hasn't been done!" );
+}
+
+/*
+==================
 CStudioRenderResource::InitResource
 ==================
 */
 template<class TBaseClass, bool bGlobal /*= false*/>
-void CStudioRenderResource<TBaseClass, bGlobal>::InitResource()
+FORCEINLINE void CStudioRenderResource<TBaseClass, bGlobal>::InitResource()
 {
-	if ( bInitedResource )
+	if ( bInitedResource.load( eastl::memory_order_relaxed ) )
 	{
 		return;
 	}
 
 	Assert( g_pStudioAPI );
 	InitStudioAPI();
-	bInitedResource = true;
+	bInitedResource.store( true, eastl::memory_order_release );
 }
 
 /*
@@ -185,16 +133,16 @@ CStudioRenderResource::ReleaseResource
 ==================
 */
 template<class TBaseClass, bool bGlobal /*= false*/>
-void CStudioRenderResource<TBaseClass, bGlobal>::ReleaseResource()
+FORCEINLINE void CStudioRenderResource<TBaseClass, bGlobal>::ReleaseResource()
 {
-	if ( !bInitedResource )
+	if ( !bInitedResource.load( eastl::memory_order_relaxed ) )
 	{
 		return;
 	}
 
 	Assert( g_pStudioAPI );
 	ReleaseStudioAPI();
-	bInitedResource = false;
+	bInitedResource.store( false, eastl::memory_order_release );
 }
 
 /*
@@ -203,9 +151,9 @@ CStudioRenderResource::UpdateResource
 ==================
 */
 template<class TBaseClass, bool bGlobal /*= false*/>
-void CStudioRenderResource<TBaseClass, bGlobal>::UpdateResource()
+FORCEINLINE void CStudioRenderResource<TBaseClass, bGlobal>::UpdateResource()
 {
-	if ( !bInitedResource )
+	if ( !bInitedResource.load( eastl::memory_order_relaxed ) )
 	{
 		InitResource();
 	}
@@ -217,13 +165,47 @@ void CStudioRenderResource<TBaseClass, bGlobal>::UpdateResource()
 
 /*
 ==================
+CStudioRenderResource::BeginEnqueueRenderOp
+==================
+*/
+template<class TBaseClass, bool bGlobal /*= false*/>
+FORCEINLINE void CStudioRenderResource<TBaseClass, bGlobal>::BeginEnqueueRenderOp()
+{
+	numPendingRenderOps.fetch_add( 1, eastl::memory_order_acq_rel );
+}
+
+/*
+==================
+CStudioRenderResource::EndEnqueueRenderOp
+==================
+*/
+template<class TBaseClass, bool bGlobal /*= false*/>
+FORCEINLINE void CStudioRenderResource<TBaseClass, bGlobal>::EndEnqueueRenderOp()
+{
+	uint32 prevNumPendingRenderOps = numPendingRenderOps.fetch_sub( 1, eastl::memory_order_acq_rel );
+	Assert( prevNumPendingRenderOps > 0 );
+}
+
+/*
+==================
+CStudioRenderResource::IsNeedDeferredDestroy
+==================
+*/
+template<class TBaseClass, bool bGlobal /*= false*/>
+FORCEINLINE bool CStudioRenderResource<TBaseClass, bGlobal>::IsNeedDeferredDestroy() const
+{
+	return bInitedResource.load( eastl::memory_order_acquire ) || numPendingRenderOps.load( eastl::memory_order_acquire ) != 0;
+}
+
+/*
+==================
 CStudioRenderResource::IsInitedResource
 ==================
 */
 template<class TBaseClass, bool bGlobal /*= false*/>
-bool CStudioRenderResource<TBaseClass, bGlobal>::IsInitedResource() const
+FORCEINLINE bool CStudioRenderResource<TBaseClass, bGlobal>::IsInitedResource() const
 {
-	return bInitedResource;
+	return bInitedResource.load( eastl::memory_order_acquire );
 }
 
 /*
@@ -232,7 +214,7 @@ CStudioRenderResource::InitStudioAPI
 ==================
 */
 template<class TBaseClass, bool bGlobal /*= false*/>
-void CStudioRenderResource<TBaseClass, bGlobal>::InitStudioAPI()
+FORCEINLINE void CStudioRenderResource<TBaseClass, bGlobal>::InitStudioAPI()
 {
 }
 
@@ -242,7 +224,7 @@ CStudioRenderResource::ReleaseStudioAPI
 ==================
 */
 template<class TBaseClass, bool bGlobal /*= false*/>
-void CStudioRenderResource<TBaseClass, bGlobal>::ReleaseStudioAPI()
+FORCEINLINE void CStudioRenderResource<TBaseClass, bGlobal>::ReleaseStudioAPI()
 {
 }
 
@@ -252,8 +234,73 @@ CStudioRenderResource::UpdateStudioAPI
 ==================
 */
 template<class TBaseClass, bool bGlobal /*= false*/>
-void CStudioRenderResource<TBaseClass, bGlobal>::UpdateStudioAPI()
+FORCEINLINE void CStudioRenderResource<TBaseClass, bGlobal>::UpdateStudioAPI()
 {
 	ReleaseStudioAPI();
 	InitStudioAPI();
+}
+
+/*
+==================
+Studio_BeginInitResource
+==================
+*/
+FORCEINLINE void Studio_BeginInitResource( IStudioRenderResource* pResource )
+{
+	Assert( pResource );
+	pResource->BeginEnqueueRenderOp();
+	UNIQUE_RENDER_COMMAND_ONEPARAMETER( CStudioInitResourceCmd, IStudioRenderResource*, pResource, pResource,
+										{
+											pResource->InitResource();
+											pResource->EndEnqueueRenderOp();
+										} );
+}
+
+/*
+==================
+Studio_BeginUpdateResource
+==================
+*/
+FORCEINLINE void Studio_BeginUpdateResource( IStudioRenderResource* pResource )
+{
+	Assert( pResource );
+	pResource->BeginEnqueueRenderOp();
+	UNIQUE_RENDER_COMMAND_ONEPARAMETER( CStudioUpdateResourceCmd, IStudioRenderResource*, pResource, pResource,
+										{
+											pResource->UpdateResource();
+											pResource->EndEnqueueRenderOp();
+										} );
+}
+
+/*
+==================
+Studio_BeginReleaseResource
+==================
+*/
+FORCEINLINE void Studio_BeginReleaseResource( IStudioRenderResource* pResource )
+{
+	Assert( pResource );
+	pResource->BeginEnqueueRenderOp();
+	UNIQUE_RENDER_COMMAND_ONEPARAMETER( CStudioReleaseResourceCmd, IStudioRenderResource*, pResource, pResource,
+										{
+											pResource->ReleaseResource();
+											pResource->EndEnqueueRenderOp();
+										} );
+}
+
+/*
+==================
+Studio_BeginDeleteResource
+==================
+*/
+FORCEINLINE void Studio_BeginDeleteResource( IStudioRenderResource* pResource )
+{
+	Assert( pResource );
+	pResource->BeginEnqueueRenderOp();
+	UNIQUE_RENDER_COMMAND_ONEPARAMETER( CStudioDeleteResourceCmd, IStudioRenderResource*, pResource, pResource,
+										{
+											pResource->ReleaseResource();
+											pResource->EndEnqueueRenderOp();
+											delete pResource;
+										} );
 }
