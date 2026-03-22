@@ -46,7 +46,6 @@ void CBaseShader::Init( const shaderInitParams_t& shaderInitParams )
 
 	// Create a pipeline set for the shader
 	pStudioRenderPipelineSet = g_pStudioRender->CreateRenderPipelineSet();
-	pStudioRenderPipelineSet->Init();
 
 	// Initialize the shader instance
 	OnInitInstance();
@@ -68,11 +67,7 @@ CBaseShader::Shutdown
 */
 void CBaseShader::Shutdown()
 {
-	if ( pStudioRenderPipelineSet )
-	{
-		pStudioRenderPipelineSet->Shutdown();
-		pStudioRenderPipelineSet = NULL;
-	}
+	pStudioRenderPipelineSet = NULL;
 	Mem_Memzero( cacheInfos, STUDIOAPI_SHADER_NUM_DRAW_TYPES * sizeof( shaderCacheInfoInternal_t ) );
 }
 
@@ -118,7 +113,7 @@ void CBaseShader::R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, studio
 
 	// Get a render pipeline or bake it
 	uint64					  pipelineIdx			   = GetPipelineIndex( comboInfo.cacheIndices );
-	IStudioAPIRenderPipeline* pStudioAPIRenderPipeline = pStudioRenderPipelineSet->GetStudioAPIRenderPipeline( renderPassType, pipelineIdx );
+	IStudioAPIRenderPipeline* pStudioAPIRenderPipeline = pStudioRenderPipelineSet->R_GetStudioAPIRenderPipeline( renderPassType, pipelineIdx );
 	if ( !pStudioAPIRenderPipeline )
 	{
 		// Initialize an information about bake the render pipeline

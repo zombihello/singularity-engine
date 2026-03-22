@@ -107,7 +107,7 @@ void CStudioRender::SetCameraView( const studioCameraView_t& cameraView )
 {
 	// Calculate a view matrix
 	vector3_t targetDirection = cameraView.rotation * g_vectorForward;
-	vector3_t axisUp		   = cameraView.rotation * g_vectorUp;
+	vector3_t axisUp		  = cameraView.rotation * g_vectorUp;
 	S_MatrixLookAt( cameraView.location, cameraView.location + targetDirection, axisUp, sceneView.viewMatrix );
 
 	// Calculate a perspective matrix
@@ -156,7 +156,7 @@ void CStudioRender::UnregisterAllObjects()
 CStudioRender::CreateViewport
 ==================
 */
-IStudioViewport* CStudioRender::CreateViewport() const
+CRefPtr<IStudioViewport> CStudioRender::CreateViewport() const
 {
 	return new CStudioViewport();
 }
@@ -166,7 +166,7 @@ IStudioViewport* CStudioRender::CreateViewport() const
 CStudioRender::CreateRenderPipelineSet
 ==================
 */
-IStudioRenderPipelineSet* CStudioRender::CreateRenderPipelineSet() const
+CRefPtr<IStudioRenderPipelineSet> CStudioRender::CreateRenderPipelineSet() const
 {
 	return new CStudioRenderPipelineSet();
 }
@@ -176,7 +176,7 @@ IStudioRenderPipelineSet* CStudioRender::CreateRenderPipelineSet() const
 CStudioRender::CreateQuadRenderObject
 ==================
 */
-IStudioRenderObject* CStudioRender::CreateQuadRenderObject( IMaterial* pMaterial, IStudioAPIBuffer* pVertexBuffer, IStudioAPIBuffer* pIndexBuffer ) const
+CRefPtr<IStudioRenderObject> CStudioRender::CreateQuadRenderObject( IMaterial* pMaterial, IStudioAPIBuffer* pVertexBuffer, IStudioAPIBuffer* pIndexBuffer ) const
 {
 	return new CStudioRenderObjectQuad( pVertexBuffer, pIndexBuffer, pMaterial );
 }

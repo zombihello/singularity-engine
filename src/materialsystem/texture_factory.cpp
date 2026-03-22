@@ -37,7 +37,7 @@ void CTextureFactory::Init()
 		studioAPISamplerInfo.addressModeW				  = STUDIOAPI_SAMPLER_ADDRESS_MODE_WRAP;
 		studioAPISamplerInfo.minLod						  = -FLT_MAX;
 		studioAPISamplerInfo.maxLod						  = FLT_MAX;
-		pTexture->SetData( STUDIOAPI_TEXTURE_TYPE_2D, STUDIOAPI_PIXEL_FORMAT_RGBA8, 1, &mipmap0, 1, studioAPISamplerInfo, data, ARRAYSIZE( data ) );
+		pTexture->Init( STUDIOAPI_TEXTURE_TYPE_2D, STUDIOAPI_PIXEL_FORMAT_RGBA8, 1, &mipmap0, 1, studioAPISamplerInfo, data, ARRAYSIZE( data ) );
 	}
 }
 
@@ -104,7 +104,7 @@ CRefPtr<IRefCounted> CTextureFactory::LoadResource( const char* pPath, uint32 lo
 
 	// Create a new texture and initialize it
 	CRefPtr<CTexture> pTexture = new CTexture();
-	pTexture->SetData( stexCompiledTextureDoc.GetType(), stexCompiledTextureDoc.GetPixelFormat(), stexCompiledTextureDoc.GetNumLayers(), mipmaps.data(), stexCompiledTextureDoc.GetNumMips(), studioAPISamplerInfo, data.data(), (uint32)data.size() );
+	pTexture->Init( stexCompiledTextureDoc.GetType(), stexCompiledTextureDoc.GetPixelFormat(), stexCompiledTextureDoc.GetNumLayers(), mipmaps.data(), stexCompiledTextureDoc.GetNumMips(), studioAPISamplerInfo, data.data(), (uint32)data.size() );
 	return pTexture;
 }
 
@@ -116,7 +116,7 @@ CTextureFactory::UnloadResource
 void CTextureFactory::UnloadResource( IRefCounted* pResoruce ) const
 {
 	CTexture* pTexture = (CTexture*)pResoruce;
-	pTexture->Clear();
+	pTexture->Destroy();
 }
 
 /*
