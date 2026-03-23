@@ -1,28 +1,59 @@
 #pragma once
+#include <EASTL/string.h>
+#include <EASTL/list.h>
+
+#include "tier1/template.h"
 #include "resourcesystem/iresource.h"
 
 //-----------------------------------------------------------------------------
-// Resource
+// Forward declarations
+//-----------------------------------------------------------------------------
+class CResourceTypeMgr;
+
+//-----------------------------------------------------------------------------
+// A resource
 //-----------------------------------------------------------------------------
 class CResource : public CRefCounted<IResource>
 {
 public:
-	CResource( const char* pPath, IRefCounted* pData, resourceType_t type, bool bProcedural = false );
+	friend CResourceTypeMgr;
 
 	// IResource interface
-	// If the data isn't valid return the default resource or NULL if it isn't exist in the system
-	virtual IRefCounted*   GetData() const override;
-	virtual resourceType_t GetType() const override;
+	// To bring a data in or out of memory
+	virtual bool Cache() override;
+	virtual void Uncache() override;
 
-	void		 SetData( IRefCounted* pData, resourceType_t type );
-	bool		 IsProcedural() const;
-	const char* GetPath() const;
+	// Mark the resource as used
+	virtual void MarkUsed() override;
+
+	// Set/clear permanent flag
+	virtual void MakePermanent() override;
+	virtual void ClearPermanent() override;
+
+	virtual bool		   HasAllFlags( uint8 flags ) const override;
+	virtual bool		   HasAnyFlags( uint8 flags ) const override;
+	virtual void*		   GetData() const override;
+	virtual resourceType_t GetType() const override;
+	virtual const char*	   GetName() const override;
+	virtual const char*	   GetPath() const override;
+
+	CResource( CResourceTypeMgr* pOwner, const char* pName, resourceType_t type, uint8 flags = RESOURCE_TYPE_NONE );
+	~CResource();
+
+	void AddFlags( uint8 flags );
+	void RemoveFlags( uint8 flags );
+	void ChangeData( const char* pPath, void* pData );
 
 private:
-	bool				 bProcedural;
-	resourceType_t		 type;
-	eastl::string			 path;
-	CRefPtr<IRefCounted> pData;
+	resourceType_t							type;
+	uint8									flags;
+	bool									bInLruList;
+	void*									pData;
+	CResourceTypeMgr*						pOwner;
+	uint64									lastUsedFrame;
+	eastl::string							name;
+	eastl::string							path;
+	eastl::list<CResource*>::const_iterator lruIt;
 };
 
 #include "resourcesystem/resource.inl"

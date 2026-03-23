@@ -5,8 +5,8 @@
 //-----------------------------------------------------------------------------
 // Forward declarations
 //-----------------------------------------------------------------------------
+class IResource;
 class IMaterial;
-class ITexture;
 
 //-----------------------------------------------------------------------------
 // Material variable interface
@@ -36,13 +36,13 @@ public:
 	virtual void SetIntValue( int32 value )							 = 0;
 	virtual void SetFloatValue( float value )						 = 0;
 	virtual void SetVecValue( const float* pValue, uint32 numComps ) = 0;
-	virtual void SetVecValue( const vector2_t& value )					 = 0;
-	virtual void SetVecValue( const vector3_t& value )					 = 0;
-	virtual void SetVecValue( const vector4_t& value )					 = 0;
-	virtual void SetMatrixValue( const matrix4x4_t& value )				 = 0;
+	virtual void SetVecValue( const vector2_t& value )				 = 0;
+	virtual void SetVecValue( const vector3_t& value )				 = 0;
+	virtual void SetVecValue( const vector4_t& value )				 = 0;
+	virtual void SetMatrixValue( const matrix4x4_t& value )			 = 0;
 	virtual void SetStringValue( const char* pValue )				 = 0;
-	virtual void SetTextureValue( ITexture* pValue )				 = 0;
-	virtual void SetMaterialValue( IMaterial* pValue )				 = 0;
+	virtual void SetTextureValue( IResource* pValue )				 = 0;
+	virtual void SetMaterialValue( IResource* pValue )				 = 0;
 
 	virtual bool			  IsDefined() const									  = 0;
 	virtual const char*		  GetName() const									  = 0;
@@ -52,8 +52,8 @@ public:
 	virtual int32			  GetIntValue() const								  = 0;
 	virtual float			  GetFloatValue() const								  = 0;
 	virtual void			  GetVecValue( float* pValue, uint32 numComps ) const = 0;
-	virtual matrix4x4_t			  GetMatrixValue() const							  = 0;
+	virtual matrix4x4_t		  GetMatrixValue() const							  = 0;
 	virtual const char*		  GetStringValue() const							  = 0;
-	virtual ITexture*		  GetTextureValue() const							  = 0;
-	virtual IMaterial*		  GetMaterialValue() const							  = 0;
+	virtual IResource*		  GetTextureValue() const							  = 0;
+	virtual IResource*		  GetMaterialValue() const							  = 0;
 };

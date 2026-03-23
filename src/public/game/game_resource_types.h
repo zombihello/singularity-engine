@@ -2,12 +2,10 @@
 #include "resourcesystem/iresourcetype.h"
 
 //-----------------------------------------------------------------------------
-// Material factory
+// Game resource types
 //-----------------------------------------------------------------------------
-class CMaterialFactory : public IResourceTypeFactory
+enum resourceTypeGame_t
 {
-public:
-	// IResourceTypeFactory interface
-	virtual void* Create() const override;
-	virtual void  Delete( void* pData ) const override;
+	RESOURCE_TYPE_ENTITY_DESC = RESOURCE_LAST_ENGINE_TYPE + 1,
+	RESOURCE_LAST_GAME_TYPE	  = RESOURCE_TYPE_ENTITY_DESC
 };

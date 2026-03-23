@@ -9,7 +9,7 @@
 //-----------------------------------------------------------------------------
 // Forward declarations
 //-----------------------------------------------------------------------------
-class IMaterial;
+class IResource;
 class IStudioAPIBuffer;
 
 //-----------------------------------------------------------------------------
@@ -44,7 +44,7 @@ public:
 	virtual CRefPtr<IStudioRenderPipelineSet> CreateRenderPipelineSet() const = 0;
 
 	// NOTE: FOR TEST ONLY!
-	virtual CRefPtr<IStudioRenderObject> CreateQuadRenderObject( IMaterial* pMaterial, IStudioAPIBuffer* pVertexBuffer, IStudioAPIBuffer* pIndexBuffer ) const = 0;
+	virtual CRefPtr<IStudioRenderObject> CreateQuadRenderObject( IResource* pMaterial, IStudioAPIBuffer* pVertexBuffer, IStudioAPIBuffer* pIndexBuffer ) const = 0;
 
 	// Returns a command buffer of the render thread. If return NULL it's mean what StudioRender don't use render thread
 	virtual IStudioCmdBuffer* GetCommandBuffer() const = 0;

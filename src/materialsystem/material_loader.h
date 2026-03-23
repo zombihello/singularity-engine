@@ -2,12 +2,12 @@
 #include "resourcesystem/iresourcetype.h"
 
 //-----------------------------------------------------------------------------
-// Material factory
+// Material loader
 //-----------------------------------------------------------------------------
-class CMaterialFactory : public IResourceTypeFactory
+class CMaterialLoader : public IResourceTypeLoader
 {
 public:
-	// IResourceTypeFactory interface
-	virtual void* Create() const override;
-	virtual void  Delete( void* pData ) const override;
+	// IResourceTypeLoader interface
+	virtual bool		Load( const char* pPath, void* pData ) const override;
+	virtual const char* GetFormatName() const override;
 };

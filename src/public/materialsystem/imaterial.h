@@ -1,6 +1,6 @@
 #pragma once
-#include "tier1/refcount.h"
 #include "studiorender/studio_renderpasstypes.h"
+#include "resourcesystem/iresourcetype.h"
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -12,7 +12,7 @@ class IShader;
 //-----------------------------------------------------------------------------
 // Material interface
 //-----------------------------------------------------------------------------
-class IMaterial : public IRefCounted
+class IMaterial
 {
 public:
 	virtual ~IMaterial() {}
@@ -25,6 +25,8 @@ public:
 
 	virtual uint32		   GetNumVars() const	 = 0;
 	virtual IMaterialVar** GetVars() const		 = 0;
-	virtual const char*   GetShaderName() const = 0;
+	virtual const char*	   GetShaderName() const = 0;
 	virtual IShader*	   GetShader() const	 = 0;
 };
+
+DECLARE_RESOURCE_TYPE( IMaterial, RESOURCE_TYPE_MATERIAL );

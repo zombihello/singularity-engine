@@ -15,15 +15,17 @@ class CEcsMap;
 // ECS entity descriptor
 // By this you can create an ECS entity
 //-----------------------------------------------------------------------------
-class CEcsEntityDesc : public CRefCounted<IEntityDesc>
+class CEcsEntityDesc : public IEntityDesc
 {
 public:
 	CEcsEntityDesc();
 	CEcsEntityDesc( const CSENTCompiledEntityDescDoc& sentCompiledDoc );
 	~CEcsEntityDesc();
 
+	void Init( const CSENTCompiledEntityDescDoc& sentCompiledDoc );
+	void Clear();
+
 	ecsEntity_t GetEcsPrefab( CEcsMap* pEcsMap );
-	void		Clear();
 
 private:
 	struct ecsPrefab_t
@@ -34,7 +36,6 @@ private:
 		IOnMapUnloaded::handle_t onMapUnloadedHandle;
 	};
 
-	void		Init( const CSENTCompiledEntityDescDoc& sentCompiledDoc );
 	uint32		CreateEcsPrefab( CEcsMap* pEcsMap, const char* pName, uint32 ecsPrefabIdx = INVALID_INDEX ) const;
 	static void OnMapResetedOrUnloaded( void* pUserData, IMap* pMap );
 
@@ -43,3 +44,5 @@ private:
 	CGuid										 guid;
 	mutable uint32								 lastUsedEcsPrefabIdx;
 };
+
+DECLARE_RESOURCE_TYPE( CEcsEntityDesc, RESOURCE_TYPE_ENTITY_DESC );

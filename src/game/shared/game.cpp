@@ -6,6 +6,7 @@
 #include "game/shared/ecs/ecs_common.gen.h"
 #include "game/shared/ecs/ecs_movement.gen.h"
 #include "game/shared/ecs/ecs_camera.gen.h"
+#include "game/shared/ecs/ecs_entitydesc.h"
 #include "game/shared/game.h"
 
 //-----------------------------------------------------------------------------
@@ -84,8 +85,19 @@ bool CGame::Init()
 	extern void EcsInitModules_Gameframework();
 	EcsInitModules_Gameframework();
 
-	// Initialize all game-specific resource factories
-	ecsEntityDescFactory.Init();
+	// Register all game-specific resource types
+	IResourceTypeMgr* pEcsDescsMgr = g_pResourceSystem->InstallResourceManagerForType<CEcsEntityDesc>();
+	pEcsDescsMgr->RegisterResourceFactory( &ecsEntityDescFactory );
+	pEcsDescsMgr->RegisterResourceLoader( &ecsEntityDescLoader );
+
+	// Set a default resource for entity descriptors
+	CResourcePtr<CEcsEntityDesc> pDefaultEntityDesc = pEcsDescsMgr->LoadResource( "//core/entities/default" );
+	if ( !pDefaultEntityDesc )
+	{
+		pDefaultEntityDesc = pEcsDescsMgr->CreateResource( "__default" );
+	}
+
+	pEcsDescsMgr->SetDefaultResource( pDefaultEntityDesc );
 	return true;
 }
 
@@ -102,8 +114,8 @@ void CGame::Shutdown()
 	// Shutdown the active map
 	MapShutdown();
 
-	// Shutdown all resource factories
-	ecsEntityDescFactory.Shutdown();
+	// Unregister all game-specific resource types
+	g_pResourceSystem->RemoveResourceManagerForType<CEcsEntityDesc>();
 }
 
 /*

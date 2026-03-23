@@ -4,8 +4,8 @@
 #include "materialsystem/imaterial.h"
 #include "materialsystem/itexture.h"
 #include "game/ientitydesc.h"
-#include "resourcesystem/iresource.h"
 #include "resourcesystem/iresourcesystem.h"
+#include "resourcesystem/resourceptr.h"
 
 //-----------------------------------------------------------------------------
 // Read a data from a SENT variable

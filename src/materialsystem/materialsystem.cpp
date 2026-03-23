@@ -1,5 +1,6 @@
 #include "pch_materialsystem.h"
 #include "resourcesystem/iresourcesystem.h"
+#include "materialsystem/texture.h"
 #include "materialsystem/material.h"
 #include "materialsystem/materialvar.h"
 #include "materialsystem/materialsystem.h"
@@ -93,9 +94,48 @@ bool CMaterialSystem::Init()
 	// Initialize the shader manager
 	g_pShaderMgr->Init();
 
-	// Initialize all resource factories
-	textureFactory.Init();
-	materialFactory.Init();
+	// Register texture resource type
+	IResourceTypeMgr* pTexturesMgr = g_pResourceSystem->InstallResourceManagerForType<CTexture>();
+	pTexturesMgr->RegisterResourceFactory( &textureFactory );
+	pTexturesMgr->RegisterResourceLoader( &textureLoader );
+
+	// Register material texture type
+	IResourceTypeMgr* pMaterialsMgr = g_pResourceSystem->InstallResourceManagerForType<CMaterial>();
+	pMaterialsMgr->RegisterResourceFactory( &materialFactory );
+	pMaterialsMgr->RegisterResourceLoader( &materialLoader );
+
+	// Set a default resource for textures
+	CResourcePtr<CTexture> pDefaultTexture = pTexturesMgr->LoadResource( "//core/materials/default" );
+	if ( !pDefaultTexture )
+	{
+		uint8			data[4] = { 0xFF, 0x00, 0xFF, 0xFF };
+		textureMipMap_t mipmap0 = {};
+		mipmap0.sizeX			= 1;
+		mipmap0.sizeY			= 1;
+		mipmap0.sizeZ			= 1;
+
+		studioAPISamplerCreateInfo_t studioAPISamplerInfo = {};
+		studioAPISamplerInfo.filer						  = STUDIOAPI_SAMPLER_FILTER_POINT;
+		studioAPISamplerInfo.addressModeU				  = STUDIOAPI_SAMPLER_ADDRESS_MODE_WRAP;
+		studioAPISamplerInfo.addressModeV				  = STUDIOAPI_SAMPLER_ADDRESS_MODE_WRAP;
+		studioAPISamplerInfo.addressModeW				  = STUDIOAPI_SAMPLER_ADDRESS_MODE_WRAP;
+		studioAPISamplerInfo.minLod						  = S_MinValue<float>();
+		studioAPISamplerInfo.maxLod						  = S_MaxValue<float>();
+
+		pDefaultTexture = pTexturesMgr->CreateResource( "__default" );
+		pDefaultTexture->Init( STUDIOAPI_TEXTURE_TYPE_2D, STUDIOAPI_PIXEL_FORMAT_RGBA8, 1, &mipmap0, 1, studioAPISamplerInfo, data, ARRAYSIZE( data ) );
+	}
+	pTexturesMgr->SetDefaultResource( pDefaultTexture );
+
+	// Set a default resource for materials
+	CResourcePtr<CMaterial> pDefaultMaterial = pMaterialsMgr->LoadResource( "//core/materials/default" );
+	if ( !pDefaultMaterial )
+	{
+		pDefaultMaterial = pMaterialsMgr->CreateResource( "__default" );
+		pDefaultMaterial->SetShader( "wireframe" );
+	}
+	pMaterialsMgr->SetDefaultResource( pDefaultMaterial );
+
 	return true;
 }
 
@@ -106,9 +146,9 @@ CMaterialSystem::Shutdown
 */
 void CMaterialSystem::Shutdown()
 {
-	// Shutdown all resource factories
-	materialFactory.Shutdown();
-	textureFactory.Shutdown();
+	// Unregister all material resource types
+	g_pResourceSystem->RemoveResourceManagerForType<CMaterial>();
+	g_pResourceSystem->RemoveResourceManagerForType<CTexture>();
 
 	// Shutdown the shader manager
 	g_pShaderMgr->Shutdown();

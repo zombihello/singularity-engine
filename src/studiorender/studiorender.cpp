@@ -176,7 +176,7 @@ CRefPtr<IStudioRenderPipelineSet> CStudioRender::CreateRenderPipelineSet() const
 CStudioRender::CreateQuadRenderObject
 ==================
 */
-CRefPtr<IStudioRenderObject> CStudioRender::CreateQuadRenderObject( IMaterial* pMaterial, IStudioAPIBuffer* pVertexBuffer, IStudioAPIBuffer* pIndexBuffer ) const
+CRefPtr<IStudioRenderObject> CStudioRender::CreateQuadRenderObject( IResource* pMaterial, IStudioAPIBuffer* pVertexBuffer, IStudioAPIBuffer* pIndexBuffer ) const
 {
 	return new CStudioRenderObjectQuad( pVertexBuffer, pIndexBuffer, pMaterial );
 }

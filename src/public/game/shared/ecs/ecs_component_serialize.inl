@@ -110,7 +110,8 @@ FORCEINLINE void EcsReadData<CResourcePtr<ITexture>>( CResourcePtr<ITexture>& da
 	data = NULL;
 	if ( sentVar.IsA( SENT_ENTITY_DESC_VAR_TYPE_STRING ) )
 	{
-		data = g_pResourceSystem->FindOrLoadResource( sentVar.GetStringValue(), RESOURCE_TYPE_TEXTURE, RESOURCE_LOAD_FLAG_WITHOUT_DEFAULT );
+		IResourceTypeMgr* pTexturesMgr = g_pResourceSystem->GetResourceManagerForType<ITexture>();
+		data						   = pTexturesMgr->LoadResource( sentVar.GetStringValue() );
 	}
 
 	if ( !data )
@@ -130,7 +131,8 @@ FORCEINLINE void EcsReadData<CResourcePtr<IMaterial>>( CResourcePtr<IMaterial>& 
 	data = NULL;
 	if ( sentVar.IsA( SENT_ENTITY_DESC_VAR_TYPE_STRING ) )
 	{
-		data = g_pResourceSystem->FindOrLoadResource( sentVar.GetStringValue(), RESOURCE_TYPE_MATERIAL, RESOURCE_LOAD_FLAG_WITHOUT_DEFAULT );
+		IResourceTypeMgr* pMaterialsMgr = g_pResourceSystem->GetResourceManagerForType<IMaterial>();
+		data							= pMaterialsMgr->LoadResource( sentVar.GetStringValue() );
 	}
 
 	if ( !data )
@@ -149,7 +151,8 @@ FORCEINLINE void EcsReadData<CResourcePtr<IEntityDesc>>( CResourcePtr<IEntityDes
 {
 	if ( sentVar.IsA( SENT_ENTITY_DESC_VAR_TYPE_STRING ) )
 	{
-		data = g_pResourceSystem->FindOrLoadResource( sentVar.GetStringValue(), RESOURCE_TYPE_ENTITY_DESC, RESOURCE_LOAD_FLAG_WITHOUT_DEFAULT );
+		IResourceTypeMgr* pEntityDescsMgr = g_pResourceSystem->GetResourceManagerForType<IEntityDesc>();
+		data							  = pEntityDescsMgr->LoadResource( sentVar.GetStringValue() );
 	}
 
 	if ( !data )

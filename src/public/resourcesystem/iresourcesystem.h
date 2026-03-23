@@ -1,8 +1,6 @@
 #pragma once
-#include "tier1/refcount.h"
 #include "appframework/iappsystem.h"
-#include "resourcesystem/iresource.h"
-#include "resourcesystem/iresourcefactory.h"
+#include "resourcesystem/iresourcetypemgr.h"
 
 //-----------------------------------------------------------------------------
 // Resource system interface
@@ -11,21 +9,28 @@
 class IResourceSystem : public IAppSystem
 {
 public:
-	// Functions register/unregister a resource factory
-	// NOTE: You can't override a resource factory if the one has RESOURCE_FACTORY_FLAG_STATIC (except for the case if the factory has RESOURCE_FACTORY_FLAG_NOT_USED)
-	virtual bool RegisterResourceFactory( resourceType_t type, IResourceFactory* pFactory ) = 0;
-	virtual bool UnRegisterResourceFactory( resourceType_t type )							= 0;
+	// Functions to install/remove a resource type manager for specific type
+	template<class TResourceClass>
+	IResourceTypeMgr*		  InstallResourceManagerForType();
+	virtual IResourceTypeMgr* InstallResourceManager( resourceType_t type ) = 0;
+	template<class TResourceClass>
+	void		 RemoveResourceManagerForType();
+	virtual void RemoveResourceManager( resourceType_t type ) = 0;
 
-	// NOTE: The path to the resource in the file system can be without file extension, or its name if it is a procedural resource
-	virtual CRefPtr<IResource> FindOrLoadResource( const char* pPath, resourceType_t type, uint32 loadFlags = RESOURCE_LOAD_FLAG_NONE ) = 0;
-	virtual CRefPtr<IResource> CreateProceduralResource( const char* pName, resourceType_t type )										 = 0;
+	// Performs per-frame resource management. Handles tasks like uncache unused resources
+	// and other maintenance operations
+	virtual void FrameUpdate() = 0;
 
-	// This function delete any resource that has a refcount <= 1 (one reference in the resource system)
-	virtual void RemoveUnusedResources() = 0;
+	// Functions to uncache all resources
+	virtual void UncacheAllResources() = 0;
 
-	// Return a default resource by its type. If the type isn't registered or not have a default resource return NULL
-	virtual CRefPtr<IResource> GetDefaultResource( resourceType_t type ) const = 0;
-
-	virtual bool			  HasResourceFactory( resourceType_t type ) const = 0;
-	virtual IResourceFactory* GetResourceFactory( resourceType_t type ) const = 0;
+	// Functions to check/get a resource type manager for specific type
+	template<class TResourceClass>
+	bool		 HasResourceManagerForType() const;
+	virtual bool HasResourceManager( resourceType_t type ) const = 0;
+	template<class TResourceClass>
+	IResourceTypeMgr*		  GetResourceManagerForType() const;
+	virtual IResourceTypeMgr* GetResourceManager( resourceType_t type ) const = 0;
 };
+
+#include "resourcesystem/iresourcesystem.inl"

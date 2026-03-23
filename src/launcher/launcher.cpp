@@ -236,14 +236,12 @@ void CLauncherApp::Shutdown()
 		onChangedMainWindowHandle = INVALID_HANDLE;
 	}
 
-	// Shutdown the viewport
+	// Destroy the viewport and the main window
 	if ( pStudioViewport )
 	{
 		pStudioViewport->Destroy();
 		pStudioViewport = NULL;
 	}
-
-	// Destroy the main window
 	g_pWindowMgr->DestroyWindow( g_pWindowMgr->GetMainWindowId() );
 
 	// Remove all our groups
