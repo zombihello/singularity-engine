@@ -22,6 +22,7 @@ CResourceSystem::Connect
 */
 bool CResourceSystem::Connect( createInterfaceFn_t pFactory )
 {
+	PROFILER_SCOPE_FUNC();
 	if ( !ConnectTier1( pFactory ) )
 	{
 		return false;
@@ -39,6 +40,7 @@ CResourceSystem::Disconnect
 */
 void CResourceSystem::Disconnect()
 {
+	PROFILER_SCOPE_FUNC();
 	ConVar_Unregister();
 	DisconnectTier1();
 	g_pResourceSystem = NULL;
@@ -51,6 +53,7 @@ CResourceSystem::Shutdown
 */
 void CResourceSystem::Shutdown()
 {
+	PROFILER_SCOPE_FUNC();
 	frameNumber = 0;
 	resourceTypeMgrDict.clear();
 }
@@ -94,11 +97,11 @@ CResourceSystem::FrameUpdate
 void CResourceSystem::FrameUpdate()
 {
 	PROFILER_SCOPE_FUNC();
-	++frameNumber;
 	for ( auto it = resourceTypeMgrDict.begin(), itEnd = resourceTypeMgrDict.end(); it != itEnd; ++it )
 	{
 		it->second.FrameUpdate();
 	}
+	++frameNumber;
 }
 
 /*

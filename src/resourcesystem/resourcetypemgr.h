@@ -50,13 +50,28 @@ public:
 
 	// To bring a data in or out of memory
 	bool CacheResource( CResource* pResource );
-	void UncacheResource( CResource* pResource );
+	void UncacheResource( CResource* pResource, bool bIgnorePermanent = false );
+
+	// Mark the resource as used
+	void MarkUsedResource( CResource* pResource );
 
 private:
+	// Functions to process pending resources to mark as used and update LRU list
+	void ProcessPendingMarkUsedResources();
+	void ProcessLruResources();
+
+	// Functions to work with the lru list
+	void LinkResourceToLruTail( CResource* pResource );
+	void MoveResourceToLruTail( CResource* pResource );
+	void UnlinkResourceFromLru( CResource* pResource );
+
 	resourceType_t																									   resourceType;
 	IResourceTypeFactory*																							   pResourceTypeFactory;
 	CRefPtr<CResource>																								   pDefaultResource;
-	eastl::vector<IResourceTypeLoader*>																				   resourceTypeLoaders;
+	CThreadMutex																									   pendingMarkUsedResourcesMutex;
+	eastl::list<CResource*>																							   pendingMarkUsedResourcesReadList;
+	eastl::list<CResource*>																							   pendingMarkUsedResourcesWriteList;
 	eastl::list<CResource*>																							   lruResourcesList;
+	eastl::vector<IResourceTypeLoader*>																				   resourceTypeLoaders;
 	eastl::unordered_map<eastl::string, CRefPtr<CResource>, stlInsensitiveStringHash_t, stlInsensitiveCompareString_t> resourcesDict;
 };

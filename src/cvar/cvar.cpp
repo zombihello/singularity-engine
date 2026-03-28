@@ -154,6 +154,7 @@ CCvarQuery::Connect
 */
 bool CCvarQuery::Connect( createInterfaceFn_t pFactory )
 {
+	PROFILER_SCOPE_FUNC();
 	pCvar = (ICvar*)pFactory( CVAR_INTERFACE_VERSION );
 	if ( !pCvar )
 	{
@@ -171,6 +172,7 @@ CCvarQuery::Disconnect
 */
 void CCvarQuery::Disconnect()
 {
+	PROFILER_SCOPE_FUNC();
 	if ( pCvar )
 	{
 		pCvar->SetCVarQuery( NULL );
@@ -224,6 +226,7 @@ CCvar::Connect
 */
 bool CCvar::Connect( createInterfaceFn_t pFactory )
 {
+	PROFILER_SCOPE_FUNC();
 	if ( !ConnectTier1( pFactory ) )
 	{
 		return false;
@@ -241,6 +244,7 @@ CCvar::Disconnect
 */
 void CCvar::Disconnect()
 {
+	PROFILER_SCOPE_FUNC();
 	ConVar_Unregister();
 	DisconnectTier1();
 }
@@ -252,6 +256,7 @@ CCvar::Init
 */
 bool CCvar::Init()
 {
+	PROFILER_SCOPE_FUNC();
 	if ( CommandLine()->HasParam( "dev" ) )
 	{
 		developer.SetBool( true );
@@ -267,6 +272,7 @@ CCvar::Shutdown
 */
 void CCvar::Shutdown()
 {
+	PROFILER_SCOPE_FUNC();
 	nextDLLIdentifier = 0;
 	conVarsOverriderDict.clear();
 }
@@ -937,6 +943,7 @@ CCvar::ConsolePrintf
 */
 void CCvar::ConsolePrintf( const CColor& color, const char* pFormat, ... )
 {
+	PROFILER_SCOPE_FUNC();
 	if ( pConsoleDisplayFunc )
 	{
 		va_list params;
@@ -953,6 +960,7 @@ CCvar::ConsolePrintf
 */
 void CCvar::ConsolePrintf( const char* pFormat, ... )
 {
+	PROFILER_SCOPE_FUNC();
 	if ( pConsoleDisplayFunc )
 	{
 		va_list params;

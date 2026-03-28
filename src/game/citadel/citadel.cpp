@@ -60,6 +60,7 @@ CCitadelGame::Connect
 */
 bool CCitadelGame::Connect( createInterfaceFn_t pFactory )
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
 	if ( !CGame::Connect( pFactory ) )
 	{
 		return false;
@@ -82,6 +83,7 @@ CCitadelGame::Disconnect
 */
 void CCitadelGame::Disconnect()
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
 	g_pStudioAPI = NULL;
 	CGame::Disconnect();
 }
@@ -93,6 +95,7 @@ CCitadelGame::Init
 */
 bool CCitadelGame::Init()
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
 	if ( !CGame::Init() )
 	{
 		return false;
@@ -145,6 +148,7 @@ CCitadelGame::Shutdown
 */
 void CCitadelGame::Shutdown()
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
 	Quad().Shutdown();
 	pQuadEntity	  = NULL;
 	pPlayerEntity = NULL;

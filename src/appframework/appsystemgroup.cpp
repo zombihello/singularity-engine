@@ -18,6 +18,7 @@ CAppSystemGroup::ConnectSystems
 */
 void CAppSystemGroup::Startup()
 {
+	PROFILER_SCOPE_FUNC();
 	if ( state == APPSYSTEM_GROUP_STATE_NONE )
 	{
 		// Let prepare a list of systems
@@ -38,6 +39,7 @@ CAppSystemGroup::ConnectSystems
 */
 void CAppSystemGroup::ConnectSystems()
 {
+	PROFILER_SCOPE_FUNC();
 	Startup();
 	if ( state == APPSYSTEM_GROUP_STATE_CREATED )
 	{
@@ -62,6 +64,7 @@ CAppSystemGroup::InitSystems
 */
 void CAppSystemGroup::InitSystems()
 {
+	PROFILER_SCOPE_FUNC();
 	ConnectSystems();
 	if ( state == APPSYSTEM_GROUP_STATE_CONNECTED )
 	{
@@ -91,6 +94,7 @@ CAppSystemGroup::ShutdownSystems
 */
 void CAppSystemGroup::ShutdownSystems()
 {
+	PROFILER_SCOPE_FUNC();
 	if ( state == APPSYSTEM_GROUP_STATE_INITIALIZED )
 	{
 		// Call Shutdown on all App Systems
@@ -110,6 +114,7 @@ CAppSystemGroup::DisconnectSystems
 */
 void CAppSystemGroup::DisconnectSystems()
 {
+	PROFILER_SCOPE_FUNC();
 	ShutdownSystems();
 	if ( state == APPSYSTEM_GROUP_STATE_CONNECTED )
 	{
@@ -129,6 +134,7 @@ CAppSystemGroup::Shutdown
 */
 void CAppSystemGroup::Shutdown()
 {
+	PROFILER_SCOPE_FUNC();
 	DisconnectSystems();
 	if ( state == APPSYSTEM_GROUP_STATE_CREATED )
 	{
@@ -192,6 +198,7 @@ CAppSystemGroup::LoadModule
 appModule_t CAppSystemGroup::LoadModule( const char* pDLLName )
 {
 	// See if we already loaded it..
+	PROFILER_SCOPE_FUNC();
 	for ( int32 index = (int32)modules.size(); --index >= 0; )
 	{
 		if ( modules[index].name == pDLLName )
@@ -221,6 +228,7 @@ CAppSystemGroup::LoadModule
 */
 appModule_t CAppSystemGroup::LoadModule( createInterfaceFn_t pFactory )
 {
+	PROFILER_SCOPE_FUNC();
 	if ( !pFactory )
 	{
 		Warning( "AppFramework: Unable to load module because pFactory is NULL!", pFactory );
@@ -249,6 +257,7 @@ CAppSystemGroup::AddSystem
 */
 IAppSystem* CAppSystemGroup::AddSystem( appModule_t module, const char* pInterfaceName )
 {
+	PROFILER_SCOPE_FUNC();
 	if ( module == APP_MODULE_INVALID )
 	{
 		return NULL;
@@ -291,6 +300,7 @@ CAppSystemGroup::AddSystem
 */
 void CAppSystemGroup::AddSystem( IAppSystem* pAppSystem, const char* pInterfaceName )
 {
+	PROFILER_SCOPE_FUNC();
 	if ( !pAppSystem )
 	{
 		return;
@@ -316,6 +326,7 @@ CAppSystemGroup::AddSystems
 */
 bool CAppSystemGroup::AddSystems( appSystemInfo_t* pAppSystems )
 {
+	PROFILER_SCOPE_FUNC();
 	while ( pAppSystems->pModuleName[0] )
 	{
 		appModule_t module	= LoadModule( pAppSystems->pModuleName );

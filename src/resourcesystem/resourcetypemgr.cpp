@@ -1,5 +1,7 @@
 #include "pch_resourcesystem.h"
 #include "resourcesystem/resourcetypemgr.h"
+#include "resourcesystem/resourcesystem.h"
+#include "resourcesystem/convars.h"
 
 /*
 ==================
@@ -19,7 +21,14 @@ CResourceTypeMgr::~CResourceTypeMgr
 */
 CResourceTypeMgr::~CResourceTypeMgr()
 {
+	// Uncache all resources and mark they as anonymous
 	UncacheAllResources();
+	for ( auto it = resourcesDict.begin(), itEnd = resourcesDict.end(); it != itEnd; ++it )
+	{
+		CResource* pResource = it->second;
+		pResource->AddFlags( RESOURCE_FLAG_ANONYMOUS );
+		Msg( "ResourceSystem: Resource '%s' removed from the manager (type: 0x%X)", pResource->GetName(), resourceType );
+	}
 }
 
 /*
@@ -123,8 +132,9 @@ CResourceTypeMgr::CreateResource
 */
 CRefPtr<IResource> CResourceTypeMgr::CreateResource( const char* pName, uint8 flags /* = RESOURCE_FLAG_NONE */ )
 {
-	// Try to find already exists the resource (only if we won't an anonymous resource)
 	PROFILER_SCOPE_FUNC();
+
+	// Try to find already exists the resource (only if we won't an anonymous resource)
 	bool			   bRequestedAnonymous = flags & RESOURCE_FLAG_ANONYMOUS;
 	CRefPtr<CResource> pResource		   = !bRequestedAnonymous ? FindResource( pName, false ) : NULL;
 	if ( pResource )
@@ -150,7 +160,6 @@ CRefPtr<IResource> CResourceTypeMgr::CreateResource( const char* pName, uint8 fl
 	// Create a resource
 	pResource = new CResource( this, pName, resourceType, RESOURCE_FLAG_PERMANENT | flags );
 	pResource->ChangeData( "", pResourceTypeFactory->Create() );
-	pResource->MarkUsed();
 	Msg( "ResourceSystem: Created resource '%s' (type: 0x%X)", pName, resourceType );
 
 	// Add into the manager if it need
@@ -160,6 +169,7 @@ CRefPtr<IResource> CResourceTypeMgr::CreateResource( const char* pName, uint8 fl
 	}
 
 	// We are done!
+	MarkUsedResource( pResource );
 	return pResource;
 }
 
@@ -170,12 +180,19 @@ CResourceTypeMgr::LoadResource
 */
 CRefPtr<IResource> CResourceTypeMgr::LoadResource( const char* pName, const char* pPath, uint8 flags /* = RESOURCE_FLAG_NONE */ )
 {
-	// Try to find already exists the resource (only if we won't an anonymous resource)
 	PROFILER_SCOPE_FUNC();
+
+	// Try to find already exists the resource (only if we won't an anonymous resource)
 	bool			   bRequestedAnonymous = flags & RESOURCE_FLAG_ANONYMOUS;
 	CRefPtr<CResource> pResource		   = !bRequestedAnonymous ? FindResource( pName, false ) : NULL;
 	if ( pResource )
 	{
+		// Cache the resource if it has been uncached
+		if ( !pResource->HasAnyFlags( RESOURCE_FLAG_CACHED ) && !CacheResource( pResource ) && !LoadResource( pResource, pPath ) )
+		{
+			Warning( "ResourceSystem: Resource '%s' found, but failed to cache it or load a new one from '%s' (type: 0x%X)", pName, pPath, resourceType );
+		}
+
 		return pResource;
 	}
 
@@ -223,7 +240,6 @@ CRefPtr<IResource> CResourceTypeMgr::LoadResource( const char* pName, const char
 	// Create a resource
 	pResource = new CResource( this, pName, resourceType, flags );
 	pResource->ChangeData( pPath, pData );
-	pResource->MarkUsed();
 
 	// Add into the manager if it need
 	if ( !bRequestedAnonymous )
@@ -232,6 +248,7 @@ CRefPtr<IResource> CResourceTypeMgr::LoadResource( const char* pName, const char
 	}
 
 	// We are done!
+	MarkUsedResource( pResource );
 	return pResource;
 }
 
@@ -242,8 +259,9 @@ CResourceTypeMgr::LoadResource
 */
 bool CResourceTypeMgr::LoadResource( IResource* pResource, const char* pPath ) const
 {
-	// Make sure that we have a factory for the resource type
 	PROFILER_SCOPE_FUNC();
+
+	// Make sure that we have a factory for the resource type
 	Assert( pResource );
 	CResource*	pResourceLocal = (CResource*)pResource;
 	const char* pName		   = pResourceLocal->GetName();
@@ -281,7 +299,7 @@ bool CResourceTypeMgr::LoadResource( IResource* pResource, const char* pPath ) c
 
 	// Change a data in the resource
 	pResourceLocal->ChangeData( pPath, pData );
-	pResourceLocal->MarkUsed();
+	const_cast<CResourceTypeMgr*>( this )->MarkUsedResource( pResourceLocal );
 	return true;
 }
 
@@ -308,8 +326,9 @@ CResourceTypeMgr::AddResource
 */
 void CResourceTypeMgr::AddResource( IResource* pResource )
 {
-	// Make sure that the resource is valid and has right a resource type
 	PROFILER_SCOPE_FUNC();
+
+	// Make sure that the resource is valid and has right a resource type
 	Assert( pResource );
 	if ( !Ensure( pResource->GetType() == resourceType ) )
 	{
@@ -338,8 +357,9 @@ CResourceTypeMgr::RemoveResource
 */
 void CResourceTypeMgr::RemoveResource( IResource* pResource )
 {
-	// Make sure that the resource is valid and has right a resource type
 	PROFILER_SCOPE_FUNC();
+
+	// Make sure that the resource is valid and has right a resource type
 	Assert( pResource );
 	if ( !Ensure( pResource->GetType() == resourceType ) )
 	{
@@ -354,8 +374,8 @@ void CResourceTypeMgr::RemoveResource( IResource* pResource )
 	}
 
 	// Remove the resource from the manager
-	CResource*	pResourceLocal = (CResource*)pResource;
-	const char* pName		   = pResourceLocal->GetName();
+	CRefPtr<CResource> pResourceLocal = (CResource*)pResource;
+	const char*		   pName		  = pResourceLocal->GetName();
 	resourcesDict.erase( pName );
 	pResourceLocal->AddFlags( RESOURCE_FLAG_ANONYMOUS );
 	Msg( "ResourceSystem: Resource '%s' removed from the manager (type: 0x%X)", pName, resourceType );
@@ -368,10 +388,10 @@ CResourceTypeMgr::CacheResource
 */
 bool CResourceTypeMgr::CacheResource( CResource* pResource )
 {
-	// Do nothing if the resource already cached
 	PROFILER_SCOPE_FUNC();
-	Assert( pResource );
-	Assert( pResource->GetType() == resourceType );
+
+	// Do nothing if the resource already cached
+	Assert( pResource && pResource->GetType() == resourceType );
 	if ( pResource->HasAnyFlags( RESOURCE_FLAG_CACHED ) )
 	{
 		return true;
@@ -413,8 +433,9 @@ bool CResourceTypeMgr::CacheResource( CResource* pResource )
 	Msg( "ResourceSystem: Cached resource '%s' (type: 0x%X, path: '%s', format: '%s')", pName, resourceType, pPath, pResourceTypeLoader->GetFormatName() );
 
 	// Change a data in the resource
-	pResource->ChangeData( pPath, pData );
-	pResource->MarkUsed();
+	pResource->pData = pData;
+	pResource->AddFlags( RESOURCE_FLAG_CACHED );
+	MarkUsedResource( pResource );
 	return true;
 }
 
@@ -423,13 +444,13 @@ bool CResourceTypeMgr::CacheResource( CResource* pResource )
 CResourceTypeMgr::UncacheResource
 ==================
 */
-void CResourceTypeMgr::UncacheResource( CResource* pResource )
+void CResourceTypeMgr::UncacheResource( CResource* pResource, bool bIgnorePermanent /* = false */ )
 {
-	// Do nothing if the resource has permanent flag or it already uncached
 	PROFILER_SCOPE_FUNC();
-	Assert( pResource );
-	Assert( pResource->GetType() == resourceType );
-	if ( pResource->HasAnyFlags( RESOURCE_FLAG_PERMANENT ) || !pResource->HasAnyFlags( RESOURCE_FLAG_CACHED ) )
+
+	// Do nothing if the resource has permanent flag or it already uncached
+	Assert( pResource && pResource->GetType() == resourceType );
+	if ( !pResource->HasAnyFlags( RESOURCE_FLAG_CACHED ) || ( !bIgnorePermanent && pResource->HasAnyFlags( RESOURCE_FLAG_PERMANENT ) ) )
 	{
 		return;
 	}
@@ -451,12 +472,230 @@ void CResourceTypeMgr::UncacheResource( CResource* pResource )
 
 /*
 ==================
+CResourceTypeMgr::MarkUsedResource
+==================
+*/
+void CResourceTypeMgr::MarkUsedResource( CResource* pResource )
+{
+	PROFILER_SCOPE_FUNC();
+
+	// Do nothing if the resource already marked as pending to mark used
+	Assert( pResource && pResource->GetType() == resourceType );
+	if ( pResource->bPendingMarkUsed.load( eastl::memory_order_relaxed )
+		 || pResource->HasAnyFlags( RESOURCE_FLAG_PERMANENT | RESOURCE_FLAG_ANONYMOUS | RESOURCE_FLAG_DEFAULT ) )
+	{
+		return;
+	}
+
+	// Add the resource into the pending list
+	CScopeLock scopeLock( pendingMarkUsedResourcesMutex );
+	pendingMarkUsedResourcesWriteList.emplace_back( pResource );
+	pResource->bPendingMarkUsed.store( true, eastl::memory_order_release );
+}
+
+/*
+==================
+CResourceTypeMgr::LinkResourceToLruTail
+==================
+*/
+void CResourceTypeMgr::LinkResourceToLruTail( CResource* pResource )
+{
+	PROFILER_SCOPE_FUNC();
+
+	// Do nothing if the resource already in the lru list
+	Assert( pResource && pResource->GetType() == resourceType );
+	if ( pResource->bInLruList )
+	{
+		return;
+	}
+
+	// Add the resource into the lru list
+	lruResourcesList.emplace_back( pResource );
+	pResource->lruIt	  = --lruResourcesList.cend();
+	pResource->bInLruList = true;
+}
+
+/*
+==================
+CResourceTypeMgr::MoveResourceToLruTail
+==================
+*/
+void CResourceTypeMgr::MoveResourceToLruTail( CResource* pResource )
+{
+	PROFILER_SCOPE_FUNC();
+
+	// Do nothing if the resource isn't in the lru list
+	Assert( pResource && pResource->GetType() == resourceType );
+	if ( !pResource->bInLruList )
+	{
+		return;
+	}
+
+	// Move the resource to the end of the lru list
+	lruResourcesList.splice( lruResourcesList.end(), lruResourcesList, pResource->lruIt );
+}
+
+/*
+==================
+CResourceTypeMgr::UnlinkResourceFromLru
+==================
+*/
+void CResourceTypeMgr::UnlinkResourceFromLru( CResource* pResource )
+{
+	PROFILER_SCOPE_FUNC();
+
+	// Do nothing if the resource isn't in the lru list
+	Assert( pResource && pResource->GetType() == resourceType );
+	if ( !pResource->bInLruList )
+	{
+		return;
+	}
+
+	// Unlink the resource from the lru list
+	lruResourcesList.erase( pResource->lruIt );
+	pResource->bInLruList = false;
+}
+
+/*
+==================
 CResourceTypeMgr::UncacheAllResources
 ==================
 */
 void CResourceTypeMgr::UncacheAllResources()
 {
 	PROFILER_SCOPE_FUNC();
+
+	// Before uncache all resources we have to update the lru list
+	ProcessPendingMarkUsedResources();
+
+	// Do nothing if the lru list is empty
+	if ( lruResourcesList.empty() )
+	{
+		return;
+	}
+
+	// Uncache all resources
+	for ( auto it = lruResourcesList.begin(), itEnd = lruResourcesList.end(); it != itEnd; ++it )
+	{
+		// Skip a resource if it isn't valid
+		CResource* pResource = *it;
+		if ( !pResource )
+		{
+			continue;
+		}
+
+		// Uncache the resource
+		UncacheResource( pResource );
+		if ( pResource->GetRefCount() <= 1 )
+		{
+			RemoveResource( pResource );
+		}
+		else
+		{
+			pResource->bInLruList = false;
+		}
+	}
+
+	// Clear the lru list
+	lruResourcesList.clear();
+}
+
+/*
+==================
+CResourceTypeMgr::ProcessPendingMarkUsedResources
+==================
+*/
+void CResourceTypeMgr::ProcessPendingMarkUsedResources()
+{
+	PROFILER_SCOPE_FUNC();
+
+	// Swap write and read lists
+	{
+		CScopeLock scopeLock( pendingMarkUsedResourcesMutex );
+		S_Swap( pendingMarkUsedResourcesWriteList, pendingMarkUsedResourcesReadList );
+	}
+
+	// Do nothing if the read list is empty
+	if ( pendingMarkUsedResourcesReadList.empty() )
+	{
+		return;
+	}
+
+	// Mark as used each resource in the read list
+	uint64 frameNumber = g_resourceSystem.GetFrameNumber();
+	for ( auto it = pendingMarkUsedResourcesReadList.begin(), itEnd = pendingMarkUsedResourcesReadList.end(); it != itEnd; ++it )
+	{
+		// Skip invalid resource or that already used at the frame or that has some flags
+		CResource* pResource = *it;
+		if ( !pResource
+			 || !pResource->HasAnyFlags( RESOURCE_FLAG_CACHED )
+			 || pResource->HasAnyFlags( RESOURCE_FLAG_PERMANENT | RESOURCE_FLAG_ANONYMOUS | RESOURCE_FLAG_DEFAULT ) )
+		{
+			continue;
+		}
+
+		// Mark the resource as used
+		pResource->bPendingMarkUsed.store( false, eastl::memory_order_release );
+		pResource->lastUsedFrame = frameNumber;
+		if ( pResource->bInLruList )
+		{
+			MoveResourceToLruTail( pResource );
+		}
+		else
+		{
+			LinkResourceToLruTail( pResource );
+		}
+	}
+
+	// Clear the read list
+	pendingMarkUsedResourcesReadList.clear();
+}
+
+/*
+==================
+CResourceTypeMgr::ProcessLruResources
+==================
+*/
+void CResourceTypeMgr::ProcessLruResources()
+{
+	PROFILER_SCOPE_FUNC();
+
+	// Do nothing if the lru list is empty
+	if ( lruResourcesList.empty() )
+	{
+		return;
+	}
+
+	// Uncache all unused resources
+	uint64		 frameNumber	   = g_resourceSystem.GetFrameNumber();
+	const uint64 expireFrameNumber = frameNumber - S_Min<uint64>( frameNumber, resSys_unusedFrameThreshold.GetInt() );
+	while ( !lruResourcesList.empty() )
+	{
+		// Remove a resource if it isn't valid
+		CResource* pResource = lruResourcesList.front();
+		if ( !pResource )
+		{
+			lruResourcesList.pop_front();
+			continue;
+		}
+
+		// Since the lru list is sorted by "recency", then as soon as a fresh resource is found,
+		// you don't need to look further
+		if ( pResource->lastUsedFrame >= expireFrameNumber )
+		{
+			break;
+		}
+
+		// Uncache the resource
+		UncacheResource( pResource );
+		UnlinkResourceFromLru( pResource );
+
+		// Remove the resource from the manager if it last reference
+		if ( pResource->GetRefCount() <= 1 )
+		{
+			RemoveResource( pResource );
+		}
+	}
 }
 
 /*
@@ -467,6 +706,8 @@ CResourceTypeMgr::FrameUpdate
 void CResourceTypeMgr::FrameUpdate()
 {
 	PROFILER_SCOPE_FUNC();
+	ProcessPendingMarkUsedResources();
+	ProcessLruResources();
 }
 
 /*
@@ -479,11 +720,13 @@ void CResourceTypeMgr::SetDefaultResource( IResource* pResource )
 	if ( pDefaultResource )
 	{
 		pDefaultResource->RemoveFlags( RESOURCE_FLAG_DEFAULT );
+		UnlinkResourceFromLru( pDefaultResource );
 	}
 	pDefaultResource = (CResource*)pResource;
 	if ( pDefaultResource )
 	{
 		pDefaultResource->AddFlags( RESOURCE_FLAG_DEFAULT );
+		UnlinkResourceFromLru( pDefaultResource );
 	}
 }
 

@@ -40,17 +40,19 @@ public:
 	CResource( CResourceTypeMgr* pOwner, const char* pName, resourceType_t type, uint8 flags = RESOURCE_TYPE_NONE );
 	~CResource();
 
+	void ChangeData( const char* pPath, void* pData );
+	void Uncache( bool bIgnorePermanent );
 	void AddFlags( uint8 flags );
 	void RemoveFlags( uint8 flags );
-	void ChangeData( const char* pPath, void* pData );
 
 private:
 	resourceType_t							type;
-	uint8									flags;
+	eastl::atomic<uint8>					flags;
+	eastl::atomic<bool>						bPendingMarkUsed;
 	bool									bInLruList;
 	void*									pData;
 	CResourceTypeMgr*						pOwner;
-	uint64									lastUsedFrame;
+	uint64									lastUsedFrame; 
 	eastl::string							name;
 	eastl::string							path;
 	eastl::list<CResource*>::const_iterator lruIt;

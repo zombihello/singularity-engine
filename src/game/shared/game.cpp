@@ -28,6 +28,8 @@ CGame::Connect
 */
 bool CGame::Connect( createInterfaceFn_t pFactory )
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
+
 	// Connect Tier1 and register cvars
 	if ( !ConnectTier1( pFactory ) )
 	{
@@ -66,6 +68,7 @@ CGame::Disconnect
 */
 void CGame::Disconnect()
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
 	ConVar_Unregister();
 	DisconnectTier1();
 
@@ -81,6 +84,8 @@ CGame::Init
 */
 bool CGame::Init()
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
+
 	// Register GameFramework ECS modules and initialize the world
 	extern void EcsInitModules_Gameframework();
 	EcsInitModules_Gameframework();
@@ -108,6 +113,8 @@ CGame::Shutdown
 */
 void CGame::Shutdown()
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
+
 	// Unregister all render objects
 	g_pStudioRender->UnregisterAllObjects();
 
@@ -125,6 +132,8 @@ CGame::MapInit
 */
 bool CGame::MapInit( const char* pPath )
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
+
 	// Shutdown the old map
 	MapShutdown();
 
@@ -149,6 +158,8 @@ CGame::MapShutdown
 */
 void CGame::MapShutdown()
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
+
 	// Reset the active map
 	if ( pActiveEcsMap )
 	{
@@ -156,6 +167,9 @@ void CGame::MapShutdown()
 		pActiveEcsMap = NULL;
 		Msg( "Game: Active map unloaded" );
 	}
+
+	// Uncache all resources
+	g_pResourceSystem->UncacheAllResources();
 }
 
 /*
@@ -165,6 +179,7 @@ CGame::FrameUpdate
 */
 void CGame::FrameUpdate()
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
 	if ( pActiveEcsMap )
 	{
 		pActiveEcsMap->Update( 0.f );

@@ -17,6 +17,8 @@ CMaterialSystem::Connect
 */
 bool CMaterialSystem::Connect( createInterfaceFn_t pFactory )
 {
+	PROFILER_SCOPE_FUNC();
+
 	// Connect Tier1
 	if ( !ConnectTier1( pFactory ) )
 	{
@@ -63,6 +65,7 @@ CMaterialSystem::Disconnect
 */
 void CMaterialSystem::Disconnect()
 {
+	PROFILER_SCOPE_FUNC();
 	g_pResourceSystem	= NULL;
 	g_pStudioRender		= NULL;
 	g_pShaderMgr		= NULL;
@@ -91,6 +94,8 @@ CMaterialSystem::Init
 */
 bool CMaterialSystem::Init()
 {
+	PROFILER_SCOPE_FUNC();
+
 	// Initialize the shader manager
 	g_pShaderMgr->Init();
 
@@ -146,6 +151,8 @@ CMaterialSystem::Shutdown
 */
 void CMaterialSystem::Shutdown()
 {
+	PROFILER_SCOPE_FUNC();
+
 	// Unregister all material resource types
 	g_pResourceSystem->RemoveResourceManagerForType<CMaterial>();
 	g_pResourceSystem->RemoveResourceManagerForType<CTexture>();

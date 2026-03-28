@@ -14,6 +14,8 @@ ConnectTier1
 */
 bool ConnectTier1( createInterfaceFn_t pFactory )
 {
+	PROFILER_SCOPE_FUNC();
+
 	// Do nothing if Tier1 already is connected
 	if ( s_bConnected )
 	{
@@ -52,6 +54,8 @@ DisconnectTier1
 */
 void DisconnectTier1()
 {
+	PROFILER_SCOPE_FUNC();
+
 	// Do nothing if Tier1 already is disconnected
 	if ( !s_bConnected )
 	{

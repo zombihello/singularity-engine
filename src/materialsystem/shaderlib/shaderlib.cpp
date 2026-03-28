@@ -24,6 +24,8 @@ CShaderLib::Connect
 */
 bool CShaderLib::Connect( createInterfaceFn_t pFactory )
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+
 	// Connect Tier1
 	if ( !ConnectTier1( pFactory ) )
 	{
@@ -68,6 +70,8 @@ CShaderLib::Disconnect
 */
 void CShaderLib::Disconnect()
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+
 	// Disconnect Tier1
 	DisconnectTier1();
 	g_pStudioAPI	= NULL;
@@ -82,6 +86,7 @@ CShaderLib::Init
 */
 void CShaderLib::Init( uint32 shaderLibIndex )
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( index == INVALID_INDEX && shaderLibIndex != INVALID_INDEX );
 	index = shaderLibIndex;
 }
@@ -93,6 +98,7 @@ CShaderLib::Shutdown
 */
 void CShaderLib::Shutdown()
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	for ( uint32 shaderIdx = 0, numShaders = (uint32)shaders.size(); shaderIdx < numShaders; ++shaderIdx )
 	{
 		shaders[shaderIdx]->Shutdown();

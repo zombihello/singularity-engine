@@ -1,5 +1,6 @@
 #include "pch_resourcesystem.h"
 #include "resourcesystem/resource.h"
+#include "resourcesystem/resourcetypemgr.h"
 #include "resourcesystem/resourcesystem.h"
 
 /*
@@ -9,12 +10,14 @@ CResource::CResource
 */
 CResource::CResource( CResourceTypeMgr* pOwner, const char* pName, resourceType_t type, uint8 flags /* = RESOURCE_TYPE_NONE */ )
 	: type( type )
-	, flags( RESOURCE_FLAG_ANONYMOUS | flags )
+	, bInLruList( false )
 	, pData( NULL )
 	, pOwner( pOwner )
-	, lastUsedFrame( 0 )
+	, lastUsedFrame( g_resourceSystem.GetFrameNumber() )
 	, name( pName )
 {
+	CResource::flags.store( RESOURCE_FLAG_ANONYMOUS | flags, eastl::memory_order_release );
+	bPendingMarkUsed.store( false, eastl::memory_order_release );
 }
 
 /*
@@ -24,7 +27,6 @@ CResource::~CResource
 */
 CResource::~CResource()
 {
-	RemoveFlags( RESOURCE_FLAG_PERMANENT );
 	Uncache();
 }
 
@@ -43,12 +45,22 @@ bool CResource::Cache()
 CResource::Uncache
 ==================
 */
-void CResource::Uncache()
+void CResource::Uncache( bool bIgnorePermanent )
 {
 	if ( Ensure( pOwner ) )
 	{
-		pOwner->UncacheResource( this );
+		pOwner->UncacheResource( this, bIgnorePermanent );
 	}
+}
+
+/*
+==================
+CResource::Uncache
+==================
+*/
+void CResource::Uncache()
+{
+	Uncache( false );
 }
 
 /*
@@ -58,6 +70,10 @@ CResource::MarkUsed
 */
 void CResource::MarkUsed()
 {
+	if ( Ensure( pOwner ) )
+	{
+		pOwner->MarkUsedResource( this );
+	}
 }
 
 /*
@@ -90,7 +106,7 @@ CResource::HasAllFlags
 */
 bool CResource::HasAllFlags( uint8 flags ) const
 {
-	return ( CResource::flags & flags ) == flags;
+	return ( CResource::flags.load( eastl::memory_order_relaxed ) & flags ) == flags;
 }
 
 /*
@@ -100,7 +116,7 @@ CResource::HasAnyFlags
 */
 bool CResource::HasAnyFlags( uint8 flags ) const
 {
-	return ( CResource::flags & flags ) != 0;
+	return ( CResource::flags.load( eastl::memory_order_relaxed ) & flags ) != 0;
 }
 
 /*

@@ -7,7 +7,7 @@ CResource::AddFlags
 */
 FORCEINLINE void CResource::AddFlags( uint8 flags )
 {
-	CResource::flags |= flags;
+	CResource::flags.fetch_or( flags, eastl::memory_order_release );
 }
 
 /*
@@ -17,7 +17,7 @@ CResource::RemoveFlags
 */
 FORCEINLINE void CResource::RemoveFlags( uint8 flags )
 {
-	CResource::flags &= ~flags;
+	CResource::flags.fetch_and( ~flags, eastl::memory_order_release );
 }
 
 /*
@@ -30,8 +30,7 @@ FORCEINLINE void CResource::ChangeData( const char* pPath, void* pData )
 	// Uncache an old data
 	if ( CResource::pData )
 	{
-		CGuardValue<uint8> guardValue( flags, flags & ~RESOURCE_FLAG_PERMANENT );
-		Uncache();
+		Uncache( true );
 	}
 
 	// Set a new data
