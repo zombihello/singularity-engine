@@ -1,5 +1,6 @@
 #include "pch_game_shared.h"
 #include "resourcesystem/iresourcesystem.h"
+#include "resourcesystem/resourceptr.h"
 #include "game/ientitydesc.h"
 #include "game/shared/game.h"
 #include "game/shared/ecs/ecs_entitydesc.h"
@@ -46,11 +47,12 @@ void CEcsMap::Init( const CSMAPCompiledMapDoc& smapCompiledDoc )
 	Reset();
 
 	// Create entities
-	const eastl::vector<CSMAPEntity>& smapEntities = smapCompiledDoc.GetEntities();
+	const eastl::vector<CSMAPEntity>& smapEntities	 = smapCompiledDoc.GetEntities();
+	IResourceTypeMgr*				  pEntityDescMgr = g_pResourceSystem->GetResourceManagerForType<IEntityDesc>();
 	for ( uint32 entityIdx = 0, numEntities = (uint32)smapEntities.size(); entityIdx < numEntities; ++entityIdx )
 	{
 		const CSMAPEntity&		  smapEntity  = smapEntities[entityIdx];
-		CResourcePtr<IEntityDesc> pEntityDesc = g_pResourceSystem->FindOrLoadResource( smapEntity.GetClassName(), RESOURCE_TYPE_ENTITY_DESC );
+		CResourcePtr<IEntityDesc> pEntityDesc = pEntityDescMgr->LoadResource( smapEntity.GetClassName() );
 		if ( !pEntityDesc )
 		{
 			Warning( "Game: Entity descriptor '%s' not found for entity %i (name: '%s')", smapEntity.GetClassName(), entityIdx, smapEntity.GetName() );

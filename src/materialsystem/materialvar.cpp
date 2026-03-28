@@ -1,5 +1,6 @@
 #include "pch_materialsystem.h"
 #include "materialsystem/material.h"
+#include "materialsystem/texture.h"
 #include "materialsystem/materialvar.h"
 
 /*
@@ -7,10 +8,10 @@
 CMaterialVar::CMaterialVar
 ==================
 */
-CMaterialVar::CMaterialVar( IMaterial* pMaterial, const char* pName )
+CMaterialVar::CMaterialVar( CMaterial* pMaterial, const char* pName )
 	: pName( pName )
 	, type( MATERIALVAR_TYPE_UNDEFINED )
-	, pOwningMaterial( (CMaterial*)pMaterial )
+	, pOwningMaterial( pMaterial )
 {
 }
 
@@ -270,7 +271,7 @@ const char* CMaterialVar::GetStringValue() const
 CMaterialVar::SetTextureValue
 ==================
 */
-void CMaterialVar::SetTextureValue( ITexture* pValue )
+void CMaterialVar::SetTextureValue( IResource* pValue )
 {
 	pTextureValue = pValue;
 	type		  = MATERIALVAR_TYPE_TEXTURE;
@@ -285,7 +286,7 @@ void CMaterialVar::SetTextureValue( ITexture* pValue )
 CMaterialVar::GetTextureValue
 ==================
 */
-ITexture* CMaterialVar::GetTextureValue() const
+IResource* CMaterialVar::GetTextureValue() const
 {
 	return type == MATERIALVAR_TYPE_TEXTURE ? pTextureValue : NULL;
 }
@@ -295,9 +296,9 @@ ITexture* CMaterialVar::GetTextureValue() const
 CMaterialVar::SetMaterialValue
 ==================
 */
-void CMaterialVar::SetMaterialValue( IMaterial* pValue )
+void CMaterialVar::SetMaterialValue( IResource* pValue )
 {
-	pMaterialValue = (CMaterial*)pValue;
+	pMaterialValue = pValue;
 	type		   = MATERIALVAR_TYPE_MATERIAL;
 	if ( pOwningMaterial )
 	{
@@ -310,7 +311,7 @@ void CMaterialVar::SetMaterialValue( IMaterial* pValue )
 CMaterialVar::GetMaterialValue
 ==================
 */
-IMaterial* CMaterialVar::GetMaterialValue() const
+IResource* CMaterialVar::GetMaterialValue() const
 {
 	return type == MATERIALVAR_TYPE_MATERIAL ? pMaterialValue : NULL;
 }

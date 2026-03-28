@@ -28,8 +28,9 @@ BEGIN_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 
 	SHADER_INIT_PARAMS
 	{
+		IResourceTypeMgr* pTexturesMgr = g_pResourceSystem->GetResourceManagerForType<ITexture>();
 		pParams[COLOR]->SetVecValue( vector4_t( 1.f, 1.f, 1.f, 1.f ) );
-		pParams[BASETEXTURE]->SetTextureValue( (ITexture*)g_pResourceSystem->GetDefaultResource( RESOURCE_TYPE_TEXTURE )->GetData() );
+		pParams[BASETEXTURE]->SetTextureValue( pTexturesMgr->GetDefaultResource() );
 	}
 
 	SHADER_UPDATE_BUFFERS
@@ -45,9 +46,9 @@ BEGIN_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 	SHADER_BARRIER
 	{
 		// TODO BS yehor.pohuliaka - Add the ability to get the queue type from IStudioAPICmdList
-		ITexture*		   pTexture			   = (ITexture*)pParams[BASETEXTURE]->GetTextureValue();
-		ITextureResource*  pTextureResource	   = pTexture->GetStudioResource();
-		studioAPIBarrier_t studioAPIBarriers[] = {
+		CResourcePtr<ITexture> pTexture			   = pParams[BASETEXTURE]->GetTextureValue();
+		ITextureResource*	   pTextureResource	   = pTexture->GetStudioResource();
+		studioAPIBarrier_t	   studioAPIBarriers[] = {
 			StudioAPI_MakeTextureBarrier( pTextureResource->GetStudioAPITexture(), STUDIOAPI_TEXTURE_LAYOUT_SHADER_RESOURCE_READONLY, STUDIOAPI_QUEUE_TYPE_GRAPHICS ),
 			StudioAPI_MakeBufferBarrier( pStudioAPIBuffers[RES_BUFFER0], STUDIOAPI_BUFFER_STATE_CONSTANT_BUFFER, STUDIOAPI_QUEUE_TYPE_GRAPHICS )
 		};
@@ -68,8 +69,8 @@ BEGIN_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 
 	SHADER_DRAW
 	{
-		ITexture*		  pTexture		   = pParams[BASETEXTURE]->GetTextureValue();
-		ITextureResource* pTextureResource = pTexture->GetStudioResource();
+		CResourcePtr<ITexture> pTexture			= pParams[BASETEXTURE]->GetTextureValue();
+		ITextureResource*	   pTextureResource = pTexture->GetStudioResource();
 		RES_BASETEXTURE.SetTexture( pStudioAPICmdList, pTextureResource->GetStudioAPITexture() );
 		RES_BASESAMPLER.SetSampler( pStudioAPICmdList, pTextureResource->GetStudioAPISampler() );
 		RES_BUFFER0.SetConstantBuffer( pStudioAPICmdList, pStudioAPIBuffers[RES_BUFFER0] );

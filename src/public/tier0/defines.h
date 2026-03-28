@@ -53,6 +53,9 @@
 #define CONCAT( X, Y )						CONCAT_IMPL( X, Y )
 #define ARRAYSIZE( Array )					( sizeof( Array ) / sizeof( ( Array )[0] ) )
 #define OFFSET_OF( Struct, Member )			( ( ptrint ) & ( (Struct*)0 )->Member )
+#define BIT( Bit )							( 1 << Bit )
+#define STRINGIFY_IMPL( X )					#X
+#define STRINGIFY( X )						STRINGIFY_IMPL( X )
 #define PACK_VERSION( Major, Minor, Patch ) ( (uint32)Major << 24 | (uint32)Minor << 16 | Patch )
 #define UNPACK_VERSION( Version, Major, Minor, Patch ) \
 	{                                                  \
@@ -60,6 +63,3 @@
 		Minor = ( (uint32)Version >> 16 ) & 0xFF;      \
 		Patch = (uint32)Version & 0xFFFF;              \
 	}
-#define BIT( Bit )			( 1 << Bit )
-#define STRINGIFY_IMPL( X ) #X
-#define STRINGIFY( X )		STRINGIFY_IMPL( X )

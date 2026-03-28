@@ -1,6 +1,7 @@
 #pragma once
 #include "studiorender/istudio_renderobject.h"
 #include "studiorender/studioapi/istudioapi_buffer.h"
+#include "resourcesystem/resourceptr.h"
 #include "materialsystem/imaterial.h"
 
 //-----------------------------------------------------------------------------
@@ -9,7 +10,7 @@
 class CStudioRenderObjectQuad : public CRefCounted<IStudioRenderObject>
 {
 public:
-	CStudioRenderObjectQuad( IStudioAPIBuffer* pStudioAPIVertexBuffer, IStudioAPIBuffer* pStudioAPIIndexBuffer, IMaterial* pMaterial )
+	CStudioRenderObjectQuad( IStudioAPIBuffer* pStudioAPIVertexBuffer, IStudioAPIBuffer* pStudioAPIIndexBuffer, IResource* pMaterial )
 		: pStudioAPIVertexBuffer( pStudioAPIVertexBuffer )
 		, pStudioAPIIndexBuffer( pStudioAPIIndexBuffer )
 		, pMaterial( pMaterial )
@@ -18,10 +19,10 @@ public:
 
 	FORCEINLINE IStudioAPIBuffer* GetStudioAPIVertexBuffer() const { return pStudioAPIVertexBuffer; }
 	FORCEINLINE IStudioAPIBuffer* GetStudioAPIIndexBuffer() const { return pStudioAPIIndexBuffer; }
-	FORCEINLINE IMaterial* GetMaterial() const { return pMaterial; }
+	FORCEINLINE IMaterial*		  GetMaterial() const { return *pMaterial; }
 
 public:
 	CRefPtr<IStudioAPIBuffer> pStudioAPIVertexBuffer;
 	CRefPtr<IStudioAPIBuffer> pStudioAPIIndexBuffer;
-	CRefPtr<IMaterial>		  pMaterial;
+	CResourcePtr<IMaterial>	  pMaterial;
 };

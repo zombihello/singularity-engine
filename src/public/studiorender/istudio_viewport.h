@@ -13,9 +13,9 @@ public:
 	virtual void Init( windowHandle_t windowHandle, uint32 width, uint32 height, bool bUseVSync = false ) = 0;
 	virtual void Destroy()																				  = 0;
 
-	virtual void Resize( uint32 newWidth, uint32 newHeight )						   = 0;
-	virtual void Update( float deltaSeconds )										   = 0;
-	virtual void DrawFrame( bool bShouldPresent = true, bool bFlushRenderCmds = true ) = 0;
+	virtual void Resize( uint32 newWidth, uint32 newHeight ) = 0;
+	virtual void Update( float deltaSeconds )				 = 0;
+	virtual void DrawFrame( bool bShouldPresent = true )	 = 0;
 
 	virtual void SetViewportClient( IStudioViewportClient* pStudioViewportClient ) = 0;
 

@@ -5,6 +5,7 @@
 #include "appframework/appsystemgroup_windowmgr.h"
 #include "studiorender/istudio_viewport.h"
 #include "studiorender/istudio_renderresource.h"
+#include "resourcesystem/iresourcesystem.h"
 #include "game/igame.h"
 #include "launcher/convars.h"
 #include "launcher/appsystemgroup_engine.h"
@@ -76,8 +77,10 @@ CLauncherApp::Init
 */
 void CLauncherApp::Init()
 {
-	// Load gameinfo.txt
 	BaseClass::Init();
+	PROFILER_SCOPE_FUNC();
+
+	// Load gameinfo.txt
 	const char* pGameDir = CommandLine()->HasParam( "game" ) ? CommandLine()->GetFirstValue( "game" ) : pDefaultGameDir;
 	if ( !gameInfo.LoadFromFile( S_Sprintf( "//base_path/%s/gameinfo.txt", pGameDir ).c_str() ) )
 	{
@@ -114,10 +117,11 @@ void CLauncherApp::Init()
 	g_pCvar->OverrideConVarsFromCommandLine();
 
 	// Get all systems
-	g_pWindowMgr	= (IWindowMgr*)FindSystem( WINDOWMGR_INTERFACE_VERSION );
-	g_pInputSystem	= (IInputSystem*)FindSystem( INPUTSYSTEM_INTERFACE_VERSION );
-	g_pStudioRender = (IStudioRender*)FindSystem( STUDIORENDER_INTERFACE_VERSION );
-	g_pGame			= (IGame*)FindSystem( GAME_INTERFACE_VERSION );
+	g_pWindowMgr	  = (IWindowMgr*)FindSystem( WINDOWMGR_INTERFACE_VERSION );
+	g_pInputSystem	  = (IInputSystem*)FindSystem( INPUTSYSTEM_INTERFACE_VERSION );
+	g_pStudioRender	  = (IStudioRender*)FindSystem( STUDIORENDER_INTERFACE_VERSION );
+	g_pResourceSystem = (IResourceSystem*)FindSystem( RESOURCESYSTEM_INTERFACE_VERSION );
+	g_pGame			  = (IGame*)FindSystem( GAME_INTERFACE_VERSION );
 
 	// Initialize WindowMgr group
 	windowMgrSystemGroup.InitSystems();
@@ -199,8 +203,12 @@ int32 CLauncherApp::Main()
 		pProfiler->Update();
 #endif	// ENABLE_PROFILING
 
-		// Update a game logic frame and draw it
+		// Update the resource system and the game
+		g_pResourceSystem->FrameUpdate();
 		g_pGame->FrameUpdate();
+
+		// Flush render commands and draw the frame
+		Studio_FlushRenderCommands();
 		pStudioViewport->DrawFrame();
 
 		// Go to next profiler frame
@@ -221,6 +229,8 @@ CLauncherApp::Shutdown
 */
 void CLauncherApp::Shutdown()
 {
+	PROFILER_SCOPE_FUNC();
+
 	// Detach the input system from the window
 	g_pInputSystem->DetachFromWindow();
 
@@ -236,14 +246,12 @@ void CLauncherApp::Shutdown()
 		onChangedMainWindowHandle = INVALID_HANDLE;
 	}
 
-	// Shutdown the viewport
+	// Destroy the viewport and the main window
 	if ( pStudioViewport )
 	{
 		pStudioViewport->Destroy();
 		pStudioViewport = NULL;
 	}
-
-	// Destroy the main window
 	g_pWindowMgr->DestroyWindow( g_pWindowMgr->GetMainWindowId() );
 
 	// Remove all our groups
@@ -331,6 +339,7 @@ CLauncherApp::OnChangedMainWindow
 */
 void CLauncherApp::OnChangedMainWindow( void* pUserData, windowId_t newMainWindowId )
 {
+	PROFILER_SCOPE_FUNC();
 	CConVarRef	  r_vsyncRef( "r_vsync" );
 	IWindow*	  pMainWindow = g_pWindowMgr->GetWindow( newMainWindowId );
 	vector2i_t	  windowSize  = pMainWindow->GetSize();

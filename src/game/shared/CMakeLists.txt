@@ -19,8 +19,8 @@ set( SRC_DIR							${CMAKE_CURRENT_SOURCE_DIR} )
 set( GENERATED_DIR						${CMAKE_CURRENT_BINARY_DIR} )
 
 set( SRC_PATTERNS						"${SRC_DIR}/*.h" "${SRC_DIR}/*.inl" "${SRC_DIR}/*.cpp" "${SRC_DIR}/*.ecs" )
-set( PUBLIC_SRC_PATTERNS				"${PUBLIC_SRC_DIR}/game/shared/*.h" "${PUBLIC_SRC_DIR}/game/shared/*.inl" 
-										"${PUBLIC_SRC_DIR}/game/shared/*.cpp" "${PUBLIC_SRC_DIR}/game/shared/*.ecs" )
+set( PUBLIC_SRC_PATTERNS				"${PUBLIC_SRC_DIR}/game/*.h" "${PUBLIC_SRC_DIR}/game/*.inl"
+										"${PUBLIC_SRC_DIR}/game/*.cpp" "${PUBLIC_SRC_DIR}/game/*.ecs" )
 set( GENERATED_SRC_PATTERNS				"${GENERATED_DIR}/*.h" "${GENERATED_DIR}/*.inl" "${GENERATED_DIR}/*.cpp"
 										"${GENERATED_DIR}/*.hxx" "${GENERATED_DIR}/*.cxx" )
 

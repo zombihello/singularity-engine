@@ -46,7 +46,7 @@ private:
 //-----------------------------------------------------------------------------
 // A texture
 //-----------------------------------------------------------------------------
-class CTexture : public CRefCounted<ITexture>
+class CTexture : public ITexture
 {
 public:
 	// ITexture interface
@@ -61,6 +61,7 @@ public:
 	virtual ITextureResource*	   GetStudioResource() const override;
 
 	CTexture();
+	~CTexture();
 
 private:
 	studioAPITextureType_t		   type;
@@ -70,3 +71,5 @@ private:
 	CRefPtr<CTextureResource>	   pStudioResource;
 	eastl::vector<textureMipMap_t> mipmaps;
 };
+
+DECLARE_RESOURCE_TYPE( CTexture, RESOURCE_TYPE_TEXTURE );

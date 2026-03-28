@@ -233,7 +233,7 @@ void CStudioViewport::Update( float deltaSeconds )
 CStudioViewport::DrawFrame
 ==================
 */
-void CStudioViewport::DrawFrame( bool bShouldPresent /* = true */, bool bFlushRenderCmds /* = true */ )
+void CStudioViewport::DrawFrame( bool bShouldPresent /* = true */ )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
@@ -252,11 +252,6 @@ void CStudioViewport::DrawFrame( bool bShouldPresent /* = true */, bool bFlushRe
 	g_StudioRender.EndFrame();
 
 	// Draw the viewport
-	if ( bFlushRenderCmds )
-	{
-		Studio_FlushRenderCommands();
-	}
-
 	UNIQUE_RENDER_COMMAND_TWOPARAMETER( CStudioRenderCmd_DrawFrame,
 										CStudioViewport*, pStudioViewport, this,
 										bool, bShouldPresent, bShouldPresent,

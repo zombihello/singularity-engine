@@ -2,6 +2,7 @@
 #include "tier1/refcount.h"
 #include "studiorender/studioapi/istudioapi_texture.h"
 #include "studiorender/istudio_renderresource.h"
+#include "resourcesystem/iresourcetype.h"
 
 //-----------------------------------------------------------------------------
 // Texture mip map info
@@ -34,7 +35,7 @@ public:
 //-----------------------------------------------------------------------------
 // A texture interface
 //-----------------------------------------------------------------------------
-class ITexture : public IRefCounted
+class ITexture
 {
 public:
 	virtual ~ITexture() {}
@@ -49,3 +50,5 @@ public:
 	virtual uint32				   GetNumLayers() const			   = 0;
 	virtual ITextureResource*	   GetStudioResource() const	   = 0;
 };
+
+DECLARE_RESOURCE_TYPE( ITexture, RESOURCE_TYPE_TEXTURE );

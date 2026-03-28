@@ -1,6 +1,4 @@
 #pragma once
-#include <stack>
-
 #include "materialsystem/imaterial.h"
 #include "studiorender/istudiorender.h"
 #include "studiorender/studioapi/istudioapi_swapchain.h"
@@ -47,7 +45,7 @@ public:
 	virtual CRefPtr<IStudioRenderPipelineSet> CreateRenderPipelineSet() const override;
 
 	// NOTE: FOR TEST ONLY!
-	virtual CRefPtr<IStudioRenderObject> CreateQuadRenderObject( IMaterial* pMaterial, IStudioAPIBuffer* pVertexBuffer, IStudioAPIBuffer* pIndexBuffer ) const override;
+	virtual CRefPtr<IStudioRenderObject> CreateQuadRenderObject( IResource* pMaterial, IStudioAPIBuffer* pVertexBuffer, IStudioAPIBuffer* pIndexBuffer ) const override;
 
 	// Returns a command buffer of the render thread. If return NULL it's mean what StudioRender don't use render thread
 	virtual IStudioCmdBuffer* GetCommandBuffer() const override;

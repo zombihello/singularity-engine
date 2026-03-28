@@ -155,6 +155,16 @@ CTexture::CTexture()
 
 /*
 ==================
+CTexture::~CTexture
+==================
+*/
+CTexture::~CTexture()
+{
+	Destroy();
+}
+
+/*
+==================
 CTexture::Init
 ==================
 */

@@ -60,6 +60,7 @@ CCitadelGame::Connect
 */
 bool CCitadelGame::Connect( createInterfaceFn_t pFactory )
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
 	if ( !CGame::Connect( pFactory ) )
 	{
 		return false;
@@ -82,6 +83,7 @@ CCitadelGame::Disconnect
 */
 void CCitadelGame::Disconnect()
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
 	g_pStudioAPI = NULL;
 	CGame::Disconnect();
 }
@@ -93,6 +95,7 @@ CCitadelGame::Init
 */
 bool CCitadelGame::Init()
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
 	if ( !CGame::Init() )
 	{
 		return false;
@@ -110,7 +113,8 @@ bool CCitadelGame::Init()
 														   { { -0.5f, 0.5f, 0.f, 1.f }, { -1.f, 1.f }, { 255, 255, 255 } } };
 			uint16						quadIndices[]  = { 0, 1, 2, 2, 3, 0 };
 
-			CResourcePtr<IMaterial>	  pMaterial				 = g_pResourceSystem->FindOrLoadResource( "materials/nelson", RESOURCE_TYPE_MATERIAL );
+			IResourceTypeMgr*		  pMaterialsMgr			 = g_pResourceSystem->GetResourceManagerForType<IMaterial>();
+			CResourcePtr<IMaterial>	  pMaterial				 = pMaterialsMgr->LoadResource( "materials/nelson" );
 			CRefPtr<IStudioAPIBuffer> pStudioAPIVertexBuffer = g_pStudioAPI->CreateBuffer( (byte*)&quadVerteces[0], ARRAYSIZE( quadVerteces ) * sizeof( studioSimpleElementVertex_t ), sizeof( studioSimpleElementVertex_t ), STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_VERTEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
 			CRefPtr<IStudioAPIBuffer> pStudioAPIIndexBuffer	 = g_pStudioAPI->CreateBuffer( (byte*)&quadIndices[0], ARRAYSIZE( quadIndices ) * sizeof( uint16 ), sizeof( uint16 ), STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_INDEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
 			Quad().Init( pStudioAPIVertexBuffer, pStudioAPIIndexBuffer, pMaterial );
@@ -144,6 +148,7 @@ CCitadelGame::Shutdown
 */
 void CCitadelGame::Shutdown()
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
 	Quad().Shutdown();
 	pQuadEntity	  = NULL;
 	pPlayerEntity = NULL;
@@ -168,7 +173,7 @@ CEcsSystemQuadDraw::OnUpdate
 void CEcsSystemQuadInit::OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity, const ecsComponentQuad_t& quad, const ecsResourceStudioRender_t& studioRender )
 {
 	ecsComponentStudioRenderObject_t studioRenderObjectComponent;
-	studioRenderObjectComponent.pStudioRenderObject = studioRender.pStudioRender->CreateQuadRenderObject( *quad.pMaterial, quad.pVertexBuffer, quad.pIndexBuffer );
+	studioRenderObjectComponent.pStudioRenderObject = studioRender.pStudioRender->CreateQuadRenderObject( quad.pMaterial, quad.pVertexBuffer, quad.pIndexBuffer );
 	studioRender.pStudioRender->RegisterObject( studioRenderObjectComponent.pStudioRenderObject );
 	ecsWorld.SetComponent( entity, eastl::move( studioRenderObjectComponent ) );
 }

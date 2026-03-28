@@ -7,6 +7,7 @@ CStudioGlobalRenderResources::InitResources
 */
 FORCEINLINE void CStudioGlobalRenderResources::InitResources()
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	CScopeLock									  scopeLock( GetThreadMutex() );
 	eastl::unordered_set<IStudioRenderResource*>& globalResources = GetResourceList();
 	for ( auto it = globalResources.begin(), itEnd = globalResources.end(); it != itEnd; ++it )
@@ -22,6 +23,7 @@ CStudioGlobalRenderResources::ReleaseResources
 */
 FORCEINLINE void CStudioGlobalRenderResources::ReleaseResources()
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	CScopeLock									  scopeLock( GetThreadMutex() );
 	eastl::unordered_set<IStudioRenderResource*>& globalResources = GetResourceList();
 	for ( auto it = globalResources.begin(), itEnd = globalResources.end(); it != itEnd; ++it )
@@ -117,6 +119,7 @@ CStudioRenderResource::InitResource
 template<class TBaseClass, bool bGlobal /*= false*/>
 FORCEINLINE void CStudioRenderResource<TBaseClass, bGlobal>::InitResource()
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	if ( bInitedResource.load( eastl::memory_order_relaxed ) )
 	{
 		return;
@@ -135,6 +138,7 @@ CStudioRenderResource::ReleaseResource
 template<class TBaseClass, bool bGlobal /*= false*/>
 FORCEINLINE void CStudioRenderResource<TBaseClass, bGlobal>::ReleaseResource()
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	if ( !bInitedResource.load( eastl::memory_order_relaxed ) )
 	{
 		return;
@@ -153,6 +157,7 @@ CStudioRenderResource::UpdateResource
 template<class TBaseClass, bool bGlobal /*= false*/>
 FORCEINLINE void CStudioRenderResource<TBaseClass, bGlobal>::UpdateResource()
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	if ( !bInitedResource.load( eastl::memory_order_relaxed ) )
 	{
 		InitResource();
@@ -236,6 +241,7 @@ CStudioRenderResource::UpdateStudioAPI
 template<class TBaseClass, bool bGlobal /*= false*/>
 FORCEINLINE void CStudioRenderResource<TBaseClass, bGlobal>::UpdateStudioAPI()
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	ReleaseStudioAPI();
 	InitStudioAPI();
 }
@@ -247,6 +253,7 @@ Studio_BeginInitResource
 */
 FORCEINLINE void Studio_BeginInitResource( IStudioRenderResource* pResource )
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( pResource );
 	pResource->BeginEnqueueRenderOp();
 	UNIQUE_RENDER_COMMAND_ONEPARAMETER( CStudioInitResourceCmd, IStudioRenderResource*, pResource, pResource,
@@ -263,6 +270,7 @@ Studio_BeginUpdateResource
 */
 FORCEINLINE void Studio_BeginUpdateResource( IStudioRenderResource* pResource )
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( pResource );
 	pResource->BeginEnqueueRenderOp();
 	UNIQUE_RENDER_COMMAND_ONEPARAMETER( CStudioUpdateResourceCmd, IStudioRenderResource*, pResource, pResource,
@@ -279,6 +287,7 @@ Studio_BeginReleaseResource
 */
 FORCEINLINE void Studio_BeginReleaseResource( IStudioRenderResource* pResource )
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( pResource );
 	pResource->BeginEnqueueRenderOp();
 	UNIQUE_RENDER_COMMAND_ONEPARAMETER( CStudioReleaseResourceCmd, IStudioRenderResource*, pResource, pResource,
@@ -295,6 +304,7 @@ Studio_BeginDeleteResource
 */
 FORCEINLINE void Studio_BeginDeleteResource( IStudioRenderResource* pResource )
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( pResource );
 	pResource->BeginEnqueueRenderOp();
 	UNIQUE_RENDER_COMMAND_ONEPARAMETER( CStudioDeleteResourceCmd, IStudioRenderResource*, pResource, pResource,

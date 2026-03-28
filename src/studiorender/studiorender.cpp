@@ -20,6 +20,8 @@ CStudioRender::Connect
 */
 bool CStudioRender::Connect( createInterfaceFn_t pFactory )
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+
 	// Connect Tier1
 	if ( !ConnectTier1( pFactory ) )
 	{
@@ -52,6 +54,8 @@ CStudioRender::Disconnect
 */
 void CStudioRender::Disconnect()
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+
 	// Disconnect Tier1
 	ConVar_Unregister();
 	DisconnectTier1();
@@ -68,6 +72,8 @@ CStudioRender::Init
 */
 bool CStudioRender::Init()
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+
 	// Initialize all global resources
 	CStudioGlobalRenderResources::InitResources();
 
@@ -88,6 +94,8 @@ CStudioRender::Shutdown
 */
 void CStudioRender::Shutdown()
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+
 	// Stop the render thread
 	Studio_StopRenderThread();
 
@@ -176,7 +184,7 @@ CRefPtr<IStudioRenderPipelineSet> CStudioRender::CreateRenderPipelineSet() const
 CStudioRender::CreateQuadRenderObject
 ==================
 */
-CRefPtr<IStudioRenderObject> CStudioRender::CreateQuadRenderObject( IMaterial* pMaterial, IStudioAPIBuffer* pVertexBuffer, IStudioAPIBuffer* pIndexBuffer ) const
+CRefPtr<IStudioRenderObject> CStudioRender::CreateQuadRenderObject( IResource* pMaterial, IStudioAPIBuffer* pVertexBuffer, IStudioAPIBuffer* pIndexBuffer ) const
 {
 	return new CStudioRenderObjectQuad( pVertexBuffer, pIndexBuffer, pMaterial );
 }

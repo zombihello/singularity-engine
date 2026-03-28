@@ -1,7 +1,9 @@
 #pragma once
 #include "materialsystem/imaterialsystem.h"
 #include "materialsystem/texture_factory.h"
+#include "materialsystem/texture_loader.h"
 #include "materialsystem/material_factory.h"
+#include "materialsystem/material_loader.h"
 
 //-----------------------------------------------------------------------------
 // Material system
@@ -26,5 +28,7 @@ public:
 
 private:
 	CTextureFactory	 textureFactory;
+	CTextureLoader	 textureLoader;
 	CMaterialFactory materialFactory;
+	CMaterialLoader	 materialLoader;
 };

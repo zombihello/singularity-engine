@@ -222,6 +222,7 @@ CInputSystem::Connect
 */
 bool CInputSystem::Connect( createInterfaceFn_t pFactory )
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_INPUT );
 	if ( !ConnectTier1( pFactory ) )
 	{
 		return false;
@@ -245,6 +246,7 @@ CInputSystem::Disconnect
 */
 void CInputSystem::Disconnect()
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_INPUT );
 	DetachFromWindow();
 	g_pCvar->OnWriteConCmdsToConfigFile()->Unsubscribe( onWriteConCmdsHandle );
 	onWriteConCmdsHandle = INVALID_HANDLE;
@@ -260,6 +262,7 @@ CInputSystem::AttachToWindow
 */
 void CInputSystem::AttachToWindow( windowId_t windowId )
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_INPUT );
 	CInputSystem::windowId = windowId;
 	if ( onInputEventHandle == INVALID_HANDLE )
 	{
@@ -276,6 +279,7 @@ CInputSystem::DetachFromWindow
 */
 void CInputSystem::DetachFromWindow()
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_INPUT );
 	if ( onInputEventHandle != INVALID_HANDLE )
 	{
 		g_pWindowMgr->OnInputEvent()->Unsubscribe( onInputEventHandle );
@@ -397,6 +401,7 @@ CInputSystem::ClearInputState
 */
 void CInputSystem::ClearInputState()
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_INPUT );
 	for ( uint32 index = 0; index < BUTTON_CODE_COUNT; ++index )
 	{
 		if ( buttonEvents[index] == BUTTON_EVENT_RELEASED || buttonEvents[index] == BUTTON_EVENT_SCROLLED || buttonEvents[index] == BUTTON_EVENT_MOVED )

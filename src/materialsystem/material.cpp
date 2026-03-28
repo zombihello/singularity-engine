@@ -59,7 +59,9 @@ void CMaterial::Init( const CSMATCompiledMaterialDoc& smatCompiledDoc )
 	SetShader( smatCompiledDoc.GetShaderName() );
 
 	// Set material variable from the SMAT file
-	const eastl::vector<CSMATMaterialVar>& smatMatVars = smatCompiledDoc.GetVars();
+	IResourceTypeMgr*					   pTexturesMgr	 = g_pResourceSystem->GetResourceManagerForType<CTexture>();
+	IResourceTypeMgr*					   pMaterialsMgr = g_pResourceSystem->GetResourceManagerForType<CMaterial>();
+	const eastl::vector<CSMATMaterialVar>& smatMatVars	 = smatCompiledDoc.GetVars();
 	for ( uint32 varIdx = 0, count = (uint32)smatMatVars.size(); varIdx < count; ++varIdx )
 	{
 		const CSMATMaterialVar& smatMatVar = smatMatVars[varIdx];
@@ -73,20 +75,8 @@ void CMaterial::Init( const CSMATCompiledMaterialDoc& smatCompiledDoc )
 			case SMAT_MATERIAL_VAR_TYPE_FLOAT: pVar->SetFloatValue( smatMatVar.GetFloatValue() ); break;
 			case SMAT_MATERIAL_VAR_TYPE_MATRIX: pVar->SetMatrixValue( smatMatVar.GetMatrixValue() ); break;
 			case SMAT_MATERIAL_VAR_TYPE_STRING: pVar->SetStringValue( smatMatVar.GetStringValue() ); break;
-			case SMAT_MATERIAL_VAR_TYPE_TEXTURE:
-			{
-				const char*		   pTexturePath = smatMatVar.GetTextureValue();
-				CResourcePtr<ITexture> pTexture		= g_pResourceSystem->FindOrLoadResource( pTexturePath, RESOURCE_TYPE_TEXTURE );
-				pVar->SetTextureValue( *pTexture );
-				break;
-			}
-			case SMAT_MATERIAL_VAR_TYPE_MATERIAL:
-			{
-				const char*			pMaterialPath = smatMatVar.GetMaterialValue();
-				CResourcePtr<IMaterial> pMaterial	  = g_pResourceSystem->FindOrLoadResource( pMaterialPath, RESOURCE_TYPE_MATERIAL );
-				pVar->SetMaterialValue( *pMaterial );
-				break;
-			}
+			case SMAT_MATERIAL_VAR_TYPE_TEXTURE: pVar->SetTextureValue( pTexturesMgr->LoadResource( smatMatVar.GetTextureValue() ) ); break;
+			case SMAT_MATERIAL_VAR_TYPE_MATERIAL: pVar->SetMaterialValue( pMaterialsMgr->LoadResource( smatMatVar.GetMaterialValue() ) ); break;
 			case SMAT_MATERIAL_VAR_TYPE_VECTOR_2D:
 			{
 				vector2_t value = { 0.f, 0.f };

@@ -16,7 +16,7 @@ public:
 
 	virtual void Resize( uint32 newWidth, uint32 newHeight ) override;
 	virtual void Update( float deltaSeconds ) override;
-	virtual void DrawFrame( bool bShouldPresent = true, bool bFlushRenderCmds = true ) override;
+	virtual void DrawFrame( bool bShouldPresent = true ) override;
 
 	virtual void SetViewportClient( IStudioViewportClient* pStudioViewportClient ) override;
 

@@ -2,7 +2,7 @@
 #include <EASTL/unordered_map.h>
 
 #include "resourcesystem/iresourcesystem.h"
-#include "resourcesystem/resource.h"
+#include "resourcesystem/resourcetypemgr.h"
 
 //-----------------------------------------------------------------------------
 // Resource system
@@ -14,32 +14,31 @@ public:
 	// Here's where the app systems get to learn about each other
 	virtual bool Connect( createInterfaceFn_t pFactory ) override;
 	virtual void Disconnect() override;
-
-	// Initialize and shutdown
-	virtual bool Init() override;
 	virtual void Shutdown() override;
 
 	// IResourceSystem interface
-	// Functions register/unregister a resource factory
-	// NOTE: You can't override a resource factory if the one has RESOURCE_FACTORY_FLAG_STATIC (except for the case if the factory has RESOURCE_FACTORY_FLAG_NOT_USED)
-	virtual bool RegisterResourceFactory( resourceType_t type, IResourceFactory* pFactory ) override;
-	virtual bool UnRegisterResourceFactory( resourceType_t type ) override;
+	// Functions to install/remove a resource type manager for specific type
+	virtual IResourceTypeMgr* InstallResourceManager( resourceType_t type ) override;
+	virtual void			  RemoveResourceManager( resourceType_t type ) override;
 
-	// NOTE: The path to the resource in the file system can be without file extension, or its name if it is a procedural resource
-	virtual CRefPtr<IResource> FindOrLoadResource( const char* pPath, resourceType_t type, uint32 loadFlags = RESOURCE_LOAD_FLAG_NONE ) override;
-	virtual CRefPtr<IResource> CreateProceduralResource( const char* pName, resourceType_t type ) override;
+	// Performs per-frame resource management. Handles tasks like uncache unused resources
+	// and other maintenance operations
+	virtual void FrameUpdate() override;
 
-	// This function delete any resource that has a refcount <= 1 (one reference in the resource system)
-	virtual void RemoveUnusedResources() override;
+	// Functions to uncache all resources
+	virtual void UncacheAllResources() override;
 
-	// Return a default resource by its type. If the type isn't registered or not have a default resource return NULL
-	virtual CRefPtr<IResource> GetDefaultResource( resourceType_t type ) const override;
+	// Functions to check/get a resource type manager for specific type
+	virtual bool			  HasResourceManager( resourceType_t type ) const override;
+	virtual IResourceTypeMgr* GetResourceManager( resourceType_t type ) const override;
 
-	virtual bool			  HasResourceFactory( resourceType_t type ) const override;
-	virtual IResourceFactory* GetResourceFactory( resourceType_t type ) const override;
+	CResourceSystem();
+	uint64 GetFrameNumber() const;
 
 private:
-	IResourceFactory*										pResourceFactories[RESOURCE_NUM_TYPES];
-	eastl::unordered_map<eastl::string, CRefPtr<CResource>> resourcesDicts[RESOURCE_NUM_TYPES];
+	uint64												   frameNumber;
+	eastl::unordered_map<resourceType_t, CResourceTypeMgr> resourceTypeMgrDict;
 };
-extern CResourceSystem g_ResourceSystem;
+
+extern CResourceSystem g_resourceSystem;
+#include "resourcesystem/resourcesystem.inl"

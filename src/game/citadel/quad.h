@@ -1,6 +1,6 @@
 #pragma once
 #include "studiorender/studioapi/istudioapi.h"
-#include "resourcesystem/iresource.h"
+#include "resourcesystem/resourceptr.h"
 #include "materialsystem/imaterial.h"
 
 //-----------------------------------------------------------------------------
@@ -14,7 +14,7 @@ public:
 
 	FORCEINLINE IStudioAPIBuffer* GetStudioAPIVertexBuffer() const { return pStudioAPIVertexBuffer; }
 	FORCEINLINE IStudioAPIBuffer* GetStudioAPIIndexBuffer() const { return pStudioAPIIndexBuffer; }
-	FORCEINLINE IResource* GetMaterial() const { return pMaterial ? pMaterial : NULL; }
+	FORCEINLINE IResource*		  GetMaterial() const { return pMaterial; }
 
 private:
 	CRefPtr<IStudioAPIBuffer> pStudioAPIVertexBuffer;

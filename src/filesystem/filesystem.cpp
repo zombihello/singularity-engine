@@ -34,6 +34,7 @@ CFileSystem::Connect
 */
 bool CFileSystem::Connect( createInterfaceFn_t pFactory )
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	return ConnectTier1( pFactory );
 }
 
@@ -44,6 +45,7 @@ CFileSystem::Disconnect
 */
 void CFileSystem::Disconnect()
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	DisconnectTier1();
 }
 
@@ -54,6 +56,8 @@ CFileSystem::Init
 */
 bool CFileSystem::Init()
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
+
 	// Get base directory from command line if it set
 	eastl::string baseDir;
 	if ( CommandLine()->HasParam( "basedir" ) )
@@ -92,6 +96,8 @@ CFileSystem::Shutdown
 */
 void CFileSystem::Shutdown()
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
+
 	// Reset default current directory
 	eastl::string exePath;
 	S_GetFilePath( Sys_GetExecutablePath(), exePath, false );
@@ -1048,6 +1054,8 @@ CFileSystem::ParsePathID
 */
 void CFileSystem::ParsePathID( const char* pPath, const char*& pFilePath, const char*& pPathID, uint32& lengthPathID ) const
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
+
 	// By default we think what in pPath no path ID
 	pFilePath	 = pPath;
 	pPathID		 = NULL;
@@ -1092,6 +1100,7 @@ CFileSystem::ComputeFullPath
 */
 void CFileSystem::ComputeFullPath( const char* pFilePath, const CSearchPath* pSearchPath, eastl::string& destPath ) const
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
 	destPath.clear();
 	Assert( pSearchPath );
 	if ( !pSearchPath )

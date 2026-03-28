@@ -13,7 +13,7 @@ class CMaterialVar;
 //-----------------------------------------------------------------------------
 // Material
 //-----------------------------------------------------------------------------
-class CMaterial : public CRefCounted<IMaterial>
+class CMaterial : public IMaterial
 {
 public:
 	// IMaterial interface
@@ -31,6 +31,7 @@ public:
 	CMaterial( const CSMATCompiledMaterialDoc& smatCompiledDoc );
 	~CMaterial();
 
+	void			 Init( const CSMATCompiledMaterialDoc& smatCompiledDoc );
 	void			 Clear();
 	FORCEINLINE void MarkDirtyBuffers()
 	{
@@ -52,7 +53,6 @@ private:
 
 	typedef eastl::unordered_map<const char*, uint32, insensitiveStringHash_t, insensitiveCompareString_t> materialVarsDict_t;
 
-	void Init( const CSMATCompiledMaterialDoc& smatCompiledDoc );
 	void R_UpdateBuffers( IStudioAPICmdContext* pCmdContext );
 	void DestroyBuffers();
 
@@ -63,4 +63,5 @@ private:
 	eastl::vector<CRefPtr<IStudioAPIBuffer>> studioAPIBuffers;
 };
 
+DECLARE_RESOURCE_TYPE( CMaterial, RESOURCE_TYPE_MATERIAL );
 #include "materialsystem/material.inl"
