@@ -1,0 +1,38 @@
+#!/bin/sh
+specific_symbols="CIT-[0-9]+"									# Define the specific symbols pattern you want to check for
+branch_name=$(git symbolic-ref --short HEAD)					# Get the current branch name
+
+# Function to extract specific symbols from the commit message
+extract_specific_symbols() {
+    commit_message="$1"
+	
+	# Capture the matched symbols
+    if [[ "$commit_message" =~ $specific_symbols ]]; then
+        matched_symbols="${BASH_REMATCH[0]}"
+        echo "$matched_symbols"
+	# Return an empty string if not found
+    else
+        echo ""
+    fi
+}
+
+branch_symbols=$(extract_specific_symbols "$branch_name")		# Extract specific symbols from the branch name
+
+# Check if extracted symbols are empty or already in the commit message
+if [ -z "$branch_symbols" ]; then
+    # If no symbols found in the branch name, do nothing
+    echo "No task ID found. Doing nothing"
+else
+    last_commit_message=$(cat $1)											# Get the last commit message
+    extracted_symbols=$(extract_specific_symbols "$last_commit_message")	# Extract specific symbols from the commit message
+	
+	# If specific symbols are not found in the commit message, add them at the start
+    if [ -z "$extracted_symbols" ]; then     
+        new_commit_message="$branch_symbols $last_commit_message"
+        echo "$new_commit_message" > $1
+        echo "Added task ID to commit message"
+	# Specific symbols are already in the commit message, do nothing
+    else
+        echo "Task ID already in commit message."
+    fi
+fi

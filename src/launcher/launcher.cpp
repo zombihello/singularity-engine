@@ -179,9 +179,9 @@ CLauncherApp::Main
 */
 int32 CLauncherApp::Main()
 {
-#if ENABLE_LOGGING
+#if ENABLE_PROFILING
 	IProfiler* pProfiler = Profiler();
-#endif	// ENABLE_LOGGING
+#endif	// ENABLE_PROFILING
 	while ( !Sys_IsRequestingExit() )
 	{
 		// Process window events
