@@ -96,7 +96,7 @@ bool CGame::Init()
 	pEcsDescsMgr->RegisterResourceLoader( &ecsEntityDescLoader );
 
 	// Set a default resource for entity descriptors
-	CResourcePtr<CEcsEntityDesc> pDefaultEntityDesc = pEcsDescsMgr->LoadResource( "//core/entities/default" );
+	CResourcePtr<CEcsEntityDesc> pDefaultEntityDesc = pEcsDescsMgr->LoadResource( "__default", "//core/entities/default" );
 	if ( !pDefaultEntityDesc )
 	{
 		pDefaultEntityDesc = pEcsDescsMgr->CreateResource( "__default" );

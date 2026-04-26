@@ -1,4 +1,4 @@
 unlitgeneric
 {
-	baseTexture 	texture:"materials/default"
+	baseTexture 	texture:"__default"
 }

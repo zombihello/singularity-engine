@@ -203,8 +203,11 @@ void CTexture::Destroy()
 
 	// Release the studio resource
 	CScopeLock scopeLock( resourceCreationMutex );
-	Studio_BeginReleaseResource( pStudioResource );
-	pStudioResource = NULL;
+	if ( pStudioResource )
+	{
+		Studio_BeginReleaseResource( pStudioResource );
+		pStudioResource = NULL;
+	}
 }
 
 /*

@@ -110,7 +110,7 @@ bool CMaterialSystem::Init()
 	pMaterialsMgr->RegisterResourceLoader( &materialLoader );
 
 	// Set a default resource for textures
-	CResourcePtr<CTexture> pDefaultTexture = pTexturesMgr->LoadResource( "//core/materials/default" );
+	CResourcePtr<CTexture> pDefaultTexture = pTexturesMgr->LoadResource( "__default", "//core/materials/default" );
 	if ( !pDefaultTexture )
 	{
 		uint8			data[4] = { 0xFF, 0x00, 0xFF, 0xFF };
@@ -133,7 +133,7 @@ bool CMaterialSystem::Init()
 	pTexturesMgr->SetDefaultResource( pDefaultTexture );
 
 	// Set a default resource for materials
-	CResourcePtr<CMaterial> pDefaultMaterial = pMaterialsMgr->LoadResource( "//core/materials/default" );
+	CResourcePtr<CMaterial> pDefaultMaterial = pMaterialsMgr->LoadResource( "__default", "//core/materials/default" );
 	if ( !pDefaultMaterial )
 	{
 		pDefaultMaterial = pMaterialsMgr->CreateResource( "__default" );
