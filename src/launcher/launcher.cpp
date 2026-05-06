@@ -84,24 +84,25 @@ void CLauncherApp::Init()
 	const char* pGameDir = CommandLine()->HasParam( "game" ) ? CommandLine()->GetFirstValue( "game" ) : pDefaultGameDir;
 	if ( !gameInfo.LoadFromFile( S_Sprintf( "//base_path/%s/gameinfo.txt", pGameDir ).c_str() ) )
 	{
-		Sys_Error( "Setup file 'gameinfo.txt' doesn't exist in subdirectory '%s'", pGameDir );
+		Sys_Error( "Setup file 'gameinfo.txt' either invalid or doesn't exist in subdirectory '%s'", pGameDir );
 		return;
 	}
 
 	// Initialize the file system for the game
-	const eastl::vector<gameInfoSearchPath_t>& searchPaths = gameInfo.GetSearchPaths();
-	for ( uint32 index = 0, count = (uint32)searchPaths.size(); index < count; ++index )
+	const gameInfoFileSystem_t& gameInfoFileSystem = gameInfo.GetFileSystem();
+	for ( uint32 index = 0, count = (uint32)gameInfoFileSystem.searchPaths.size(); index < count; ++index )
 	{
-		const gameInfoSearchPath_t& searchPath = searchPaths[index];
+		const gameInfoSearchPath_t& searchPath = gameInfoFileSystem.searchPaths[index];
 		g_pFileSystem->AddSearchPath( searchPath.path.c_str(), searchPath.id.c_str() );
 	}
 
 	// Setup application information for the crash dump
-	crashDumpAppInfo_t crashDumpAppInfo = {};
-	crashDumpAppInfo.pAppName			= gameInfo.GetGame().c_str();
-	crashDumpAppInfo.pAppVersion		= gameInfo.GetVersion().c_str();
-	crashDumpAppInfo.pSupportEmail		= gameInfo.GetSupportEmail().c_str();
-	crashDumpAppInfo.pSupportURL		= gameInfo.GetSupportURL().c_str();
+	const gameInfoCrashDump_t& gameInfoCrashDump = gameInfo.GetCrashDump();
+	crashDumpAppInfo_t		   crashDumpAppInfo	 = {};
+	crashDumpAppInfo.pAppName					 = gameInfo.GetGame().c_str();
+	crashDumpAppInfo.pAppVersion				 = gameInfo.GetVersion().c_str();
+	crashDumpAppInfo.pSupportEmail				 = gameInfoCrashDump.supportEmail.c_str();
+	crashDumpAppInfo.pSupportURL				 = gameInfoCrashDump.supportURL.c_str();
 	CrashDumpHandler()->SetAppInfo( crashDumpAppInfo );
 
 	// Connect WindowMgr, Engine and Game groups
@@ -269,11 +270,11 @@ void CLauncherApp::Shutdown()
 	}
 
 	// Otherwise we look for search paths in gameinfo.txt and remove they from the file system
-	eastl::unordered_set<eastl::string>		   pathIDSet;
-	const eastl::vector<gameInfoSearchPath_t>& searchPaths = gameInfo.GetSearchPaths();
-	for ( uint32 index = 0, count = (uint32)searchPaths.size(); index < count; ++index )
+	eastl::unordered_set<eastl::string> pathIDSet;
+	const gameInfoFileSystem_t&			gameInfoFileSystem = gameInfo.GetFileSystem();
+	for ( uint32 index = 0, count = (uint32)gameInfoFileSystem.searchPaths.size(); index < count; ++index )
 	{
-		const gameInfoSearchPath_t& searchPath = searchPaths[index];
+		const gameInfoSearchPath_t& searchPath = gameInfoFileSystem.searchPaths[index];
 		pathIDSet.insert( searchPath.id );
 	}
 

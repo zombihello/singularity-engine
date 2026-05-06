@@ -17,6 +17,12 @@ public:
 	const eastl::vector<eastl::string>& GetErrorMsgs() const;
 
 private:
+	enum contextType_t
+	{
+		CONTEXT_TYPE_DEFAULT,
+		CONTEXT_TYPE_CONDITIONAL_BLOCK
+	};
+
 	enum tokenType_t
 	{
 		TOKEN_TYPE_BARE,
@@ -84,6 +90,7 @@ private:
 	void   GetPostionInCode( uint64 streamOffset, uint64& line, uint64& column ) const;
 
 	mutable CBuffer							   buffer;
+	contextType_t							   contextType;
 	uint32									   scopeLevel;
 	eastl::vector<eastl::string>			   errorMsgs;
 	eastl::vector<eastl::pair<uint64, uint64>> lineRanges;

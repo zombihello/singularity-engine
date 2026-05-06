@@ -664,6 +664,36 @@ void S_RemoveDotPathSeparators( char* pPath, bool bRemoveDoubleSeparators /*= tr
 
 /*
 ==================
+S_FillPathPlaceholders
+==================
+*/
+void S_FillPathPlaceholders( eastl::string& path )
+{
+	enum pathPlaceholder_t
+	{
+		PATH_PLACEHOLDER_PLATFORM_DIR,		// |platform_dir|
+		PATH_PLACEHOLDER_PLATFORM_BIN_DIR,	// |platform_bin_dir|
+		PATH_NUM_PLACEHOLDERS
+	};
+
+	static const char* s_pPathPlaceholdersTable[] = {
+		"|platform_dir|",	  // PATH_PLACEHOLDER_PLATFORM_DIR
+		"|platform_bin_dir|"  // PATH_PLACEHOLDER_PLATFORM_BIN_DIR
+	};
+	static const char* s_pValuePathPlaceholdersTable[] = {
+		PLATFORM_DIR,	  // |platform_dir|
+		PLATFORM_BIN_DIR  // |platform_bin_dir|
+	};
+	static_assert( ARRAYSIZE( s_pPathPlaceholdersTable ) == PATH_NUM_PLACEHOLDERS && ARRAYSIZE( s_pValuePathPlaceholdersTable ) == PATH_NUM_PLACEHOLDERS, "Need full init s_pPathPlaceholdersTable and s_pValuePathPlaceholdersTable array" );
+
+	for ( uint32 placeholderIndex = 0; placeholderIndex < PATH_NUM_PLACEHOLDERS; ++placeholderIndex )
+	{
+		S_ReplaceSubString( path, s_pPathPlaceholdersTable[placeholderIndex], s_pValuePathPlaceholdersTable[placeholderIndex] );
+	}
+}
+
+/*
+==================
 CFilename::CFilename
 ==================
 */

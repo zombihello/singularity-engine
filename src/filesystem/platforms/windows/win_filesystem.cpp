@@ -225,5 +225,9 @@ bool Plat_GetCurrentDirectory( char* pDest, uint32 maxLen )
 
 	// Copy the UTF8 string into the buffer
 	Mem_Memcpy( pDest, (char*)wcharToUtf8, length );
+	if ( length < maxLen )
+	{
+		pDest[length] = 0;
+	}
 	return true;
 }

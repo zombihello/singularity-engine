@@ -2,6 +2,27 @@
 
 /*
 ==================
+gameInfoCrashDump_t::Clear
+==================
+*/
+FORCEINLINE void gameInfoCrashDump_t::Clear()
+{
+	supportEmail.clear();
+	supportURL.clear();
+}
+
+/*
+==================
+gameInfoFileSystem_t::Clear
+==================
+*/
+FORCEINLINE void gameInfoFileSystem_t::Clear()
+{
+	searchPaths.clear();
+}
+
+/*
+==================
 CGameInfoDoc::LoadFromFile
 ==================
 */
@@ -19,9 +40,7 @@ FORCEINLINE bool CGameInfoDoc::LoadFromFile( const char* pPath )
 	}
 
 	// Load a gameinfo from the stream
-	eastl::string gameinfoPath;
-	S_GetFilePath( pFile->GetPath(), gameinfoPath, false );
-	return LoadFromStream( pFile, gameinfoPath.c_str() );
+	return LoadFromStream( pFile );
 }
 
 /*
@@ -29,11 +48,11 @@ FORCEINLINE bool CGameInfoDoc::LoadFromFile( const char* pPath )
 CGameInfoDoc::LoadFromBuffer
 ==================
 */
-FORCEINLINE bool CGameInfoDoc::LoadFromBuffer( const char* pBuffer, const char* pGameInfoPath )
+FORCEINLINE bool CGameInfoDoc::LoadFromBuffer( const char* pBuffer )
 {
 	PROFILER_SCOPE_FUNC();
 	CStreamDataMemoryReader streamReader( (byte*)pBuffer, S_Strlen( pBuffer ) );
-	return LoadFromStream( &streamReader, pGameInfoPath );
+	return LoadFromStream( &streamReader );
 }
 
 /*
@@ -58,32 +77,22 @@ FORCEINLINE const eastl::string& CGameInfoDoc::GetVersion() const
 
 /*
 ==================
-CGameInfoDoc::GetSupportEmail
+CGameInfoDoc::GetCrashDump
 ==================
 */
-FORCEINLINE const eastl::string& CGameInfoDoc::GetSupportEmail() const
+FORCEINLINE const gameInfoCrashDump_t& CGameInfoDoc::GetCrashDump() const
 {
-	return supportEmail;
+	return crashDump;
 }
 
 /*
 ==================
-CGameInfoDoc::GetSupportURL
+CGameInfoDoc::GetFileSystem
 ==================
 */
-FORCEINLINE const eastl::string& CGameInfoDoc::GetSupportURL() const
+FORCEINLINE const gameInfoFileSystem_t& CGameInfoDoc::GetFileSystem() const
 {
-	return supportURL;
-}
-
-/*
-==================
-CGameInfoDoc::GetSearchPaths
-==================
-*/
-FORCEINLINE const eastl::vector<gameInfoSearchPath_t>& CGameInfoDoc::GetSearchPaths() const
-{
-	return searchPaths;
+	return fileSystem;
 }
 
 /*

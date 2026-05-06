@@ -70,6 +70,9 @@ bool		   S_IsSpace( wchar_t c );
 bool		   S_IsDigit( char c );
 bool		   S_IsDigit( wchar_t c );
 
+void S_ReplaceSubString( eastl::string& string, const char* pOldSubString, const char* pNewSubString );
+void S_ReplaceSubString( eastl::wstring& string, const wchar_t* pOldSubString, const wchar_t* pNewSubString );
+
 //-----------------------------------------------------------------------------
 // UTF-8 tools
 //-----------------------------------------------------------------------------

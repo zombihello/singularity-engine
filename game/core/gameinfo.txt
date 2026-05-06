@@ -1,4 +1,4 @@
-game	"Citadel"
+game	"Core"
 version	"0.1.0"
 
 crash_dump
@@ -11,7 +11,7 @@ file_system
 {
 	search_paths
 	{
-		gamebin 	citadel/bin/|platform_bin_dir|
-		game 		citadel
+		gamebin 	core/bin/|platform_bin_dir|
+		game 		core
 	}
 }

@@ -18,7 +18,7 @@ CGameInfoDoc::CGameInfoDoc()
 CGameInfoDoc::LoadFromStream
 ==================
 */
-bool CGameInfoDoc::LoadFromStream( IStreamDataReader* pStreamReader, const char* pGameInfoPath /* = "" */ )
+bool CGameInfoDoc::LoadFromStream( IStreamDataReader* pStreamReader )
 {
 	// Clear a game info data
 	PROFILER_SCOPE_FUNC();
@@ -31,22 +31,33 @@ bool CGameInfoDoc::LoadFromStream( IStreamDataReader* pStreamReader, const char*
 		return false;
 	}
 
-	// Get values from the key value
-	game		 = keyValues.GetString( "game", "Game" );
-	version		 = keyValues.GetString( "version" );
-	supportEmail = keyValues.GetString( "support_email" );
-	supportURL	 = keyValues.GetString( "support_url" );
+	// Get game and version from the key values
+	game	= keyValues.GetString( "game", "Singularity Game" );
+	version = keyValues.GetString( "version" );
 
-	// Initialize search paths
-	CKeyValues* pSearchPaths = keyValues.FindKey( "search_paths" );
-	if ( pSearchPaths )
+	// Get some information for a crash dump
+	CKeyValues* pCrashDump = keyValues.FindKey( "crash_dump" );
+	if ( pCrashDump )
 	{
-		for ( CKeyValuesSubKeysIterator it( pSearchPaths ); it; ++it )
+		crashDump.supportEmail = pCrashDump->GetString( "support_email" );
+		crashDump.supportURL   = pCrashDump->GetString( "support_url" );
+	}
+
+	// Get some information for the file system
+	CKeyValues* pFileSystem = keyValues.FindKey( "file_system" );
+	if ( pFileSystem )
+	{
+		// Get search paths
+		CKeyValues* pSearchPaths = pFileSystem->FindKey( "search_paths" );
+		if ( pSearchPaths )
 		{
-			gameInfoSearchPath_t& searchPath = searchPaths.emplace_back();
-			searchPath.id					 = it->GetName();
-			searchPath.path					 = it->GetString( NULL );
-			ReplaceMacros( searchPath.path, pGameInfoPath );
+			for ( CKeyValuesSubKeysIterator it( pSearchPaths ); it; ++it )
+			{
+				gameInfoSearchPath_t& searchPath = fileSystem.searchPaths.emplace_back();
+				searchPath.id					 = it->GetName();
+				searchPath.path					 = it->GetString( NULL );
+				S_FillPathPlaceholders( searchPath.path );
+			}
 		}
 	}
 
@@ -57,61 +68,14 @@ bool CGameInfoDoc::LoadFromStream( IStreamDataReader* pStreamReader, const char*
 
 /*
 ==================
-CGameInfoDoc::ReplaceMacros
-==================
-*/
-void CGameInfoDoc::ReplaceMacros( eastl::string& string, const char* pGameInfoPath )
-{
-	PROFILER_SCOPE_FUNC();
-	enum gameInfoMacro_t
-	{
-		GAMEINFO_MACRO_PLATFORM_DIR,	  // |platform_dir|
-		GAMEINFO_MACRO_PLATFORM_BIN_DIR,  // |platform_bin_dir|
-		GAMEINFO_MACRO_GAMEINFO_PATH,	  // |gameinfo_path|
-		GAMEINFO_NUM_MACROS				  // Number of macros in gameinfo.txt
-	};
-
-	// Table of all macros in gameinfo.txt
-	static const char* s_pMacrosTable[] = {
-		"|platform_dir|",	   // GAMEINFO_MACRO_PLATFORM_DIR
-		"|platform_bin_dir|",  // GAMEINFO_MACRO_PLATFORM_BIN_DIR
-		"|gameinfo_path|"	   // GAMEINFO_MACRO_GAMEINFO_PATH
-	};
-
-	// Table of macros value
-	static const char* s_pValueMacroTable[] = {
-		PLATFORM_DIR,	   // |platform_dir|
-		PLATFORM_BIN_DIR,  // |platform_bin_dir|
-		"",				   // |gameinfo_path|
-	};
-	static_assert( ARRAYSIZE( s_pMacrosTable ) == GAMEINFO_NUM_MACROS && ARRAYSIZE( s_pValueMacroTable ) == GAMEINFO_NUM_MACROS, "Need full init s_pMacrosTable and s_pValueMacroTable array" );
-
-	// Update value for |gameinfo_path|
-	s_pValueMacroTable[GAMEINFO_MACRO_GAMEINFO_PATH] = pGameInfoPath;
-
-	// Replace all macros in the string
-	for ( uint32 macroIndex = 0; macroIndex < GAMEINFO_NUM_MACROS; ++macroIndex )
-	{
-		const char* pCurMacro = s_pMacrosTable[macroIndex];
-		const char* pCurValue = s_pValueMacroTable[macroIndex];
-
-		size startPos = 0;
-		while ( ( startPos = string.find( pCurMacro, startPos ) ) != eastl::string::npos )
-		{
-			string.replace( startPos, S_Strlen( pCurMacro ), pCurValue );
-			startPos += S_Strlen( pCurValue );
-		}
-	}
-}
-
-/*
-==================
 CGameInfoDoc::Clear
 ==================
 */
 void CGameInfoDoc::Clear()
 {
 	game.clear();
-	searchPaths.clear();
+	version.clear();
+	crashDump.Clear();
+	fileSystem.Clear();
 	bLoaded = false;
 }
