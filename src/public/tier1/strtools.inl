@@ -526,6 +526,38 @@ FORCEINLINE bool S_IsDigit( wchar_t c )
 
 /*
 ==================
+S_ReplaceSubString
+==================
+*/
+FORCEINLINE void S_ReplaceSubString( eastl::string& string, const char* pOldSubString, const char* pNewSubString )
+{
+	size   idSubString	   = string.find( pOldSubString );
+	uint32 oldSubStringLen = S_Strlen( pOldSubString );
+	while ( idSubString != eastl::string::npos )
+	{
+		string.replace( idSubString, oldSubStringLen, pNewSubString );
+		idSubString = string.find( pOldSubString );
+	}
+}
+
+/*
+==================
+S_ReplaceSubString
+==================
+*/
+FORCEINLINE void S_ReplaceSubString( eastl::wstring& string, const wchar_t* pOldSubString, const wchar_t* pNewSubString )
+{
+	size   idSubString	   = string.find( pOldSubString );
+	uint32 oldSubStringLen = S_Strlen( pOldSubString );
+	while ( idSubString != eastl::wstring::npos )
+	{
+		string.replace( idSubString, oldSubStringLen, pNewSubString );
+		idSubString = string.find( pOldSubString );
+	}
+}
+
+/*
+==================
 S_Utf8_CharSize
 ==================
 */

@@ -2,6 +2,17 @@
 
 /*
 ==================
+gameInfoCrashDump_t::Clear
+==================
+*/
+FORCEINLINE void gameInfoCrashDump_t::Clear()
+{
+	supportEmail.clear();
+	supportURL.clear();
+}
+
+/*
+==================
 CGameInfoDoc::LoadFromFile
 ==================
 */
@@ -19,9 +30,7 @@ FORCEINLINE bool CGameInfoDoc::LoadFromFile( const char* pPath )
 	}
 
 	// Load a gameinfo from the stream
-	eastl::string gameinfoPath;
-	S_GetFilePath( pFile->GetPath(), gameinfoPath, false );
-	return LoadFromStream( pFile, gameinfoPath.c_str() );
+	return LoadFromStream( pFile );
 }
 
 /*
@@ -29,11 +38,25 @@ FORCEINLINE bool CGameInfoDoc::LoadFromFile( const char* pPath )
 CGameInfoDoc::LoadFromBuffer
 ==================
 */
-FORCEINLINE bool CGameInfoDoc::LoadFromBuffer( const char* pBuffer, const char* pGameInfoPath )
+FORCEINLINE bool CGameInfoDoc::LoadFromBuffer( const char* pBuffer )
 {
 	PROFILER_SCOPE_FUNC();
 	CStreamDataMemoryReader streamReader( (byte*)pBuffer, S_Strlen( pBuffer ) );
-	return LoadFromStream( &streamReader, pGameInfoPath );
+	return LoadFromStream( &streamReader );
+}
+
+/*
+==================
+CGameInfoDoc::Clear
+==================
+*/
+FORCEINLINE void CGameInfoDoc::Clear()
+{
+	game.clear();
+	version.clear();
+	crashDump.Clear();
+	searchPaths.clear();
+	bLoaded = false;
 }
 
 /*
@@ -58,22 +81,12 @@ FORCEINLINE const eastl::string& CGameInfoDoc::GetVersion() const
 
 /*
 ==================
-CGameInfoDoc::GetSupportEmail
+CGameInfoDoc::GetCrashDump
 ==================
 */
-FORCEINLINE const eastl::string& CGameInfoDoc::GetSupportEmail() const
+FORCEINLINE const gameInfoCrashDump_t& CGameInfoDoc::GetCrashDump() const
 {
-	return supportEmail;
-}
-
-/*
-==================
-CGameInfoDoc::GetSupportURL
-==================
-*/
-FORCEINLINE const eastl::string& CGameInfoDoc::GetSupportURL() const
-{
-	return supportURL;
+	return crashDump;
 }
 
 /*

@@ -42,6 +42,11 @@ bool S_LoadFileToString( const char* pPath, eastl::string& result, uint32 flags 
 bool S_SaveArrayToFile( const char* pPath, const eastl::vector<byte>& data, uint32 flags = FILE_WRITE_NONE );
 bool S_SaveStringToFile( const char* pPath, const eastl::string& data, uint32 flags = FILE_WRITE_NONE );
 
+// Supported placeholders: |platform_dir|, |platform_bin_dir|
+void		  S_FillPathPlaceholders( eastl::string& path );
+void		  S_FillPathPlaceholders( const char* pSrcPath, eastl::string& destPath );
+eastl::string S_FillPathPlaceholders( const char* pPath );
+
 //-----------------------------------------------------------------------------
 // Utility class for quick inquiries against filenames
 //-----------------------------------------------------------------------------

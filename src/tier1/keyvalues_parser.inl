@@ -6,7 +6,8 @@ CKeyValuesParser::CKeyValuesParser
 ==================
 */
 FORCEINLINE CKeyValuesParser::CKeyValuesParser()
-	: scopeLevel( 0 )
+	: contextType( CONTEXT_TYPE_DEFAULT )
+	, scopeLevel( 0 )
 {
 }
 
@@ -121,15 +122,27 @@ CKeyValuesParser::IsControlSymbol
 */
 FORCEINLINE bool CKeyValuesParser::IsControlSymbol( uint32 offset /* = 0 */ ) const
 {
-	const char c = buffer.Peek( offset );
-	return IsBeginLineComment( offset )
-		   || IsBeginMultilineComment( offset )
-		   || IsEndLineComment( offset )
-		   || IsEndMultilineComment( offset )
-		   || c == '{' || c == '}'
-		   || c == '[' || c == ']'
-		   || c == '"' || c == '|'
-		   || c == ':';
+	const char c			  = buffer.Peek( offset );
+	bool	   bControlSymbol = IsBeginLineComment( offset )
+								|| IsBeginMultilineComment( offset )
+								|| IsEndLineComment( offset )
+								|| IsEndMultilineComment( offset );
+	switch ( contextType )
+	{
+	case CONTEXT_TYPE_DEFAULT:
+		bControlSymbol |= c == '{' || c == '}' || c == '[' || c == ']' || c == '"' || c == ':';
+		break;
+
+	case CONTEXT_TYPE_CONDITIONAL_BLOCK:
+		bControlSymbol |= c == '|';
+		break;
+
+	default:
+		AssertMsg( false, "Unknown context type 0x%X", contextType );
+		break;
+	}
+
+	return bControlSymbol;
 }
 
 /*

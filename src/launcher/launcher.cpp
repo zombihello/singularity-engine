@@ -84,7 +84,7 @@ void CLauncherApp::Init()
 	const char* pGameDir = CommandLine()->HasParam( "game" ) ? CommandLine()->GetFirstValue( "game" ) : pDefaultGameDir;
 	if ( !gameInfo.LoadFromFile( S_Sprintf( "//base_path/%s/gameinfo.txt", pGameDir ).c_str() ) )
 	{
-		Sys_Error( "Setup file 'gameinfo.txt' doesn't exist in subdirectory '%s'", pGameDir );
+		Sys_Error( "Setup file 'gameinfo.txt' either invalid or doesn't exist in subdirectory '%s'", pGameDir );
 		return;
 	}
 
@@ -97,11 +97,12 @@ void CLauncherApp::Init()
 	}
 
 	// Setup application information for the crash dump
-	crashDumpAppInfo_t crashDumpAppInfo = {};
-	crashDumpAppInfo.pAppName			= gameInfo.GetGame().c_str();
-	crashDumpAppInfo.pAppVersion		= gameInfo.GetVersion().c_str();
-	crashDumpAppInfo.pSupportEmail		= gameInfo.GetSupportEmail().c_str();
-	crashDumpAppInfo.pSupportURL		= gameInfo.GetSupportURL().c_str();
+	const gameInfoCrashDump_t& gameInfoCrashDump = gameInfo.GetCrashDump();
+	crashDumpAppInfo_t		   crashDumpAppInfo	 = {};
+	crashDumpAppInfo.pAppName					 = gameInfo.GetGame().c_str();
+	crashDumpAppInfo.pAppVersion				 = gameInfo.GetVersion().c_str();
+	crashDumpAppInfo.pSupportEmail				 = gameInfoCrashDump.supportEmail.c_str();
+	crashDumpAppInfo.pSupportURL				 = gameInfoCrashDump.supportURL.c_str();
 	CrashDumpHandler()->SetAppInfo( crashDumpAppInfo );
 
 	// Connect WindowMgr, Engine and Game groups

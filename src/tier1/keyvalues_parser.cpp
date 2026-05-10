@@ -344,10 +344,11 @@ bool CKeyValuesParser::ReadConditionalBlock( bool& bAccepted )
 		return true;
 	}
 
-	bool				bExpectVar			 = true;
-	bool				bEndConditionalBlock = false;
-	eastl::vector<bool> bConditionalGroups;
-	uint32				curConditionalGroupId = 0;
+	bool					   bExpectVar			= true;
+	bool					   bEndConditionalBlock = false;
+	eastl::vector<bool>		   bConditionalGroups;
+	uint32					   curConditionalGroupId = 0;
+	CGuardValue<contextType_t> contextTypeGuardValue( contextType, CONTEXT_TYPE_CONDITIONAL_BLOCK );
 	bConditionalGroups.emplace_back( true );
 	while ( !buffer.IsEndOfBuffer() )
 	{
@@ -462,12 +463,19 @@ bool CKeyValuesParser::ReadIncludeKeys( eastl::vector<CKeyValues*>& includedKeys
 		return false;
 	}
 
-	// Get relative subdirectory
+	// Get a full path to the include file
 	eastl::string fullPath;
-	S_GetFilePath( buffer.GetStream()->GetPath(), fullPath, false );
-	size offset = fullPath.size();
-	fullPath.resize( fullPath.size() + token.string.size() );
-	Mem_Memcpy( fullPath.data() + offset, token.string.data(), token.string.size() );
+	if ( !S_IsAbsolutePath( token.string.c_str() ) )
+	{
+		S_GetFilePath( buffer.GetStream()->GetPath(), fullPath, false );
+		size offset = fullPath.size();
+		fullPath.resize( fullPath.size() + token.string.size() );
+		Mem_Memcpy( fullPath.data() + offset, token.string.data(), token.string.size() );
+	}
+	else
+	{
+		fullPath = token.string;
+	}
 
 	// Try open the file
 	CRefPtr<IStreamDataReader> pFile = g_pFileSystem->CreateFileReader( fullPath.c_str() );

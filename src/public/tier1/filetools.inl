@@ -170,6 +170,29 @@ FORCEINLINE bool S_SaveStringToFile( const char* pPath, const eastl::string& dat
 
 /*
 ==================
+S_FillPathPlaceholders
+==================
+*/
+FORCEINLINE void S_FillPathPlaceholders( const char* pSrcPath, eastl::string& destPath )
+{
+	destPath = pSrcPath;
+	S_FillPathPlaceholders( destPath );
+}
+
+/*
+==================
+S_FillPathPlaceholders
+==================
+*/
+FORCEINLINE eastl::string S_FillPathPlaceholders( const char* pPath )
+{
+	eastl::string result = pPath;
+	S_FillPathPlaceholders( result );
+	return result;
+}
+
+/*
+==================
 CFilename::GetExtension
 ==================
 */

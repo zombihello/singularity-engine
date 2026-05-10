@@ -18,6 +18,6 @@ ECHO Citadel: compile resources
 ECHO.
 ECHO ==============================================================================
 
-"%RESOURCECOMPILER_EXE%" -filelist %~dp0/resourcelist.txt -output "%GAME_DIR%/citadel/
+"%RESOURCECOMPILER_EXE%" -game %GAME_DIR%/citadel/ -filelist %~dp0/resourcelist.txt
 
 ECHO ==============================================================================

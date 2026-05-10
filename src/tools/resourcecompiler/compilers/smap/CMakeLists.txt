@@ -23,10 +23,6 @@ file( GLOB_RECURSE SRC_FILES        CONFIGURE_DEPENDS           ${SRC_PATTERNS} 
 file( GLOB_RECURSE PUBLIC_SRC_FILES CONFIGURE_DEPENDS           ${PUBLIC_SRC_PATTERNS} )
 file( GLOB_RECURSE GENERATED_FILES  CONFIGURE_DEPENDS           ${GENERATED_SRC_PATTERNS} )
 
-# Filter out all unnecessary files
-list( FILTER SRC_FILES 					EXCLUDE REGEX "/compilers/" )
-list( FILTER PUBLIC_SRC_FILES 			EXCLUDE REGEX "/compilers/" )
-
 # Filter out all unnecessary platforms
 filter_platform_files( SRC_FILES        ${PLATFORM_SRC_DIR} )
 filter_platform_files( PUBLIC_SRC_FILES ${PLATFORM_SRC_DIR} )
@@ -41,26 +37,19 @@ source_group( TREE "${PUBLIC_SRC_DIR}"  PREFIX "public"         FILES   ${PUBLIC
 source_group( TREE "${GENERATED_DIR}"   PREFIX "generated"      FILES   ${GENERATED_FILES} )
 
 
-set( FULL_SRC_FILES                                     						${SRC_FILES} ${PUBLIC_SRC_FILES} ${GENERATED_FILES} )
-add_executable( resourcecompiler	                      	    				${FULL_SRC_FILES} )
-target_precompile_headers( resourcecompiler PRIVATE 							pch_resourcecompiler.h )
-set_target_properties( resourcecompiler PROPERTIES FOLDER         				"Tools/Resource Compiler" )
-set_target_properties( resourcecompiler PROPERTIES PREFIX 						"" )
+set( FULL_SRC_FILES                                     							${SRC_FILES} ${PUBLIC_SRC_FILES} ${GENERATED_FILES} )
+add_library( resourcecompiler_smap SHARED 	                      	    			${FULL_SRC_FILES} )
+set_target_properties( resourcecompiler_smap PROPERTIES FOLDER         				"Tools/Resource Compiler" )
+set_target_properties( resourcecompiler_smap PROPERTIES PREFIX 						"" )
 
-target_link_libraries( resourcecompiler PRIVATE									tier0 tier1 appframework interfaces gameinfo toolsinfo stexdoc smatdoc smdldoc sentdoc smapdoc ${CMAKE_DL_LIBS} )
-add_common_target_defines( resourcecompiler )
-add_dependencies( resourcecompiler 												filesystem cvar resourcecompiler_stex resourcecompiler_smat resourcecompiler_smdl resourcecompiler_sent resourcecompiler_smap )
+target_link_libraries( resourcecompiler_smap PRIVATE								tier0 tier1 interfaces smapdoc ${CMAKE_DL_LIBS} )
+add_common_target_defines( resourcecompiler_smap )
 
 
 #
 # Install
 #
-inherit_install_files( resourcecompiler									TARGETS tier0 filesystem cvar resourcecompiler_stex resourcecompiler_smat resourcecompiler_smdl resourcecompiler_sent resourcecompiler_smap tier1 appframework interfaces gameinfo toolsinfo stexdoc smatdoc smdldoc sentdoc smapdoc )
+inherit_install_files( resourcecompiler_smap										TARGETS tier0 tier1 interfaces smapdoc )
 
 # Binaries
-install_files( resourcecompiler TARGETS RUNTIME resourcecompiler 		DESTINATION     bin/${PLATFORM_BIN_DIR}/ )
-
-# Setup install the target
-if ( INSTALL_SDK_TOOLS )
-	install_target( resourcecompiler									DESTINATION		game )
-endif()
+install_files( resourcecompiler_smap TARGETS RUNTIME resourcecompiler_smap 			DESTINATION bin/${PLATFORM_BIN_DIR}/ )
