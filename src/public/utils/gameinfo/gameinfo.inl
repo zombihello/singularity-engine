@@ -13,16 +13,6 @@ FORCEINLINE void gameInfoCrashDump_t::Clear()
 
 /*
 ==================
-gameInfoFileSystem_t::Clear
-==================
-*/
-FORCEINLINE void gameInfoFileSystem_t::Clear()
-{
-	searchPaths.clear();
-}
-
-/*
-==================
 CGameInfoDoc::LoadFromFile
 ==================
 */
@@ -57,6 +47,20 @@ FORCEINLINE bool CGameInfoDoc::LoadFromBuffer( const char* pBuffer )
 
 /*
 ==================
+CGameInfoDoc::Clear
+==================
+*/
+FORCEINLINE void CGameInfoDoc::Clear()
+{
+	game.clear();
+	version.clear();
+	crashDump.Clear();
+	searchPaths.clear();
+	bLoaded = false;
+}
+
+/*
+==================
 CGameInfoDoc::GetGame
 ==================
 */
@@ -87,12 +91,12 @@ FORCEINLINE const gameInfoCrashDump_t& CGameInfoDoc::GetCrashDump() const
 
 /*
 ==================
-CGameInfoDoc::GetFileSystem
+CGameInfoDoc::GetSearchPaths
 ==================
 */
-FORCEINLINE const gameInfoFileSystem_t& CGameInfoDoc::GetFileSystem() const
+FORCEINLINE const eastl::vector<gameInfoSearchPath_t>& CGameInfoDoc::GetSearchPaths() const
 {
-	return fileSystem;
+	return searchPaths;
 }
 
 /*

@@ -53,7 +53,7 @@ bool CGameInfoDoc::LoadFromStream( IStreamDataReader* pStreamReader )
 		{
 			for ( CKeyValuesSubKeysIterator it( pSearchPaths ); it; ++it )
 			{
-				gameInfoSearchPath_t& searchPath = fileSystem.searchPaths.emplace_back();
+				gameInfoSearchPath_t& searchPath = searchPaths.emplace_back();
 				searchPath.id					 = it->GetName();
 				searchPath.path					 = it->GetString( NULL );
 				S_FillPathPlaceholders( searchPath.path );
@@ -64,18 +64,4 @@ bool CGameInfoDoc::LoadFromStream( IStreamDataReader* pStreamReader )
 	// We are done
 	bLoaded = true;
 	return bLoaded;
-}
-
-/*
-==================
-CGameInfoDoc::Clear
-==================
-*/
-void CGameInfoDoc::Clear()
-{
-	game.clear();
-	version.clear();
-	crashDump.Clear();
-	fileSystem.Clear();
-	bLoaded = false;
 }

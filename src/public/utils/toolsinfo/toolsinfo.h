@@ -9,26 +9,18 @@
 #include "tier1/keyvalues.h"
 
 //-----------------------------------------------------------------------------
-// Helper for work with gameinfo.txt files
+// Helper for work with toolsinfo.txt files
 //-----------------------------------------------------------------------------
-struct gameInfoCrashDump_t
-{
-	void Clear();
-
-	eastl::string supportEmail;
-	eastl::string supportURL;
-};
-
-struct gameInfoSearchPath_t
+struct toolsInfoSearchPath_t
 {
 	eastl::string id;
 	eastl::string path;
 };
 
-class CGameInfoDoc
+class CToolsInfoDoc
 {
 public:
-	CGameInfoDoc();
+	CToolsInfoDoc();
 
 	// Methods for load from file/buffer and clear the document
 	// NOTE: For LoadFromFile must be connected Tier1
@@ -37,18 +29,14 @@ public:
 	bool LoadFromStream( IStreamDataReader* pStreamReader );
 	void Clear();
 
-	const eastl::string&					   GetGame() const;
-	const eastl::string&					   GetVersion() const;
-	const gameInfoCrashDump_t&				   GetCrashDump() const;
-	const eastl::vector<gameInfoSearchPath_t>& GetSearchPaths() const;
-	bool									   IsLoaded() const;
+	const eastl::vector<toolsInfoSearchPath_t>& GetSearchPaths() const;
+	const eastl::vector<eastl::string>&			GetResourceCompilers() const;
+	bool										IsLoaded() const;
 
 private:
-	bool								bLoaded;
-	eastl::string						game;
-	eastl::string						version;
-	gameInfoCrashDump_t					crashDump;
-	eastl::vector<gameInfoSearchPath_t> searchPaths;
+	bool								 bLoaded;
+	eastl::vector<toolsInfoSearchPath_t> searchPaths;
+	eastl::vector<eastl::string>		 resourceCompilers;
 };
 
-#include "utils/gameinfo/gameinfo.inl"
+#include "utils/toolsinfo/toolsinfo.inl"

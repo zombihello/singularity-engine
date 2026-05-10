@@ -13,5 +13,6 @@ file_system
 	{
 		gamebin 	core/bin/|platform_bin_dir|
 		game 		core
+		core		core
 	}
 }

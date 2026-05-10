@@ -1,0 +1,16 @@
+file_system
+{
+	search_paths
+	{
+		tools 	core/tools
+	}
+}
+
+resource_compilers
+{
+	compiler 	"//enginebin/resourcecompiler_stex"
+	compiler 	"//enginebin/resourcecompiler_smat"
+	compiler 	"//enginebin/resourcecompiler_smdl"
+	compiler 	"//enginebin/resourcecompiler_sent"
+	compiler 	"//enginebin/resourcecompiler_smap"
+}

@@ -18,6 +18,6 @@ ECHO Core: compile resources
 ECHO.
 ECHO ==============================================================================
 
-"%RESOURCECOMPILER_EXE%" -filelist %~dp0/resourcelist.txt -output "%GAME_DIR%/core/
+"%RESOURCECOMPILER_EXE%" -game %GAME_DIR%/core/ -filelist %~dp0/resourcelist.txt
 
 ECHO ==============================================================================

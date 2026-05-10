@@ -13,5 +13,6 @@ file_system
 	{
 		gamebin 	citadel/bin/|platform_bin_dir|
 		game 		citadel
+		core		core
 	}
 }

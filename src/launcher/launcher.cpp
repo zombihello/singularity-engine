@@ -89,10 +89,10 @@ void CLauncherApp::Init()
 	}
 
 	// Initialize the file system for the game
-	const gameInfoFileSystem_t& gameInfoFileSystem = gameInfo.GetFileSystem();
-	for ( uint32 index = 0, count = (uint32)gameInfoFileSystem.searchPaths.size(); index < count; ++index )
+	const eastl::vector<gameInfoSearchPath_t>& searchPaths = gameInfo.GetSearchPaths();
+	for ( uint32 index = 0, count = (uint32)searchPaths.size(); index < count; ++index )
 	{
-		const gameInfoSearchPath_t& searchPath = gameInfoFileSystem.searchPaths[index];
+		const gameInfoSearchPath_t& searchPath = searchPaths[index];
 		g_pFileSystem->AddSearchPath( searchPath.path.c_str(), searchPath.id.c_str() );
 	}
 
@@ -270,11 +270,11 @@ void CLauncherApp::Shutdown()
 	}
 
 	// Otherwise we look for search paths in gameinfo.txt and remove they from the file system
-	eastl::unordered_set<eastl::string> pathIDSet;
-	const gameInfoFileSystem_t&			gameInfoFileSystem = gameInfo.GetFileSystem();
-	for ( uint32 index = 0, count = (uint32)gameInfoFileSystem.searchPaths.size(); index < count; ++index )
+	eastl::unordered_set<eastl::string>		   pathIDSet;
+	const eastl::vector<gameInfoSearchPath_t>& searchPaths = gameInfo.GetSearchPaths();
+	for ( uint32 index = 0, count = (uint32)searchPaths.size(); index < count; ++index )
 	{
-		const gameInfoSearchPath_t& searchPath = gameInfoFileSystem.searchPaths[index];
+		const gameInfoSearchPath_t& searchPath = searchPaths[index];
 		pathIDSet.insert( searchPath.id );
 	}
 

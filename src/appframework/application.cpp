@@ -117,7 +117,6 @@ void CApplication::Init()
 	S_GetFilePath( Sys_GetExecutablePath(), exePath, false );
 	S_AppendPathSeparator( exePath );
 	g_pFileSystem->AddSearchPath( exePath.c_str(), "enginebin" );
-	g_pFileSystem->AddSearchPath( "core", "core" );
 
 	// Initialize the profiler
 #if ENABLE_PROFILING
