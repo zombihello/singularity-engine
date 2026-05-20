@@ -1,5 +1,5 @@
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-:: The batch file to compile all dev tools
+:: The batch file to compile citadel
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 @ECHO OFF
@@ -9,13 +9,13 @@ SETLOCAL EnableDelayedExpansion
 SET ROOT_DIR="%~dp0/../../.."
 SET BUILD_DIR="%~dp0/../../build/__temp__"
 SET BUILD_CONFIGURATION=%~1
-SET BUILD_TARGETS=shadercompiler ecscompiler
+SET BUILD_TARGETS=citadel citadel_launcher
 SET INSTALL_DIR=%~2
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 ECHO ==============================================================================
 ECHO.
-ECHO Compile dev tools
+ECHO Compile citadel
 ECHO.
 ECHO ==============================================================================
 
@@ -47,7 +47,7 @@ IF NOT EXIST %BUILD_DIR% (
 PUSHD %BUILD_DIR% || GOTO :CLEANUP
 
 :: Configure cmake
-cmake -G "Ninja" -DCMAKE_INSTALL_PREFIX="%INSTALL_DIR%" -DCMAKE_BUILD_TYPE=%BUILD_CONFIGURATION% -DINSTALL_THIRDPARTY_TOOLS=OFF -DINSTALL_SDK_TOOLS=OFF -DCMAKE_TOOLCHAIN_FILE="%ROOT_DIR%/src/cmake/toolchains/windows/msvc_toolchain.cmake" "%ROOT_DIR%/src"
+cmake -G "Ninja" -DCMAKE_INSTALL_PREFIX="%INSTALL_DIR%" -DCMAKE_BUILD_TYPE=%BUILD_CONFIGURATION% -DINSTALL_DEV_TOOLS=OFF -DINSTALL_SDK_TOOLS=OFF -DINSTALL_THIRDPARTY_TOOLS=OFF -DCMAKE_TOOLCHAIN_FILE="%ROOT_DIR%/src/cmake/toolchains/windows/msvc_toolchain.cmake" "%ROOT_DIR%/src"
 IF ERRORLEVEL 1 GOTO :CLEANUP
 
 :: Build and install tools
