@@ -55,12 +55,15 @@ add_dependencies( resourcecompiler 												filesystem cvar resourcecompiler_
 #
 # Install
 #
-inherit_install_files( resourcecompiler									TARGETS tier0 filesystem cvar resourcecompiler_stex resourcecompiler_smat resourcecompiler_smdl resourcecompiler_sent resourcecompiler_smap tier1 appframework interfaces gameinfo toolsinfo stexdoc smatdoc smdldoc sentdoc smapdoc )
+inherit_install_files( resourcecompiler												TARGETS tier0 filesystem cvar resourcecompiler_stex resourcecompiler_smat resourcecompiler_smdl resourcecompiler_sent resourcecompiler_smap tier1 appframework interfaces gameinfo toolsinfo stexdoc smatdoc smdldoc sentdoc smapdoc )
 
 # Binaries
-install_files( resourcecompiler TARGETS RUNTIME resourcecompiler 		DESTINATION     bin/${PLATFORM_BIN_DIR}/ )
+install_files( resourcecompiler TARGETS RUNTIME resourcecompiler 					DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+if ( INSTALL_PDB )
+    install_files( resourcecompiler FILES $<TARGET_PDB_FILE:resourcecompiler>   	DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+endif()
 
 # Setup install the target
 if ( INSTALL_SDK_TOOLS )
-	install_target( resourcecompiler									DESTINATION		game )
+	install_target( resourcecompiler												DESTINATION game )
 endif()

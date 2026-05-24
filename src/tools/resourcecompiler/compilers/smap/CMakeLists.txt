@@ -49,7 +49,10 @@ add_common_target_defines( resourcecompiler_smap )
 #
 # Install
 #
-inherit_install_files( resourcecompiler_smap										TARGETS tier0 tier1 interfaces smapdoc )
+inherit_install_files( resourcecompiler_smap												TARGETS tier0 tier1 interfaces smapdoc )
 
 # Binaries
-install_files( resourcecompiler_smap TARGETS RUNTIME resourcecompiler_smap 			DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+install_files( resourcecompiler_smap TARGETS RUNTIME resourcecompiler_smap 					DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+if ( INSTALL_PDB )
+    install_files( resourcecompiler_smap FILES $<TARGET_PDB_FILE:resourcecompiler_smap>   	DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+endif()

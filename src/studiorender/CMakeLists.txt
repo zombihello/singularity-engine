@@ -54,7 +54,10 @@ add_dependencies( studiorender												studioapi_vk )
 #
 # Install
 #
-inherit_install_files( studiorender								TARGETS tier0 tier1 interfaces shadercache studioapi_vk )
+inherit_install_files( studiorender										TARGETS tier0 tier1 interfaces shadercache studioapi_vk )
 
 # Binaries
-install_files( studiorender TARGETS RUNTIME studiorender 		DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+install_files( studiorender TARGETS RUNTIME studiorender 				DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+if ( INSTALL_PDB )
+    install_files( studiorender FILES $<TARGET_PDB_FILE:studiorender>   DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+endif()

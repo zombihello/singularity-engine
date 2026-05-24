@@ -50,4 +50,7 @@ add_common_target_defines( inputsystem )
 # Install
 #
 inherit_install_files( inputsystem										TARGETS tier0 tier1 interfaces )
-install_files( inputsystem TARGETS RUNTIME inputsystem 					DESTINATION     bin/${PLATFORM_BIN_DIR}/ )
+install_files( inputsystem TARGETS RUNTIME inputsystem 					DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+if ( INSTALL_PDB )
+    install_files( inputsystem FILES $<TARGET_PDB_FILE:inputsystem>     DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+endif()

@@ -61,10 +61,13 @@ add_common_target_defines( studioapi_vk )
 #
 # Install
 #
-inherit_install_files( studioapi_vk									TARGETS tier0 tier1 interfaces shadercache pixelformatinfos )
+inherit_install_files( studioapi_vk										TARGETS tier0 tier1 interfaces shadercache pixelformatinfos )
 
 # Binaries
-install_files( studioapi_vk TARGETS RUNTIME studioapi_vk 			DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+install_files( studioapi_vk TARGETS RUNTIME studioapi_vk 				DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+if ( INSTALL_PDB )
+    install_files( studioapi_vk FILES $<TARGET_PDB_FILE:studioapi_vk>   DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+endif()
 
 # Linceses
-install_files( studioapi_vk FILES ${VULKANSDK_INSTALL_LICENSES}		DESTINATION licenses/vulkansdk/ )
+install_files( studioapi_vk FILES ${VULKANSDK_INSTALL_LICENSES}			DESTINATION licenses/vulkansdk/ )

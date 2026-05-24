@@ -24,15 +24,15 @@ endif()
 
 # Set default CMAKE_INSTALL_PREFIX if it wasn't set
 if ( CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT )
-    set( CMAKE_INSTALL_PREFIX               "${CMAKE_SOURCE_DIR}/" CACHE PATH "Default install path" FORCE )
+    set( CMAKE_INSTALL_PREFIX               "${CMAKE_SOURCE_DIR}/../" CACHE PATH "Default install path" FORCE )
 endif()
 
 
 #
 # Disable PCH for source files in public folder
 #
-file( GLOB_RECURSE PUBLIC_FILES                         "public/*.h" "public/*.inl" "public/*.cpp" "public/*.c" )
-set_source_files_properties( PUBLIC_FILES PROPERTIES    SKIP_PRECOMPILE_HEADERS ON )
+file( GLOB_RECURSE PUBLIC_FILES                             "public/*.h" "public/*.inl" "public/*.cpp" "public/*.c" )
+set_source_files_properties( PUBLIC_FILES   PROPERTIES      SKIP_PRECOMPILE_HEADERS ON )
 
 
 #
@@ -41,7 +41,7 @@ set_source_files_properties( PUBLIC_FILES PROPERTIES    SKIP_PRECOMPILE_HEADERS 
 option( INSTALL_SDK_TOOLS                               "Install sdk tools" ON )
 option( INSTALL_DEV_TOOLS                               "Install dev tools" ON )
 option( INSTALL_THIRDPARTY_TOOLS                        "Install third-party tools" ON )
-
+option( INSTALL_PDB                                     "Install PDB files" OFF )
 
 #
 # Paths

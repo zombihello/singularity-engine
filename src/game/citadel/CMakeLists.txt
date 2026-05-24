@@ -62,3 +62,6 @@ inherit_install_files( citadel											TARGETS game_shared								DESTINATION 
 
 # Binaries
 install_files( citadel TARGETS RUNTIME citadel 							DESTINATION	citadel/bin/${PLATFORM_BIN_DIR}/ )
+if ( INSTALL_PDB )
+    install_files( citadel FILES $<TARGET_PDB_FILE:citadel>       		DESTINATION citadel/bin/${PLATFORM_BIN_DIR}/ )
+endif()

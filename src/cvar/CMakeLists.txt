@@ -53,4 +53,7 @@ add_common_target_defines( cvar )
 inherit_install_files( cvar											TARGETS tier0 tier1 interfaces )
 
 # Binaries
-install_files( cvar TARGETS RUNTIME cvar 							DESTINATION		bin/${PLATFORM_BIN_DIR}/ )
+install_files( cvar TARGETS RUNTIME cvar 							DESTINATION	bin/${PLATFORM_BIN_DIR}/ )
+if ( INSTALL_PDB )
+    install_files( cvar FILES $<TARGET_PDB_FILE:cvar>       		DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+endif()

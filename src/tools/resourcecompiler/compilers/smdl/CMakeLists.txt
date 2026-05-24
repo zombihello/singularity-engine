@@ -61,13 +61,16 @@ add_common_target_defines( resourcecompiler_smdl )
 #
 # Install
 #
-inherit_install_files( resourcecompiler_smdl										TARGETS tier0 tier1 interfaces smdldoc )
+inherit_install_files( resourcecompiler_smdl												TARGETS tier0 tier1 interfaces smdldoc )
 
 # Binaries
-install_files( resourcecompiler_smdl TARGETS RUNTIME resourcecompiler_smdl 						DESTINATION     bin/${PLATFORM_BIN_DIR}/ )
-install_files( resourcecompiler_smdl FILES ${THIRDPARTY_INSTALL_DEBUG_DLLS}			DESTINATION 	bin/${PLATFORM_BIN_DIR}/	CONFIGURATIONS 	Debug )
-install_files( resourcecompiler_smdl FILES ${THIRDPARTY_INSTALL_RELEASE_DLLS}		DESTINATION 	bin/${PLATFORM_BIN_DIR}/	CONFIGURATIONS 	Release Retail )
+install_files( resourcecompiler_smdl TARGETS RUNTIME resourcecompiler_smdl 					DESTINATION 	bin/${PLATFORM_BIN_DIR}/ )
+if ( INSTALL_PDB )
+    install_files( resourcecompiler_smdl FILES $<TARGET_PDB_FILE:resourcecompiler_smdl>   	DESTINATION 	bin/${PLATFORM_BIN_DIR}/ )
+endif()
+install_files( resourcecompiler_smdl FILES ${THIRDPARTY_INSTALL_DEBUG_DLLS}					DESTINATION 	bin/${PLATFORM_BIN_DIR}/	CONFIGURATIONS 	Debug )
+install_files( resourcecompiler_smdl FILES ${THIRDPARTY_INSTALL_RELEASE_DLLS}				DESTINATION 	bin/${PLATFORM_BIN_DIR}/	CONFIGURATIONS 	Release Retail )
 
 # Linceses
-install_files( resourcecompiler_smdl FILES ${ASSIMP_INSTALL_LICENSES}				DESTINATION 	licenses/assimp/ )
-install_files( resourcecompiler_smdl FILES ${MESHOPTIMIZER_INSTALL_LICENSES}		DESTINATION 	licenses/meshoptimizer/ )
+install_files( resourcecompiler_smdl FILES ${ASSIMP_INSTALL_LICENSES}						DESTINATION 	licenses/assimp/ )
+install_files( resourcecompiler_smdl FILES ${MESHOPTIMIZER_INSTALL_LICENSES}				DESTINATION 	licenses/meshoptimizer/ )

@@ -49,7 +49,10 @@ add_common_target_defines( resourcecompiler_smat )
 #
 # Install
 #
-inherit_install_files( resourcecompiler_smat										TARGETS tier0 tier1 interfaces smatdoc )
+inherit_install_files( resourcecompiler_smat												TARGETS tier0 tier1 interfaces smatdoc )
 
 # Binaries
-install_files( resourcecompiler_smat TARGETS RUNTIME resourcecompiler_smat 			DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+install_files( resourcecompiler_smat TARGETS RUNTIME resourcecompiler_smat 					DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+if ( INSTALL_PDB )
+    install_files( resourcecompiler_smat FILES $<TARGET_PDB_FILE:resourcecompiler_smat>   	DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+endif()
