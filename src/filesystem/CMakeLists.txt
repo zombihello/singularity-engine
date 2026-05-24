@@ -54,3 +54,6 @@ inherit_install_files( filesystem										TARGETS tier0 tier1 interfaces )
 
 # Binaries
 install_files( filesystem TARGETS RUNTIME filesystem 					DESTINATION	bin/${PLATFORM_BIN_DIR}/ )
+if ( INSTALL_PDB )
+    install_files( filesystem FILES $<TARGET_PDB_FILE:filesystem>       DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+endif()

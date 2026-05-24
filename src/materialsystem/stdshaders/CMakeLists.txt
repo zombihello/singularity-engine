@@ -6,11 +6,14 @@ cmake_minimum_required( VERSION 3.19 )
 set( SRC_DIR							${CMAKE_CURRENT_SOURCE_DIR} )
 set( GENERATED_DIR						${CMAKE_CURRENT_BINARY_DIR} )
 
-set( SRC_PATTERNS						"${SRC_DIR}/*.h" "${SRC_DIR}/*.inl" "${SRC_DIR}/*.cpp" "${SRC_DIR}/*.makefile" "${SRC_DIR}/*.shader" "${SRC_DIR}/*.hlsl" )
+set( SRC_PATTERNS						"${SRC_DIR}/*.h" "${SRC_DIR}/*.inl" "${SRC_DIR}/*.cpp" "${SRC_DIR}/*.shader" )
 set( PUBLIC_SRC_PATTERNS				"${PUBLIC_SRC_DIR}/materialsystem/*.h" "${PUBLIC_SRC_DIR}/materialsystem/*.inl" "${PUBLIC_SRC_DIR}/materialsystem/*.cpp" 
-										"${PUBLIC_SRC_DIR}/materialsystem/*.hlsl" "${PUBLIC_SRC_DIR}/tier0/*.cpp" )
+										"${PUBLIC_SRC_DIR}/tier0/*.cpp" )
 set( GENERATED_SRC_PATTERNS				"${GENERATED_DIR}/*.h" "${GENERATED_DIR}/*.inl" "${GENERATED_DIR}/*.cpp"
 										"${GENERATED_DIR}/*.hxx" "${GENERATED_DIR}/*.cxx" )
+
+set( VIEW_ONLY_PATTERNS					"${SRC_DIR}/*.makefile" "${SRC_DIR}/*.hlsl" )
+set( PUBLIC_VIEW_ONLY_PATTERNS 			"${PUBLIC_SRC_DIR}/materialsystem/*.hlsl" )
 
 if ( PLATFORM_WINDOWS )
 	set( SRC_PATTERNS 					${SRC_PATTERNS} "${SRC_DIR}/*.rc" )
@@ -19,14 +22,20 @@ else()
 endif()
 
 
-file( GLOB_RECURSE SRC_FILES        CONFIGURE_DEPENDS           ${SRC_PATTERNS} )
-file( GLOB_RECURSE PUBLIC_SRC_FILES CONFIGURE_DEPENDS           ${PUBLIC_SRC_PATTERNS} )
-file( GLOB_RECURSE GENERATED_FILES  CONFIGURE_DEPENDS           ${GENERATED_SRC_PATTERNS} )
+file( GLOB_RECURSE SRC_FILES        				CONFIGURE_DEPENDS           ${SRC_PATTERNS} )
+file( GLOB_RECURSE PUBLIC_SRC_FILES 				CONFIGURE_DEPENDS           ${PUBLIC_SRC_PATTERNS} )
+file( GLOB_RECURSE GENERATED_FILES  				CONFIGURE_DEPENDS           ${GENERATED_SRC_PATTERNS} )
+file( GLOB_RECURSE VIEW_ONLY_FILES        			CONFIGURE_DEPENDS           ${VIEW_ONLY_PATTERNS} )
+file( GLOB_RECURSE PUBLIC_VIEW_ONLY_FILES        	CONFIGURE_DEPENDS           ${PUBLIC_VIEW_ONLY_PATTERNS} )
 
 # Filter out all unnecessary platforms
 filter_platform_files( SRC_FILES        ${PLATFORM_SRC_DIR} )
 filter_platform_files( PUBLIC_SRC_FILES ${PLATFORM_SRC_DIR} )
 filter_platform_files( GENERATED_FILES 	${PLATFORM_SRC_DIR} )
+
+# Just add the source files to the project as documents
+set_source_files_properties( ${VIEW_ONLY_FILES}     		PROPERTIES      VS_TOOL_OVERRIDE "None" )
+set_source_files_properties( ${PUBLIC_VIEW_ONLY_FILES}     	PROPERTIES      VS_TOOL_OVERRIDE "None" ) 
 
 
 #
@@ -38,12 +47,12 @@ add_shadercompiler_commands( ${SRC_DIR} ${GENERATED_DIR} GENERATED_FILES ${SRC_F
 #
 # Source groups
 #
-source_group( TREE "${SRC_DIR}"         PREFIX "src"            FILES   ${SRC_FILES} )
-source_group( TREE "${PUBLIC_SRC_DIR}"  PREFIX "public"         FILES   ${PUBLIC_SRC_FILES} )
+source_group( TREE "${SRC_DIR}"         PREFIX "src"            FILES   ${SRC_FILES} ${VIEW_ONLY_FILES} )
+source_group( TREE "${PUBLIC_SRC_DIR}"  PREFIX "public"         FILES   ${PUBLIC_SRC_FILES} ${PUBLIC_VIEW_ONLY_FILES} )
 source_group( TREE "${GENERATED_DIR}"   PREFIX "generated"      FILES   ${GENERATED_FILES} )
 
 
-set( FULL_SRC_FILES                                     				${SRC_FILES} ${PUBLIC_SRC_FILES} ${GENERATED_FILES} )
+set( FULL_SRC_FILES                                     				${SRC_FILES} ${PUBLIC_SRC_FILES} ${GENERATED_FILES} ${VIEW_ONLY_FILES} ${PUBLIC_VIEW_ONLY_FILES} )
 add_library( stdshaders SHARED 	                      	    			${FULL_SRC_FILES} )
 target_precompile_headers( stdshaders PRIVATE 							pch_stdshaders.h )
 set_target_properties( stdshaders PROPERTIES FOLDER         			Engine/Shaders )
@@ -60,3 +69,6 @@ inherit_install_files( stdshaders										TARGETS tier0 tier1 interfaces shader
 
 # Binaries
 install_files( stdshaders TARGETS RUNTIME stdshaders 					DESTINATION	bin/${PLATFORM_BIN_DIR}/ )
+if ( INSTALL_PDB )
+    install_files( stdshaders FILES $<TARGET_PDB_FILE:stdshaders>     	DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+endif()

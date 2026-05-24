@@ -48,7 +48,10 @@ add_common_target_defines( resourcecompiler_sent )
 #
 # Install
 #
-inherit_install_files( resourcecompiler_sent									TARGETS tier0 tier1 interfaces sentdoc )
+inherit_install_files( resourcecompiler_sent												TARGETS tier0 tier1 interfaces sentdoc )
 
 # Binaries
-install_files( resourcecompiler_sent TARGETS RUNTIME resourcecompiler_sent 		DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+install_files( resourcecompiler_sent TARGETS RUNTIME resourcecompiler_sent 					DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+if ( INSTALL_PDB )
+    install_files( resourcecompiler_sent FILES $<TARGET_PDB_FILE:resourcecompiler_sent>   	DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+endif()

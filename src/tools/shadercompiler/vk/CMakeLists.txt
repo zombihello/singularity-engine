@@ -58,10 +58,13 @@ add_common_target_defines( shadercompiler_vk )
 #
 # Install
 #
-inherit_install_files( shadercompiler_vk								TARGETS tier0 tier1 interfaces shadercache )
+inherit_install_files( shadercompiler_vk											TARGETS tier0 tier1 interfaces shadercache )
 
 # Binaries
-install_files( shadercompiler_vk TARGETS RUNTIME shadercompiler_vk 		DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+install_files( shadercompiler_vk TARGETS RUNTIME shadercompiler_vk 					DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+if ( INSTALL_PDB )
+    install_files( shadercompiler_vk FILES $<TARGET_PDB_FILE:shadercompiler_vk>   	DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+endif()
 
 # Linceses
-install_files( shadercompiler_vk FILES ${VULKANSDK_INSTALL_LICENSES}	DESTINATION licenses/vulkansdk/ )
+install_files( shadercompiler_vk FILES ${VULKANSDK_INSTALL_LICENSES}				DESTINATION licenses/vulkansdk/ )

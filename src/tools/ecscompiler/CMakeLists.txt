@@ -56,12 +56,15 @@ add_dependencies( ecscompiler 											filesystem cvar )
 #
 # Install
 #
-inherit_install_files( ecscompiler								TARGETS tier0 tier1 appframework interfaces parserlib filesystem cvar )
+inherit_install_files( ecscompiler										TARGETS tier0 tier1 appframework interfaces parserlib filesystem cvar )
 
 # Binaries
-install_files( ecscompiler TARGETS RUNTIME ecscompiler 			DESTINATION     bin/${PLATFORM_BIN_DIR}/ )
+install_files( ecscompiler TARGETS RUNTIME ecscompiler 					DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+if ( INSTALL_PDB )
+    install_files( ecscompiler FILES $<TARGET_PDB_FILE:ecscompiler>   	DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+endif()
 
 # Setup install the target
 if ( INSTALL_DEV_TOOLS )
-	install_target( ecscompiler									DESTINATION		src/devtools/ecscompiler )
+	install_target( ecscompiler											DESTINATION	src/devtools/ecscompiler )
 endif()

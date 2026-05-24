@@ -37,11 +37,12 @@ source_group( TREE "${PUBLIC_SRC_DIR}"  PREFIX "public"         FILES   ${PUBLIC
 source_group( TREE "${GENERATED_DIR}"   PREFIX "generated"      FILES   ${GENERATED_FILES} )
 
 
-set( FULL_SRC_FILES                                     				${SRC_FILES} ${PUBLIC_SRC_FILES} ${GENERATED_FILES} )
-add_executable( citadel_launcher WIN32                      	    	${FULL_SRC_FILES} )
-set_target_properties( citadel_launcher PROPERTIES FOLDER         		Game )
-set_target_properties( citadel_launcher PROPERTIES PREFIX 				"" )
-set_target_properties( citadel_launcher PROPERTIES OUTPUT_NAME			citadel )
+set( FULL_SRC_FILES                                     							${SRC_FILES} ${PUBLIC_SRC_FILES} ${GENERATED_FILES} )
+add_executable( citadel_launcher WIN32                      	    				${FULL_SRC_FILES} )
+set_target_properties( citadel_launcher PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY    "${ROOT_DIR}/game/bin/${PLATFORM_BIN_DIR}/" )
+set_target_properties( citadel_launcher PROPERTIES FOLDER         					Game )
+set_target_properties( citadel_launcher PROPERTIES PREFIX 							"" )
+set_target_properties( citadel_launcher PROPERTIES OUTPUT_NAME						citadel )
 
 target_compile_definitions( citadel_launcher PRIVATE					DEFAULT_GAMEDIR="citadel" )
 target_link_libraries( citadel_launcher PRIVATE							tier0 tier1 ${CMAKE_DL_LIBS} )
@@ -52,10 +53,13 @@ add_dependencies( citadel_launcher 										launcher citadel )
 #
 # Install
 #
-inherit_install_files( citadel_launcher									TARGETS tier0 tier1 launcher citadel )
+inherit_install_files( citadel_launcher												TARGETS tier0 tier1 launcher citadel )
 
 # Binaries
-install_files( citadel_launcher TARGETS RUNTIME citadel_launcher 		DESTINATION     bin/${PLATFORM_BIN_DIR}/ )
+install_files( citadel_launcher TARGETS RUNTIME citadel_launcher 					DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+if ( INSTALL_PDB )
+    install_files( citadel_launcher FILES $<TARGET_PDB_FILE:citadel_launcher>     	DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+endif()
 
 # Setup install the target
-install_target( citadel_launcher										DESTINATION		game )
+install_target( citadel_launcher													DESTINATION game )

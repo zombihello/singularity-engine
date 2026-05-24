@@ -60,12 +60,15 @@ add_common_target_defines( resourcecompiler_stex )
 #
 # Install
 #
-inherit_install_files( resourcecompiler_stex											TARGETS tier0 tier1 interfaces stexdoc )
+inherit_install_files( resourcecompiler_stex												TARGETS tier0 tier1 interfaces stexdoc )
 
 # Binaries
-install_files( resourcecompiler_stex TARGETS RUNTIME resourcecompiler_stex 				DESTINATION     bin/${PLATFORM_BIN_DIR}/ )
-install_files( resourcecompiler_stex FILES ${THIRDPARTY_INSTALL_DEBUG_DLLS}				DESTINATION 	bin/${PLATFORM_BIN_DIR}/	CONFIGURATIONS 	Debug )
-install_files( resourcecompiler_stex FILES ${THIRDPARTY_INSTALL_RELEASE_DLLS}			DESTINATION 	bin/${PLATFORM_BIN_DIR}/	CONFIGURATIONS 	Release Retail )
+install_files( resourcecompiler_stex TARGETS RUNTIME resourcecompiler_stex 					DESTINATION     bin/${PLATFORM_BIN_DIR}/ )
+if ( INSTALL_PDB )
+    install_files( resourcecompiler_stex FILES $<TARGET_PDB_FILE:resourcecompiler_stex>   	DESTINATION 	bin/${PLATFORM_BIN_DIR}/ )
+endif()
+install_files( resourcecompiler_stex FILES ${THIRDPARTY_INSTALL_DEBUG_DLLS}					DESTINATION 	bin/${PLATFORM_BIN_DIR}/	CONFIGURATIONS 	Debug )
+install_files( resourcecompiler_stex FILES ${THIRDPARTY_INSTALL_RELEASE_DLLS}				DESTINATION 	bin/${PLATFORM_BIN_DIR}/	CONFIGURATIONS 	Release Retail )
 
 # Linceses
-install_files( resourcecompiler_stex DIRECTORY ${COMPRESSONATOR_INSTALL_LICENSES_DIR}	DESTINATION 	licenses/compressonator/ )
+install_files( resourcecompiler_stex DIRECTORY ${COMPRESSONATOR_INSTALL_LICENSES_DIR}		DESTINATION 	licenses/compressonator/ )

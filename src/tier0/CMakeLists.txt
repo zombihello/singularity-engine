@@ -87,6 +87,9 @@ inherit_install_files( tier0									TARGETS tier1 )
 
 # Binaries
 install_files( tier0 TARGETS RUNTIME tier0						DESTINATION		bin/${PLATFORM_BIN_DIR}/ )
+if ( INSTALL_PDB )
+    install_files( tier0 FILES $<TARGET_PDB_FILE:tier0>   		DESTINATION 	bin/${PLATFORM_BIN_DIR}/ )
+endif()
 install_files( tier0 FILES ${THIRDPARTY_INSTALL_DLLS}			DESTINATION		bin/${PLATFORM_BIN_DIR}/ )
 if ( INSTALL_THIRDPARTY_TOOLS )
 	install_files( tier0 FILES ${THIRDPARTY_INSTALL_TOOLS}		DESTINATION		bin/${PLATFORM_BIN_DIR}/ )

@@ -50,7 +50,10 @@ add_dependencies( launcher											inputsystem filesystem cvar studiorender ma
 #
 # Install
 #
-inherit_install_files( launcher							TARGETS tier0 tier1 appframework interfaces gameinfo inputsystem filesystem cvar studiorender materialsystem resourcesystem )
+inherit_install_files( launcher										TARGETS tier0 tier1 appframework interfaces gameinfo inputsystem filesystem cvar studiorender materialsystem resourcesystem )
 
 # Binaries
-install_files( launcher TARGETS RUNTIME launcher 		DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+install_files( launcher TARGETS RUNTIME launcher 					DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+if ( INSTALL_PDB )
+    install_files( launcher FILES $<TARGET_PDB_FILE:launcher>     	DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+endif()

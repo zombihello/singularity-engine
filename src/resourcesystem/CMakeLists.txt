@@ -50,7 +50,10 @@ add_common_target_defines( resourcesystem )
 #
 # Install
 #
-inherit_install_files( resourcesystem							TARGETS tier0 tier1 interfaces )
+inherit_install_files( resourcesystem											TARGETS tier0 tier1 interfaces )
 
 # Binaries
-install_files( resourcesystem TARGETS RUNTIME resourcesystem 	DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+install_files( resourcesystem TARGETS RUNTIME resourcesystem 					DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+if ( INSTALL_PDB )
+    install_files( resourcesystem FILES $<TARGET_PDB_FILE:resourcesystem>     	DESTINATION bin/${PLATFORM_BIN_DIR}/ )
+endif()

@@ -55,12 +55,15 @@ add_dependencies( shadercompiler 											filesystem cvar shadercompiler_vk )
 #
 # Install
 #
-inherit_install_files( shadercompiler								TARGETS tier0 tier1 appframework interfaces shadercache filesystem cvar shadercompiler_vk )
+inherit_install_files( shadercompiler										TARGETS tier0 tier1 appframework interfaces shadercache filesystem cvar shadercompiler_vk )
 
 # Binaries
-install_files( shadercompiler TARGETS RUNTIME shadercompiler 		DESTINATION     bin/${PLATFORM_BIN_DIR}/ )
+install_files( shadercompiler TARGETS RUNTIME shadercompiler 				DESTINATION     bin/${PLATFORM_BIN_DIR}/ )
+if ( INSTALL_PDB )
+    install_files( shadercompiler FILES $<TARGET_PDB_FILE:shadercompiler>   DESTINATION 	bin/${PLATFORM_BIN_DIR}/ )
+endif()
 
 # Setup install the target
 if ( INSTALL_DEV_TOOLS )
-	install_target( shadercompiler									DESTINATION		src/devtools/shadercompiler/ )
+	install_target( shadercompiler											DESTINATION		src/devtools/shadercompiler/ )
 endif()
