@@ -27,7 +27,8 @@ struct appInfo_t
 {
 	const char*		   pAppName;
 	applicationType_t  appType;
-	uint32			   baseConVarFlags;
+	uint32			   baseCmdFlags;
+	uint32			   baseCVarFlags;
 	IConVarsOverrider* pConVarsOverrider;
 	ICvarAccessor*	   pCvarAccessor;
 };

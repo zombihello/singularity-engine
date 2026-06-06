@@ -40,12 +40,13 @@ CStudioAPIVk::Connect
 bool CStudioAPIVk::Connect( createInterfaceFn_t pFactory )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-	
+
 	// Connect Tier1 and register cvars
 	if ( !ConnectTier1( pFactory ) )
 	{
 		return false;
 	}
+	LinkCmds();
 	ConVar_Register();
 	return true;
 }
@@ -58,8 +59,9 @@ CStudioAPIVk::Disconnect
 void CStudioAPIVk::Disconnect()
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-	
+
 	// Unregister cvars and disconnect Tier1
+	UnlinkCmds();
 	ConVar_Unregister();
 	DisconnectTier1();
 }
@@ -72,7 +74,7 @@ CStudioAPIVk::Init
 bool CStudioAPIVk::Init()
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-	
+
 	// Initialize the StudioAPI device
 	device.Init( ENGINE_VERSION_MAJOR, ENGINE_VERSION_MINOR, ENGINE_VERSION_PATCH );
 
@@ -149,7 +151,7 @@ CStudioAPIVk::Shutdown
 void CStudioAPIVk::Shutdown()
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-	
+
 	// Wait of device idle
 	vkDeviceWaitIdle( device.GetVkLogicalDevice() );
 

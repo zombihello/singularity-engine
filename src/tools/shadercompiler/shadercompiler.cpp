@@ -578,7 +578,7 @@ CShaderCompilerApp::GetAppInfo
 */
 const appInfo_t& CShaderCompilerApp::GetAppInfo() const
 {
-	static appInfo_t s_appInfo{ "shadercompiler", APPLICATION_TYPE_CONSOLE, FCVAR_NONE, NULL, NULL };
+	static appInfo_t s_appInfo{ "shadercompiler", APPLICATION_TYPE_CONSOLE, CMD_FLAG_NONE, FCVAR_NONE, NULL, NULL };
 	return s_appInfo;
 }
 

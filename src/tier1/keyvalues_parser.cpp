@@ -275,7 +275,7 @@ bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValues )
 			else
 			{
 				eastl::string convertedValueBuffer;
-				S_ConvertUnescapeToEscapeSymbols( convertedValueBuffer, value.c_str() );
+				S_UnescapeString( convertedValueBuffer, value.c_str() );
 				pSubKey->SetString( NULL, convertedValueBuffer.c_str() );
 			}
 

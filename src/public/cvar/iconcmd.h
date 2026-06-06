@@ -1,5 +1,6 @@
 #pragma once
 #include "tier0/types.h"
+#include "tier1/cmdargs.h"
 
 //-----------------------------------------------------------------------------
 // IConVars/IConCmds are marked as having a particular DLL identifier
@@ -47,5 +48,5 @@ public:
 class IConCmd : public IConCmdBase
 {
 public:
-	virtual void Exec( uint32 argc, const char** argv ) = 0;
+	virtual void Exec( const CCmdArgs& args ) = 0;
 };

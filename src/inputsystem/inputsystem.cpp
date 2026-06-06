@@ -1,5 +1,6 @@
 #include "pch_inputsystem.h"
 #include "tier1/convar.h"
+#include "tier1/cmdlink.h"
 #include "tier1/istreamdata.h"
 #include "cvar/icvar.h"
 #include "appframework/iwindowmgr.h"
@@ -234,6 +235,7 @@ bool CInputSystem::Connect( createInterfaceFn_t pFactory )
 		return false;
 	}
 
+	LinkCmds();
 	ConVar_Register();
 	onWriteConCmdsHandle = g_pCvar->OnWriteConCmdsToConfigFile()->Subscribe( &CInputSystem::OnWriteConCmdsToConfigFile, this );
 	return true;
@@ -251,6 +253,7 @@ void CInputSystem::Disconnect()
 	g_pCvar->OnWriteConCmdsToConfigFile()->Unsubscribe( onWriteConCmdsHandle );
 	onWriteConCmdsHandle = INVALID_HANDLE;
 
+	UnlinkCmds();
 	ConVar_Unregister();
 	DisconnectTier1();
 }
@@ -643,68 +646,68 @@ const char* CInputSystem::GetButtonName( buttonCode_t buttonCode ) const
 
 /*
 ==================
-Bind command
+bind
 ==================
 */
-CON_COMMAND( bind, "Bind a key", FCVAR_NONE )
+CONSOLE_COMMAND( bind, "Bind a key", CMD_FLAG_NONE )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_INPUT );
-	if ( argc < 2 || !argv )
+	if ( args.Argc() < 2 )
 	{
 		Msg( "InputSystem: bind <key> <command> : Attach a command to a key" );
 		return;
 	}
 
 	// Get button code by name
-	buttonCode_t buttonCode = s_InputSystem.GetButtonCodeByName( argv[0] );
+	buttonCode_t buttonCode = s_InputSystem.GetButtonCodeByName( args.Argv( 1 ) );
 
 	// Do nothing if button isn't valid
 	if ( buttonCode == BUTTON_CODE_NONE )
 	{
-		Warning( "InputSystem: bind: \"%s\" isn't a valid key", argv[0] );
+		Warning( "InputSystem: bind: \"%s\" isn't a valid key", args.Argv( 1 ) );
 		return;
 	}
 
 	// Set binding
-	s_InputSystem.SetBinding( buttonCode, argv[1] );
-	Msg( "InputSystem: bind: \"%s\" = \"%s\"", argv[0], argv[1] );
+	s_InputSystem.SetBinding( buttonCode, args.Argv( 2 ) );
+	Msg( "InputSystem: bind: \"%s\" = \"%s\"", args.Argv( 1 ), args.Argv( 2 ) );
 }
 
 /*
 ==================
-Unbind command
+unbind
 ==================
 */
-CON_COMMAND( unbind, "Unbind a key", FCVAR_NONE )
+CONSOLE_COMMAND( unbind, "Unbind a key", CMD_FLAG_NONE )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_INPUT );
-	if ( argc < 1 || !argv )
+	if ( args.Argc() < 1 )
 	{
 		Msg( "InputSystem: unbind <key> : Remove commands from a key" );
 		return;
 	}
 
 	// Get button code by name
-	buttonCode_t buttonCode = s_InputSystem.GetButtonCodeByName( argv[0] );
+	buttonCode_t buttonCode = s_InputSystem.GetButtonCodeByName( args.Argv( 1 ) );
 
 	// Do nothing if button isn't valid
 	if ( buttonCode == BUTTON_CODE_NONE )
 	{
-		Warning( "InputSystem: unbind: \"%s\" isn't a valid key", argv[0] );
+		Warning( "InputSystem: unbind: \"%s\" isn't a valid key", args.Argv( 1 ) );
 		return;
 	}
 
 	// Unbind a key
 	s_InputSystem.SetBinding( buttonCode, "" );
-	Msg( "InputSystem: unbind: \"%s\" is unbind", argv[0] );
+	Msg( "InputSystem: unbind: \"%s\" is unbind", args.Argv( 1 ) );
 }
 
 /*
 ==================
-UnbindAll command
+unbindall
 ==================
 */
-CON_COMMAND( unbindall, "Unbind all keys", FCVAR_NONE )
+CONSOLE_COMMAND( unbindall, "Unbind all keys", CMD_FLAG_NONE )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_INPUT );
 	s_InputSystem.UnbindAll();

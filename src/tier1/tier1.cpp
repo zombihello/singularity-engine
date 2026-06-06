@@ -2,6 +2,8 @@
 #include "utils/interfaces/interfaces.h"
 #include "filesystem/ifilesystem.h"
 #include "cvar/icvar.h"
+#include "cvar/icmdsystem.h"
+#include "cvar/icvarsystem.h"
 #include "tier1/tier1.h"
 
 // Is Tier1 already connected
@@ -42,6 +44,26 @@ bool ConnectTier1( createInterfaceFn_t pFactory )
 		}
 	}
 
+	// Try connect the console command system
+	if ( !g_pCmdSystem )
+	{
+		g_pCmdSystem = (ICmdSystem*)pFactory( CMDSYSTEM_INTERFACE_VERSION );
+		if ( !g_pCmdSystem )
+		{
+			return false;
+		}
+	}
+
+	// Try connect the console variable system
+	if ( !g_pCvarSystem )
+	{
+		g_pCvarSystem = (ICVarSystem*)pFactory( CVARSYSTEM_INTERFACE_VERSION );
+		if ( !g_pCvarSystem )
+		{
+			return false;
+		}
+	}
+
 	// Tier1 was successfully connected!
 	s_bConnected = true;
 	return true;
@@ -66,4 +88,6 @@ void DisconnectTier1()
 	s_bConnected  = false;
 	g_pFileSystem = NULL;
 	g_pCvar		  = NULL;
+	g_pCmdSystem  = NULL;
+	g_pCvarSystem = NULL;
 }

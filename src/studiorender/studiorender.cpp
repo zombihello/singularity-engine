@@ -27,6 +27,7 @@ bool CStudioRender::Connect( createInterfaceFn_t pFactory )
 	{
 		return false;
 	}
+	LinkCmds();
 	ConVar_Register();
 
 	// Get Studio API
@@ -57,6 +58,7 @@ void CStudioRender::Disconnect()
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Disconnect Tier1
+	UnlinkCmds();
 	ConVar_Unregister();
 	DisconnectTier1();
 

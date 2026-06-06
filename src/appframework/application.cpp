@@ -3,6 +3,7 @@
 #include "tier0/iprofiler.h"
 #include "tier1/filetools.h"
 #include "tier1/convar.h"
+#include "tier1/cmdlink.h"
 #include "appframework/application.h"
 #if ENABLE_LOGGING
 	#include "tier0/consoleio.h"
@@ -76,7 +77,8 @@ void CApplication::Init()
 
 	// Register cvars
 	const appInfo_t& appInfo = GetAppInfo();
-	ConVar_Register( appInfo.baseConVarFlags, appInfo.pConVarsOverrider, appInfo.pCvarAccessor );
+	LinkCmds( appInfo.baseCmdFlags );
+	ConVar_Register( appInfo.baseCVarFlags, appInfo.pConVarsOverrider, appInfo.pCvarAccessor );
 
 	// Setup a log file
 #if ENABLE_LOGGING

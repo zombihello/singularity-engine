@@ -1,5 +1,7 @@
 #pragma once
 #include "cvar/icvar.h"
+#include "cvar/icmdsystem.h"
+#include "cvar/icvarsystem.h"
 #include "filesystem/ifilesystem.h"
 #include "appframework/appsystemgroup.h"
 

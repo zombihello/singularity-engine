@@ -91,11 +91,11 @@ CConCmd::CConCmd( const char* pName, conCmdExecFn_t pExecFn, const char* pHelpTe
 CConCmd::Exec
 ==================
 */
-void CConCmd::Exec( uint32 argc, const char** argv )
+void CConCmd::Exec( const CCmdArgs& args )
 {
 	if ( pExecFn )
 	{
-		pExecFn( argc, argv );
+		pExecFn( args );
 	}
 }
 

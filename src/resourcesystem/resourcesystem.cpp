@@ -1,5 +1,6 @@
 #include "pch_resourcesystem.h"
 #include "tier1/convar.h"
+#include "tier1/cmdlink.h"
 #include "resourcesystem/resourcesystem.h"
 
 CResourceSystem g_resourceSystem;
@@ -27,6 +28,7 @@ bool CResourceSystem::Connect( createInterfaceFn_t pFactory )
 	{
 		return false;
 	}
+	LinkCmds();
 	ConVar_Register();
 
 	g_pResourceSystem = this;
@@ -41,6 +43,7 @@ CResourceSystem::Disconnect
 void CResourceSystem::Disconnect()
 {
 	PROFILER_SCOPE_FUNC();
+	UnlinkCmds();
 	ConVar_Unregister();
 	DisconnectTier1();
 	g_pResourceSystem = NULL;

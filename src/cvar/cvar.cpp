@@ -3,6 +3,7 @@
 #include "filesystem/ifilesystem.h"
 #include "cvar/icvar.h"
 #include "tier1/convar.h"
+#include "cvar/cvars.h"
 
 #define CVAR_CONFIG_NAME		 "config"
 #define CVAR_DEFAULT_CONFIG_NAME "config_default"
@@ -11,15 +12,6 @@
 // Cvar delegates
 //-----------------------------------------------------------------------------
 DECLARE_EVENT( COnWriteConCmdsToConfigFile, IStreamDataWriter* /* pStreamData */ );
-
-//-----------------------------------------------------------------------------
-// Cvars
-//-----------------------------------------------------------------------------
-void CheatsCVarChanged( IConVar* pConVar );
-void DeveloperCVarChanged( IConVar* pConVar );
-
-CConVar cheats( "cheats", "0", "Allow cheats in the game", FCVAR_NONE, CheatsCVarChanged );
-CConVar developer( "developer", "0", "Enables developer messages", FCVAR_NONE, DeveloperCVarChanged );
 
 //-----------------------------------------------------------------------------
 // CvarQuery implementation
@@ -39,6 +31,7 @@ public:
 	virtual void* QueryInterface( const char* pInterfaceName ) override;
 
 	// ICvarQuery interface
+	// Returns true if the commands can be aliased to one another
 	virtual bool AreConVarsLinkable( const IConVar* pChildVar, const IConVar* pParentVar ) override;
 
 private:
@@ -96,10 +89,6 @@ public:
 	virtual void SetGlobalChangeCallback( conVarChangeCallbackFn_t pChangeCallbackFn ) override;
 	virtual void CallGlobalChangeCallback( IConVar* pConVar ) override;
 
-	virtual void SetConsoleDisplayFunc( IConsoleDisplayFunc* pConsoleDisplayFunc ) override;
-	virtual void ConsolePrintf( const CColor& color, const char* pFormat, ... ) override;
-	virtual void ConsolePrintf( const char* pFormat, ... ) override;
-
 	// Method allowing the engine ICvarQuery interface to take over
 	// A little hacky, owing to the fact the engine is loaded
 	// well after ICvar, so we can't use the standard connect pattern
@@ -124,7 +113,6 @@ private:
 	ICvarQuery*													  pCvarQuery;
 	cvarDLLIdentifier_t											  nextDLLIdentifier;
 	conVarChangeCallbackFn_t									  pGlobalChangeCallbackFn;
-	IConsoleDisplayFunc*										  pConsoleDisplayFunc;
 	char														  commandArgvBuffer[COMMAND_MAX_LENGTH];
 	uint32														  commandArgc;
 	const char*													  pCommandArgv[COMMAND_MAX_ARGC];
@@ -214,7 +202,6 @@ CCvar::CCvar()
 	, pCvarQuery( &s_CvarQuery )
 	, nextDLLIdentifier( 0 )
 	, pGlobalChangeCallbackFn( NULL )
-	, pConsoleDisplayFunc( NULL )
 	, commandArgc( 0 )
 {
 }
@@ -232,6 +219,7 @@ bool CCvar::Connect( createInterfaceFn_t pFactory )
 		return false;
 	}
 
+	LinkCmds();
 	ConVar_Register();
 
 	return true;
@@ -245,6 +233,7 @@ CCvar::Disconnect
 void CCvar::Disconnect()
 {
 	PROFILER_SCOPE_FUNC();
+	UnlinkCmds();
 	ConVar_Unregister();
 	DisconnectTier1();
 }
@@ -642,7 +631,7 @@ bool CCvar::Exec( const char* pCommand )
 				if ( pConCmdBase->IsCommand() )
 				{
 					IConCmd* pConCmd = (IConCmd*)pConCmdBase;
-					pConCmd->Exec( commandArgc - 1, pCommandArgv + 1 );
+					pConCmd->Exec( CCmdArgs( commandArgc, pCommandArgv ) );
 				}
 				// Otherwise it's variable
 				else
@@ -928,81 +917,10 @@ void CCvar::CallGlobalChangeCallback( IConVar* pConVar )
 
 /*
 ==================
-CCvar::SetConsoleDisplayFunc
-==================
-*/
-void CCvar::SetConsoleDisplayFunc( IConsoleDisplayFunc* pConsoleDisplayFunc )
-{
-	CCvar::pConsoleDisplayFunc = pConsoleDisplayFunc;
-}
-
-/*
-==================
-CCvar::ConsolePrintf
-==================
-*/
-void CCvar::ConsolePrintf( const CColor& color, const char* pFormat, ... )
-{
-	PROFILER_SCOPE_FUNC();
-	if ( pConsoleDisplayFunc )
-	{
-		va_list params;
-		va_start( params, pFormat );
-		pConsoleDisplayFunc->Print( S_Vsprintf( pFormat, params ).c_str(), color );
-		va_end( params );
-	}
-}
-
-/*
-==================
-CCvar::ConsolePrintf
-==================
-*/
-void CCvar::ConsolePrintf( const char* pFormat, ... )
-{
-	PROFILER_SCOPE_FUNC();
-	if ( pConsoleDisplayFunc )
-	{
-		va_list params;
-		va_start( params, pFormat );
-		pConsoleDisplayFunc->Print( S_Vsprintf( pFormat, params ).c_str() );
-		va_end( params );
-	}
-}
-
-/*
-==================
 CCvar::SetCVarQuery
 ==================
 */
 void CCvar::SetCVarQuery( ICvarQuery* pCvarQuery )
 {
 	CCvar::pCvarQuery = pCvarQuery ? pCvarQuery : &s_CvarQuery;
-}
-
-/*
-==================
-CheatsChanged
-==================
-*/
-static void CheatsCVarChanged( IConVar* pConVar )
-{
-	PROFILER_SCOPE_FUNC();
-
-	// Cheats were disabled, revert all cheat cvars to their default values
-	if ( g_pCvar && pConVar->GetInt() == 0 )
-	{
-		g_pCvar->ResetFlaggedVars( FCVAR_CHEAT );
-		Msg( "Cvar: FCVAR_CHEAT cvars reverted to defaults" );
-	}
-}
-
-/*
-==================
-DeveloperCVarChanged
-==================
-*/
-static void DeveloperCVarChanged( IConVar* pConVar )
-{
-	Logger()->SetGroupActivate( LOG_GROUP_DEVELOPER, pConVar->GetBool() );
 }

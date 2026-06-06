@@ -22,6 +22,7 @@ DECLARE_EVENT_INTERFACE( IOnWriteConCmdsToConfigFile, IStreamDataWriter* /* pStr
 class ICvarQuery : public IAppSystem
 {
 public:
+	// Returns true if the commands can be aliased to one another
 	virtual bool AreConVarsLinkable( const IConVar* pChildVar, const IConVar* pParentVar ) = 0;
 };
 
@@ -32,16 +33,6 @@ class IConVarsOverrider
 {
 public:
 	virtual void OverrideFromCommandLine() = 0;
-};
-
-//-----------------------------------------------------------------------------
-// Used to display console messages
-//-----------------------------------------------------------------------------
-class IConsoleDisplayFunc
-{
-public:
-	virtual void Print( const char* pMsg )						= 0;
-	virtual void Print( const char* pMsg, const CColor& color ) = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -83,10 +74,6 @@ public:
 
 	virtual void SetGlobalChangeCallback( conVarChangeCallbackFn_t pChangeCallbackFn ) = 0;
 	virtual void CallGlobalChangeCallback( IConVar* pConVar )						   = 0;
-
-	virtual void SetConsoleDisplayFunc( IConsoleDisplayFunc* pConsoleDisplayFunc ) = 0;
-	virtual void ConsolePrintf( const CColor& color, const char* pFormat, ... )	   = 0;
-	virtual void ConsolePrintf( const char* pFormat, ... )						   = 0;
 
 	// Method allowing the engine ICvarQuery interface to take over
 	// A little hacky, owing to the fact the engine is loaded

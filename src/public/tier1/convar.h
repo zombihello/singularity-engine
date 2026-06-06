@@ -6,31 +6,9 @@
 #include "cvar/icvar.h"
 
 //-----------------------------------------------------------------------------
-// Macroses for implement a console command
-//
-// Usage example:
-// CON_COMMAND( mycommand, "My console command", FCVAR_CHEAT )
-// {
-//		Msg( "It's work!" );
-// }
-//-----------------------------------------------------------------------------
-#define CON_COMMAND( Name, Description, Flags )                                 \
-	static void	   ConCmdExec_##Name( uint32 argc, const char** argv );         \
-	static CConCmd s_cmd##Name( #Name, ConCmdExec_##Name, Description, Flags ); \
-	static void	   ConCmdExec_##Name( uint32 argc, const char** argv )
-
-#define CON_COMMAND_EXTERN( Name, FuncName, Description, Flags )       \
-	void		   FuncName( uint32 argc, const char** argv );         \
-	static CConCmd s_cmd##Name( #Name, FuncName, Description, Flags ); \
-	void		   FuncName( uint32 argc, const char** argv )
-
-#define CON_COMMAND_METHOD( Name, MethodName, Description, Flags ) \
-	static CConCmd s_cmd##Name( #Name, MethodName, Description, Flags );
-
-//-----------------------------------------------------------------------------
 // Type execute function of a console command
 //-----------------------------------------------------------------------------
-typedef void ( *conCmdExecFn_t )( uint32 argc, const char** argv );
+typedef void ( *conCmdExecFn_t )( const CCmdArgs& args );
 
 //-----------------------------------------------------------------------------
 // Any executable that wants to use IConVars/IConCmds need to implement one of these to hook up access to console variables
@@ -131,7 +109,7 @@ public:
 	virtual bool IsCommand() const override;
 
 	// IConCmd interface
-	virtual void Exec( uint32 argc, const char** argv ) override;
+	virtual void Exec( const CCmdArgs& args ) override;
 
 private:
 	conCmdExecFn_t pExecFn;

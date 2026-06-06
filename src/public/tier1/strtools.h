@@ -1,5 +1,6 @@
 #pragma once
 #include <EASTL/string.h>
+#include <wildmatch/wildmatch.h>
 
 #include "tier0/defines.h"
 #include "tier0/types.h"
@@ -70,8 +71,23 @@ bool		   S_IsSpace( wchar_t c );
 bool		   S_IsDigit( char c );
 bool		   S_IsDigit( wchar_t c );
 
+// Note: va() returns a const char* stack address that must be copied into a new memory location (e.g. eastl::string) to be persistent.
+//		 This means that va() should not be assigned to a char* variable or used as a return value for a char* type function.
+//		 Once the va() expression is complete, the returned memory location will be recovered and the contents will be lost
+#define va( Format, ... ) S_Sprintf( Format, ##__VA_ARGS__ ).c_str()
+
 void S_ReplaceSubString( eastl::string& string, const char* pOldSubString, const char* pNewSubString );
 void S_ReplaceSubString( eastl::wstring& string, const wchar_t* pOldSubString, const wchar_t* pNewSubString );
+
+// Returns true if the string conforms the given pattern
+// Several meta character may be used in the pattern
+//
+// *          Match any string of zero or more characters
+// ?          Match any single character
+// [abc...]   Match any of the enclosed characters; a hyphen can
+//			  be used to specify a range (e.g. a-z, A-Z, 0-9)
+bool S_StringMatchesPattern( const char* pString, const char* pPattern, bool bCaseSensitive = false );
+bool S_StringMatchesPattern( const wchar_t* pString, const wchar_t* pPattern, bool bCaseSensitive = false );
 
 //-----------------------------------------------------------------------------
 // UTF-8 tools
@@ -80,16 +96,24 @@ uint32 S_Utf8_CharSize( byte b );
 uint32 S_Utf8_Strlen( const char* pString, uint32 size );
 
 //-----------------------------------------------------------------------------
-// Functions to convert escape <-> unescape symbols
+// Functions to convert escape <-> unescape strings
 //-----------------------------------------------------------------------------
-void S_ConvertEscapeToUnescapeSymbols( eastl::string& dest, const char* pSrc, uint32 srcLength );
-void S_ConvertEscapeToUnescapeSymbols( eastl::string& dest, const char* pSrc );
-void S_ConvertEscapeToUnescapeSymbols( eastl::wstring& dest, const wchar_t* pSrc, uint32 srcLength );
-void S_ConvertEscapeToUnescapeSymbols( eastl::wstring& dest, const wchar_t* pSrc );
-void S_ConvertUnescapeToEscapeSymbols( eastl::string& dest, const char* pSrc, uint32 srcLength );
-void S_ConvertUnescapeToEscapeSymbols( eastl::string& dest, const char* pSrc );
-void S_ConvertUnescapeToEscapeSymbols( eastl::wstring& dest, const wchar_t* pSrc, uint32 srcLength );
-void S_ConvertUnescapeToEscapeSymbols( eastl::wstring& dest, const wchar_t* pSrc );
+void		   S_UnescapeString( eastl::string& dest, const char* pSrc, uint32 srcLen );
+void		   S_UnescapeString( eastl::string& dest, const char* pSrc );
+eastl::string  S_UnescapeString( const char* pSrc, uint32 srcLen );
+eastl::string  S_UnescapeString( const char* pSrc );
+void		   S_UnescapeString( eastl::wstring& dest, const wchar_t* pSrc, uint32 srcLen );
+void		   S_UnescapeString( eastl::wstring& dest, const wchar_t* pSrc );
+eastl::wstring S_UnescapeString( const wchar_t* pSrc, uint32 srcLen );
+eastl::wstring S_UnescapeString( const wchar_t* pSrc );
+void		   S_EscapeString( eastl::string& dest, const char* pSrc, uint32 srcLen );
+void		   S_EscapeString( eastl::string& dest, const char* pSrc );
+eastl::string  S_EscapeString( const char* pSrc, uint32 srcLen );
+eastl::string  S_EscapeString( const char* pSrc );
+void		   S_EscapeString( eastl::wstring& dest, const wchar_t* pSrc, uint32 srcLen );
+void		   S_EscapeString( eastl::wstring& dest, const wchar_t* pSrc );
+eastl::wstring S_EscapeString( const wchar_t* pSrc, uint32 srcLen );
+eastl::wstring S_EscapeString( const wchar_t* pSrc );
 
 //-----------------------------------------------------------------------------
 // Class that handles the ANSI to WCHAR conversion

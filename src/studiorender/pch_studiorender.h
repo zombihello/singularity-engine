@@ -6,4 +6,5 @@
 #include "tier0/iprofiler.h"
 #include "tier1/tier1.h"
 #include "tier1/convar.h"
+#include "tier1/cmdlink.h"
 #include "studiorender/studioapi/istudioapi.h"

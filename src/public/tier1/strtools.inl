@@ -558,6 +558,26 @@ FORCEINLINE void S_ReplaceSubString( eastl::wstring& string, const wchar_t* pOld
 
 /*
 ==================
+S_StringMatchesPattern
+==================
+*/
+FORCEINLINE bool S_StringMatchesPattern( const char* pString, const char* pPattern, bool bCaseSensitive /*= false*/ )
+{
+	return wildmatch( pPattern, pString, bCaseSensitive ? 0x0 : WM_CASEFOLD ) == WM_MATCH;
+}
+
+/*
+==================
+S_StringMatchesPattern
+==================
+*/
+FORCEINLINE bool S_StringMatchesPattern( const wchar_t* pString, const wchar_t* pPattern, bool bCaseSensitive /*= false*/ )
+{
+	return wildmatch( WCHAR_TO_ANSI( pPattern ), WCHAR_TO_ANSI( pString ), bCaseSensitive ? 0x0 : WM_CASEFOLD ) == WM_MATCH;
+}
+
+/*
+==================
 S_Utf8_CharSize
 ==================
 */
@@ -611,42 +631,138 @@ FORCEINLINE uint32 S_Utf8_Strlen( const char* pString, uint32 size )
 
 /*
 ==================
-S_ConvertEscapeToUnescapeSymbols
+S_UnescapeString
 ==================
 */
-FORCEINLINE void S_ConvertEscapeToUnescapeSymbols( eastl::string& dest, const char* pSrc )
+FORCEINLINE eastl::string S_UnescapeString( const char* pSrc, uint32 srcLen )
 {
-	S_ConvertEscapeToUnescapeSymbols( dest, pSrc, S_Strlen( pSrc ) );
+	eastl::string result;
+	S_UnescapeString( result, pSrc, srcLen );
+	return result;
 }
 
 /*
 ==================
-S_ConvertEscapeToUnescapeSymbols
+S_UnescapeString
 ==================
 */
-FORCEINLINE void S_ConvertEscapeToUnescapeSymbols( eastl::wstring& dest, const wchar_t* pSrc )
+FORCEINLINE void S_UnescapeString( eastl::string& dest, const char* pSrc )
 {
-	S_ConvertEscapeToUnescapeSymbols( dest, pSrc, S_Strlen( pSrc ) );
+	S_UnescapeString( dest, pSrc, S_Strlen( pSrc ) );
 }
 
 /*
 ==================
-S_ConvertUnescapeToEscapeSymbols
+S_UnescapeString
 ==================
 */
-FORCEINLINE void S_ConvertUnescapeToEscapeSymbols( eastl::string& dest, const char* pSrc )
+FORCEINLINE eastl::string S_UnescapeString( const char* pSrc )
 {
-	S_ConvertUnescapeToEscapeSymbols( dest, pSrc, S_Strlen( pSrc ) );
+	eastl::string result;
+	S_UnescapeString( result, pSrc, S_Strlen( pSrc ) );
+	return result;
 }
 
 /*
 ==================
-S_ConvertUnescapeToEscapeSymbols
+S_UnescapeString
 ==================
 */
-FORCEINLINE void S_ConvertUnescapeToEscapeSymbols( eastl::wstring& dest, const wchar_t* pSrc )
+FORCEINLINE eastl::wstring S_UnescapeString( const wchar_t* pSrc, uint32 srcLen )
 {
-	S_ConvertUnescapeToEscapeSymbols( dest, pSrc, S_Strlen( pSrc ) );
+	eastl::wstring result;
+	S_UnescapeString( result, pSrc, srcLen );
+	return result;
+}
+
+/*
+==================
+S_UnescapeString
+==================
+*/
+FORCEINLINE void S_UnescapeString( eastl::wstring& dest, const wchar_t* pSrc )
+{
+	S_UnescapeString( dest, pSrc, S_Strlen( pSrc ) );
+}
+
+/*
+==================
+S_UnescapeString
+==================
+*/
+FORCEINLINE eastl::wstring S_UnescapeString( const wchar_t* pSrc )
+{
+	eastl::wstring result;
+	S_UnescapeString( result, pSrc, S_Strlen( pSrc ) );
+	return result;
+}
+
+/*
+==================
+S_EscapeString
+==================
+*/
+FORCEINLINE eastl::string S_EscapeString( const char* pSrc, uint32 srcLen )
+{
+	eastl::string result;
+	S_EscapeString( result, pSrc, srcLen );
+	return result;
+}
+
+/*
+==================
+S_EscapeString
+==================
+*/
+FORCEINLINE void S_EscapeString( eastl::string& dest, const char* pSrc )
+{
+	S_EscapeString( dest, pSrc, S_Strlen( pSrc ) );
+}
+
+/*
+==================
+S_EscapeString
+==================
+*/
+FORCEINLINE eastl::string S_EscapeString( const char* pSrc )
+{
+	eastl::string result;
+	S_EscapeString( result, pSrc, S_Strlen( pSrc ) );
+	return result;
+}
+
+/*
+==================
+S_EscapeString
+==================
+*/
+FORCEINLINE eastl::wstring S_EscapeString( const wchar_t* pSrc, uint32 srcLen )
+{
+	eastl::wstring result;
+	S_EscapeString( result, pSrc, srcLen );
+	return result;
+}
+
+/*
+==================
+S_EscapeString
+==================
+*/
+FORCEINLINE void S_EscapeString( eastl::wstring& dest, const wchar_t* pSrc )
+{
+	S_EscapeString( dest, pSrc, S_Strlen( pSrc ) );
+}
+
+/*
+==================
+S_EscapeString
+==================
+*/
+FORCEINLINE eastl::wstring S_EscapeString( const wchar_t* pSrc )
+{
+	eastl::wstring result;
+	S_EscapeString( result, pSrc, S_Strlen( pSrc ) );
+	return result;
 }
 
 /*

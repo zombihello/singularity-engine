@@ -113,8 +113,13 @@ void CLauncherApp::Init()
 	engineSystemGroup.ConnectSystems();
 	gameSystemGroup.ConnectSystems();
 
-	// Read file configuration and override it from the command line
-	g_pCvar->ReadConfigFile( "//game/cfg" );
+	// Execute the startup scripts
+	g_pCmdSystem->AppendCommandString( CMD_EXECUTION_APPEND_END, "exec //game/cfg/config_default.cfg" );
+	g_pCmdSystem->AppendCommandString( CMD_EXECUTION_APPEND_END, "exec //game/cfg/config.cfg" );
+	g_pCmdSystem->AppendCommandString( CMD_EXECUTION_APPEND_END, "exec //game/cfg/autoexec.cfg" );
+	g_pCmdSystem->ExecuteCommands();
+
+	// Override cvars from the command line
 	g_pCvar->OverrideConVarsFromCommandLine();
 
 	// Get all systems
@@ -199,6 +204,9 @@ int32 CLauncherApp::Main()
 			continue;
 		}
 
+		// TODO BS yehor.pohuliaka - Here we should write config file if anything changed (see idCommonLocal::WriteConfiguration() in DOOM 3 BFG Edition source code)
+		// WriteConfiguration();
+
 		// Update the profiler
 #if ENABLE_PROFILING
 		pProfiler->Update();
@@ -207,6 +215,9 @@ int32 CLauncherApp::Main()
 		// Update the resource system and the game
 		g_pResourceSystem->FrameUpdate();
 		g_pGame->FrameUpdate();
+
+		// Execute pending commands
+		g_pCmdSystem->ExecuteCommands();
 
 		// Flush render commands and draw the frame
 		Studio_FlushRenderCommands();
@@ -357,7 +368,7 @@ CLauncherApp::GetAppInfo
 */
 const appInfo_t& CLauncherApp::GetAppInfo() const
 {
-	static appInfo_t s_appInfo{ "launcher", APPLICATION_TYPE_WINDOW, FCVAR_NONE, &g_conVarsOverrider, NULL };
+	static appInfo_t s_appInfo{ "launcher", APPLICATION_TYPE_WINDOW, CMD_FLAG_NONE, FCVAR_NONE, &g_conVarsOverrider, NULL };
 	return s_appInfo;
 }
 
