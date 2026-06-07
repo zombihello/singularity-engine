@@ -1,14 +1,12 @@
 #include "pch_inputsystem.h"
-#include "tier1/convar.h"
 #include "tier1/istreamdata.h"
-#include "cvar/icvar.h"
+#include "cvar/icmdsystem.h"
 #include "appframework/iwindowmgr.h"
-#include "inputsystem/iinputsystem.h"
+#include "inputsystem/inputsystem.h"
+#include "inputsystem/cvars.h"
 
-//-----------------------------------------------------------------------------
-// Global values and cvars
-//-----------------------------------------------------------------------------
-CConVar mouse_sensitivity( "mouse_sensitivity", "0.5", "Mouse sensitivity", FCVAR_ARCHIVE );
+CInputSystem g_inputSystem;
+EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CInputSystem, IInputSystem, INPUTSYSTEM_INTERFACE_VERSION, g_inputSystem );
 
 // Table of button names
 static const char* s_pButtonNames[] = {
@@ -131,65 +129,6 @@ static const char* s_pButtonNames[] = {
 	"mousey"	   // MOUSE_Y
 };
 
-//-----------------------------------------------------------------------------
-// Input system
-//-----------------------------------------------------------------------------
-class CInputSystem : public CBaseAppSystem<IInputSystem>
-{
-public:
-	CInputSystem();
-	~CInputSystem();
-
-	// IAppSystem interface
-	virtual bool Connect( createInterfaceFn_t pFactory ) override;
-	virtual void Disconnect() override;
-
-	// IInputSystem interface
-	virtual void AttachToWindow( windowId_t windowId ) override;
-	virtual void DetachFromWindow() override;
-
-	virtual void ClearInputState() override;
-
-	// Functions set/get console command which binded on a button
-	virtual void		SetBinding( buttonCode_t button, const char* pCommand ) override;
-	virtual const char* GetBindingCommand( buttonCode_t button ) const override;
-	virtual void		UnbindAll() override;
-
-	virtual bool IsKeyDown( buttonCode_t key ) const override;
-	virtual bool IsKeyUp( buttonCode_t key ) const override;
-	virtual bool IsMouseKeyDown( buttonCode_t key ) const override;
-	virtual bool IsMouseKeyUp( buttonCode_t key ) const override;
-	virtual bool IsMouseWheel( buttonCode_t wheel ) const override;
-	virtual bool IsMouseMoved( buttonCode_t mouseAxis ) const override;
-
-	virtual vector2_t GetMouseLocation() const override;
-	virtual vector2_t GetMouseOffset() const override;
-	virtual float	  GetMouseOffset( buttonCode_t mouseAxis ) const override;
-	virtual float	  GetMouseSensitivity() const override;
-
-	virtual buttonEvent_t GetButtonEvent( buttonCode_t buttonCode ) const override;
-	virtual buttonCode_t  GetButtonCodeByName( const char* pButtonName ) const override;
-	virtual const char*	  GetButtonName( buttonCode_t buttonCode ) const override;
-
-	void ExecBindingCommand( buttonCode_t button );
-
-private:
-	static void OnInputEvent( void* pUserData, const inputEvent_t& inputEvent );
-	static void OnWriteConCmdsToConfigFile( void* pUserData, IStreamDataWriter* pStreamData );
-
-	windowId_t							  windowId;	 // A window that was attached the input system
-	IWindowMgr::IOnInputEvent::handle_t	  onInputEventHandle;
-	IOnWriteConCmdsToConfigFile::handle_t onWriteConCmdsHandle;
-	buttonEvent_t						  buttonEvents[BUTTON_CODE_COUNT];
-	vector2_t							  mouseLocation;
-	vector2_t							  mouseOffset;
-	eastl::string						  binds[BUTTON_CODE_COUNT];
-};
-
-// Input system singleton
-static CInputSystem s_InputSystem;
-EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CInputSystem, IInputSystem, INPUTSYSTEM_INTERFACE_VERSION, s_InputSystem );
-
 /*
 ==================
 CInputSystem::CInputSystem
@@ -198,7 +137,6 @@ CInputSystem::CInputSystem
 CInputSystem::CInputSystem()
 	: windowId( INVALID_WINDOW_ID )
 	, onInputEventHandle( INVALID_HANDLE )
-	, onWriteConCmdsHandle( INVALID_HANDLE )
 	, mouseLocation( g_vector000 )
 	, mouseOffset( g_vector000 )
 {
@@ -234,8 +172,8 @@ bool CInputSystem::Connect( createInterfaceFn_t pFactory )
 		return false;
 	}
 
-	ConVar_Register();
-	onWriteConCmdsHandle = g_pCvar->OnWriteConCmdsToConfigFile()->Subscribe( &CInputSystem::OnWriteConCmdsToConfigFile, this );
+	LinkCmds();
+	LinkCVars();
 	return true;
 }
 
@@ -248,10 +186,8 @@ void CInputSystem::Disconnect()
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_INPUT );
 	DetachFromWindow();
-	g_pCvar->OnWriteConCmdsToConfigFile()->Unsubscribe( onWriteConCmdsHandle );
-	onWriteConCmdsHandle = INVALID_HANDLE;
-
-	ConVar_Unregister();
+	UnlinkCVars();
+	UnlinkCmds();
 	DisconnectTier1();
 }
 
@@ -368,34 +304,6 @@ void CInputSystem::OnInputEvent( void* pUserData, const inputEvent_t& inputEvent
 
 /*
 ==================
-CInputSystem::OnWriteConCmdsToConfigFile
-==================
-*/
-void CInputSystem::OnWriteConCmdsToConfigFile( void* pUserData, IStreamDataWriter* pStreamData )
-{
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
-	Assert( pUserData );
-	CInputSystem* pInputSystem = (CInputSystem*)pUserData;
-
-	eastl::string buffer;
-	buffer += "unbindall\n";
-	for ( uint32 index = 0; index < BUTTON_CODE_COUNT; ++index )
-	{
-		const char* pCommand = pInputSystem->GetBindingCommand( (buttonCode_t)index );
-		if ( !pCommand || !pCommand[0] )
-		{
-			continue;
-		}
-
-		buffer += S_Sprintf( "bind \"%s\" \"%s\"\n", pInputSystem->GetButtonName( (buttonCode_t)index ), pCommand );
-	}
-
-	// Write the buffer into the file
-	pStreamData->Write( buffer.data(), buffer.size() * sizeof( char ) );
-}
-
-/*
-==================
 CInputSystem::ClearInputState
 ==================
 */
@@ -411,6 +319,33 @@ void CInputSystem::ClearInputState()
 	}
 
 	mouseOffset = g_vector000;
+}
+
+/*
+==================
+CInputSystem::WriteBindings
+==================
+*/
+void CInputSystem::WriteBindings( IStreamDataWriter* pStreamData ) const
+{
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
+
+	// Write bindings into a string buffer
+	eastl::string buffer;
+	buffer += "unbindall\n";
+	for ( uint32 index = 0; index < BUTTON_CODE_COUNT; ++index )
+	{
+		const char* pCmd = GetBindingCommand( (buttonCode_t)index );
+		if ( !pCmd || !pCmd[0] )
+		{
+			continue;
+		}
+
+		buffer += S_Sprintf( "bind \"%s\" \"%s\"\n", GetButtonName( (buttonCode_t)index ), pCmd );
+	}
+
+	// Write the buffer into the stream data
+	pStreamData->Write( buffer.data(), buffer.size() * sizeof( char ) );
 }
 
 /*
@@ -458,7 +393,7 @@ void CInputSystem::ExecBindingCommand( buttonCode_t button )
 	Assert( button < BUTTON_CODE_COUNT );
 	if ( !binds[button].empty() )
 	{
-		g_pCvar->Exec( binds[button].c_str() );
+		g_pCmdSystem->AppendCommandString( CMD_EXECUTION_APPEND_END, binds[button].c_str() );
 	}
 }
 
@@ -639,74 +574,4 @@ const char* CInputSystem::GetButtonName( buttonCode_t buttonCode ) const
 	}
 
 	return s_pButtonNames[(uint32)buttonCode];
-}
-
-/*
-==================
-Bind command
-==================
-*/
-CON_COMMAND( bind, "Bind a key", FCVAR_NONE )
-{
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_INPUT );
-	if ( argc < 2 || !argv )
-	{
-		Msg( "InputSystem: bind <key> <command> : Attach a command to a key" );
-		return;
-	}
-
-	// Get button code by name
-	buttonCode_t buttonCode = s_InputSystem.GetButtonCodeByName( argv[0] );
-
-	// Do nothing if button isn't valid
-	if ( buttonCode == BUTTON_CODE_NONE )
-	{
-		Warning( "InputSystem: bind: \"%s\" isn't a valid key", argv[0] );
-		return;
-	}
-
-	// Set binding
-	s_InputSystem.SetBinding( buttonCode, argv[1] );
-	Msg( "InputSystem: bind: \"%s\" = \"%s\"", argv[0], argv[1] );
-}
-
-/*
-==================
-Unbind command
-==================
-*/
-CON_COMMAND( unbind, "Unbind a key", FCVAR_NONE )
-{
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_INPUT );
-	if ( argc < 1 || !argv )
-	{
-		Msg( "InputSystem: unbind <key> : Remove commands from a key" );
-		return;
-	}
-
-	// Get button code by name
-	buttonCode_t buttonCode = s_InputSystem.GetButtonCodeByName( argv[0] );
-
-	// Do nothing if button isn't valid
-	if ( buttonCode == BUTTON_CODE_NONE )
-	{
-		Warning( "InputSystem: unbind: \"%s\" isn't a valid key", argv[0] );
-		return;
-	}
-
-	// Unbind a key
-	s_InputSystem.SetBinding( buttonCode, "" );
-	Msg( "InputSystem: unbind: \"%s\" is unbind", argv[0] );
-}
-
-/*
-==================
-UnbindAll command
-==================
-*/
-CON_COMMAND( unbindall, "Unbind all keys", FCVAR_NONE )
-{
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_INPUT );
-	s_InputSystem.UnbindAll();
-	Msg( "InputSystem: unbindall: All keys has been unbind" );
 }

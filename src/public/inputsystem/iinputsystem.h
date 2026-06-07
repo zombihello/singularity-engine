@@ -5,6 +5,11 @@
 #include "inputsystem/buttoncode.h"
 
 //-----------------------------------------------------------------------------
+// Forward declarations
+//-----------------------------------------------------------------------------
+class IStreamDataWriter;
+
+//-----------------------------------------------------------------------------
 // Button events
 //-----------------------------------------------------------------------------
 enum buttonEvent_t
@@ -23,10 +28,10 @@ enum buttonEvent_t
 class IInputSystem : public IAppSystem
 {
 public:
-	virtual void AttachToWindow( windowId_t windowId ) = 0;
-	virtual void DetachFromWindow()					   = 0;
-
-	virtual void ClearInputState() = 0;
+	virtual void AttachToWindow( windowId_t windowId )				   = 0;
+	virtual void DetachFromWindow()									   = 0;
+	virtual void WriteBindings( IStreamDataWriter* pStreamData ) const = 0;
+	virtual void ClearInputState()									   = 0;
 
 	// Functions set/get console command which binded on a button
 	virtual void		SetBinding( buttonCode_t button, const char* pCommand ) = 0;
@@ -40,10 +45,10 @@ public:
 	virtual bool IsMouseWheel( buttonCode_t wheel ) const	  = 0;
 	virtual bool IsMouseMoved( buttonCode_t mouseAxis ) const = 0;
 
-	virtual vector2_t GetMouseLocation() const						  = 0;
-	virtual vector2_t GetMouseOffset() const						  = 0;
-	virtual float  GetMouseOffset( buttonCode_t mouseAxis ) const = 0;
-	virtual float  GetMouseSensitivity() const					  = 0;
+	virtual vector2_t GetMouseLocation() const						 = 0;
+	virtual vector2_t GetMouseOffset() const						 = 0;
+	virtual float	  GetMouseOffset( buttonCode_t mouseAxis ) const = 0;
+	virtual float	  GetMouseSensitivity() const					 = 0;
 
 	virtual buttonEvent_t GetButtonEvent( buttonCode_t buttonCode ) const	   = 0;
 	virtual buttonCode_t  GetButtonCodeByName( const char* pButtonName ) const = 0;

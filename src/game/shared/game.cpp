@@ -35,7 +35,8 @@ bool CGame::Connect( createInterfaceFn_t pFactory )
 	{
 		return false;
 	}
-	ConVar_Register();
+	LinkCmds();
+	LinkCVars();
 
 	// Get the window manager
 	g_pWindowMgr = (IWindowMgr*)pFactory( WINDOWMGR_INTERFACE_VERSION );
@@ -69,7 +70,8 @@ CGame::Disconnect
 void CGame::Disconnect()
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
-	ConVar_Unregister();
+	UnlinkCVars();
+	UnlinkCmds();
 	DisconnectTier1();
 
 	g_pWindowMgr	  = NULL;

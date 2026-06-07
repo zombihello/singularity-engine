@@ -9,7 +9,7 @@
 #include "studiorender/studio_renderobject_quad.h"
 #include "studiorender/studiorender.h"
 
-CConVar		  r_vsync( "r_vsync", "0", "Should use vertical synchronization (VSync)", FCVAR_ARCHIVE );
+CCVar		  r_vsync( "r_vsync", "0", "Should use vertical synchronization (VSync)", CVAR_FLAG_ARCHIVE );
 CStudioRender g_StudioRender;
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CStudioRender, IStudioRender, STUDIORENDER_INTERFACE_VERSION, g_StudioRender );
 
@@ -27,7 +27,8 @@ bool CStudioRender::Connect( createInterfaceFn_t pFactory )
 	{
 		return false;
 	}
-	ConVar_Register();
+	LinkCmds();
+	LinkCVars();
 
 	// Get Studio API
 	g_pStudioAPI = (IStudioAPI*)pFactory( STUDIOAPI_INTERFACE_VERSION );
@@ -57,7 +58,8 @@ void CStudioRender::Disconnect()
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Disconnect Tier1
-	ConVar_Unregister();
+	UnlinkCVars();
+	UnlinkCmds();
 	DisconnectTier1();
 
 	g_pStudioAPI	= NULL;

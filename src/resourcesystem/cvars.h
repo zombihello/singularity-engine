@@ -1,7 +1,7 @@
 #pragma once
-#include "tier1/convar.h"
+#include "tier1/cvar.h"
 
 //-----------------------------------------------------------------------------
-// ConVars
+// CVars
 //-----------------------------------------------------------------------------
-extern CConVar resSys_unusedFrameThreshold;
+extern CCVar res_unusedFrameThreshold;

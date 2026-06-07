@@ -9,12 +9,6 @@
 #endif	// ENABLE_LOGGING
 
 //-----------------------------------------------------------------------------
-// Forward declarations
-//-----------------------------------------------------------------------------
-class IConVarsOverrider;
-class ICvarAccessor;
-
-//-----------------------------------------------------------------------------
 // Constants and types
 //-----------------------------------------------------------------------------
 enum applicationType_t
@@ -25,11 +19,10 @@ enum applicationType_t
 
 struct appInfo_t
 {
-	const char*		   pAppName;
-	applicationType_t  appType;
-	uint32			   baseConVarFlags;
-	IConVarsOverrider* pConVarsOverrider;
-	ICvarAccessor*	   pCvarAccessor;
+	const char*		  pAppName;
+	applicationType_t appType;
+	uint32			  baseCmdFlags;
+	uint32			  baseCVarFlags;
 };
 
 //-----------------------------------------------------------------------------
