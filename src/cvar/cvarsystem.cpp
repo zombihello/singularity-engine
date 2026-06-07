@@ -3,8 +3,8 @@
 #include "cvar/cvars.h"
 #include "cvar/cvarsystem.h"
 
-CCVarSystem s_cvarSystem;
-EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CCVarSystem, ICVarSystem, CVARSYSTEM_INTERFACE_VERSION, s_cvarSystem );
+CCVarSystem g_cvarSystem;
+EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CCVarSystem, ICVarSystem, CVARSYSTEM_INTERFACE_VERSION, g_cvarSystem );
 
 /*
 ==================

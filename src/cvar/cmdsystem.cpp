@@ -2,8 +2,8 @@
 #include "cvar/cmdsystem.h"
 #include "cvar/cvars.h"
 
-CCmdSystem s_cmdSystem;
-EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CCmdSystem, ICmdSystem, CMDSYSTEM_INTERFACE_VERSION, s_cmdSystem );
+CCmdSystem g_cmdSystem;
+EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CCmdSystem, ICmdSystem, CMDSYSTEM_INTERFACE_VERSION, g_cmdSystem );
 
 /*
 ==================

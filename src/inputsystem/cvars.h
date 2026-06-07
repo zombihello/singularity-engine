@@ -2,6 +2,6 @@
 #include "tier1/cvar.h"
 
 //-----------------------------------------------------------------------------
-// ConVars
+// CVars
 //-----------------------------------------------------------------------------
-extern CCVar resSys_unusedFrameThreshold;
+extern CCVar mouse_sensitivity;

@@ -7,7 +7,7 @@
 #include "studiorender/istudio_renderresource.h"
 #include "resourcesystem/iresourcesystem.h"
 #include "game/igame.h"
-#include "launcher/convars.h"
+#include "launcher/cvars.h"
 #include "launcher/appsystemgroup_engine.h"
 #include "launcher/appsystemgroup_game.h"
 #include "utils/gameinfo/gameinfo.h"

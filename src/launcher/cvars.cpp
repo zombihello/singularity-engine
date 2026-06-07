@@ -1,6 +1,6 @@
 #include "tier0/icommandline.h"
 #include "appframework/iwindow.h"
-#include "launcher/convars.h"
+#include "launcher/cvars.h"
 
 //-----------------------------------------------------------------------------
 // CVars

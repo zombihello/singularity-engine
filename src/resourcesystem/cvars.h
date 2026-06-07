@@ -2,10 +2,6 @@
 #include "tier1/cvar.h"
 
 //-----------------------------------------------------------------------------
-// ConVars
+// CVars
 //-----------------------------------------------------------------------------
-extern CCVar window_displayId;
-extern CCVar window_width;
-extern CCVar window_height;
-extern CCVar window_refreshRate;
-extern CCVar window_mode;
+extern CCVar res_unusedFrameThreshold;

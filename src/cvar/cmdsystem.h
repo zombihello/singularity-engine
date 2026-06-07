@@ -59,5 +59,5 @@ private:
 	eastl::list<commandDef_t> cmdList;
 };
 
-extern CCmdSystem s_cmdSystem;
+extern CCmdSystem g_cmdSystem;
 #include "cvar/cmdsystem.inl"

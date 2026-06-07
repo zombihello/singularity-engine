@@ -1,7 +1,7 @@
 #include "pch_resourcesystem.h"
 #include "resourcesystem/resourcetypemgr.h"
 #include "resourcesystem/resourcesystem.h"
-#include "resourcesystem/convars.h"
+#include "resourcesystem/cvars.h"
 
 /*
 ==================
@@ -668,7 +668,7 @@ void CResourceTypeMgr::ProcessLruResources()
 
 	// Uncache all unused resources
 	uint64		 frameNumber	   = g_resourceSystem.GetFrameNumber();
-	const uint64 expireFrameNumber = frameNumber - S_Min<uint64>( frameNumber, resSys_unusedFrameThreshold.GetInt() );
+	const uint64 expireFrameNumber = frameNumber - S_Min<uint64>( frameNumber, res_unusedFrameThreshold.GetInt() );
 	while ( !lruResourcesList.empty() )
 	{
 		// Remove a resource if it isn't valid

@@ -46,6 +46,7 @@ public:
 	virtual void WriteFlaggedVariables( uint32 flags, IStreamDataWriter* pStreamData ) const override;
 
 	CCVarSystem();
+	const eastl::list<ICVar*>& GetCVarList() const;
 
 private:
 	cvarDLLIdentifier_t nextDLLIdentifier;
@@ -53,4 +54,5 @@ private:
 	eastl::list<ICVar*> cvarList;
 };
 
-extern CCVarSystem s_cvarSystem;
+extern CCVarSystem g_cvarSystem;
+#include "cvar/cvarsystem.inl"

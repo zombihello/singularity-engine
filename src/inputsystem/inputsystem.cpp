@@ -1,15 +1,12 @@
 #include "pch_inputsystem.h"
-#include "tier1/cvar.h"
-#include "tier1/cmdlink.h"
 #include "tier1/istreamdata.h"
 #include "cvar/icmdsystem.h"
 #include "appframework/iwindowmgr.h"
-#include "inputsystem/iinputsystem.h"
+#include "inputsystem/inputsystem.h"
+#include "inputsystem/cvars.h"
 
-//-----------------------------------------------------------------------------
-// Global values and cvars
-//-----------------------------------------------------------------------------
-CCVar mouse_sensitivity( "mouse_sensitivity", "0.5", "Mouse sensitivity", CVAR_FLAG_ARCHIVE );
+CInputSystem g_inputSystem;
+EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CInputSystem, IInputSystem, INPUTSYSTEM_INTERFACE_VERSION, g_inputSystem );
 
 // Table of button names
 static const char* s_pButtonNames[] = {
@@ -131,63 +128,6 @@ static const char* s_pButtonNames[] = {
 	"mousex",	   // MOUSE_X
 	"mousey"	   // MOUSE_Y
 };
-
-//-----------------------------------------------------------------------------
-// Input system
-//-----------------------------------------------------------------------------
-class CInputSystem : public CBaseAppSystem<IInputSystem>
-{
-public:
-	CInputSystem();
-	~CInputSystem();
-
-	// IAppSystem interface
-	virtual bool Connect( createInterfaceFn_t pFactory ) override;
-	virtual void Disconnect() override;
-
-	// IInputSystem interface
-	virtual void AttachToWindow( windowId_t windowId ) override;
-	virtual void DetachFromWindow() override;
-	virtual void WriteBindings( IStreamDataWriter* pStreamData ) const override;
-	virtual void ClearInputState() override;
-
-	// Functions set/get console command which binded on a button
-	virtual void		SetBinding( buttonCode_t button, const char* pCommand ) override;
-	virtual const char* GetBindingCommand( buttonCode_t button ) const override;
-	virtual void		UnbindAll() override;
-
-	virtual bool IsKeyDown( buttonCode_t key ) const override;
-	virtual bool IsKeyUp( buttonCode_t key ) const override;
-	virtual bool IsMouseKeyDown( buttonCode_t key ) const override;
-	virtual bool IsMouseKeyUp( buttonCode_t key ) const override;
-	virtual bool IsMouseWheel( buttonCode_t wheel ) const override;
-	virtual bool IsMouseMoved( buttonCode_t mouseAxis ) const override;
-
-	virtual vector2_t GetMouseLocation() const override;
-	virtual vector2_t GetMouseOffset() const override;
-	virtual float	  GetMouseOffset( buttonCode_t mouseAxis ) const override;
-	virtual float	  GetMouseSensitivity() const override;
-
-	virtual buttonEvent_t GetButtonEvent( buttonCode_t buttonCode ) const override;
-	virtual buttonCode_t  GetButtonCodeByName( const char* pButtonName ) const override;
-	virtual const char*	  GetButtonName( buttonCode_t buttonCode ) const override;
-
-	void ExecBindingCommand( buttonCode_t button );
-
-private:
-	static void OnInputEvent( void* pUserData, const inputEvent_t& inputEvent );
-
-	windowId_t							windowId;  // A window that was attached the input system
-	IWindowMgr::IOnInputEvent::handle_t onInputEventHandle;
-	buttonEvent_t						buttonEvents[BUTTON_CODE_COUNT];
-	vector2_t							mouseLocation;
-	vector2_t							mouseOffset;
-	eastl::string						binds[BUTTON_CODE_COUNT];
-};
-
-// Input system singleton
-static CInputSystem s_InputSystem;
-EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CInputSystem, IInputSystem, INPUTSYSTEM_INTERFACE_VERSION, s_InputSystem );
 
 /*
 ==================
@@ -634,74 +574,4 @@ const char* CInputSystem::GetButtonName( buttonCode_t buttonCode ) const
 	}
 
 	return s_pButtonNames[(uint32)buttonCode];
-}
-
-/*
-==================
-bind
-==================
-*/
-CONSOLE_COMMAND( bind, "Bind a key", CMD_FLAG_NONE )
-{
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_INPUT );
-	if ( args.Argc() < 2 )
-	{
-		Msg( "InputSystem: bind <key> <command> : Attach a command to a key" );
-		return;
-	}
-
-	// Get button code by name
-	buttonCode_t buttonCode = s_InputSystem.GetButtonCodeByName( args.Argv( 1 ) );
-
-	// Do nothing if button isn't valid
-	if ( buttonCode == BUTTON_CODE_NONE )
-	{
-		Warning( "InputSystem: bind: \"%s\" isn't a valid key", args.Argv( 1 ) );
-		return;
-	}
-
-	// Set binding
-	s_InputSystem.SetBinding( buttonCode, args.Argv( 2 ) );
-	Msg( "InputSystem: bind: \"%s\" = \"%s\"", args.Argv( 1 ), args.Argv( 2 ) );
-}
-
-/*
-==================
-unbind
-==================
-*/
-CONSOLE_COMMAND( unbind, "Unbind a key", CMD_FLAG_NONE )
-{
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_INPUT );
-	if ( args.Argc() < 1 )
-	{
-		Msg( "InputSystem: unbind <key> : Remove commands from a key" );
-		return;
-	}
-
-	// Get button code by name
-	buttonCode_t buttonCode = s_InputSystem.GetButtonCodeByName( args.Argv( 1 ) );
-
-	// Do nothing if button isn't valid
-	if ( buttonCode == BUTTON_CODE_NONE )
-	{
-		Warning( "InputSystem: unbind: \"%s\" isn't a valid key", args.Argv( 1 ) );
-		return;
-	}
-
-	// Unbind a key
-	s_InputSystem.SetBinding( buttonCode, "" );
-	Msg( "InputSystem: unbind: \"%s\" is unbind", args.Argv( 1 ) );
-}
-
-/*
-==================
-unbindall
-==================
-*/
-CONSOLE_COMMAND( unbindall, "Unbind all keys", CMD_FLAG_NONE )
-{
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_INPUT );
-	s_InputSystem.UnbindAll();
-	Msg( "InputSystem: unbindall: All keys has been unbind" );
 }
