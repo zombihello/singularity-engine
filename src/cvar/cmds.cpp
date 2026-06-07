@@ -221,3 +221,29 @@ CONSOLE_COMMAND( reset, "Resets a cvar", CMD_FLAG_NONE )
 	// Reset the cvar
 	pCVar->Reset();
 }
+
+/*
+==================
+vstr
+==================
+*/
+CONSOLE_COMMAND( vstr, "Inserts the current value of a cvar as command string", CMD_FLAG_NONE )
+{
+	if ( args.Argc() != 2 )
+	{
+		Msg( "usage: vstr <variable>" );
+		return;
+	}
+
+	// Try to find a cvar
+	const char* pCVarName = args.Argv( 1 );
+	ICVar*		pCVar	  = g_cvarSystem.FindVariable( pCVarName, S_Strlen( pCVarName ) );
+	if ( !pCVar )
+	{
+		Warning( "vstr: CVar '%s' not found", pCVarName );
+		return;
+	}
+
+	// Append the value as command string
+	g_cmdSystem.AppendCommandString( CMD_EXECUTION_APPEND_END, pCVar->GetString() );
+}
