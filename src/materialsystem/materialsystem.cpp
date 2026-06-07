@@ -25,7 +25,7 @@ bool CMaterialSystem::Connect( createInterfaceFn_t pFactory )
 		return false;
 	}
 	LinkCmds();
-	ConVar_Register();
+	LinkCVars();
 
 	// Get the StudioAPI
 	g_pStudioAPI = (IStudioAPI*)pFactory( STUDIOAPI_INTERFACE_VERSION );
@@ -73,8 +73,8 @@ void CMaterialSystem::Disconnect()
 	g_pStudioAPI		= NULL;
 	g_pAppSystemFactory = NULL;
 
+	UnlinkCVars();
 	UnlinkCmds();
-	ConVar_Unregister();
 	DisconnectTier1();
 }
 

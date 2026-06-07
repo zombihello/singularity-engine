@@ -2,7 +2,7 @@
 #include "tier0/icommandline.h"
 #include "tier0/iprofiler.h"
 #include "tier1/filetools.h"
-#include "tier1/convar.h"
+#include "tier1/cvar.h"
 #include "tier1/cmdlink.h"
 #include "appframework/application.h"
 #if ENABLE_LOGGING
@@ -78,7 +78,7 @@ void CApplication::Init()
 	// Register cvars
 	const appInfo_t& appInfo = GetAppInfo();
 	LinkCmds( appInfo.baseCmdFlags );
-	ConVar_Register( appInfo.baseCVarFlags, appInfo.pConVarsOverrider, appInfo.pCvarAccessor );
+	LinkCVars( appInfo.baseCVarFlags );
 
 	// Setup a log file
 #if ENABLE_LOGGING
@@ -102,15 +102,15 @@ void CApplication::Init()
 
 	// Set true in cheats and developer cvars if we in debug configuration
 #if DEBUG
-	CConVarRef cheatsRef( "cheats" );
-	CConVarRef developerRef( "developer" );
+	CCVarRef cheatsRef( "cheats" );
+	CCVarRef developerRef( "developer" );
 	if ( cheatsRef.IsValid() )
 	{
-		cheatsRef->SetBool( true );
+		cheatsRef->SetInt( 1 );
 	}
 	if ( developerRef.IsValid() )
 	{
-		developerRef->SetBool( true );
+		developerRef->SetInt( 1 );
 	}
 #endif	// DEBUG
 
@@ -152,8 +152,9 @@ void CApplication::Shutdown()
 	}
 #endif	// ENABLE_LOGGING
 
-	// Unregister cvars
-	ConVar_Unregister();
+	// Unregister commands and cvars
+	UnlinkCVars();
+	UnlinkCmds();
 	DisconnectTier1();
 
 	// Shutdown Tier1 and clear system groups array

@@ -4,26 +4,24 @@
 //-----------------------------------------------------------------------------
 // CVars
 //-----------------------------------------------------------------------------
-void CheatsCVarChanged( IConVar* pConVar );
-void DeveloperCVarChanged( IConVar* pConVar );
+void CheatsCVarChanged( ICVar* pCVar, const char* pOldValueStr, float oldValue );
+void DeveloperCVarChanged( ICVar* pCVar, const char* pOldValueStr, float oldValue );
 
-CConVar cheats( "cheats", "0", "Allow cheats in the game", FCVAR_NONE, CheatsCVarChanged );
-CConVar developer( "developer", "0", "Enables developer messages", FCVAR_NONE, DeveloperCVarChanged );
+CCVar cheats( "cheats", "0", "Allow cheats in the game", CVAR_FLAG_NONE, CheatsCVarChanged );
+CCVar developer( "developer", "0", "Enables developer messages", CVAR_FLAG_NONE, DeveloperCVarChanged );
 
 /*
 ==================
 CheatsChanged
 ==================
 */
-static void CheatsCVarChanged( IConVar* pConVar )
+static void CheatsCVarChanged( ICVar* pCVar, const char* pOldValueStr, float oldValue )
 {
-	PROFILER_SCOPE_FUNC();
-
 	// Cheats were disabled, revert all cheat cvars to their default values
-	if ( g_pCvar && pConVar->GetInt() == 0 )
+	if ( g_pCVarSystem && oldValue != 0 )
 	{
-		g_pCvar->ResetFlaggedVars( FCVAR_CHEAT );
-		Msg( "Cvar: FCVAR_CHEAT cvars reverted to defaults" );
+		g_pCVarSystem->ResetFlaggedVariables( CVAR_FLAG_CHEAT );
+		Msg( "CVarSystem: CVAR_FLAG_CHEAT cvars reverted to defaults" );
 	}
 }
 
@@ -32,7 +30,7 @@ static void CheatsCVarChanged( IConVar* pConVar )
 DeveloperCVarChanged
 ==================
 */
-static void DeveloperCVarChanged( IConVar* pConVar )
+static void DeveloperCVarChanged( ICVar* pCVar, const char* pOldValueStr, float oldValue )
 {
-	Logger()->SetGroupActivate( LOG_GROUP_DEVELOPER, pConVar->GetBool() );
+	Logger()->SetGroupActivate( LOG_GROUP_DEVELOPER, pCVar->GetInt() != 0 );
 }

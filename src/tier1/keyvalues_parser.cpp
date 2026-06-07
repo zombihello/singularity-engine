@@ -1,7 +1,7 @@
 #include "pch_tier1.h"
 #include "utils/interfaces/interfaces.h"
 #include "tier1/filetools.h"
-#include "cvar/icvar.h"
+#include "cvar/icvarsystem.h"
 #include "tier1/keyvalues_parser.h"
 
 /*
@@ -327,7 +327,7 @@ CKeyValuesParser::ReadConditionalBlock
 bool CKeyValuesParser::ReadConditionalBlock( bool& bAccepted )
 {
 	PROFILER_SCOPE_FUNC();
-	Assert( g_pCvar );
+	Assert( g_pCVarSystem );
 	static eastl::pair<const char*, bool> s_constantVars[] = {
 		eastl::make_pair( "$WINDOWS", PLATFORM_WINDOWS )
 
@@ -410,11 +410,11 @@ bool CKeyValuesParser::ReadConditionalBlock( bool& bAccepted )
 		// Otherwise, it must be a cvar
 		if ( !bEvaluated )
 		{
-			IConVar* pConVar = g_pCvar->FindVar( token.string.c_str() );
-			if ( pConVar )
+			ICVar* pCVar = g_pCVarSystem->FindVariable( token.string.c_str() );
+			if ( pCVar )
 			{
 				bEvaluated = true;
-				bConditionalGroups[curConditionalGroupId] &= pConVar->GetBool() ^ bNot;
+				bConditionalGroups[curConditionalGroupId] &= ( pCVar->GetInt() != 0 ) ^ bNot;
 			}
 			else
 			{

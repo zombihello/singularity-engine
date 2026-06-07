@@ -47,7 +47,7 @@ bool CStudioAPIVk::Connect( createInterfaceFn_t pFactory )
 		return false;
 	}
 	LinkCmds();
-	ConVar_Register();
+	LinkCVars();
 	return true;
 }
 
@@ -61,8 +61,8 @@ void CStudioAPIVk::Disconnect()
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Unregister cvars and disconnect Tier1
+	UnlinkCVars();
 	UnlinkCmds();
-	ConVar_Unregister();
 	DisconnectTier1();
 }
 

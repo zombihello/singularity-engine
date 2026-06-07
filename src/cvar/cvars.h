@@ -1,8 +1,8 @@
 #pragma once
-#include "tier1/convar.h"
+#include "tier1/cvar.h"
 
 //-----------------------------------------------------------------------------
 // CVars
 //-----------------------------------------------------------------------------
-extern CConVar cheats;
-extern CConVar developer;
+extern CCVar cheats;
+extern CCVar developer;

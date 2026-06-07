@@ -6,7 +6,6 @@
 class IFileSystem;
 class IWindowMgr;
 class IInputSystem;
-class ICvar;
 class ICmdSystem;
 class ICVarSystem;
 class IGame;
@@ -22,9 +21,8 @@ class IResourceSystem;
 extern IFileSystem*		g_pFileSystem;
 extern IWindowMgr*		g_pWindowMgr;
 extern IInputSystem*	g_pInputSystem;
-extern ICvar*			g_pCvar;
 extern ICmdSystem*		g_pCmdSystem;
-extern ICVarSystem*		g_pCvarSystem;
+extern ICVarSystem*		g_pCVarSystem;
 extern IGame*			g_pGame;
 extern IStudioRender*	g_pStudioRender;
 extern IStudioAPI*		g_pStudioAPI;

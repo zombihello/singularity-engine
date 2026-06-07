@@ -1,7 +1,6 @@
 #include "pch_tier1.h"
 #include "utils/interfaces/interfaces.h"
 #include "filesystem/ifilesystem.h"
-#include "cvar/icvar.h"
 #include "cvar/icmdsystem.h"
 #include "cvar/icvarsystem.h"
 #include "tier1/tier1.h"
@@ -34,16 +33,6 @@ bool ConnectTier1( createInterfaceFn_t pFactory )
 		}
 	}
 
-	// Try connect cvar system
-	if ( !g_pCvar )
-	{
-		g_pCvar = (ICvar*)pFactory( CVAR_INTERFACE_VERSION );
-		if ( !g_pCvar )
-		{
-			return false;
-		}
-	}
-
 	// Try connect the console command system
 	if ( !g_pCmdSystem )
 	{
@@ -55,10 +44,10 @@ bool ConnectTier1( createInterfaceFn_t pFactory )
 	}
 
 	// Try connect the console variable system
-	if ( !g_pCvarSystem )
+	if ( !g_pCVarSystem )
 	{
-		g_pCvarSystem = (ICVarSystem*)pFactory( CVARSYSTEM_INTERFACE_VERSION );
-		if ( !g_pCvarSystem )
+		g_pCVarSystem = (ICVarSystem*)pFactory( CVARSYSTEM_INTERFACE_VERSION );
+		if ( !g_pCVarSystem )
 		{
 			return false;
 		}
@@ -87,7 +76,6 @@ void DisconnectTier1()
 	// Reset all app systems and variables
 	s_bConnected  = false;
 	g_pFileSystem = NULL;
-	g_pCvar		  = NULL;
 	g_pCmdSystem  = NULL;
-	g_pCvarSystem = NULL;
+	g_pCVarSystem = NULL;
 }

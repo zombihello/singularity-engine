@@ -1,15 +1,15 @@
 #include "pch_inputsystem.h"
-#include "tier1/convar.h"
+#include "tier1/cvar.h"
 #include "tier1/cmdlink.h"
 #include "tier1/istreamdata.h"
-#include "cvar/icvar.h"
+#include "cvar/icmdsystem.h"
 #include "appframework/iwindowmgr.h"
 #include "inputsystem/iinputsystem.h"
 
 //-----------------------------------------------------------------------------
 // Global values and cvars
 //-----------------------------------------------------------------------------
-CConVar mouse_sensitivity( "mouse_sensitivity", "0.5", "Mouse sensitivity", FCVAR_ARCHIVE );
+CCVar mouse_sensitivity( "mouse_sensitivity", "0.5", "Mouse sensitivity", CVAR_FLAG_ARCHIVE );
 
 // Table of button names
 static const char* s_pButtonNames[] = {
@@ -148,7 +148,7 @@ public:
 	// IInputSystem interface
 	virtual void AttachToWindow( windowId_t windowId ) override;
 	virtual void DetachFromWindow() override;
-
+	virtual void WriteBindings( IStreamDataWriter* pStreamData ) const override;
 	virtual void ClearInputState() override;
 
 	// Functions set/get console command which binded on a button
@@ -176,15 +176,13 @@ public:
 
 private:
 	static void OnInputEvent( void* pUserData, const inputEvent_t& inputEvent );
-	static void OnWriteConCmdsToConfigFile( void* pUserData, IStreamDataWriter* pStreamData );
 
-	windowId_t							  windowId;	 // A window that was attached the input system
-	IWindowMgr::IOnInputEvent::handle_t	  onInputEventHandle;
-	IOnWriteConCmdsToConfigFile::handle_t onWriteConCmdsHandle;
-	buttonEvent_t						  buttonEvents[BUTTON_CODE_COUNT];
-	vector2_t							  mouseLocation;
-	vector2_t							  mouseOffset;
-	eastl::string						  binds[BUTTON_CODE_COUNT];
+	windowId_t							windowId;  // A window that was attached the input system
+	IWindowMgr::IOnInputEvent::handle_t onInputEventHandle;
+	buttonEvent_t						buttonEvents[BUTTON_CODE_COUNT];
+	vector2_t							mouseLocation;
+	vector2_t							mouseOffset;
+	eastl::string						binds[BUTTON_CODE_COUNT];
 };
 
 // Input system singleton
@@ -199,7 +197,6 @@ CInputSystem::CInputSystem
 CInputSystem::CInputSystem()
 	: windowId( INVALID_WINDOW_ID )
 	, onInputEventHandle( INVALID_HANDLE )
-	, onWriteConCmdsHandle( INVALID_HANDLE )
 	, mouseLocation( g_vector000 )
 	, mouseOffset( g_vector000 )
 {
@@ -236,8 +233,7 @@ bool CInputSystem::Connect( createInterfaceFn_t pFactory )
 	}
 
 	LinkCmds();
-	ConVar_Register();
-	onWriteConCmdsHandle = g_pCvar->OnWriteConCmdsToConfigFile()->Subscribe( &CInputSystem::OnWriteConCmdsToConfigFile, this );
+	LinkCVars();
 	return true;
 }
 
@@ -250,11 +246,8 @@ void CInputSystem::Disconnect()
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_INPUT );
 	DetachFromWindow();
-	g_pCvar->OnWriteConCmdsToConfigFile()->Unsubscribe( onWriteConCmdsHandle );
-	onWriteConCmdsHandle = INVALID_HANDLE;
-
+	UnlinkCVars();
 	UnlinkCmds();
-	ConVar_Unregister();
 	DisconnectTier1();
 }
 
@@ -371,34 +364,6 @@ void CInputSystem::OnInputEvent( void* pUserData, const inputEvent_t& inputEvent
 
 /*
 ==================
-CInputSystem::OnWriteConCmdsToConfigFile
-==================
-*/
-void CInputSystem::OnWriteConCmdsToConfigFile( void* pUserData, IStreamDataWriter* pStreamData )
-{
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
-	Assert( pUserData );
-	CInputSystem* pInputSystem = (CInputSystem*)pUserData;
-
-	eastl::string buffer;
-	buffer += "unbindall\n";
-	for ( uint32 index = 0; index < BUTTON_CODE_COUNT; ++index )
-	{
-		const char* pCommand = pInputSystem->GetBindingCommand( (buttonCode_t)index );
-		if ( !pCommand || !pCommand[0] )
-		{
-			continue;
-		}
-
-		buffer += S_Sprintf( "bind \"%s\" \"%s\"\n", pInputSystem->GetButtonName( (buttonCode_t)index ), pCommand );
-	}
-
-	// Write the buffer into the file
-	pStreamData->Write( buffer.data(), buffer.size() * sizeof( char ) );
-}
-
-/*
-==================
 CInputSystem::ClearInputState
 ==================
 */
@@ -414,6 +379,33 @@ void CInputSystem::ClearInputState()
 	}
 
 	mouseOffset = g_vector000;
+}
+
+/*
+==================
+CInputSystem::WriteBindings
+==================
+*/
+void CInputSystem::WriteBindings( IStreamDataWriter* pStreamData ) const
+{
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
+
+	// Write bindings into a string buffer
+	eastl::string buffer;
+	buffer += "unbindall\n";
+	for ( uint32 index = 0; index < BUTTON_CODE_COUNT; ++index )
+	{
+		const char* pCmd = GetBindingCommand( (buttonCode_t)index );
+		if ( !pCmd || !pCmd[0] )
+		{
+			continue;
+		}
+
+		buffer += S_Sprintf( "bind \"%s\" \"%s\"\n", GetButtonName( (buttonCode_t)index ), pCmd );
+	}
+
+	// Write the buffer into the stream data
+	pStreamData->Write( buffer.data(), buffer.size() * sizeof( char ) );
 }
 
 /*
@@ -461,7 +453,7 @@ void CInputSystem::ExecBindingCommand( buttonCode_t button )
 	Assert( button < BUTTON_CODE_COUNT );
 	if ( !binds[button].empty() )
 	{
-		g_pCvar->Exec( binds[button].c_str() );
+		g_pCmdSystem->AppendCommandString( CMD_EXECUTION_APPEND_END, binds[button].c_str() );
 	}
 }
 

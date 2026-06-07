@@ -324,7 +324,7 @@ void CCmdSystem::ExecuteTokenizedCommand( const CCmdArgs& args )
 			cmdList.splice( cmdList.begin(), cmdList, it );
 
 			// Allow cheat commands only with 'cheats' on
-			if ( ( cmd.flags & CMD_FLAG_CHEAT ) && !cheats.GetBool() )
+			if ( ( cmd.flags & CMD_FLAG_CHEAT ) && !cheats.GetInt() )
 			{
 				Warning( "CmdSystem: Can't use cheat command '%s', unless has cheats set to 1", cmd.name.c_str() );
 				return;
@@ -342,7 +342,7 @@ void CCmdSystem::ExecuteTokenizedCommand( const CCmdArgs& args )
 	}
 
 	// Check cvars
-	if ( g_pCvar->Exec( args.Args().c_str() ) )
+	if ( g_pCVarSystem->ExecuteCommand( args ) )
 	{
 		return;
 	}

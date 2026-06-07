@@ -3,6 +3,7 @@
 #include "tier0/version.h"
 #include "filesystem/ifilesystem.h"
 #include "cvar/cmdsystem.h"
+#include "cvar/cvarsystem.h"
 
 /*
 ==================
@@ -23,6 +24,16 @@ quit
 CONSOLE_COMMAND( quit, "Quit from the game", CMD_FLAG_NONE )
 {
 	Sys_RequestExit( false );
+}
+
+/*
+==================
+echo
+==================
+*/
+CONSOLE_COMMAND( echo, "Prints text", CMD_FLAG_NONE )
+{
+	Msg( args.Args( 1, INVALID_INDEX ).c_str() );
 }
 
 /*
@@ -81,18 +92,38 @@ CONSOLE_COMMAND( listCmds, "Lists commands", CMD_FLAG_NONE )
 	// Print all founded commands
 	for ( auto it = foundCmdList.begin(), itEnd = foundCmdList.end(); it != itEnd; ++it )
 	{
-		const commandDef_t* cmd = *it;
-		Msg( "%-21s %s", cmd->name.c_str(), cmd->description.c_str() );
+		const commandDef_t* pCmd = *it;
+		Msg( "%-21s %s", pCmd->name.c_str(), pCmd->description.c_str() );
 	}
 	Msg( "%i commands", foundCmdList.size() );
 }
 
 /*
 ==================
-echo
+listCVars
 ==================
 */
-CONSOLE_COMMAND( echo, "Prints text", CMD_FLAG_NONE )
+CONSOLE_COMMAND( listCVars, "Lists cvars", CMD_FLAG_NONE )
 {
-	Msg( args.Args( 1, INVALID_INDEX ).c_str() );
+	// TODO BS yehor.pohuliaka - Implement it
+}
+
+/*
+==================
+toggle
+==================
+*/
+CONSOLE_COMMAND( toggle, "Toggles a cvar", CMD_FLAG_NONE )
+{
+	// TODO BS yehor.pohuliaka - Implement it
+}
+
+/*
+==================
+reset
+==================
+*/
+CONSOLE_COMMAND( reset, "Resets a cvar", CMD_FLAG_NONE )
+{
+	// TODO BS yehor.pohuliaka - Implement it
 }

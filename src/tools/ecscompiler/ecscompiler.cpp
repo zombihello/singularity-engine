@@ -2,7 +2,6 @@
 #include "tier1/filetools.h"
 #include "utils/interfaces/interfaces.h"
 #include "filesystem/ifilesystem.h"
-#include "cvar/icvar.h"
 #include "appframework/application.h"
 #include "tools/ecscompiler/ecsfileparser.h"
 #include "tools/ecscompiler/ecscppgenerator.h"
@@ -283,7 +282,7 @@ CEcsCompilerApp::GetAppInfo
 */
 const appInfo_t& CEcsCompilerApp::GetAppInfo() const
 {
-	static appInfo_t s_appInfo{ "ecscompiler", APPLICATION_TYPE_CONSOLE, CMD_FLAG_NONE, FCVAR_NONE, NULL, NULL };
+	static appInfo_t s_appInfo{ "ecscompiler", APPLICATION_TYPE_CONSOLE, CMD_FLAG_NONE, CVAR_FLAG_NONE };
 	return s_appInfo;
 }
 

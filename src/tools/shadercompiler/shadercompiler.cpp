@@ -1,6 +1,5 @@
 #include "pch_shadercompiler.h"
 #include "tier0/icommandline.h"
-#include "cvar/icvar.h"
 #include "appframework/application.h"
 #include "utils/shadercache/shadercache.h"
 #include "tools/shadercompiler/shadercompiler_cppgenerator.h"
@@ -578,7 +577,7 @@ CShaderCompilerApp::GetAppInfo
 */
 const appInfo_t& CShaderCompilerApp::GetAppInfo() const
 {
-	static appInfo_t s_appInfo{ "shadercompiler", APPLICATION_TYPE_CONSOLE, CMD_FLAG_NONE, FCVAR_NONE, NULL, NULL };
+	static appInfo_t s_appInfo{ "shadercompiler", APPLICATION_TYPE_CONSOLE, CMD_FLAG_NONE, CVAR_FLAG_NONE };
 	return s_appInfo;
 }
 

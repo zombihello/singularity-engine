@@ -12,6 +12,9 @@
 #include "launcher/appsystemgroup_game.h"
 #include "utils/gameinfo/gameinfo.h"
 
+#define CONFIG_NAME			"config"
+#define DEFAULT_CONFIG_NAME "config_default"
+
 //-----------------------------------------------------------------------------
 // Game viewport client
 //-----------------------------------------------------------------------------
@@ -42,6 +45,8 @@ protected:
 private:
 	static void OnWindowEvent( void* pUserData, const windowEvent_t& windowEvent );
 	static void OnChangedMainWindow( void* pUserData, windowId_t newMainWindowId );
+	void		OverrideCVarsFromCommandLine();
+	void		WriteConfiguration();
 
 	bool					 bInFocus;
 	const char*				 pDefaultGameDir;
@@ -114,13 +119,16 @@ void CLauncherApp::Init()
 	gameSystemGroup.ConnectSystems();
 
 	// Execute the startup scripts
-	g_pCmdSystem->AppendCommandString( CMD_EXECUTION_APPEND_END, "exec //game/cfg/config_default.cfg" );
-	g_pCmdSystem->AppendCommandString( CMD_EXECUTION_APPEND_END, "exec //game/cfg/config.cfg" );
+	g_pCmdSystem->AppendCommandString( CMD_EXECUTION_APPEND_END, "exec //game/cfg/" DEFAULT_CONFIG_NAME ".cfg" );
+	g_pCmdSystem->AppendCommandString( CMD_EXECUTION_APPEND_END, "exec //game/cfg/" CONFIG_NAME ".cfg" );
 	g_pCmdSystem->AppendCommandString( CMD_EXECUTION_APPEND_END, "exec //game/cfg/autoexec.cfg" );
 	g_pCmdSystem->ExecuteCommands();
 
 	// Override cvars from the command line
-	g_pCvar->OverrideConVarsFromCommandLine();
+	OverrideCVarsFromCommandLine();
+
+	// If any archived cvars are modified after this, we will trigger a writing of the config file
+	g_pCVarSystem->ClearModifiedFlags( CVAR_FLAG_ARCHIVE );
 
 	// Get all systems
 	g_pWindowMgr	  = (IWindowMgr*)FindSystem( WINDOWMGR_INTERFACE_VERSION );
@@ -180,6 +188,60 @@ void CLauncherApp::Init()
 
 /*
 ==================
+CLauncherApp::OverrideCVarsFromCommandLine
+==================
+*/
+void CLauncherApp::OverrideCVarsFromCommandLine()
+{
+	// Check for windowed mode command line override
+	ICommandLine* pCommandLine = CommandLine();
+	if ( pCommandLine->HasParam( "windowed" ) || pCommandLine->HasParam( "window" ) )
+	{
+		window_mode.SetInt( WINDOW_MODE_WINDOWED );
+	}
+	// Check for fullscreen override
+	else if ( pCommandLine->HasParam( "full" ) || pCommandLine->HasParam( "fullscreen" ) )
+	{
+		window_mode.SetInt( WINDOW_MODE_EXCLUSIVE_FULLSCREEN );
+	}
+
+	// Get width
+	const char* pWidthParam = NULL;
+	if ( pCommandLine->HasParam( "width" ) )
+	{
+		pWidthParam = "width";
+	}
+	else if ( pCommandLine->HasParam( "w" ) )
+	{
+		pWidthParam = "w";
+	}
+
+	// Override width
+	if ( pWidthParam )
+	{
+		window_width.SetString( pCommandLine->GetFirstValue( pWidthParam ) );
+	}
+
+	// Get height
+	const char* pHeightParam = NULL;
+	if ( pCommandLine->HasParam( "height" ) )
+	{
+		pHeightParam = "height";
+	}
+	else if ( pCommandLine->HasParam( "h" ) )
+	{
+		pHeightParam = "h";
+	}
+
+	// Override height
+	if ( pHeightParam )
+	{
+		window_height.SetString( pCommandLine->GetFirstValue( pHeightParam ) );
+	}
+}
+
+/*
+==================
 CLauncherApp::Main
 ==================
 */
@@ -204,8 +266,8 @@ int32 CLauncherApp::Main()
 			continue;
 		}
 
-		// TODO BS yehor.pohuliaka - Here we should write config file if anything changed (see idCommonLocal::WriteConfiguration() in DOOM 3 BFG Edition source code)
-		// WriteConfiguration();
+		// Write config file if anything changed
+		WriteConfiguration();
 
 		// Update the profiler
 #if ENABLE_PROFILING
@@ -232,6 +294,33 @@ int32 CLauncherApp::Main()
 	// Flush render thread commands before shutdown the application
 	Studio_FlushRenderCommands();
 	return 0;
+}
+
+/*
+==================
+CLauncherApp::WriteConfiguration
+==================
+*/
+void CLauncherApp::WriteConfiguration()
+{
+	// Do nothing if any archive cvar hasn't been changed
+	if ( !( g_pCVarSystem->GetModifiedFlags() & CVAR_FLAG_ARCHIVE ) )
+	{
+		return;
+	}
+	g_pCVarSystem->ClearModifiedFlags( CVAR_FLAG_ARCHIVE );
+
+	// Open file to write
+	CRefPtr<IStreamDataWriter> pFile = g_pFileSystem->CreateFileWriter( "//game/cfg/" CONFIG_NAME ".cfg" );
+	if ( !pFile )
+	{
+		Warning( "Launcher: Failed to create file configuration '//game/cfg/" CONFIG_NAME ".cfg'" );
+		return;
+	}
+
+	// Write bindings and cvars
+	g_pInputSystem->WriteBindings( pFile );
+	g_pCVarSystem->WriteFlaggedVariables( CVAR_FLAG_ARCHIVE, pFile );
 }
 
 /*
@@ -352,13 +441,13 @@ CLauncherApp::OnChangedMainWindow
 void CLauncherApp::OnChangedMainWindow( void* pUserData, windowId_t newMainWindowId )
 {
 	PROFILER_SCOPE_FUNC();
-	CConVarRef	  r_vsyncRef( "r_vsync" );
+	CCVarRef	  r_vsyncRef( "r_vsync" );
 	IWindow*	  pMainWindow = g_pWindowMgr->GetWindow( newMainWindowId );
 	vector2i_t	  windowSize  = pMainWindow->GetSize();
 	CLauncherApp* pApp		  = (CLauncherApp*)pUserData;
 
 	Assert( pApp->pStudioViewport );
-	pApp->pStudioViewport->Init( pMainWindow->GetHandle(), windowSize.x, windowSize.y, r_vsyncRef.IsValid() ? r_vsyncRef->GetBool() : false );
+	pApp->pStudioViewport->Init( pMainWindow->GetHandle(), windowSize.x, windowSize.y, r_vsyncRef.IsValid() ? r_vsyncRef->GetInt() != 0 : false );
 }
 
 /*
@@ -368,7 +457,7 @@ CLauncherApp::GetAppInfo
 */
 const appInfo_t& CLauncherApp::GetAppInfo() const
 {
-	static appInfo_t s_appInfo{ "launcher", APPLICATION_TYPE_WINDOW, CMD_FLAG_NONE, FCVAR_NONE, &g_conVarsOverrider, NULL };
+	static appInfo_t s_appInfo{ "launcher", APPLICATION_TYPE_WINDOW, CMD_FLAG_NONE, CVAR_FLAG_NONE };
 	return s_appInfo;
 }
 
