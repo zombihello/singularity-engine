@@ -103,7 +103,7 @@ FORCEINLINE TType* CFrameAlloc<blockSize, numPools, defaultAlignment, minAlignme
 	PROFILER_SCOPE_FUNC();
 	void*  pData   = Alloc( sizeof( TType ), alignof( TType ) );
 	TType* pObject = new ( pData ) TType( eastl::forward<TArgs>( args )... );
-	if constexpr ( !eastl::is_trivially_default_constructible_v<TType> )
+	if constexpr ( !eastl::is_trivially_destructible_v<TType> )
 	{
 		destructorEntry_t destructorEntry;
 		destructorEntry.pObject			 = pObject;
