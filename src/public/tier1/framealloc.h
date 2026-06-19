@@ -15,6 +15,7 @@
 //	* Frame allocator hasn't any free ranges, after each allocation a pointer move forward to free position
 //	* On beginning of a frame the allocator resets and whole the memory will be reused
 //	* Based on point 1 and 2, the allocator not supported Free and Realloc functions
+//	* Before use the allocator you must call CFrameAlloc::SwapPools to get a pool to use
 //-----------------------------------------------------------------------------
 template<uint32 blockSize = 64 * 1024 * 1024, uint32 numPools = 1, uint32 defaultAlignment = 16, uint32 minAlignment = 8>
 class CFrameAlloc
@@ -24,7 +25,7 @@ public:
 	~CFrameAlloc();
 
 	template<typename TType, typename... TArgs>
-	TType* New( TArgs&&... args );
+	TType* Construct( TArgs&&... args );
 	void*  Alloc( size numBytes, uint32 alignment = 0 );
 	void   SwapPools();
 	void   MarkAsFreePool( uint32 index );
@@ -39,23 +40,24 @@ private:
 
 	struct memoryBlock_t
 	{
-		uint64 allocatedSize;
-		uint64 usedSize;
-		byte*  pData;
+		uint64						   allocatedSize;
+		uint64						   usedSize;
+		byte*						   pData;
+		eastl::list<destructorEntry_t> destructorList;
 	};
 
 	struct memoryPool_t
 	{
-		uint32						   id;
-		eastl::atomic<bool>			   bIsFree;
-		eastl::list<destructorEntry_t> destructorList;
-		eastl::list<memoryBlock_t>	   blockList;
+		uint32					   id;
+		eastl::atomic<bool>		   bIsFree;
+		eastl::list<memoryBlock_t> blockList;
 	};
 
-	void AllocBlock( memoryPool_t& pool );
-	void FreeBlock( memoryPool_t& pool, memoryBlock_t* pBlock );
-	void FreeAllBlocks( memoryPool_t& pool );
-	void WaitFreePool();
+	void* Alloc( size numBytes, uint32 alignment, memoryBlock_t** pBlock );
+	void  AllocBlock( memoryPool_t& pool );
+	void  FreeBlock( memoryPool_t& pool, memoryBlock_t* pBlock );
+	void  FreeAllBlocks( memoryPool_t& pool );
+	void  WaitFreePool();
 
 	uint32		 currentPoolId;
 	memoryPool_t pools[numPools];
