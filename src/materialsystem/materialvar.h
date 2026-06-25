@@ -14,9 +14,6 @@ class CMaterial;
 class CMaterialVar : public IMaterialVar
 {
 public:
-	CMaterialVar( CMaterial* pMaterial, const char* pName );
-	~CMaterialVar();
-
 	// IMaterialVar interface
 	virtual void SetUndefined() override;
 	virtual void SetBoolValue( bool bValue ) override;
@@ -44,9 +41,15 @@ public:
 	virtual IResource*		  GetTextureValue() const override;
 	virtual IResource*		  GetMaterialValue() const override;
 
+	CMaterialVar( CMaterial* pMaterial, const char* pName, uint32 id );
+	~CMaterialVar();
+
+	uint32 GetId() const;
+
 private:
 	const char*		  pName;
 	materialVarType_t type;
+	uint32			  id;
 	CMaterial*		  pOwningMaterial;
 	union
 	{
@@ -62,3 +65,5 @@ private:
 	CResourcePtr<CTexture>	pTextureValue;
 	CResourcePtr<CMaterial> pMaterialValue;
 };
+
+#include "materialsystem/materialvar.inl"

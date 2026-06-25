@@ -8,9 +8,10 @@
 CMaterialVar::CMaterialVar
 ==================
 */
-CMaterialVar::CMaterialVar( CMaterial* pMaterial, const char* pName )
+CMaterialVar::CMaterialVar( CMaterial* pMaterial, const char* pName, uint32 id )
 	: pName( pName )
 	, type( MATERIALVAR_TYPE_UNDEFINED )
+	, id( id )
 	, pOwningMaterial( pMaterial )
 {
 }
@@ -31,11 +32,12 @@ CMaterialVar::SetBoolValue
 */
 void CMaterialVar::SetBoolValue( bool bValue )
 {
-	boolValue = bValue;
-	type	  = MATERIALVAR_TYPE_BOOL;
+	materialVarType_t oldType = type;
+	boolValue				  = bValue;
+	type					  = MATERIALVAR_TYPE_BOOL;
 	if ( pOwningMaterial )
 	{
-		pOwningMaterial->MarkDirtyBuffers();
+		pOwningMaterial->ReportVarChanged( this, oldType );
 	}
 }
 
@@ -62,11 +64,12 @@ CMaterialVar::SetIntValue
 */
 void CMaterialVar::SetIntValue( int32 value )
 {
-	intValue = value;
-	type	 = MATERIALVAR_TYPE_INT;
+	materialVarType_t oldType = type;
+	intValue				  = value;
+	type					  = MATERIALVAR_TYPE_INT;
 	if ( pOwningMaterial )
 	{
-		pOwningMaterial->MarkDirtyBuffers();
+		pOwningMaterial->ReportVarChanged( this, oldType );
 	}
 }
 
@@ -93,11 +96,12 @@ CMaterialVar::SetFloatValue
 */
 void CMaterialVar::SetFloatValue( float value )
 {
-	floatValue = value;
-	type	   = MATERIALVAR_TYPE_FLOAT;
+	materialVarType_t oldType = type;
+	floatValue				  = value;
+	type					  = MATERIALVAR_TYPE_FLOAT;
 	if ( pOwningMaterial )
 	{
-		pOwningMaterial->MarkDirtyBuffers();
+		pOwningMaterial->ReportVarChanged( this, oldType );
 	}
 }
 
@@ -133,11 +137,6 @@ void CMaterialVar::SetVecValue( const float* pValue, uint32 numComps )
 		AssertMsg( false, "A material variable can take only in range from 2 to 4" );
 		break;
 	}
-
-	if ( pOwningMaterial )
-	{
-		pOwningMaterial->MarkDirtyBuffers();
-	}
 }
 
 /*
@@ -147,11 +146,12 @@ CMaterialVar::SetVecValue
 */
 void CMaterialVar::SetVecValue( const vector2_t& value )
 {
-	vector2DValue = value;
-	type		  = MATERIALVAR_TYPE_VECTOR_2D;
+	materialVarType_t oldType = type;
+	vector2DValue			  = value;
+	type					  = MATERIALVAR_TYPE_VECTOR_2D;
 	if ( pOwningMaterial )
 	{
-		pOwningMaterial->MarkDirtyBuffers();
+		pOwningMaterial->ReportVarChanged( this, oldType );
 	}
 }
 
@@ -162,11 +162,12 @@ CMaterialVar::SetVecValue
 */
 void CMaterialVar::SetVecValue( const vector3_t& value )
 {
-	vector3DValue = value;
-	type		  = MATERIALVAR_TYPE_VECTOR_3D;
+	materialVarType_t oldType = type;
+	vector3DValue			  = value;
+	type					  = MATERIALVAR_TYPE_VECTOR_3D;
 	if ( pOwningMaterial )
 	{
-		pOwningMaterial->MarkDirtyBuffers();
+		pOwningMaterial->ReportVarChanged( this, oldType );
 	}
 }
 
@@ -177,11 +178,12 @@ CMaterialVar::SetVecValue
 */
 void CMaterialVar::SetVecValue( const vector4_t& value )
 {
-	vector4DValue = value;
-	type		  = MATERIALVAR_TYPE_VECTOR_4D;
+	materialVarType_t oldType = type;
+	vector4DValue			  = value;
+	type					  = MATERIALVAR_TYPE_VECTOR_4D;
 	if ( pOwningMaterial )
 	{
-		pOwningMaterial->MarkDirtyBuffers();
+		pOwningMaterial->ReportVarChanged( this, oldType );
 	}
 }
 
@@ -223,11 +225,12 @@ CMaterialVar::SetMatrixValue
 */
 void CMaterialVar::SetMatrixValue( const matrix4x4_t& value )
 {
-	matrixValue = value;
-	type		= MATERIALVAR_TYPE_MATRIX;
+	materialVarType_t oldType = type;
+	matrixValue				  = value;
+	type					  = MATERIALVAR_TYPE_MATRIX;
 	if ( pOwningMaterial )
 	{
-		pOwningMaterial->MarkDirtyBuffers();
+		pOwningMaterial->ReportVarChanged( this, oldType );
 	}
 }
 
@@ -248,11 +251,12 @@ CMaterialVar::SetStringValue
 */
 void CMaterialVar::SetStringValue( const char* pValue )
 {
-	stringValue = pValue;
-	type		= MATERIALVAR_TYPE_STRING;
+	materialVarType_t oldType = type;
+	stringValue				  = pValue;
+	type					  = MATERIALVAR_TYPE_STRING;
 	if ( pOwningMaterial )
 	{
-		pOwningMaterial->MarkDirtyBuffers();
+		pOwningMaterial->ReportVarChanged( this, oldType );
 	}
 }
 
@@ -273,11 +277,12 @@ CMaterialVar::SetTextureValue
 */
 void CMaterialVar::SetTextureValue( IResource* pValue )
 {
-	pTextureValue = pValue;
-	type		  = MATERIALVAR_TYPE_TEXTURE;
+	materialVarType_t oldType = type;
+	pTextureValue			  = pValue;
+	type					  = MATERIALVAR_TYPE_TEXTURE;
 	if ( pOwningMaterial )
 	{
-		pOwningMaterial->MarkDirtyBuffers();
+		pOwningMaterial->ReportVarChanged( this, oldType );
 	}
 }
 
@@ -298,11 +303,12 @@ CMaterialVar::SetMaterialValue
 */
 void CMaterialVar::SetMaterialValue( IResource* pValue )
 {
-	pMaterialValue = pValue;
-	type		   = MATERIALVAR_TYPE_MATERIAL;
+	materialVarType_t oldType = type;
+	pMaterialValue			  = pValue;
+	type					  = MATERIALVAR_TYPE_MATERIAL;
 	if ( pOwningMaterial )
 	{
-		pOwningMaterial->MarkDirtyBuffers();
+		pOwningMaterial->ReportVarChanged( this, oldType );
 	}
 }
 
@@ -333,10 +339,11 @@ CMaterialVar::SetUndefined
 */
 void CMaterialVar::SetUndefined()
 {
-	type = MATERIALVAR_TYPE_UNDEFINED;
+	materialVarType_t oldType = type;
+	type					  = MATERIALVAR_TYPE_UNDEFINED;
 	if ( pOwningMaterial )
 	{
-		pOwningMaterial->MarkDirtyBuffers();
+		pOwningMaterial->ReportVarChanged( this, oldType );
 	}
 }
 

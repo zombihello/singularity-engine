@@ -1,10 +1,11 @@
 #pragma once
+#include "resourcesystem/iresourcetype.h"
 #include "game/igame.h"
 #include "game/shared/ecs/ecs_core.h"
 #include "game/shared/ecs/ecs_component_factory.h"
 #include "game/shared/ecs/ecs_component_serialize.h"
-#include "game/shared/ecs/ecs_entitydesc_factory.h"
 #include "game/shared/ecs/ecs_entitydesc_loader.h"
+#include "game/shared/ecs/ecs_entitydesc.h"
 #include "game/shared/ecs/ecs_map.h"
 
 //-----------------------------------------------------------------------------
@@ -41,8 +42,8 @@ protected:
 	CEcsMap*		   pActiveEcsMap;
 
 private:
-	CEcsEntityDescFactory ecsEntityDescFactory;
-	CEcsEntityDescLoader  ecsEntityDescLoader;
+	CResourceTypeFactory<CEcsEntityDesc> ecsEntityDescFactory;
+	CEcsEntityDescLoader				 ecsEntityDescLoader;
 };
 
 // NOTE: You must implement the function to return a singleton game class

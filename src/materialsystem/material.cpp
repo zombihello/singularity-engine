@@ -12,8 +12,9 @@
 CMaterial::CMaterial
 ==================
 */
-CMaterial::CMaterial()
-	: bDirtyBuffers( false )
+CMaterial::CMaterial( IResource* pResource )
+	: CResourceData<IMaterial>( pResource )
+	, bDirtyBuffers( false )
 	, pShader( NULL )
 {
 }
@@ -23,8 +24,9 @@ CMaterial::CMaterial()
 CMaterial::CMaterial
 ==================
 */
-CMaterial::CMaterial( const CSMATCompiledMaterialDoc& smatCompiledDoc )
-	: bDirtyBuffers( false )
+CMaterial::CMaterial( IResource* pResource, const CSMATCompiledMaterialDoc& smatCompiledDoc )
+	: CResourceData<IMaterial>( pResource )
+	, bDirtyBuffers( false )
 	, pShader( NULL )
 {
 	// Initialize the material by SMAT compiled document
@@ -129,9 +131,75 @@ void CMaterial::Clear()
 
 	// Clear some fields
 	vars.clear();
+	resourceVarIds.clear();
 	varsDict.clear();
 	bDirtyBuffers = false;
 	pShader		  = NULL;
+}
+
+/*
+==================
+CMaterial::MarkUsedDependencies
+==================
+*/
+void CMaterial::MarkUsedDependencies()
+{
+	PROFILER_SCOPE_FUNC();
+	for ( uint32 index = 0, count = (uint32)resourceVarIds.size(); index < count; ++index )
+	{
+		CMaterialVar* pVar		= vars[resourceVarIds[index]];
+		IResource*	  pResource = NULL;
+		switch ( pVar->GetType() )
+		{
+		case MATERIALVAR_TYPE_TEXTURE: pResource = pVar->GetTextureValue(); break;
+		case MATERIALVAR_TYPE_MATERIAL: pResource = pVar->GetMaterialValue(); break;
+		default:
+			AssertMsg( false, "Unknown material variable type 0x%X", pVar->GetType() );
+			break;
+		}
+
+		if ( pResource )
+		{
+			pResource->MarkUsed();
+		}
+	}
+}
+
+/*
+==================
+CMaterial::ReportVarChanged
+==================
+*/
+void CMaterial::ReportVarChanged( CMaterialVar* pVar, materialVarType_t oldType )
+{
+	// Update resource var indices if the type has been changed
+	bool bOldResourceVarType = IsResourceVarType( oldType );
+	bool bNewResourceVarType = IsResourceVarType( pVar->GetType() );
+	if ( bNewResourceVarType != bOldResourceVarType )
+	{
+		// Remove the var from `resourceVarIds` if the old type was a resource
+		uint32 varId = pVar->GetId();
+		if ( bOldResourceVarType )
+		{
+			for ( uint32 index = 0, count = (uint32)resourceVarIds.size(); index < count; ++index )
+			{
+				if ( resourceVarIds[index] == varId )
+				{
+					resourceVarIds.erase( resourceVarIds.begin() + index );
+					break;
+				}
+			}
+		}
+
+		// Add the var to `resourceVarIds` if the new type is a resource
+		if ( bNewResourceVarType )
+		{
+			resourceVarIds.emplace_back( varId );
+		}
+	}
+
+	// Mark buffers as dirty
+	bDirtyBuffers = true;
 }
 
 /*
@@ -236,11 +304,12 @@ void CMaterial::SetShader( const char* pShaderName )
 		// Create undefined vars for all the actual material vars
 		uint32 numParams = pShader->GetNumParams();
 		vars.resize( numParams );
+		resourceVarIds.clear();
 		varsDict.clear();
 		for ( uint32 paramIdx = 0; paramIdx < numParams; ++paramIdx )
 		{
 			shaderParam_t shaderParam	= pShader->GetParam( paramIdx );
-			vars[paramIdx]				= new CMaterialVar( this, shaderParam.pName );
+			vars[paramIdx]				= new CMaterialVar( this, shaderParam.pName, paramIdx );
 			varsDict[shaderParam.pName] = paramIdx;
 		}
 

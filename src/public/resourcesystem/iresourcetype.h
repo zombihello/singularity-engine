@@ -3,6 +3,12 @@
 #include "tier0/types.h"
 
 //-----------------------------------------------------------------------------
+// Forward declarations
+//-----------------------------------------------------------------------------
+class IResource;
+class IResourceData;
+
+//-----------------------------------------------------------------------------
 // Engine resource types
 //-----------------------------------------------------------------------------
 enum resourceTypeEngine_t
@@ -26,8 +32,8 @@ typedef uint32 resourceType_t;
 class IResourceTypeFactory
 {
 public:
-	virtual void* Create() const			  = 0;
-	virtual void  Delete( void* pData ) const = 0;
+	virtual IResourceData* Create( IResource* pResource ) const = 0;
+	virtual void		   Delete( IResourceData* pData ) const = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -37,8 +43,20 @@ public:
 class IResourceTypeLoader
 {
 public:
-	virtual bool		Load( const char* pPath, void* pData ) const = 0;
-	virtual const char* GetFormatName() const						 = 0;
+	virtual bool		Load( const char* pPath, IResourceData* pData ) const = 0;
+	virtual const char* GetFormatName() const								  = 0;
+};
+
+//-----------------------------------------------------------------------------
+// Helper class to implement of a resource type factory for specific resource type
+//-----------------------------------------------------------------------------
+template<class TResourceDataClass>
+class CResourceTypeFactory : public IResourceTypeFactory
+{
+public:
+	// IResourceTypeFactory interface
+	virtual IResourceData* Create( IResource* pResource ) const override;
+	virtual void		   Delete( IResourceData* pData ) const override;
 };
 
 //-----------------------------------------------------------------------------
@@ -64,3 +82,5 @@ struct resourceTypeInfo_t
 			RESOURCE_TYPE = ResourceType                 \
 		};                                               \
 	}
+
+#include "resourcesystem/iresourcetype.inl"

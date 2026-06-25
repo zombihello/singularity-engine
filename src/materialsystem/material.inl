@@ -39,3 +39,22 @@ FORCEINLINE void CMaterial::DestroyBuffers()
 											} );
 	}
 }
+
+/*
+==================
+CMaterial::IsResourceVarType
+==================
+*/
+FORCEINLINE bool CMaterial::IsResourceVarType( materialVarType_t varType )
+{
+	return varType == MATERIALVAR_TYPE_TEXTURE || varType == MATERIALVAR_TYPE_MATERIAL;
+}
+/*
+==================
+CMaterial::IsResourceVarType
+==================
+*/
+FORCEINLINE bool CMaterial::IsResourceVarType( shaderParamType_t varType )
+{
+	return varType == SHADER_PARAM_TYPE_TEXTURE || varType == SHADER_PARAM_TYPE_MATERIAL;
+}

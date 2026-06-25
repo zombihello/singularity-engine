@@ -2,6 +2,8 @@
 #include "utils/smatdoc/smat_compiled_doc.h"
 #include "studiorender/studioapi/istudioapi_buffer.h"
 #include "studiorender/istudio_rendercmd.h"
+#include "materialsystem/ishader.h"
+#include "materialsystem/imaterialvar.h"
 #include "materialsystem/imaterial.h"
 
 //-----------------------------------------------------------------------------
@@ -13,9 +15,13 @@ class CMaterialVar;
 //-----------------------------------------------------------------------------
 // Material
 //-----------------------------------------------------------------------------
-class CMaterial : public IMaterial
+class CMaterial : public CResourceData<IMaterial>
 {
 public:
+	// IResourceData interface
+	// Marks all dependent resources as used
+	virtual void MarkUsedDependencies() override;
+
 	// IMaterial interface
 	virtual void		  R_Barrier( IStudioAPICmdList* pStudioAPICmdList ) override;
 	virtual void		  R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, studioRenderPassType_t renderPassType ) override;
@@ -27,16 +33,13 @@ public:
 	virtual const char*	   GetShaderName() const override;
 	virtual IShader*	   GetShader() const override;
 
-	CMaterial();
-	CMaterial( const CSMATCompiledMaterialDoc& smatCompiledDoc );
+	CMaterial( IResource* pResource );
+	CMaterial( IResource* pResource, const CSMATCompiledMaterialDoc& smatCompiledDoc );
 	~CMaterial();
 
-	void			 Init( const CSMATCompiledMaterialDoc& smatCompiledDoc );
-	void			 Clear();
-	FORCEINLINE void MarkDirtyBuffers()
-	{
-		bDirtyBuffers = true;
-	}
+	void Init( const CSMATCompiledMaterialDoc& smatCompiledDoc );
+	void Clear();
+	void ReportVarChanged( CMaterialVar* pVar, materialVarType_t oldType );
 
 private:
 	// Calculate a hash for a string to use it in eastl::unordered_map
@@ -53,12 +56,15 @@ private:
 
 	typedef eastl::unordered_map<const char*, uint32, insensitiveStringHash_t, insensitiveCompareString_t> materialVarsDict_t;
 
-	void R_UpdateBuffers( IStudioAPICmdContext* pCmdContext );
-	void DestroyBuffers();
+	void		R_UpdateBuffers( IStudioAPICmdContext* pCmdContext );
+	void		DestroyBuffers();
+	static bool IsResourceVarType( materialVarType_t varType );
+	static bool IsResourceVarType( shaderParamType_t varType );
 
 	bool									 bDirtyBuffers;
 	IShader*								 pShader;
 	eastl::vector<CMaterialVar*>			 vars;
+	eastl::vector<uint32>					 resourceVarIds;
 	materialVarsDict_t						 varsDict;
 	eastl::vector<CRefPtr<IStudioAPIBuffer>> studioAPIBuffers;
 };

@@ -1,9 +1,10 @@
 #pragma once
+#include "resourcesystem/iresourcetype.h"
 #include "materialsystem/imaterialsystem.h"
-#include "materialsystem/texture_factory.h"
 #include "materialsystem/texture_loader.h"
-#include "materialsystem/material_factory.h"
 #include "materialsystem/material_loader.h"
+#include "materialsystem/texture.h"
+#include "materialsystem/material.h"
 
 //-----------------------------------------------------------------------------
 // Material system
@@ -27,8 +28,8 @@ public:
 	virtual void Shutdown() override;
 
 private:
-	CTextureFactory	 textureFactory;
-	CTextureLoader	 textureLoader;
-	CMaterialFactory materialFactory;
-	CMaterialLoader	 materialLoader;
+	CResourceTypeFactory<CTexture>	textureFactory;
+	CTextureLoader					textureLoader;
+	CResourceTypeFactory<CMaterial> materialFactory;
+	CMaterialLoader					materialLoader;
 };

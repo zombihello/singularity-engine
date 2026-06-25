@@ -7,7 +7,7 @@
 CEcsEntityDescLoader::Load
 ==================
 */
-bool CEcsEntityDescLoader::Load( const char* pPath, void* pData ) const
+bool CEcsEntityDescLoader::Load( const char* pPath, IResourceData* pData ) const
 {
 	Assert( pData );
 	CSENTCompiledEntityDescDoc sentCompiledEntityDescDoc;

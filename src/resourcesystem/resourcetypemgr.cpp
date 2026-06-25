@@ -159,7 +159,7 @@ CRefPtr<IResource> CResourceTypeMgr::CreateResource( const char* pName, uint8 fl
 
 	// Create a resource
 	pResource = new CResource( this, pName, resourceType, RESOURCE_FLAG_PERMANENT | flags );
-	pResource->ChangeData( "", pResourceTypeFactory->Create() );
+	pResource->ChangeData( "", pResourceTypeFactory->Create( pResource ) );
 	Msg( "ResourceSystem: Created resource '%s' (type: 0x%X)", pName, resourceType );
 
 	// Add into the manager if it need
@@ -210,10 +210,13 @@ CRefPtr<IResource> CResourceTypeMgr::LoadResource( const char* pName, const char
 		return NULL;
 	}
 
+	// Create a new resource and try to load it
+	pResource = new CResource( this, pName, resourceType, flags );
+
 	// Try to load a resource from a file
 	bool				 bHasBeenLoaded		 = false;
 	IResourceTypeLoader* pResourceTypeLoader = NULL;
-	void*				 pData				 = pResourceTypeFactory->Create();
+	IResourceData*		 pData				 = pResourceTypeFactory->Create( pResource );
 	for ( uint32 index = 0, count = (uint32)resourceTypeLoaders.size(); index < count && !bHasBeenLoaded; ++index )
 	{
 		pResourceTypeLoader = resourceTypeLoaders[index];
@@ -237,8 +240,7 @@ CRefPtr<IResource> CResourceTypeMgr::LoadResource( const char* pName, const char
 		Warning( "ResourceSystem: In resource '%s' stripped forbidden flags (forbiddenFlags: 0x%X)", pName, forbiddenFlags );
 	}
 
-	// Create a resource
-	pResource = new CResource( this, pName, resourceType, flags );
+	// Update resource data in the resource
 	pResource->ChangeData( pPath, pData );
 
 	// Add into the manager if it need
@@ -281,7 +283,7 @@ bool CResourceTypeMgr::LoadResource( IResource* pResource, const char* pPath ) c
 	// Try to load a resource from a file
 	bool				 bHasBeenLoaded		 = false;
 	IResourceTypeLoader* pResourceTypeLoader = NULL;
-	void*				 pData				 = pResourceTypeFactory->Create();
+	IResourceData*		 pData				 = pResourceTypeFactory->Create( pResource );
 	for ( uint32 index = 0, count = (uint32)resourceTypeLoaders.size(); index < count && !bHasBeenLoaded; ++index )
 	{
 		pResourceTypeLoader = resourceTypeLoaders[index];
@@ -416,7 +418,7 @@ bool CResourceTypeMgr::CacheResource( CResource* pResource )
 	// Try to load a resource from a file
 	bool				 bHasBeenLoaded		 = false;
 	IResourceTypeLoader* pResourceTypeLoader = NULL;
-	void*				 pData				 = pResourceTypeFactory->Create();
+	IResourceData*		 pData				 = pResourceTypeFactory->Create( pResource );
 	for ( uint32 index = 0, count = (uint32)resourceTypeLoaders.size(); index < count && !bHasBeenLoaded; ++index )
 	{
 		pResourceTypeLoader = resourceTypeLoaders[index];
@@ -436,6 +438,7 @@ bool CResourceTypeMgr::CacheResource( CResource* pResource )
 	pResource->pData = pData;
 	pResource->AddFlags( RESOURCE_FLAG_CACHED );
 	MarkUsedResource( pResource );
+	pResource->onCached.Invoke( pResource );
 	return true;
 }
 
@@ -467,6 +470,7 @@ void CResourceTypeMgr::UncacheResource( CResource* pResource, bool bIgnorePerman
 	pResource->RemoveFlags( RESOURCE_FLAG_CACHED );
 	pResourceTypeFactory->Delete( pResource->pData );
 	pResource->pData = NULL;
+	pResource->onUncached.Invoke( pResource );
 	Msg( "ResourceSystem: Uncached resource '%s' (type: 0x%X)", pName, resourceType );
 }
 
@@ -488,9 +492,17 @@ void CResourceTypeMgr::MarkUsedResource( CResource* pResource )
 	}
 
 	// Add the resource into the pending list
-	CScopeLock scopeLock( pendingMarkUsedResourcesMutex );
-	pendingMarkUsedResourcesWriteList.emplace_back( pResource );
-	pResource->bPendingMarkUsed.store( true, eastl::memory_order_release );
+	{
+		CScopeLock scopeLock( pendingMarkUsedResourcesMutex );
+		pendingMarkUsedResourcesWriteList.emplace_back( pResource );
+		pResource->bPendingMarkUsed.store( true, eastl::memory_order_release );
+	}
+
+	// Mark all dependent resources as used
+	if ( pResource->pData )
+	{
+		pResource->pData->MarkUsedDependencies();
+	}
 }
 
 /*

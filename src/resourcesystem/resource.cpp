@@ -124,7 +124,7 @@ bool CResource::HasAnyFlags( uint8 flags ) const
 CResource::GetData
 ==================
 */
-void* CResource::GetData() const
+IResourceData* CResource::GetData() const
 {
 	return pData;
 }
@@ -157,4 +157,24 @@ CResource::GetPath
 const char* CResource::GetPath() const
 {
 	return path.c_str();
+}
+
+/*
+==================
+CResource::OnCached
+==================
+*/
+IResource::IOnCached* CResource::OnCached() const
+{
+	return &onCached;
+}
+
+/*
+==================
+CResource::OnUncached
+==================
+*/
+IResource::IOnUncached* CResource::OnUncached() const
+{
+	return &onUncached;
 }

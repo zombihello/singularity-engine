@@ -1,6 +1,12 @@
 #pragma once
 #include "tier1/refcount.h"
+#include "tier1/event.h"
 #include "resourcesystem/iresourcetype.h"
+
+//-----------------------------------------------------------------------------
+// Forward declarations
+//-----------------------------------------------------------------------------
+class IResource;
 
 //-----------------------------------------------------------------------------
 // Resource flags
@@ -15,11 +21,27 @@ enum resourceFlags_t
 };
 
 //-----------------------------------------------------------------------------
+// A resource data interface
+//-----------------------------------------------------------------------------
+class IResourceData
+{
+public:
+	virtual ~IResourceData() {}
+
+	// Marks all dependent resources as used
+	virtual void	   MarkUsedDependencies() = 0;
+	virtual IResource* GetResource() const	  = 0;
+};
+
+//-----------------------------------------------------------------------------
 // A resource interface
 //-----------------------------------------------------------------------------
 class IResource : public IRefCounted
 {
 public:
+	DECLARE_EVENT_INTERFACE( IOnCached, IResource* /* pResource */ );
+	DECLARE_EVENT_INTERFACE( IOnUncached, IResource* /* pResource */ );
+
 	virtual ~IResource() {}
 
 	// To bring a data in or out of memory
@@ -35,8 +57,30 @@ public:
 
 	virtual bool		   HasAllFlags( uint8 flags ) const = 0;
 	virtual bool		   HasAnyFlags( uint8 flags ) const = 0;
-	virtual void*		   GetData() const					= 0;
+	virtual IResourceData* GetData() const					= 0;
 	virtual resourceType_t GetType() const					= 0;
 	virtual const char*	   GetName() const					= 0;
 	virtual const char*	   GetPath() const					= 0;
+	virtual IOnCached*	   OnCached() const					= 0;
+	virtual IOnUncached*   OnUncached() const				= 0;
 };
+
+//-----------------------------------------------------------------------------
+// Base class to implement a resource data
+//-----------------------------------------------------------------------------
+template<class TBaseClass>
+class CResourceData : public TBaseClass
+{
+public:
+	// IResourceData interface
+	// Marks all dependent resources as used
+	virtual void	   MarkUsedDependencies() override;
+	virtual IResource* GetResource() const override;
+
+	CResourceData( IResource* pResource );
+
+private:
+	IResource* pResource;
+};
+
+#include "resourcesystem/iresource.inl"

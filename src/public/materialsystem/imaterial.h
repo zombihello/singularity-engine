@@ -1,6 +1,6 @@
 #pragma once
 #include "studiorender/studio_renderpasstypes.h"
-#include "resourcesystem/iresourcetype.h"
+#include "resourcesystem/iresource.h"
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -12,7 +12,7 @@ class IShader;
 //-----------------------------------------------------------------------------
 // Material interface
 //-----------------------------------------------------------------------------
-class IMaterial
+class IMaterial : public IResourceData
 {
 public:
 	virtual ~IMaterial() {}

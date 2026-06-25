@@ -8,8 +8,9 @@
 CEcsEntityDesc::CEcsEntityDesc
 ==================
 */
-CEcsEntityDesc::CEcsEntityDesc()
-	: lastUsedEcsPrefabIdx( INVALID_INDEX )
+CEcsEntityDesc::CEcsEntityDesc( IResource* pResource )
+	: CResourceData<IEntityDesc>( pResource )
+	, lastUsedEcsPrefabIdx( INVALID_INDEX )
 {
 }
 
@@ -18,7 +19,9 @@ CEcsEntityDesc::CEcsEntityDesc()
 CEcsEntityDesc::CEcsEntityDesc
 ==================
 */
-CEcsEntityDesc::CEcsEntityDesc( const CSENTCompiledEntityDescDoc& sentCompiledDoc )
+CEcsEntityDesc::CEcsEntityDesc( IResource* pResource, const CSENTCompiledEntityDescDoc& sentCompiledDoc )
+	: CResourceData<IEntityDesc>( pResource )
+	, lastUsedEcsPrefabIdx( INVALID_INDEX )
 {
 	// Initialize the entity descriptor by SENT compiled document
 	Init( sentCompiledDoc );

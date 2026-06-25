@@ -9,7 +9,7 @@
 CTextureLoader::Load
 ==================
 */
-bool CTextureLoader::Load( const char* pPath, void* pData ) const
+bool CTextureLoader::Load( const char* pPath, IResourceData* pData ) const
 {
 	Assert( pData );
 	CSTEXCompiledTextureDoc stexCompiledTextureDoc;

@@ -15,11 +15,11 @@ class CEcsMap;
 // ECS entity descriptor
 // By this you can create an ECS entity
 //-----------------------------------------------------------------------------
-class CEcsEntityDesc : public IEntityDesc
+class CEcsEntityDesc : public CResourceData<IEntityDesc>
 {
 public:
-	CEcsEntityDesc();
-	CEcsEntityDesc( const CSENTCompiledEntityDescDoc& sentCompiledDoc );
+	CEcsEntityDesc( IResource* pResource );
+	CEcsEntityDesc( IResource* pResource, const CSENTCompiledEntityDescDoc& sentCompiledDoc );
 	~CEcsEntityDesc();
 
 	void Init( const CSENTCompiledEntityDescDoc& sentCompiledDoc );

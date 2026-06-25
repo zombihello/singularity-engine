@@ -8,6 +8,6 @@ class CEcsEntityDescLoader : public IResourceTypeLoader
 {
 public:
 	// IResourceTypeLoader interface
-	virtual bool		Load( const char* pPath, void* pData ) const override;
+	virtual bool		Load( const char* pPath, IResourceData* pData ) const override;
 	virtual const char* GetFormatName() const override;
 };

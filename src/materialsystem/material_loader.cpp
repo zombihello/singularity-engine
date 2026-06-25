@@ -9,7 +9,7 @@
 CMaterialLoader::Load
 ==================
 */
-bool CMaterialLoader::Load( const char* pPath, void* pData ) const
+bool CMaterialLoader::Load( const char* pPath, IResourceData* pData ) const
 {
 	Assert( pData );
 	CSMATCompiledMaterialDoc smatCompiledMaterialDoc;

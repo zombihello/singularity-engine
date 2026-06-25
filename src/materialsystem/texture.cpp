@@ -146,8 +146,9 @@ IStudioAPISampler* CTextureResource::GetStudioAPISampler() const
 CTexture::CTexture
 ==================
 */
-CTexture::CTexture()
-	: type( STUDIOAPI_TEXTURE_TYPE_1D )
+CTexture::CTexture( IResource* pResource )
+	: CResourceData<ITexture>( pResource )
+	, type( STUDIOAPI_TEXTURE_TYPE_1D )
 	, pixelFormat( STUDIOAPI_PIXEL_FORMAT_UNKNOWN )
 	, numLayers( 0 )
 {
@@ -183,9 +184,14 @@ void CTexture::Init( studioAPITextureType_t type, studioAPIPixelFormat_t pixelFo
 	// Create a studio resource
 	Assert( !mipmaps.empty() );
 	const textureMipMap_t& mipmap0 = mipmaps[0];
-	CScopeLock			   scopeLock( resourceCreationMutex );
-	pStudioResource = new CTextureResource( type, pixelFormat, mipmap0.sizeX, mipmap0.sizeY, mipmap0.sizeZ, numLayers, (uint32)mipmaps.size(), samplerInfo, pData, dataSize );
-	Studio_BeginInitResource( pStudioResource );
+	{
+		CScopeLock scopeLock( resourceCreationMutex );
+		pStudioResource = new CTextureResource( type, pixelFormat, mipmap0.sizeX, mipmap0.sizeY, mipmap0.sizeZ, numLayers, (uint32)mipmaps.size(), samplerInfo, pData, dataSize );
+		Studio_BeginInitResource( pStudioResource );
+	}
+
+	// Trigger event that the studio resource has been changed
+	onStudioResourceChanged.Invoke( this );
 }
 
 /*
@@ -202,12 +208,17 @@ void CTexture::Destroy()
 	mipmaps.clear();
 
 	// Release the studio resource
-	CScopeLock scopeLock( resourceCreationMutex );
-	if ( pStudioResource )
 	{
-		Studio_BeginReleaseResource( pStudioResource );
-		pStudioResource = NULL;
+		CScopeLock scopeLock( resourceCreationMutex );
+		if ( pStudioResource )
+		{
+			Studio_BeginReleaseResource( pStudioResource );
+			pStudioResource = NULL;
+		}
 	}
+
+	// Trigger event that the studio resource has been changed
+	onStudioResourceChanged.Invoke( this );
 }
 
 /*
@@ -270,4 +281,14 @@ ITextureResource* CTexture::GetStudioResource() const
 {
 	CScopeLock scopeLock( resourceCreationMutex );
 	return pStudioResource;
+}
+
+/*
+==================
+CTexture::OnStudioResourceChanged
+==================
+*/
+ITexture::IOnStudioResourceChanged* CTexture::OnStudioResourceChanged() const
+{
+	return &onStudioResourceChanged;
 }
