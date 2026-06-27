@@ -15,6 +15,7 @@
 #include "game/shared/ecs/ecs_movement.gen.h"
 #include "game/shared/ecs/ecs_camera.gen.h"
 #include "game/citadel/ecs/ecs_testdraw.gen.h"
+#include "tier1/cmdlink.h"
 
 //-----------------------------------------------------------------------------
 // Citadel game
@@ -41,6 +42,36 @@ private:
 
 EXPOSE_INTERFACE_FN( Game, IGame, GAME_INTERFACE_VERSION );
 EXPOSE_SINGLE_INTERFACE( CGameAppSystems, IGameAppSystems, GAME_APPSYSTEMS_INTERFACE_VERSION );
+
+/*
+==================
+test_unload_texture_nelson
+==================
+*/
+CONSOLE_COMMAND( test_unload_texture_nelson, "Unload texture 'materials/nelson' to test uncache case while rendering", CMD_FLAG_NONE )
+{
+	IResourceTypeMgr*	   pTextureMgr = g_pResourceSystem->GetResourceManagerForType<ITexture>();
+	CResourcePtr<ITexture> pTexture	   = pTextureMgr->FindResource( "materials/nelson", false );
+	if ( pTexture )
+	{
+		pTexture.Uncache();
+	}
+}
+
+/*
+==================
+test_load_texture_nelson
+==================
+*/
+CONSOLE_COMMAND( test_load_texture_nelson, "Load texture 'materials/nelson' to test cache case while rendering", CMD_FLAG_NONE )
+{
+	IResourceTypeMgr*	   pTextureMgr = g_pResourceSystem->GetResourceManagerForType<ITexture>();
+	CResourcePtr<ITexture> pTexture	   = pTextureMgr->FindResource( "materials/nelson", false );
+	if ( pTexture )
+	{
+		pTexture.Cache();
+	}
+}
 
 /*
 ==================

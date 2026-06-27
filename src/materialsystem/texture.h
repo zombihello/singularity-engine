@@ -46,30 +46,33 @@ private:
 //-----------------------------------------------------------------------------
 // A texture
 //-----------------------------------------------------------------------------
-class CTexture : public ITexture
+class CTexture : public CResourceData<ITexture>
 {
 public:
+	DECLARE_EVENT( COnStudioResourceChanged, ITexture* /* pTexture */ );
+
 	// ITexture interface
 	virtual void Init( studioAPITextureType_t type, studioAPIPixelFormat_t pixelFormat, uint32 numLayers, const textureMipMap_t* pMipmaps, uint32 numMipmaps, const studioAPISamplerCreateInfo_t& samplerInfo, const byte* pData = NULL, uint32 dataSize = 0 ) override;
 	virtual void Destroy() override;
 
-	virtual studioAPITextureType_t GetType() const override;
-	virtual studioAPIPixelFormat_t GetPixelFormat() const override;
-	virtual uint32				   GetNumMips() const override;
-	virtual const textureMipMap_t& GetMip( uint32 mipLevel ) const override;
-	virtual uint32				   GetNumLayers() const override;
-	virtual ITextureResource*	   GetStudioResource() const override;
+	virtual studioAPITextureType_t	  GetType() const override;
+	virtual studioAPIPixelFormat_t	  GetPixelFormat() const override;
+	virtual uint32					  GetNumMips() const override;
+	virtual const textureMipMap_t&	  GetMip( uint32 mipLevel ) const override;
+	virtual uint32					  GetNumLayers() const override;
+	virtual ITextureResource*		  GetStudioResource() const override;
+	virtual IOnStudioResourceChanged* OnStudioResourceChanged() const override;
 
-	CTexture();
+	CTexture( IResource* pResource );
 	~CTexture();
 
 private:
-	studioAPITextureType_t		   type;
-	studioAPIPixelFormat_t		   pixelFormat;
-	uint32						   numLayers;
-	mutable CThreadMutex		   resourceCreationMutex;
-	CRefPtr<CTextureResource>	   pStudioResource;
-	eastl::vector<textureMipMap_t> mipmaps;
+	studioAPITextureType_t			 type;
+	studioAPIPixelFormat_t			 pixelFormat;
+	uint32							 numLayers;
+	CRefPtr<CTextureResource>		 pStudioResource;
+	eastl::vector<textureMipMap_t>	 mipmaps;
+	mutable COnStudioResourceChanged onStudioResourceChanged;
 };
 
 DECLARE_RESOURCE_TYPE( CTexture, RESOURCE_TYPE_TEXTURE );

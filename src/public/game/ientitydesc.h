@@ -1,12 +1,12 @@
 #pragma once
-#include "resourcesystem/iresourcetype.h"
+#include "resourcesystem/iresource.h"
 #include "game/game_resource_types.h"
 
 //-----------------------------------------------------------------------------
 // Entity descriptor interface
 // By this you can create an entity
 //-----------------------------------------------------------------------------
-class IEntityDesc
+class IEntityDesc : public IResourceData
 {
 public:
 	virtual ~IEntityDesc() {}

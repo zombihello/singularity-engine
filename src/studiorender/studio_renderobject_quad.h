@@ -17,12 +17,19 @@ public:
 	{
 	}
 
-	FORCEINLINE IStudioAPIBuffer* GetStudioAPIVertexBuffer() const { return pStudioAPIVertexBuffer; }
-	FORCEINLINE IStudioAPIBuffer* GetStudioAPIIndexBuffer() const { return pStudioAPIIndexBuffer; }
-	FORCEINLINE IMaterial*		  GetMaterial() const { return *pMaterial; }
+	FORCEINLINE void RefreshMaterialResource()
+	{
+		pMaterialResource = pMaterial->GetStudioResource();
+	}
+
+	FORCEINLINE IStudioAPIBuffer*  GetStudioAPIVertexBuffer() const { return pStudioAPIVertexBuffer; }
+	FORCEINLINE IStudioAPIBuffer*  GetStudioAPIIndexBuffer() const { return pStudioAPIIndexBuffer; }
+	FORCEINLINE IMaterial*		   GetMaterial() const { return *pMaterial; }
+	FORCEINLINE IMaterialResource* GetMaterialResource() const { return pMaterialResource; }
 
 public:
-	CRefPtr<IStudioAPIBuffer> pStudioAPIVertexBuffer;
-	CRefPtr<IStudioAPIBuffer> pStudioAPIIndexBuffer;
-	CResourcePtr<IMaterial>	  pMaterial;
+	CRefPtr<IStudioAPIBuffer>  pStudioAPIVertexBuffer;
+	CRefPtr<IStudioAPIBuffer>  pStudioAPIIndexBuffer;
+	CResourcePtr<IMaterial>	   pMaterial;
+	CRefPtr<IMaterialResource> pMaterialResource;
 };

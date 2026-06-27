@@ -25,7 +25,7 @@ FORCEINLINE void CResource::RemoveFlags( uint8 flags )
 CResource::ChangeData
 ==================
 */
-FORCEINLINE void CResource::ChangeData( const char* pPath, void* pData )
+FORCEINLINE void CResource::ChangeData( const char* pPath, IResourceData* pData )
 {
 	// Uncache an old data
 	if ( CResource::pData )

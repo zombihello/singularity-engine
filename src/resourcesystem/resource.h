@@ -17,6 +17,8 @@ class CResource : public CRefCounted<IResource>
 {
 public:
 	friend CResourceTypeMgr;
+	DECLARE_EVENT( COnCached, IResource* /* pResource */ );
+	DECLARE_EVENT( COnUncached, IResource* /* pResource */ );
 
 	// IResource interface
 	// To bring a data in or out of memory
@@ -32,15 +34,17 @@ public:
 
 	virtual bool		   HasAllFlags( uint8 flags ) const override;
 	virtual bool		   HasAnyFlags( uint8 flags ) const override;
-	virtual void*		   GetData() const override;
+	virtual IResourceData* GetData() const override;
 	virtual resourceType_t GetType() const override;
 	virtual const char*	   GetName() const override;
 	virtual const char*	   GetPath() const override;
+	virtual IOnCached*	   OnCached() const override;
+	virtual IOnUncached*   OnUncached() const override;
 
 	CResource( CResourceTypeMgr* pOwner, const char* pName, resourceType_t type, uint8 flags = RESOURCE_TYPE_NONE );
 	~CResource();
 
-	void ChangeData( const char* pPath, void* pData );
+	void ChangeData( const char* pPath, IResourceData* pData );
 	void Uncache( bool bIgnorePermanent );
 	void AddFlags( uint8 flags );
 	void RemoveFlags( uint8 flags );
@@ -50,12 +54,14 @@ private:
 	eastl::atomic<uint8>					flags;
 	eastl::atomic<bool>						bPendingMarkUsed;
 	bool									bInLruList;
-	void*									pData;
+	IResourceData*							pData;
 	CResourceTypeMgr*						pOwner;
 	uint64									lastUsedFrame; 
 	eastl::string							name;
 	eastl::string							path;
 	eastl::list<CResource*>::const_iterator lruIt;
+	mutable COnCached						onCached;
+	mutable COnUncached						onUncached;
 };
 
 #include "resourcesystem/resource.inl"

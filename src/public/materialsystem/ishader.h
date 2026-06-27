@@ -1,4 +1,5 @@
 #pragma once
+#include "studiorender/istudio_renderresource.h"
 #include "tier0/types.h"
 #include "studiorender/studioapi/istudioapi_shader.h"
 #include "studiorender/studio_renderpasstypes.h"
@@ -42,9 +43,9 @@ enum shaderParamType_t
 //-----------------------------------------------------------------------------
 struct shaderParam_t
 {
-	const char*	  pName;
+	const char*		  pName;
 	shaderParamType_t type;
-	const char*	  pHelpString;
+	const char*		  pHelpString;
 	uint32			  flags;  // see shaderParamFlags_t
 };
 
@@ -60,6 +61,16 @@ struct shaderInitParams_t
 };
 
 //-----------------------------------------------------------------------------
+// Shader context data interface
+// NOTE: Shaders can keep per material data in classes descended from this
+//-----------------------------------------------------------------------------
+class IShaderContextData : public IStudioRenderResource, public IRefCounted
+{
+public:
+	virtual ~IShaderContextData() {}
+};
+
+//-----------------------------------------------------------------------------
 // Shader interface
 //-----------------------------------------------------------------------------
 class IShader
@@ -70,20 +81,20 @@ public:
 	virtual void InitDefaultParams( IMaterialVar** pParams ) const	= 0;
 	virtual void Shutdown()											= 0;
 
-	// NOTE: pStudioAPIBuffers and pParams Must be size equal to shader parameters and buffers count
-	virtual void R_UpdateBuffers( IStudioAPICmdContext* pStudioAPICmdContext, CRefPtr<IStudioAPIBuffer>* pStudioAPIBuffers, IMaterialVar** pParams ) const							  = 0;
-	virtual void R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, studioRenderPassType_t renderPassType, IMaterialVar** pParams, IStudioAPIBuffer** pStudioAPIBuffers = NULL ) = 0;
+	// The function creates context data from material vars
+	// NOTE: `pParams` must be size equal to shader parameters
+	virtual CRefPtr<IShaderContextData> CreateContextData( IMaterialVar** pParams ) const = 0;
 
 	// Place barriers into a command list
-	virtual void R_Barrier( IStudioAPICmdList* pStudioAPICmdList, IMaterialVar** pParams, IStudioAPIBuffer** pStudioAPIBuffers ) const = 0;
+	virtual void R_Barrier( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData ) const										   = 0;
+	virtual void R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData, studioRenderPassType_t renderPassType ) = 0;
 
 	virtual uint32		  GetNumParams() const				 = 0;
 	virtual shaderParam_t GetParam( uint32 index ) const	 = 0;
 	virtual uint32		  GetNumCacheNames() const			 = 0;
-	virtual const char*  GetCacheName( uint32 index ) const = 0;
-	virtual uint32		  GetNumBuffers() const				 = 0;
+	virtual const char*	  GetCacheName( uint32 index ) const = 0;
 	virtual uint32		  GetFlags() const					 = 0;
-	virtual const char*  GetName() const					 = 0;
-	virtual const char*  GetHelp() const					 = 0;
-	virtual const char*  GetFallbackShader() const			 = 0;
+	virtual const char*	  GetName() const					 = 0;
+	virtual const char*	  GetHelp() const					 = 0;
+	virtual const char*	  GetFallbackShader() const			 = 0;
 };

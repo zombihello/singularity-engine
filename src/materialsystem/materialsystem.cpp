@@ -106,7 +106,7 @@ bool CMaterialSystem::Init()
 	pTexturesMgr->RegisterResourceFactory( &textureFactory );
 	pTexturesMgr->RegisterResourceLoader( &textureLoader );
 
-	// Register material texture type
+	// Register material resource type
 	IResourceTypeMgr* pMaterialsMgr = g_pResourceSystem->InstallResourceManagerForType<CMaterial>();
 	pMaterialsMgr->RegisterResourceFactory( &materialFactory );
 	pMaterialsMgr->RegisterResourceLoader( &materialLoader );
