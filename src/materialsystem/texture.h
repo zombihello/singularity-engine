@@ -70,7 +70,6 @@ private:
 	studioAPITextureType_t			 type;
 	studioAPIPixelFormat_t			 pixelFormat;
 	uint32							 numLayers;
-	mutable CThreadMutex			 resourceCreationMutex;
 	CRefPtr<CTextureResource>		 pStudioResource;
 	eastl::vector<textureMipMap_t>	 mipmaps;
 	mutable COnStudioResourceChanged onStudioResourceChanged;

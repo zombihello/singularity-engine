@@ -15,7 +15,7 @@ CMaterialVar::CMaterialVar( CMaterial* pMaterial, const char* pName, uint32 id )
 	, pOwningMaterial( pMaterial )
 	, onResourceChachedHandle( INVALID_HANDLE )
 	, onResourceUncachedHandle( INVALID_HANDLE )
-	, onTextureResourceChangedHandle( INVALID_HANDLE )
+	, onStudioResourceChangedHandle( INVALID_HANDLE )
 {
 }
 
@@ -404,6 +404,11 @@ void CMaterialVar::SubscribeResourceEvents()
 			CTexture* pTexture			   = (CTexture*)pResourceValue->GetData();
 			onTextureResourceChangedHandle = pTexture->OnStudioResourceChanged()->Subscribe( &CMaterialVar::OnTextureResourceChanged, this );
 		}
+		else if ( type == MATERIALVAR_TYPE_MATERIAL && onMaterialResourceChangedHandle == INVALID_HANDLE )
+		{
+			CMaterial* pMaterial			= (CMaterial*)pResourceValue->GetData();
+			onMaterialResourceChangedHandle = pMaterial->OnStudioResourceChanged()->Subscribe( &CMaterialVar::OnMaterialResourceChanged, this );
+		}
 	}
 }
 
@@ -440,13 +445,17 @@ void CMaterialVar::UnsubscribeResourceEvents( bool bOnlyResourceDataEvents /* = 
 			pTexture->OnStudioResourceChanged()->Unsubscribe( onTextureResourceChangedHandle );
 			break;
 		}
+
+		case MATERIALVAR_TYPE_MATERIAL:
+		{
+			CMaterial* pMaterial = (CMaterial*)pResourceValue->GetData();
+			pMaterial->OnStudioResourceChanged()->Unsubscribe( onMaterialResourceChangedHandle );
+			break;
+		}
 		}
 	}
 
-	switch ( type )
-	{
-	case MATERIALVAR_TYPE_TEXTURE: onTextureResourceChangedHandle = INVALID_HANDLE; break;
-	}
+	onStudioResourceChangedHandle = INVALID_HANDLE;
 }
 
 /*
@@ -478,6 +487,20 @@ CMaterialVar::OnTextureResourceChanged
 ==================
 */
 void CMaterialVar::OnTextureResourceChanged( void* pUserData, ITexture* pTexture )
+{
+	CMaterialVar* pVar = (CMaterialVar*)pUserData;
+	if ( pVar->pOwningMaterial )
+	{
+		pVar->pOwningMaterial->ReportVarChanged( pVar, pVar->type );
+	}
+}
+
+/*
+==================
+CMaterialVar::OnMaterialResourceChanged
+==================
+*/
+void CMaterialVar::OnMaterialResourceChanged( void* pUserData, IMaterial* pMaterial )
 {
 	CMaterialVar* pVar = (CMaterialVar*)pUserData;
 	if ( pVar->pOwningMaterial )

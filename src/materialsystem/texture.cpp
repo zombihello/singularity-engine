@@ -184,11 +184,8 @@ void CTexture::Init( studioAPITextureType_t type, studioAPIPixelFormat_t pixelFo
 	// Create a studio resource
 	Assert( !mipmaps.empty() );
 	const textureMipMap_t& mipmap0 = mipmaps[0];
-	{
-		CScopeLock scopeLock( resourceCreationMutex );
-		pStudioResource = new CTextureResource( type, pixelFormat, mipmap0.sizeX, mipmap0.sizeY, mipmap0.sizeZ, numLayers, (uint32)mipmaps.size(), samplerInfo, pData, dataSize );
-		Studio_BeginInitResource( pStudioResource );
-	}
+	pStudioResource				   = new CTextureResource( type, pixelFormat, mipmap0.sizeX, mipmap0.sizeY, mipmap0.sizeZ, numLayers, (uint32)mipmaps.size(), samplerInfo, pData, dataSize );
+	Studio_BeginInitResource( pStudioResource );
 
 	// Trigger event that the studio resource has been changed
 	onStudioResourceChanged.Invoke( this );
@@ -208,17 +205,14 @@ void CTexture::Destroy()
 	mipmaps.clear();
 
 	// Release the studio resource
+	if ( pStudioResource )
 	{
-		CScopeLock scopeLock( resourceCreationMutex );
-		if ( pStudioResource )
-		{
-			Studio_BeginReleaseResource( pStudioResource );
-			pStudioResource = NULL;
-		}
-	}
+		Studio_BeginReleaseResource( pStudioResource );
+		pStudioResource = NULL;
 
-	// Trigger event that the studio resource has been changed
-	onStudioResourceChanged.Invoke( this );
+		// Trigger event that the studio resource has been changed
+		onStudioResourceChanged.Invoke( this );
+	}
 }
 
 /*
@@ -279,7 +273,6 @@ CTexture::GetStudioResource
 */
 ITextureResource* CTexture::GetStudioResource() const
 {
-	CScopeLock scopeLock( resourceCreationMutex );
 	return pStudioResource;
 }
 

@@ -209,9 +209,12 @@ CStudioRender::EndFrame
 */
 void CStudioRender::EndFrame()
 {
+	// TODO BS yehor.pohuliaka - Implement here synchronization the renderObjects between the main thread and the render thread
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( Sys_IsInMainThread() );
-	// TODO BS yehor.pohuliaka - Implement here synchronization the renderObjects between the main thread and the render thread
+	Assert( !renderObjects.empty() );
+	CStudioRenderObjectQuad* pRenderObject = (CStudioRenderObjectQuad*)renderObjects[0].GetRawPtr();
+	pRenderObject->RefreshMaterialResource();
 }
 
 /*

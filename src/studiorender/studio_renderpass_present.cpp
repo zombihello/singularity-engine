@@ -33,8 +33,10 @@ void CStudioRenderPassPresent::R_DrawPass( CStudioViewport* pViewport, CStudioRe
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	IStudioAPIBuffer*				pQuadVertexBuffer	  = pQuad->GetStudioAPIVertexBuffer();
 	IStudioAPIBuffer*				pQuadIndexBuffer	  = pQuad->GetStudioAPIIndexBuffer();
-	IMaterial*						pQuadMaterial		  = pQuad->GetMaterial();
-	vector2i_t							viewportSize		  = pViewport->GetSize();
+	IMaterialResource*				pQuadMaterialResource = pQuad->GetMaterialResource();
+	IShader*						pShader				  = pQuadMaterialResource->GetShader();
+	IShaderContextData*				pShaderContextData	  = pQuadMaterialResource->GetContextData();
+	vector2i_t						viewportSize		  = pViewport->GetSize();
 	IStudioAPISwapChain*			pStudioAPISwapChain	  = pViewport->GetStudioAPISwapChain();
 	CRefPtr<IStudioAPICmdContext>	pGraphicsCmdContext	  = g_pStudioAPI->GetImmediateCmdContext( STUDIOAPI_QUEUE_TYPE_GRAPHICS );
 	CRefPtr<IStudioAPICmdListBatch> pGraphicsCmdListBatch = g_pStudioAPI->CreateCmdListBatch( pGraphicsCmdContext );
@@ -50,9 +52,9 @@ void CStudioRenderPassPresent::R_DrawPass( CStudioViewport* pViewport, CStudioRe
 		};
 		pGraphicsCmdList->Barrier( barriers, ARRAYSIZE( barriers ) );
 	}
-	pQuadMaterial->R_Barrier( pGraphicsCmdList );
+	pShader->R_Barrier( pGraphicsCmdList, pShaderContextData );
 	pGraphicsCmdList->BeginRenderPass( pViewport->GetStudioAPIRenderPass(), pViewport->GetStudioAPIFrameBuffer() );
-	pQuadMaterial->R_PrepareForDraw( pGraphicsCmdList, STUDIO_RENDERPASS_TYPE_PRESENT );
+	pShader->R_PrepareForDraw( pGraphicsCmdList, pShaderContextData, STUDIO_RENDERPASS_TYPE_PRESENT );
 	pGraphicsCmdList->SetVertexBuffer( 0, pQuadVertexBuffer, 0 );
 	pGraphicsCmdList->DrawIndexed( pQuadIndexBuffer, 0, 0, 6, 10 );
 	pGraphicsCmdList->EndRenderPass();

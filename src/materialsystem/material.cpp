@@ -1,11 +1,69 @@
 #include "pch_materialsystem.h"
 #include "tier1/filetools.h"
 #include "resourcesystem/iresourcesystem.h"
-#include "studiorender/studioapi/istudioapi_barrier.h"
 #include "materialsystem/ishader.h"
 #include "materialsystem/texture.h"
 #include "materialsystem/materialvar.h"
 #include "materialsystem/material.h"
+
+/*
+==================
+CMaterialResource::CMaterialResource
+==================
+*/
+CMaterialResource::CMaterialResource( IShader* pShader, IShaderContextData* pContextData )
+	: pShader( pShader )
+	, pContextData( pContextData )
+{
+}
+
+/*
+==================
+CMaterialResource::FinalRelease
+==================
+*/
+void CMaterialResource::FinalRelease()
+{
+	if ( IsNeedDeferredDestroy() )
+	{
+		Studio_BeginDeleteResource( this );
+	}
+	else
+	{
+		delete this;
+	}
+}
+
+/*
+==================
+CMaterialResource::ReleaseStudioAPI
+==================
+*/
+void CMaterialResource::ReleaseStudioAPI()
+{
+	pContextData->ReleaseResource();
+	pContextData = NULL;
+}
+
+/*
+==================
+CMaterialResource::GetShader
+==================
+*/
+IShader* CMaterialResource::GetShader() const
+{
+	return pShader;
+}
+
+/*
+==================
+CMaterialResource::GetContextData
+==================
+*/
+IShaderContextData* CMaterialResource::GetContextData() const
+{
+	return pContextData;
+}
 
 /*
 ==================
@@ -14,7 +72,6 @@ CMaterial::CMaterial
 */
 CMaterial::CMaterial( IResource* pResource )
 	: CResourceData<IMaterial>( pResource )
-	, bDirtyContextData( false )
 	, pShader( NULL )
 {
 }
@@ -26,7 +83,6 @@ CMaterial::CMaterial
 */
 CMaterial::CMaterial( IResource* pResource, const CSMATCompiledMaterialDoc& smatCompiledDoc )
 	: CResourceData<IMaterial>( pResource )
-	, bDirtyContextData( false )
 	, pShader( NULL )
 {
 	// Initialize the material by SMAT compiled document
@@ -40,6 +96,9 @@ CMaterial::~CMaterial
 */
 CMaterial::~CMaterial()
 {
+	// Delete the studio resource
+	DeleteStudioResource();
+
 	// Free allocated memory for variables
 	for ( uint32 varIdx = 0, numVars = (uint32)vars.size(); varIdx < numVars; ++varIdx )
 	{
@@ -117,6 +176,9 @@ CMaterial::Clear
 */
 void CMaterial::Clear()
 {
+	// Delete the studio resource
+	DeleteStudioResource();
+
 	// Free allocated memory for variables
 	for ( uint32 varIdx = 0, numVars = (uint32)vars.size(); varIdx < numVars; ++varIdx )
 	{
@@ -127,9 +189,7 @@ void CMaterial::Clear()
 	vars.clear();
 	resourceVarIds.clear();
 	varsDict.clear();
-	bDirtyContextData = false;
-	pShader			  = NULL;
-	pContextData	  = NULL;
+	pShader = NULL;
 }
 
 /*
@@ -193,63 +253,53 @@ void CMaterial::ReportVarChanged( CMaterialVar* pVar, materialVarType_t oldType 
 		}
 	}
 
-	// Mark the shader context data as dirty
-	bDirtyContextData = true;
+	// Delete the studio resource
+	DeleteStudioResource();
 }
 
 /*
 ==================
-CMaterial::R_UpdateContextData
+CMaterial::CreateStudioResource
 ==================
 */
-void CMaterial::R_UpdateContextData()
+void CMaterial::CreateStudioResource()
 {
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-	Assert( pShader );
-
-	// Do nothing if the context data isn't dirty
-	if ( !bDirtyContextData )
+	// Do nothing if the studio resource already created
+	PROFILER_SCOPE_FUNC();
+	if ( pStudioResource )
 	{
 		return;
 	}
-	bDirtyContextData = false;
 
-	// Create a new context data
-	pContextData = pShader->CreateContextData( (IMaterialVar**)vars.data() );
+	// Create a studio resource
+	Assert( pShader );
+	pStudioResource = new CMaterialResource( pShader, pShader->CreateContextData( (IMaterialVar**)vars.data() ) );
+	Studio_BeginInitResource( pStudioResource );
+
+	// Trigger event that the studio resource has been changed
+	onStudioResourceChanged.Invoke( this );
 }
 
 /*
 ==================
-CMaterial::R_Barrier
+CMaterial::DeleteStudioResource
 ==================
 */
-void CMaterial::R_Barrier( IStudioAPICmdList* pStudioAPICmdList )
+void CMaterial::DeleteStudioResource()
 {
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-	Assert( pShader );
+	// Do nothing if the studio resource already deleted
+	PROFILER_SCOPE_FUNC();
+	if ( !pStudioResource )
+	{
+		return;
+	}
 
-	// Update the context data
-	R_UpdateContextData();
+	// Release the studio resource
+	Studio_BeginReleaseResource( pStudioResource );
+	pStudioResource = NULL;
 
-	// Place barriers into the list
-	pShader->R_Barrier( pStudioAPICmdList, pContextData );
-}
-
-/*
-==================
-CMaterial::R_PrepareForDraw
-==================
-*/
-void CMaterial::R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, studioRenderPassType_t renderPassType )
-{
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-	Assert( pShader );
-
-	// Update the context data
-	R_UpdateContextData();
-
-	// Prepare the shader for draw
-	pShader->R_PrepareForDraw( pStudioAPICmdList, pContextData, renderPassType );
+	// Trigger event that the studio resource has been changed
+	onStudioResourceChanged.Invoke( this );
 }
 
 /*
@@ -308,9 +358,6 @@ void CMaterial::SetShader( const char* pShaderName )
 		}
 		pCurrentShaderName = pFallbackShaderName;
 	}
-
-	// Mark the shader context data as dirty
-	bDirtyContextData = true;
 }
 
 /*
@@ -373,7 +420,21 @@ IShader* CMaterial::GetShader() const
 CMaterial::GetShaderContextData
 ==================
 */
-IShaderContextData* CMaterial::GetShaderContextData() const
+IMaterialResource* CMaterial::GetStudioResource() const
 {
-	return pContextData;
+	if ( !pStudioResource )
+	{
+		const_cast<CMaterial*>( this )->CreateStudioResource();
+	}
+	return pStudioResource;
+}
+
+/*
+==================
+CMaterial::OnStudioResourceChanged
+==================
+*/
+IMaterial::IOnStudioResourceChanged* CMaterial::OnStudioResourceChanged() const
+{
+	return &onStudioResourceChanged;
 }

@@ -45,6 +45,7 @@ public:
 private:
 	static void OnResourceCachedUncached( void* pUserData, IResource* pResource );
 	static void OnTextureResourceChanged( void* pUserData, ITexture* pTexture );
+	static void OnMaterialResourceChanged( void* pUserData, IMaterial* pMaterial );
 	void		SubscribeResourceEvents();
 	void		UnsubscribeResourceEvents( bool bOnlyResourceDataEvents = false );
 
@@ -68,7 +69,9 @@ private:
 	IResource::IOnUncached::handle_t onResourceUncachedHandle;
 	union
 	{
-		CTexture::COnStudioResourceChanged::handle_t onTextureResourceChangedHandle;
+		CTexture::COnStudioResourceChanged::handle_t  onTextureResourceChangedHandle;
+		CMaterial::COnStudioResourceChanged::handle_t onMaterialResourceChangedHandle;
+		IEvent<>::handle_t							  onStudioResourceChangedHandle;
 	};
 };
 
