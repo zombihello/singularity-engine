@@ -1,12 +1,7 @@
 #pragma once
-#include "materialsystem/imaterialvar.h"
+#include "materialsystem/texture.h"
+#include "materialsystem/material.h"
 #include "resourcesystem/resourceptr.h"
-
-//-----------------------------------------------------------------------------
-// Forward declarations
-//-----------------------------------------------------------------------------
-class CTexture;
-class CMaterial;
 
 //-----------------------------------------------------------------------------
 // Material variable
@@ -44,9 +39,15 @@ public:
 	CMaterialVar( CMaterial* pMaterial, const char* pName, uint32 id );
 	~CMaterialVar();
 
-	uint32 GetId() const;
+	static bool IsResourceVarType( materialVarType_t varType );
+	uint32		GetId() const;
 
 private:
+	static void OnResourceCachedUncached( void* pUserData, IResource* pResource );
+	static void OnTextureResourceChanged( void* pUserData, ITexture* pTexture );
+	void		SubscribeResourceEvents();
+	void		UnsubscribeResourceEvents( bool bOnlyResourceDataEvents = false );
+
 	const char*		  pName;
 	materialVarType_t type;
 	uint32			  id;
@@ -61,9 +62,14 @@ private:
 		vector4_t	vector4DValue;
 		matrix4x4_t matrixValue;
 	};
-	eastl::string			stringValue;
-	CResourcePtr<CTexture>	pTextureValue;
-	CResourcePtr<CMaterial> pMaterialValue;
+	eastl::string					 stringValue;
+	CRefPtr<IResource>				 pResourceValue;
+	IResource::IOnCached::handle_t	 onResourceChachedHandle;
+	IResource::IOnUncached::handle_t onResourceUncachedHandle;
+	union
+	{
+		CTexture::COnStudioResourceChanged::handle_t onTextureResourceChangedHandle;
+	};
 };
 
 #include "materialsystem/materialvar.inl"

@@ -1,8 +1,5 @@
 #pragma once
 #include "utils/smatdoc/smat_compiled_doc.h"
-#include "studiorender/studioapi/istudioapi_buffer.h"
-#include "studiorender/istudio_rendercmd.h"
-#include "materialsystem/ishader.h"
 #include "materialsystem/imaterialvar.h"
 #include "materialsystem/imaterial.h"
 
@@ -28,10 +25,11 @@ public:
 	virtual void		  SetShader( const char* pShaderName ) override;
 	virtual IMaterialVar* FindVar( const char* pName ) const override;
 
-	virtual uint32		   GetNumVars() const override;
-	virtual IMaterialVar** GetVars() const override;
-	virtual const char*	   GetShaderName() const override;
-	virtual IShader*	   GetShader() const override;
+	virtual uint32				GetNumVars() const override;
+	virtual IMaterialVar**		GetVars() const override;
+	virtual const char*			GetShaderName() const override;
+	virtual IShader*			GetShader() const override;
+	virtual IShaderContextData* GetShaderContextData() const override;
 
 	CMaterial( IResource* pResource );
 	CMaterial( IResource* pResource, const CSMATCompiledMaterialDoc& smatCompiledDoc );
@@ -42,32 +40,16 @@ public:
 	void ReportVarChanged( CMaterialVar* pVar, materialVarType_t oldType );
 
 private:
-	// Calculate a hash for a string to use it in eastl::unordered_map
-	struct insensitiveStringHash_t
-	{
-		size operator()( const char* pString ) const;
-	};
+	typedef eastl::unordered_map<const char*, uint32, stlInsensitiveStringHash_t, stlInsensitiveCompareString_t> materialVarsDict_t;
 
-	// Comparator for eastl::unordered_map to insensitive compre strings
-	struct insensitiveCompareString_t
-	{
-		bool operator()( const char* pLeft, const char* pRight ) const;
-	};
+	void R_UpdateContextData();
 
-	typedef eastl::unordered_map<const char*, uint32, insensitiveStringHash_t, insensitiveCompareString_t> materialVarsDict_t;
-
-	void		R_UpdateBuffers( IStudioAPICmdContext* pCmdContext );
-	void		DestroyBuffers();
-	static bool IsResourceVarType( materialVarType_t varType );
-	static bool IsResourceVarType( shaderParamType_t varType );
-
-	bool									 bDirtyBuffers;
-	IShader*								 pShader;
-	eastl::vector<CMaterialVar*>			 vars;
-	eastl::vector<uint32>					 resourceVarIds;
-	materialVarsDict_t						 varsDict;
-	eastl::vector<CRefPtr<IStudioAPIBuffer>> studioAPIBuffers;
+	bool						 bDirtyContextData;
+	IShader*					 pShader;
+	CRefPtr<IShaderContextData>	 pContextData;
+	eastl::vector<CMaterialVar*> vars;
+	eastl::vector<uint32>		 resourceVarIds;
+	materialVarsDict_t			 varsDict;
 };
 
 DECLARE_RESOURCE_TYPE( CMaterial, RESOURCE_TYPE_MATERIAL );
-#include "materialsystem/material.inl"

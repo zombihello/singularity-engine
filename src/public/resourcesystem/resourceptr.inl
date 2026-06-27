@@ -28,6 +28,17 @@ CResourcePtr::CResourcePtr
 ==================
 */
 template<class TResourceClass>
+FORCEINLINE CResourcePtr<TResourceClass>::CResourcePtr( const CRefPtr<IResource>& pPtr )
+	: CResourcePtr( pPtr.GetRawPtr() )
+{
+}
+
+/*
+==================
+CResourcePtr::CResourcePtr
+==================
+*/
+template<class TResourceClass>
 FORCEINLINE CResourcePtr<TResourceClass>::CResourcePtr( const CResourcePtr& copy )
 	: pPtr( copy.pPtr )
 {
@@ -149,6 +160,19 @@ template<class TResourceClass>
 FORCEINLINE CResourcePtr<TResourceClass>& CResourcePtr<TResourceClass>::operator=( IResource* pPtr )
 {
 	CResourcePtr::pPtr = pPtr;
+	Assert( !pPtr || pPtr->GetType() == resourceTypeInfo_t<TResourceClass>::RESOURCE_TYPE );
+	return *this;
+}
+
+/*
+==================
+CResourcePtr::operator=
+==================
+*/
+template<class TResourceClass>
+FORCEINLINE CResourcePtr<TResourceClass>& CResourcePtr<TResourceClass>::operator=( const CRefPtr<IResource>& pPtr )
+{
+	CResourcePtr::pPtr = pPtr.GetRawPtr();
 	Assert( !pPtr || pPtr->GetType() == resourceTypeInfo_t<TResourceClass>::RESOURCE_TYPE );
 	return *this;
 }

@@ -14,7 +14,7 @@ CMaterial::CMaterial
 */
 CMaterial::CMaterial( IResource* pResource )
 	: CResourceData<IMaterial>( pResource )
-	, bDirtyBuffers( false )
+	, bDirtyContextData( false )
 	, pShader( NULL )
 {
 }
@@ -26,7 +26,7 @@ CMaterial::CMaterial
 */
 CMaterial::CMaterial( IResource* pResource, const CSMATCompiledMaterialDoc& smatCompiledDoc )
 	: CResourceData<IMaterial>( pResource )
-	, bDirtyBuffers( false )
+	, bDirtyContextData( false )
 	, pShader( NULL )
 {
 	// Initialize the material by SMAT compiled document
@@ -40,9 +40,6 @@ CMaterial::~CMaterial
 */
 CMaterial::~CMaterial()
 {
-	// Destroy buffers
-	DestroyBuffers();
-
 	// Free allocated memory for variables
 	for ( uint32 varIdx = 0, numVars = (uint32)vars.size(); varIdx < numVars; ++varIdx )
 	{
@@ -120,9 +117,6 @@ CMaterial::Clear
 */
 void CMaterial::Clear()
 {
-	// Destroy buffers
-	DestroyBuffers();
-
 	// Free allocated memory for variables
 	for ( uint32 varIdx = 0, numVars = (uint32)vars.size(); varIdx < numVars; ++varIdx )
 	{
@@ -133,8 +127,9 @@ void CMaterial::Clear()
 	vars.clear();
 	resourceVarIds.clear();
 	varsDict.clear();
-	bDirtyBuffers = false;
-	pShader		  = NULL;
+	bDirtyContextData = false;
+	pShader			  = NULL;
+	pContextData	  = NULL;
 }
 
 /*
@@ -173,8 +168,8 @@ CMaterial::ReportVarChanged
 void CMaterial::ReportVarChanged( CMaterialVar* pVar, materialVarType_t oldType )
 {
 	// Update resource var indices if the type has been changed
-	bool bOldResourceVarType = IsResourceVarType( oldType );
-	bool bNewResourceVarType = IsResourceVarType( pVar->GetType() );
+	bool bOldResourceVarType = CMaterialVar::IsResourceVarType( oldType );
+	bool bNewResourceVarType = CMaterialVar::IsResourceVarType( pVar->GetType() );
 	if ( bNewResourceVarType != bOldResourceVarType )
 	{
 		// Remove the var from `resourceVarIds` if the old type was a resource
@@ -198,40 +193,29 @@ void CMaterial::ReportVarChanged( CMaterialVar* pVar, materialVarType_t oldType 
 		}
 	}
 
-	// Mark buffers as dirty
-	bDirtyBuffers = true;
+	// Mark the shader context data as dirty
+	bDirtyContextData = true;
 }
 
 /*
 ==================
-CMaterial::R_UpdateBuffers
+CMaterial::R_UpdateContextData
 ==================
 */
-void CMaterial::R_UpdateBuffers( IStudioAPICmdContext* pCmdContext )
+void CMaterial::R_UpdateContextData()
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( pShader );
 
-	// Do nothing if buffers aren't dirty
-	if ( !bDirtyBuffers )
+	// Do nothing if the context data isn't dirty
+	if ( !bDirtyContextData )
 	{
 		return;
 	}
+	bDirtyContextData = false;
 
-	// Get a new buffer count
-	uint32 numBuffers = pShader->GetNumBuffers();
-	bDirtyBuffers	  = false;
-
-	// Destroy buffers if the shader doesn't use they
-	if ( numBuffers == 0 )
-	{
-		studioAPIBuffers.clear();
-		return;
-	}
-	studioAPIBuffers.resize( numBuffers );
-
-	// Update all buffers
-	pShader->R_UpdateBuffers( pCmdContext, studioAPIBuffers.data(), (IMaterialVar**)vars.data() );
+	// Create a new context data
+	pContextData = pShader->CreateContextData( (IMaterialVar**)vars.data() );
 }
 
 /*
@@ -244,11 +228,11 @@ void CMaterial::R_Barrier( IStudioAPICmdList* pStudioAPICmdList )
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( pShader );
 
-	// Update buffers
-	R_UpdateBuffers( pStudioAPICmdList->GetCmdContext() );
+	// Update the context data
+	R_UpdateContextData();
 
 	// Place barriers into the list
-	pShader->R_Barrier( pStudioAPICmdList, (IMaterialVar**)vars.data(), (IStudioAPIBuffer**)studioAPIBuffers.data() );
+	pShader->R_Barrier( pStudioAPICmdList, pContextData );
 }
 
 /*
@@ -261,11 +245,11 @@ void CMaterial::R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, studioRe
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( pShader );
 
-	// Update buffers
-	R_UpdateBuffers( pStudioAPICmdList->GetCmdContext() );
+	// Update the context data
+	R_UpdateContextData();
 
 	// Prepare the shader for draw
-	pShader->R_PrepareForDraw( pStudioAPICmdList, renderPassType, (IMaterialVar**)vars.data(), (IStudioAPIBuffer**)studioAPIBuffers.data() );
+	pShader->R_PrepareForDraw( pStudioAPICmdList, pContextData, renderPassType );
 }
 
 /*
@@ -325,8 +309,8 @@ void CMaterial::SetShader( const char* pShaderName )
 		pCurrentShaderName = pFallbackShaderName;
 	}
 
-	// Mark buffers as dirty
-	bDirtyBuffers = true;
+	// Mark the shader context data as dirty
+	bDirtyContextData = true;
 }
 
 /*
@@ -382,4 +366,14 @@ CMaterial::GetShader
 IShader* CMaterial::GetShader() const
 {
 	return pShader;
+}
+
+/*
+==================
+CMaterial::GetShaderContextData
+==================
+*/
+IShaderContextData* CMaterial::GetShaderContextData() const
+{
+	return pContextData;
 }

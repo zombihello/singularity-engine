@@ -10,6 +10,7 @@ class CResourcePtr
 public:
 	CResourcePtr();
 	CResourcePtr( IResource* pPtr );
+	CResourcePtr( const CRefPtr<IResource>& pPtr );
 	CResourcePtr( const CResourcePtr& copy );
 
 	// To bring a data in or out of memory
@@ -26,6 +27,7 @@ public:
 	TResourceClass* GetData() const;
 
 	CResourcePtr&	operator=( IResource* pPtr );
+	CResourcePtr&	operator=( const CRefPtr<IResource>& pPtr );
 	CResourcePtr&	operator=( const CResourcePtr& copy );
 	bool			operator==( const CResourcePtr& right ) const;
 	bool			operator==( IResource* pRight ) const;

@@ -7,6 +7,23 @@
 
 /*
 ==================
+CBaseShaderContextData::FinalRelease
+==================
+*/
+void CBaseShaderContextData::FinalRelease()
+{
+	if ( IsNeedDeferredDestroy() )
+	{
+		Studio_BeginDeleteResource( this );
+	}
+	else
+	{
+		delete this;
+	}
+}
+
+/*
+==================
 CBaseShader::CBaseShader
 ==================
 */
@@ -62,6 +79,15 @@ void CBaseShader::OnInitInstance()
 
 /*
 ==================
+CBaseShader::OnInitContextData
+==================
+*/
+void CBaseShader::OnInitContextData( IMaterialVar** pParams, IShaderContextData* pContextData ) const
+{
+}
+
+/*
+==================
 CBaseShader::Shutdown
 ==================
 */
@@ -82,19 +108,10 @@ void CBaseShader::InitDefaultParams( IMaterialVar** pParams ) const
 
 /*
 ==================
-CBaseShader::R_UpdateBuffers
-==================
-*/
-void CBaseShader::R_UpdateBuffers( IStudioAPICmdContext* pStudioAPICmdContext, CRefPtr<IStudioAPIBuffer>* pStudioAPIBuffers, IMaterialVar** pParams ) const
-{
-}
-
-/*
-==================
 CBaseShader::R_Barrier
 ==================
 */
-void CBaseShader::R_Barrier( IStudioAPICmdList* pStudioAPICmdList, IMaterialVar** pParams, IStudioAPIBuffer** pStudioAPIBuffers ) const
+void CBaseShader::R_Barrier( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData ) const
 {
 }
 
@@ -103,13 +120,13 @@ void CBaseShader::R_Barrier( IStudioAPICmdList* pStudioAPICmdList, IMaterialVar*
 CBaseShader::R_PrepareForDraw
 ==================
 */
-void CBaseShader::R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, studioRenderPassType_t renderPassType, IMaterialVar** pParams, IStudioAPIBuffer** pStudioAPConstantIBuffers /* = NULL */ )
+void CBaseShader::R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData, studioRenderPassType_t renderPassType )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Select a shader combination
 	shaderComboInfo_t comboInfo = {};
-	R_SelectCombo( pParams, comboInfo );
+	R_SelectCombo( pContextData, comboInfo );
 
 	// Get a render pipeline or bake it
 	uint64					  pipelineIdx			   = GetPipelineIndex( comboInfo.cacheIndices );
@@ -141,7 +158,7 @@ void CBaseShader::R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, studio
 	pStudioAPICmdList->SetRenderPipeline( pStudioAPIRenderPipeline );
 
 	// Prepare the shader for draw
-	R_OnDraw( pStudioAPICmdList, pParams, pStudioAPConstantIBuffers );
+	R_OnDraw( pStudioAPICmdList, pContextData );
 }
 
 /*

@@ -5,8 +5,8 @@
 // Macros
 //-----------------------------------------------------------------------------
 #if ENABLE_PROFILING
-	#define INTERNAL_PROFILER_SCOPE_VAR( ScopeName, ScopeGroup )                                                                   \
-		static profilerScopeData_t CONCAT( s_autogenScopeData_, __LINE__ )( FUNCTION, FUNCSIG, __FILE__, __LINE__, ##ScopeGroup ); \
+	#define INTERNAL_PROFILER_SCOPE_VAR( ScopeName, ScopeGroup )                                                                 \
+		static profilerScopeData_t CONCAT( s_autogenScopeData_, __LINE__ )( FUNCTION, FUNCSIG, __FILE__, __LINE__, ScopeGroup ); \
 		CProfilerScope			   CONCAT( s_autogenScope_, __LINE__ )( CONCAT( s_autogenScopeData_, __LINE__ ), ScopeName );
 
 	#define PROFILER_SCOPE_FUNC()						  INTERNAL_PROFILER_SCOPE_VAR( NULL, PROFILER_SCOPE_GROUP_NONE )

@@ -8,6 +8,7 @@
 class IStudioAPICmdList;
 class IMaterialVar;
 class IShader;
+class IShaderContextData;
 
 //-----------------------------------------------------------------------------
 // Material interface
@@ -23,10 +24,11 @@ public:
 	virtual void		  SetShader( const char* pShaderName )															  = 0;
 	virtual IMaterialVar* FindVar( const char* pName ) const															  = 0;
 
-	virtual uint32		   GetNumVars() const	 = 0;
-	virtual IMaterialVar** GetVars() const		 = 0;
-	virtual const char*	   GetShaderName() const = 0;
-	virtual IShader*	   GetShader() const	 = 0;
+	virtual uint32				GetNumVars() const			 = 0;
+	virtual IMaterialVar**		GetVars() const				 = 0;
+	virtual const char*			GetShaderName() const		 = 0;
+	virtual IShader*			GetShader() const			 = 0;
+	virtual IShaderContextData* GetShaderContextData() const = 0;
 };
 
 DECLARE_RESOURCE_TYPE( IMaterial, RESOURCE_TYPE_MATERIAL );

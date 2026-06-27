@@ -56,6 +56,16 @@
 #define BIT( Bit )							( 1 << Bit )
 #define STRINGIFY_IMPL( X )					#X
 #define STRINGIFY( X )						STRINGIFY_IMPL( X )
+#define ALIGN4_PREDECL						ALIGN_PREDECL( 4 )
+#define ALIGN4_POSTDECL						ALIGN_POSTDECL( 4 )
+#define ALIGN8_PREDECL						ALIGN_PREDECL( 8 )
+#define ALIGN8_POSTDECL						ALIGN_POSTDECL( 8 )
+#define ALIGN16_PREDECL						ALIGN_PREDECL( 16 )
+#define ALIGN16_POSTDECL					ALIGN_POSTDECL( 16 )
+#define ALIGN32_PREDECL						ALIGN_PREDECL( 32 )
+#define ALIGN32_POSTDECL					ALIGN_POSTDECL( 32 )
+#define ALIGN128_PREDECL					ALIGN_PREDECL( 128 )
+#define ALIGN128_POSTDECL					ALIGN_POSTDECL( 128 )
 #define PACK_VERSION( Major, Minor, Patch ) ( (uint32)Major << 24 | (uint32)Minor << 16 | Patch )
 #define UNPACK_VERSION( Version, Major, Minor, Patch ) \
 	{                                                  \
