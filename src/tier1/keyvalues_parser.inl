@@ -134,7 +134,7 @@ FORCEINLINE bool CKeyValuesParser::IsControlSymbol( uint32 offset /* = 0 */ ) co
 		break;
 
 	case CONTEXT_TYPE_CONDITIONAL_BLOCK:
-		bControlSymbol |= c == '|';
+		bControlSymbol |= c == '|' || c == '[' || c == ']';
 		break;
 
 	default:

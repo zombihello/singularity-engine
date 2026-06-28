@@ -123,7 +123,7 @@ bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValues )
 		eastl::string name = eastl::move( token.string );
 		if ( token.type == TOKEN_TYPE_CONTROL )
 		{
-			EmitError( token.position, "Unexpected control symbol" );
+			EmitError( token.position, "Unexpected control symbol '%s'", name.c_str() );
 			break;
 		}
 
@@ -158,7 +158,7 @@ bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValues )
 			// Make sure that the token hasn't a control symbol
 			if ( token.type == TOKEN_TYPE_CONTROL )
 			{
-				EmitError( token.position, "Unexpected control symbol" );
+				EmitError( token.position, "Unexpected control symbol '%s'", token.string.c_str() );
 				delete pSubKey;
 				break;
 			}
@@ -179,7 +179,7 @@ bool CKeyValuesParser::ReadKeyValues( CKeyValues* pKeyValues )
 				// Make sure that the token hasn't a control symbol
 				if ( token.type == TOKEN_TYPE_CONTROL )
 				{
-					EmitError( token.position, "Unexpected control symbol" );
+					EmitError( token.position, "Unexpected control symbol '%s'", value.c_str() );
 					delete pSubKey;
 					break;
 				}
@@ -367,7 +367,7 @@ bool CKeyValuesParser::ReadConditionalBlock( bool& bAccepted )
 			break;
 		}
 
-		if ( token.type != TOKEN_TYPE_QUOTED )
+		if ( token.type == TOKEN_TYPE_CONTROL )
 		{
 			// Check if we reach end of the conditional block
 			if ( token.string[0] == ']' )
@@ -383,6 +383,10 @@ bool CKeyValuesParser::ReadConditionalBlock( bool& bAccepted )
 				bConditionalGroups.emplace_back( true );
 				continue;
 			}
+
+			// Otherwise we encountered an unexpected control symbol
+			EmitError( token.position, "Unexpected control symbol '%s'", token.string.c_str() );
+			continue;
 		}
 
 		// Evaluate the conditional variable
