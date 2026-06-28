@@ -45,6 +45,10 @@ public:
 	// Marks all dependent resources as used
 	virtual void MarkUsedDependencies() override;
 
+	// Set/clear permanent flag in all dependent resources
+	virtual void MakePermanentDependencies() override;
+	virtual void ClearPermanentDependencies() override;
+
 	// IMaterial interface
 	virtual void		  SetShader( const char* pShaderName ) override;
 	virtual IMaterialVar* FindVar( const char* pName ) const override;

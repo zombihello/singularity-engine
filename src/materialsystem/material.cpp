@@ -222,6 +222,62 @@ void CMaterial::MarkUsedDependencies()
 
 /*
 ==================
+CMaterial::MakePermanentDependencies
+==================
+*/
+void CMaterial::MakePermanentDependencies()
+{
+	PROFILER_SCOPE_FUNC();
+	for ( uint32 index = 0, count = (uint32)resourceVarIds.size(); index < count; ++index )
+	{
+		CMaterialVar* pVar		= vars[resourceVarIds[index]];
+		IResource*	  pResource = NULL;
+		switch ( pVar->GetType() )
+		{
+		case MATERIALVAR_TYPE_TEXTURE: pResource = pVar->GetTextureValue(); break;
+		case MATERIALVAR_TYPE_MATERIAL: pResource = pVar->GetMaterialValue(); break;
+		default:
+			AssertMsg( false, "Unknown material variable type 0x%X", pVar->GetType() );
+			break;
+		}
+
+		if ( pResource )
+		{
+			pResource->MakePermanent();
+		}
+	}
+}
+
+/*
+==================
+CMaterial::ClearPermanentDependencies
+==================
+*/
+void CMaterial::ClearPermanentDependencies()
+{
+	PROFILER_SCOPE_FUNC();
+	for ( uint32 index = 0, count = (uint32)resourceVarIds.size(); index < count; ++index )
+	{
+		CMaterialVar* pVar		= vars[resourceVarIds[index]];
+		IResource*	  pResource = NULL;
+		switch ( pVar->GetType() )
+		{
+		case MATERIALVAR_TYPE_TEXTURE: pResource = pVar->GetTextureValue(); break;
+		case MATERIALVAR_TYPE_MATERIAL: pResource = pVar->GetMaterialValue(); break;
+		default:
+			AssertMsg( false, "Unknown material variable type 0x%X", pVar->GetType() );
+			break;
+		}
+
+		if ( pResource )
+		{
+			pResource->ClearPermanent();
+		}
+	}
+}
+
+/*
+==================
 CMaterial::ReportVarChanged
 ==================
 */

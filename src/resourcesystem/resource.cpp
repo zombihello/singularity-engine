@@ -83,7 +83,20 @@ CResource::MakePermanent
 */
 void CResource::MakePermanent()
 {
+	// Do nothing if the resource is permanent
+	if ( HasAnyFlags( RESOURCE_FLAG_PERMANENT ) )
+	{
+		return;
+	}
+
+	// Mark the resource as permanent
 	AddFlags( RESOURCE_FLAG_PERMANENT );
+
+	// Mark all dependent resources as permanent
+	if ( pData )
+	{
+		pData->MakePermanentDependencies();
+	}
 }
 
 /*
@@ -93,10 +106,23 @@ CResource::ClearPermanent
 */
 void CResource::ClearPermanent()
 {
-	if ( !path.empty() && !HasAnyFlags( RESOURCE_FLAG_DEFAULT ) )
+	// Do nothing if the resource isn't permanent or is procedural
+	if ( !HasAnyFlags( RESOURCE_FLAG_PERMANENT ) || path.empty() )
 	{
-		RemoveFlags( RESOURCE_FLAG_PERMANENT );
+		return;
 	}
+
+	// Remove flag permanent in the resource
+	RemoveFlags( RESOURCE_FLAG_PERMANENT );
+
+	// Remove flag permanent in all dependent resources
+	if ( pData )
+	{
+		pData->ClearPermanentDependencies();
+	}
+
+	// Mark the resource as used
+	MarkUsed();
 }
 
 /*

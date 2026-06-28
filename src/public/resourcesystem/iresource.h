@@ -29,8 +29,14 @@ public:
 	virtual ~IResourceData() {}
 
 	// Marks all dependent resources as used
-	virtual void	   MarkUsedDependencies() = 0;
-	virtual IResource* GetResource() const	  = 0;
+	virtual void MarkUsedDependencies() = 0;
+
+	// Set/clear permanent flag in all dependent resources
+	virtual void MakePermanentDependencies()  = 0;
+	virtual void ClearPermanentDependencies() = 0;
+
+	// Get the resource where the data is
+	virtual IResource* GetResource() const = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -74,7 +80,13 @@ class CResourceData : public TBaseClass
 public:
 	// IResourceData interface
 	// Marks all dependent resources as used
-	virtual void	   MarkUsedDependencies() override;
+	virtual void MarkUsedDependencies() override;
+
+	// Set/clear permanent flag in all dependent resources
+	virtual void MakePermanentDependencies() override;
+	virtual void ClearPermanentDependencies() override;
+
+	// Get the resource where the data is
 	virtual IResource* GetResource() const override;
 
 	CResourceData( IResource* pResource );

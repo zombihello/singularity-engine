@@ -438,6 +438,14 @@ bool CResourceTypeMgr::CacheResource( CResource* pResource )
 	pResource->pData = pData;
 	pResource->AddFlags( RESOURCE_FLAG_CACHED );
 	MarkUsedResource( pResource );
+
+	// If the resource is permanent then mark all dependent resources
+	if ( pResource->HasAnyFlags( RESOURCE_FLAG_PERMANENT ) )
+	{
+		pData->MakePermanentDependencies();
+	}
+
+	// We are done
 	pResource->onCached.Invoke( pResource );
 	return true;
 }
@@ -466,8 +474,14 @@ void CResourceTypeMgr::UncacheResource( CResource* pResource, bool bIgnorePerman
 		return;
 	}
 
-	// Delete the resource data
+	// Remove cached flag and If the resource is permanent then remove flag in all dependent resources
 	pResource->RemoveFlags( RESOURCE_FLAG_CACHED );
+	if ( pResource->HasAnyFlags( RESOURCE_FLAG_PERMANENT ) )
+	{
+		pResource->pData->ClearPermanentDependencies();
+	}
+
+	// Delete the resource data
 	pResourceTypeFactory->Delete( pResource->pData );
 	pResource->pData = NULL;
 	pResource->onUncached.Invoke( pResource );
@@ -486,6 +500,7 @@ void CResourceTypeMgr::MarkUsedResource( CResource* pResource )
 	// Do nothing if the resource already marked as pending to mark used
 	Assert( pResource && pResource->GetType() == resourceType );
 	if ( pResource->bPendingMarkUsed.load( eastl::memory_order_relaxed )
+		 || !pResource->HasAnyFlags( RESOURCE_FLAG_CACHED )
 		 || pResource->HasAnyFlags( RESOURCE_FLAG_PERMANENT | RESOURCE_FLAG_ANONYMOUS | RESOURCE_FLAG_DEFAULT ) )
 	{
 		return;
@@ -596,15 +611,20 @@ void CResourceTypeMgr::UncacheAllResources()
 			continue;
 		}
 
-		// Uncache the resource
-		UncacheResource( pResource );
-		if ( pResource->GetRefCount() <= 1 )
+		// Mark that the resource isn't in the lru list
+		pResource->bInLruList = false;
+
+		// Uncache and remove the resource only if it isn't permanent, anonymous and default
+		if ( !pResource->HasAnyFlags( RESOURCE_FLAG_PERMANENT | RESOURCE_FLAG_ANONYMOUS | RESOURCE_FLAG_DEFAULT ) )
 		{
-			RemoveResource( pResource );
-		}
-		else
-		{
-			pResource->bInLruList = false;
+			// Uncache the resource
+			UncacheResource( pResource );
+
+			// Remove the resource from the manager if it last reference
+			if ( pResource->GetRefCount() <= 1 )
+			{
+				RemoveResource( pResource );
+			}
 		}
 	}
 
@@ -637,17 +657,22 @@ void CResourceTypeMgr::ProcessPendingMarkUsedResources()
 	uint64 frameNumber = g_resourceSystem.GetFrameNumber();
 	for ( auto it = pendingMarkUsedResourcesReadList.begin(), itEnd = pendingMarkUsedResourcesReadList.end(); it != itEnd; ++it )
 	{
-		// Skip invalid resource or that already used at the frame or that has some flags
+		// Skip the resource if it is invalid
 		CResource* pResource = *it;
-		if ( !pResource
-			 || !pResource->HasAnyFlags( RESOURCE_FLAG_CACHED )
+		if ( !pResource )
+		{
+			continue;
+		}
+		pResource->bPendingMarkUsed.store( false, eastl::memory_order_release );
+
+		// Skip the resource if it has some flags
+		if ( !pResource->HasAnyFlags( RESOURCE_FLAG_CACHED )
 			 || pResource->HasAnyFlags( RESOURCE_FLAG_PERMANENT | RESOURCE_FLAG_ANONYMOUS | RESOURCE_FLAG_DEFAULT ) )
 		{
 			continue;
 		}
 
-		// Mark the resource as used
-		pResource->bPendingMarkUsed.store( false, eastl::memory_order_release );
+		// Update the lru list
 		pResource->lastUsedFrame = frameNumber;
 		if ( pResource->bInLruList )
 		{
@@ -698,14 +723,20 @@ void CResourceTypeMgr::ProcessLruResources()
 			break;
 		}
 
-		// Uncache the resource
-		UncacheResource( pResource );
+		// Unlink the resource from the lru list
 		UnlinkResourceFromLru( pResource );
 
-		// Remove the resource from the manager if it last reference
-		if ( pResource->GetRefCount() <= 1 )
+		// Uncache and remove the resource only if it isn't permanent, anonymous and default
+		if ( !pResource->HasAnyFlags( RESOURCE_FLAG_PERMANENT | RESOURCE_FLAG_ANONYMOUS | RESOURCE_FLAG_DEFAULT ) )
 		{
-			RemoveResource( pResource );
+			// Uncache the resource
+			UncacheResource( pResource );
+
+			// Remove the resource from the manager if it last reference
+			if ( pResource->GetRefCount() <= 1 )
+			{
+				RemoveResource( pResource );
+			}
 		}
 	}
 }
@@ -732,13 +763,12 @@ void CResourceTypeMgr::SetDefaultResource( IResource* pResource )
 	if ( pDefaultResource )
 	{
 		pDefaultResource->RemoveFlags( RESOURCE_FLAG_DEFAULT );
-		UnlinkResourceFromLru( pDefaultResource );
+		pDefaultResource->MarkUsed();
 	}
 	pDefaultResource = (CResource*)pResource;
 	if ( pDefaultResource )
 	{
 		pDefaultResource->AddFlags( RESOURCE_FLAG_DEFAULT );
-		UnlinkResourceFromLru( pDefaultResource );
 	}
 }
 
