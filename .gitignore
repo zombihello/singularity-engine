@@ -16,6 +16,7 @@
 **/.cache
 **/.vscode
 **/.vs
+**/.idea
 **/__pycache__
 **/obj
 **/intermediate
