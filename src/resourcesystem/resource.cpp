@@ -27,7 +27,7 @@ CResource::~CResource
 */
 CResource::~CResource()
 {
-	Uncache();
+	Uncache( true );
 }
 
 /*

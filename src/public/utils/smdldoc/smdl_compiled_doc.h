@@ -2,7 +2,7 @@
 #include <EASTL/vector.h>
 
 #include "tier0/tier0.h"
-#include "studiorender/studio_vertextypes.h"
+#include "modelsystem/modeltypes.h"
 
 //-----------------------------------------------------------------------------
 // Helper for work with compiled SMDL (Singularity Model) files

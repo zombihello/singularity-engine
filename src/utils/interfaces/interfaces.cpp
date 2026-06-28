@@ -12,3 +12,4 @@ IStudioAPI*		 g_pStudioAPI	   = NULL;
 IShaderMgr*		 g_pShaderMgr	   = NULL;
 IMaterialSystem* g_pMaterialSystem = NULL;
 IResourceSystem* g_pResourceSystem = NULL;
+IModelSystem*	 g_pModelSystem	   = NULL;

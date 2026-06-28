@@ -1,11 +1,10 @@
 #include "pch_studiorender.h"
 #include "filesystem/ifilesystem.h"
 #include "materialsystem/ishadermgr.h"
-#include "studiorender/studioapi/istudioapi_barrier.h"
+#include "modelsystem/imodelsystem.h"
 #include "studiorender/studio_renderthread.h"
 #include "studiorender/studio_viewport.h"
 #include "studiorender/studio_renderpipelineset.h"
-#include "studiorender/studio_vertexdeclarations.h"
 #include "studiorender/studiorender.h"
 
 CCVar		  r_vsync( "r_vsync", "0", "Should use vertical synchronization (VSync)", CVAR_FLAG_ARCHIVE );
@@ -19,9 +18,8 @@ CStudioRender::Connect
 */
 bool CStudioRender::Connect( createInterfaceFn_t pFactory )
 {
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-
 	// Connect Tier1
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	if ( !ConnectTier1( pFactory ) )
 	{
 		return false;
@@ -29,16 +27,23 @@ bool CStudioRender::Connect( createInterfaceFn_t pFactory )
 	LinkCmds();
 	LinkCVars();
 
-	// Get Studio API
+	// Get the studio api
 	g_pStudioAPI = (IStudioAPI*)pFactory( STUDIOAPI_INTERFACE_VERSION );
 	if ( !g_pStudioAPI )
 	{
 		return false;
 	}
 
-	// Get shader manager
+	// Get the shader manager
 	g_pShaderMgr = (IShaderMgr*)pFactory( SHADERMGR_INTERFACE_VERSION );
 	if ( !g_pShaderMgr )
+	{
+		return false;
+	}
+
+	// Get the model system
+	g_pModelSystem = (IModelSystem*)pFactory( MODELSYSTEM_INTERFACE_VERSION );
+	if ( !g_pModelSystem )
 	{
 		return false;
 	}
@@ -55,8 +60,6 @@ CStudioRender::Disconnect
 void CStudioRender::Disconnect()
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-
-	// Disconnect Tier1
 	UnlinkCVars();
 	UnlinkCmds();
 	DisconnectTier1();
@@ -64,6 +67,7 @@ void CStudioRender::Disconnect()
 	g_pStudioAPI	= NULL;
 	g_pStudioRender = NULL;
 	g_pShaderMgr	= NULL;
+	g_pModelSystem	= NULL;
 }
 
 /*
@@ -73,15 +77,12 @@ CStudioRender::Init
 */
 bool CStudioRender::Init()
 {
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-
 	// Initialize all global resources
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	CStudioGlobalRenderResources::InitResources();
 
 	// Start the render thread
 	Studio_StartRenderThread();
-
-	// We are done!
 	return true;
 }
 
@@ -92,9 +93,8 @@ CStudioRender::Shutdown
 */
 void CStudioRender::Shutdown()
 {
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-
 	// Stop the render thread
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Studio_StopRenderThread();
 
 	// Release all global resources

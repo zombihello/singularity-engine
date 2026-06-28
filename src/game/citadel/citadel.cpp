@@ -1,10 +1,10 @@
 #include "pch_citadel.h"
 #include "studiorender/studioapi/istudioapi.h"
 #include "studiorender/istudio_rendercmd.h"
-#include "studiorender/studio_vertextypes.h"
 #include "studiorender/istudiorender.h"
 #include "materialsystem/imaterial.h"
 #include "materialsystem/imaterialvar.h"
+#include "modelsystem/modeltypes.h"
 #include "resourcesystem/iresourcesystem.h"
 #include "game/shared/game.h"
 #include "game/ientity.h"
@@ -132,15 +132,15 @@ bool CCitadelGame::Init()
 	public:
 		static void R_InitQuad( CCitadelGame* pGame )
 		{
-			studioSimpleElementVertex_t quadVerteces[] = { { { -0.5f, -0.5f, 0.f, 1.f }, { -1.f, 0.f }, { 255, 0, 0 } },
-														   { { 0.5f, -0.5f, 0.f, 1.f }, { 0.f, 0.f }, { 0, 255, 0 } },
-														   { { 0.5f, 0.5f, 0.f, 1.f }, { 0.f, 1.f }, { 0, 0, 255 } },
-														   { { -0.5f, 0.5f, 0.f, 1.f }, { -1.f, 1.f }, { 255, 255, 255 } } };
-			uint16						quadIndices[]  = { 0, 1, 2, 2, 3, 0 };
+			modelSimpleVertex_t quadVerteces[] = { { { -0.5f, -0.5f, 0.f, 1.f }, { -1.f, 0.f }, { 255, 0, 0 } },
+												   { { 0.5f, -0.5f, 0.f, 1.f }, { 0.f, 0.f }, { 0, 255, 0 } },
+												   { { 0.5f, 0.5f, 0.f, 1.f }, { 0.f, 1.f }, { 0, 0, 255 } },
+												   { { -0.5f, 0.5f, 0.f, 1.f }, { -1.f, 1.f }, { 255, 255, 255 } } };
+			uint16				quadIndices[]  = { 0, 1, 2, 2, 3, 0 };
 
 			IResourceTypeMgr*		  pMaterialsMgr			 = g_pResourceSystem->GetResourceManagerForType<IMaterial>();
 			CResourcePtr<IMaterial>	  pMaterial				 = pMaterialsMgr->LoadResource( "materials/nelson" );
-			CRefPtr<IStudioAPIBuffer> pStudioAPIVertexBuffer = g_pStudioAPI->CreateBuffer( (byte*)&quadVerteces[0], ARRAYSIZE( quadVerteces ) * sizeof( studioSimpleElementVertex_t ), sizeof( studioSimpleElementVertex_t ), STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_VERTEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
+			CRefPtr<IStudioAPIBuffer> pStudioAPIVertexBuffer = g_pStudioAPI->CreateBuffer( (byte*)&quadVerteces[0], ARRAYSIZE( quadVerteces ) * sizeof( modelSimpleVertex_t ), sizeof( modelSimpleVertex_t ), STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_VERTEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
 			CRefPtr<IStudioAPIBuffer> pStudioAPIIndexBuffer	 = g_pStudioAPI->CreateBuffer( (byte*)&quadIndices[0], ARRAYSIZE( quadIndices ) * sizeof( uint16 ), sizeof( uint16 ), STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_INDEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
 			Quad().Init( pStudioAPIVertexBuffer, pStudioAPIIndexBuffer, pMaterial );
 		}

@@ -4,6 +4,7 @@
 #include "studiorender/istudiorender.h"
 #include "resourcesystem/iresourcesystem.h"
 #include "materialsystem/imaterialsystem.h"
+#include "modelsystem/imodelsystem.h"
 #include "appframework/appsystemgroup.h"
 
 //-----------------------------------------------------------------------------

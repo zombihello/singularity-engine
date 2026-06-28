@@ -303,8 +303,8 @@ public:
 protected:
 	struct shaderComboInfo_t
 	{
-		uint64			   cacheIndices[STUDIOAPI_SHADER_NUM_DRAW_TYPES];
-		studioVertexType_t vertexType;
+		uint64			  cacheIndices[STUDIOAPI_SHADER_NUM_DRAW_TYPES];
+		modelVertexType_t vertexType;
 	};
 
 	virtual void OnInitInstance();

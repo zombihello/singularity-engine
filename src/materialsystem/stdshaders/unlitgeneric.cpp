@@ -77,7 +77,7 @@ BEGIN_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 	{
 		// Set a vertex shader and type
 		DECLARE_VERTEX_SHADER( unlitgeneric_vs );
-		SET_VERTEX_TYPE( STUDIO_VERTEXTYPE_SIMPLEELEMENT );
+		SET_VERTEX_TYPE( MODEL_VERTEXTYPE_SIMPLE );
 		SET_VERTEX_SHADER( unlitgeneric_vs );
 
 		// Set a pixel shader
