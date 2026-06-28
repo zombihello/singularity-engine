@@ -1,4 +1,3 @@
-Transform {}
 Quad
 {
 	Material "materials/nelson"

@@ -1,4 +1,5 @@
 #include "pch_studioapi_vk.h"
+#include "studiorender/studioapi/istudioapi_barrier.h"
 #include "studiorender/studioapi_vk/vk_studioapi_cmdbuffer.h"
 #include "studiorender/studioapi_vk/vk_studioapi_cmdcontext.h"
 #include "studiorender/studioapi_vk/vk_studioapi_swapchain.h"
@@ -92,6 +93,8 @@ CStudioAPISwapChainVk::CStudioAPISwapChainVk
 */
 CStudioAPISwapChainVk::CStudioAPISwapChainVk( const char* pDebugName /* = "" */ )
 	: bUseVSync( false )
+	, bImageAcquired( false )
+	, status( STUDIOAPI_SWAPCHAIN_STATUS_NOT_CREATED )
 	, windowHandle( INVALID_WINDOW_HANDLE )
 	, vkSurface( VK_NULL_HANDLE )
 	, vkSwapChain( VK_NULL_HANDLE )
@@ -128,7 +131,7 @@ bool CStudioAPISwapChainVk::Create( windowHandle_t windowHandle, uint32 width, u
 		&& CStudioAPISwapChainVk::windowHandle == windowHandle
 		&& CStudioAPISwapChainVk::vkSurfaceFormat.format == vkPixelFormat
 		&& CStudioAPISwapChainVk::vkSurfaceFormat.colorSpace == vkColorSpace;
-	if ( IsCreated() && !bReCreate )
+	if ( status != STUDIOAPI_SWAPCHAIN_STATUS_NOT_CREATED && !bReCreate )
 	{
 		Destroy();
 	}
@@ -338,8 +341,10 @@ bool CStudioAPISwapChainVk::Create( windowHandle_t windowHandle, uint32 width, u
 		}
 	}
 
-	// Save the new Vulkan swap chain
-	vkSwapChain = vkNewSwapChain;
+	// Save the new Vulkan swap chain and update the status
+	vkSwapChain	   = vkNewSwapChain;
+	bImageAcquired = false;
+	status		   = STUDIOAPI_SWAPCHAIN_STATUS_OK;
 
 	// Initialize all swap chain images
 	uint32				   numImages = 0;
@@ -431,22 +436,32 @@ void CStudioAPISwapChainVk::Destroy()
 	// Release all semaphores and fences
 	for ( uint32 index = 0; index < STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT; ++index )
 	{
-		g_StudioAPIVk.GetSyncMgr().ReleaseSemaphore( pImageAvailableSemaphores[index] );
+		if ( pImageAvailableSemaphores[index] )
+		{
+			g_StudioAPIVk.GetSyncMgr().ReleaseSemaphore( pImageAvailableSemaphores[index] );
+		}
 	}
 	Mem_Memzero( pImageAvailableSemaphores, STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT * sizeof( CStudioAPISemaphoreVk* ) );
 
 	for ( uint32 index = 0, count = (uint32)renderFinishedSemaphores.size(); index < count; ++index )
 	{
-		g_StudioAPIVk.GetSyncMgr().ReleaseSemaphore( renderFinishedSemaphores[index] );
+		if ( renderFinishedSemaphores[index] )
+		{
+			g_StudioAPIVk.GetSyncMgr().ReleaseSemaphore( renderFinishedSemaphores[index] );
+		}
 	}
 	renderFinishedSemaphores.clear();
 
 	// Reset values
 	Mem_Memzero( &vkSurfaceFormat, sizeof( VkSurfaceFormatKHR ) );
+	vkSwapChain		  = VK_NULL_HANDLE;
+	vkSurface		  = VK_NULL_HANDLE;
 	size			  = vector2i_t( 0, 0 );
 	currentImageIndex = 0;
 	windowHandle	  = INVALID_WINDOW_HANDLE;
 	bUseVSync		  = false;
+	bImageAcquired	  = false;
+	status			  = STUDIOAPI_SWAPCHAIN_STATUS_NOT_CREATED;
 
 	if ( onStudioAPIVkShutdownHandle != INVALID_HANDLE )
 	{
@@ -465,14 +480,16 @@ void CStudioAPISwapChainVk::Resize( uint32 width, uint32 height )
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Save the new size
-	size.x = width;
-	size.y = height;
+	vector2i_t oldSize = size;
+	size.x			   = width;
+	size.y			   = height;
 
 	// Re-create the swap chain
 	if ( !ReCreate() )
 	{
+		// If failed we restore old size
+		size = oldSize;
 		Error( "StudioAPIVk: Failed to re-create the swap chain with size %ix%i", width, height );
-		Destroy();
 		return;
 	}
 }
@@ -485,9 +502,7 @@ CStudioAPISwapChainVk::AcquireNextImage
 bool CStudioAPISwapChainVk::AcquireNextImage()
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-
-	// Acquire the next image only if the swap chain is created
-	Assert( IsCreated() );
+	Assert( status != STUDIOAPI_SWAPCHAIN_STATUS_NOT_CREATED );
 
 	// Get the index of the next swap chain image we should render to
 	// We'll wait with an "infinite" timeout, the function will block until an image is ready
@@ -522,16 +537,24 @@ bool CStudioAPISwapChainVk::AcquireNextImage()
 	// Revert semaphore index if the image is out of date
 	if ( vkResult == VK_ERROR_OUT_OF_DATE_KHR )
 	{
+		status = STUDIOAPI_SWAPCHAIN_STATUS_OUT_OF_DATE;
 		return false;
 	}
-	// Other result except VK_SUBOPTIMAL_KHR is critical
-	else if ( vkResult != VK_SUBOPTIMAL_KHR )
+	// Update the status to suboptimal if we received VK_SUBOPTIMAL_KHR
+	else if ( vkResult == VK_SUBOPTIMAL_KHR )
+	{
+		status = STUDIOAPI_SWAPCHAIN_STATUS_SUBOPTIMAL;
+	}
+	// Other the result is critical
+	else
 	{
 		STUDIOAPI_VK_VERIFY_RESULT( vkResult );
 	}
 	currentImageIndex = imageIndex;
+	bImageAcquired	  = true;
 
 	// We are done
+	Assert( !pImageAvailableSemaphore->IsSignaled() );
 	pImageAvailableSemaphore->Signal();
 	return true;
 }
@@ -560,17 +583,41 @@ CStudioAPISwapChainVk::Present
 bool CStudioAPISwapChainVk::Present()
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	Assert( status != STUDIOAPI_SWAPCHAIN_STATUS_NOT_CREATED );
+	if ( !bImageAcquired )
+	{
+		return false;
+	}
 
-	// Present the frame if the swap chain is created
-	Assert( IsCreated() );
-
-	// Get the current render finished semaphore
+	// Submit a dummy command buffer if the swap chain image was received but not presented
 	CStudioAPISemaphoreVk* pRenderFinishedSemaphore = GetRenderFinishedSemaphore();
+	if ( !pRenderFinishedSemaphore->IsSignaled() )
+	{
+		CRefPtr<IStudioAPICmdContext>	pGraphicsCmdContext	  = g_StudioAPIVk.GetImmediateCmdContext( STUDIOAPI_QUEUE_TYPE_GRAPHICS );
+		CRefPtr<IStudioAPICmdListBatch> pGraphicsCmdListBatch = g_StudioAPIVk.CreateCmdListBatch( pGraphicsCmdContext );
+		CRefPtr<IStudioAPICmdList>		pGraphicsCmdList	  = g_StudioAPIVk.CreateCmdList( pGraphicsCmdContext );
+
+		pGraphicsCmdList->BeginRecord();
+		pGraphicsCmdList->SetViewport( 0.f, 0.f, (float)size.x, (float)size.y, 0.f, 1.f );
+		pGraphicsCmdList->SetScissor( 0, 0, size.x, size.y );
+		{
+			studioAPIBarrier_t barriers[] = {
+				StudioAPI_MakeTextureBarrier( GetCurrentImage(), STUDIOAPI_TEXTURE_LAYOUT_PRESENT, STUDIOAPI_QUEUE_TYPE_GRAPHICS )
+			};
+			pGraphicsCmdList->Barrier( barriers, ARRAYSIZE( barriers ) );
+		}
+		pGraphicsCmdList->EndRecord();
+
+		pGraphicsCmdListBatch->AddCmdList( pGraphicsCmdList );
+		pGraphicsCmdListBatch->SyncSwapChain( this, STUDIOAPI_SYNC_SWAPCHAIN_FLAGS_ACQUIRE_NEXT_IMAGE | STUDIOAPI_SYNC_SWAPCHAIN_FLAGS_PRESENT_TO_IMAGE );
+		g_StudioAPIVk.SubmitCmdListBatch( pGraphicsCmdListBatch );
+	}
 	Assert( pRenderFinishedSemaphore->IsSignaled() );
 
 	// Present the back buffer with synchronization of render finished signal
 	VkSemaphore		 vkPresentWaitSemaphore = pRenderFinishedSemaphore->GetVkSemaphore();
 	VkPresentInfoKHR vkPresentInfo			= {};
+	bImageAcquired							= false;
 	vkPresentInfo.sType						= VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 	vkPresentInfo.pWaitSemaphores			= &vkPresentWaitSemaphore;
 	vkPresentInfo.waitSemaphoreCount		= 1;
@@ -584,10 +631,16 @@ bool CStudioAPISwapChainVk::Present()
 	// Exit from the method if the swap chain is out of date
 	if ( vkResult == VK_ERROR_OUT_OF_DATE_KHR )
 	{
+		status = STUDIOAPI_SWAPCHAIN_STATUS_OUT_OF_DATE;
 		return false;
 	}
-	// Other result except VK_SUBOPTIMAL_KHR is critical
-	else if ( vkResult != VK_SUBOPTIMAL_KHR )
+	// Update the status to suboptimal if we received VK_SUBOPTIMAL_KHR
+	else if ( vkResult == VK_SUBOPTIMAL_KHR )
+	{
+		status = STUDIOAPI_SWAPCHAIN_STATUS_SUBOPTIMAL;
+	}
+	// Other the result is critical
+	else
 	{
 		STUDIOAPI_VK_VERIFY_RESULT( vkResult );
 	}
@@ -696,10 +749,20 @@ bool CStudioAPISwapChainVk::IsUseVSync() const
 
 /*
 ==================
-CStudioAPISwapChainVk::IsValid
+CStudioAPISwapChainVk::IsImageAcquired
 ==================
 */
-bool CStudioAPISwapChainVk::IsValid() const
+bool CStudioAPISwapChainVk::IsImageAcquired() const
 {
-	return IsCreated();
+	return bImageAcquired;
+}
+
+/*
+==================
+CStudioAPISwapChainVk::GetStatus
+==================
+*/
+studioAPISwapChainStatus_t CStudioAPISwapChainVk::GetStatus() const
+{
+	return status;
 }

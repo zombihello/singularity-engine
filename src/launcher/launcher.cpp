@@ -21,6 +21,8 @@
 class CGameViewportClient : public CBaseStudioViewportClient<IStudioViewportClient>
 {
 public:
+	// IStudioViewportClient interface
+	virtual void DrawFrame( IStudioViewport* pStudioViewport ) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -60,6 +62,16 @@ private:
 	IWindowMgr::IOnWindowEvent::handle_t	   onWindowEventHandle;
 	IWindowMgr::IOnChangedMainWindow::handle_t onChangedMainWindowHandle;
 };
+
+/*
+==================
+CGameViewportClient::DrawFrame
+==================
+*/
+void CGameViewportClient::DrawFrame( IStudioViewport* pStudioViewport )
+{
+	g_pGame->FrameDraw( pStudioViewport );
+}
 
 /*
 ==================
@@ -276,14 +288,16 @@ int32 CLauncherApp::Main()
 
 		// Update the resource system and the game
 		g_pResourceSystem->FrameUpdate();
-		g_pGame->FrameUpdate();
+		g_pGame->FrameUpdate( 0.f );
 
 		// Execute pending commands
 		g_pCmdSystem->ExecuteCommands();
 
 		// Flush render commands and draw the frame
 		Studio_FlushRenderCommands();
+		g_pStudioRender->BeginFrame();
 		pStudioViewport->DrawFrame();
+		g_pStudioRender->EndFrame();
 
 		// Go to next profiler frame
 #if ENABLE_PROFILING
@@ -350,7 +364,7 @@ void CLauncherApp::Shutdown()
 	// Destroy the viewport and the main window
 	if ( pStudioViewport )
 	{
-		pStudioViewport->Destroy();
+		pStudioViewport->Shutdown();
 		pStudioViewport = NULL;
 	}
 	g_pWindowMgr->DestroyWindow( g_pWindowMgr->GetMainWindowId() );

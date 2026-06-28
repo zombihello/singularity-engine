@@ -2,9 +2,7 @@
 #include "game/shared/game.h"
 #include "game/shared/ecs/ecs_core.h"
 #include "game/shared/ecs/ecs_common.gen.h"
-#include "game/shared/ecs/ecs_movement.gen.h"
 #include "game/shared/ecs/ecs_render.gen.h"
-#include "game/shared/ecs/ecs_camera.gen.h"
 
 /*
 ==================
@@ -29,8 +27,6 @@ void EcsInitModules_Gameframework()
 {
 	EcsInitReflection_Common();
 	EcsInitReflection_Render();
-	EcsInitReflection_Movement();
-	EcsInitReflection_Camera();
 }
 
 /*
@@ -42,8 +38,6 @@ void EcsInitWorld_GameframeworkOnly( CEcsWorld& ecsWorld )
 {
 	ecsWorld.RegisterModule<ecsModuleCommon_t>();
 	ecsWorld.RegisterModule<ecsModuleRender_t>();
-	ecsWorld.RegisterModule<ecsModuleMovement_t>();
-	ecsWorld.RegisterModule<ecsModuleCamera_t>();
 
 	ecsWorld.SetResource( ecsResourceWindowMgr_t{ g_pWindowMgr } );
 	ecsWorld.SetResource( ecsResourceStudioRender_t{ g_pStudioRender } );

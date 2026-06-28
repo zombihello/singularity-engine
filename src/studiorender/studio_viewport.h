@@ -12,7 +12,7 @@ class CStudioViewport : public CRefCounted<IStudioViewport>, private CStudioRend
 public:
 	// IStudioViewport interface
 	virtual void Init( windowHandle_t windowHandle, uint32 width, uint32 height, bool bUseVSync = false ) override;
-	virtual void Destroy() override;
+	virtual void Shutdown() override;
 
 	virtual void Resize( uint32 newWidth, uint32 newHeight ) override;
 	virtual void Update( float deltaSeconds ) override;
@@ -55,7 +55,8 @@ private:
 	virtual void ReleaseStudioAPI() override;
 
 	// Part of DrawFrame() function that executes at the render thread
-	void		R_DrawFrame( bool bShouldPresent );
+	void		R_AcquireNextImage( bool bShouldPresent );
+	void		R_Present( bool bShouldPresent );
 	static void OnSwapChainReCreated( void* pUserData, IStudioAPISwapChain* pStudioAPISwapChain, bool bChangedImageFormat );
 
 	uint32 AcquireIndex();

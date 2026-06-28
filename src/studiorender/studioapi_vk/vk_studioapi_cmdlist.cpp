@@ -158,7 +158,7 @@ void CStudioAPICmdListVk::BeginRenderPass( IStudioAPIRenderPass* pRenderPass, IS
 
 	CStudioAPIRenderPassVk*	 pStudioAPIRenderPass  = (CStudioAPIRenderPassVk*)pRenderPass;
 	CStudioAPIFrameBufferVk* pStudioAPIFrameBuffer = (CStudioAPIFrameBufferVk*)pFrameBuffer;
-	vector2i_t					 frameBufferSize	   = pStudioAPIFrameBuffer->GetSize();
+	vector2i_t				 frameBufferSize	   = pStudioAPIFrameBuffer->GetSize();
 	VkRenderPassBeginInfo	 vkRenderPassBeginInfo = {};
 	vkRenderPassBeginInfo.sType					   = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 	vkRenderPassBeginInfo.renderPass			   = pStudioAPIRenderPass->GetVkRenderPass();
@@ -204,6 +204,17 @@ void CStudioAPICmdListVk::SetVertexBuffer( uint32 slot, IStudioAPIBuffer* pVerte
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	pCmdContext->SetVertexBuffer( this, slot, (CStudioAPIBufferVk*)pVertexBuffer, offset );
+}
+
+/*
+==================
+CStudioAPICmdListVk::SetIndexBuffer
+==================
+*/
+void CStudioAPICmdListVk::SetIndexBuffer( IStudioAPIBuffer* pIndexBuffer, uint64 offset )
+{
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	pCmdContext->SetIndexBuffer( this, (CStudioAPIBufferVk*)pIndexBuffer, offset );
 }
 
 /*
@@ -277,10 +288,10 @@ void CStudioAPICmdListVk::Draw( uint32 baseVertexIndex, uint32 numVertices, uint
 CStudioAPICmdListVk::DrawIndexed
 ==================
 */
-void CStudioAPICmdListVk::DrawIndexed( IStudioAPIBuffer* pIndexBuffer, uint32 baseVertexIndex, uint32 baseIndex, uint32 numIndices, uint32 numInstances /* = 1 */ )
+void CStudioAPICmdListVk::DrawIndexed( uint32 baseVertexIndex, uint32 baseIndex, uint32 numIndices, uint32 numInstances /* = 1 */ )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-	pCmdContext->DrawIndexed( this, (CStudioAPIBufferVk*)pIndexBuffer, baseVertexIndex, baseIndex, numIndices, numInstances );
+	pCmdContext->DrawIndexed( this, baseVertexIndex, baseIndex, numIndices, numInstances );
 }
 
 /*
@@ -829,10 +840,10 @@ void CStudioAPICmdListBatchMgrVk::Submit( CStudioAPICmdListBatchVk* pCmdListBatc
 	Assert( pCmdListBatch->GetCmdContext() == &cmdContext );
 
 	// Grab from the batch all synchronization signals, waits and command buffers
-	eastl::vector<VkSemaphore>		  vkSignalSemaphores;
-	eastl::vector<VkSemaphore>		  vkWaitSemaphores;
+	eastl::vector<VkSemaphore>			vkSignalSemaphores;
+	eastl::vector<VkSemaphore>			vkWaitSemaphores;
 	eastl::vector<VkPipelineStageFlags> vkWaitStageMasks;
-	eastl::vector<VkCommandBuffer>	  vkCommandBuffers;
+	eastl::vector<VkCommandBuffer>		vkCommandBuffers;
 	GrabVkSyncSignalsFromBatch( pCmdListBatch, vkSignalSemaphores );
 	GrabVkSyncWaitsFromBatch( pCmdListBatch, vkWaitSemaphores, vkWaitStageMasks );
 	GrabVkCmdBuffersFromBatch( pCmdListBatch, vkCommandBuffers );
@@ -854,7 +865,7 @@ void CStudioAPICmdListBatchMgrVk::Submit( CStudioAPICmdListBatchVk* pCmdListBatc
 	bool bWaitResult = false;
 	if ( bWait )
 	{
-		bWaitResult = pFence->Wait( waitTime != 0 ? ( uint64 )( waitTime * 1e9 ) : UINT64_MAX );
+		bWaitResult = pFence->Wait( waitTime != 0 ? (uint64)( waitTime * 1e9 ) : UINT64_MAX );
 		if ( bWaitResult )
 		{
 			g_StudioAPIVk.GetSyncMgr().ReleaseFence( pFence );
@@ -888,7 +899,7 @@ bool CStudioAPICmdListBatchMgrVk::Wait( CStudioAPICmdListBatchVk* pCmdListBatch,
 	auto it = submittedBatchesDict.find( pCmdListBatch );
 	if ( it != submittedBatchesDict.end() )
 	{
-		bool bResult = it->second->Wait( waitTime != 0 ? ( uint64 )( waitTime * 1e9 ) : UINT64_MAX );
+		bool bResult = it->second->Wait( waitTime != 0 ? (uint64)( waitTime * 1e9 ) : UINT64_MAX );
 		if ( bResult )
 		{
 			g_StudioAPIVk.GetSyncMgr().ReleaseFence( it->second );

@@ -179,6 +179,7 @@ CStudioAPISyncMgrVk::ReleaseSemaphore
 void CStudioAPISyncMgrVk::ReleaseSemaphore( CStudioAPISemaphoreVk*& pSemaphore )
 {
 	// Remove the semaphore from the used list
+	Assert( pSemaphore != NULL );
 	semaphores.remove( pSemaphore );
 
 	// Add the semaphore into the pending list to release

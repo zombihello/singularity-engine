@@ -14,11 +14,3 @@ component Quad
 	[serialize][name="Material"] 
 	CResourcePtr<IMaterial>			pMaterial;
 }
-
-[stage="on_update", profiler_group="scene"]
-system QuadInit
-{
-	read: 				Quad quad;
-	read_resource:		StudioRender	studioRender;
-	exclude: 			StudioRenderObject;
-}

@@ -13,11 +13,8 @@ class IStudioViewportClient
 {
 public:
 	virtual ~IStudioViewportClient() {}
-	virtual void Update( float deltaSeconds ) = 0;
-
-	virtual void DrawFrame( IStudioViewport* pStudioViewport )		  = 0;
-	virtual void R_BeginDrawFrame( IStudioViewport* pStudioViewport ) = 0;
-	virtual void R_EndDrawFrame( IStudioViewport* pStudioViewport )	  = 0;
+	virtual void Update( float deltaSeconds )				   = 0;
+	virtual void DrawFrame( IStudioViewport* pStudioViewport ) = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -28,7 +25,5 @@ class CBaseStudioViewportClient : public TBaseClass
 {
 public:
 	virtual void Update( float deltaSeconds ) override {}
-	virtual void DrawFrame( class IStudioViewport* pStudioViewport ) override {}
-	virtual void R_BeginDrawFrame( IStudioViewport* pStudioViewport ) override {}
-	virtual void R_EndDrawFrame( IStudioViewport* pStudioViewport ) override {}
+	virtual void DrawFrame( IStudioViewport* pStudioViewport ) override {}
 };

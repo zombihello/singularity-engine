@@ -1,13 +1,7 @@
 module Render;
 using "studiorender/istudiorender.h";
-using "studiorender/istudio_renderobject.h";
 
 resource StudioRender
 {
 	IStudioRender*		pStudioRender;
-}
-
-component StudioRenderObject
-{
-	CRefPtr<IStudioRenderObject>	pStudioRenderObject;
 }

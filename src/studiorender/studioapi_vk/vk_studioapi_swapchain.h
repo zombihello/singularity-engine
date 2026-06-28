@@ -57,14 +57,15 @@ public:
 	virtual bool Present() override;
 	virtual bool ReCreate() override;
 
-	virtual bool					  IsUseVSync() const override;
-	virtual bool					  IsValid() const override;
-	virtual vector2i_t				  GetSize() const override;
-	virtual uint32					  GetCurrentImageIndex() const override;
-	virtual IStudioAPISwapChainImage* GetCurrentImage() const override;
-	virtual uint32					  GetNumImages() const override;
-	virtual IStudioAPISwapChainImage* GetImage( uint32 index ) const override;
-	virtual windowHandle_t			  GetWindowHandle() const override;
+	virtual bool					   IsUseVSync() const override;
+	virtual bool					   IsImageAcquired() const override;
+	virtual studioAPISwapChainStatus_t GetStatus() const override;
+	virtual vector2i_t				   GetSize() const override;
+	virtual uint32					   GetCurrentImageIndex() const override;
+	virtual IStudioAPISwapChainImage*  GetCurrentImage() const override;
+	virtual uint32					   GetNumImages() const override;
+	virtual IStudioAPISwapChainImage*  GetImage( uint32 index ) const override;
+	virtual windowHandle_t			   GetWindowHandle() const override;
 
 	virtual IOnReCreated* OnReCreated() const override;
 
@@ -78,7 +79,6 @@ public:
 
 	VkSurfaceFormatKHR GetVkSurfaceFormat() const;
 	VkSwapchainKHR	   GetVkSwapChain() const;
-	bool			   IsCreated() const;
 
 	// NOTE: The semaphore must be set as wait semaphore at begin of a frame
 	// NOTE: The semaphore valid only from AcquireNextImage call and to Present
@@ -92,6 +92,8 @@ private:
 	static void OnStudioAPIVkShutdown( void* pUserData );
 
 	bool									   bUseVSync;
+	bool									   bImageAcquired;
+	studioAPISwapChainStatus_t				   status;
 	windowHandle_t							   windowHandle;
 	VkSurfaceKHR							   vkSurface;
 	VkSwapchainKHR							   vkSwapChain;

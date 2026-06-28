@@ -12,8 +12,6 @@
 #include "game/imap.h"
 #include "game/shared/ecs/ecs_core.h"
 #include "game/shared/ecs/ecs_common.gen.h"
-#include "game/shared/ecs/ecs_movement.gen.h"
-#include "game/shared/ecs/ecs_camera.gen.h"
 #include "game/citadel/ecs/ecs_testdraw.gen.h"
 #include "tier1/cmdlink.h"
 
@@ -194,17 +192,4 @@ CCitadelGame::GetGameDescription
 const char* CCitadelGame::GetGameDescription() const
 {
 	return "Citadel";
-}
-
-/*
-==================
-CEcsSystemQuadDraw::OnUpdate
-==================
-*/
-void CEcsSystemQuadInit::OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity, const ecsComponentQuad_t& quad, const ecsResourceStudioRender_t& studioRender )
-{
-	ecsComponentStudioRenderObject_t studioRenderObjectComponent;
-	studioRenderObjectComponent.pStudioRenderObject = studioRender.pStudioRender->CreateQuadRenderObject( quad.pMaterial, quad.pVertexBuffer, quad.pIndexBuffer );
-	studioRender.pStudioRender->RegisterObject( studioRenderObjectComponent.pStudioRenderObject );
-	ecsWorld.SetComponent( entity, eastl::move( studioRenderObjectComponent ) );
 }

@@ -186,10 +186,10 @@ void CStudioViewport::Init( windowHandle_t windowHandle, uint32 width, uint32 he
 
 /*
 ==================
-CStudioViewport::Destroy
+CStudioViewport::Shutdown
 ==================
 */
-void CStudioViewport::Destroy()
+void CStudioViewport::Shutdown()
 {
 	windowHandle = INVALID_WINDOW_HANDLE;
 	size		 = vector2i_t( 0, 0 );
@@ -243,78 +243,87 @@ void CStudioViewport::DrawFrame( bool bShouldPresent /* = true */ )
 		return;
 	}
 
-	// Submit of geometries to the studio render
-	g_StudioRender.BeginFrame();
+	// Acquire the next swap chain image on the render thread
+	UNIQUE_RENDER_COMMAND_TWOPARAMETER( CStudioViewportCmd_AcquireNextImage,
+										CStudioViewport*, pStudioViewport, this,
+										bool, bShouldPresent, bShouldPresent,
+										{
+											pStudioViewport->R_AcquireNextImage( bShouldPresent );
+										} );
+
+	// Draw a frame by the client
 	if ( pStudioViewportClient )
 	{
 		pStudioViewportClient->DrawFrame( this );
 	}
-	g_StudioRender.EndFrame();
 
-	// Draw the viewport
-	UNIQUE_RENDER_COMMAND_TWOPARAMETER( CStudioRenderCmd_DrawFrame,
+	// Present the frame on the render thread
+	UNIQUE_RENDER_COMMAND_TWOPARAMETER( CStudioViewportCmd_Present,
 										CStudioViewport*, pStudioViewport, this,
 										bool, bShouldPresent, bShouldPresent,
 										{
-											pStudioViewport->R_DrawFrame( bShouldPresent );
+											pStudioViewport->R_Present( bShouldPresent );
 										} );
 }
 
 /*
 ==================
-CStudioViewport::R_DrawFrame
+CStudioViewport::R_AcquireNextImage
 ==================
 */
-void CStudioViewport::R_DrawFrame( bool bShouldPresent )
+void CStudioViewport::R_AcquireNextImage( bool bShouldPresent )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-
-	// Don't draw a new frame if the swap chain is invalid
-	if ( !pStudioAPISwapChain->IsValid() )
-	{
-		Warning( "StudioRender: Couldn't to begin drawing a new frame due to the swap chain is invalid" );
-		return;
-	}
-
-	// Begin draw a new frame
-	g_pStudioAPI->BeginDrawingFrame();
-
-	// Acquire the next swap chain image and recreate it if need
-	if ( !pStudioAPISwapChain->AcquireNextImage() )
-	{
-		if ( !pStudioAPISwapChain->ReCreate() )
-		{
-			Warning( "StudioRender: Failed to re-create the swap chain" );
-			return;
-		}
-
-		// Retry to acquire the swap chain image
-		pStudioAPISwapChain->AcquireNextImage();
-	}
-
-	// Draw the frame
 	AssertMsg( !s_pActiveViewport, "Only into one viewport we can draw in one time" );
 	s_pActiveViewport = this;
-	if ( pStudioViewportClient )
+
+	// Don't acquire the next image if we shouldn't present it
+	if ( !bShouldPresent )
 	{
-		pStudioViewportClient->R_BeginDrawFrame( this );
+		return;
 	}
-	g_StudioRender.R_DrawFrame( this );
-	if ( pStudioViewportClient )
+	Assert( pStudioAPISwapChain->GetStatus() != STUDIOAPI_SWAPCHAIN_STATUS_NOT_CREATED );
+
+	// Re-create the swap chain if it hasn't OK status
+	if ( pStudioAPISwapChain->GetStatus() != STUDIOAPI_SWAPCHAIN_STATUS_OK && !pStudioAPISwapChain->ReCreate() )
 	{
-		pStudioViewportClient->R_EndDrawFrame( this );
+		studioAPISwapChainStatus_t status = pStudioAPISwapChain->GetStatus();
+		DevWarning( "StudioRender: Failed to re-create the swap chain (%p). Frame: %i, Swap chain status: 0x%X", pStudioAPISwapChain, g_pStudioAPI->GetFrameNumber(), status );
+		if ( status == STUDIOAPI_SWAPCHAIN_STATUS_OUT_OF_DATE )
+		{
+			return;
+		}
 	}
+
+	// Acquire the next swap chain image
+	if ( !pStudioAPISwapChain->AcquireNextImage() )
+	{
+		DevWarning( "StudioRender: Failed to acquire the next image. Frame: %i, Swap chain status: 0x%X", g_pStudioAPI->GetFrameNumber(), pStudioAPISwapChain->GetStatus() );
+	}
+}
+
+/*
+==================
+CStudioViewport::R_Present
+==================
+*/
+void CStudioViewport::R_Present( bool bShouldPresent )
+{
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	s_pActiveViewport = NULL;
 
-	// Present the frame and re-create it if the one is out of date
-	if ( bShouldPresent && !pStudioAPISwapChain->Present() )
+	// Don't present the frame if we shouldn't do it
+	if ( !bShouldPresent )
 	{
-		pStudioAPISwapChain->ReCreate();
-		Warning( "StudioRender: Present of the swap chain back buffer have been skipped, because the swap chain was out of date" );
+		return;
 	}
+	Assert( pStudioAPISwapChain->GetStatus() != STUDIOAPI_SWAPCHAIN_STATUS_NOT_CREATED );
 
-	// End draw the frame
-	g_pStudioAPI->EndDrawingFrame();
+	// Present the frame
+	if ( !pStudioAPISwapChain->Present() )
+	{
+		DevWarning( "StudioRender: Present the frame was skipped. Frame: %i, Swap chain status: 0x%X", g_pStudioAPI->GetFrameNumber(), pStudioAPISwapChain->GetStatus() );
+	}
 }
 
 /*

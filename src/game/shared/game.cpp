@@ -4,8 +4,6 @@
 #include "resourcesystem/iresourcesystem.h"
 #include "game/shared/ecs/ecs_core.h"
 #include "game/shared/ecs/ecs_common.gen.h"
-#include "game/shared/ecs/ecs_movement.gen.h"
-#include "game/shared/ecs/ecs_camera.gen.h"
 #include "game/shared/ecs/ecs_entitydesc.h"
 #include "game/shared/game.h"
 
@@ -117,9 +115,6 @@ void CGame::Shutdown()
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
 
-	// Unregister all render objects
-	g_pStudioRender->UnregisterAllObjects();
-
 	// Shutdown the active map
 	MapShutdown();
 
@@ -179,12 +174,26 @@ void CGame::MapShutdown()
 CGame::FrameUpdate
 ==================
 */
-void CGame::FrameUpdate()
+void CGame::FrameUpdate( float deltaTime )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
 	if ( pActiveEcsMap )
 	{
-		pActiveEcsMap->Update( 0.f );
+		pActiveEcsMap->Update( deltaTime );
+	}
+}
+
+/*
+==================
+CGame::FrameDraw
+==================
+*/
+void CGame::FrameDraw( IStudioViewport* pStudioViewport )
+{
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	if ( pActiveEcsMap )
+	{
+		// TODO BS yehor.pohuliaka - Implement here drawing scene by the studio render
 	}
 }
 

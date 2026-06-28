@@ -63,16 +63,6 @@ FORCEINLINE VkSwapchainKHR CStudioAPISwapChainVk::GetVkSwapChain() const
 
 /*
 ==================
-CStudioAPISwapChainVk::IsCreated
-==================
-*/
-FORCEINLINE bool CStudioAPISwapChainVk::IsCreated() const
-{
-	return vkSwapChain != VK_NULL_HANDLE;
-}
-
-/*
-==================
 CStudioAPISwapChainVk::GetImageAvailableSemaphore
 ==================
 */

@@ -7,69 +7,12 @@
 
 /*
 ==================
-CStudioRenderPassPresent::Init
-==================
-*/
-void CStudioRenderPassPresent::Init()
-{
-}
-
-/*
-==================
-CStudioRenderPassPresent::Shutdown
-==================
-*/
-void CStudioRenderPassPresent::Shutdown()
-{
-}
-
-/*
-==================
 CStudioRenderPassPresent::R_DrawPass
 ==================
 */
-void CStudioRenderPassPresent::R_DrawPass( CStudioViewport* pViewport, CStudioRenderObjectQuad* pQuad )
+void CStudioRenderPassPresent::R_DrawPass( CStudioViewport* pViewport )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-	IStudioAPIBuffer*				pQuadVertexBuffer	  = pQuad->GetStudioAPIVertexBuffer();
-	IStudioAPIBuffer*				pQuadIndexBuffer	  = pQuad->GetStudioAPIIndexBuffer();
-	IMaterialResource*				pQuadMaterialResource = pQuad->GetMaterialResource();
-	IShader*						pShader				  = pQuadMaterialResource->GetShader();
-	IShaderContextData*				pShaderContextData	  = pQuadMaterialResource->GetContextData();
-	vector2i_t						viewportSize		  = pViewport->GetSize();
-	IStudioAPISwapChain*			pStudioAPISwapChain	  = pViewport->GetStudioAPISwapChain();
-	CRefPtr<IStudioAPICmdContext>	pGraphicsCmdContext	  = g_pStudioAPI->GetImmediateCmdContext( STUDIOAPI_QUEUE_TYPE_GRAPHICS );
-	CRefPtr<IStudioAPICmdListBatch> pGraphicsCmdListBatch = g_pStudioAPI->CreateCmdListBatch( pGraphicsCmdContext );
-	CRefPtr<IStudioAPICmdList>		pGraphicsCmdList	  = g_pStudioAPI->CreateCmdList( pGraphicsCmdContext );
-	pGraphicsCmdList->BeginRecord();
-	pGraphicsCmdList->SetViewport( 0.f, 0.f, (float)viewportSize.x, (float)viewportSize.y, 0.f, 1.f );
-	pGraphicsCmdList->SetScissor( 0, 0, viewportSize.x, viewportSize.y );
-	{
-		studioAPIBarrier_t barriers[] = {
-			StudioAPI_MakeBufferBarrier( pQuadVertexBuffer, STUDIOAPI_BUFFER_STATE_VERTEX_BUFFER, STUDIOAPI_QUEUE_TYPE_GRAPHICS ),
-			StudioAPI_MakeBufferBarrier( pQuadIndexBuffer, STUDIOAPI_BUFFER_STATE_INDEX_BUFFER, STUDIOAPI_QUEUE_TYPE_GRAPHICS ),
-			StudioAPI_MakeTextureBarrier( pStudioAPISwapChain->GetCurrentImage(), STUDIOAPI_TEXTURE_LAYOUT_COLOR_RENDER_TARGET, STUDIOAPI_QUEUE_TYPE_GRAPHICS )
-		};
-		pGraphicsCmdList->Barrier( barriers, ARRAYSIZE( barriers ) );
-	}
-	pShader->R_Barrier( pGraphicsCmdList, pShaderContextData );
-	pGraphicsCmdList->BeginRenderPass( pViewport->GetStudioAPIRenderPass(), pViewport->GetStudioAPIFrameBuffer() );
-	pShader->R_PrepareForDraw( pGraphicsCmdList, pShaderContextData, STUDIO_RENDERPASS_TYPE_PRESENT );
-	pGraphicsCmdList->SetVertexBuffer( 0, pQuadVertexBuffer, 0 );
-	pGraphicsCmdList->DrawIndexed( pQuadIndexBuffer, 0, 0, 6, 10 );
-	pGraphicsCmdList->EndRenderPass();
-
-	{
-		studioAPIBarrier_t barriers[] = {
-			StudioAPI_MakeTextureBarrier( pStudioAPISwapChain->GetCurrentImage(), STUDIOAPI_TEXTURE_LAYOUT_PRESENT, STUDIOAPI_QUEUE_TYPE_GRAPHICS )
-		};
-		pGraphicsCmdList->Barrier( barriers, ARRAYSIZE( barriers ) );
-	}
-	pGraphicsCmdList->EndRecord();
-
-	pGraphicsCmdListBatch->AddCmdList( pGraphicsCmdList );
-	pGraphicsCmdListBatch->SyncSwapChain( pStudioAPISwapChain, STUDIOAPI_SYNC_SWAPCHAIN_FLAGS_ACQUIRE_NEXT_IMAGE | STUDIOAPI_SYNC_SWAPCHAIN_FLAGS_PRESENT_TO_IMAGE );
-	g_pStudioAPI->SubmitCmdListBatch( pGraphicsCmdListBatch );
 }
 
 /*
