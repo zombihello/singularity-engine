@@ -101,6 +101,7 @@ void CEcsMap::DestroyEntity( IEntity* pEntity )
 			{
 				pEcsEntity->Destroy();
 				ecsEntities.erase( ecsEntities.begin() + index );
+				break;
 			}
 		}
 	}

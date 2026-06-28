@@ -32,10 +32,6 @@ public:
 
 	// IGame interfaces
 	virtual const char* GetGameDescription() const override;
-
-private:
-	CRefPtr<IEntity> pQuadEntity;
-	CRefPtr<IEntity> pPlayerEntity;
 };
 
 EXPOSE_INTERFACE_FN( Game, IGame, GAME_INTERFACE_VERSION );
@@ -179,8 +175,6 @@ void CCitadelGame::Shutdown()
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
 	Quad().Shutdown();
-	pQuadEntity	  = NULL;
-	pPlayerEntity = NULL;
 	CGame::Shutdown();
 }
 
