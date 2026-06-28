@@ -23,6 +23,26 @@ FORCEINLINE void CResourceData<TBaseClass>::MarkUsedDependencies()
 
 /*
 ==================
+CResourceData::MakePermanentDependencies
+==================
+*/
+template<class TBaseClass>
+FORCEINLINE void CResourceData<TBaseClass>::MakePermanentDependencies()
+{
+}
+
+/*
+==================
+CResourceData::ClearPermanentDependencies
+==================
+*/
+template<class TBaseClass>
+FORCEINLINE void CResourceData<TBaseClass>::ClearPermanentDependencies()
+{
+}
+
+/*
+==================
 CResourceData::GetResource
 ==================
 */
