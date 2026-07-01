@@ -508,7 +508,7 @@ void CResourceCompilerSMdl::InitSMDLDoc( CSMDLCompiledModelDoc& smdlCompiledFile
 	eastl::vector<uint16> indices16Bit;
 	if ( vertices.size() <= S_MaxValue<uint16>() )
 	{
-		Msg( "ModelTool: In the model count vertices less than max 16bit integer, converting indices into 16bit.." );
+		Msg( "ResourceCompilerSMdl: In the model count vertices less than max 16bit integer, converting indices into 16bit.." );
 		indices16Bit.resize( indices.size() );
 		for ( uint32 index = 0, count = (uint32)indices.size(); index < count; ++index )
 		{
@@ -516,11 +516,11 @@ void CResourceCompilerSMdl::InitSMDLDoc( CSMDLCompiledModelDoc& smdlCompiledFile
 			indices16Bit[index] = (uint16)value;
 			if ( value > S_MaxValue<uint16>() )
 			{
-				Warning( "ModelTool: Index at %i was truncated because it was larger than a 16-bit integer", index );
+				Warning( "ResourceCompilerSMdl: Index at %i was truncated because it was larger than a 16-bit integer", index );
 				indices16Bit[index] = (uint16)( value & S_MaxValue<uint16>() );
 			}
 		}
-		Msg( "ModelTool: ..All indices are converted into 16bit" );
+		Msg( "ResourceCompilerSMdl: ..All indices are converted into 16bit" );
 	}
 
 	smdlInitialData_t initialData = {};
