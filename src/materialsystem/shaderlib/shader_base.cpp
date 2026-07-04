@@ -79,10 +79,10 @@ void CBaseShader::OnInitInstance()
 
 /*
 ==================
-CBaseShader::OnInitContextData
+CBaseShader::OnUpdateContextData
 ==================
 */
-void CBaseShader::OnInitContextData( IMaterialVar** pParams, IShaderContextData* pContextData ) const
+void CBaseShader::OnUpdateContextData( IMaterialVar** pParams, IShaderContextData* pContextData ) const
 {
 }
 

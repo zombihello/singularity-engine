@@ -186,62 +186,68 @@
 	{                                                        \
 	public:
 #define SHADER_CONTEXT_DATA_INIT_STUDIO_API	   virtual void InitStudioAPI() override
+#define SHADER_CONTEXT_DATA_UPDATE_STUDIO_API  virtual void UpdateStudioAPI() override
 #define SHADER_CONTEXT_DATA_RELEASE_STUDIO_API virtual void ReleaseStudioAPI() override
-#define END_SHADER_CONTEXT_DATA                                                                        \
-	}                                                                                                  \
-	;                                                                                                  \
-	class CShader : public CBaseShader                                                                 \
-	{                                                                                                  \
-	public:                                                                                            \
-		virtual CRefPtr<IShaderContextData> CreateContextData( IMaterialVar** pParams ) const override \
-		{                                                                                              \
-			CRefPtr<IShaderContextData> pContextData = new CShaderContextData();                       \
-			OnInitContextData( pParams, pContextData );                                                \
-			Studio_BeginInitResource( pContextData );                                                  \
-			return pContextData;                                                                       \
-		}                                                                                              \
-		virtual const char* GetName() const override                                                   \
-		{                                                                                              \
-			return s_pName;                                                                            \
-		}                                                                                              \
-		virtual const char* GetHelp() const override                                                   \
-		{                                                                                              \
-			return s_pHelpString;                                                                      \
-		}                                                                                              \
-		virtual uint32 GetFlags() const override                                                       \
-		{                                                                                              \
-			return s_Flags;                                                                            \
-		}                                                                                              \
-		virtual uint32 GetNumParams() const override                                                   \
-		{                                                                                              \
-			return (uint32)s_ShaderParams.size();                                                      \
-		}                                                                                              \
-		virtual shaderParam_t GetParam( uint32 index ) const override                                  \
-		{                                                                                              \
-			Assert( index < (uint32)s_ShaderParams.size() );                                           \
-			return s_ShaderParams[index];                                                              \
-		}                                                                                              \
-		virtual uint32 GetNumCacheNames() const override                                               \
-		{                                                                                              \
-			return ARRAYSIZE( s_pShaderCacheNames );                                                   \
-		}                                                                                              \
-		virtual const char* GetCacheName( uint32 index ) const override                                \
-		{                                                                                              \
-			Assert( index < ARRAYSIZE( s_pShaderCacheNames ) );                                        \
-			return s_pShaderCacheNames[index];                                                         \
+#define END_SHADER_CONTEXT_DATA                                                                                   \
+	}                                                                                                             \
+	;                                                                                                             \
+	class CShader : public CBaseShader                                                                            \
+	{                                                                                                             \
+	public:                                                                                                       \
+		virtual CRefPtr<IShaderContextData> CreateContextData( IMaterialVar** pParams ) const override            \
+		{                                                                                                         \
+			CRefPtr<CShaderContextData> pContextData = new CShaderContextData();                                  \
+			OnUpdateContextData( pParams, pContextData );                                                         \
+			Studio_BeginInitResource( pContextData );                                                             \
+			return pContextData;                                                                                  \
+		}                                                                                                         \
+		virtual void UpdateContextData( IMaterialVar** pParams, IShaderContextData* pContextData ) const override \
+		{                                                                                                         \
+			OnUpdateContextData( pParams, pContextData );                                                         \
+			Studio_BeginUpdateResource( (CShaderContextData*)pContextData );                                      \
+		}                                                                                                         \
+		virtual const char* GetName() const override                                                              \
+		{                                                                                                         \
+			return s_pName;                                                                                       \
+		}                                                                                                         \
+		virtual const char* GetHelp() const override                                                              \
+		{                                                                                                         \
+			return s_pHelpString;                                                                                 \
+		}                                                                                                         \
+		virtual uint32 GetFlags() const override                                                                  \
+		{                                                                                                         \
+			return s_Flags;                                                                                       \
+		}                                                                                                         \
+		virtual uint32 GetNumParams() const override                                                              \
+		{                                                                                                         \
+			return (uint32)s_ShaderParams.size();                                                                 \
+		}                                                                                                         \
+		virtual shaderParam_t GetParam( uint32 index ) const override                                             \
+		{                                                                                                         \
+			Assert( index < (uint32)s_ShaderParams.size() );                                                      \
+			return s_ShaderParams[index];                                                                         \
+		}                                                                                                         \
+		virtual uint32 GetNumCacheNames() const override                                                          \
+		{                                                                                                         \
+			return ARRAYSIZE( s_pShaderCacheNames );                                                              \
+		}                                                                                                         \
+		virtual const char* GetCacheName( uint32 index ) const override                                           \
+		{                                                                                                         \
+			Assert( index < ARRAYSIZE( s_pShaderCacheNames ) );                                                   \
+			return s_pShaderCacheNames[index];                                                                    \
 		}
 #define DECLARE_SHADER_CONTEXT_DATA( Name ) CShaderContextData* Name = (CShaderContextData*)pContextData;
 
 //-----------------------------------------------------------------------------
 // Helper macros to implement shader functions
 //-----------------------------------------------------------------------------
-#define SHADER_INIT				 virtual void OnInitInstance() override
-#define SHADER_INIT_PARAMS		 virtual void InitDefaultParams( IMaterialVar** pParams ) const override
-#define SHADER_FALLBACK			 virtual const char* GetFallbackShader() const override
-#define SHADER_INIT_CONTEXT_DATA virtual void OnInitContextData( IMaterialVar** pParams, IShaderContextData* pContextData ) const override
-#define SHADER_SELECT_COMBO		 virtual void R_SelectCombo( IShaderContextData* pContextData, shaderComboInfo_t& comboInfo ) override
-#define SHADER_DRAW				 virtual void R_OnDraw( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData ) override
-#define SHADER_BARRIER			 virtual void R_Barrier( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData ) const override
+#define SHADER_INIT				   virtual void OnInitInstance() override
+#define SHADER_INIT_PARAMS		   virtual void InitDefaultParams( IMaterialVar** pParams ) const override
+#define SHADER_FALLBACK			   virtual const char* GetFallbackShader() const override
+#define SHADER_UPDATE_CONTEXT_DATA virtual void OnUpdateContextData( IMaterialVar** pParams, IShaderContextData* pContextData ) const override
+#define SHADER_SELECT_COMBO		   virtual void R_SelectCombo( IShaderContextData* pContextData, shaderComboInfo_t& comboInfo ) override
+#define SHADER_DRAW				   virtual void R_OnDraw( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData ) override
+#define SHADER_BARRIER			   virtual void R_Barrier( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData ) const override
 
 //-----------------------------------------------------------------------------
 // Helper macros to set shader caches
@@ -272,7 +278,7 @@
 // Base shader context data
 // NOTE: Shaders can keep per material data in classes descended from this
 //-----------------------------------------------------------------------------
-class CBaseShaderContextData : public CStudioRenderResource<CRefCounted<IShaderContextData>>
+class CBaseShaderContextData : public CRefCounted<IShaderContextData>, public CStudioRenderResource<IStudioRenderResource>
 {
 protected:
 	// IRefCounted interface
@@ -308,7 +314,7 @@ protected:
 	};
 
 	virtual void OnInitInstance();
-	virtual void OnInitContextData( IMaterialVar** pParams, IShaderContextData* pContextData ) const;
+	virtual void OnUpdateContextData( IMaterialVar** pParams, IShaderContextData* pContextData ) const;
 	virtual void R_SelectCombo( IShaderContextData* pContextData, shaderComboInfo_t& comboInfo )	= 0;
 	virtual void R_OnDraw( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData ) = 0;
 

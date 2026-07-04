@@ -1,4 +1,6 @@
 #pragma once
+#include <EASTL/atomic.h>
+
 #include "utils/interfaces/interfaces.h"
 #include "tier0/defines.h"
 #include "tier0/types.h"
@@ -36,6 +38,28 @@ public:
 
 private:
 	uint32 numSkipBytes;
+};
+
+//-----------------------------------------------------------------------------
+// Used to track pending render commands from the main thread
+//-----------------------------------------------------------------------------
+class CStudioRenderCmdFence
+{
+public:
+	CStudioRenderCmdFence();
+
+	// Adds a fence command to the render command queue.
+	// The pending fence count is incremented to reflect the pending fence command.
+	// Once the render thread has executed the fence command, it decrements the pending fence count
+	void InsertFence();
+
+	// Waits for pending fence commands to retire
+	// numFencesLeft	Maximum number of fence commands to leave in queue
+	void   Wait( uint32 numFencesLeft = 0 ) const;
+	uint32 GetNumPendingFences() const;
+
+private:
+	eastl::atomic<uint32> numPendingFences;
 };
 
 //-----------------------------------------------------------------------------
