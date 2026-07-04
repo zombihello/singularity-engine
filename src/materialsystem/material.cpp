@@ -11,37 +11,51 @@
 CMaterialResource::CMaterialResource
 ==================
 */
-CMaterialResource::CMaterialResource( IShader* pShader, IShaderContextData* pContextData )
-	: pShader( pShader )
-	, pContextData( pContextData )
+CMaterialResource::CMaterialResource()
+	: pShader( NULL )
 {
 }
 
 /*
 ==================
-CMaterialResource::FinalRelease
+CMaterialResource::Update
 ==================
 */
-void CMaterialResource::FinalRelease()
+void CMaterialResource::Update( IShader* pShader, CMaterialVar** pVars )
 {
-	if ( IsNeedDeferredDestroy() )
+	PROFILER_SCOPE_FUNC();
+	Assert( pShader && pVars );
+
+	// Create a new context data if shader has been changed
+	if ( CMaterialResource::pShader != pShader )
 	{
-		Studio_BeginDeleteResource( this );
+		// Remember a new shader and create a new context data
+		CMaterialResource::pShader = pShader;
+		pContextData			   = pShader->CreateContextData( (IMaterialVar**)pVars );
 	}
+	// Otherwise update existing the context data
 	else
 	{
-		delete this;
+		pShader->UpdateContextData( (IMaterialVar**)pVars, pContextData );
 	}
 }
 
 /*
 ==================
-CMaterialResource::ReleaseStudioAPI
+CMaterialResource::Clear
 ==================
 */
-void CMaterialResource::ReleaseStudioAPI()
+void CMaterialResource::Clear()
 {
-	pContextData->ReleaseResource();
+	// Do nothing if the studio resource isn't valid
+	PROFILER_SCOPE_FUNC();
+	if ( !IsValid() )
+	{
+		return;
+	}
+
+	// Clear all fields
+	pShader		 = NULL;
 	pContextData = NULL;
 }
 
@@ -72,7 +86,9 @@ CMaterial::CMaterial
 */
 CMaterial::CMaterial( IResource* pResource )
 	: CResourceData<IMaterial>( pResource )
+	, bDirtyStudioResource( false )
 	, pShader( NULL )
+	, pStudioResource( new CMaterialResource() )
 {
 }
 
@@ -83,7 +99,9 @@ CMaterial::CMaterial
 */
 CMaterial::CMaterial( IResource* pResource, const CSMATCompiledMaterialDoc& smatCompiledDoc )
 	: CResourceData<IMaterial>( pResource )
+	, bDirtyStudioResource( false )
 	, pShader( NULL )
+	, pStudioResource( new CMaterialResource() )
 {
 	// Initialize the material by SMAT compiled document
 	Init( smatCompiledDoc );
@@ -96,8 +114,8 @@ CMaterial::~CMaterial
 */
 CMaterial::~CMaterial()
 {
-	// Delete the studio resource
-	DeleteStudioResource();
+	// Clear the studio resource
+	ClearStudioResource();
 
 	// Free allocated memory for variables
 	for ( uint32 varIdx = 0, numVars = (uint32)vars.size(); varIdx < numVars; ++varIdx )
@@ -176,8 +194,8 @@ CMaterial::Clear
 */
 void CMaterial::Clear()
 {
-	// Delete the studio resource
-	DeleteStudioResource();
+	// Clear the studio resource
+	ClearStudioResource();
 
 	// Free allocated memory for variables
 	for ( uint32 varIdx = 0, numVars = (uint32)vars.size(); varIdx < numVars; ++varIdx )
@@ -189,7 +207,8 @@ void CMaterial::Clear()
 	vars.clear();
 	resourceVarIds.clear();
 	varsDict.clear();
-	pShader = NULL;
+	pShader				 = NULL;
+	bDirtyStudioResource = false;
 }
 
 /*
@@ -309,53 +328,54 @@ void CMaterial::ReportVarChanged( CMaterialVar* pVar, materialVarType_t oldType 
 		}
 	}
 
-	// Delete the studio resource
-	DeleteStudioResource();
+	// Insert a fence to the render thread and mark the studio resource as dirty
+	pStudioResource->GetRenderCmdFence().InsertFence();
+	bDirtyStudioResource = true;
 }
 
 /*
 ==================
-CMaterial::CreateStudioResource
+CMaterial::UpdateStudioResource
 ==================
 */
-void CMaterial::CreateStudioResource()
+void CMaterial::UpdateStudioResource()
 {
-	// Do nothing if the studio resource already created
+	// Do nothing if the studio resource isn't dirty
 	PROFILER_SCOPE_FUNC();
-	if ( pStudioResource )
+	if ( !bDirtyStudioResource )
 	{
 		return;
 	}
+	bDirtyStudioResource = false;
 
-	// Create a studio resource
-	Assert( pShader );
-	pStudioResource = new CMaterialResource( pShader, pShader->CreateContextData( (IMaterialVar**)vars.data() ) );
-	Studio_BeginInitResource( pStudioResource );
+	// Wait fences to make sure that the render thread not using the studio resource
+	pStudioResource->GetRenderCmdFence().Wait();
 
-	// Trigger event that the studio resource has been changed
-	onStudioResourceChanged.Invoke( this );
+	// Update the studio resource
+	pStudioResource->Update( pShader, vars.data() );
 }
 
 /*
 ==================
-CMaterial::DeleteStudioResource
+CMaterial::ClearStudioResource
 ==================
 */
-void CMaterial::DeleteStudioResource()
+void CMaterial::ClearStudioResource()
 {
-	// Do nothing if the studio resource already deleted
+	// Do nothing if the studio resource already isn't valid
 	PROFILER_SCOPE_FUNC();
-	if ( !pStudioResource )
+	if ( !pStudioResource->IsValid() )
 	{
 		return;
 	}
 
-	// Release the studio resource
-	Studio_BeginReleaseResource( pStudioResource );
-	pStudioResource = NULL;
+	// Insert and wait a fence to make sure that the render thread not using the studio resource
+	CStudioRenderCmdFence& renderCmdFence = pStudioResource->GetRenderCmdFence();
+	renderCmdFence.InsertFence();
+	renderCmdFence.Wait();
 
-	// Trigger event that the studio resource has been changed
-	onStudioResourceChanged.Invoke( this );
+	// Clear the studio resource
+	pStudioResource->Clear();
 }
 
 /*
@@ -365,9 +385,8 @@ CMaterial::SetShader
 */
 void CMaterial::SetShader( const char* pShaderName )
 {
-	PROFILER_SCOPE_FUNC();
-
 	// Clear the material
+	PROFILER_SCOPE_FUNC();
 	Clear();
 
 	// Keep going until there's no more fallbacks
@@ -414,6 +433,10 @@ void CMaterial::SetShader( const char* pShaderName )
 		}
 		pCurrentShaderName = pFallbackShaderName;
 	}
+
+	// Insert a fence to the render thread and mark the studio resource as dirty
+	pStudioResource->GetRenderCmdFence().InsertFence();
+	bDirtyStudioResource = true;
 }
 
 /*
@@ -478,19 +501,10 @@ CMaterial::GetShaderContextData
 */
 IMaterialResource* CMaterial::GetStudioResource() const
 {
-	if ( !pStudioResource )
+	// TODO BS yehor.pohuliaka - Remove it when will be done CIT-43
+	if ( bDirtyStudioResource )
 	{
-		const_cast<CMaterial*>( this )->CreateStudioResource();
+		const_cast<CMaterial*>( this )->UpdateStudioResource();
 	}
 	return pStudioResource;
-}
-
-/*
-==================
-CMaterial::OnStudioResourceChanged
-==================
-*/
-IMaterial::IOnStudioResourceChanged* CMaterial::OnStudioResourceChanged() const
-{
-	return &onStudioResourceChanged;
 }

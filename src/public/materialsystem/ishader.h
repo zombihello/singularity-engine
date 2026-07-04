@@ -64,7 +64,7 @@ struct shaderInitParams_t
 // Shader context data interface
 // NOTE: Shaders can keep per material data in classes descended from this
 //-----------------------------------------------------------------------------
-class IShaderContextData : public IStudioRenderResource, public IRefCounted
+class IShaderContextData : public IRefCounted
 {
 public:
 	virtual ~IShaderContextData() {}
@@ -81,9 +81,10 @@ public:
 	virtual void InitDefaultParams( IMaterialVar** pParams ) const	= 0;
 	virtual void Shutdown()											= 0;
 
-	// The function creates context data from material vars
+	// Function create and update context data from material vars
 	// NOTE: `pParams` must be size equal to shader parameters
-	virtual CRefPtr<IShaderContextData> CreateContextData( IMaterialVar** pParams ) const = 0;
+	virtual CRefPtr<IShaderContextData> CreateContextData( IMaterialVar** pParams ) const									= 0;
+	virtual void						UpdateContextData( IMaterialVar** pParams, IShaderContextData* pContextData ) const = 0;
 
 	// Place barriers into a command list
 	virtual void R_Barrier( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData ) const										   = 0;

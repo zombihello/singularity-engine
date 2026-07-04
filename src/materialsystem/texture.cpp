@@ -6,18 +6,66 @@
 CTextureResource::CTextureResource
 ==================
 */
-CTextureResource::CTextureResource( studioAPITextureType_t type, studioAPIPixelFormat_t pixelFormat, uint32 sizeX, uint32 sizeY, uint32 sizeZ, uint32 numLayers, uint32 numMipmaps, const studioAPISamplerCreateInfo_t& samplerInfo, const byte* pData /* = NULL */, uint32 dataSize /* = 0 */ )
-	: type( type )
-	, pixelFormat( pixelFormat )
-	, studioAPISamplerCreateInfo( samplerInfo )
-	, sizeX( sizeX )
-	, sizeY( sizeY )
-	, sizeZ( sizeZ )
-	, numLayers( numLayers )
-	, numMipmaps( numMipmaps )
+CTextureResource::CTextureResource()
+	: type( STUDIOAPI_TEXTURE_TYPE_1D )
+	, pixelFormat( STUDIOAPI_PIXEL_FORMAT_UNKNOWN )
+	, sizeX( 0 )
+	, sizeY( 0 )
+	, sizeZ( 0 )
+	, numLayers( 0 )
+	, numMipmaps( 0 )
 {
+	Mem_Memzero( &studioAPISamplerCreateInfo, sizeof( studioAPISamplerCreateInfo_t ) );
+}
+
+/*
+==================
+CTextureResource::Update
+==================
+*/
+void CTextureResource::Update( studioAPITextureType_t type, studioAPIPixelFormat_t pixelFormat, uint32 sizeX, uint32 sizeY, uint32 sizeZ, uint32 numLayers, uint32 numMipmaps, const studioAPISamplerCreateInfo_t& samplerInfo, const byte* pData, uint32 dataSize )
+{
+	// Copy new parameters
+	PROFILER_SCOPE_FUNC();
+	CTextureResource::type		  = type;
+	CTextureResource::pixelFormat = pixelFormat;
+	CTextureResource::sizeX		  = sizeX;
+	CTextureResource::sizeY		  = sizeY;
+	CTextureResource::sizeZ		  = sizeZ;
+	CTextureResource::numLayers	  = numLayers;
+	CTextureResource::numMipmaps  = numMipmaps;
+	studioAPISamplerCreateInfo	  = samplerInfo;
+
+	// Copy the new resource data
+	data.clear();
 	data.resize( dataSize );
 	Mem_Memcpy( data.data(), pData, dataSize );
+
+	// Begin update the resource in the render thread
+	Studio_BeginUpdateResource( this );
+}
+
+/*
+==================
+CTextureResource::Clear
+==================
+*/
+void CTextureResource::Clear()
+{
+	// Reset all fields and data
+	PROFILER_SCOPE_FUNC();
+	type		= STUDIOAPI_TEXTURE_TYPE_1D;
+	pixelFormat = STUDIOAPI_PIXEL_FORMAT_UNKNOWN;
+	sizeX		= 0;
+	sizeY		= 0;
+	sizeZ		= 0;
+	numLayers	= 0;
+	numMipmaps	= 0;
+	Mem_Memzero( &studioAPISamplerCreateInfo, sizeof( studioAPISamplerCreateInfo_t ) );
+	data.clear();
+
+	// Begin release the resource in the render thread
+	Studio_BeginReleaseResource( this );
 }
 
 /*
@@ -151,6 +199,7 @@ CTexture::CTexture( IResource* pResource )
 	, type( STUDIOAPI_TEXTURE_TYPE_1D )
 	, pixelFormat( STUDIOAPI_PIXEL_FORMAT_UNKNOWN )
 	, numLayers( 0 )
+	, pStudioResource( new CTextureResource() )
 {
 }
 
@@ -171,6 +220,11 @@ CTexture::Init
 */
 void CTexture::Init( studioAPITextureType_t type, studioAPIPixelFormat_t pixelFormat, uint32 numLayers, const textureMipMap_t* pMipmaps, uint32 numMipmaps, const studioAPISamplerCreateInfo_t& samplerInfo, const byte* pData /* = NULL */, uint32 dataSize /* = 0 */ )
 {
+	// Insert a fence to make sure that the render thread not using the studio resource
+	PROFILER_SCOPE_FUNC();
+	CStudioRenderCmdFence& renderCmdFence = pStudioResource->GetRenderCmdFence();
+	renderCmdFence.InsertFence();
+
 	// Copy a new texture parameters
 	CTexture::type		  = type;
 	CTexture::pixelFormat = pixelFormat;
@@ -181,14 +235,13 @@ void CTexture::Init( studioAPITextureType_t type, studioAPIPixelFormat_t pixelFo
 	mipmaps.resize( numMipmaps );
 	Mem_Memcpy( mipmaps.data(), pMipmaps, numMipmaps * sizeof( textureMipMap_t ) );
 
-	// Create a studio resource
+	// Wait the render command fence
+	renderCmdFence.Wait();
+
+	// Update the studio resource
 	Assert( !mipmaps.empty() );
 	const textureMipMap_t& mipmap0 = mipmaps[0];
-	pStudioResource				   = new CTextureResource( type, pixelFormat, mipmap0.sizeX, mipmap0.sizeY, mipmap0.sizeZ, numLayers, (uint32)mipmaps.size(), samplerInfo, pData, dataSize );
-	Studio_BeginInitResource( pStudioResource );
-
-	// Trigger event that the studio resource has been changed
-	onStudioResourceChanged.Invoke( this );
+	pStudioResource->Update( type, pixelFormat, mipmap0.sizeX, mipmap0.sizeY, mipmap0.sizeZ, numLayers, (uint32)mipmaps.size(), samplerInfo, pData, dataSize );
 }
 
 /*
@@ -198,21 +251,22 @@ CTexture::Destroy
 */
 void CTexture::Destroy()
 {
+	// Insert a fence to make sure that the render thread not using the studio resource
+	PROFILER_SCOPE_FUNC();
+	CStudioRenderCmdFence& renderCmdFence = pStudioResource->GetRenderCmdFence();
+	renderCmdFence.InsertFence();
+
 	// Clear some fields
 	type		= STUDIOAPI_TEXTURE_TYPE_1D;
 	pixelFormat = STUDIOAPI_PIXEL_FORMAT_UNKNOWN;
 	numLayers	= 0;
 	mipmaps.clear();
 
-	// Release the studio resource
-	if ( pStudioResource )
-	{
-		Studio_BeginReleaseResource( pStudioResource );
-		pStudioResource = NULL;
+	// Wait the render command fence
+	renderCmdFence.Wait();
 
-		// Trigger event that the studio resource has been changed
-		onStudioResourceChanged.Invoke( this );
-	}
+	// Clear the studio resource
+	pStudioResource->Clear();
 }
 
 /*
@@ -274,14 +328,4 @@ CTexture::GetStudioResource
 ITextureResource* CTexture::GetStudioResource() const
 {
 	return pStudioResource;
-}
-
-/*
-==================
-CTexture::OnStudioResourceChanged
-==================
-*/
-ITexture::IOnStudioResourceChanged* CTexture::OnStudioResourceChanged() const
-{
-	return &onStudioResourceChanged;
 }
