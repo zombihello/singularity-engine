@@ -364,7 +364,7 @@ void CLauncherApp::Shutdown()
 	// Destroy the viewport and the main window
 	if ( pStudioViewport )
 	{
-		pStudioViewport->Shutdown();
+		pStudioViewport->Destroy();
 		pStudioViewport = NULL;
 	}
 	g_pWindowMgr->DestroyWindow( g_pWindowMgr->GetMainWindowId() );

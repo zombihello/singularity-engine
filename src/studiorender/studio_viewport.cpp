@@ -186,10 +186,10 @@ void CStudioViewport::Init( windowHandle_t windowHandle, uint32 width, uint32 he
 
 /*
 ==================
-CStudioViewport::Shutdown
+CStudioViewport::Destroy
 ==================
 */
-void CStudioViewport::Shutdown()
+void CStudioViewport::Destroy()
 {
 	windowHandle = INVALID_WINDOW_HANDLE;
 	size		 = vector2i_t( 0, 0 );

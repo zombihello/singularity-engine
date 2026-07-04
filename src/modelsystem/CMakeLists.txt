@@ -43,7 +43,7 @@ target_precompile_headers( modelsystem PRIVATE 								pch_modelsystem.h )
 set_target_properties( modelsystem PROPERTIES FOLDER         				Engine )
 set_target_properties( modelsystem PROPERTIES PREFIX 						"" )
 
-target_link_libraries( modelsystem PRIVATE									tier0 tier1 interfaces ${CMAKE_DL_LIBS} )
+target_link_libraries( modelsystem PRIVATE									tier0 tier1 interfaces smdldoc ${CMAKE_DL_LIBS} )
 add_common_target_defines( modelsystem )
 add_dependencies( materialsystem											studiorender )
 
@@ -51,7 +51,7 @@ add_dependencies( materialsystem											studiorender )
 #
 # Install
 #
-inherit_install_files( modelsystem										TARGETS tier0 tier1 interfaces studiorender )
+inherit_install_files( modelsystem										TARGETS tier0 tier1 interfaces smdldoc studiorender )
 install_files( modelsystem TARGETS RUNTIME modelsystem 					DESTINATION bin/${PLATFORM_BIN_DIR}/ )
 if ( INSTALL_PDB )
     install_files( modelsystem FILES $<TARGET_PDB_FILE:modelsystem>     DESTINATION bin/${PLATFORM_BIN_DIR}/ )

@@ -1,6 +1,8 @@
 #pragma once
 #include "modelsystem/imodelsystem.h"
 #include "modelsystem/vertexdeclarations.h"
+#include "modelsystem/model.h"
+#include "modelsystem/model_loader.h"
 
 //-----------------------------------------------------------------------------
 // Model system
@@ -20,7 +22,9 @@ public:
 	virtual IStudioAPIVertexDeclaration* GetStudioAPIVertexDeclaration( modelVertexType_t vertexType ) const override;
 
 private:
-	CVertexDeclarations vertexDeclarations;
+	CResourceTypeFactory<CModel> modelFactory;
+	CModelLoader				 modelLoader;
+	CVertexDeclarations			 vertexDeclarations;
 };
 
 extern CModelSystem g_modelSystem;

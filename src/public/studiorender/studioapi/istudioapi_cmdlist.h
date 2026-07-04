@@ -1,5 +1,4 @@
 #pragma once
-#include "studiorender/studioapi/istudioapi.h"
 #include "studiorender/studioapi/istudioapi_cmdcontext.h"
 #include "studiorender/studioapi/istudioapi_texture.h"
 

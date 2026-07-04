@@ -1,5 +1,6 @@
 #include "pch_modelsystem.h"
 #include "studiorender/studioapi/istudioapi.h"
+#include "resourcesystem/iresourcesystem.h"
 #include "modelsystem/modelsystem.h"
 
 CModelSystem g_modelSystem;
@@ -35,6 +36,13 @@ bool CModelSystem::Connect( createInterfaceFn_t pFactory )
 		return false;
 	}
 
+	// Get the resource system
+	g_pResourceSystem = (IResourceSystem*)pFactory( RESOURCESYSTEM_INTERFACE_VERSION );
+	if ( !g_pResourceSystem )
+	{
+		return false;
+	}
+
 	// We are done
 	g_pModelSystem = this;
 	return true;
@@ -52,9 +60,10 @@ void CModelSystem::Disconnect()
 	UnlinkCmds();
 	DisconnectTier1();
 
-	g_pStudioAPI	= NULL;
-	g_pStudioRender = NULL;
-	g_pModelSystem	= NULL;
+	g_pStudioAPI	  = NULL;
+	g_pStudioRender	  = NULL;
+	g_pResourceSystem = NULL;
+	g_pModelSystem	  = NULL;
 }
 
 /*
@@ -67,6 +76,19 @@ bool CModelSystem::Init()
 	// Initialize all global resources
 	PROFILER_SCOPE_FUNC();
 	CStudioGlobalRenderResources::InitResources();
+
+	// Register model resource type
+	IResourceTypeMgr* pModelsMgr = g_pResourceSystem->InstallResourceManagerForType<CModel>();
+	pModelsMgr->RegisterResourceFactory( &modelFactory );
+	pModelsMgr->RegisterResourceLoader( &modelLoader );
+
+	// Set a default resource for models
+	CResourcePtr<CModel> pDefaultModel = pModelsMgr->LoadResource( "__default", "//core/models/default" );
+	if ( !pDefaultModel )
+	{
+		pDefaultModel = pModelsMgr->CreateResource( "__default" );
+	}
+	pModelsMgr->SetDefaultResource( pDefaultModel );
 	return true;
 }
 
@@ -77,8 +99,11 @@ CModelSystem::Shutdown
 */
 void CModelSystem::Shutdown()
 {
-	// Release all global resources
+	// Unregister model resource type
 	PROFILER_SCOPE_FUNC();
+	g_pResourceSystem->RemoveResourceManagerForType<CModel>();
+
+	// Release all global resources
 	CStudioGlobalRenderResources::ReleaseResources();
 }
 

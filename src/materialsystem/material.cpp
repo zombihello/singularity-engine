@@ -504,7 +504,7 @@ IMaterialResource* CMaterial::GetStudioResource() const
 	// TODO BS yehor.pohuliaka - Remove it when will be done CIT-43
 	if ( bDirtyStudioResource )
 	{
-		const_cast<CMaterial*>( this )->UpdateStudioResource();
+		( (CMaterial*)this )->UpdateStudioResource();
 	}
 	return pStudioResource;
 }
