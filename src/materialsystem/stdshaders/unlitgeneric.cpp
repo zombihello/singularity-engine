@@ -35,6 +35,12 @@ BEGIN_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 			pStudioAPIBuffer0 = RES_BUFFER0.CreateBuffer( (byte*)&buffer0 );
 		}
 
+		SHADER_CONTEXT_DATA_UPDATE_STUDIO_API
+		{
+			IStudioAPICmdContext* pStudioAPICmdContext = g_pStudioAPI->GetImmediateCmdContext( STUDIOAPI_QUEUE_TYPE_GRAPHICS );
+			RES_BUFFER0.UpdateBuffer( pStudioAPICmdContext, (byte*)&buffer0, pStudioAPIBuffer0 );
+		}
+
 		SHADER_CONTEXT_DATA_RELEASE_STUDIO_API
 		{
 			pStudioAPIBuffer0 = NULL;
@@ -48,7 +54,7 @@ BEGIN_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 		pParams[BASETEXTURE]->SetTextureValue( pTexturesMgr->GetDefaultResource() );
 	}
 
-	SHADER_INIT_CONTEXT_DATA
+	SHADER_UPDATE_CONTEXT_DATA
 	{
 		DECLARE_SHADER_CONTEXT_DATA( pUnlitGenericContextData );
 		CResourcePtr<ITexture> pBaseTexture = pParams[BASETEXTURE]->GetTextureValue();

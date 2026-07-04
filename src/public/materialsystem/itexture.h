@@ -1,6 +1,5 @@
 #pragma once
 #include "tier1/refcount.h"
-#include "tier1/event.h"
 #include "studiorender/studioapi/istudioapi_texture.h"
 #include "studiorender/istudio_renderresource.h"
 #include "resourcesystem/iresource.h"
@@ -18,7 +17,7 @@ struct textureMipMap_t
 //-----------------------------------------------------------------------------
 // A texture resource interface which is owned by the render thread
 //-----------------------------------------------------------------------------
-class ITextureResource : public IRefCounted, public IStudioRenderResource
+class ITextureResource : public IRefCounted
 {
 public:
 	virtual ~ITextureResource() {}
@@ -39,20 +38,17 @@ public:
 class ITexture : public IResourceData
 {
 public:
-	DECLARE_EVENT_INTERFACE( IOnStudioResourceChanged, ITexture* /* pTexture */ );
-
 	virtual ~ITexture() {}
 
 	virtual void Init( studioAPITextureType_t type, studioAPIPixelFormat_t pixelFormat, uint32 numLayers, const textureMipMap_t* pMipmaps, uint32 numMipmaps, const studioAPISamplerCreateInfo_t& samplerInfo, const byte* pData = NULL, uint32 dataSize = 0 ) = 0;
 	virtual void Destroy()																																																									   = 0;
 
-	virtual studioAPITextureType_t	  GetType() const				  = 0;
-	virtual studioAPIPixelFormat_t	  GetPixelFormat() const		  = 0;
-	virtual uint32					  GetNumMips() const			  = 0;
-	virtual const textureMipMap_t&	  GetMip( uint32 mipLevel ) const = 0;
-	virtual uint32					  GetNumLayers() const			  = 0;
-	virtual ITextureResource*		  GetStudioResource() const		  = 0;
-	virtual IOnStudioResourceChanged* OnStudioResourceChanged() const = 0;
+	virtual studioAPITextureType_t GetType() const				   = 0;
+	virtual studioAPIPixelFormat_t GetPixelFormat() const		   = 0;
+	virtual uint32				   GetNumMips() const			   = 0;
+	virtual const textureMipMap_t& GetMip( uint32 mipLevel ) const = 0;
+	virtual uint32				   GetNumLayers() const			   = 0;
+	virtual ITextureResource*	   GetStudioResource() const	   = 0;
 };
 
 DECLARE_RESOURCE_TYPE( ITexture, RESOURCE_TYPE_TEXTURE );

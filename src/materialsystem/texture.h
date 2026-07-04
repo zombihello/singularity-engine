@@ -6,7 +6,7 @@
 //-----------------------------------------------------------------------------
 // A texture resource which is owned by the render thread
 //-----------------------------------------------------------------------------
-class CTextureResource : public CStudioRenderResource<CRefCounted<ITextureResource>>
+class CTextureResource : public CRefCounted<ITextureResource>, public CStudioRenderResource<IStudioRenderResource>
 {
 public:
 	// ITextureResource interface
@@ -19,10 +19,14 @@ public:
 	virtual IStudioAPITexture*	   GetStudioAPITexture() const override;
 	virtual IStudioAPISampler*	   GetStudioAPISampler() const override;
 
-	CTextureResource( studioAPITextureType_t type, studioAPIPixelFormat_t pixelFormat, uint32 sizeX, uint32 sizeY, uint32 sizeZ, uint32 numLayers, uint32 numMipmaps, const studioAPISamplerCreateInfo_t& samplerInfo, const byte* pData = NULL, uint32 dataSize = 0 );
+	CTextureResource();
 
-	// IRefCounted interface
+	void				   Update( studioAPITextureType_t type, studioAPIPixelFormat_t pixelFormat, uint32 sizeX, uint32 sizeY, uint32 sizeZ, uint32 numLayers, uint32 numMipmaps, const studioAPISamplerCreateInfo_t& samplerInfo, const byte* pData = NULL, uint32 dataSize = 0 );
+	void				   Clear();
+	CStudioRenderCmdFence& GetRenderCmdFence();
+
 protected:
+	// IRefCounted interface
 	virtual void FinalRelease() override;
 
 private:
@@ -38,6 +42,7 @@ private:
 	uint32						 sizeZ;
 	uint32						 numLayers;
 	uint32						 numMipmaps;
+	CStudioRenderCmdFence		 renderCmdFence;
 	CRefPtr<IStudioAPITexture>	 pStudioAPITexture;
 	CRefPtr<IStudioAPISampler>	 pStudioAPISampler;
 	eastl::vector<byte>			 data;
@@ -49,30 +54,27 @@ private:
 class CTexture : public CResourceData<ITexture>
 {
 public:
-	DECLARE_EVENT( COnStudioResourceChanged, ITexture* /* pTexture */ );
-
 	// ITexture interface
 	virtual void Init( studioAPITextureType_t type, studioAPIPixelFormat_t pixelFormat, uint32 numLayers, const textureMipMap_t* pMipmaps, uint32 numMipmaps, const studioAPISamplerCreateInfo_t& samplerInfo, const byte* pData = NULL, uint32 dataSize = 0 ) override;
 	virtual void Destroy() override;
 
-	virtual studioAPITextureType_t	  GetType() const override;
-	virtual studioAPIPixelFormat_t	  GetPixelFormat() const override;
-	virtual uint32					  GetNumMips() const override;
-	virtual const textureMipMap_t&	  GetMip( uint32 mipLevel ) const override;
-	virtual uint32					  GetNumLayers() const override;
-	virtual ITextureResource*		  GetStudioResource() const override;
-	virtual IOnStudioResourceChanged* OnStudioResourceChanged() const override;
+	virtual studioAPITextureType_t GetType() const override;
+	virtual studioAPIPixelFormat_t GetPixelFormat() const override;
+	virtual uint32				   GetNumMips() const override;
+	virtual const textureMipMap_t& GetMip( uint32 mipLevel ) const override;
+	virtual uint32				   GetNumLayers() const override;
+	virtual ITextureResource*	   GetStudioResource() const override;
 
 	CTexture( IResource* pResource );
 	~CTexture();
 
 private:
-	studioAPITextureType_t			 type;
-	studioAPIPixelFormat_t			 pixelFormat;
-	uint32							 numLayers;
-	CRefPtr<CTextureResource>		 pStudioResource;
-	eastl::vector<textureMipMap_t>	 mipmaps;
-	mutable COnStudioResourceChanged onStudioResourceChanged;
+	studioAPITextureType_t		   type;
+	studioAPIPixelFormat_t		   pixelFormat;
+	uint32						   numLayers;
+	CRefPtr<CTextureResource>	   pStudioResource;
+	eastl::vector<textureMipMap_t> mipmaps;
 };
 
 DECLARE_RESOURCE_TYPE( CTexture, RESOURCE_TYPE_TEXTURE );
+#include "materialsystem/texture.inl"

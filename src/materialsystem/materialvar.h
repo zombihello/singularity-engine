@@ -44,10 +44,8 @@ public:
 
 private:
 	static void OnResourceCachedUncached( void* pUserData, IResource* pResource );
-	static void OnTextureResourceChanged( void* pUserData, ITexture* pTexture );
-	static void OnMaterialResourceChanged( void* pUserData, IMaterial* pMaterial );
 	void		SubscribeResourceEvents();
-	void		UnsubscribeResourceEvents( bool bOnlyResourceDataEvents = false );
+	void		UnsubscribeResourceEvents();
 
 	const char*		  pName;
 	materialVarType_t type;
@@ -67,12 +65,6 @@ private:
 	CRefPtr<IResource>				 pResourceValue;
 	IResource::IOnCached::handle_t	 onResourceChachedHandle;
 	IResource::IOnUncached::handle_t onResourceUncachedHandle;
-	union
-	{
-		CTexture::COnStudioResourceChanged::handle_t  onTextureResourceChangedHandle;
-		CMaterial::COnStudioResourceChanged::handle_t onMaterialResourceChangedHandle;
-		IEvent<>::handle_t							  onStudioResourceChangedHandle;
-	};
 };
 
 #include "materialsystem/materialvar.inl"

@@ -15,7 +15,6 @@ CMaterialVar::CMaterialVar( CMaterial* pMaterial, const char* pName, uint32 id )
 	, pOwningMaterial( pMaterial )
 	, onResourceChachedHandle( INVALID_HANDLE )
 	, onResourceUncachedHandle( INVALID_HANDLE )
-	, onStudioResourceChangedHandle( INVALID_HANDLE )
 {
 }
 
@@ -395,21 +394,6 @@ void CMaterialVar::SubscribeResourceEvents()
 	{
 		onResourceUncachedHandle = pResourceValue->OnUncached()->Subscribe( &CMaterialVar::OnResourceCachedUncached, this );
 	}
-
-	// Subscribe on resource data events if the resource is cached
-	if ( pResourceValue->HasAnyFlags( RESOURCE_FLAG_CACHED ) )
-	{
-		if ( type == MATERIALVAR_TYPE_TEXTURE && onTextureResourceChangedHandle == INVALID_HANDLE )
-		{
-			CTexture* pTexture			   = (CTexture*)pResourceValue->GetData();
-			onTextureResourceChangedHandle = pTexture->OnStudioResourceChanged()->Subscribe( &CMaterialVar::OnTextureResourceChanged, this );
-		}
-		else if ( type == MATERIALVAR_TYPE_MATERIAL && onMaterialResourceChangedHandle == INVALID_HANDLE )
-		{
-			CMaterial* pMaterial			= (CMaterial*)pResourceValue->GetData();
-			onMaterialResourceChangedHandle = pMaterial->OnStudioResourceChanged()->Subscribe( &CMaterialVar::OnMaterialResourceChanged, this );
-		}
-	}
 }
 
 /*
@@ -417,7 +401,7 @@ void CMaterialVar::SubscribeResourceEvents()
 CMaterialVar::UnsubscribeResourceEvents
 ==================
 */
-void CMaterialVar::UnsubscribeResourceEvents( bool bOnlyResourceDataEvents /* = false */ )
+void CMaterialVar::UnsubscribeResourceEvents()
 {
 	// Do nothing if the var type isn't resource or `pResourceValue` isn't valid
 	if ( !IsResourceVarType( type ) || !pResourceValue )
@@ -426,36 +410,10 @@ void CMaterialVar::UnsubscribeResourceEvents( bool bOnlyResourceDataEvents /* = 
 	}
 
 	// Unsubscribe from resource events
-	if ( !bOnlyResourceDataEvents )
-	{
-		pResourceValue->OnCached()->Unsubscribe( onResourceChachedHandle );
-		pResourceValue->OnUncached()->Unsubscribe( onResourceUncachedHandle );
-		onResourceChachedHandle	 = INVALID_HANDLE;
-		onResourceUncachedHandle = INVALID_HANDLE;
-	}
-
-	// Unsubscribe from resource data events if the resource is cached
-	if ( pResourceValue->HasAnyFlags( RESOURCE_FLAG_CACHED ) )
-	{
-		switch ( type )
-		{
-		case MATERIALVAR_TYPE_TEXTURE:
-		{
-			CTexture* pTexture = (CTexture*)pResourceValue->GetData();
-			pTexture->OnStudioResourceChanged()->Unsubscribe( onTextureResourceChangedHandle );
-			break;
-		}
-
-		case MATERIALVAR_TYPE_MATERIAL:
-		{
-			CMaterial* pMaterial = (CMaterial*)pResourceValue->GetData();
-			pMaterial->OnStudioResourceChanged()->Unsubscribe( onMaterialResourceChangedHandle );
-			break;
-		}
-		}
-	}
-
-	onStudioResourceChangedHandle = INVALID_HANDLE;
+	pResourceValue->OnCached()->Unsubscribe( onResourceChachedHandle );
+	pResourceValue->OnUncached()->Unsubscribe( onResourceUncachedHandle );
+	onResourceChachedHandle	 = INVALID_HANDLE;
+	onResourceUncachedHandle = INVALID_HANDLE;
 }
 
 /*
@@ -464,43 +422,6 @@ CMaterialVar::OnResourceCachedUncached
 ==================
 */
 void CMaterialVar::OnResourceCachedUncached( void* pUserData, IResource* pResource )
-{
-	CMaterialVar* pVar = (CMaterialVar*)pUserData;
-	if ( pResource->HasAnyFlags( RESOURCE_FLAG_CACHED ) )
-	{
-		pVar->SubscribeResourceEvents();
-	}
-	else
-	{
-		pVar->UnsubscribeResourceEvents( true );
-	}
-
-	if ( pVar->pOwningMaterial )
-	{
-		pVar->pOwningMaterial->ReportVarChanged( pVar, pVar->type );
-	}
-}
-
-/*
-==================
-CMaterialVar::OnTextureResourceChanged
-==================
-*/
-void CMaterialVar::OnTextureResourceChanged( void* pUserData, ITexture* pTexture )
-{
-	CMaterialVar* pVar = (CMaterialVar*)pUserData;
-	if ( pVar->pOwningMaterial )
-	{
-		pVar->pOwningMaterial->ReportVarChanged( pVar, pVar->type );
-	}
-}
-
-/*
-==================
-CMaterialVar::OnMaterialResourceChanged
-==================
-*/
-void CMaterialVar::OnMaterialResourceChanged( void* pUserData, IMaterial* pMaterial )
 {
 	CMaterialVar* pVar = (CMaterialVar*)pUserData;
 	if ( pVar->pOwningMaterial )
