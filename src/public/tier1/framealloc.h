@@ -27,6 +27,7 @@ public:
 	template<typename TType, typename... TArgs>
 	TType* Construct( TArgs&&... args );
 	void*  Alloc( size numBytes, uint32 alignment = 0 );
+	void*  AllocZero( size numBytes, uint32 alignment = 0 );
 	void   SwapPools();
 	void   MarkAsFreePool( uint32 index );
 	uint32 GetCurrentPoolId() const;

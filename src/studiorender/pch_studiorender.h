@@ -8,3 +8,4 @@
 #include "tier1/cvar.h"
 #include "tier1/cmdlink.h"
 #include "studiorender/studioapi/istudioapi.h"
+#include "studiorender/studio_defines.h"

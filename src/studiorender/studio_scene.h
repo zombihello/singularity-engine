@@ -5,6 +5,7 @@
 // Forward declarations
 //-----------------------------------------------------------------------------
 class CStudioScene;
+struct studioSceneView_t;
 
 //-----------------------------------------------------------------------------
 // Studio entity
@@ -28,6 +29,7 @@ public:
 	virtual void						FreeEntity( studioEntityId_t id ) override;
 	virtual const studioEntityParams_t* GetEntityParams( studioEntityId_t id ) const override;
 
+	void								 FindEntityViews( studioSceneView_t* pSceneView ) const;
 	const eastl::vector<studioEntity_t>& GetEntities() const;
 
 private:

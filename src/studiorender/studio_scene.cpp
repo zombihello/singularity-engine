@@ -1,4 +1,6 @@
 #include "pch_studiorender.h"
+#include "studiorender/studiorender.h"
+#include "studiorender/studio_sceneview.h"
 #include "studiorender/studio_scene.h"
 
 /*
@@ -77,6 +79,25 @@ void CStudioScene::FreeEntity( studioEntityId_t id )
 	studioEntity_t& studioEntity = entities[id];
 	studioEntity.params			 = studioEntityParams_t{};
 	freeEntityIdList.emplace_back( id );
+}
+
+/*
+==================
+CStudioScene::FindEntityViews
+==================
+*/
+void CStudioScene::FindEntityViews( studioSceneView_t* pSceneView ) const
+{
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_VISIBILITY );
+	for ( uint32 index = 0, count = (uint32)entities.size(); index < count; ++index )
+	{
+		const studioEntity_t& entity	  = entities[index];
+		studioEntityView_t*	  pEntityView = (studioEntityView_t*)g_StudioRender.GetFrameAlloc().AllocZero( sizeof( studioEntityView_t ) );
+		pEntityView->pEntity			  = (studioEntity_t*)&entity;
+		pEntityView->transform			  = g_matrixIdentity;
+		pEntityView->pNext				  = pSceneView->pEntityViews;
+		pSceneView->pEntityViews		  = pEntityView;
+	}
 }
 
 /*

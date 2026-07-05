@@ -5,9 +5,7 @@
 //-----------------------------------------------------------------------------
 // Constants and types
 //-----------------------------------------------------------------------------
-#define RENDER_COMMAND_BUFFER_SIZE ( 1024 * 1024 )
-
-CStudioCmdBuffer		g_studioCmdBuffer( RENDER_COMMAND_BUFFER_SIZE, 16 );
+CStudioCmdBuffer		g_studioCmdBuffer( STUDIO_RENDERCOMMAND_BUFFER_SIZE, 16 );
 threadId_t				g_renderThreadId		= INVALID_THREAD_ID;
 static CThread*			s_pRenderThread			= NULL;
 static CRunnableObject* s_pRenderRunnableObject = NULL;

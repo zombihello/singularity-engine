@@ -291,6 +291,60 @@ void CModel::Destroy()
 
 /*
 ==================
+CModel::MarkUsedDependencies
+==================
+*/
+void CModel::MarkUsedDependencies()
+{
+	PROFILER_SCOPE_FUNC();
+	for ( uint32 index = 0, count = (uint32)materials.size(); index < count; ++index )
+	{
+		IResource* pResource = materials[index];
+		if ( pResource )
+		{
+			pResource->MarkUsed();
+		}
+	}
+}
+
+/*
+==================
+CModel::MakePermanentDependencies
+==================
+*/
+void CModel::MakePermanentDependencies()
+{
+	PROFILER_SCOPE_FUNC();
+	for ( uint32 index = 0, count = (uint32)materials.size(); index < count; ++index )
+	{
+		IResource* pResource = materials[index];
+		if ( pResource )
+		{
+			pResource->MakePermanent();
+		}
+	}
+}
+
+/*
+==================
+CModel::ClearPermanentDependencies
+==================
+*/
+void CModel::ClearPermanentDependencies()
+{
+	PROFILER_SCOPE_FUNC();
+	for ( uint32 index = 0, count = (uint32)materials.size(); index < count; ++index )
+	{
+		IResource* pResource = materials[index];
+		if ( pResource )
+		{
+			pResource->ClearPermanent();
+		}
+	}
+}
+
+/*
+==================
 CModel::OnMaterialCachedUncached
 ==================
 */

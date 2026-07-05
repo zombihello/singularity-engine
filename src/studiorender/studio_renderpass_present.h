@@ -8,6 +8,8 @@ class IStudioAPIBoundShaderState;
 class IStudioAPIRenderPipeline;
 class IStudioAPISwapChain;
 class CStudioViewport;
+struct studioSceneView_t;
+struct studioDrawSurface_t;
 
 //-----------------------------------------------------------------------------
 // Studio present render pass
@@ -15,8 +17,10 @@ class CStudioViewport;
 class CStudioRenderPassPresent
 {
 public:
-	void									 R_DrawPass( CStudioViewport* pViewport );
-	static CRefPtr<IStudioAPIRenderPipeline> R_CreateStudioAPIRenderPipeline( CStudioViewport* pViewport, IStudioAPIBoundShaderState* pStudioAPIBoundShaderState );
+	void R_DrawPass( CStudioViewport* pViewport, studioSceneView_t* pSceneView );
 
-private:
+	static CRefPtr<IStudioAPIRenderPipeline> R_CreateStudioAPIRenderPipeline( CStudioViewport* pViewport, IStudioAPIBoundShaderState* pStudioAPIBoundShaderState );
+	static bool								 ShouldDrawSurfaceInPass( studioDrawSurface_t* pDrawSurface );
 };
+
+#include "studiorender/studio_renderpass_present.inl"

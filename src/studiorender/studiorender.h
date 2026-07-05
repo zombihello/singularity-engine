@@ -1,7 +1,6 @@
 #pragma once
-#include "materialsystem/imaterial.h"
+#include "tier1/framealloc.h"
 #include "studiorender/istudiorender.h"
-#include "studiorender/studioapi/istudioapi_swapchain.h"
 #include "studiorender/studio_renderpass_present.h"
 
 //-----------------------------------------------------------------------------
@@ -10,13 +9,9 @@
 class CStudioViewport;
 
 //-----------------------------------------------------------------------------
-// Studio scene view
+// Studio frame allocator
 //-----------------------------------------------------------------------------
-struct studioSceneView_t
-{
-	matrix4x4_t viewMatrix;
-	matrix4x4_t projectionMatrix;
-};
+typedef CFrameAlloc<STUDIO_FRAMEALLOC_BLOCK_SIZE, STUDIO_FRAMEALLOC_NUM_POOLS> studioFrameAlloc_t;
 
 //-----------------------------------------------------------------------------
 // Studio render
@@ -47,8 +42,16 @@ public:
 	virtual IStudioCmdBuffer* GetCommandBuffer() const override;
 	virtual bool			  IsInRenderThread() const override;
 
+	CStudioRender();
+	studioFrameAlloc_t& GetFrameAlloc();
+
 private:
+	void AddDrawSurfacesToSceneView( studioSceneView_t* pSceneView );
+	void R_DrawScene( CStudioViewport* pViewport, studioSceneView_t* pSceneView );
+
 	CStudioRenderPassPresent presentRenderPass;
-	studioSceneView_t		 sceneView;
+	studioFrameAlloc_t		 frameAlloc;
 };
+
 extern CStudioRender g_StudioRender;
+#include "studiorender/studiorender.inl"

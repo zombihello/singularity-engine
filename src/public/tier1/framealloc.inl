@@ -48,6 +48,19 @@ FORCEINLINE void* CFrameAlloc<blockSize, numPools, defaultAlignment, minAlignmen
 
 /*
 ==================
+CFrameAlloc::AllocZero
+==================
+*/
+template<uint32 blockSize, uint32 numPools, uint32 defaultAlignment, uint32 minAlignment>
+FORCEINLINE void* CFrameAlloc<blockSize, numPools, defaultAlignment, minAlignment>::AllocZero( size numBytes, uint32 alignment /* = 0 */ )
+{
+	void* pData = Alloc( numBytes, alignment, NULL );
+	Mem_Memzero( pData, numBytes );
+	return pData;
+}
+
+/*
+==================
 CFrameAlloc::Alloc
 ==================
 */
