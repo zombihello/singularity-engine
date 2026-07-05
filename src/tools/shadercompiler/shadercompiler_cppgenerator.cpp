@@ -80,7 +80,6 @@ void CShaderCompilerCppGenerator::GenerateVar( const shaderFlag_t& shaderFlag )
 	// Generate set function
 	buffer += "public:\n";
 
-	// Uint32 version
 	buffer += S_Sprintf( "\tvoid Set%s( uint32 value )\n", shaderFlag.name.c_str() );
 	buffer += "\t{\n";
 	buffer += S_Sprintf( "\t\tAssert( value >= %i && value <= %i );\n", shaderFlag.minValue, shaderFlag.maxValue );
@@ -89,18 +88,6 @@ void CShaderCompilerCppGenerator::GenerateVar( const shaderFlag_t& shaderFlag )
 	buffer += S_Sprintf( "\t\tb%s = true;\n", shaderFlag.name.c_str() );
 	buffer += "#endif // DEBUG\n";
 	buffer += "\t}";
-
-	// Bool version (only if 0 and 1 in our range)
-	if ( 0 >= shaderFlag.minValue && 0 <= shaderFlag.maxValue && 1 >= shaderFlag.minValue && 1 <= shaderFlag.maxValue )
-	{
-		buffer += S_Sprintf( "\n\n\tvoid Set%s( bool bValue )\n", shaderFlag.name.c_str() );
-		buffer += "\t{\n";
-		buffer += S_Sprintf( "\t\t%s = bValue ? 1 : 0;\n", shaderFlag.name.c_str() );
-		buffer += "#if DEBUG\n";
-		buffer += S_Sprintf( "\t\tb%s = true;\n", shaderFlag.name.c_str() );
-		buffer += "#endif // DEBUG\n";
-		buffer += "\t}";
-	}
 }
 
 /*
