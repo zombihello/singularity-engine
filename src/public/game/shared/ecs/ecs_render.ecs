@@ -1,7 +1,18 @@
 module Render;
 using "studiorender/istudiorender.h";
+using "studiorender/istudio_scene.h";
 
 resource StudioRender
 {
-	IStudioRender*		pStudioRender;
+	IStudioRender* pStudioRender;
+}
+
+resource StudioScene
+{
+    IStudioScene* pStudioScene;
+}
+
+component StudioEntity
+{
+    studioEntityId_t id;
 }

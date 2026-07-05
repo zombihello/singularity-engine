@@ -5,6 +5,7 @@
 #include "game/shared/game.h"
 #include "game/shared/ecs/ecs_entitydesc.h"
 #include "game/shared/ecs/ecs_map.h"
+#include "game/shared/ecs/ecs_render.gen.h"
 
 /*
 ==================
@@ -12,18 +13,8 @@ CEcsMap::CEcsMap
 ==================
 */
 CEcsMap::CEcsMap()
+	: bInitialized( false )
 {
-}
-
-/*
-==================
-CEcsMap::CEcsMap
-==================
-*/
-CEcsMap::CEcsMap( const CSMAPCompiledMapDoc& smapCompiledDoc )
-{
-	// Initialize the map by SMAP compiled document
-	Init( smapCompiledDoc );
 }
 
 /*
@@ -38,13 +29,43 @@ CEcsMap::~CEcsMap()
 
 /*
 ==================
+CEcsMap::SetupEcsResources
+==================
+*/
+void CEcsMap::SetupEcsResources()
+{
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_SCENE );
+	Assert( pStudioScene );
+	ecsWorld.SetResource( ecsResourceStudioScene_t{ pStudioScene } );
+}
+
+/*
+==================
+CEcsMap::Init
+==================
+*/
+void CEcsMap::Init()
+{
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_SCENE );
+	AssertMsg( !bInitialized, "A map can't be initialized twice" );
+
+	// Create a new studio scene and setup ECS resources
+	pStudioScene = g_pStudioRender->CreateScene();
+	SetupEcsResources();
+
+	// We are done
+	bInitialized = true;
+}
+
+/*
+==================
 CEcsMap::Init
 ==================
 */
 void CEcsMap::Init( const CSMAPCompiledMapDoc& smapCompiledDoc )
 {
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_SCENE )
-	Reset();
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_SCENE );
+	AssertMsg( !bInitialized, "A map can't be initialized twice" );
 
 	// Create entities
 	const eastl::vector<CSMAPEntity>& smapEntities	 = smapCompiledDoc.GetEntities();
@@ -61,6 +82,13 @@ void CEcsMap::Init( const CSMAPCompiledMapDoc& smapCompiledDoc )
 
 		SpawnEntity( *pEntityDesc, smapEntity.GetName() );
 	}
+
+	// Create a new studio scene and setup ECS resources
+	pStudioScene = g_pStudioRender->CreateScene();
+	SetupEcsResources();
+
+	// We are done
+	bInitialized = true;
 }
 
 /*
@@ -70,6 +98,7 @@ CEcsMap::SpawnEntity
 */
 IEntity* CEcsMap::SpawnEntity( IEntityDesc* pEntityDesc, const char* pName /* = "" */ )
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_SCENE );
 	CRefPtr<CEcsEntity> pNewEcsEntity;
 	if ( pEntityDesc )
 	{
@@ -92,6 +121,7 @@ CEcsMap::DestroyEntity
 */
 void CEcsMap::DestroyEntity( IEntity* pEntity )
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_SCENE );
 	if ( pEntity )
 	{
 		CEcsEntity* pEcsEntity = (CEcsEntity*)pEntity;
@@ -114,12 +144,17 @@ CEcsMap::Reset
 */
 void CEcsMap::Reset()
 {
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_SCENE )
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_SCENE );
 	onMapReseted.Invoke( this );
 
 	// TODO BS yehor.pohuliaka - Implement reload the map from the file system
 	ecsWorld.Reset();
 	ecsEntities.clear();
+	pStudioScene = NULL;
+	bInitialized = false;
+
+	// Initialize the map as empty
+	Init();
 }
 
 /*
@@ -129,7 +164,7 @@ CEcsMap::Update
 */
 void CEcsMap::Update( float deltaTime )
 {
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_SCENE )
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_SCENE );
 	ecsWorld.Update( deltaTime );
 }
 

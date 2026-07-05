@@ -5,6 +5,7 @@
 #include "studiorender/studio_renderthread.h"
 #include "studiorender/studio_viewport.h"
 #include "studiorender/studio_renderpipelineset.h"
+#include "studiorender/studio_scene.h"
 #include "studiorender/studiorender.h"
 
 CCVar		  r_vsync( "r_vsync", "0", "Should use vertical synchronization (VSync)", CVAR_FLAG_ARCHIVE );
@@ -123,6 +124,16 @@ CRefPtr<IStudioRenderPipelineSet> CStudioRender::CreateRenderPipelineSet() const
 
 /*
 ==================
+CStudioRender::CreateScene
+==================
+*/
+CRefPtr<IStudioScene> CStudioRender::CreateScene() const
+{
+	return new CStudioScene();
+}
+
+/*
+==================
 CStudioRender::BeginFrame
 ==================
 */
@@ -149,6 +160,16 @@ void CStudioRender::EndFrame()
 						   {
 							   g_pStudioAPI->EndDrawingFrame();
 						   } );
+}
+
+/*
+==================
+CStudioRender::DrawScene
+==================
+*/
+void CStudioRender::DrawScene( IStudioViewport* pStudioViewport, IStudioScene* pStudioScene, const studioCameraView_t& cameraView )
+{
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 }
 
 /*

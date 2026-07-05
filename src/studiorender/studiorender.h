@@ -37,9 +37,11 @@ public:
 	// Functions to draw scene
 	virtual void BeginFrame() override;
 	virtual void EndFrame() override;
+	virtual void DrawScene( IStudioViewport* pStudioViewport, IStudioScene* pStudioScene, const studioCameraView_t& cameraView ) override;
 
 	virtual CRefPtr<IStudioViewport>		  CreateViewport() const override;
 	virtual CRefPtr<IStudioRenderPipelineSet> CreateRenderPipelineSet() const override;
+	virtual CRefPtr<IStudioScene>			  CreateScene() const override;
 
 	// Returns a command buffer of the render thread. If return NULL it's mean what StudioRender don't use render thread
 	virtual IStudioCmdBuffer* GetCommandBuffer() const override;

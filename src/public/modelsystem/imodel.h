@@ -1,12 +1,13 @@
 #pragma once
-#include "tier1/event.h"
 #include "resourcesystem/iresource.h"
 #include "resourcesystem/resourceptr.h"
-#include "studiorender/istudio_renderresource.h"
+#include "modelsystem/modeltypes.h"
 
 //-----------------------------------------------------------------------------
 // Forward declarations
 //-----------------------------------------------------------------------------
+class IStudioAPIVertexDeclaration;
+class IStudioAPIBuffer;
 class IMaterialResource;
 class IMaterial;
 

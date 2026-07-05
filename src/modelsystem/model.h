@@ -1,5 +1,6 @@
 #pragma once
 #include "studiorender/studioapi/istudioapi_buffer.h"
+#include "studiorender/istudio_renderresource.h"
 #include "modelsystem/imodel.h"
 
 //-----------------------------------------------------------------------------

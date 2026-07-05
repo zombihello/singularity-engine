@@ -129,9 +129,8 @@ CGame::MapInit
 */
 bool CGame::MapInit( const char* pPath )
 {
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
-
 	// Shutdown the old map
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
 	MapShutdown();
 
 	// Load a new map
@@ -143,7 +142,8 @@ bool CGame::MapInit( const char* pPath )
 		return false;
 	}
 
-	pActiveEcsMap = new CEcsMap( smapCompiledMapDoc );
+	pActiveEcsMap = new CEcsMap();
+	pActiveEcsMap->Init( smapCompiledMapDoc );
 	Msg( "Game: Map '%s' loaded", mapPath.c_str() );
 	return true;
 }
@@ -155,9 +155,8 @@ CGame::MapShutdown
 */
 void CGame::MapShutdown()
 {
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
-
 	// Reset the active map
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
 	if ( pActiveEcsMap )
 	{
 		delete pActiveEcsMap;
@@ -193,7 +192,8 @@ void CGame::FrameDraw( IStudioViewport* pStudioViewport )
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	if ( pActiveEcsMap )
 	{
-		// TODO BS yehor.pohuliaka - Implement here drawing scene by the studio render
+		studioCameraView_t studioCameraView = {};
+		g_pStudioRender->DrawScene( pStudioViewport, pActiveEcsMap->GetStudioScene(), studioCameraView );
 	}
 }
 

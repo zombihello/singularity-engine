@@ -1,7 +1,6 @@
 #pragma once
-#include "studiorender/studioapi/istudioapi.h"
 #include "resourcesystem/resourceptr.h"
-#include "materialsystem/imaterial.h"
+#include "modelsystem/imodel.h"
 
 //-----------------------------------------------------------------------------
 // Quad mesh
@@ -9,17 +8,13 @@
 class CQuad
 {
 public:
-	void Init( IStudioAPIBuffer* pStudioAPIVertexBuffer, IStudioAPIBuffer* pStudioAPIIndexBuffer, IResource* pMaterial );
+	void Init( IResource* pModel );
 	void Shutdown();
 
-	FORCEINLINE IStudioAPIBuffer* GetStudioAPIVertexBuffer() const { return pStudioAPIVertexBuffer; }
-	FORCEINLINE IStudioAPIBuffer* GetStudioAPIIndexBuffer() const { return pStudioAPIIndexBuffer; }
-	FORCEINLINE IResource*		  GetMaterial() const { return pMaterial; }
+	FORCEINLINE IResource* GetModel() const { return pModel; }
 
 private:
-	CRefPtr<IStudioAPIBuffer> pStudioAPIVertexBuffer;
-	CRefPtr<IStudioAPIBuffer> pStudioAPIIndexBuffer;
-	CResourcePtr<IMaterial>	  pMaterial;
+	CResourcePtr<IModel> pModel;
 };
 
 CQuad& Quad();

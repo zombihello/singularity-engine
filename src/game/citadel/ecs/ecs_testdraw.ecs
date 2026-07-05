@@ -5,12 +5,15 @@ using "game/shared/ecs/ecs_render.gen.h";
 component Quad
 {
 	defaults:
-		pVertexBuffer( Quad().GetStudioAPIVertexBuffer() ),
-		pIndexBuffer( Quad().GetStudioAPIIndexBuffer() ),
-		pMaterial( Quad().GetMaterial() );
+		pModel( Quad().GetModel() );
 		
-	CRefPtr<IStudioAPIBuffer>		pVertexBuffer;
-	CRefPtr<IStudioAPIBuffer>		pIndexBuffer;
-	[serialize][name="Material"] 
-	CResourcePtr<IMaterial>			pMaterial;
+	CResourcePtr<IModel>    pModel;
+}
+
+[stage="on_update", profiler_group="scene"]
+system QuadInit
+{
+	read: 				Quad quad;
+	write_resource:		StudioScene		studioScene;
+	exclude: 			StudioEntity;
 }

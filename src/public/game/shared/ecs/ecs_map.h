@@ -12,21 +12,11 @@ DECLARE_EVENT( COnMapReseted, IMap* /* pMap */ );
 DECLARE_EVENT( COnMapUnloaded, IMap* /* pMap */ );
 
 //-----------------------------------------------------------------------------
-// Forward declarations
-//-----------------------------------------------------------------------------
-class CEcsEntityDesc;
-
-//-----------------------------------------------------------------------------
 // ECS map
 //-----------------------------------------------------------------------------
 class CEcsMap : public IMap
 {
 public:
-	friend CEcsEntityDesc;
-	CEcsMap();
-	CEcsMap( const CSMAPCompiledMapDoc& smapCompiledDoc );
-	~CEcsMap();
-
 	// IMap interface
 	// Spawn and destroy an entity
 	virtual IEntity* SpawnEntity( IEntityDesc* pEntityDesc, const char* pName = "" ) override;
@@ -39,14 +29,25 @@ public:
 	virtual IOnMapReseted*	OnMapReseted() const override;
 	virtual IOnMapUnloaded* OnMapUnloaded() const override;
 
-	CEcsWorld& GetEcsWorld();
+	CEcsMap();
+	~CEcsMap();
 
-private:
+	void Init();
 	void Init( const CSMAPCompiledMapDoc& smapCompiledDoc );
 
+	bool		  IsInitialized() const;
+	CEcsWorld&	  GetEcsWorld();
+	IStudioScene* GetStudioScene() const;
+
+protected:
+	virtual void SetupEcsResources();
+
+private:
+	bool							   bInitialized;
 	CEcsWorld						   ecsWorld;
 	COnMapReseted					   onMapReseted;
 	COnMapUnloaded					   onMapUnloaded;
+	CRefPtr<IStudioScene>			   pStudioScene;
 	eastl::vector<CRefPtr<CEcsEntity>> ecsEntities;
 };
 
