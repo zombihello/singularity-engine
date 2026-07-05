@@ -207,12 +207,19 @@ void CStudioRender::DrawScene( IStudioViewport* pStudioViewport, IStudioScene* p
 	CStudioScene*	   pStudioSceneLocal = (CStudioScene*)pStudioScene;
 	studioSceneView_t* pSceneView		 = (studioSceneView_t*)frameAlloc.AllocZero( sizeof( studioSceneView_t ) );
 
-	// Find all visible entities and lights, after that creates
-	// entity views and lights for them
+	// Find all visible entities, after that creates entity views for them
 	pStudioSceneLocal->FindEntityViews( pSceneView );
 
-	// Add draw surfaces into the scene view
-	AddDrawSurfacesToSceneView( pSceneView );
+	// Preallocate memory for draw surfaces
+	pSceneView->numDrawSurfaces = 0;
+	pSceneView->maxDrawSurfaces = STUDIO_SCENEVIEW_INITIAL_NUM_DRAWSURFACES;
+	pSceneView->pDrawSurfaces	= (studioDrawSurface_t**)frameAlloc.Alloc( pSceneView->maxDrawSurfaces * sizeof( studioDrawSurface_t* ) );
+
+	// Go through each entity view and add draw surfaces to the scene view
+	for ( studioEntityView_t* pEntityView = pSceneView->pEntityViews; pEntityView; pEntityView = pEntityView->pNext )
+	{
+		AddModelToSceneView( pSceneView, pEntityView );
+	}
 
 	// Send a render scene command to the render thread
 	UNIQUE_RENDER_COMMAND_TWOPARAMETER( CStudioRenderCmd_DrawScene,
@@ -225,89 +232,56 @@ void CStudioRender::DrawScene( IStudioViewport* pStudioViewport, IStudioScene* p
 
 /*
 ==================
-CStudioRender::AddDrawSurfacesToSceneView
+CStudioRender::AddModelToSceneView
 ==================
 */
-void CStudioRender::AddDrawSurfacesToSceneView( studioSceneView_t* pSceneView )
+void CStudioRender::AddModelToSceneView( studioSceneView_t* pSceneView, studioEntityView_t* pEntityView )
 {
-	// Go through each view entity and create surfaces for it
+	// Get the default model for case when an entity's model has been uncached
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-	Assert( pSceneView->numDrawSurfaces == 0 );
-
 	IResourceTypeMgr*	 pModelsMgr	   = g_pResourceSystem->GetResourceManagerForType<IModel>();
 	CResourcePtr<IModel> pDefaultModel = pModelsMgr->GetDefaultResource();
-	for ( studioEntityView_t* pEntityView = pSceneView->pEntityViews; pEntityView; pEntityView = pEntityView->pNext )
+
+	// Get entity's model, if it isn't cached use default one
+	CResourcePtr<IModel> pModel			= pEntityView->pEntity->params.pModel;
+	IModelResource*		 pModelResource = pModel.IsCached() ? pModel->GetStudioResource() : pDefaultModel->GetStudioResource();
+	if ( !pModelResource )
 	{
-		// Get entity's model, if it isn't cached use default one
-		CResourcePtr<IModel> pModelRef = pEntityView->pEntity->params.pModel;
-		IModelResource*		 pModel	   = pModelRef.IsCached() ? pModelRef->GetStudioResource() : pDefaultModel->GetStudioResource();
-		if ( !pModel )
-		{
-			continue;
-		}
-
-		// Get in the model resource surfaces and materials
-		uint32							  numSurfaces  = pModel->GetNumSurfaces();
-		uint32							  numMaterials = pModel->GetNumMaterials();
-		const modelSurface_t*			  pSurfaces	   = pModel->GetSurfaces();
-		const CRefPtr<IMaterialResource>* pMaterials   = pModel->GetMaterials();
-
-		// Add surfaces into the scene view
-		pSceneView->numDrawSurfaces += numSurfaces;
-		for ( uint32 index = 0; index < numSurfaces; index++ )
-		{
-			const modelSurface_t& surface	   = pSurfaces[index];
-			studioDrawSurface_t*  pDrawSurface = frameAlloc.Construct<studioDrawSurface_t>();
-			pDrawSurface->pEntityView		   = pEntityView;
-			pDrawSurface->pModel			   = pModel;
-			pDrawSurface->pMaterial			   = pMaterials[surface.materialId];
-			pDrawSurface->baseVertexIndex	   = surface.baseVertexIndex;
-			pDrawSurface->baseIndex			   = surface.baseIndex;
-			pDrawSurface->numIndices		   = surface.numIndices;
-			pDrawSurface->pNext				   = pEntityView->pDrawSurfaces;
-			pEntityView->pDrawSurfaces		   = pDrawSurface;
-
-			// Increase number of draw surfaces if the one should draw on a pass
-			if ( CStudioRenderPassPresent::ShouldDrawSurfaceInPass( pDrawSurface ) )
-			{
-				studioRenderPass_t& renderPass										   = pSceneView->renderPasses[STUDIO_RENDERPASS_TYPE_PRESENT];
-				pDrawSurface->bShouldDrawSurfaceInPass[STUDIO_RENDERPASS_TYPE_PRESENT] = true;
-				++renderPass.numDrawSurfaces;
-			}
-		}
+		return;
 	}
 
-	// Move the draw surfaces to the scene view
-	Assert( !pSceneView->pDrawSurfaces );
-	uint32 globalDrawSurfaceId = 0;
-	uint32 localDrawSurfaceIds[STUDIO_RENDERPASS_NUM_TYPES];
-	pSceneView->pDrawSurfaces = (studioDrawSurface_t**)frameAlloc.AllocZero( pSceneView->numDrawSurfaces * sizeof( studioEntityId_t* ) );
-	for ( uint32 index = 0; index < STUDIO_RENDERPASS_NUM_TYPES; ++index )
+	// Get all surfaces and materials
+	uint32							  numSurfaces		 = pModelResource->GetNumSurfaces();
+	const modelSurface_t*			  pSurfaces			 = pModelResource->GetSurfaces();
+	const CRefPtr<IMaterialResource>* pMaterialResources = pModelResource->GetMaterials();
+
+	// Resize the draw surfaces list if it doesn't fit
+	uint32 requiredCapacity = pSceneView->numDrawSurfaces + numSurfaces;
+	if ( requiredCapacity > pSceneView->maxDrawSurfaces )
 	{
-		studioRenderPass_t& renderPass = pSceneView->renderPasses[index];
-		renderPass.pDrawSurfaceIds	   = (uint32*)frameAlloc.AllocZero( renderPass.numDrawSurfaces * sizeof( uint32 ) );
-		localDrawSurfaceIds[index]	   = 0;
+		studioDrawSurface_t** pOldList	  = pSceneView->pDrawSurfaces;
+		uint32				  oldCapacity = pSceneView->maxDrawSurfaces;
+		while ( pSceneView->maxDrawSurfaces < requiredCapacity )
+		{
+			pSceneView->maxDrawSurfaces *= 2;
+		}
+		pSceneView->pDrawSurfaces = (studioDrawSurface_t**)frameAlloc.Alloc( pSceneView->maxDrawSurfaces * sizeof( studioDrawSurface_t* ) );
+		Mem_Memcpy( pSceneView->pDrawSurfaces, pOldList, oldCapacity * sizeof( studioDrawSurface_t* ) );
 	}
 
-	for ( studioEntityView_t* pEntityView = pSceneView->pEntityViews; pEntityView; pEntityView = pEntityView->pNext )
+	// Go through each model surface and add draw surfaces to the scene view
+	for ( uint32 index = 0; index < numSurfaces; index++ )
 	{
-		for ( studioDrawSurface_t* pDrawSurface = pEntityView->pDrawSurfaces; pDrawSurface; pDrawSurface = pDrawSurface->pNext, ++globalDrawSurfaceId )
-		{
-			// Add indices of the draw surfaces for each render pass if it need
-			for ( uint32 renderPassId = 0; renderPassId < STUDIO_RENDERPASS_NUM_TYPES; ++renderPassId )
-			{
-				if ( pDrawSurface->bShouldDrawSurfaceInPass[renderPassId] )
-				{
-					studioRenderPass_t& renderPass				   = pSceneView->renderPasses[renderPassId];
-					uint32&				localDrawSurfaceId		   = localDrawSurfaceIds[renderPassId];
-					renderPass.pDrawSurfaceIds[localDrawSurfaceId] = globalDrawSurfaceId;
-					++localDrawSurfaceId;
-				}
-			}
-
-			// Add the draw surfaces to the scene view
-			pSceneView->pDrawSurfaces[globalDrawSurfaceId] = pDrawSurface;
-		}
+		const modelSurface_t& surface						   = pSurfaces[index];
+		studioDrawSurface_t*  pDrawSurface					   = frameAlloc.Construct<studioDrawSurface_t>();
+		pDrawSurface->pEntityView							   = pEntityView;
+		pDrawSurface->pModel								   = pModelResource;
+		pDrawSurface->pMaterial								   = pMaterialResources[surface.materialId];
+		pDrawSurface->baseVertexIndex						   = surface.baseVertexIndex;
+		pDrawSurface->baseIndex								   = surface.baseIndex;
+		pDrawSurface->numIndices							   = surface.numIndices;
+		pSceneView->pDrawSurfaces[pSceneView->numDrawSurfaces] = pDrawSurface;
+		++pSceneView->numDrawSurfaces;
 	}
 }
 

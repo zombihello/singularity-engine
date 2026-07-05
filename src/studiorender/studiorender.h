@@ -7,6 +7,7 @@
 // Forward declarations
 //-----------------------------------------------------------------------------
 class CStudioViewport;
+struct studioEntityView_t;
 
 //-----------------------------------------------------------------------------
 // Studio frame allocator
@@ -46,7 +47,7 @@ public:
 	studioFrameAlloc_t& GetFrameAlloc();
 
 private:
-	void AddDrawSurfacesToSceneView( studioSceneView_t* pSceneView );
+	void AddModelToSceneView( studioSceneView_t* pSceneView, studioEntityView_t* pEntityView );
 	void R_DrawScene( CStudioViewport* pViewport, studioSceneView_t* pSceneView );
 
 	CStudioRenderPassPresent presentRenderPass;

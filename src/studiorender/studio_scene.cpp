@@ -88,13 +88,14 @@ CStudioScene::FindEntityViews
 */
 void CStudioScene::FindEntityViews( studioSceneView_t* pSceneView ) const
 {
+	// TODO BS yehor.pohuliaka - Here should be frustum and occlusion culling
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_VISIBILITY );
 	for ( uint32 index = 0, count = (uint32)entities.size(); index < count; ++index )
 	{
 		const studioEntity_t& entity	  = entities[index];
-		studioEntityView_t*	  pEntityView = (studioEntityView_t*)g_StudioRender.GetFrameAlloc().AllocZero( sizeof( studioEntityView_t ) );
+		studioEntityView_t*	  pEntityView = (studioEntityView_t*)g_StudioRender.GetFrameAlloc().Alloc( sizeof( studioEntityView_t ) );
 		pEntityView->pEntity			  = (studioEntity_t*)&entity;
-		pEntityView->transform			  = g_matrixIdentity;
+		pEntityView->localToWorld		  = g_matrixIdentity;
 		pEntityView->pNext				  = pSceneView->pEntityViews;
 		pSceneView->pEntityViews		  = pEntityView;
 	}

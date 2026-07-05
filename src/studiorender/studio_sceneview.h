@@ -8,7 +8,6 @@
 // Forward declarations
 //-----------------------------------------------------------------------------
 struct studioEntity_t;
-struct studioDrawSurface_t;
 
 //-----------------------------------------------------------------------------
 // Studio entity view
@@ -23,10 +22,9 @@ struct studioDrawSurface_t;
 //-----------------------------------------------------------------------------
 struct studioEntityView_t
 {
-	studioEntityView_t*	 pNext;
-	studioEntity_t*		 pEntity;  // NOTE: The render thread should NOT use the pEntity, because it can change in another thread
-	matrix4x4_t			 transform;
-	studioDrawSurface_t* pDrawSurfaces;
+	studioEntityView_t* pNext;
+	studioEntity_t*		pEntity;  // NOTE: The render thread should NOT use the pEntity, because it can change in another thread
+	matrix4x4_t			localToWorld;
 };
 
 //-----------------------------------------------------------------------------
@@ -38,32 +36,22 @@ struct studioEntityView_t
 //-----------------------------------------------------------------------------
 struct studioDrawSurface_t
 {
-	studioDrawSurface_t*	   pNext;
 	studioEntityView_t*		   pEntityView;
 	CRefPtr<IModelResource>	   pModel;
 	CRefPtr<IMaterialResource> pMaterial;
 	uint32					   baseVertexIndex;
 	uint32					   baseIndex;
 	uint32					   numIndices;
-	bool					   bShouldDrawSurfaceInPass[STUDIO_RENDERPASS_NUM_TYPES];
-};
-
-//-----------------------------------------------------------------------------
-// Studio render pass
-//-----------------------------------------------------------------------------
-struct studioRenderPass_t
-{
-	uint32* pDrawSurfaceIds;
-	uint32	numDrawSurfaces;
 };
 
 //-----------------------------------------------------------------------------
 // Studio scene view
+// NOTE: studioSceneView_t are allocated on the frame temporary stack memory
 //-----------------------------------------------------------------------------
 struct studioSceneView_t
 {
-	studioEntityView_t*	  pEntityViews;
-	studioDrawSurface_t** pDrawSurfaces;
-	uint32				  numDrawSurfaces;
-	studioRenderPass_t	  renderPasses[STUDIO_RENDERPASS_NUM_TYPES];
+	studioEntityView_t*	  pEntityViews;		// Chain of all entity views effecting view, including off screen ones casting shadows
+	studioDrawSurface_t** pDrawSurfaces;	// Draw surfaces are the visible surfaces of the entity views
+	uint32				  numDrawSurfaces;	// It is allocated in frame temporary memory
+	uint32				  maxDrawSurfaces;	// May be resized
 };

@@ -31,10 +31,9 @@ void CStudioRenderPassPresent::R_DrawPass( CStudioViewport* pViewport, studioSce
 		pGraphicsCmdList->Barrier( barriers, ARRAYSIZE( barriers ) );
 	}
 
-	const studioRenderPass_t& renderPass = pSceneView->renderPasses[STUDIO_RENDERPASS_TYPE_PRESENT];
-	for ( uint32 index = 0, count = renderPass.numDrawSurfaces; index < count; ++index )
+	for ( uint32 index = 0; index < pSceneView->numDrawSurfaces; ++index )
 	{
-		studioDrawSurface_t* pDrawSurface			= pSceneView->pDrawSurfaces[renderPass.pDrawSurfaceIds[index]];
+		studioDrawSurface_t* pDrawSurface			= pSceneView->pDrawSurfaces[index];
 		IShader*			 pShader				= pDrawSurface->pMaterial->GetShader();
 		IShaderContextData*	 pContextData			= pDrawSurface->pMaterial->GetContextData();
 		IStudioAPIBuffer*	 pStudioAPIVertexBuffer = pDrawSurface->pModel->GetStudioAPIVertexBuffer();
