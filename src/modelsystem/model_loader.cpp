@@ -3,6 +3,7 @@
 #include "utils/smdldoc/smdl_compiled_doc.h"
 #include "resourcesystem/iresourcesystem.h"
 #include "resourcesystem/iresourcetypemgr.h"
+#include "materialsystem/imaterial.h"
 #include "modelsystem/model.h"
 #include "modelsystem/model_loader.h"
 
