@@ -105,7 +105,7 @@ void CStudioAPIDescriptorStateCommonVk::InitDescriptorWriteInfos()
 	// Initialize descriptor set write container
 	Assert( pDescriptorSetsLayout );
 	const eastl::vector<studioAPIDescriptorSetInfoVk_t>& descriptorSetInfos = pDescriptorSetsLayout->GetDescriptorSetInfos();
-	uint32											   numDescriptorSets  = (uint32)descriptorSetInfos.size();
+	uint32												 numDescriptorSets	= (uint32)descriptorSetInfos.size();
 	for ( uint32 set = 0; set < numDescriptorSets; ++set )
 	{
 		const studioAPIDescriptorSetInfoVk_t& descriptorSetInfo = descriptorSetInfos[set];
@@ -200,6 +200,7 @@ bool CStudioAPIDescriptorStateRenderVk::UpdateDescriptorSets( CStudioAPICmdListV
 	// Update descriptor sets
 	if ( pCmdList->GetCmdBuffer()->AcquirePoolSetAndDescriptorsIfNeed( *pDescriptorSetsLayout, bDirtyDescriptorSets, vkDescriptorSets.data() ) )
 	{
+		bDirtyDescriptorSets = false;
 		for ( uint32 index = 0, numSets = (uint32)vkDescriptorSets.size(); index < numSets; ++index )
 		{
 			CStudioAPIDescriptorSetWriterVk& descriptorSetWriter = descriptorSetWriters[index];

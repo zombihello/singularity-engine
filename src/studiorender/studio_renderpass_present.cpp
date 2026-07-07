@@ -4,69 +4,92 @@
 #include "studiorender/studio_renderpasstypes.h"
 #include "studiorender/studio_viewport.h"
 #include "studiorender/studio_renderpass_present.h"
-
-/*
-==================
-CStudioRenderPassPresent::Init
-==================
-*/
-void CStudioRenderPassPresent::Init()
-{
-}
-
-/*
-==================
-CStudioRenderPassPresent::Shutdown
-==================
-*/
-void CStudioRenderPassPresent::Shutdown()
-{
-}
+#include "studiorender/studio_sceneview.h"
 
 /*
 ==================
 CStudioRenderPassPresent::R_DrawPass
 ==================
 */
-void CStudioRenderPassPresent::R_DrawPass( CStudioViewport* pViewport, CStudioRenderObjectQuad* pQuad )
+void CStudioRenderPassPresent::R_DrawPass( CStudioViewport* pViewport, studioSceneView_t* pSceneView )
 {
+	// Do nothing if the swap chain hasn't an acquired image
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-	IStudioAPIBuffer*				pQuadVertexBuffer	  = pQuad->GetStudioAPIVertexBuffer();
-	IStudioAPIBuffer*				pQuadIndexBuffer	  = pQuad->GetStudioAPIIndexBuffer();
-	IMaterialResource*				pQuadMaterialResource = pQuad->GetMaterialResource();
-	IShader*						pShader				  = pQuadMaterialResource->GetShader();
-	IShaderContextData*				pShaderContextData	  = pQuadMaterialResource->GetContextData();
+	IStudioAPISwapChain* pStudioAPISwapChain = pViewport->GetStudioAPISwapChain();
+	if ( !pStudioAPISwapChain->IsImageAcquired() )
+	{
+		return;
+	}
+
 	vector2i_t						viewportSize		  = pViewport->GetSize();
-	IStudioAPISwapChain*			pStudioAPISwapChain	  = pViewport->GetStudioAPISwapChain();
 	CRefPtr<IStudioAPICmdContext>	pGraphicsCmdContext	  = g_pStudioAPI->GetImmediateCmdContext( STUDIOAPI_QUEUE_TYPE_GRAPHICS );
 	CRefPtr<IStudioAPICmdListBatch> pGraphicsCmdListBatch = g_pStudioAPI->CreateCmdListBatch( pGraphicsCmdContext );
 	CRefPtr<IStudioAPICmdList>		pGraphicsCmdList	  = g_pStudioAPI->CreateCmdList( pGraphicsCmdContext );
+
+	// Initialize viewport and scissor
 	pGraphicsCmdList->BeginRecord();
 	pGraphicsCmdList->SetViewport( 0.f, 0.f, (float)viewportSize.x, (float)viewportSize.y, 0.f, 1.f );
 	pGraphicsCmdList->SetScissor( 0, 0, viewportSize.x, viewportSize.y );
+
+	// Place barriers into the command list
+	studioAPIBarrier_t barrier = StudioAPI_MakeTextureBarrier( pStudioAPISwapChain->GetCurrentImage(), STUDIOAPI_TEXTURE_LAYOUT_COLOR_RENDER_TARGET, STUDIOAPI_QUEUE_TYPE_GRAPHICS );
+	pGraphicsCmdList->Barrier( &barrier, 1 );
+
+	const studioRenderPass_t& renderPass = pSceneView->renderPasses[STUDIO_RENDERPASS_TYPE_PRESENT];
+	for ( auto it = renderPass.resourceIds.begin(), itEnd = renderPass.resourceIds.end(); it != itEnd; ++it )
 	{
-		studioAPIBarrier_t barriers[] = {
-			StudioAPI_MakeBufferBarrier( pQuadVertexBuffer, STUDIOAPI_BUFFER_STATE_VERTEX_BUFFER, STUDIOAPI_QUEUE_TYPE_GRAPHICS ),
-			StudioAPI_MakeBufferBarrier( pQuadIndexBuffer, STUDIOAPI_BUFFER_STATE_INDEX_BUFFER, STUDIOAPI_QUEUE_TYPE_GRAPHICS ),
-			StudioAPI_MakeTextureBarrier( pStudioAPISwapChain->GetCurrentImage(), STUDIOAPI_TEXTURE_LAYOUT_COLOR_RENDER_TARGET, STUDIOAPI_QUEUE_TYPE_GRAPHICS )
-		};
-		pGraphicsCmdList->Barrier( barriers, ARRAYSIZE( barriers ) );
+		studioResource_t* pResource = pSceneView->resources[*it];
+		switch ( pResource->type )
+		{
+		case STUDIO_RESOURCE_TYPE_MODEL:
+		{
+			IModelResource*	   pModel	  = pResource->pModel;
+			studioAPIBarrier_t barriers[] = {
+				StudioAPI_MakeBufferBarrier( pModel->GetStudioAPIVertexBuffer(), STUDIOAPI_BUFFER_STATE_VERTEX_BUFFER, STUDIOAPI_QUEUE_TYPE_GRAPHICS ),
+				StudioAPI_MakeBufferBarrier( pModel->GetStudioAPIIndexBuffer(), STUDIOAPI_BUFFER_STATE_INDEX_BUFFER, STUDIOAPI_QUEUE_TYPE_GRAPHICS )
+			};
+			pGraphicsCmdList->Barrier( barriers, ARRAYSIZE( barriers ) );
+			break;
+		}
+
+		case STUDIO_RESOURCE_TYPE_MATERIAL:
+		{
+			IMaterialResource*	pMaterial	 = pResource->pMaterial;
+			IShader*			pShader		 = pMaterial->GetShader();
+			IShaderContextData* pContextData = pMaterial->GetContextData();
+			pShader->R_Barrier( pGraphicsCmdList, pContextData );
+			break;
+		}
+
+		default:
+			AssertMsg( false, "Unknown studio resource type 0x%X", pResource->type );
+			break;
+		}
 	}
-	pShader->R_Barrier( pGraphicsCmdList, pShaderContextData );
+
+	// Draw all surfaces for the pass
 	pGraphicsCmdList->BeginRenderPass( pViewport->GetStudioAPIRenderPass(), pViewport->GetStudioAPIFrameBuffer() );
-	pShader->R_PrepareForDraw( pGraphicsCmdList, pShaderContextData, STUDIO_RENDERPASS_TYPE_PRESENT );
-	pGraphicsCmdList->SetVertexBuffer( 0, pQuadVertexBuffer, 0 );
-	pGraphicsCmdList->DrawIndexed( pQuadIndexBuffer, 0, 0, 6, 10 );
+	for ( uint32 index = 0, count = (uint32)renderPass.drawSurfaceIds.size(); index < count; ++index )
+	{
+		studioDrawSurface_t* pDrawSurface = pSceneView->drawSurfaces[renderPass.drawSurfaceIds[index]];
+		IModelResource*		 pModel		  = pSceneView->resources[pDrawSurface->modelId]->pModel;
+		IMaterialResource*	 pMaterial	  = pSceneView->resources[pDrawSurface->materialId]->pMaterial;
+		IShader*			 pShader	  = pMaterial->GetShader();
+		IShaderContextData*	 pContextData = pMaterial->GetContextData();
+
+		pShader->R_PrepareForDraw( pGraphicsCmdList, pContextData, STUDIO_RENDERPASS_TYPE_PRESENT );
+		pGraphicsCmdList->SetVertexBuffer( 0, pModel->GetStudioAPIVertexBuffer(), 0 );
+		pGraphicsCmdList->SetIndexBuffer( pModel->GetStudioAPIIndexBuffer(), 0 );
+		pGraphicsCmdList->DrawIndexed( pDrawSurface->baseVertexIndex, pDrawSurface->baseIndex, pDrawSurface->numIndices );
+	}
 	pGraphicsCmdList->EndRenderPass();
 
-	{
-		studioAPIBarrier_t barriers[] = {
-			StudioAPI_MakeTextureBarrier( pStudioAPISwapChain->GetCurrentImage(), STUDIOAPI_TEXTURE_LAYOUT_PRESENT, STUDIOAPI_QUEUE_TYPE_GRAPHICS )
-		};
-		pGraphicsCmdList->Barrier( barriers, ARRAYSIZE( barriers ) );
-	}
+	// Place barriers for swapchain image
+	barrier = StudioAPI_MakeTextureBarrier( pStudioAPISwapChain->GetCurrentImage(), STUDIOAPI_TEXTURE_LAYOUT_PRESENT, STUDIOAPI_QUEUE_TYPE_GRAPHICS );
+	pGraphicsCmdList->Barrier( &barrier, 1 );
 	pGraphicsCmdList->EndRecord();
 
+	// Submit the command list
 	pGraphicsCmdListBatch->AddCmdList( pGraphicsCmdList );
 	pGraphicsCmdListBatch->SyncSwapChain( pStudioAPISwapChain, STUDIOAPI_SYNC_SWAPCHAIN_FLAGS_ACQUIRE_NEXT_IMAGE | STUDIOAPI_SYNC_SWAPCHAIN_FLAGS_PRESENT_TO_IMAGE );
 	g_pStudioAPI->SubmitCmdListBatch( pGraphicsCmdListBatch );

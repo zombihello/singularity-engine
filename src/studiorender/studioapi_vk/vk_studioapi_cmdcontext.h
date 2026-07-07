@@ -42,6 +42,7 @@ public:
 	// Set resources
 	void SetRenderPipeline( CStudioAPICmdListVk* pCmdList, CStudioAPIRenderPipelineVk* pRenderPipeline );
 	void SetVertexBuffer( CStudioAPICmdListVk* pCmdList, uint32 slot, CStudioAPIBufferVk* pVertexBuffer, uint64 offset );
+	void SetIndexBuffer( CStudioAPICmdListVk* pCmdList, CStudioAPIBufferVk* pIndexBuffer, uint64 offset );
 	void SetConstantBuffer( CStudioAPICmdListVk* pCmdList, uint32 set, uint32 slot, CStudioAPIBufferVk* pConstantBuffer );
 	void SetTexture( CStudioAPICmdListVk* pCmdList, uint32 set, uint32 slot, CStudioAPITextureVk* pTexture );
 	void SetSampler( CStudioAPICmdListVk* pCmdList, uint32 set, uint32 slot, CStudioAPISamplerVk* pSampler );
@@ -50,7 +51,7 @@ public:
 
 	// Draw commands
 	void Draw( CStudioAPICmdListVk* pCmdList, uint32 baseVertexIndex, uint32 numVertices, uint32 numInstances = 1 );
-	void DrawIndexed( CStudioAPICmdListVk* pCmdList, CStudioAPIBufferVk* pIndexBuffer, uint32 baseVertexIndex, uint32 baseIndex, uint32 numIndices, uint32 numInstances = 1 );
+	void DrawIndexed( CStudioAPICmdListVk* pCmdList, uint32 baseVertexIndex, uint32 baseIndex, uint32 numIndices, uint32 numInstances = 1 );
 
 	// Barriers
 	void AddPendingBufferBarriers( CStudioAPICmdListVk* pCmdList, uint32 numBufferBarriers, const VkBufferMemoryBarrier* pVkBufferMemoryBarriers, VkPipelineStageFlags vkSrcStageMask, VkPipelineStageFlags vkDstStageMask );

@@ -17,9 +17,8 @@ CMaterialSystem::Connect
 */
 bool CMaterialSystem::Connect( createInterfaceFn_t pFactory )
 {
-	PROFILER_SCOPE_FUNC();
-
 	// Connect Tier1
+	PROFILER_SCOPE_FUNC();
 	if ( !ConnectTier1( pFactory ) )
 	{
 		return false;
@@ -27,7 +26,7 @@ bool CMaterialSystem::Connect( createInterfaceFn_t pFactory )
 	LinkCmds();
 	LinkCVars();
 
-	// Get the StudioAPI
+	// Get the studio api
 	g_pStudioAPI = (IStudioAPI*)pFactory( STUDIOAPI_INTERFACE_VERSION );
 	if ( !g_pStudioAPI )
 	{
@@ -67,15 +66,15 @@ CMaterialSystem::Disconnect
 void CMaterialSystem::Disconnect()
 {
 	PROFILER_SCOPE_FUNC();
+	UnlinkCVars();
+	UnlinkCmds();
+	DisconnectTier1();
+
 	g_pResourceSystem	= NULL;
 	g_pStudioRender		= NULL;
 	g_pShaderMgr		= NULL;
 	g_pStudioAPI		= NULL;
 	g_pAppSystemFactory = NULL;
-
-	UnlinkCVars();
-	UnlinkCmds();
-	DisconnectTier1();
 }
 
 /*
@@ -96,9 +95,8 @@ CMaterialSystem::Init
 */
 bool CMaterialSystem::Init()
 {
-	PROFILER_SCOPE_FUNC();
-
 	// Initialize the shader manager
+	PROFILER_SCOPE_FUNC();
 	g_pShaderMgr->Init();
 
 	// Register texture resource type
@@ -142,7 +140,6 @@ bool CMaterialSystem::Init()
 		pDefaultMaterial->SetShader( "wireframe" );
 	}
 	pMaterialsMgr->SetDefaultResource( pDefaultMaterial );
-
 	return true;
 }
 
@@ -153,9 +150,8 @@ CMaterialSystem::Shutdown
 */
 void CMaterialSystem::Shutdown()
 {
-	PROFILER_SCOPE_FUNC();
-
 	// Unregister all material resource types
+	PROFILER_SCOPE_FUNC();
 	g_pResourceSystem->RemoveResourceManagerForType<CMaterial>();
 	g_pResourceSystem->RemoveResourceManagerForType<CTexture>();
 

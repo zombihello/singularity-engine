@@ -10,6 +10,17 @@
 class IStudioAPISwapChain;
 
 //-----------------------------------------------------------------------------
+// StudioAPI swap chain status
+//-----------------------------------------------------------------------------
+enum studioAPISwapChainStatus_t
+{
+	STUDIOAPI_SWAPCHAIN_STATUS_OK,
+	STUDIOAPI_SWAPCHAIN_STATUS_NOT_CREATED,
+	STUDIOAPI_SWAPCHAIN_STATUS_OUT_OF_DATE,
+	STUDIOAPI_SWAPCHAIN_STATUS_SUBOPTIMAL
+};
+
+//-----------------------------------------------------------------------------
 // StudioAPI swap chain image interface
 //-----------------------------------------------------------------------------
 class IStudioAPISwapChainImage
@@ -34,14 +45,15 @@ public:
 	virtual bool Present()							   = 0;
 	virtual bool ReCreate()							   = 0;
 
-	virtual bool					  IsUseVSync() const			 = 0;
-	virtual bool					  IsValid() const				 = 0;
-	virtual vector2i_t				  GetSize() const				 = 0;
-	virtual uint32					  GetCurrentImageIndex() const	 = 0;
-	virtual IStudioAPISwapChainImage* GetCurrentImage() const		 = 0;
-	virtual uint32					  GetNumImages() const			 = 0;
-	virtual IStudioAPISwapChainImage* GetImage( uint32 index ) const = 0;
-	virtual windowHandle_t			  GetWindowHandle() const		 = 0;
+	virtual bool					   IsUseVSync() const			  = 0;
+	virtual bool					   IsImageAcquired() const		  = 0;
+	virtual studioAPISwapChainStatus_t GetStatus() const			  = 0;
+	virtual vector2i_t				   GetSize() const				  = 0;
+	virtual uint32					   GetCurrentImageIndex() const	  = 0;
+	virtual IStudioAPISwapChainImage*  GetCurrentImage() const		  = 0;
+	virtual uint32					   GetNumImages() const			  = 0;
+	virtual IStudioAPISwapChainImage*  GetImage( uint32 index ) const = 0;
+	virtual windowHandle_t			   GetWindowHandle() const		  = 0;
 
 	virtual IOnReCreated* OnReCreated() const = 0;
 };

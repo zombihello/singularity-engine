@@ -1,22 +1,13 @@
 #pragma once
-#include "materialsystem/imaterial.h"
 #include "studiorender/istudiorender.h"
-#include "studiorender/studioapi/istudioapi_swapchain.h"
+#include "studiorender/studio_sceneview.h"
 #include "studiorender/studio_renderpass_present.h"
 
 //-----------------------------------------------------------------------------
 // Forward declarations
 //-----------------------------------------------------------------------------
 class CStudioViewport;
-
-//-----------------------------------------------------------------------------
-// Studio scene view
-//-----------------------------------------------------------------------------
-struct studioSceneView_t
-{
-	matrix4x4_t viewMatrix;
-	matrix4x4_t projectionMatrix;
-};
+struct studioEntityView_t;
 
 //-----------------------------------------------------------------------------
 // Studio render
@@ -34,31 +25,28 @@ public:
 	virtual void Shutdown() override;
 
 	// IStudioRender interface
-	virtual void SetCameraView( const studioCameraView_t& cameraView ) override;
-
-	// Register and unregister render objects for rendering
-	virtual void RegisterObject( IStudioRenderObject* pRenderObject ) override;
-	virtual void UnregisterObject( IStudioRenderObject* pRenderObject ) override;
-	virtual void UnregisterAllObjects() override;
+	// Functions to draw scene
+	virtual void BeginFrame() override;
+	virtual void EndFrame() override;
+	virtual void DrawScene( IStudioViewport* pStudioViewport, IStudioScene* pStudioScene, const studioCameraView_t& cameraView ) override;
 
 	virtual CRefPtr<IStudioViewport>		  CreateViewport() const override;
 	virtual CRefPtr<IStudioRenderPipelineSet> CreateRenderPipelineSet() const override;
-
-	// NOTE: FOR TEST ONLY!
-	virtual CRefPtr<IStudioRenderObject> CreateQuadRenderObject( IResource* pMaterial, IStudioAPIBuffer* pVertexBuffer, IStudioAPIBuffer* pIndexBuffer ) const override;
+	virtual CRefPtr<IStudioScene>			  CreateScene() const override;
 
 	// Returns a command buffer of the render thread. If return NULL it's mean what StudioRender don't use render thread
 	virtual IStudioCmdBuffer* GetCommandBuffer() const override;
 	virtual bool			  IsInRenderThread() const override;
 
-	void BeginFrame();
-	void EndFrame();
-
-	void R_DrawFrame( CStudioViewport* pViewport );
-
 private:
-	CStudioRenderPassPresent					presentRenderPass;
-	studioSceneView_t							sceneView;
-	eastl::vector<CRefPtr<IStudioRenderObject>> renderObjects;
+	void AddModelToSceneView( studioSceneView_t* pSceneView, studioEntityView_t* pEntityView );
+	template<class TResourceClass>
+	uint32 AddResourceToSceneView( studioSceneView_t* pSceneView, TResourceClass* pResource );
+	uint32 AddResourceToSceneView( studioSceneView_t* pSceneView, studioResourcePtr_t pPtr, studioResourceType_t type );
+	void   R_DrawScene( CStudioViewport* pViewport, studioSceneView_t* pSceneView );
+
+	CStudioRenderPassPresent presentRenderPass;
 };
+
 extern CStudioRender g_StudioRender;
+#include "studiorender/studiorender.inl"

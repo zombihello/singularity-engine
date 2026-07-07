@@ -43,6 +43,7 @@ public:
 	void BindRenderPipeline( CStudioAPICmdListVk* pCmdList );
 	void UpdateDynamicStates( CStudioAPICmdListVk* pCmdList );
 	void PrepareForDraw( CStudioAPICmdListVk* pCmdList );
+	bool HasIndexBuffer() const;
 
 private:
 	struct vertexBuffer_t

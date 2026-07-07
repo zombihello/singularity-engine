@@ -31,7 +31,8 @@ public:
 	virtual IMap* GetActiveMap() const override;
 
 	// Process one game frame
-	virtual void FrameUpdate() override;
+	virtual void FrameUpdate( float deltaTime ) override;
+	virtual void FrameDraw( IStudioViewport* pStudioViewport ) override;
 
 	CGame();
 	CEcsMap*			GetActiveEcsMap() const;

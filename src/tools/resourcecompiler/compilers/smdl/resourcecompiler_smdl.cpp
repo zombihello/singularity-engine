@@ -32,18 +32,17 @@ struct smdlAiMesh_t
 	aiMesh*		pMesh;
 };
 
-// Assimp meshes dictionary type
-// Material Index -> Ai meshes
-typedef eastl::unordered_map<uint32, eastl::vector<smdlAiMesh_t>> smdlAiMeshesMap_t;
-
 struct smdlMeshData_t
 {
-	eastl::string				name;
-	eastl::vector<smdlVertex_t> vertices;
-	eastl::vector<uint32>		indices;
-	smdlSurface_t				surface;
-	uint32						materialID;
+	eastl::string					   name;
+	eastl::vector<modelStaticVertex_t> vertices;
+	eastl::vector<uint32>			   indices;
+	modelSurface_t					   surface;
+	uint32							   materialId;
 };
+
+// Assimp meshes dictionary type. Material index -> Ai meshes
+typedef eastl::unordered_map<uint32, eastl::vector<smdlAiMesh_t>> smdlAiMeshesMap_t;
 
 /*
 ==================
@@ -102,6 +101,7 @@ private:
 	void ProcessNode( aiNode* pNode, const aiScene* pScene, smdlAiMeshesMap_t& meshesDict ) const;
 	bool ParseModels( const CSMDLSourceModelDoc& smdlSourceFile, const char* pSrcFileDir, eastl::vector<smdlMeshData_t>& parsedMeshes, eastl::vector<eastl::string>& parsedMaterials ) const;
 	void OptimizeModel( smdlMeshData_t& meshData ) const;
+	void InitSMDLDoc( CSMDLCompiledModelDoc& smdlCompiledFile, const eastl::vector<modelStaticVertex_t>& vertices, const eastl::vector<uint32>& indices, const eastl::vector<modelSurface_t>& surfaces, const eastl::vector<eastl::string>& materials ) const;
 };
 
 EXPOSE_SINGLE_INTERFACE( CResourceCompilerSMdl, IResourceCompiler, RESOURCECOMPILER_INTERFACE_VERSION );
@@ -176,19 +176,19 @@ bool CResourceCompilerSMdl::Compile( const char* pSrcPath, const char* pDestPath
 		eastl::unordered_map<uint32, eastl::vector<uint32>> parsedMeshesDict;  // Key - material ID, Item - index to a mesh data in the meshes
 		for ( uint32 meshIdx = 0, numMeshes = (uint32)parsedMeshes.size(); meshIdx < numMeshes; ++meshIdx )
 		{
-			smdlMeshData_t& smdlMeshData = parsedMeshes[meshIdx];
-			parsedMeshesDict[smdlMeshData.materialID].emplace_back( meshIdx );
+			const smdlMeshData_t& smdlMeshData = parsedMeshes[meshIdx];
+			parsedMeshesDict[smdlMeshData.materialId].emplace_back( meshIdx );
 		}
 
 		// Combine meshes
-		eastl::vector<smdlVertex_t>	 smdlVertices;
-		eastl::vector<uint32>		 indices;
-		eastl::vector<smdlSurface_t> smdlSurfaces;
+		eastl::vector<modelStaticVertex_t> smdlVertices;
+		eastl::vector<uint32>			   indices;
+		eastl::vector<modelSurface_t>	   smdlSurfaces;
 		for ( auto itMaterial = parsedMeshesDict.begin(), itMaterialEnd = parsedMeshesDict.end(); itMaterial != itMaterialEnd; ++itMaterial )
 		{
-			smdlSurface_t smdlSurface = {};
-			smdlSurface.firstIndex	  = (uint32)indices.size();
-			smdlSurface.materialID	  = itMaterial->first;
+			modelSurface_t smdlSurface = {};
+			smdlSurface.baseIndex	   = (uint32)indices.size();
+			smdlSurface.materialId	   = itMaterial->first;
 
 			for ( uint32 meshIdx = 0, numMeshes = (uint32)itMaterial->second.size(); meshIdx < numMeshes; ++meshIdx )
 			{
@@ -196,7 +196,7 @@ bool CResourceCompilerSMdl::Compile( const char* pSrcPath, const char* pDestPath
 				const smdlMeshData_t& smdlMeshData	 = parsedMeshes[itMaterial->second[meshIdx]];
 				uint32				  offsetVertices = (uint32)smdlVertices.size();
 				smdlVertices.resize( smdlVertices.size() + smdlMeshData.vertices.size() );
-				Mem_Memcpy( smdlVertices.data() + offsetVertices, smdlMeshData.vertices.data(), smdlMeshData.vertices.size() * sizeof( smdlVertex_t ) );
+				Mem_Memcpy( smdlVertices.data() + offsetVertices, smdlMeshData.vertices.data(), smdlMeshData.vertices.size() * sizeof( modelStaticVertex_t ) );
 
 				// Copy new indices
 				uint32 offsetIndices = (uint32)indices.size();
@@ -207,12 +207,12 @@ bool CResourceCompilerSMdl::Compile( const char* pSrcPath, const char* pDestPath
 				}
 			}
 
-			smdlSurface.numIndices = (uint32)indices.size() - smdlSurface.firstIndex;
+			smdlSurface.numIndices = (uint32)indices.size() - smdlSurface.baseIndex;
 			smdlSurfaces.emplace_back( smdlSurface );
 		}
 
 		CSMDLCompiledModelDoc& smdlCompiledFile = smdlCompiledFiles.emplace_back();
-		smdlCompiledFile.SetData( smdlVertices, indices, smdlSurfaces, parsedMaterials );
+		InitSMDLDoc( smdlCompiledFile, smdlVertices, indices, smdlSurfaces, parsedMaterials );
 		Msg( "ResourceCompilerSMdl: ..Combine is done" );
 	}
 	// Otherwise compile separated meshes
@@ -220,14 +220,14 @@ bool CResourceCompilerSMdl::Compile( const char* pSrcPath, const char* pDestPath
 	{
 		for ( uint32 modelIdx = 0, numModels = (uint32)parsedMeshes.size(); modelIdx < numModels; ++modelIdx )
 		{
-			CSMDLCompiledModelDoc&		 smdlCompiledFile = smdlCompiledFiles.emplace_back();
-			smdlMeshData_t&				 smdlMeshData	  = parsedMeshes[modelIdx];
-			eastl::vector<smdlSurface_t> smdlSurfaces;
-			eastl::vector<eastl::string> materials;
+			CSMDLCompiledModelDoc&		  smdlCompiledFile = smdlCompiledFiles.emplace_back();
+			smdlMeshData_t&				  smdlMeshData	   = parsedMeshes[modelIdx];
+			eastl::vector<modelSurface_t> smdlSurfaces;
+			eastl::vector<eastl::string>  materials;
 
 			smdlSurfaces.emplace_back( smdlMeshData.surface );
-			materials.emplace_back( parsedMaterials[smdlMeshData.materialID] );
-			smdlCompiledFile.SetData( smdlMeshData.vertices, smdlMeshData.indices, smdlSurfaces, materials );
+			materials.emplace_back( parsedMaterials[smdlMeshData.materialId] );
+			InitSMDLDoc( smdlCompiledFile, smdlMeshData.vertices, smdlMeshData.indices, smdlSurfaces, materials );
 		}
 	}
 
@@ -352,9 +352,9 @@ bool CResourceCompilerSMdl::ParseModels( const CSMDLSourceModelDoc& smdlSourceFi
 			aiMesh*		   pAiMesh			= ( *itMesh ).pMesh;
 			smdlMeshData_t smdlMeshData		= {};
 			smdlMeshData.name				= pAiMesh->mName.C_Str();
-			smdlMeshData.materialID			= itMaterial->first;
-			smdlMeshData.surface.materialID = itMaterial->first;
-			smdlMeshData.surface.firstIndex = (uint32)smdlMeshData.indices.size();
+			smdlMeshData.materialId			= itMaterial->first;
+			smdlMeshData.surface.materialId = itMaterial->first;
+			smdlMeshData.surface.baseIndex	= (uint32)smdlMeshData.indices.size();
 
 			// Prepare the vertex buffer
 			smdlMeshData.vertices.resize( pAiMesh->mNumVertices );
@@ -363,8 +363,8 @@ bool CResourceCompilerSMdl::ParseModels( const CSMDLSourceModelDoc& smdlSourceFi
 			axisUp_t axisUp = smdlSourceFile.GetAxisUp();
 			for ( uint32 vertexIdx = 0; vertexIdx < pAiMesh->mNumVertices; ++vertexIdx )
 			{
-				smdlVertex_t smdlVertex = {};
-				aiVector3D	 aiVertex	= ( *itMesh ).transformation * pAiMesh->mVertices[vertexIdx];
+				modelStaticVertex_t smdlVertex = {};
+				aiVector3D			aiVertex   = ( *itMesh ).transformation * pAiMesh->mVertices[vertexIdx];
 				SMdl_ChangeAxisUp( aiVertex, axisUp );
 
 				smdlVertex.position.x = aiVertex.x;
@@ -436,7 +436,7 @@ bool CResourceCompilerSMdl::ParseModels( const CSMDLSourceModelDoc& smdlSourceFi
 		aiString	aiMaterialName;
 		pMaterial->Get( AI_MATKEY_NAME, aiMaterialName );
 
-		// Rename material if it need
+		// Rename material if it needs
 		eastl::string materialName		= aiMaterialName.C_Str();
 		auto		  itRenamedMaterial = renamedMaterialsDict.find( materialName );
 		if ( itRenamedMaterial != renamedMaterialsDict.end() )
@@ -466,27 +466,73 @@ void CResourceCompilerSMdl::OptimizeModel( smdlMeshData_t& meshData ) const
 	eastl::vector<uint32> meshoptVertexRemap( numIndices );
 	uint32				  optimizedNumVertices = (uint32)meshopt_generateVertexRemap( meshoptVertexRemap.data(),
 																					  meshData.indices.data(), numIndices,
-																					  meshData.vertices.data(), numVertices, sizeof( smdlVertex_t ) );
+																					  meshData.vertices.data(), numVertices, sizeof( modelStaticVertex_t ) );
 
 	// Allocate memory for optimized vertices and indices
-	eastl::vector<uint32>		optimizedIndices( numIndices );
-	eastl::vector<smdlVertex_t> optimizedVertices( optimizedNumVertices );
+	eastl::vector<uint32>			   optimizedIndices( numIndices );
+	eastl::vector<modelStaticVertex_t> optimizedVertices( optimizedNumVertices );
 
 	// Remove duplicate vertices
 	meshopt_remapIndexBuffer( optimizedIndices.data(), meshData.indices.data(), numIndices, meshoptVertexRemap.data() );
-	meshopt_remapVertexBuffer( optimizedVertices.data(), meshData.vertices.data(), numVertices, sizeof( smdlVertex_t ), meshoptVertexRemap.data() );
+	meshopt_remapVertexBuffer( optimizedVertices.data(), meshData.vertices.data(), numVertices, sizeof( modelStaticVertex_t ), meshoptVertexRemap.data() );
 
 	// Improve the locality of the vertices
 	meshopt_optimizeVertexCache( optimizedIndices.data(), optimizedIndices.data(), numIndices, optimizedNumVertices );
 
 	// Reduce pixel overdraw
 	meshopt_optimizeOverdraw( optimizedIndices.data(), optimizedIndices.data(), numIndices,
-							  &optimizedVertices[0].position.x, optimizedNumVertices, sizeof( smdlVertex_t ), 1.05f );
+							  &optimizedVertices[0].position.x, optimizedNumVertices, sizeof( modelStaticVertex_t ), 1.05f );
 
 	// Optimize access to the vertex buffer
-	meshopt_optimizeVertexFetch( optimizedVertices.data(), optimizedIndices.data(), numIndices, optimizedVertices.data(), optimizedNumVertices, sizeof( smdlVertex_t ) );
+	meshopt_optimizeVertexFetch( optimizedVertices.data(), optimizedIndices.data(), numIndices, optimizedVertices.data(), optimizedNumVertices, sizeof( modelStaticVertex_t ) );
 
 	// Save the optimized vertices and indices
 	meshData.vertices = eastl::move( optimizedVertices );
 	meshData.indices  = eastl::move( optimizedIndices );
+}
+
+/*
+==================
+CResourceCompilerSMdl::InitSMDLDoc
+==================
+*/
+void CResourceCompilerSMdl::InitSMDLDoc( CSMDLCompiledModelDoc& smdlCompiledFile, const eastl::vector<modelStaticVertex_t>& vertices, const eastl::vector<uint32>& indices, const eastl::vector<modelSurface_t>& surfaces, const eastl::vector<eastl::string>& materials ) const
+{
+	eastl::vector<const char*> pMatrerials;
+	pMatrerials.resize( materials.size() );
+	for ( uint32 index = 0, count = (uint32)materials.size(); index < count; ++index )
+	{
+		pMatrerials[index] = materials[index].data();
+	}
+
+	eastl::vector<uint16> indices16Bit;
+	if ( vertices.size() <= S_MaxValue<uint16>() )
+	{
+		Msg( "ResourceCompilerSMdl: In the model count vertices less than max 16bit integer, converting indices into 16bit.." );
+		indices16Bit.resize( indices.size() );
+		for ( uint32 index = 0, count = (uint32)indices.size(); index < count; ++index )
+		{
+			const uint32& value = indices[index];
+			indices16Bit[index] = (uint16)value;
+			if ( value > S_MaxValue<uint16>() )
+			{
+				Warning( "ResourceCompilerSMdl: Index at %i was truncated because it was larger than a 16-bit integer", index );
+				indices16Bit[index] = (uint16)( value & S_MaxValue<uint16>() );
+			}
+		}
+		Msg( "ResourceCompilerSMdl: ..All indices are converted into 16bit" );
+	}
+
+	smdlInitialData_t initialData = {};
+	initialData.vertexType		  = MODEL_VERTEXTYPE_STATIC;
+	initialData.indexType		  = !indices16Bit.empty() ? MODEL_INDEXTYPE_UINT16 : MODEL_INDEXTYPE_UINT32;
+	initialData.sizeVertices	  = (uint32)vertices.size() * sizeof( modelStaticVertex_t );
+	initialData.sizeIndices		  = !indices16Bit.empty() ? ( (uint32)indices16Bit.size() * sizeof( uint16 ) ) : ( (uint32)indices.size() * sizeof( uint32 ) );
+	initialData.numSurfaces		  = (uint32)surfaces.size();
+	initialData.numMaterials	  = (uint32)materials.size();
+	initialData.pVertices		  = (byte*)vertices.data();
+	initialData.pIndices		  = !indices16Bit.empty() ? (byte*)indices16Bit.data() : (byte*)indices.data();
+	initialData.pSurfaces		  = surfaces.data();
+	initialData.pMaterials		  = pMatrerials.data();
+	smdlCompiledFile.SetData( initialData );
 }

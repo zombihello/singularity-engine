@@ -1,7 +1,7 @@
 #pragma once
 #include "studiorender/studioapi/istudioapi_shader.h"
 #include "studiorender/studio_renderpasstypes.h"
-#include "studiorender/studio_vertextypes.h"
+#include "modelsystem/modeltypes.h"
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -15,7 +15,7 @@ struct studioBakeRenderPipelineParams_t
 {
 	uint64				   pipelineIdx;
 	studioRenderPassType_t renderPassType;
-	studioVertexType_t	   vertexType;
+	modelVertexType_t	   vertexType;
 	IStudioAPIShader*	   pStudioAPIShaders[STUDIOAPI_SHADER_NUM_DRAW_TYPES];
 };
 

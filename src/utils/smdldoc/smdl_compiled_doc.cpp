@@ -20,7 +20,28 @@ CSMDLCompiledModelDoc::CSMDLCompiledModelDoc
 ==================
 */
 CSMDLCompiledModelDoc::CSMDLCompiledModelDoc()
+	: vertexType( MODEL_VERTEX_NUM_TYPES )
+	, indexType( MODEL_INDEX_NUM_TYPES )
+	, flags( SMDL_DATA_FLAG_NONE )
+	, sizeVertices( 0 )
+	, sizeIndices( 0 )
+	, numSurfaces( 0 )
+	, numMaterials( 0 )
+	, pVertices( NULL )
+	, pIndices( NULL )
+	, pSurfaces( NULL )
+	, pMaterials( NULL )
 {
+}
+
+/*
+==================
+CSMDLCompiledModelDoc::~CSMDLCompiledModelDoc
+==================
+*/
+CSMDLCompiledModelDoc::~CSMDLCompiledModelDoc()
+{
+	Clear();
 }
 
 /*
@@ -46,31 +67,31 @@ bool CSMDLCompiledModelDoc::SaveFile( const char* pPath )
 	pFile->Write( (void*)s_SMDLMagic, s_SMDLMagicSize );
 	pFile->Write( (void*)&s_SMDLVersion, sizeof( uint32 ) );
 
+	// Write vertex and index type
+	pFile->Write( &vertexType, sizeof( modelVertexType_t ) );
+	pFile->Write( &indexType, sizeof( modelIndexType_t ) );
+
 	// Write materials
-	uint32 numMaterials = (uint32)materials.size();
 	pFile->Write( &numMaterials, sizeof( uint32 ) );
 	for ( uint32 materialIdx = 0; materialIdx < numMaterials; ++materialIdx )
 	{
-		const eastl::string& material	= materials[materialIdx];
-		uint32				 sizeString = (uint32)material.size();
-		pFile->Write( &sizeString, sizeof( uint32 ) );
-		pFile->Write( (char*)material.data(), sizeString * sizeof( char ) );
+		const char* pMaterial = pMaterials[materialIdx];
+		uint32		strLen	  = S_Strlen( pMaterial );
+		pFile->Write( &strLen, sizeof( uint32 ) );
+		pFile->Write( (char*)pMaterial, strLen * sizeof( char ) );
 	}
 
 	// Write vertices
-	uint32 numVertices = (uint32)vertices.size();
-	pFile->Write( &numVertices, sizeof( uint32 ) );
-	CompressStreamData( COMPRESSION_ZLIB, pFile, (byte*)vertices.data(), numVertices * sizeof( smdlVertex_t ) );
+	pFile->Write( &sizeVertices, sizeof( uint32 ) );
+	CompressStreamData( COMPRESSION_ZLIB, pFile, (byte*)pVertices, sizeVertices );
 
 	// Write indices
-	uint32 numIndices = (uint32)indices.size();
-	pFile->Write( &numIndices, sizeof( uint32 ) );
-	CompressStreamData( COMPRESSION_ZLIB, pFile, (byte*)indices.data(), numIndices * sizeof( uint32 ) );
+	pFile->Write( &sizeIndices, sizeof( uint32 ) );
+	CompressStreamData( COMPRESSION_ZLIB, pFile, (byte*)pIndices, sizeIndices );
 
 	// Write surfaces
-	uint32 numSurfaces = (uint32)surfaces.size();
 	pFile->Write( &numSurfaces, sizeof( uint32 ) );
-	pFile->Write( surfaces.data(), numSurfaces * sizeof( smdlSurface_t ) );
+	pFile->Write( (byte*)pSurfaces, numSurfaces * sizeof( modelSurface_t ) );
 
 	// We are done
 	return true;
@@ -113,37 +134,183 @@ bool CSMDLCompiledModelDoc::LoadFromFile( const char* pPath )
 	}
 	Clear();
 
-	// Read materials
-	uint32 numMaterials = 0;
-	pFile->Read( &numMaterials, sizeof( uint32 ) );
-	materials.resize( numMaterials );
-	for ( uint32 materialIdx = 0; materialIdx < numMaterials; ++materialIdx )
+	// Read vertex and index type
+	pFile->Read( &vertexType, sizeof( modelVertexType_t ) );
+	pFile->Read( &indexType, sizeof( modelIndexType_t ) );
+
+	// Validate vertex type and index type
+	if ( vertexType >= MODEL_VERTEX_NUM_TYPES )
 	{
-		eastl::string& material	  = materials[materialIdx];
-		uint32		   sizeString = 0;
-		pFile->Read( &sizeString, sizeof( uint32 ) );
-		material.resize( sizeString );
-		pFile->Read( (char*)material.data(), sizeString * sizeof( char ) );
+		Error( "SMDLDoc: Invalid vertex type in the model, received 0x%X", vertexType );
+		return false;
+	}
+	if ( indexType >= MODEL_INDEX_NUM_TYPES )
+	{
+		Error( "SMDLDoc: Invalid index type in the model, received 0x%X", indexType );
+		return false;
+	}
+
+	// Read materials
+	pFile->Read( &numMaterials, sizeof( uint32 ) );
+	if ( numMaterials > 0 )
+	{
+		flags |= SMDL_DATA_FLAG_OWN_MATERIALS;
+		pMaterials = new const char*[numMaterials];
+		for ( uint32 materialIdx = 0; materialIdx < numMaterials; ++materialIdx )
+		{
+			uint32 strLen = 0;
+			pFile->Read( &strLen, sizeof( uint32 ) );
+			pMaterials[materialIdx] = new char[strLen + 1];
+			char* pMaterial			= (char*)pMaterials[materialIdx];
+			pFile->Read( (char*)pMaterial, strLen * sizeof( char ) );
+			pMaterial[strLen] = 0;
+		}
 	}
 
 	// Read vertices
-	uint32 numVertices = 0;
-	pFile->Read( &numVertices, sizeof( uint32 ) );
-	vertices.resize( numVertices );
-	UncompressStreamData( COMPRESSION_ZLIB, pFile, (byte*)vertices.data(), numVertices * sizeof( smdlVertex_t ) );
+	pFile->Read( &sizeVertices, sizeof( uint32 ) );
+	if ( sizeVertices > 0 )
+	{
+		flags |= SMDL_DATA_FLAG_OWN_VERTICES;
+		pVertices = new byte[sizeVertices];
+		UncompressStreamData( COMPRESSION_ZLIB, pFile, (byte*)pVertices, sizeVertices );
+	}
 
 	// Write indices
-	uint32 numIndices = 0;
-	pFile->Read( &numIndices, sizeof( uint32 ) );
-	indices.resize( numIndices );
-	UncompressStreamData( COMPRESSION_ZLIB, pFile, (byte*)indices.data(), numIndices * sizeof( uint32 ) );
+	pFile->Read( &sizeIndices, sizeof( uint32 ) );
+	if ( sizeIndices > 0 )
+	{
+		flags |= SMDL_DATA_FLAG_OWN_INDICES;
+		pIndices = new byte[sizeIndices];
+		UncompressStreamData( COMPRESSION_ZLIB, pFile, (byte*)pIndices, sizeIndices );
+	}
 
 	// Write surfaces
-	uint32 numSurfaces = 0;
 	pFile->Read( &numSurfaces, sizeof( uint32 ) );
-	surfaces.resize( numSurfaces );
-	pFile->Read( surfaces.data(), numSurfaces * sizeof( smdlSurface_t ) );
+	if ( numSurfaces > 0 )
+	{
+		flags |= SMDL_DATA_FLAG_OWN_SURFACES;
+		pSurfaces = new modelSurface_t[numSurfaces];
+		pFile->Read( (byte*)pSurfaces, numSurfaces * sizeof( modelSurface_t ) );
+	}
 
 	// We are done
 	return true;
+}
+
+/*
+==================
+CSMDLCompiledModelDoc::SetData
+==================
+*/
+void CSMDLCompiledModelDoc::SetData( const smdlInitialData_t& initialData, uint8 flags )
+{
+	// Clear old data
+	PROFILER_SCOPE_FUNC();
+	Clear();
+
+	// Copy all fields
+	vertexType	 = initialData.vertexType;
+	indexType	 = initialData.indexType;
+	sizeVertices = initialData.sizeVertices;
+	sizeIndices	 = initialData.sizeIndices;
+	numSurfaces	 = initialData.numSurfaces;
+	numMaterials = initialData.numMaterials;
+
+	// Copy vertices
+	if ( flags & SMDL_INITIALDATA_FLAG_REFERENCE_VERTICES )
+	{
+		pVertices = initialData.pVertices;
+	}
+	else
+	{
+		flags |= SMDL_DATA_FLAG_OWN_VERTICES;
+		pVertices = new byte[sizeVertices];
+		Mem_Memcpy( (byte*)pVertices, initialData.pVertices, sizeVertices );
+	}
+
+	// Copy indices
+	if ( flags & SMDL_INITIALDATA_FLAG_REFERENCE_INDICES )
+	{
+		pIndices = initialData.pIndices;
+	}
+	else
+	{
+		flags |= SMDL_DATA_FLAG_OWN_INDICES;
+		pIndices = new byte[sizeIndices];
+		Mem_Memcpy( (byte*)pIndices, initialData.pIndices, sizeIndices );
+	}
+
+	// Copy surfaces
+	if ( flags & SMDL_INITIALDATA_FLAG_REFERENCE_SURFACES )
+	{
+		pSurfaces = initialData.pSurfaces;
+	}
+	else
+	{
+		flags |= SMDL_DATA_FLAG_OWN_SURFACES;
+		pSurfaces = new modelSurface_t[numSurfaces];
+		Mem_Memcpy( (byte*)pSurfaces, initialData.pSurfaces, numSurfaces * sizeof( modelSurface_t ) );
+	}
+
+	// Copy materials
+	if ( flags & SMDL_INITIALDATA_FLAG_REFERENCE_MATERIALS )
+	{
+		pMaterials = initialData.pMaterials;
+	}
+	else
+	{
+		flags |= SMDL_DATA_FLAG_OWN_MATERIALS;
+		pMaterials = new const char*[numMaterials];
+		for ( uint32 materialIdx = 0; materialIdx < numMaterials; ++materialIdx )
+		{
+			uint32 strLen			= S_Strlen( initialData.pMaterials[materialIdx] );
+			pMaterials[materialIdx] = new char[strLen + 1];
+			char* pMaterial			= (char*)pMaterials[materialIdx];
+			Mem_Memcpy( (byte*)pMaterial, initialData.pMaterials[materialIdx], strLen * sizeof( char ) );
+			pMaterial[strLen] = 0;
+		}
+	}
+}
+
+/*
+==================
+CSMDLCompiledModelDoc::Clear
+==================
+*/
+void CSMDLCompiledModelDoc::Clear()
+{
+	PROFILER_SCOPE_FUNC();
+	if ( pVertices && ( flags & SMDL_DATA_FLAG_OWN_VERTICES ) )
+	{
+		delete[] pVertices;
+	}
+	if ( pIndices && ( flags & SMDL_DATA_FLAG_OWN_INDICES ) )
+	{
+		delete[] pIndices;
+	}
+	if ( pSurfaces && ( flags & SMDL_DATA_FLAG_OWN_SURFACES ) )
+	{
+		delete[] pSurfaces;
+	}
+	if ( pMaterials && ( flags & SMDL_DATA_FLAG_OWN_MATERIALS ) )
+	{
+		for ( uint32 materialIdx = 0; materialIdx < numMaterials; ++materialIdx )
+		{
+			delete[] pMaterials[materialIdx];
+		}
+		delete[] pMaterials;
+	}
+
+	vertexType	 = MODEL_VERTEX_NUM_TYPES;
+	indexType	 = MODEL_INDEX_NUM_TYPES;
+	flags		 = SMDL_DATA_FLAG_NONE;
+	sizeVertices = 0;
+	sizeIndices	 = 0;
+	numSurfaces	 = 0;
+	numMaterials = 0;
+	pVertices	 = NULL;
+	pIndices	 = NULL;
+	pSurfaces	 = NULL;
+	pMaterials	 = NULL;
 }

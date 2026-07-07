@@ -2,3 +2,9 @@ source 			"veh_btr_br.fbx"
 materials_dir 	"materials/models/"
 axis_up 		+y
 combine_models	1
+rename_materials
+{
+	"veh_BTR_S.001" 	"veh_btr_br"
+	"veh_BTR_S4.001" 	"veh_btr_br"
+	"veh_BTR_S3.001" 	"veh_btr_br"
+}

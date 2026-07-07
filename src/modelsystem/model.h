@@ -1,0 +1,92 @@
+#pragma once
+#include "studiorender/studioapi/istudioapi_buffer.h"
+#include "studiorender/istudio_renderresource.h"
+#include "modelsystem/imodel.h"
+
+//-----------------------------------------------------------------------------
+// A model resource which is owned by the render thread
+//-----------------------------------------------------------------------------
+class CModelResource : public CRefCounted<IModelResource>, public CStudioRenderResource<IStudioRenderResource>
+{
+public:
+	// IModelResource interface
+	virtual uint32							  GetNumMaterials() const override;
+	virtual const CRefPtr<IMaterialResource>* GetMaterials() const override;
+	virtual uint32							  GetNumSurfaces() const override;
+	virtual const modelSurface_t*			  GetSurfaces() const override;
+	virtual IStudioAPIVertexDeclaration*	  GetStudioAPIVertexDeclaration() const override;
+	virtual IStudioAPIBuffer*				  GetStudioAPIVertexBuffer() const override;
+	virtual IStudioAPIBuffer*				  GetStudioAPIIndexBuffer() const override;
+
+	CModelResource();
+
+	void				   Update( const modelInitialData_t& initialData );
+	void				   UpdateMaterials( const CResourcePtr<IMaterial>* pMaterials, uint32 numMaterials );
+	void				   Clear();
+	CStudioRenderCmdFence& GetRenderCmdFence();
+
+protected:
+	// IRefCounted interface
+	virtual void FinalRelease() override;
+
+private:
+	// IStudioRenderResource interface
+	virtual void InitStudioAPI() override;
+	virtual void ReleaseStudioAPI() override;
+
+	modelVertexType_t						  vertexType;
+	modelIndexType_t						  indexType;
+	CStudioRenderCmdFence					  renderCmdFence;
+	CRefPtr<IStudioAPIBuffer>				  pStudioAPIVertexBuffer;
+	CRefPtr<IStudioAPIBuffer>				  pStudioAPIIndexBuffer;
+	eastl::vector<byte>						  vertices;
+	eastl::vector<byte>						  indices;
+	eastl::vector<CRefPtr<IMaterialResource>> materials;
+	eastl::vector<modelSurface_t>			  surfaces;
+};
+
+//-----------------------------------------------------------------------------
+// A model
+//-----------------------------------------------------------------------------
+class CModel : public CResourceData<IModel>
+{
+public:
+	// IResourceData interface
+	// Marks all dependent resources as used
+	virtual void MarkUsedDependencies() override;
+
+	// Set/clear permanent flag in all dependent resources
+	virtual void MakePermanentDependencies() override;
+	virtual void ClearPermanentDependencies() override;
+
+	// IModel interface
+	virtual void Init( const modelInitialData_t& initialData ) override;
+	virtual void Destroy() override;
+
+	virtual uint32						   GetNumMaterials() const override;
+	virtual const CResourcePtr<IMaterial>* GetMaterials() const override;
+	virtual IModelResource*				   GetStudioResource() const override;
+
+	CModel( IResource* pResource );
+	~CModel();
+
+private:
+	struct materialEventHandles_t
+	{
+		uint32							 materialId;
+		IResource::IOnCached::handle_t	 onChachedHandle;
+		IResource::IOnUncached::handle_t onUncachedHandle;
+	};
+
+	static void OnMaterialCachedUncached( void* pUserData, IResource* pResource );
+	void		SubscribeMaterialEvents();
+	void		UnsubscribeMaterialEvents();
+
+	bool								   bDirtyMaterials;
+	CRefPtr<CModelResource>				   pStudioResource;
+	eastl::vector<CResourcePtr<IMaterial>> materials;
+	eastl::vector<materialEventHandles_t>  materialEventHandles;
+};
+
+DECLARE_RESOURCE_TYPE( CModel, RESOURCE_TYPE_MODEL );
+#include "modelsystem\model.inl"

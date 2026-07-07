@@ -4,8 +4,6 @@
 #include "resourcesystem/iresourcesystem.h"
 #include "game/shared/ecs/ecs_core.h"
 #include "game/shared/ecs/ecs_common.gen.h"
-#include "game/shared/ecs/ecs_movement.gen.h"
-#include "game/shared/ecs/ecs_camera.gen.h"
 #include "game/shared/ecs/ecs_entitydesc.h"
 #include "game/shared/game.h"
 
@@ -117,9 +115,6 @@ void CGame::Shutdown()
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
 
-	// Unregister all render objects
-	g_pStudioRender->UnregisterAllObjects();
-
 	// Shutdown the active map
 	MapShutdown();
 
@@ -134,9 +129,8 @@ CGame::MapInit
 */
 bool CGame::MapInit( const char* pPath )
 {
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
-
 	// Shutdown the old map
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
 	MapShutdown();
 
 	// Load a new map
@@ -148,7 +142,8 @@ bool CGame::MapInit( const char* pPath )
 		return false;
 	}
 
-	pActiveEcsMap = new CEcsMap( smapCompiledMapDoc );
+	pActiveEcsMap = new CEcsMap();
+	pActiveEcsMap->Init( smapCompiledMapDoc );
 	Msg( "Game: Map '%s' loaded", mapPath.c_str() );
 	return true;
 }
@@ -160,9 +155,8 @@ CGame::MapShutdown
 */
 void CGame::MapShutdown()
 {
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
-
 	// Reset the active map
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
 	if ( pActiveEcsMap )
 	{
 		delete pActiveEcsMap;
@@ -179,12 +173,27 @@ void CGame::MapShutdown()
 CGame::FrameUpdate
 ==================
 */
-void CGame::FrameUpdate()
+void CGame::FrameUpdate( float deltaTime )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
 	if ( pActiveEcsMap )
 	{
-		pActiveEcsMap->Update( 0.f );
+		pActiveEcsMap->Update( deltaTime );
+	}
+}
+
+/*
+==================
+CGame::FrameDraw
+==================
+*/
+void CGame::FrameDraw( IStudioViewport* pStudioViewport )
+{
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	if ( pActiveEcsMap )
+	{
+		studioCameraView_t studioCameraView = {};
+		g_pStudioRender->DrawScene( pStudioViewport, pActiveEcsMap->GetStudioScene(), studioCameraView );
 	}
 }
 

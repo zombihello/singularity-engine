@@ -147,6 +147,27 @@ EcsReadData
 ==================
 */
 template<>
+FORCEINLINE void EcsReadData<CResourcePtr<IModel>>( CResourcePtr<IModel>& data, const CSENTEntityDescVar& sentVar, const CResourcePtr<IModel>& pDefaultValue )
+{
+	data = NULL;
+	if ( sentVar.IsA( SENT_ENTITY_DESC_VAR_TYPE_STRING ) )
+	{
+		IResourceTypeMgr* pModelsMgr = g_pResourceSystem->GetResourceManagerForType<IModel>();
+		data						 = pModelsMgr->LoadResource( sentVar.GetStringValue() );
+	}
+
+	if ( !data )
+	{
+		data = pDefaultValue;
+	}
+}
+
+/*
+==================
+EcsReadData
+==================
+*/
+template<>
 FORCEINLINE void EcsReadData<CResourcePtr<IEntityDesc>>( CResourcePtr<IEntityDesc>& data, const CSENTEntityDescVar& sentVar, const CResourcePtr<IEntityDesc>& pDefaultValue )
 {
 	if ( sentVar.IsA( SENT_ENTITY_DESC_VAR_TYPE_STRING ) )

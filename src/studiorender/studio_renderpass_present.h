@@ -1,6 +1,5 @@
 #pragma once
 #include "materialsystem/imaterial.h"
-#include "studiorender/studio_renderobject_quad.h"
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -9,6 +8,8 @@ class IStudioAPIBoundShaderState;
 class IStudioAPIRenderPipeline;
 class IStudioAPISwapChain;
 class CStudioViewport;
+struct studioSceneView_t;
+struct studioDrawSurface_t;
 
 //-----------------------------------------------------------------------------
 // Studio present render pass
@@ -16,11 +17,10 @@ class CStudioViewport;
 class CStudioRenderPassPresent
 {
 public:
-	void Init();
-	void Shutdown();
+	void R_DrawPass( CStudioViewport* pViewport, studioSceneView_t* pSceneView );
 
-	void									 R_DrawPass( CStudioViewport* pViewport, CStudioRenderObjectQuad* pQuad );
 	static CRefPtr<IStudioAPIRenderPipeline> R_CreateStudioAPIRenderPipeline( CStudioViewport* pViewport, IStudioAPIBoundShaderState* pStudioAPIBoundShaderState );
-
-private:
+	static bool								 ShouldDrawSurfaceInPass( studioDrawSurface_t* pDrawSurface );
 };
+
+#include "studiorender/studio_renderpass_present.inl"

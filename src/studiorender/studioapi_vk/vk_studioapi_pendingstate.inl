@@ -66,6 +66,16 @@ FORCEINLINE void CStudioAPIPendingRenderStateVk::BindRenderPipeline( CStudioAPIC
 
 /*
 ==================
+CStudioAPIPendingRenderStateVk::HasIndexBuffer
+==================
+*/
+FORCEINLINE bool CStudioAPIPendingRenderStateVk::HasIndexBuffer() const
+{
+	return indexBuffer.pBuffer;
+}
+
+/*
+==================
 CStudioAPIPendingRenderStateVk::vertexBuffer_t::Clear
 ==================
 */

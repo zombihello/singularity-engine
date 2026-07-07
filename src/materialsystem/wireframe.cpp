@@ -69,7 +69,7 @@ BEGIN_SHADER( Wireframe, "Default shader" )
 	{
 		// Set a vertex shader and type
 		DECLARE_VERTEX_SHADER( wireframe_vs );
-		SET_VERTEX_TYPE( STUDIO_VERTEXTYPE_SIMPLEELEMENT );
+		SET_VERTEX_TYPE( MODEL_VERTEXTYPE_SIMPLE );
 		SET_VERTEX_SHADER( wireframe_vs );
 
 		// Set a pixel shader

@@ -48,6 +48,20 @@ FORCEINLINE void* CFrameAlloc<blockSize, numPools, defaultAlignment, minAlignmen
 
 /*
 ==================
+CFrameAlloc::AllocZero
+==================
+*/
+template<uint32 blockSize, uint32 numPools, uint32 defaultAlignment, uint32 minAlignment>
+FORCEINLINE void* CFrameAlloc<blockSize, numPools, defaultAlignment, minAlignment>::AllocZero( size numBytes, uint32 alignment /* = 0 */ )
+{
+	PROFILER_SCOPE_FUNC();
+	void* pData = Alloc( numBytes, alignment, NULL );
+	Mem_Memzero( pData, numBytes );
+	return pData;
+}
+
+/*
+==================
 CFrameAlloc::Alloc
 ==================
 */
@@ -68,7 +82,7 @@ void* CFrameAlloc<blockSize, numPools, defaultAlignment, minAlignment>::Alloc( s
 	for ( auto it = pool.blockList.begin(), itEnd = pool.blockList.end(); it != itEnd; ++it )
 	{
 		memoryBlock_t& block	= *it;
-		uint64		   freeSize = block.allocatedSize - block.usedSize;
+		uint64		   freeSize = blockSize - block.usedSize;
 		if ( freeSize < alignedSize )
 		{
 			continue;
@@ -96,7 +110,7 @@ void* CFrameAlloc<blockSize, numPools, defaultAlignment, minAlignment>::Alloc( s
 		memoryBlock_t& block			  = pool.blockList.back();
 		byte*		   pAlignedFreeMemory = S_Align<byte*>( block.pData, alignment );
 		uint64		   alignPadding		  = (uint64)( pAlignedFreeMemory - block.pData );
-		Assert( block.allocatedSize >= alignedSize + alignPadding );
+		Assert( blockSize >= alignedSize + alignPadding );
 
 		pPtr		= pAlignedFreeMemory;
 		pFoundBlock = &block;
@@ -161,10 +175,11 @@ CFrameAlloc::MarkAsFreePool
 ==================
 */
 template<uint32 blockSize, uint32 numPools, uint32 defaultAlignment, uint32 minAlignment>
-FORCEINLINE void CFrameAlloc<blockSize, numPools, defaultAlignment, minAlignment>::MarkAsFreePool( uint32 index )
+FORCEINLINE void CFrameAlloc<blockSize, numPools, defaultAlignment, minAlignment>::MarkAsFreePool( uint32 poolId )
 {
 	// Reset used size and destruct objects in blocks
-	memoryPool_t& pool = pools[index];
+	PROFILER_SCOPE_FUNC();
+	memoryPool_t& pool = pools[poolId];
 	for ( auto it = pool.blockList.begin(), itEnd = pool.blockList.end(); it != itEnd; ++it )
 	{
 		memoryBlock_t& curBlock = *it;
@@ -179,7 +194,7 @@ FORCEINLINE void CFrameAlloc<blockSize, numPools, defaultAlignment, minAlignment
 	}
 
 	// Mark the pool as free
-	pools[index].bIsFree.store( true, eastl::memory_order_release );
+	pools[poolId].bIsFree.store( true, eastl::memory_order_release );
 }
 
 /*
@@ -195,18 +210,48 @@ FORCEINLINE uint32 CFrameAlloc<blockSize, numPools, defaultAlignment, minAlignme
 
 /*
 ==================
+CFrameAlloc::GetTotalUsedSize
+==================
+*/
+template<uint32 blockSize, uint32 numPools, uint32 defaultAlignment, uint32 minAlignment>
+FORCEINLINE uint64 CFrameAlloc<blockSize, numPools, defaultAlignment, minAlignment>::GetTotalUsedSize( uint32 poolId ) const
+{
+	PROFILER_SCOPE_FUNC();
+	uint64				totalUsedSize = 0;
+	const memoryPool_t& pool		  = pools[poolId];
+	for ( auto it = pool.blockList.begin(), itEnd = pool.blockList.end(); it != itEnd; ++it )
+	{
+		const memoryBlock_t& curBlock = *it;
+		totalUsedSize += curBlock.usedSize;
+	}
+	return totalUsedSize;
+}
+
+/*
+==================
+CFrameAlloc::GetAllocName
+==================
+*/
+template<uint32 blockSize, uint32 numPools, uint32 defaultAlignment, uint32 minAlignment>
+FORCEINLINE const char* CFrameAlloc<blockSize, numPools, defaultAlignment, minAlignment>::GetAllocName() const
+{
+	return pAllocName;
+}
+
+/*
+==================
 CFrameAlloc::AllocBlock
 ==================
 */
 template<uint32 blockSize, uint32 numPools, uint32 defaultAlignment, uint32 minAlignment>
 FORCEINLINE void CFrameAlloc<blockSize, numPools, defaultAlignment, minAlignment>::AllocBlock( memoryPool_t& pool )
 {
+	PROFILER_SCOPE_FUNC();
 	memoryBlock_t& block = pool.blockList.emplace_back();
-	block.allocatedSize	 = blockSize;
 	block.usedSize		 = 0;
-	block.pData			 = (byte*)Mem_MallocZero( block.allocatedSize );
-	Msg( "FrameAlloc: Allocated block (%llu bytes, pool: %i, name: '%s')", block.allocatedSize, pool.id, pAllocName );
-	PROFILER_MEM_ALLOC( block.pData, block.allocatedSize, pAllocName );
+	block.pData			 = (byte*)Mem_MallocZero( blockSize );
+	Msg( "FrameAlloc: Allocated block (%llu bytes, pool: %i, name: '%s')", blockSize, pool.id, pAllocName );
+	PROFILER_MEM_ALLOC( block.pData, blockSize, pAllocName );
 }
 
 /*
@@ -236,7 +281,7 @@ void CFrameAlloc<blockSize, numPools, defaultAlignment, minAlignment>::FreeBlock
 				PROFILER_MEM_FREE( curBlock.pData, pAllocName );
 			}
 
-			Msg( "FrameAlloc: Freed block (%llu bytes, pool: %i, name: '%s')", curBlock.allocatedSize, pool.id, pAllocName );
+			Msg( "FrameAlloc: Freed block (%llu bytes, pool: %i, name: '%s')", blockSize, pool.id, pAllocName );
 			pool.blockList.erase( it );
 			break;
 		}
@@ -253,13 +298,10 @@ void CFrameAlloc<blockSize, numPools, defaultAlignment, minAlignment>::FreeAllBl
 {
 	// Free blocks
 	PROFILER_SCOPE_FUNC();
-	uint64 totalUsedMemory = 0;
-	uint64 numBlocks	   = pool.blockList.size();
+	uint64 numBlocks = pool.blockList.size();
 	for ( auto it = pool.blockList.begin(), itEnd = pool.blockList.end(); it != itEnd; ++it )
 	{
 		memoryBlock_t& curBlock = *it;
-		totalUsedMemory += curBlock.allocatedSize;
-
 		for ( auto itDestructorEntry = curBlock.destructorList.begin(), itDestructorEntryEnd = curBlock.destructorList.end(); itDestructorEntry != itDestructorEntryEnd; ++itDestructorEntry )
 		{
 			destructorEntry_t& destructorEntry = *itDestructorEntry;
@@ -273,8 +315,8 @@ void CFrameAlloc<blockSize, numPools, defaultAlignment, minAlignment>::FreeAllBl
 		}
 	}
 
+	Msg( "FrameAlloc: Freed %i blocks (%llu bytes, pool: %i, name: '%s')", numBlocks, (uint32)pool.blockList.size() * blockSize, pool.id, pAllocName );
 	pool.blockList.clear();
-	Msg( "FrameAlloc: Freed %i blocks (%llu bytes, pool: %i, name: '%s')", numBlocks, totalUsedMemory, pool.id, pAllocName );
 }
 
 /*
@@ -290,4 +332,98 @@ FORCEINLINE void CFrameAlloc<blockSize, numPools, defaultAlignment, minAlignment
 	{
 		Sys_Yield();
 	}
+}
+
+/*
+==================
+CStlFrameAlloc::CStlFrameAlloc
+==================
+*/
+template<auto& frameAlloc>
+FORCEINLINE CStlFrameAlloc<frameAlloc>::CStlFrameAlloc( const char* pName )
+{
+}
+
+/*
+==================
+CStlFrameAlloc::CStlFrameAlloc
+==================
+*/
+template<auto& frameAlloc>
+FORCEINLINE CStlFrameAlloc<frameAlloc>::CStlFrameAlloc( const CStlFrameAlloc& other )
+{
+}
+
+/*
+==================
+CStlFrameAlloc::CStlFrameAlloc
+==================
+*/
+template<auto& frameAlloc>
+FORCEINLINE CStlFrameAlloc<frameAlloc>::CStlFrameAlloc( const CStlFrameAlloc& other, const char* pName )
+{
+}
+
+/*
+==================
+CStlFrameAlloc::allocate
+==================
+*/
+template<auto& frameAlloc>
+FORCEINLINE void* CStlFrameAlloc<frameAlloc>::allocate( size numBytes, int32 flags )
+{
+	return frameAlloc.Alloc( numBytes );
+}
+
+/*
+==================
+CStlFrameAlloc::allocate
+==================
+*/
+template<auto& frameAlloc>
+FORCEINLINE void* CStlFrameAlloc<frameAlloc>::allocate( size numBytes, size alignment, size offset, int32 flags )
+{
+	return frameAlloc.Alloc( numBytes, alignment );
+}
+
+/*
+==================
+CStlFrameAlloc::deallocate
+==================
+*/
+template<auto& frameAlloc>
+FORCEINLINE void CStlFrameAlloc<frameAlloc>::deallocate( void* pPtr, size numBytes )
+{
+}
+
+/*
+==================
+CStlFrameAlloc::set_name
+==================
+*/
+template<auto& frameAlloc>
+FORCEINLINE void CStlFrameAlloc<frameAlloc>::set_name( const char* pName )
+{
+}
+
+/*
+==================
+CStlFrameAlloc::get_name
+==================
+*/
+template<auto& frameAlloc>
+FORCEINLINE const char* CStlFrameAlloc<frameAlloc>::get_name() const
+{
+	return frameAlloc.GetAllocName();
+}
+
+/*
+==================
+CStlFrameAlloc::operator=
+==================
+*/
+template<auto& frameAlloc>
+FORCEINLINE CStlFrameAlloc<frameAlloc>& CStlFrameAlloc<frameAlloc>::operator=( const CStlFrameAlloc& other )
+{
+	return *this;
 }

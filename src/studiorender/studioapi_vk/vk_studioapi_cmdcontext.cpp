@@ -183,6 +183,18 @@ void CStudioAPICmdContextVk::SetVertexBuffer( CStudioAPICmdListVk* pCmdList, uin
 
 /*
 ==================
+CStudioAPICmdContextVk::SetIndexBuffer
+==================
+*/
+void CStudioAPICmdContextVk::SetIndexBuffer( CStudioAPICmdListVk* pCmdList, CStudioAPIBufferVk* pIndexBuffer, uint64 offset )
+{
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	Assert( pPendingRenderState );
+	pPendingRenderState->SetIndexBuffer( pCmdList, pIndexBuffer, offset );
+}
+
+/*
+==================
 CStudioAPICmdContextVk::SetConstantBuffer
 ==================
 */
@@ -257,12 +269,12 @@ void CStudioAPICmdContextVk::Draw( CStudioAPICmdListVk* pCmdList, uint32 baseVer
 CStudioAPICmdContextVk::DrawIndexed
 ==================
 */
-void CStudioAPICmdContextVk::DrawIndexed( CStudioAPICmdListVk* pCmdList, CStudioAPIBufferVk* pIndexBuffer, uint32 baseVertexIndex, uint32 baseIndex, uint32 numIndices, uint32 numInstances /* = 1 */ )
+void CStudioAPICmdContextVk::DrawIndexed( CStudioAPICmdListVk* pCmdList, uint32 baseVertexIndex, uint32 baseIndex, uint32 numIndices, uint32 numInstances /* = 1 */ )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( pPendingRenderState );
 	AssertMsg( pCmdList->HasPipeline() && pCmdList->GetState() == STUDIOAPI_VK_CMDLIST_STATE_IS_INSIDE_RENDER_PASS, "To draw must be set a render pass and a render pipeline" );
-	pPendingRenderState->SetIndexBuffer( pCmdList, pIndexBuffer, 0 );
+	AssertMsg( pPendingRenderState->HasIndexBuffer(), "To indexed draw an index buffer must be set before" );
 	pPendingRenderState->PrepareForDraw( pCmdList );
 	vkCmdDrawIndexed( pCmdList->GetCmdBuffer()->GetVkCommandBuffer(), numIndices, numInstances, baseIndex, baseVertexIndex, 0 );
 }

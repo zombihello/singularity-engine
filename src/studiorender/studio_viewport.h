@@ -55,7 +55,8 @@ private:
 	virtual void ReleaseStudioAPI() override;
 
 	// Part of DrawFrame() function that executes at the render thread
-	void		R_DrawFrame( bool bShouldPresent );
+	void		R_AcquireNextImage( bool bShouldPresent );
+	void		R_Present( bool bShouldPresent );
 	static void OnSwapChainReCreated( void* pUserData, IStudioAPISwapChain* pStudioAPISwapChain, bool bChangedImageFormat );
 
 	uint32 AcquireIndex();

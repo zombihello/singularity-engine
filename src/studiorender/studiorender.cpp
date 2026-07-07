@@ -1,12 +1,14 @@
 #include "pch_studiorender.h"
 #include "filesystem/ifilesystem.h"
+#include "resourcesystem/iresourcesystem.h"
 #include "materialsystem/ishadermgr.h"
-#include "studiorender/studioapi/istudioapi_barrier.h"
+#include "modelsystem/imodel.h"
+#include "modelsystem/imodelsystem.h"
 #include "studiorender/studio_renderthread.h"
 #include "studiorender/studio_viewport.h"
 #include "studiorender/studio_renderpipelineset.h"
-#include "studiorender/studio_vertexdeclarations.h"
-#include "studiorender/studio_renderobject_quad.h"
+#include "studiorender/studio_sceneview.h"
+#include "studiorender/studio_scene.h"
 #include "studiorender/studiorender.h"
 
 CCVar		  r_vsync( "r_vsync", "0", "Should use vertical synchronization (VSync)", CVAR_FLAG_ARCHIVE );
@@ -20,9 +22,8 @@ CStudioRender::Connect
 */
 bool CStudioRender::Connect( createInterfaceFn_t pFactory )
 {
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-
 	// Connect Tier1
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	if ( !ConnectTier1( pFactory ) )
 	{
 		return false;
@@ -30,16 +31,30 @@ bool CStudioRender::Connect( createInterfaceFn_t pFactory )
 	LinkCmds();
 	LinkCVars();
 
-	// Get Studio API
+	// Get the studio api
 	g_pStudioAPI = (IStudioAPI*)pFactory( STUDIOAPI_INTERFACE_VERSION );
 	if ( !g_pStudioAPI )
 	{
 		return false;
 	}
 
-	// Get shader manager
+	// Get the shader manager
 	g_pShaderMgr = (IShaderMgr*)pFactory( SHADERMGR_INTERFACE_VERSION );
 	if ( !g_pShaderMgr )
+	{
+		return false;
+	}
+
+	// Get the model system
+	g_pModelSystem = (IModelSystem*)pFactory( MODELSYSTEM_INTERFACE_VERSION );
+	if ( !g_pModelSystem )
+	{
+		return false;
+	}
+
+	// Ge the resource system
+	g_pResourceSystem = (IResourceSystem*)pFactory( RESOURCESYSTEM_INTERFACE_VERSION );
+	if ( !g_pResourceSystem )
 	{
 		return false;
 	}
@@ -56,15 +71,15 @@ CStudioRender::Disconnect
 void CStudioRender::Disconnect()
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-
-	// Disconnect Tier1
 	UnlinkCVars();
 	UnlinkCmds();
 	DisconnectTier1();
 
-	g_pStudioAPI	= NULL;
-	g_pStudioRender = NULL;
-	g_pShaderMgr	= NULL;
+	g_pStudioAPI	  = NULL;
+	g_pStudioRender	  = NULL;
+	g_pShaderMgr	  = NULL;
+	g_pModelSystem	  = NULL;
+	g_pResourceSystem = NULL;
 }
 
 /*
@@ -74,18 +89,12 @@ CStudioRender::Init
 */
 bool CStudioRender::Init()
 {
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-
 	// Initialize all global resources
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	CStudioGlobalRenderResources::InitResources();
-
-	// Initialize the present pass
-	presentRenderPass.Init();
 
 	// Start the render thread
 	Studio_StartRenderThread();
-
-	// We are done!
 	return true;
 }
 
@@ -96,69 +105,12 @@ CStudioRender::Shutdown
 */
 void CStudioRender::Shutdown()
 {
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-
 	// Stop the render thread
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Studio_StopRenderThread();
-
-	// Shutdown the present pass
-	presentRenderPass.Shutdown();
 
 	// Release all global resources
 	CStudioGlobalRenderResources::ReleaseResources();
-}
-
-/*
-==================
-CStudioRender::SetCameraView
-==================
-*/
-void CStudioRender::SetCameraView( const studioCameraView_t& cameraView )
-{
-	// Calculate a view matrix
-	vector3_t targetDirection = cameraView.rotation * g_vectorForward;
-	vector3_t axisUp		  = cameraView.rotation * g_vectorUp;
-	S_MatrixLookAt( cameraView.location, cameraView.location + targetDirection, axisUp, sceneView.viewMatrix );
-
-	// Calculate a perspective matrix
-	S_MatrixPerspective( cameraView.fieldOfView, cameraView.aspectRatio, cameraView.nearClipPlane, cameraView.farClipPlane, sceneView.projectionMatrix );
-}
-
-/*
-==================
-CStudioRender::RegisterObject
-==================
-*/
-void CStudioRender::RegisterObject( IStudioRenderObject* pRenderObject )
-{
-	renderObjects.emplace_back( pRenderObject );
-}
-
-/*
-==================
-CStudioRender::UnregisterObject
-==================
-*/
-void CStudioRender::UnregisterObject( IStudioRenderObject* pRenderObject )
-{
-	for ( uint32 renderObjectIdx = 0, numRenderObjects = (uint32)renderObjects.size(); renderObjectIdx < numRenderObjects; ++renderObjectIdx )
-	{
-		if ( renderObjects[renderObjectIdx] == pRenderObject )
-		{
-			renderObjects.erase( renderObjects.begin() + renderObjectIdx );
-			return;
-		}
-	}
-}
-
-/*
-==================
-CStudioRender::UnregisterAllObjects
-==================
-*/
-void CStudioRender::UnregisterAllObjects()
-{
-	renderObjects.clear();
 }
 
 /*
@@ -183,12 +135,12 @@ CRefPtr<IStudioRenderPipelineSet> CStudioRender::CreateRenderPipelineSet() const
 
 /*
 ==================
-CStudioRender::CreateQuadRenderObject
+CStudioRender::CreateScene
 ==================
 */
-CRefPtr<IStudioRenderObject> CStudioRender::CreateQuadRenderObject( IResource* pMaterial, IStudioAPIBuffer* pVertexBuffer, IStudioAPIBuffer* pIndexBuffer ) const
+CRefPtr<IStudioScene> CStudioRender::CreateScene() const
 {
-	return new CStudioRenderObjectQuad( pVertexBuffer, pIndexBuffer, pMaterial );
+	return new CStudioScene();
 }
 
 /*
@@ -198,8 +150,15 @@ CStudioRender::BeginFrame
 */
 void CStudioRender::BeginFrame()
 {
+	// Swap pools in the frame allocator
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-	Assert( Sys_IsInMainThread() );
+	g_studioFrameAlloc.SwapPools();
+
+	// Tell StudioAPI about begin of drawing frame
+	UNIQUE_RENDER_COMMAND( CStudioRenderCmd_BeginFrame,
+						   {
+							   g_pStudioAPI->BeginDrawingFrame();
+						   } );
 }
 
 /*
@@ -209,26 +168,145 @@ CStudioRender::EndFrame
 */
 void CStudioRender::EndFrame()
 {
-	// TODO BS yehor.pohuliaka - Implement here synchronization the renderObjects between the main thread and the render thread
+	// Tell StudioAPI about end of drawing frame and free the pool in the frame allocator
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-	Assert( Sys_IsInMainThread() );
-	Assert( !renderObjects.empty() );
-	CStudioRenderObjectQuad* pRenderObject = (CStudioRenderObjectQuad*)renderObjects[0].GetRawPtr();
-	pRenderObject->RefreshMaterialResource();
+	UNIQUE_RENDER_COMMAND_ONEPARAMETER( CStudioRenderCmd_EndFrame,
+										uint32, framePoolId, g_studioFrameAlloc.GetCurrentPoolId(),
+										{
+											g_pStudioAPI->EndDrawingFrame();
+											g_studioFrameAlloc.MarkAsFreePool( framePoolId );
+										} );
 }
 
 /*
 ==================
-CStudioRender::R_DrawFrame
+CStudioRender::DrawScene
 ==================
 */
+void CStudioRender::DrawScene( IStudioViewport* pStudioViewport, IStudioScene* pStudioScene, const studioCameraView_t& cameraView )
+{
+	// Do nothing if the viewport or the scene isn't valid
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	if ( !pStudioViewport || !pStudioScene )
+	{
+		return;
+	}
 
-void CStudioRender::R_DrawFrame( CStudioViewport* pViewport )
+	// Cast the scene to our type and allocate a scene view
+	CStudioScene*	   pStudioSceneLocal = (CStudioScene*)pStudioScene;
+	studioSceneView_t* pSceneView		 = g_studioFrameAlloc.Construct<studioSceneView_t>();
+
+	// Find all visible entities, after that creates entity views for them
+	pStudioSceneLocal->FindEntityViews( pSceneView );
+
+	// Go through each entity view and add draw surfaces to the scene view
+	for ( studioEntityView_t* pEntityView = pSceneView->pEntityViews; pEntityView; pEntityView = pEntityView->pNext )
+	{
+		AddModelToSceneView( pSceneView, pEntityView );
+	}
+
+	// Send a render scene command to the render thread
+	UNIQUE_RENDER_COMMAND_TWOPARAMETER( CStudioRenderCmd_DrawScene,
+										CRefPtr<CStudioViewport>, pViewport, (CStudioViewport*)pStudioViewport,
+										studioSceneView_t*, pSceneView, pSceneView,
+										{
+											g_StudioRender.R_DrawScene( pViewport, pSceneView );
+										} );
+}
+
+/*
+==================
+CStudioRender::AddModelToSceneView
+==================
+*/
+void CStudioRender::AddModelToSceneView( studioSceneView_t* pSceneView, studioEntityView_t* pEntityView )
+{
+	// Get the default model for case when an entity's model has been uncached
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	IResourceTypeMgr*	 pModelsMgr	   = g_pResourceSystem->GetResourceManagerForType<IModel>();
+	CResourcePtr<IModel> pDefaultModel = pModelsMgr->GetDefaultResource();
+
+	// Get entity's model, if it isn't cached use default one
+	CResourcePtr<IModel> pModel			= pEntityView->pEntity->params.pModel;
+	IModelResource*		 pModelResource = pModel.IsCached() ? pModel->GetStudioResource() : pDefaultModel->GetStudioResource();
+	if ( !pModelResource )
+	{
+		return;
+	}
+
+	// Get all surfaces and materials
+	uint32							  numSurfaces		 = pModelResource->GetNumSurfaces();
+	uint32							  numMaterials		 = pModelResource->GetNumMaterials();
+	const modelSurface_t*			  pSurfaces			 = pModelResource->GetSurfaces();
+	const CRefPtr<IMaterialResource>* pMaterialResources = pModelResource->GetMaterials();
+
+	// Go through each resource and add it to the scene view
+	uint32	modelId		 = AddResourceToSceneView( pSceneView, pModelResource );
+	uint32* pMaterialIds = (uint32*)Mem_Alloca( numMaterials * sizeof( uint32 ) );
+	for ( uint32 index = 0; index < numMaterials; ++index )
+	{
+		pMaterialIds[index] = AddResourceToSceneView( pSceneView, pMaterialResources[index].GetRawPtr() );
+	}
+
+	// Go through each model surface and allocate draw surfaces
+	for ( uint32 index = 0; index < numSurfaces; ++index )
+	{
+		const modelSurface_t& surface	   = pSurfaces[index];
+		studioDrawSurface_t*  pDrawSurface = (studioDrawSurface_t*)g_studioFrameAlloc.Alloc( sizeof( studioDrawSurface_t ) );
+		pDrawSurface->pEntityView		   = pEntityView;
+		pDrawSurface->modelId			   = modelId;
+		pDrawSurface->materialId		   = pMaterialIds[surface.materialId];
+		pDrawSurface->baseVertexIndex	   = surface.baseVertexIndex;
+		pDrawSurface->baseIndex			   = surface.baseIndex;
+		pDrawSurface->numIndices		   = surface.numIndices;
+
+		// Add the draw surface into the scene view and render passes
+		studioRenderPass_t& renderPassPresent = pSceneView->renderPasses[STUDIO_RENDERPASS_TYPE_PRESENT];
+		uint32				drawSurfaceId	  = (uint32)pSceneView->drawSurfaces.size();
+		pSceneView->drawSurfaces.emplace_back( pDrawSurface );
+		renderPassPresent.drawSurfaceIds.emplace_back( drawSurfaceId );
+		renderPassPresent.resourceIds.insert( modelId );
+		renderPassPresent.resourceIds.insert( pMaterialIds[surface.materialId] );
+	}
+}
+
+/*
+==================
+CStudioRender::R_DrawScene
+==================
+*/
+void CStudioRender::R_DrawScene( CStudioViewport* pViewport, studioSceneView_t* pSceneView )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( Studio_IsInRenderThread() );
-	Assert( !renderObjects.empty() );
-	presentRenderPass.R_DrawPass( pViewport, (CStudioRenderObjectQuad*)renderObjects[0].GetRawPtr() );
+	presentRenderPass.R_DrawPass( pViewport, pSceneView );
+}
+
+/*
+==================
+CStudioRender::AddResourceToSceneView
+==================
+*/
+uint32 CStudioRender::AddResourceToSceneView( studioSceneView_t* pSceneView, studioResourcePtr_t pPtr, studioResourceType_t type )
+{
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	uint32 resourceId	= INVALID_INDEX;
+	auto   itResourceId = pSceneView->resourceDict.find( pPtr );
+	if ( itResourceId != pSceneView->resourceDict.end() )
+	{
+		resourceId = itResourceId->second;
+	}
+	else
+	{
+		studioResource_t* pResource = (studioResource_t*)g_studioFrameAlloc.Alloc( sizeof( studioResource_t ) );
+		pResource->type				= type;
+		pResource->pPtr				= pPtr;
+		resourceId					= (uint32)pSceneView->resources.size();
+		pSceneView->resources.emplace_back( pResource );
+		pSceneView->resourceDict.insert( eastl::make_pair( pPtr, resourceId ) );
+	}
+
+	return resourceId;
 }
 
 /*

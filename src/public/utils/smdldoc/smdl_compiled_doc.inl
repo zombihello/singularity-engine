@@ -2,41 +2,62 @@
 
 /*
 ==================
-CSMDLCompiledModelDoc::Clear
+CSMDLCompiledModelDoc::GetVertexType
 ==================
 */
-FORCEINLINE void CSMDLCompiledModelDoc::Clear()
+FORCEINLINE modelVertexType_t CSMDLCompiledModelDoc::GetVertexType() const
 {
-	vertices.clear();
-	indices.clear();
-	surfaces.clear();
-	materials.clear();
+	return vertexType;
 }
 
 /*
 ==================
-CSMDLCompiledModelDoc::SetData
+CSMDLCompiledModelDoc::GetIndexType
 ==================
 */
-FORCEINLINE void CSMDLCompiledModelDoc::SetData( const eastl::vector<smdlVertex_t>& vertices, const eastl::vector<uint32>& indices, const eastl::vector<smdlSurface_t>& surfaces, const eastl::vector<eastl::string>& materials )
+FORCEINLINE modelIndexType_t CSMDLCompiledModelDoc::GetIndexType() const
 {
-	CSMDLCompiledModelDoc::vertices	 = vertices;
-	CSMDLCompiledModelDoc::indices	 = indices;
-	CSMDLCompiledModelDoc::surfaces	 = surfaces;
-	CSMDLCompiledModelDoc::materials = materials;
+	return indexType;
 }
 
 /*
 ==================
-CSMDLCompiledModelDoc::SetData
+CSMDLCompiledModelDoc::GetSizeVertices
 ==================
 */
-FORCEINLINE void CSMDLCompiledModelDoc::SetData( eastl::vector<smdlVertex_t>& vertices, eastl::vector<uint32>& indices, eastl::vector<smdlSurface_t>& surfaces, eastl::vector<eastl::string>& materials )
+FORCEINLINE uint32 CSMDLCompiledModelDoc::GetSizeVertices() const
 {
-	CSMDLCompiledModelDoc::vertices	 = eastl::move( vertices );
-	CSMDLCompiledModelDoc::indices	 = eastl::move( indices );
-	CSMDLCompiledModelDoc::surfaces	 = eastl::move( surfaces );
-	CSMDLCompiledModelDoc::materials = eastl::move( materials );
+	return sizeVertices;
+}
+
+/*
+==================
+CSMDLCompiledModelDoc::GetSizeIndices
+==================
+*/
+FORCEINLINE uint32 CSMDLCompiledModelDoc::GetSizeIndices() const
+{
+	return sizeIndices;
+}
+
+/*
+==================
+CSMDLCompiledModelDoc::GetNumSurfaces
+==================
+*/
+FORCEINLINE uint32 CSMDLCompiledModelDoc::GetNumSurfaces() const
+{
+	return numSurfaces;
+}
+
+/*
+==================
+CSMDLCompiledModelDoc::GetNumMaterials
+==================
+*/
+FORCEINLINE uint32 CSMDLCompiledModelDoc::GetNumMaterials() const
+{
+	return numMaterials;
 }
 
 /*
@@ -44,9 +65,9 @@ FORCEINLINE void CSMDLCompiledModelDoc::SetData( eastl::vector<smdlVertex_t>& ve
 CSMDLCompiledModelDoc::GetVertices
 ==================
 */
-FORCEINLINE const eastl::vector<smdlVertex_t>& CSMDLCompiledModelDoc::GetVertices() const
+FORCEINLINE const byte* CSMDLCompiledModelDoc::GetVertices() const
 {
-	return vertices;
+	return pVertices;
 }
 
 /*
@@ -54,9 +75,9 @@ FORCEINLINE const eastl::vector<smdlVertex_t>& CSMDLCompiledModelDoc::GetVertice
 CSMDLCompiledModelDoc::GetIndices
 ==================
 */
-FORCEINLINE const eastl::vector<uint32>& CSMDLCompiledModelDoc::GetIndices() const
+FORCEINLINE const byte* CSMDLCompiledModelDoc::GetIndices() const
 {
-	return indices;
+	return pIndices;
 }
 
 /*
@@ -64,9 +85,9 @@ FORCEINLINE const eastl::vector<uint32>& CSMDLCompiledModelDoc::GetIndices() con
 CSMDLCompiledModelDoc::GetSurfaces
 ==================
 */
-FORCEINLINE const eastl::vector<smdlSurface_t>& CSMDLCompiledModelDoc::GetSurfaces() const
+FORCEINLINE const modelSurface_t* CSMDLCompiledModelDoc::GetSurfaces() const
 {
-	return surfaces;
+	return pSurfaces;
 }
 
 /*
@@ -74,7 +95,7 @@ FORCEINLINE const eastl::vector<smdlSurface_t>& CSMDLCompiledModelDoc::GetSurfac
 CSMDLCompiledModelDoc::GetMaterials
 ==================
 */
-FORCEINLINE const eastl::vector<eastl::string>& CSMDLCompiledModelDoc::GetMaterials() const
+FORCEINLINE const char** CSMDLCompiledModelDoc::GetMaterials() const
 {
-	return materials;
+	return pMaterials;
 }

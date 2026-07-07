@@ -40,6 +40,7 @@ public:
 
 	virtual void SetRenderPipeline( IStudioAPIRenderPipeline* pRenderPipeline ) override;
 	virtual void SetVertexBuffer( uint32 slot, IStudioAPIBuffer* pVertexBuffer, uint64 offset ) override;
+	virtual void SetIndexBuffer( IStudioAPIBuffer* pIndexBuffer, uint64 offset ) override;
 	virtual void SetConstantBuffer( uint32 set, uint32 slot, IStudioAPIBuffer* pConstantBuffer ) override;
 	virtual void SetTexture( uint32 set, uint32 slot, IStudioAPITexture* pTexture ) override;
 	virtual void SetSampler( uint32 set, uint32 slot, IStudioAPISampler* pSampler ) override;
@@ -47,7 +48,7 @@ public:
 	virtual void SetScissor( int32 x, int32 y, uint32 width, uint32 height ) override;
 
 	virtual void Draw( uint32 baseVertexIndex, uint32 numVertices, uint32 numInstances = 1 ) override;
-	virtual void DrawIndexed( IStudioAPIBuffer* pIndexBuffer, uint32 baseVertexIndex, uint32 baseIndex, uint32 numIndices, uint32 numInstances = 1 ) override;
+	virtual void DrawIndexed( uint32 baseVertexIndex, uint32 baseIndex, uint32 numIndices, uint32 numInstances = 1 ) override;
 	virtual void Barrier( const studioAPIBarrier_t* pBarriers, uint32 numBarriers, bool bFlush = false ) override;
 	virtual void CopyBuffer( IStudioAPIBuffer* pSrcBuffer, uint64 srcOffset, IStudioAPIBuffer* pDstBuffer, uint64 dstOffset, uint64 size ) override;
 
@@ -123,11 +124,11 @@ public:
 	~CStudioAPICmdListBatchVk();
 
 private:
-	uint8									  syncSwapChainFlags;
-	CStudioAPISwapChainVk*					  pSyncSwapChain;
-	CRefPtr<CStudioAPICmdContextVk>			  pCmdContext;
-	eastl::list<CStudioAPINamedSemaphoreVk*>	  syncSignals;
-	eastl::list<CStudioAPINamedSemaphoreVk*>	  syncWaits;
+	uint8										syncSwapChainFlags;
+	CStudioAPISwapChainVk*						pSyncSwapChain;
+	CRefPtr<CStudioAPICmdContextVk>				pCmdContext;
+	eastl::list<CStudioAPINamedSemaphoreVk*>	syncSignals;
+	eastl::list<CStudioAPINamedSemaphoreVk*>	syncWaits;
 	eastl::vector<CRefPtr<CStudioAPICmdListVk>> cmdLists;
 };
 

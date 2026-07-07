@@ -1,10 +1,10 @@
 #include "pch_citadel.h"
 #include "studiorender/studioapi/istudioapi.h"
 #include "studiorender/istudio_rendercmd.h"
-#include "studiorender/studio_vertextypes.h"
 #include "studiorender/istudiorender.h"
 #include "materialsystem/imaterial.h"
 #include "materialsystem/imaterialvar.h"
+#include "modelsystem/modeltypes.h"
 #include "resourcesystem/iresourcesystem.h"
 #include "game/shared/game.h"
 #include "game/ientity.h"
@@ -12,8 +12,6 @@
 #include "game/imap.h"
 #include "game/shared/ecs/ecs_core.h"
 #include "game/shared/ecs/ecs_common.gen.h"
-#include "game/shared/ecs/ecs_movement.gen.h"
-#include "game/shared/ecs/ecs_camera.gen.h"
 #include "game/citadel/ecs/ecs_testdraw.gen.h"
 #include "tier1/cmdlink.h"
 
@@ -34,10 +32,6 @@ public:
 
 	// IGame interfaces
 	virtual const char* GetGameDescription() const override;
-
-private:
-	CRefPtr<IEntity> pQuadEntity;
-	CRefPtr<IEntity> pPlayerEntity;
 };
 
 EXPOSE_INTERFACE_FN( Game, IGame, GAME_INTERFACE_VERSION );
@@ -132,34 +126,34 @@ bool CCitadelGame::Init()
 		return false;
 	}
 
-	// Load a quad material
-	IResourceTypeMgr*		pMaterialsMgr = g_pResourceSystem->GetResourceManagerForType<IMaterial>();
-	CResourcePtr<IMaterial> pMaterial	  = pMaterialsMgr->LoadResource( "materials/nelson" );
-
-	// Initialize StudioAPI buffers
-	class CInitQuadHelper
-	{
-	public:
-		static void R_InitQuad( CCitadelGame* pGame, const CResourcePtr<IMaterial>& pMaterial )
-		{
-			studioSimpleElementVertex_t quadVerteces[]		   = { { { -0.5f, -0.5f, 0.f, 1.f }, { -1.f, 0.f }, { 255, 0, 0 } },
-																   { { 0.5f, -0.5f, 0.f, 1.f }, { 0.f, 0.f }, { 0, 255, 0 } },
-																   { { 0.5f, 0.5f, 0.f, 1.f }, { 0.f, 1.f }, { 0, 0, 255 } },
-																   { { -0.5f, 0.5f, 0.f, 1.f }, { -1.f, 1.f }, { 255, 255, 255 } } };
-			uint16						quadIndices[]		   = { 0, 1, 2, 2, 3, 0 };
-			CRefPtr<IStudioAPIBuffer>	pStudioAPIVertexBuffer = g_pStudioAPI->CreateBuffer( (byte*)&quadVerteces[0], ARRAYSIZE( quadVerteces ) * sizeof( studioSimpleElementVertex_t ), sizeof( studioSimpleElementVertex_t ), STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_VERTEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
-			CRefPtr<IStudioAPIBuffer>	pStudioAPIIndexBuffer  = g_pStudioAPI->CreateBuffer( (byte*)&quadIndices[0], ARRAYSIZE( quadIndices ) * sizeof( uint16 ), sizeof( uint16 ), STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_INDEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
-			Quad().Init( pStudioAPIVertexBuffer, pStudioAPIIndexBuffer, pMaterial );
-		}
+	// Create a quad model
+	IResourceTypeMgr*	pMaterialsMgr  = g_pResourceSystem->GetResourceManagerForType<IMaterial>();
+	IResourceTypeMgr*	pModelsMgr	   = g_pResourceSystem->GetResourceManagerForType<IModel>();
+	modelSimpleVertex_t quadVerteces[] = {
+		{ { -0.5f, -0.5f, 0.f, 1.f }, { -1.f, 0.f }, { 255, 0, 0 } },
+		{ { 0.5f, -0.5f, 0.f, 1.f }, { 0.f, 0.f }, { 0, 255, 0 } },
+		{ { 0.5f, 0.5f, 0.f, 1.f }, { 0.f, 1.f }, { 0, 0, 255 } },
+		{ { -0.5f, 0.5f, 0.f, 1.f }, { -1.f, 1.f }, { 255, 255, 255 } }
 	};
+	uint16					quadIndices[] = { 0, 1, 2, 2, 3, 0 };
+	CResourcePtr<IMaterial> pQuadMaterial = pMaterialsMgr->LoadResource( "materials/nelson" );
+	modelSurface_t			quadSurface	  = {};
+	quadSurface.numIndices				  = ARRAYSIZE( quadIndices );
 
-	UNIQUE_RENDER_COMMAND_TWOPARAMETER( CStudioRenderCmd_InitQuad,
-										CCitadelGame*, pGame, this,
-										CResourcePtr<IMaterial>, pMaterial, pMaterial,
-										{
-											CInitQuadHelper::R_InitQuad( pGame, pMaterial );
-										} );
-	Studio_FlushRenderCommands();
+	CResourcePtr<IModel> pQuadModel		  = pModelsMgr->CreateResource( "quad" );
+	modelInitialData_t	 modelInitialData = {};
+	modelInitialData.vertexType			  = MODEL_VERTEXTYPE_SIMPLE;
+	modelInitialData.indexType			  = MODEL_INDEXTYPE_UINT16;
+	modelInitialData.sizeVertices		  = ARRAYSIZE( quadVerteces ) * sizeof( modelSimpleVertex_t );
+	modelInitialData.sizeIndices		  = ARRAYSIZE( quadIndices ) * sizeof( uint16 );
+	modelInitialData.numMaterials		  = 1;
+	modelInitialData.numSurfaces		  = 1;
+	modelInitialData.pVertices			  = (byte*)&quadVerteces[0];
+	modelInitialData.pIndices			  = (byte*)&quadIndices[0];
+	modelInitialData.pMaterials			  = &pQuadMaterial;
+	modelInitialData.pSurfaces			  = &quadSurface;
+	pQuadModel->Init( modelInitialData );
+	Quad().Init( pQuadModel, pQuadMaterial );
 
 	// Initialize the ECS world
 	extern void EcsInitModules_Citadel();
@@ -183,8 +177,6 @@ void CCitadelGame::Shutdown()
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
 	Quad().Shutdown();
-	pQuadEntity	  = NULL;
-	pPlayerEntity = NULL;
 	CGame::Shutdown();
 }
 
@@ -200,13 +192,30 @@ const char* CCitadelGame::GetGameDescription() const
 
 /*
 ==================
-CEcsSystemQuadDraw::OnUpdate
+CEcsSystemQuadInit::OnUpdate
 ==================
 */
-void CEcsSystemQuadInit::OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity, const ecsComponentQuad_t& quad, const ecsResourceStudioRender_t& studioRender )
+void CEcsSystemQuadInit::OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity, const ecsComponentQuad_t& quad, ecsResourceStudioScene_t& studioScene )
 {
-	ecsComponentStudioRenderObject_t studioRenderObjectComponent;
-	studioRenderObjectComponent.pStudioRenderObject = studioRender.pStudioRender->CreateQuadRenderObject( quad.pMaterial, quad.pVertexBuffer, quad.pIndexBuffer );
-	studioRender.pStudioRender->RegisterObject( studioRenderObjectComponent.pStudioRenderObject );
-	ecsWorld.SetComponent( entity, eastl::move( studioRenderObjectComponent ) );
+	// TODO BS yehor.pohuliaka - CIT-81 Implement observer/system to free a studio entity when the ecs entity has been destroyed
+	studioEntityParams_t	   studioEntityParams	 = {};
+	ecsComponentStudioEntity_t studioEntityComponent = {};
+	studioEntityParams.pModel						 = quad.pModel;
+	studioEntityComponent.id						 = studioScene.pStudioScene->AddEntity( studioEntityParams );
+	ecsWorld.SetComponent( entity, eastl::move( studioEntityComponent ) );
+}
+
+/*
+==================
+CEcsSystemModelInit::OnUpdate
+==================
+*/
+void CEcsSystemModelInit::OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity, const ecsComponentModel_t& model, ecsResourceStudioScene_t& studioScene )
+{
+	// TODO BS yehor.pohuliaka - CIT-81 Implement observer/system to free a studio entity when the ecs entity has been destroyed
+	studioEntityParams_t	   studioEntityParams	 = {};
+	ecsComponentStudioEntity_t studioEntityComponent = {};
+	studioEntityParams.pModel						 = model.pModel;
+	studioEntityComponent.id						 = studioScene.pStudioScene->AddEntity( studioEntityParams );
+	ecsWorld.SetComponent( entity, eastl::move( studioEntityComponent ) );
 }

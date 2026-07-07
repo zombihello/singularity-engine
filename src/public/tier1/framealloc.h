@@ -27,9 +27,13 @@ public:
 	template<typename TType, typename... TArgs>
 	TType* Construct( TArgs&&... args );
 	void*  Alloc( size numBytes, uint32 alignment = 0 );
+	void*  AllocZero( size numBytes, uint32 alignment = 0 );
 	void   SwapPools();
-	void   MarkAsFreePool( uint32 index );
-	uint32 GetCurrentPoolId() const;
+	void   MarkAsFreePool( uint32 poolId );
+
+	uint32		GetCurrentPoolId() const;
+	uint64		GetTotalUsedSize( uint32 poolId ) const;
+	const char* GetAllocName() const;
 
 private:
 	struct destructorEntry_t
@@ -40,8 +44,7 @@ private:
 
 	struct memoryBlock_t
 	{
-		uint64						   allocatedSize;
-		uint64						   usedSize;
+		uint32						   usedSize;
 		byte*						   pData;
 		eastl::list<destructorEntry_t> destructorList;
 	};
@@ -62,6 +65,28 @@ private:
 	uint32		 currentPoolId;
 	memoryPool_t pools[numPools];
 	const char*	 pAllocName;
+};
+
+//-----------------------------------------------------------------------------
+// Frame memory allocator wrapper to use it in STL containers
+// i.g: eastl::vector, eastl::unoredred_map, etc
+//-----------------------------------------------------------------------------
+template<auto& frameAlloc>
+class CStlFrameAlloc
+{
+public:
+	CStlFrameAlloc( const char* pName = "Unknown" );
+	CStlFrameAlloc( const CStlFrameAlloc& other );
+	CStlFrameAlloc( const CStlFrameAlloc& other, const char* pName );
+
+	void* allocate( size numBytes, int32 flags = 0 );
+	void* allocate( size numBytes, size alignment, size offset, int32 flags = 0 );
+	void  deallocate( void* pPtr, size numBytes );
+
+	void		set_name( const char* pName );
+	const char* get_name() const;
+
+	CStlFrameAlloc& operator=( const CStlFrameAlloc& other );
 };
 
 #include "tier1/framealloc.inl"
