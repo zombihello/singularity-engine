@@ -65,6 +65,7 @@ public:
 template<class TResourceClass>
 struct resourceTypeInfo_t
 {
+	static_assert( false, "Used unknown resource class" );
 	typedef TResourceClass class_t;
 	enum
 	{
