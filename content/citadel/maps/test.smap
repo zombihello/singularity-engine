@@ -3,6 +3,11 @@ quad
 	classname "entities/test_quad"
 }
 
+model
+{
+	classname "entities/test_model"
+}
+
 player
 {
 	classname "entities/player"

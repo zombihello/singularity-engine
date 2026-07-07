@@ -3,6 +3,7 @@
 #include "utils/interfaces/interfaces.h"
 #include "materialsystem/imaterial.h"
 #include "materialsystem/itexture.h"
+#include "modelsystem/imodel.h"
 #include "game/ientitydesc.h"
 #include "resourcesystem/iresourcesystem.h"
 #include "resourcesystem/resourceptr.h"

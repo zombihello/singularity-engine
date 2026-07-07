@@ -153,7 +153,7 @@ bool CCitadelGame::Init()
 	modelInitialData.pMaterials			  = &pQuadMaterial;
 	modelInitialData.pSurfaces			  = &quadSurface;
 	pQuadModel->Init( modelInitialData );
-	Quad().Init( pQuadModel );
+	Quad().Init( pQuadModel, pQuadMaterial );
 
 	// Initialize the ECS world
 	extern void EcsInitModules_Citadel();
@@ -197,10 +197,25 @@ CEcsSystemQuadInit::OnUpdate
 */
 void CEcsSystemQuadInit::OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity, const ecsComponentQuad_t& quad, ecsResourceStudioScene_t& studioScene )
 {
-	// TODO BS yehor.pohuliaka - Implement observer/system to free a studio entity when the ecs entity has been destroyed
+	// TODO BS yehor.pohuliaka - CIT-81 Implement observer/system to free a studio entity when the ecs entity has been destroyed
 	studioEntityParams_t	   studioEntityParams	 = {};
 	ecsComponentStudioEntity_t studioEntityComponent = {};
 	studioEntityParams.pModel						 = quad.pModel;
+	studioEntityComponent.id						 = studioScene.pStudioScene->AddEntity( studioEntityParams );
+	ecsWorld.SetComponent( entity, eastl::move( studioEntityComponent ) );
+}
+
+/*
+==================
+CEcsSystemModelInit::OnUpdate
+==================
+*/
+void CEcsSystemModelInit::OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity, const ecsComponentModel_t& model, ecsResourceStudioScene_t& studioScene )
+{
+	// TODO BS yehor.pohuliaka - CIT-81 Implement observer/system to free a studio entity when the ecs entity has been destroyed
+	studioEntityParams_t	   studioEntityParams	 = {};
+	ecsComponentStudioEntity_t studioEntityComponent = {};
+	studioEntityParams.pModel						 = model.pModel;
 	studioEntityComponent.id						 = studioScene.pStudioScene->AddEntity( studioEntityParams );
 	ecsWorld.SetComponent( entity, eastl::move( studioEntityComponent ) );
 }

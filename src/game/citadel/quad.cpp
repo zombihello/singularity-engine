@@ -6,9 +6,10 @@
 CQuad::Init
 ==================
 */
-void CQuad::Init( IResource* pModel )
+void CQuad::Init( IResource* pModel, IResource* pMaterial )
 {
-	CQuad::pModel = pModel;
+	CQuad::pModel	 = pModel;
+	CQuad::pMaterial = pMaterial;
 }
 
 /*
@@ -18,7 +19,8 @@ CQuad::Shutdown
 */
 void CQuad::Shutdown()
 {
-	pModel = NULL;
+	pModel	  = NULL;
+	pMaterial = NULL;
 }
 
 /*
