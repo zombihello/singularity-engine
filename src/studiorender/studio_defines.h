@@ -3,8 +3,10 @@
 //-----------------------------------------------------------------------------
 // StudioRender defines
 //-----------------------------------------------------------------------------
-#define STUDIO_RENDERCOMMAND_BUFFER_SIZE		  ( 1024 * 1024 )
-#define STUDIO_FRAMEALLOC_BLOCK_SIZE			  ( 64 * 1024 * 1024 )
-#define STUDIO_FRAMEALLOC_NUM_POOLS				  1
-#define STUDIO_SCENEVIEW_INITIAL_NUM_DRAWSURFACES 2048	// This is the initial allocation for max number of studioDrawSurface_t
-														// in a given scene view, but it will automatically grow if needed
+#define STUDIO_RENDERCOMMAND_BUFFER_SIZE			 ( 1024 * 1024 )
+#define STUDIO_FRAMEALLOC_BLOCK_SIZE				 ( 64 * 1024 * 1024 )
+#define STUDIO_FRAMEALLOC_NUM_POOLS					 1
+#define STUDIO_SCENEVIEW_INITIAL_NUM_DRAWSURFACES	 2048
+#define STUDIO_SCENEVIEW_INITIAL_NUM_RESOURCES		 2048
+#define STUDIO_RENDERPASS_INITIAL_NUM_DRAWSURFACEIDS 2048
+#define STUDIO_RENDERPASS_INITIAL_NUM_RESOURCEIDS	 2048

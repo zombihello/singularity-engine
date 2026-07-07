@@ -93,7 +93,7 @@ void CStudioScene::FindEntityViews( studioSceneView_t* pSceneView ) const
 	for ( uint32 index = 0, count = (uint32)entities.size(); index < count; ++index )
 	{
 		const studioEntity_t& entity	  = entities[index];
-		studioEntityView_t*	  pEntityView = (studioEntityView_t*)g_StudioRender.GetFrameAlloc().Alloc( sizeof( studioEntityView_t ) );
+		studioEntityView_t*	  pEntityView = (studioEntityView_t*)g_studioFrameAlloc.Alloc( sizeof( studioEntityView_t ) );
 		pEntityView->pEntity			  = (studioEntity_t*)&entity;
 		pEntityView->localToWorld		  = g_matrixIdentity;
 		pEntityView->pNext				  = pSceneView->pEntityViews;

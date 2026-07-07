@@ -17,16 +17,6 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CStudioRender, IStudioRender, STUDIORENDER_IN
 
 /*
 ==================
-CStudioRender::CStudioRender
-==================
-*/
-CStudioRender::CStudioRender()
-	: frameAlloc( "Studio FrameAlloc" )
-{
-}
-
-/*
-==================
 CStudioRender::Connect
 ==================
 */
@@ -162,7 +152,7 @@ void CStudioRender::BeginFrame()
 {
 	// Swap pools in the frame allocator
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-	frameAlloc.SwapPools();
+	g_studioFrameAlloc.SwapPools();
 
 	// Tell StudioAPI about begin of drawing frame
 	UNIQUE_RENDER_COMMAND( CStudioRenderCmd_BeginFrame,
@@ -180,12 +170,11 @@ void CStudioRender::EndFrame()
 {
 	// Tell StudioAPI about end of drawing frame and free the pool in the frame allocator
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-	UNIQUE_RENDER_COMMAND_TWOPARAMETER( CStudioRenderCmd_EndFrame,
-										studioFrameAlloc_t&, frameAlloc, frameAlloc,
-										uint32, framePoolId, frameAlloc.GetCurrentPoolId(),
+	UNIQUE_RENDER_COMMAND_ONEPARAMETER( CStudioRenderCmd_EndFrame,
+										uint32, framePoolId, g_studioFrameAlloc.GetCurrentPoolId(),
 										{
 											g_pStudioAPI->EndDrawingFrame();
-											frameAlloc.MarkAsFreePool( framePoolId );
+											g_studioFrameAlloc.MarkAsFreePool( framePoolId );
 										} );
 }
 
@@ -205,15 +194,10 @@ void CStudioRender::DrawScene( IStudioViewport* pStudioViewport, IStudioScene* p
 
 	// Cast the scene to our type and allocate a scene view
 	CStudioScene*	   pStudioSceneLocal = (CStudioScene*)pStudioScene;
-	studioSceneView_t* pSceneView		 = (studioSceneView_t*)frameAlloc.AllocZero( sizeof( studioSceneView_t ) );
+	studioSceneView_t* pSceneView		 = g_studioFrameAlloc.Construct<studioSceneView_t>();
 
 	// Find all visible entities, after that creates entity views for them
 	pStudioSceneLocal->FindEntityViews( pSceneView );
-
-	// Preallocate memory for draw surfaces
-	pSceneView->numDrawSurfaces = 0;
-	pSceneView->maxDrawSurfaces = STUDIO_SCENEVIEW_INITIAL_NUM_DRAWSURFACES;
-	pSceneView->pDrawSurfaces	= (studioDrawSurface_t**)frameAlloc.Alloc( pSceneView->maxDrawSurfaces * sizeof( studioDrawSurface_t* ) );
 
 	// Go through each entity view and add draw surfaces to the scene view
 	for ( studioEntityView_t* pEntityView = pSceneView->pEntityViews; pEntityView; pEntityView = pEntityView->pNext )
@@ -252,36 +236,37 @@ void CStudioRender::AddModelToSceneView( studioSceneView_t* pSceneView, studioEn
 
 	// Get all surfaces and materials
 	uint32							  numSurfaces		 = pModelResource->GetNumSurfaces();
+	uint32							  numMaterials		 = pModelResource->GetNumMaterials();
 	const modelSurface_t*			  pSurfaces			 = pModelResource->GetSurfaces();
 	const CRefPtr<IMaterialResource>* pMaterialResources = pModelResource->GetMaterials();
 
-	// Resize the draw surfaces list if it doesn't fit
-	uint32 requiredCapacity = pSceneView->numDrawSurfaces + numSurfaces;
-	if ( requiredCapacity > pSceneView->maxDrawSurfaces )
+	// Go through each resource and add it to the scene view
+	uint32	modelId		 = AddResourceToSceneView( pSceneView, pModelResource );
+	uint32* pMaterialIds = (uint32*)Mem_Alloca( numMaterials * sizeof( uint32 ) );
+	for ( uint32 index = 0; index < numMaterials; ++index )
 	{
-		studioDrawSurface_t** pOldList	  = pSceneView->pDrawSurfaces;
-		uint32				  oldCapacity = pSceneView->maxDrawSurfaces;
-		while ( pSceneView->maxDrawSurfaces < requiredCapacity )
-		{
-			pSceneView->maxDrawSurfaces *= 2;
-		}
-		pSceneView->pDrawSurfaces = (studioDrawSurface_t**)frameAlloc.Alloc( pSceneView->maxDrawSurfaces * sizeof( studioDrawSurface_t* ) );
-		Mem_Memcpy( pSceneView->pDrawSurfaces, pOldList, oldCapacity * sizeof( studioDrawSurface_t* ) );
+		pMaterialIds[index] = AddResourceToSceneView( pSceneView, pMaterialResources[index].GetRawPtr() );
 	}
 
-	// Go through each model surface and add draw surfaces to the scene view
-	for ( uint32 index = 0; index < numSurfaces; index++ )
+	// Go through each model surface and allocate draw surfaces
+	for ( uint32 index = 0; index < numSurfaces; ++index )
 	{
-		const modelSurface_t& surface						   = pSurfaces[index];
-		studioDrawSurface_t*  pDrawSurface					   = frameAlloc.Construct<studioDrawSurface_t>();
-		pDrawSurface->pEntityView							   = pEntityView;
-		pDrawSurface->pModel								   = pModelResource;
-		pDrawSurface->pMaterial								   = pMaterialResources[surface.materialId];
-		pDrawSurface->baseVertexIndex						   = surface.baseVertexIndex;
-		pDrawSurface->baseIndex								   = surface.baseIndex;
-		pDrawSurface->numIndices							   = surface.numIndices;
-		pSceneView->pDrawSurfaces[pSceneView->numDrawSurfaces] = pDrawSurface;
-		++pSceneView->numDrawSurfaces;
+		const modelSurface_t& surface	   = pSurfaces[index];
+		studioDrawSurface_t*  pDrawSurface = (studioDrawSurface_t*)g_studioFrameAlloc.Alloc( sizeof( studioDrawSurface_t ) );
+		pDrawSurface->pEntityView		   = pEntityView;
+		pDrawSurface->modelId			   = modelId;
+		pDrawSurface->materialId		   = pMaterialIds[surface.materialId];
+		pDrawSurface->baseVertexIndex	   = surface.baseVertexIndex;
+		pDrawSurface->baseIndex			   = surface.baseIndex;
+		pDrawSurface->numIndices		   = surface.numIndices;
+
+		// Add the draw surface into the scene view and render passes
+		studioRenderPass_t& renderPassPresent = pSceneView->renderPasses[STUDIO_RENDERPASS_TYPE_PRESENT];
+		uint32				drawSurfaceId	  = (uint32)pSceneView->drawSurfaces.size();
+		pSceneView->drawSurfaces.emplace_back( pDrawSurface );
+		renderPassPresent.drawSurfaceIds.emplace_back( drawSurfaceId );
+		renderPassPresent.resourceIds.insert( modelId );
+		renderPassPresent.resourceIds.insert( pMaterialIds[surface.materialId] );
 	}
 }
 
@@ -295,6 +280,33 @@ void CStudioRender::R_DrawScene( CStudioViewport* pViewport, studioSceneView_t* 
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( Studio_IsInRenderThread() );
 	presentRenderPass.R_DrawPass( pViewport, pSceneView );
+}
+
+/*
+==================
+CStudioRender::AddResourceToSceneView
+==================
+*/
+uint32 CStudioRender::AddResourceToSceneView( studioSceneView_t* pSceneView, studioResourcePtr_t pPtr, studioResourceType_t type )
+{
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	uint32 resourceId	= INVALID_INDEX;
+	auto   itResourceId = pSceneView->resourceDict.find( pPtr );
+	if ( itResourceId != pSceneView->resourceDict.end() )
+	{
+		resourceId = itResourceId->second;
+	}
+	else
+	{
+		studioResource_t* pResource = (studioResource_t*)g_studioFrameAlloc.Alloc( sizeof( studioResource_t ) );
+		pResource->type				= type;
+		pResource->pPtr				= pPtr;
+		resourceId					= (uint32)pSceneView->resources.size();
+		pSceneView->resources.emplace_back( pResource );
+		pSceneView->resourceDict.insert( eastl::make_pair( pPtr, resourceId ) );
+	}
+
+	return resourceId;
 }
 
 /*

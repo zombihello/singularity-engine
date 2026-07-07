@@ -2,12 +2,23 @@
 #include "tier1/math/math_types.h"
 #include "modelsystem/imodel.h"
 #include "materialsystem/imaterial.h"
+#include "studiorender/studio_framealloc.h"
 #include "studiorender/studio_renderpasstypes.h"
 
 //-----------------------------------------------------------------------------
 // Forward declarations
 //-----------------------------------------------------------------------------
 struct studioEntity_t;
+
+//-----------------------------------------------------------------------------
+// Studio resource type
+//-----------------------------------------------------------------------------
+enum studioResourceType_t
+{
+	STUDIO_RESOURCE_TYPE_MATERIAL,
+	STUDIO_RESOURCE_TYPE_MODEL
+};
+using studioResourcePtr_t = void*;
 
 //-----------------------------------------------------------------------------
 // Studio entity view
@@ -36,22 +47,62 @@ struct studioEntityView_t
 //-----------------------------------------------------------------------------
 struct studioDrawSurface_t
 {
-	studioEntityView_t*		   pEntityView;
-	CRefPtr<IModelResource>	   pModel;
-	CRefPtr<IMaterialResource> pMaterial;
-	uint32					   baseVertexIndex;
-	uint32					   baseIndex;
-	uint32					   numIndices;
+	studioEntityView_t* pEntityView;
+	uint32				modelId;
+	uint32				materialId;
+	uint32				baseVertexIndex;
+	uint32				baseIndex;
+	uint32				numIndices;
+};
+
+//-----------------------------------------------------------------------------
+// Studio resource
+//
+// NOTES:
+//	* studioResource_t contains a render resource that uses by a draw surface in the render thread
+//	* studioResource_t are always allocated and freed every frame, they are never cached
+//-----------------------------------------------------------------------------
+struct studioResource_t
+{
+	studioResourceType_t type;
+	union
+	{
+		IModelResource*		pModel;
+		IMaterialResource*	pMaterial;
+		studioResourcePtr_t pPtr;
+	};
+};
+
+//-----------------------------------------------------------------------------
+// Studio render pass
+//
+// NOTES:
+//	* `drawSurfaceIds` and `resourceIds` are uses the frame temporary memory and may be resized
+//	* studioRenderPass_t are always allocated and freed every frame, they are never cached
+//-----------------------------------------------------------------------------
+struct studioRenderPass_t
+{
+	studioRenderPass_t();
+
+	studioFrameVector_t<uint32>	 drawSurfaceIds;  // Draw surface indices that are to be rendered in the pass
+	studioFrameHashSet_t<uint32> resourceIds;	  // Resource indices that are used in the pass
 };
 
 //-----------------------------------------------------------------------------
 // Studio scene view
-// NOTE: studioSceneView_t are allocated on the frame temporary stack memory
+// NOTES:
+//	* `drawSurfaces`, `resources` and `resourceDict` are uses the frame temporary memory and may be resized
+//	* studioSceneView_t are allocated on the frame temporary stack memory
 //-----------------------------------------------------------------------------
 struct studioSceneView_t
 {
-	studioEntityView_t*	  pEntityViews;		// Chain of all entity views effecting view, including off screen ones casting shadows
-	studioDrawSurface_t** pDrawSurfaces;	// Draw surfaces are the visible surfaces of the entity views
-	uint32				  numDrawSurfaces;	// It is allocated in frame temporary memory
-	uint32				  maxDrawSurfaces;	// May be resized
+	studioSceneView_t();
+
+	studioEntityView_t*								  pEntityViews;								  // Chain of all entity views effecting view, including off screen ones casting shadows
+	studioRenderPass_t								  renderPasses[STUDIO_RENDERPASS_NUM_TYPES];  // Information for each render pass
+	studioFrameVector_t<studioDrawSurface_t*>		  drawSurfaces;								  // Draw surfaces are the visible surfaces of the entity views
+	studioFrameVector_t<studioResource_t*>			  resources;								  // Resources are used by the draw surfaces
+	studioFrameHashMap_t<studioResourcePtr_t, uint32> resourceDict;								  // Lookup table to find a resource in `resources` by hash
 };
+
+#include "studiorender/studio_sceneview.inl"
