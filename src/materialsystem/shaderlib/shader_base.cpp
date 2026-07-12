@@ -2,6 +2,7 @@
 #include "utils/shadercache/shadercache.h"
 #include "studiorender/studioapi/istudioapi_barrier.h"
 #include "studiorender/istudiorender.h"
+#include "modelsystem/ivertexfactory.h"
 #include "materialsystem/shaderlib/shader_base.h"
 #include "materialsystem/shaderlib/shaderlib.h"
 
@@ -120,7 +121,7 @@ void CBaseShader::R_Barrier( IStudioAPICmdList* pStudioAPICmdList, IShaderContex
 CBaseShader::R_PrepareForDraw
 ==================
 */
-void CBaseShader::R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData, studioRenderPassType_t renderPassType )
+void CBaseShader::R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData, IVertexFactory* pVertexFactory, studioRenderPassType_t renderPassType )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 

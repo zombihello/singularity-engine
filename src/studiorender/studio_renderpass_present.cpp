@@ -1,5 +1,6 @@
 #include "pch_studiorender.h"
 #include "materialsystem/ishader.h"
+#include "modelsystem/ivertexfactory.h"
 #include "studiorender/studioapi/istudioapi_barrier.h"
 #include "studiorender/studio_renderpasstypes.h"
 #include "studiorender/studio_viewport.h"
@@ -43,12 +44,9 @@ void CStudioRenderPassPresent::R_DrawPass( CStudioViewport* pViewport, studioSce
 		{
 		case STUDIO_RESOURCE_TYPE_MODEL:
 		{
-			IModelResource*	   pModel	  = pResource->pModel;
-			studioAPIBarrier_t barriers[] = {
-				StudioAPI_MakeBufferBarrier( pModel->GetStudioAPIVertexBuffer(), STUDIOAPI_BUFFER_STATE_VERTEX_BUFFER, STUDIOAPI_QUEUE_TYPE_GRAPHICS ),
-				StudioAPI_MakeBufferBarrier( pModel->GetStudioAPIIndexBuffer(), STUDIOAPI_BUFFER_STATE_INDEX_BUFFER, STUDIOAPI_QUEUE_TYPE_GRAPHICS )
-			};
-			pGraphicsCmdList->Barrier( barriers, ARRAYSIZE( barriers ) );
+			IModelResource* pModel		   = pResource->pModel;
+			IVertexFactory* pVertexFactory = pModel->GetVertexFactory();
+			pVertexFactory->R_Barrier( pGraphicsCmdList );
 			break;
 		}
 
@@ -71,15 +69,15 @@ void CStudioRenderPassPresent::R_DrawPass( CStudioViewport* pViewport, studioSce
 	pGraphicsCmdList->BeginRenderPass( pViewport->GetStudioAPIRenderPass(), pViewport->GetStudioAPIFrameBuffer() );
 	for ( uint32 index = 0, count = (uint32)renderPass.drawSurfaceIds.size(); index < count; ++index )
 	{
-		studioDrawSurface_t* pDrawSurface = pSceneView->drawSurfaces[renderPass.drawSurfaceIds[index]];
-		IModelResource*		 pModel		  = pSceneView->resources[pDrawSurface->modelId]->pModel;
-		IMaterialResource*	 pMaterial	  = pSceneView->resources[pDrawSurface->materialId]->pMaterial;
-		IShader*			 pShader	  = pMaterial->GetShader();
-		IShaderContextData*	 pContextData = pMaterial->GetContextData();
+		studioDrawSurface_t* pDrawSurface	= pSceneView->drawSurfaces[renderPass.drawSurfaceIds[index]];
+		IModelResource*		 pModel			= pSceneView->resources[pDrawSurface->modelId]->pModel;
+		IMaterialResource*	 pMaterial		= pSceneView->resources[pDrawSurface->materialId]->pMaterial;
+		IShader*			 pShader		= pMaterial->GetShader();
+		IShaderContextData*	 pContextData	= pMaterial->GetContextData();
+		IVertexFactory*		 pVertexFactory = pModel->GetVertexFactory();
 
-		pShader->R_PrepareForDraw( pGraphicsCmdList, pContextData, STUDIO_RENDERPASS_TYPE_PRESENT );
-		pGraphicsCmdList->SetVertexBuffer( 0, pModel->GetStudioAPIVertexBuffer(), 0 );
-		pGraphicsCmdList->SetIndexBuffer( pModel->GetStudioAPIIndexBuffer(), 0 );
+		pVertexFactory->R_PrepareForDraw( pGraphicsCmdList, STUDIO_RENDERPASS_TYPE_PRESENT );
+		pShader->R_PrepareForDraw( pGraphicsCmdList, pContextData, pVertexFactory, STUDIO_RENDERPASS_TYPE_PRESENT );
 		pGraphicsCmdList->DrawIndexed( pDrawSurface->baseVertexIndex, pDrawSurface->baseIndex, pDrawSurface->numIndices );
 	}
 	pGraphicsCmdList->EndRenderPass();

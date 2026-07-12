@@ -300,7 +300,7 @@ public:
 
 	// Place barriers into a command list
 	virtual void R_Barrier( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData ) const override;
-	virtual void R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData, studioRenderPassType_t renderPassType ) override;
+	virtual void R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData, IVertexFactory* pVertexFactory, studioRenderPassType_t renderPassType ) override;
 
 	// Get a fallback shader
 	// Returns NULL when no have a fallback shader

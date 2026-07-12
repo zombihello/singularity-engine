@@ -3,6 +3,8 @@
 #include "resourcesystem/iresourcesystem.h"
 #include "resourcesystem/iresourcetypemgr.h"
 #include "materialsystem/imaterial.h"
+#include "modelsystem/vertexfactory_simple.h"
+#include "modelsystem/vertexfactory_static.h"
 #include "modelsystem/modelsystem.h"
 #include "modelsystem/model.h"
 
@@ -24,8 +26,7 @@ CModelResource::CModelResource
 ==================
 */
 CModelResource::CModelResource()
-	: vertexType( MODEL_VERTEX_NUM_TYPES )
-	, indexType( MODEL_INDEX_NUM_TYPES )
+	: indexType( MODEL_INDEX_NUM_TYPES )
 {
 }
 
@@ -36,12 +37,35 @@ CModelResource::Update
 */
 void CModelResource::Update( const modelInitialData_t& initialData )
 {
-	// Copy a new vertex and index type
+	// Copy a new index type
 	PROFILER_SCOPE_FUNC();
 	Assert( initialData.vertexType < MODEL_VERTEX_NUM_TYPES );
 	Assert( initialData.indexType < MODEL_INDEX_NUM_TYPES );
-	vertexType = initialData.vertexType;
-	indexType  = initialData.indexType;
+	indexType = initialData.indexType;
+
+	// Create a new vertex factory if the resource didn't have one previously, or
+	// if the new vertex type doesn't match the factory
+	bool bDirtyVertexFactory = false;
+	if ( !pVertexFactory || pVertexFactory->GetVertexType() != initialData.vertexType )
+	{
+		// If the old vertex factory is valid begin release one in the render thread
+		bDirtyVertexFactory = true;
+		if ( pVertexFactory )
+		{
+			Studio_BeginReleaseResource( pVertexFactory );
+		}
+
+		// Create a new vertex factory for the vertex type
+		switch ( initialData.vertexType )
+		{
+		case MODEL_VERTEXTYPE_SIMPLE: pVertexFactory = new CVertexFactorySimple(); break;
+		case MODEL_VERTEXTYPE_STATIC: pVertexFactory = new CVertexFactoryStatic(); break;
+		default:
+			AssertMsg( false, "Unknown vertex type 0x%X", initialData.vertexType );
+			break;
+		}
+	}
+	pVertexFactory->ClearStreams();
 
 	// Copy vertices, indices and surfaces
 	vertices.resize( initialData.sizeVertices );
@@ -54,7 +78,11 @@ void CModelResource::Update( const modelInitialData_t& initialData )
 	// Copy materials
 	UpdateMaterials( initialData.pMaterials, initialData.numMaterials );
 
-	// Begin update the resource in the render thread
+	// Begin update the vertex factory (if it need) and the resource in the render thread
+	if ( bDirtyVertexFactory )
+	{
+		Studio_BeginUpdateResource( pVertexFactory );
+	}
 	Studio_BeginUpdateResource( this );
 }
 
@@ -85,15 +113,19 @@ void CModelResource::Clear()
 {
 	// Reset all fields
 	PROFILER_SCOPE_FUNC();
-	vertexType = MODEL_VERTEX_NUM_TYPES;
-	indexType  = MODEL_INDEX_NUM_TYPES;
+	indexType = MODEL_INDEX_NUM_TYPES;
 	vertices.clear();
 	indices.clear();
 	materials.clear();
 	surfaces.clear();
 
-	// Begin release the resource in the render thread
+	// Begin release the resource and the vertex factory (if it exists) in the render thread
 	Studio_BeginReleaseResource( this );
+	if ( pVertexFactory )
+	{
+		Studio_BeginReleaseResource( pVertexFactory );
+		pVertexFactory = NULL;
+	}
 }
 
 /*
@@ -103,12 +135,18 @@ CModelResource::InitStudioAPI
 */
 void CModelResource::InitStudioAPI()
 {
+	// Create a GPU vertex buffer and add all vertex streams into the vertex factory
+	Assert( pVertexFactory );
 	Assert( !vertices.empty() );
-	pStudioAPIVertexBuffer = g_pStudioAPI->CreateBuffer( vertices.data(), (uint32)vertices.size(), s_strideVertexType[vertexType], STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_VERTEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
+	modelVertexType_t vertexType = pVertexFactory->GetVertexType();
+	pStudioAPIVertexBuffer		 = g_pStudioAPI->CreateBuffer( vertices.data(), (uint32)vertices.size(), s_strideVertexType[vertexType], STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_VERTEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
+	pVertexFactory->AddVertexStream( vertexFactoryStream_t{ pStudioAPIVertexBuffer, 0 } );
 	vertices.clear();
 
+	// Create a GPU index buffer and set a index stream into the vertex factory
 	Assert( !indices.empty() );
 	pStudioAPIIndexBuffer = g_pStudioAPI->CreateBuffer( indices.data(), (uint32)indices.size(), s_strideIndexType[indexType], STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_INDEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
+	pVertexFactory->SetIndexStream( vertexFactoryStream_t{ pStudioAPIIndexBuffer, 0 } );
 	indices.clear();
 }
 
@@ -182,32 +220,12 @@ const modelSurface_t* CModelResource::GetSurfaces() const
 
 /*
 ==================
-CModelResource::GetStudioAPIVertexDeclaration
+CModelResource::GetVertexFactory
 ==================
 */
-IStudioAPIVertexDeclaration* CModelResource::GetStudioAPIVertexDeclaration() const
+IVertexFactory* CModelResource::GetVertexFactory() const
 {
-	return g_modelSystem.GetStudioAPIVertexDeclaration( vertexType );
-}
-
-/*
-==================
-CModelResource::GetStudioAPIVertexBuffer
-==================
-*/
-IStudioAPIBuffer* CModelResource::GetStudioAPIVertexBuffer() const
-{
-	return pStudioAPIVertexBuffer;
-}
-
-/*
-==================
-CModelResource::GetStudioAPIIndexBuffer
-==================
-*/
-IStudioAPIBuffer* CModelResource::GetStudioAPIIndexBuffer() const
-{
-	return pStudioAPIIndexBuffer;
+	return pVertexFactory;
 }
 
 /*
