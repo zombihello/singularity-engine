@@ -18,15 +18,23 @@ public:
 	virtual const char* GetIncludeDir( uint32 index ) const override;
 	virtual void		GetDefine( uint32 index, const char*& pName, const char*& pValue ) const override;
 
+	// Absolute path to the vertex factory implementation, can be NULL/empty
+	// when the shader isn't using vertex factories
+	virtual const char* GetVertexFactoryFile() const override;
+
 	CShaderCompilerEnvironment( studioAPIShaderType_t type );
 	CShaderCompilerEnvironment( const CShaderCompilerEnvironment& copy );
 
-	FORCEINLINE void AddIncludeDir( const char* pPath ) { includeDirs.push_back( pPath ); }
-	FORCEINLINE void AddDefine( const char* pName, const char* pValue ) { defines[pName] = pValue; }
-	FORCEINLINE void SetCompileFlags( uint32 flags ) { compileFlags = flags; }
+	void AddIncludeDir( const char* pPath );
+	void AddDefine( const char* pName, const char* pValue );
+	void SetCompileFlags( uint32 flags );
+	void SetVertexFactoryFile( const char* pPath );
 
 private:
+	uint32											   compileFlags;
+	eastl::string									   vertexFactoryFile;
 	eastl::vector<eastl::string>					   includeDirs;
 	eastl::unordered_map<eastl::string, eastl::string> defines;
-	uint32											   compileFlags;
 };
+
+#include "tools/shadercompiler/shadercompiler_environment.inl"

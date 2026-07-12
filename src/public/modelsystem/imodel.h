@@ -10,6 +10,7 @@ class IStudioAPIVertexDeclaration;
 class IStudioAPIBuffer;
 class IMaterialResource;
 class IMaterial;
+class IVertexFactory;
 
 //-----------------------------------------------------------------------------
 // Initial model data
@@ -36,13 +37,11 @@ class IModelResource : public IRefCounted
 public:
 	virtual ~IModelResource() {}
 
-	virtual uint32							  GetNumMaterials() const				= 0;
-	virtual const CRefPtr<IMaterialResource>* GetMaterials() const					= 0;
-	virtual uint32							  GetNumSurfaces() const				= 0;
-	virtual const modelSurface_t*			  GetSurfaces() const					= 0;
-	virtual IStudioAPIVertexDeclaration*	  GetStudioAPIVertexDeclaration() const = 0;
-	virtual IStudioAPIBuffer*				  GetStudioAPIVertexBuffer() const		= 0;
-	virtual IStudioAPIBuffer*				  GetStudioAPIIndexBuffer() const		= 0;
+	virtual uint32							  GetNumMaterials() const  = 0;
+	virtual const CRefPtr<IMaterialResource>* GetMaterials() const	   = 0;
+	virtual uint32							  GetNumSurfaces() const   = 0;
+	virtual const modelSurface_t*			  GetSurfaces() const	   = 0;
+	virtual IVertexFactory*					  GetVertexFactory() const = 0;
 };
 
 //-----------------------------------------------------------------------------

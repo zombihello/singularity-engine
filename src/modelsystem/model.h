@@ -2,6 +2,7 @@
 #include "studiorender/studioapi/istudioapi_buffer.h"
 #include "studiorender/istudio_renderresource.h"
 #include "modelsystem/imodel.h"
+#include "modelsystem/vertexfactory_base.h"
 
 //-----------------------------------------------------------------------------
 // A model resource which is owned by the render thread
@@ -14,9 +15,7 @@ public:
 	virtual const CRefPtr<IMaterialResource>* GetMaterials() const override;
 	virtual uint32							  GetNumSurfaces() const override;
 	virtual const modelSurface_t*			  GetSurfaces() const override;
-	virtual IStudioAPIVertexDeclaration*	  GetStudioAPIVertexDeclaration() const override;
-	virtual IStudioAPIBuffer*				  GetStudioAPIVertexBuffer() const override;
-	virtual IStudioAPIBuffer*				  GetStudioAPIIndexBuffer() const override;
+	virtual IVertexFactory*					  GetVertexFactory() const override;
 
 	CModelResource();
 
@@ -34,9 +33,9 @@ private:
 	virtual void InitStudioAPI() override;
 	virtual void ReleaseStudioAPI() override;
 
-	modelVertexType_t						  vertexType;
 	modelIndexType_t						  indexType;
 	CStudioRenderCmdFence					  renderCmdFence;
+	CRefPtr<CVertexFactoryBase>				  pVertexFactory;
 	CRefPtr<IStudioAPIBuffer>				  pStudioAPIVertexBuffer;
 	CRefPtr<IStudioAPIBuffer>				  pStudioAPIIndexBuffer;
 	eastl::vector<byte>						  vertices;

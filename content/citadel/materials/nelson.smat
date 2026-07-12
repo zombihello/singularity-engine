@@ -1,5 +1,4 @@
 unlitgeneric
 {
 	baseTexture texture:"materials/nelson"
-	simpleModel 1
 }

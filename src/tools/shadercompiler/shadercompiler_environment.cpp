@@ -3,34 +3,6 @@
 
 /*
 ==================
-CShaderCompilerEnvironment::CShaderCompilerEnvironment
-==================
-*/
-CShaderCompilerEnvironment::CShaderCompilerEnvironment( studioAPIShaderType_t type )
-	: compileFlags( 0x0 )
-{
-	defines.insert( eastl::make_pair( "VERTEX_SHADER", type == STUDIOAPI_SHADER_TYPE_VERTEX ? "1" : "0" ) );
-	defines.insert( eastl::make_pair( "DOMAIN_SHADER", type == STUDIOAPI_SHADER_TYPE_DOMAIN ? "1" : "0" ) );
-	defines.insert( eastl::make_pair( "HULL_SHADER", type == STUDIOAPI_SHADER_TYPE_HULL ? "1" : "0" ) );
-	defines.insert( eastl::make_pair( "GEOMETRY_SHADER", type == STUDIOAPI_SHADER_TYPE_GEOMETRY ? "1" : "0" ) );
-	defines.insert( eastl::make_pair( "PIXEL_SHADER", type == STUDIOAPI_SHADER_TYPE_PIXEL ? "1" : "0" ) );
-	defines.insert( eastl::make_pair( "COMPUTE_SHADER", type == STUDIOAPI_SHADER_TYPE_COMPUTE ? "1" : "0" ) );
-}
-
-/*
-==================
-CShaderCompilerEnvironment::CShaderCompilerEnvironment
-==================
-*/
-CShaderCompilerEnvironment::CShaderCompilerEnvironment( const CShaderCompilerEnvironment& copy )
-	: includeDirs( copy.includeDirs )
-	, defines( copy.defines )
-	, compileFlags( copy.compileFlags )
-{
-}
-
-/*
-==================
 CShaderCompilerEnvironment::GetCompileFlags
 ==================
 */
@@ -92,4 +64,14 @@ void CShaderCompilerEnvironment::GetDefine( uint32 index, const char*& pName, co
 
 	pName	= "";
 	pDefine = "";
+}
+
+/*
+==================
+CShaderCompilerEnvironment::GetVertexFactoryFile
+==================
+*/
+const char* CShaderCompilerEnvironment::GetVertexFactoryFile() const
+{
+	return vertexFactoryFile.c_str();
 }

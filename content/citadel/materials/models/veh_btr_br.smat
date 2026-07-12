@@ -1,5 +1,4 @@
 unlitgeneric
 {
 	baseTexture texture:"materials/models/veh_btr_br"
-	staticModel 1
 }

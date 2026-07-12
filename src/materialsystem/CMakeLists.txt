@@ -14,6 +14,7 @@ set( GENERATED_SRC_PATTERNS				"${GENERATED_DIR}/*.h" "${GENERATED_DIR}/*.inl" "
 
 set( VIEW_ONLY_PATTERNS					"${SRC_DIR}/*.makefile" "${SRC_DIR}/*.hlsl" )
 set( PUBLIC_VIEW_ONLY_PATTERNS 			"${PUBLIC_SRC_DIR}/materialsystem/*.hlsl" )
+set( PUBLIC_VERTEXFACTORY_PATTERNS		"${PUBLIC_SRC_DIR}/modelsystem/*.list" )
 
 if ( PLATFORM_WINDOWS )
 	set( SRC_PATTERNS 					${SRC_PATTERNS} "${SRC_DIR}/*.rc" )
@@ -27,6 +28,18 @@ file( GLOB_RECURSE PUBLIC_SRC_FILES 				CONFIGURE_DEPENDS           ${PUBLIC_SRC
 file( GLOB_RECURSE GENERATED_FILES  				CONFIGURE_DEPENDS           ${GENERATED_SRC_PATTERNS} )
 file( GLOB_RECURSE VIEW_ONLY_FILES        			CONFIGURE_DEPENDS           ${VIEW_ONLY_PATTERNS} )
 file( GLOB_RECURSE PUBLIC_VIEW_ONLY_FILES        	CONFIGURE_DEPENDS           ${PUBLIC_VIEW_ONLY_PATTERNS} )
+file( GLOB		   VERTEXFACTORY_FILES				CONFIGURE_DEPENDS			${PUBLIC_VERTEXFACTORY_PATTERNS} )
+
+# Dynamically get the vertex factory list file (*.list), there must be exactly one
+list( LENGTH VERTEXFACTORY_FILES VERTEXFACTORY_FILE_COUNT )
+if ( VERTEXFACTORY_FILE_COUNT EQUAL 0 )
+	message( SEND_ERROR "No vertex factory list file found (${PUBLIC_VERTEXFACTORY_PATTERNS}), expected exactly one" )
+elseif ( VERTEXFACTORY_FILE_COUNT GREATER 1 )
+	message( SEND_ERROR "Multiple vertex factory list files found in (${PUBLIC_VERTEXFACTORY_PATTERNS}), expected exactly one: ${VERTEXFACTORY_FILES}" )
+else()
+	list( GET VERTEXFACTORY_FILES 0			VERTEXFACTORY_FILE )
+	list( APPEND PUBLIC_VIEW_ONLY_FILES		"${VERTEXFACTORY_FILE}" )
+endif()
 
 # Filter out all unnecessary files
 list( FILTER SRC_FILES 					EXCLUDE REGEX "/stdshaders/" )
@@ -50,9 +63,9 @@ set_source_files_properties( ${PUBLIC_VIEW_ONLY_FILES}     	PROPERTIES      VS_T
 
 
 #
-# Add commands for EcsCompiler
+# Add commands for ShaderCompiler
 #
-add_shadercompiler_commands( ${SRC_DIR} ${GENERATED_DIR} GENERATED_FILES ${SRC_FILES} )
+add_shadercompiler_commands( ${SRC_DIR} ${GENERATED_DIR} GENERATED_FILES ${VERTEXFACTORY_FILE} ${SRC_FILES} )
 
 
 #

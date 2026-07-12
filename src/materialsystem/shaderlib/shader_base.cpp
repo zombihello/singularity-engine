@@ -2,6 +2,7 @@
 #include "utils/shadercache/shadercache.h"
 #include "studiorender/studioapi/istudioapi_barrier.h"
 #include "studiorender/istudiorender.h"
+#include "modelsystem/ivertexfactory.h"
 #include "materialsystem/shaderlib/shader_base.h"
 #include "materialsystem/shaderlib/shaderlib.h"
 
@@ -120,13 +121,13 @@ void CBaseShader::R_Barrier( IStudioAPICmdList* pStudioAPICmdList, IShaderContex
 CBaseShader::R_PrepareForDraw
 ==================
 */
-void CBaseShader::R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData, studioRenderPassType_t renderPassType )
+void CBaseShader::R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData, IVertexFactory* pVertexFactory, studioRenderPassType_t renderPassType )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
 	// Select a shader combination
 	shaderComboInfo_t comboInfo = {};
-	R_SelectCombo( pContextData, comboInfo );
+	R_SelectCombo( pContextData, pVertexFactory, comboInfo );
 
 	// Get a render pipeline or bake it
 	uint64					  pipelineIdx			   = GetPipelineIndex( comboInfo.cacheIndices );
@@ -137,7 +138,7 @@ void CBaseShader::R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, IShade
 		studioBakeRenderPipelineParams_t studioBakeParams = {};
 		studioBakeParams.pipelineIdx					  = pipelineIdx;
 		studioBakeParams.renderPassType					  = renderPassType;
-		studioBakeParams.vertexType						  = comboInfo.vertexType;
+		studioBakeParams.pVertexDeclaration				  = pVertexFactory->GetStudioAPIVertexDeclaration();
 		for ( uint32 shaderIdx = 0; shaderIdx < STUDIOAPI_SHADER_NUM_DRAW_TYPES; ++shaderIdx )
 		{
 			const shaderCacheInfoInternal_t& cacheInfo = cacheInfos[shaderIdx];

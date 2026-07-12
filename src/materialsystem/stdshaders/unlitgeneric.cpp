@@ -23,13 +23,10 @@ BEGIN_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 	BEGIN_SHADER_PARAMS
 		SHADER_PARAM( COLOR, SHADER_PARAM_TYPE_VECTOR_4D, "Color" )
 		SHADER_PARAM( BASETEXTURE, SHADER_PARAM_TYPE_TEXTURE, "Base texture" )
-		SHADER_PARAM( SIMPLEMODEL, SHADER_PARAM_TYPE_BOOL, "Use vertex type for simple models" )
-		SHADER_PARAM( STATICMODEL, SHADER_PARAM_TYPE_BOOL, "Use vertex type for static models" )
 	END_SHADER_PARAMS
 
 	BEGIN_SHADER_CONTEXT_DATA
 		DECLARE_SHADER_BUFFER_DATA( buffer0 );
-		modelVertexType_t		  vertexType;
 		CRefPtr<ITextureResource> pBaseTexture;
 		CRefPtr<IStudioAPIBuffer> pStudioAPIBuffer0;
 
@@ -55,8 +52,6 @@ BEGIN_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 		IResourceTypeMgr* pTexturesMgr = g_pResourceSystem->GetResourceManagerForType<ITexture>();
 		pParams[COLOR]->SetVecValue( vector4_t( 1.f, 1.f, 1.f, 1.f ) );
 		pParams[BASETEXTURE]->SetTextureValue( pTexturesMgr->GetDefaultResource() );
-		pParams[SIMPLEMODEL]->SetBoolValue( true );
-		pParams[STATICMODEL]->SetBoolValue( false );
 	}
 
 	SHADER_UPDATE_CONTEXT_DATA
@@ -67,15 +62,6 @@ BEGIN_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 		{
 			IResourceTypeMgr* pTexturesMgr = g_pResourceSystem->GetResourceManagerForType<ITexture>();
 			pBaseTexture				   = pTexturesMgr->GetDefaultResource();
-		}
-
-		if ( pParams[SIMPLEMODEL]->GetBoolValue() )
-		{
-			pUnlitGenericContextData->vertexType = MODEL_VERTEXTYPE_SIMPLE;
-		}
-		if ( pParams[STATICMODEL]->GetBoolValue() )
-		{
-			pUnlitGenericContextData->vertexType = MODEL_VERTEXTYPE_STATIC;
 		}
 
 		pUnlitGenericContextData->pBaseTexture = pBaseTexture->GetStudioResource();
@@ -95,11 +81,9 @@ BEGIN_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 
 	SHADER_SELECT_COMBO
 	{
-		// Set a vertex shader and type
-		DECLARE_SHADER_CONTEXT_DATA( pUnlitGenericContextData );
+		// Set a vertex shader for the model's vertex factory
 		DECLARE_VERTEX_SHADER( unlitgeneric_vs );
-		SET_VERTEX_TYPE( pUnlitGenericContextData->vertexType );
-		SET_VERTEX_SHADER_COMBO( VERTEX_TYPE, (uint32)pUnlitGenericContextData->vertexType );
+		SET_VERTEX_FACTORY( unlitgeneric_vs, pVertexFactory );
 		SET_VERTEX_SHADER( unlitgeneric_vs );
 
 		// Set a pixel shader

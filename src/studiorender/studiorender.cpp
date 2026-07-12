@@ -45,13 +45,6 @@ bool CStudioRender::Connect( createInterfaceFn_t pFactory )
 		return false;
 	}
 
-	// Get the model system
-	g_pModelSystem = (IModelSystem*)pFactory( MODELSYSTEM_INTERFACE_VERSION );
-	if ( !g_pModelSystem )
-	{
-		return false;
-	}
-
 	// Ge the resource system
 	g_pResourceSystem = (IResourceSystem*)pFactory( RESOURCESYSTEM_INTERFACE_VERSION );
 	if ( !g_pResourceSystem )

@@ -174,6 +174,15 @@ public:
 		shaderc_include_result* pShadercIncludeResult = new shaderc_include_result;
 		Mem_Memzero( pShadercIncludeResult, sizeof( shaderc_include_result ) );
 
+		// If this is the abstract vertex factory and the environment has a concrete
+		// implementation selected for the current combo, redirect to it instead of resolving
+		// `pRequestedSource` normally
+		const char* pVertexFactoryFile = pEnvironment->GetVertexFactoryFile();
+		if ( pVertexFactoryFile && pVertexFactoryFile[0] != '\0' && !S_Stricmp( pRequestedSource, "vertexfactory.hlsl" ) )
+		{
+			pRequestedSource = pVertexFactoryFile;
+		}
+
 		// Try to find file in the file system
 		CRefPtr<IStreamDataReader> pFile;
 

@@ -27,6 +27,12 @@ static const char* s_pShaderCompilerModeNames[] = {
 };
 static_assert( SHADER_COMPILER_MODE_NUM == ARRAYSIZE( s_pShaderCompilerModeNames ), "Array size 's_pShaderCompilerModeNames' must be equal to SHADER_COMPILER_MODE_NUM" );
 
+// Table of system shader flag names
+static const char* s_pShaderSystemFlagNames[] = {
+	"VERTEXFACTORY"  // SHADER_SYSTEM_FLAG_VERTEXFACTORY
+};
+static_assert( SHADER_SYSTEM_FLAG_NUM == ARRAYSIZE( s_pShaderSystemFlagNames ), "Array size 's_pShaderSystemFlagNames' must be equal to SHADER_SYSTEM_FLAG_NUM" );
+
 /*
 ==================
 ConvStringToShaderType
@@ -91,6 +97,17 @@ void ConvShaderCompilerModeToString( shaderCompilerMode_t shaderCompilerMode, co
 {
 	Assert( shaderCompilerMode < SHADER_COMPILER_MODE_NUM );
 	pShaderCompilerModeName = s_pShaderCompilerModeNames[(uint32)shaderCompilerMode];
+}
+
+/*
+==================
+ConvShaderSystemFlagToString
+==================
+*/
+const char* ConvShaderSystemFlagToString( shaderSystemFlag_t systemFlag )
+{
+	Assert( systemFlag < SHADER_SYSTEM_FLAG_NUM );
+	return s_pShaderSystemFlagNames[(uint32)systemFlag];
 }
 
 //-----------------------------------------------------------------------------
@@ -165,6 +182,14 @@ int32 CShaderCompilerApp::Main()
 	{
 		PrintUsageHelp();
 		return 0;
+	}
+
+	// Load the vertex factory list if it's given on the command line
+	const char* pVertexFactoryPath = CommandLine()->GetFirstValue( "vertexfactory" );
+	if ( pVertexFactoryPath && pVertexFactoryPath[0] != '\0' && !makefile.LoadVertexFactoryList( pVertexFactoryPath ) )
+	{
+		Error( "ShaderCompiler: Failed to load vertex factory list '%s'", pVertexFactoryPath );
+		return 1;
 	}
 
 	// Load shader file
@@ -250,8 +275,8 @@ void CShaderCompilerApp::PrintUsageHelp()
 	Msg( "Shader compiler for Singularity Engine (" __DATE__ " " __TIME__ ")" );
 	Msg( "Usage: shadercompiler -mode <name> <input> -output <dir> [options]" );
 	Msg( "Ex: shadercompiler -mode compile -file C:/shaderlist.makefile -output C:/shaders/stdshaders/ -backend shadercompiler_vk" );
-	Msg( "Ex: shadercompiler -mode compile -file C:/test.shader -output C:/shaders/stdshaders/ -include \"C:/hlsl_include\" \"E:/hlsl_include\" -backend shadercompiler_vk" );
-	Msg( "Ex: shadercompiler -mode gencpp -file C:/test.shader -output C:/cpp_shaders/" );
+	Msg( "Ex: shadercompiler -mode compile -file C:/test.shader -vertexfactory C:/vertexfactory.list -output C:/shaders/stdshaders/ -include \"C:/hlsl_include\" \"E:/hlsl_include\" -backend shadercompiler_vk" );
+	Msg( "Ex: shadercompiler -mode gencpp -file C:/test.shader -vertexfactory C:/vertexfactory.list -output C:/cpp_shaders/" );
 	Msg( "Ex: shadercompiler -mode gencpp -file C:/shaderlist.makefile -output C:/cpp_shaders/" );
 	Msg( "" );
 	Msg( "-mode <name>\t\tOperation mode." );
@@ -264,6 +289,7 @@ void CShaderCompilerApp::PrintUsageHelp()
 	Msg( "-include <p1> [p2 ...]\tInclude directories (used in compile mode)" );
 	Msg( "-debug\t\t\tCompile debug shader version (used in compile mode)" );
 	Msg( "-backend <name>\t\tShader compiler backend (used in compile mode)" );
+	Msg( "-vertexfactory <path>\tPath to a vertex factory list (*.list)" );
 	Msg( "" );
 }
 
@@ -410,6 +436,14 @@ bool CShaderCompilerApp::CompileShader( const shader_t& shader, CShaderCacheDoc&
 		for ( pSetFlagVar = pFlagVarSlotBegin, pSetFlag = (shaderFlag_t*)shader.flags.data(); pSetFlagVar < pFlagVarSlotEnd; ++pSetFlagVar, ++pSetFlag )
 		{
 			shaderCompileEnvironment.AddDefine( pSetFlag->name.c_str(), S_Sprintf( "%i", *pSetFlagVar ).c_str() );
+		}
+
+		// Select the vertex factory implementation to substitute for 'vertexfactory.hlsl' in the combo
+		if ( !shader.vertexFactories.empty() )
+		{
+			int32 vertexFactoryIndex = shader.GetSystemFlagValue( SHADER_SYSTEM_FLAG_VERTEXFACTORY, pFlagVarSlotBegin );
+			Assert( vertexFactoryIndex >= 0 && vertexFactoryIndex < (int32)shader.vertexFactories.size() );
+			shaderCompileEnvironment.SetVertexFactoryFile( shader.vertexFactories[vertexFactoryIndex]->source.c_str() );
 		}
 
 		// Compile shader

@@ -9,6 +9,7 @@
 //-----------------------------------------------------------------------------
 class IStudioAPICmdList;
 class IMaterialVar;
+class IVertexFactory;
 
 //-----------------------------------------------------------------------------
 // Shader flags and parameter types
@@ -87,8 +88,8 @@ public:
 	virtual void						UpdateContextData( IMaterialVar** pParams, IShaderContextData* pContextData ) const = 0;
 
 	// Place barriers into a command list
-	virtual void R_Barrier( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData ) const										   = 0;
-	virtual void R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData, studioRenderPassType_t renderPassType ) = 0;
+	virtual void R_Barrier( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData ) const																		   = 0;
+	virtual void R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData, IVertexFactory* pVertexFactory, studioRenderPassType_t renderPassType ) = 0;
 
 	virtual uint32		  GetNumParams() const				 = 0;
 	virtual shaderParam_t GetParam( uint32 index ) const	 = 0;
