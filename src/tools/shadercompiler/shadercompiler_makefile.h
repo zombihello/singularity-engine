@@ -1,4 +1,5 @@
 #pragma once
+#include "tier1/stl.h"
 #include "tools/shadercompiler/shadercompiler.h"
 
 //-----------------------------------------------------------------------------
@@ -9,6 +10,7 @@ class CShaderCompilerMakeFile
 public:
 	bool			 LoadMakeFile( const char* pPath, const char* pBaseDir = "" );
 	bool			 LoadShader( const char* pPath, const char* pBaseDir = "" );
+	bool			 LoadVertexFactoryList( const char* pPath, const char* pBaseDir = "" );
 	FORCEINLINE void AddIncludeDir( const char* pPath, const char* pBaseDir = "" )
 	{
 		eastl::string absoluteIncludeDir;
@@ -19,6 +21,8 @@ public:
 	{
 		includeDirs.clear();
 		shaders.clear();
+		vertexFactories.clear();
+		vertexFactoryDict.clear();
 	}
 
 	FORCEINLINE const eastl::vector<eastl::string>& GetIncludeDirs() const
@@ -29,8 +33,14 @@ public:
 	{
 		return shaders;
 	}
+	FORCEINLINE const eastl::vector<vertexFactory_t>& GetVertexFactories() const
+	{
+		return vertexFactories;
+	}
 
 private:
-	eastl::vector<eastl::string> includeDirs;
-	eastl::vector<shader_t>		 shaders;
+	eastl::vector<eastl::string>																		   includeDirs;
+	eastl::vector<shader_t>																				   shaders;
+	eastl::vector<vertexFactory_t>																		   vertexFactories;
+	eastl::unordered_map<eastl::string, uint32, stlInsensitiveStringHash_t, stlInsensitiveCompareString_t> vertexFactoryDict;
 };

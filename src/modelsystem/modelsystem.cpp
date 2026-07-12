@@ -106,13 +106,3 @@ void CModelSystem::Shutdown()
 	// Release all global resources
 	CStudioGlobalRenderResources::ReleaseResources();
 }
-
-/*
-==================
-CModelSystem::GetStudioAPIVertexDeclaration
-==================
-*/
-IStudioAPIVertexDeclaration* CModelSystem::GetStudioAPIVertexDeclaration( modelVertexType_t vertexType ) const
-{
-	return vertexDeclarations.GetStudioAPIVertexDeclaration( vertexType );
-}

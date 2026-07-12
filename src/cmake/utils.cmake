@@ -497,10 +497,12 @@ function( add_ecscompiler_commands BASE_DIR DEST_DIR DEST_OUTPUT_FILES )
 endfunction()
 
 #
-# Add commands to compile *.bison files
-# Usage: add_shadercompiler_commands( ${<BASE_DIR>} ${<DEST_DIR>} <DEST_OUTPUT_FILES> ${<FILES, ...>} )
+# Add commands to compile *.shader files
+# Usage: add_shadercompiler_commands( ${<BASE_DIR>} ${<DEST_DIR>} <DEST_OUTPUT_FILES> ${<VERTEXFACTORY_LIST>} ${<FILES, ...>} )
+# 
+# NOTE: VERTEXFACTORY_LIST can be an empty string when none of the shaders use a vertex factory
 #
-function( add_shadercompiler_commands BASE_DIR DEST_DIR DEST_OUTPUT_FILES )
+function( add_shadercompiler_commands BASE_DIR DEST_DIR DEST_OUTPUT_FILES VERTEXFACTORY_LIST )
     set( SHADERCOMPILER_DIR            "${DEVTOOLS_DIR}/shadercompiler/" )
     set( SHADERCOMPILER_BIN_DIR        "" )
     set( SHADERCOMPILER_EXE            "" )
@@ -509,6 +511,11 @@ function( add_shadercompiler_commands BASE_DIR DEST_DIR DEST_OUTPUT_FILES )
         set( SHADERCOMPILER_EXE        "${SHADERCOMPILER_BIN_DIR}/shadercompiler.exe" )
     else()
         message( FATAL_ERROR "add_shadercompiler_commands: unknown platform" )
+    endif()
+
+    set( VERTEXFACTORY_ARGS     "" )
+    if ( VERTEXFACTORY_LIST )
+        set( VERTEXFACTORY_ARGS -vertexfactory "${VERTEXFACTORY_LIST}" )
     endif()
 
     set( OUTPUT_FILES               ${${DEST_OUTPUT_FILES}} )
@@ -524,8 +531,8 @@ function( add_shadercompiler_commands BASE_DIR DEST_DIR DEST_OUTPUT_FILES )
             get_filename_component( FILE_NAME "${FILE}" NAME_WE )
             set( OUTPUT_FILE_HEADER "${FILE_DEST_DIR}/${FILE_NAME}.gen.h" )
             add_custom_command( OUTPUT "${OUTPUT_FILE_HEADER}"
-                                COMMAND "${SHADERCOMPILER_EXE}" -mode gencpp -file "${FILE}" -output "${FILE_DEST_DIR}"
-                                DEPENDS "${FILE}"
+                                COMMAND "${SHADERCOMPILER_EXE}" -mode gencpp -file "${FILE}" -output "${FILE_DEST_DIR}" ${VERTEXFACTORY_ARGS}
+                                DEPENDS "${FILE}" "${VERTEXFACTORY_LIST}"
                                 WORKING_DIRECTORY "${ROOT_DIR}"
                                 COMMAND_EXPAND_LISTS )
 

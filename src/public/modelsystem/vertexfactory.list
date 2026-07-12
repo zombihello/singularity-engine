@@ -1,0 +1,24 @@
+// vertexfactories
+// {
+//		<factory_name>					// 'all' forbidden as an actual factory name
+//		{
+//			index	<global_index>		// Must match modelVertexType_t
+//			source	<source_path>.hlsl	// Path to the implementation, relative to this file
+//		}
+//		...
+// }
+
+vertexfactories
+{
+	simple
+	{
+		index 	0
+		source  "vertexfactory_simple.hlsl"
+	}
+	
+	static
+	{
+		index 	1
+		source  "vertexfactory_static.hlsl"
+	}
+}

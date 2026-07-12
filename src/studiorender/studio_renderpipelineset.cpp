@@ -3,7 +3,6 @@
 #include "studiorender/studio_renderthread.h"
 #include "studiorender/studio_renderpass_present.h"
 #include "studiorender/studio_renderpipelineset.h"
-#include "modelsystem/imodelsystem.h"
 
 /*
 ==================
@@ -159,7 +158,7 @@ IStudioAPIRenderPipeline* CStudioRenderPipelineSet::CRenderPipelineContainer::R_
 	}
 
 	// Create a new render pipeline
-	CRefPtr<IStudioAPIBoundShaderState> pStudioAPIBoundShaderState = g_pStudioAPI->FindOrCreateBoundShaderState( g_pModelSystem->GetStudioAPIVertexDeclaration( bakeParams.vertexType ),
+	CRefPtr<IStudioAPIBoundShaderState> pStudioAPIBoundShaderState = g_pStudioAPI->FindOrCreateBoundShaderState( bakeParams.pVertexDeclaration,
 																												 bakeParams.pStudioAPIShaders[STUDIOAPI_SHADER_TYPE_VERTEX],
 																												 bakeParams.pStudioAPIShaders[STUDIOAPI_SHADER_TYPE_PIXEL],
 																												 bakeParams.pStudioAPIShaders[STUDIOAPI_SHADER_TYPE_HULL],

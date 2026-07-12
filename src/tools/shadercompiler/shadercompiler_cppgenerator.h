@@ -16,6 +16,7 @@ private:
 	void GenerateVar( const shaderFlag_t& shaderFlag );
 	void GenerateConstructor( const char* pClassName, const shader_t& shader );
 	void GenerateGetIndexFunc( const shader_t& shader );
+	void GenerateRemapVertexFactories( const shader_t& shader );
 
 	eastl::string buffer;
 };

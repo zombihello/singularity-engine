@@ -127,7 +127,7 @@ void CBaseShader::R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, IShade
 
 	// Select a shader combination
 	shaderComboInfo_t comboInfo = {};
-	R_SelectCombo( pContextData, comboInfo );
+	R_SelectCombo( pContextData, pVertexFactory, comboInfo );
 
 	// Get a render pipeline or bake it
 	uint64					  pipelineIdx			   = GetPipelineIndex( comboInfo.cacheIndices );
@@ -138,7 +138,7 @@ void CBaseShader::R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, IShade
 		studioBakeRenderPipelineParams_t studioBakeParams = {};
 		studioBakeParams.pipelineIdx					  = pipelineIdx;
 		studioBakeParams.renderPassType					  = renderPassType;
-		studioBakeParams.vertexType						  = comboInfo.vertexType;
+		studioBakeParams.pVertexDeclaration				  = pVertexFactory->GetStudioAPIVertexDeclaration();
 		for ( uint32 shaderIdx = 0; shaderIdx < STUDIOAPI_SHADER_NUM_DRAW_TYPES; ++shaderIdx )
 		{
 			const shaderCacheInfoInternal_t& cacheInfo = cacheInfos[shaderIdx];

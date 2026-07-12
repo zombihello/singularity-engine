@@ -1,4 +1,5 @@
 #include "pch_shadercompiler.h"
+#include "modelsystem/modeltypes.h"
 #include "tools/shadercompiler/shadercompiler_cppgenerator.h"
 
 /*
@@ -42,6 +43,16 @@ void CShaderCompilerCppGenerator::Generate( const shader_t& shader )
 		buffer += S_Sprintf( "\t// Shader flag '%s' with range [%i;%i]\n", shaderFlag.name.c_str(), shaderFlag.minValue, shaderFlag.maxValue );
 		buffer += "\t//\n";
 		GenerateVar( shaderFlag );
+		buffer += "\n\n";
+	}
+
+	// Generate a helper that maps a model vertex type to this shader's local vertex factory index
+	if ( !shader.vertexFactories.empty() )
+	{
+		buffer += "\t//\n";
+		buffer += "\t// Map a model vertex type to this shader's local vertex factory index (INVALID_INDEX if unsupported)\n";
+		buffer += "\t//\n";
+		GenerateRemapVertexFactories( shader );
 		buffer += "\n\n";
 	}
 
@@ -164,4 +175,41 @@ void CShaderCompilerCppGenerator::GenerateGetIndexFunc( const shader_t& shader )
 	}
 
 	buffer += "0;\n\t}";
+}
+
+/*
+==================
+CShaderCompilerCppGenerator::GenerateRemapVertexFactories
+==================
+*/
+void CShaderCompilerCppGenerator::GenerateRemapVertexFactories( const shader_t& shader )
+{
+	// Build the remap table: modelVertexType_t -> shader's local vertex factory index (INVALID_INDEX if unsupported)
+	uint32 vertexFactoryRemap[MODEL_VERTEX_NUM_TYPES];
+	Mem_Memset( vertexFactoryRemap, (uint8)INVALID_INDEX, MODEL_VERTEX_NUM_TYPES * sizeof( uint32 ) );
+	for ( uint32 index = 0, count = (uint32)shader.vertexFactories.size(); index < count; ++index )
+	{
+		const vertexFactory_t* pVertexFactory = shader.vertexFactories[index];
+		Assert( pVertexFactory->index < MODEL_VERTEX_NUM_TYPES );
+		vertexFactoryRemap[pVertexFactory->index] = index;
+	}
+
+	// Generate function to set a vertex factory by a model vertex type
+	buffer += "public:\n";
+	buffer += "\tvoid SetVertexFactory( modelVertexType_t vertexType )\n";
+	buffer += "\t{\n";
+	buffer += "\t\tstatic const uint32 s_vertexFactoryRemap[MODEL_VERTEX_NUM_TYPES] = { ";
+	for ( uint32 index = 0; index < MODEL_VERTEX_NUM_TYPES; ++index )
+	{
+		uint32 vertexFactoryIndex = vertexFactoryRemap[index];
+		buffer += vertexFactoryIndex != INVALID_INDEX ? S_Sprintf( "%i", vertexFactoryIndex ) : "(uint32)INVALID_INDEX";
+		if ( index + 1 < MODEL_VERTEX_NUM_TYPES )
+		{
+			buffer += ", ";
+		}
+	}
+	buffer += " };\n";
+	buffer += "\t\tAssert( vertexType < MODEL_VERTEX_NUM_TYPES && s_vertexFactoryRemap[(uint32)vertexType] != INVALID_INDEX );\n";
+	buffer += S_Sprintf( "\t\tSet%s( s_vertexFactoryRemap[vertexType] );\n", ConvShaderSystemFlagToString( SHADER_SYSTEM_FLAG_VERTEXFACTORY ) );
+	buffer += "\t}";
 }

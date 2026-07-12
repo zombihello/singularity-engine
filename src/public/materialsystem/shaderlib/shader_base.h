@@ -2,10 +2,11 @@
 #include "studiorender/studioapi/istudioapi.h"
 #include "studiorender/studioapi/istudioapi_barrier.h"
 #include "studiorender/istudio_renderpipelineset.h"
+#include "studiorender/istudio_renderresource.h"
 #include "materialsystem/imaterialvar.h"
 #include "materialsystem/ishader.h"
+#include "modelsystem/ivertexfactory.h"
 #include "resourcesystem/iresourcesystem.h"
-#include "studiorender/istudio_renderresource.h"
 
 //-----------------------------------------------------------------------------
 // Helper macros to begin/end implement a shader
@@ -245,7 +246,7 @@
 #define SHADER_INIT_PARAMS		   virtual void InitDefaultParams( IMaterialVar** pParams ) const override
 #define SHADER_FALLBACK			   virtual const char* GetFallbackShader() const override
 #define SHADER_UPDATE_CONTEXT_DATA virtual void OnUpdateContextData( IMaterialVar** pParams, IShaderContextData* pContextData ) const override
-#define SHADER_SELECT_COMBO		   virtual void R_SelectCombo( IShaderContextData* pContextData, shaderComboInfo_t& comboInfo ) override
+#define SHADER_SELECT_COMBO		   virtual void R_SelectCombo( IShaderContextData* pContextData, IVertexFactory* pVertexFactory, shaderComboInfo_t& comboInfo ) override
 #define SHADER_DRAW				   virtual void R_OnDraw( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData ) override
 #define SHADER_BARRIER			   virtual void R_Barrier( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData ) const override
 
@@ -259,13 +260,13 @@
 #define DECLARE_PIXEL_SHADER( Name )	C_##Name##_pixel_Index __pixelShaderIndex;
 #define DECLARE_COMPUTE_SHADER( Name )	C_##Name##_compute_Index __computeShaderIndex;
 
-#define SET_VERTEX_TYPE( VertexType )			 comboInfo.vertexType = VertexType;
-#define SET_VERTEX_SHADER_COMBO( Name, Value )	 __vertexShaderIndex.Set##Name( Value );
-#define SET_HULL_SHADER_COMBO( Name, Value )	 __hullShaderIndex.Set##Name( Value );
-#define SET_DOMAIN_SHADER_COMBO( Name, Value )	 __domainShaderIndex.Set##Name( Value );
-#define SET_GEOMETRY_SHADER_COMBO( Name, Value ) __geometryShaderIndex.Set##Name( Value );
-#define SET_PIXEL_SHADER_COMBO( Name, Value )	 __pixelShaderIndex.Set##Name( Value );
-#define SET_COMPUTE_SHADER_COMBO( Name, Value )	 __computeShaderIndex.Set##Name( Value );
+#define SET_VERTEX_FACTORY( Name, pVertexFactory ) __vertexShaderIndex.SetVertexFactory( pVertexFactory->GetVertexType() );
+#define SET_VERTEX_SHADER_COMBO( Name, Value )	   __vertexShaderIndex.Set##Name( Value );
+#define SET_HULL_SHADER_COMBO( Name, Value )	   __hullShaderIndex.Set##Name( Value );
+#define SET_DOMAIN_SHADER_COMBO( Name, Value )	   __domainShaderIndex.Set##Name( Value );
+#define SET_GEOMETRY_SHADER_COMBO( Name, Value )   __geometryShaderIndex.Set##Name( Value );
+#define SET_PIXEL_SHADER_COMBO( Name, Value )	   __pixelShaderIndex.Set##Name( Value );
+#define SET_COMPUTE_SHADER_COMBO( Name, Value )	   __computeShaderIndex.Set##Name( Value );
 
 #define SET_VERTEX_SHADER( Name )	comboInfo.cacheIndices[STUDIOAPI_SHADER_TYPE_VERTEX] = __vertexShaderIndex.GetIndex();
 #define SET_HULL_SHADER( Name )		comboInfo.cacheIndices[STUDIOAPI_SHADER_TYPE_HULL] = __hullShaderIndex.GetIndex();
@@ -309,14 +310,13 @@ public:
 protected:
 	struct shaderComboInfo_t
 	{
-		uint64			  cacheIndices[STUDIOAPI_SHADER_NUM_DRAW_TYPES];
-		modelVertexType_t vertexType;
+		uint64 cacheIndices[STUDIOAPI_SHADER_NUM_DRAW_TYPES];
 	};
 
 	virtual void OnInitInstance();
 	virtual void OnUpdateContextData( IMaterialVar** pParams, IShaderContextData* pContextData ) const;
-	virtual void R_SelectCombo( IShaderContextData* pContextData, shaderComboInfo_t& comboInfo )	= 0;
-	virtual void R_OnDraw( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData ) = 0;
+	virtual void R_SelectCombo( IShaderContextData* pContextData, IVertexFactory* pVertexFactory, shaderComboInfo_t& comboInfo ) = 0;
+	virtual void R_OnDraw( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData )								 = 0;
 
 private:
 	struct shaderCacheInfoInternal_t

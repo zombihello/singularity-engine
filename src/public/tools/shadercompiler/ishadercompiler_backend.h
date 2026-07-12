@@ -18,11 +18,15 @@ enum shaderCompilerFlags_t
 class IShaderCompilerEnvironment
 {
 public:
-	virtual uint32		 GetCompileFlags() const													= 0;
-	virtual uint32		 GetNumIncludeDirs() const													= 0;
-	virtual uint32		 GetNumDefines() const														= 0;
-	virtual const char* GetIncludeDir( uint32 index ) const										= 0;
-	virtual void		 GetDefine( uint32 index, const char*& pName, const char*& pValue ) const = 0;
+	virtual uint32		GetCompileFlags() const													 = 0;
+	virtual uint32		GetNumIncludeDirs() const												 = 0;
+	virtual uint32		GetNumDefines() const													 = 0;
+	virtual const char* GetIncludeDir( uint32 index ) const										 = 0;
+	virtual void		GetDefine( uint32 index, const char*& pName, const char*& pValue ) const = 0;
+
+	// Absolute path to the vertex factory implementation, can be NULL/empty
+	// when the shader isn't using vertex factories
+	virtual const char* GetVertexFactoryFile() const = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -46,6 +50,6 @@ public:
 	virtual bool Connect( createInterfaceFn_t pFactory ) = 0;
 	virtual void Disconnect()							 = 0;
 
-	virtual bool		 CompileShader( const char* pSrcFileName, const char* pFunctionName, studioAPIShaderType_t type, IShaderCompilerEnvironment* pEnvironment, IShaderCompilerOutput* pOutput ) = 0;
-	virtual const char* GetShaderPlatform() const																																					  = 0;
+	virtual bool		CompileShader( const char* pSrcFileName, const char* pFunctionName, studioAPIShaderType_t type, IShaderCompilerEnvironment* pEnvironment, IShaderCompilerOutput* pOutput ) = 0;
+	virtual const char* GetShaderPlatform() const																																				   = 0;
 };
