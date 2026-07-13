@@ -51,12 +51,8 @@ class CModel : public CResourceData<IModel>
 {
 public:
 	// IResourceData interface
-	// Marks all dependent resources as used
-	virtual void MarkUsedDependencies() override;
-
-	// Set/clear permanent flag in all dependent resources
-	virtual void MakePermanentDependencies() override;
-	virtual void ClearPermanentDependencies() override;
+	// Collect all resources this data depends on
+	virtual void CollectDependencies( IResourceDependencyCollector* pCollector ) const override;
 
 	// IModel interface
 	virtual void Init( const modelInitialData_t& initialData ) override;

@@ -21,6 +21,15 @@ enum resourceFlags_t
 };
 
 //-----------------------------------------------------------------------------
+// A resource dependency collector interface
+//-----------------------------------------------------------------------------
+class IResourceDependencyCollector
+{
+public:
+	virtual void AddDependency( IResource* pResource ) = 0;
+};
+
+//-----------------------------------------------------------------------------
 // A resource data interface
 //-----------------------------------------------------------------------------
 class IResourceData
@@ -28,12 +37,8 @@ class IResourceData
 public:
 	virtual ~IResourceData() {}
 
-	// Marks all dependent resources as used
-	virtual void MarkUsedDependencies() = 0;
-
-	// Set/clear permanent flag in all dependent resources
-	virtual void MakePermanentDependencies()  = 0;
-	virtual void ClearPermanentDependencies() = 0;
+	// Collect all resources this data depends on
+	virtual void CollectDependencies( IResourceDependencyCollector* pCollector ) const = 0;
 
 	// Get the resource where the data is
 	virtual IResource* GetResource() const = 0;
@@ -61,8 +66,13 @@ public:
 	virtual void MakePermanent()  = 0;
 	virtual void ClearPermanent() = 0;
 
+	// Re-collect the dependency list from the current data.
+	// Call whenever the resource's references to other resources change
+	virtual void RebuildDependencies() = 0;
+
 	virtual bool		   HasAllFlags( uint8 flags ) const = 0;
 	virtual bool		   HasAnyFlags( uint8 flags ) const = 0;
+	virtual bool		   HasPermanentHolders() const		= 0;
 	virtual IResourceData* GetData() const					= 0;
 	virtual resourceType_t GetType() const					= 0;
 	virtual const char*	   GetName() const					= 0;
@@ -79,12 +89,8 @@ class CResourceData : public TBaseClass
 {
 public:
 	// IResourceData interface
-	// Marks all dependent resources as used
-	virtual void MarkUsedDependencies() override;
-
-	// Set/clear permanent flag in all dependent resources
-	virtual void MakePermanentDependencies() override;
-	virtual void ClearPermanentDependencies() override;
+	// Collect all resources this data depends on
+	virtual void CollectDependencies( IResourceDependencyCollector* pCollector ) const override;
 
 	// Get the resource where the data is
 	virtual IResource* GetResource() const override;

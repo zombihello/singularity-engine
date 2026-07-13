@@ -1,6 +1,7 @@
 #pragma once
 #include <EASTL/string.h>
 #include <EASTL/list.h>
+#include <EASTL/vector.h>
 
 #include "tier1/template.h"
 #include "resourcesystem/iresource.h"
@@ -32,8 +33,13 @@ public:
 	virtual void MakePermanent() override;
 	virtual void ClearPermanent() override;
 
+	// Re-collect the dependency list from the current data.
+	// Call whenever the resource's references to other resources change
+	virtual void RebuildDependencies() override;
+
 	virtual bool		   HasAllFlags( uint8 flags ) const override;
 	virtual bool		   HasAnyFlags( uint8 flags ) const override;
+	virtual bool		   HasPermanentHolders() const override;
 	virtual IResourceData* GetData() const override;
 	virtual resourceType_t GetType() const override;
 	virtual const char*	   GetName() const override;
@@ -48,15 +54,25 @@ public:
 	void Uncache( bool bIgnorePermanent );
 	void AddFlags( uint8 flags );
 	void RemoveFlags( uint8 flags );
+	void MarkUsedDependencies();
 
 private:
+	// Applies/releases a permanent hold on this resource's dependencies.
+	// NOTE: Set `bFromDependent` to true when called because a dependent 
+	// resource itself became (or stopped being) permanent
+	void ApplyPermanentHolds( bool bFromDependent );
+	void ReleasePermanentHolds( bool bFromDependent );
+
 	resourceType_t							type;
 	eastl::atomic<uint8>					flags;
 	eastl::atomic<bool>						bPendingMarkUsed;
 	bool									bInLruList;
+	bool									bHoldsApplied;
 	IResourceData*							pData;
 	CResourceTypeMgr*						pOwner;
-	uint64									lastUsedFrame; 
+	uint64									lastUsedFrame;
+	eastl::atomic<uint32>					numPermanentHolders;
+	eastl::vector<CRefPtr<CResource>>		dependencies;
 	eastl::string							name;
 	eastl::string							path;
 	eastl::list<CResource*>::const_iterator lruIt;

@@ -40,12 +40,8 @@ class CMaterial : public CResourceData<IMaterial>
 {
 public:
 	// IResourceData interface
-	// Marks all dependent resources as used
-	virtual void MarkUsedDependencies() override;
-
-	// Set/clear permanent flag in all dependent resources
-	virtual void MakePermanentDependencies() override;
-	virtual void ClearPermanentDependencies() override;
+	// Collect all resources this data depends on
+	virtual void CollectDependencies( IResourceDependencyCollector* pCollector ) const override;
 
 	// IMaterial interface
 	virtual void		  SetShader( const char* pShaderName ) override;
