@@ -2,10 +2,11 @@
 #include "materialsystem/ishader.h"
 #include "modelsystem/ivertexfactory.h"
 #include "studiorender/studioapi/istudioapi_barrier.h"
+#include "studiorender/studio_resourcebindingslots.h"
 #include "studiorender/studio_renderpasstypes.h"
 #include "studiorender/studio_viewport.h"
+#include "studiorender/studiorender.h"
 #include "studiorender/studio_renderpass_present.h"
-#include "studiorender/studio_sceneview.h"
 
 /*
 ==================
@@ -23,6 +24,7 @@ void CStudioRenderPassPresent::R_DrawPass( CStudioViewport* pViewport, studioSce
 	}
 
 	vector2i_t						viewportSize		  = pViewport->GetSize();
+	CRefPtr<IStudioAPIBuffer>		pGlobalConstantBuffer = g_StudioRender.GetStudioAPIGlobalConstantBuffer();
 	CRefPtr<IStudioAPICmdContext>	pGraphicsCmdContext	  = g_pStudioAPI->GetImmediateCmdContext( STUDIOAPI_QUEUE_TYPE_GRAPHICS );
 	CRefPtr<IStudioAPICmdListBatch> pGraphicsCmdListBatch = g_pStudioAPI->CreateCmdListBatch( pGraphicsCmdContext );
 	CRefPtr<IStudioAPICmdList>		pGraphicsCmdList	  = g_pStudioAPI->CreateCmdList( pGraphicsCmdContext );
@@ -33,8 +35,13 @@ void CStudioRenderPassPresent::R_DrawPass( CStudioViewport* pViewport, studioSce
 	pGraphicsCmdList->SetScissor( 0, 0, viewportSize.x, viewportSize.y );
 
 	// Place barriers into the command list
-	studioAPIBarrier_t barrier = StudioAPI_MakeTextureBarrier( pStudioAPISwapChain->GetCurrentImage(), STUDIOAPI_TEXTURE_LAYOUT_COLOR_RENDER_TARGET, STUDIOAPI_QUEUE_TYPE_GRAPHICS );
-	pGraphicsCmdList->Barrier( &barrier, 1 );
+	{
+		studioAPIBarrier_t barriers[] = {
+			StudioAPI_MakeTextureBarrier( pStudioAPISwapChain->GetCurrentImage(), STUDIOAPI_TEXTURE_LAYOUT_COLOR_RENDER_TARGET, STUDIOAPI_QUEUE_TYPE_GRAPHICS ),
+			StudioAPI_MakeBufferBarrier( pGlobalConstantBuffer, STUDIOAPI_BUFFER_STATE_CONSTANT_BUFFER, STUDIOAPI_QUEUE_TYPE_GRAPHICS )
+		};
+		pGraphicsCmdList->Barrier( barriers, ARRAYSIZE( barriers ) );
+	}
 
 	const studioRenderPass_t& renderPass = pSceneView->renderPasses[STUDIO_RENDERPASS_TYPE_PRESENT];
 	for ( auto it = renderPass.resourceIds.begin(), itEnd = renderPass.resourceIds.end(); it != itEnd; ++it )
@@ -78,13 +85,16 @@ void CStudioRenderPassPresent::R_DrawPass( CStudioViewport* pViewport, studioSce
 
 		pVertexFactory->R_PrepareForDraw( pGraphicsCmdList, STUDIO_RENDERPASS_TYPE_PRESENT );
 		pShader->R_PrepareForDraw( pGraphicsCmdList, pContextData, pVertexFactory, STUDIO_RENDERPASS_TYPE_PRESENT );
+		pGraphicsCmdList->SetConstantBuffer( 0, STUDIO_RESOURCE_BINDING_SLOT_GLOBAL_CB, pGlobalConstantBuffer );
 		pGraphicsCmdList->DrawIndexed( pDrawSurface->baseVertexIndex, pDrawSurface->baseIndex, pDrawSurface->numIndices );
 	}
 	pGraphicsCmdList->EndRenderPass();
 
-	// Place barriers for swapchain image
-	barrier = StudioAPI_MakeTextureBarrier( pStudioAPISwapChain->GetCurrentImage(), STUDIOAPI_TEXTURE_LAYOUT_PRESENT, STUDIOAPI_QUEUE_TYPE_GRAPHICS );
-	pGraphicsCmdList->Barrier( &barrier, 1 );
+	// Place barriers for the swapchain image
+	{
+		studioAPIBarrier_t barrier = StudioAPI_MakeTextureBarrier( pStudioAPISwapChain->GetCurrentImage(), STUDIOAPI_TEXTURE_LAYOUT_PRESENT, STUDIOAPI_QUEUE_TYPE_GRAPHICS );
+		pGraphicsCmdList->Barrier( &barrier, 1 );
+	}
 	pGraphicsCmdList->EndRecord();
 
 	// Submit the command list

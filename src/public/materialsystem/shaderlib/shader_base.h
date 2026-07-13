@@ -3,6 +3,7 @@
 #include "studiorender/studioapi/istudioapi_barrier.h"
 #include "studiorender/istudio_renderpipelineset.h"
 #include "studiorender/istudio_renderresource.h"
+#include "studiorender/studio_resourcebindingslots.h"
 #include "materialsystem/imaterialvar.h"
 #include "materialsystem/ishader.h"
 #include "modelsystem/ivertexfactory.h"
@@ -165,8 +166,8 @@
 //-----------------------------------------------------------------------------
 // Helper macros to declare resources sections (constant buffers, textures, samplers, etc)
 //-----------------------------------------------------------------------------
-#define SHADER_BUFFER( Name, BindSet, BindSlot, DataType, UsageFlags ) static CShaderBufferInfo Name( BindSet, BindSlot, sizeof( SHADER_BUFFER_DATA_TYPE( DataType ) ), UsageFlags );
-#define SHADER_TEXTURE_SAMPLER( Name, BindSet, BindSlot )			   static CShaderTextureSamplerInfo Name( BindSet, BindSlot );
+#define SHADER_BUFFER( Name, BindSet, BindSlot, DataType, UsageFlags ) static CShaderBufferInfo Name( BindSet, STUDIO_RESOURCE_BINDING_SLOT_FREE_BEGIN + BindSlot, sizeof( SHADER_BUFFER_DATA_TYPE( DataType ) ), UsageFlags );
+#define SHADER_TEXTURE_SAMPLER( Name, BindSet, BindSlot )			   static CShaderTextureSamplerInfo Name( BindSet, STUDIO_RESOURCE_BINDING_SLOT_FREE_BEGIN + BindSlot );
 #define BEGIN_SHADER_RESOURCES
 #define END_SHADER_RESOURCES
 

@@ -16,16 +16,18 @@ CStudioAPIPendingRenderStateVk::SetViewport
 */
 FORCEINLINE void CStudioAPIPendingRenderStateVk::SetViewport( float x, float y, float width, float height, float minDepth, float maxDepth )
 {
+	// Update scissor to default-match the viewport (uses the original, non Y-flipped rectangle)
+	SetScissor( false, (int32)x, (int32)y, (uint32)width, (uint32)height );
+
 	// Update viewport
+	// Negate height and move the viewport corner so we don't need to have the shaders flip
+	// clip space (negative viewport height has been core since Vulkan 1.1)
 	vkViewport.x		= x;
-	vkViewport.y		= y;
+	vkViewport.y		= y + height;
 	vkViewport.width	= width;
-	vkViewport.height	= height;
+	vkViewport.height	= -height;
 	vkViewport.minDepth = minDepth;
 	vkViewport.maxDepth = maxDepth;
-
-	// Update scissor
-	SetScissor( false, (int32)x, (int32)y, (uint32)width, (uint32)height );
 }
 
 /*
@@ -35,22 +37,11 @@ CStudioAPIPendingRenderStateVk::SetScissor
 */
 FORCEINLINE void CStudioAPIPendingRenderStateVk::SetScissor( bool bEnable, int32 x, int32 y, uint32 width, uint32 height )
 {
-	if ( bEnable )
-	{
-		vkScissor.offset.x		= x;
-		vkScissor.offset.y		= y;
-		vkScissor.extent.width	= width;
-		vkScissor.extent.height = height;
-	}
-	else
-	{
-		vkScissor.offset.x		= (int32)vkViewport.x;
-		vkScissor.offset.y		= (int32)vkViewport.y;
-		vkScissor.extent.width	= (uint32)vkViewport.width;
-		vkScissor.extent.height = (uint32)vkViewport.height;
-	}
-
-	bScissorEnabled = bEnable;
+	vkScissor.offset.x		= x;
+	vkScissor.offset.y		= y;
+	vkScissor.extent.width	= width;
+	vkScissor.extent.height = height;
+	bScissorEnabled			= bEnable;
 }
 
 /*

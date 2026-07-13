@@ -4,6 +4,7 @@
 #include "materialsystem/imaterial.h"
 #include "studiorender/studio_framealloc.h"
 #include "studiorender/studio_renderpasstypes.h"
+#include "studiorender/studio_globalshaderparams.h"
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -90,6 +91,7 @@ struct studioRenderPass_t
 
 //-----------------------------------------------------------------------------
 // Studio scene view
+//
 // NOTES:
 //	* `drawSurfaces`, `resources` and `resourceDict` are uses the frame temporary memory and may be resized
 //	* studioSceneView_t are allocated on the frame temporary stack memory
@@ -98,6 +100,7 @@ struct studioSceneView_t
 {
 	studioSceneView_t();
 
+	studioGlobalShaderParams_t						  globalShaderParams;						  // Global shader params built from the camera view for this scene view
 	studioEntityView_t*								  pEntityViews;								  // Chain of all entity views effecting view, including off screen ones casting shadows
 	studioRenderPass_t								  renderPasses[STUDIO_RENDERPASS_NUM_TYPES];  // Information for each render pass
 	studioFrameVector_t<studioDrawSurface_t*>		  drawSurfaces;								  // Draw surfaces are the visible surfaces of the entity views

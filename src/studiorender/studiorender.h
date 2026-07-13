@@ -7,6 +7,7 @@
 // Forward declarations
 //-----------------------------------------------------------------------------
 class CStudioViewport;
+class IStudioAPIBuffer;
 struct studioEntityView_t;
 
 //-----------------------------------------------------------------------------
@@ -38,6 +39,8 @@ public:
 	virtual IStudioCmdBuffer* GetCommandBuffer() const override;
 	virtual bool			  IsInRenderThread() const override;
 
+	IStudioAPIBuffer* GetStudioAPIGlobalConstantBuffer() const;
+
 private:
 	void AddModelToSceneView( studioSceneView_t* pSceneView, studioEntityView_t* pEntityView );
 	template<class TResourceClass>
@@ -45,7 +48,8 @@ private:
 	uint32 AddResourceToSceneView( studioSceneView_t* pSceneView, studioResourcePtr_t pPtr, studioResourceType_t type );
 	void   R_DrawScene( CStudioViewport* pViewport, studioSceneView_t* pSceneView );
 
-	CStudioRenderPassPresent presentRenderPass;
+	CStudioRenderPassPresent  presentRenderPass;
+	CRefPtr<IStudioAPIBuffer> pStudioAPIGlobalConstantBuffer;
 };
 
 extern CStudioRender g_StudioRender;

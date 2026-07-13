@@ -33,3 +33,13 @@ FORCEINLINE uint32 CStudioRender::AddResourceToSceneView<IMaterialResource>( stu
 {
 	return AddResourceToSceneView( pSceneView, pMaterialResource, STUDIO_RESOURCE_TYPE_MATERIAL );
 }
+
+/*
+==================
+CStudioRender::GetStudioAPIGlobalConstantBuffer
+==================
+*/
+FORCEINLINE IStudioAPIBuffer* CStudioRender::GetStudioAPIGlobalConstantBuffer() const
+{
+	return pStudioAPIGlobalConstantBuffer;
+}

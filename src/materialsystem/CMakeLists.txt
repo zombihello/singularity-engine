@@ -13,7 +13,7 @@ set( GENERATED_SRC_PATTERNS				"${GENERATED_DIR}/*.h" "${GENERATED_DIR}/*.inl" "
 										"${GENERATED_DIR}/*.hxx" "${GENERATED_DIR}/*.cxx" )
 
 set( VIEW_ONLY_PATTERNS					"${SRC_DIR}/*.makefile" "${SRC_DIR}/*.hlsl" )
-set( PUBLIC_VIEW_ONLY_PATTERNS 			"${PUBLIC_SRC_DIR}/materialsystem/*.hlsl" )
+set( PUBLIC_VIEW_ONLY_PATTERNS 			"${PUBLIC_SRC_DIR}/materialsystem/*.hlsl" "${PUBLIC_SRC_DIR}/modelsystem/*.hlsl" )
 set( PUBLIC_VERTEXFACTORY_PATTERNS		"${PUBLIC_SRC_DIR}/modelsystem/*.list" )
 
 if ( PLATFORM_WINDOWS )

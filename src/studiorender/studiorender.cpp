@@ -1,4 +1,5 @@
 #include "pch_studiorender.h"
+#include "tier1/math/math.h"
 #include "filesystem/ifilesystem.h"
 #include "resourcesystem/iresourcesystem.h"
 #include "materialsystem/ishadermgr.h"
@@ -86,6 +87,11 @@ bool CStudioRender::Init()
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	CStudioGlobalRenderResources::InitResources();
 
+	// Create the global constant buffer
+	pStudioAPIGlobalConstantBuffer = g_pStudioAPI->CreateBuffer( NULL, sizeof( studioGlobalShaderParams_t ), sizeof( studioGlobalShaderParams_t ),
+																 STUDIOAPI_BUFFER_USAGE_FLAG_VOLATILE | STUDIOAPI_BUFFER_USAGE_FLAG_CONSTANT_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST,
+																 "GlobalShaderParams" );
+
 	// Start the render thread
 	Studio_StartRenderThread();
 	return true;
@@ -101,6 +107,9 @@ void CStudioRender::Shutdown()
 	// Stop the render thread
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Studio_StopRenderThread();
+
+	// Release the global constant buffer
+	pStudioAPIGlobalConstantBuffer = NULL;
 
 	// Release all global resources
 	CStudioGlobalRenderResources::ReleaseResources();
@@ -189,6 +198,18 @@ void CStudioRender::DrawScene( IStudioViewport* pStudioViewport, IStudioScene* p
 	CStudioScene*	   pStudioSceneLocal = (CStudioScene*)pStudioScene;
 	studioSceneView_t* pSceneView		 = g_studioFrameAlloc.Construct<studioSceneView_t>();
 
+	// Build the global shader params from the camera view
+	vector3_t					forward			   = cameraView.rotation * g_vectorForward;
+	vector3_t					up				   = cameraView.rotation * g_vectorUp;
+	vector2i_t					viewportSize	   = pStudioViewport->GetSize();
+	studioGlobalShaderParams_t& globalShaderParams = pSceneView->globalShaderParams;
+	globalShaderParams.viewMatrix				   = S_MatrixLookAt( cameraView.location, cameraView.location + forward, up );
+	globalShaderParams.projectionMatrix			   = S_MatrixPerspective( cameraView.fieldOfView, cameraView.aspectRatio, cameraView.nearClipPlane, cameraView.farClipPlane );
+	globalShaderParams.viewProjectionMatrix		   = globalShaderParams.projectionMatrix * globalShaderParams.viewMatrix;
+	globalShaderParams.invViewProjectionMatrix	   = S_MatrixInverse( globalShaderParams.viewProjectionMatrix );
+	globalShaderParams.position					   = vector4_t( cameraView.location, 1.f );
+	globalShaderParams.screenAndBufferSize		   = vector4_t( (float)viewportSize.x, (float)viewportSize.y, (float)viewportSize.x, (float)viewportSize.y );
+
 	// Find all visible entities, after that creates entity views for them
 	pStudioSceneLocal->FindEntityViews( pSceneView );
 
@@ -270,8 +291,13 @@ CStudioRender::R_DrawScene
 */
 void CStudioRender::R_DrawScene( CStudioViewport* pViewport, studioSceneView_t* pSceneView )
 {
+	// Update the global constant buffer from the scene view's global params
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( Studio_IsInRenderThread() );
+	pStudioAPIGlobalConstantBuffer->UpdateData( g_pStudioAPI->GetImmediateCmdContext( STUDIOAPI_QUEUE_TYPE_GRAPHICS ),
+												(byte*)&pSceneView->globalShaderParams, sizeof( studioGlobalShaderParams_t ) );
+
+	// Draw the present render pass
 	presentRenderPass.R_DrawPass( pViewport, pSceneView );
 }
 
