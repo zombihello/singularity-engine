@@ -5,6 +5,32 @@
 
 /*
 ==================
+CResourceTypeMgr::NormalizeResourceName
+==================
+*/
+eastl::string CResourceTypeMgr::NormalizeResourceName( const char* pResourceName )
+{
+	// Normalize backslashes to the forward-slash, then collapse
+	// duplicate slashes outside of the preserved search path prefix
+	eastl::string name		 = pResourceName;
+	uint32		  startIndex = ( name.size() >= 2 && name[0] == '/' && name[1] == '/' ) ? 2 : 0;
+	uint32		  writeIndex = 0;
+	for ( uint32 readIndex = 0, count = (uint32)name.size(); readIndex < count; ++readIndex )
+	{
+		char c = name[readIndex] == '\\' ? '/' : name[readIndex];
+		if ( c == '/' && writeIndex > startIndex && name[writeIndex - 1] == '/' )
+		{
+			continue;
+		}
+		name[writeIndex++] = c;
+	}
+
+	name.resize( writeIndex );
+	return name;
+}
+
+/*
+==================
 CResourceTypeMgr::CResourceTypeMgr
 ==================
 */
@@ -132,11 +158,14 @@ CResourceTypeMgr::CreateResource
 */
 CRefPtr<IResource> CResourceTypeMgr::CreateResource( const char* pName, uint8 flags /* = RESOURCE_FLAG_NONE */ )
 {
+	// Normalize the resource name so equivalent names (e.g. differing only by
+	// duplicate/backslash separators) always resolve to the same resource
 	PROFILER_SCOPE_FUNC();
+	eastl::string name = NormalizeResourceName( pName );
 
 	// Try to find already exists the resource (only if we won't an anonymous resource)
 	bool			   bRequestedAnonymous = flags & RESOURCE_FLAG_ANONYMOUS;
-	CRefPtr<CResource> pResource		   = !bRequestedAnonymous ? FindResource( pName, false ) : NULL;
+	CRefPtr<CResource> pResource		   = !bRequestedAnonymous ? FindResource( name.c_str(), false ) : NULL;
 	if ( pResource )
 	{
 		return pResource;
@@ -145,7 +174,7 @@ CRefPtr<IResource> CResourceTypeMgr::CreateResource( const char* pName, uint8 fl
 	// Make sure that we have a factory for the resource type
 	if ( !Ensure( pResourceTypeFactory ) )
 	{
-		Warning( "ResourceSystem: Failed to create resource '%s'. Resource factory for type 0x%X isn't registered", pName, resourceType );
+		Warning( "ResourceSystem: Failed to create resource '%s'. Resource factory for type 0x%X isn't registered", name.c_str(), resourceType );
 		return NULL;
 	}
 
@@ -154,13 +183,13 @@ CRefPtr<IResource> CResourceTypeMgr::CreateResource( const char* pName, uint8 fl
 	if ( flags & forbiddenFlags )
 	{
 		flags &= ~forbiddenFlags;
-		Warning( "ResourceSystem: In resource '%s' stripped forbidden flags (forbiddenFlags: 0x%X)", pName, forbiddenFlags );
+		Warning( "ResourceSystem: In resource '%s' stripped forbidden flags (forbiddenFlags: 0x%X)", name.c_str(), forbiddenFlags );
 	}
 
 	// Create a resource
-	pResource = new CResource( this, pName, resourceType, RESOURCE_FLAG_PERMANENT | flags );
+	pResource = new CResource( this, name.c_str(), resourceType, RESOURCE_FLAG_PERMANENT | flags );
 	pResource->ChangeData( "", pResourceTypeFactory->Create( pResource ) );
-	Msg( "ResourceSystem: Created resource '%s' (type: 0x%X)", pName, resourceType );
+	Msg( "ResourceSystem: Created resource '%s' (type: 0x%X)", name.c_str(), resourceType );
 
 	// Add into the manager if it need
 	if ( !bRequestedAnonymous )
@@ -180,17 +209,21 @@ CResourceTypeMgr::LoadResource
 */
 CRefPtr<IResource> CResourceTypeMgr::LoadResource( const char* pName, const char* pPath, uint8 flags /* = RESOURCE_FLAG_NONE */ )
 {
+	// Normalize the resource name/path so equivalent values (e.g. differing
+	// only by duplicate/backslash separators) always resolve to the same resource
 	PROFILER_SCOPE_FUNC();
+	eastl::string name = NormalizeResourceName( pName );
+	eastl::string path = NormalizeResourceName( pPath );
 
 	// Try to find already exists the resource (only if we won't an anonymous resource)
 	bool			   bRequestedAnonymous = flags & RESOURCE_FLAG_ANONYMOUS;
-	CRefPtr<CResource> pResource		   = !bRequestedAnonymous ? FindResource( pName, false ) : NULL;
+	CRefPtr<CResource> pResource		   = !bRequestedAnonymous ? FindResource( name.c_str(), false ) : NULL;
 	if ( pResource )
 	{
 		// Cache the resource if it has been uncached
-		if ( !pResource->HasAnyFlags( RESOURCE_FLAG_CACHED ) && !CacheResource( pResource ) && !LoadResource( pResource, pPath ) )
+		if ( !pResource->HasAnyFlags( RESOURCE_FLAG_CACHED ) && !CacheResource( pResource ) && !LoadResource( pResource, path.c_str() ) )
 		{
-			Warning( "ResourceSystem: Resource '%s' found, but failed to cache it or load a new one from '%s' (type: 0x%X)", pName, pPath, resourceType );
+			Warning( "ResourceSystem: Resource '%s' found, but failed to cache it or load a new one from '%s' (type: 0x%X)", name.c_str(), path.c_str(), resourceType );
 		}
 
 		return pResource;
@@ -199,19 +232,27 @@ CRefPtr<IResource> CResourceTypeMgr::LoadResource( const char* pName, const char
 	// Make sure that we have a factory for the resource type
 	if ( !Ensure( pResourceTypeFactory ) )
 	{
-		Warning( "ResourceSystem: Failed to load resource '%s' as '%s'. Resource factory for type 0x%X isn't registered", pPath, pName, resourceType );
+		Warning( "ResourceSystem: Failed to load resource '%s' as '%s'. Resource factory for type 0x%X isn't registered", path.c_str(), name.c_str(), resourceType );
 		return NULL;
 	}
 
 	// Make sure that we have at least one a resource loader
 	if ( !Ensure( !resourceTypeLoaders.empty() ) )
 	{
-		Warning( "ResourceSystem: Failed to load resource '%s' as '%s'. There are no resource loaders for type 0x%X", pPath, pName, resourceType );
+		Warning( "ResourceSystem: Failed to load resource '%s' as '%s'. There are no resource loaders for type 0x%X", path.c_str(), name.c_str(), resourceType );
 		return NULL;
 	}
 
+	// Strip forbidden flags
+	const uint8 forbiddenFlags = RESOURCE_FLAG_DEFAULT;
+	if ( flags & forbiddenFlags )
+	{
+		flags &= ~forbiddenFlags;
+		Warning( "ResourceSystem: In resource '%s' stripped forbidden flags (forbiddenFlags: 0x%X)", name.c_str(), forbiddenFlags );
+	}
+
 	// Create a new resource and try to load it
-	pResource = new CResource( this, pName, resourceType, flags );
+	pResource = new CResource( this, name.c_str(), resourceType, flags );
 
 	// Try to load a resource from a file
 	bool				 bHasBeenLoaded		 = false;
@@ -220,28 +261,20 @@ CRefPtr<IResource> CResourceTypeMgr::LoadResource( const char* pName, const char
 	for ( uint32 index = 0, count = (uint32)resourceTypeLoaders.size(); index < count && !bHasBeenLoaded; ++index )
 	{
 		pResourceTypeLoader = resourceTypeLoaders[index];
-		bHasBeenLoaded		= pResourceTypeLoader->Load( pPath, pData );
+		bHasBeenLoaded		= pResourceTypeLoader->Load( path.c_str(), pData );
 	}
 
 	// Delete the resource data if failed to load the resource
 	if ( !bHasBeenLoaded )
 	{
-		Error( "ResourceSystem: Failed to load resource '%s' as '%s' (type: 0x%X)", pPath, pName, resourceType );
+		Error( "ResourceSystem: Failed to load resource '%s' as '%s' (type: 0x%X)", path.c_str(), name.c_str(), resourceType );
 		pResourceTypeFactory->Delete( pData );
 		return pDefaultResource;
 	}
-	Msg( "ResourceSystem: Loaded resource '%s' as '%s' (type: 0x%X, format: '%s')", pPath, pName, resourceType, pResourceTypeLoader->GetFormatName() );
-
-	// Strip forbidden flags
-	const uint8 forbiddenFlags = RESOURCE_FLAG_DEFAULT;
-	if ( flags & forbiddenFlags )
-	{
-		flags &= ~forbiddenFlags;
-		Warning( "ResourceSystem: In resource '%s' stripped forbidden flags (forbiddenFlags: 0x%X)", pName, forbiddenFlags );
-	}
+	Msg( "ResourceSystem: Loaded resource '%s' as '%s' (type: 0x%X, format: '%s')", path.c_str(), name.c_str(), resourceType, pResourceTypeLoader->GetFormatName() );
 
 	// Update resource data in the resource
-	pResource->ChangeData( pPath, pData );
+	pResource->ChangeData( path.c_str(), pData );
 
 	// Add into the manager if it need
 	if ( !bRequestedAnonymous )
@@ -261,7 +294,10 @@ CResourceTypeMgr::LoadResource
 */
 bool CResourceTypeMgr::LoadResource( IResource* pResource, const char* pPath ) const
 {
+	// Normalize the resource path so equivalent values (e.g. differing only
+	// by duplicate/backslash separators) always resolve to the same resource
 	PROFILER_SCOPE_FUNC();
+	eastl::string path = NormalizeResourceName( pPath );
 
 	// Make sure that we have a factory for the resource type
 	Assert( pResource );
@@ -269,14 +305,14 @@ bool CResourceTypeMgr::LoadResource( IResource* pResource, const char* pPath ) c
 	const char* pName		   = pResourceLocal->GetName();
 	if ( !Ensure( pResourceTypeFactory ) )
 	{
-		Warning( "ResourceSystem: Failed to load resource '%s' as '%s'. Resource factory for type 0x%X isn't registered", pPath, pName, resourceType );
+		Warning( "ResourceSystem: Failed to load resource '%s' as '%s'. Resource factory for type 0x%X isn't registered", path.c_str(), pName, resourceType );
 		return false;
 	}
 
 	// Make sure that we have at least one a resource loader
 	if ( !Ensure( !resourceTypeLoaders.empty() ) )
 	{
-		Warning( "ResourceSystem: Failed to load resource '%s' as '%s'. There are no resource loaders for type 0x%X", pPath, pName, resourceType );
+		Warning( "ResourceSystem: Failed to load resource '%s' as '%s'. There are no resource loaders for type 0x%X", path.c_str(), pName, resourceType );
 		return false;
 	}
 
@@ -287,20 +323,20 @@ bool CResourceTypeMgr::LoadResource( IResource* pResource, const char* pPath ) c
 	for ( uint32 index = 0, count = (uint32)resourceTypeLoaders.size(); index < count && !bHasBeenLoaded; ++index )
 	{
 		pResourceTypeLoader = resourceTypeLoaders[index];
-		bHasBeenLoaded		= pResourceTypeLoader->Load( pPath, pData );
+		bHasBeenLoaded		= pResourceTypeLoader->Load( path.c_str(), pData );
 	}
 
 	// Delete the resource data if failed to load the resource
 	if ( !bHasBeenLoaded )
 	{
-		Error( "ResourceSystem: Failed to load resource '%s' as '%s' (type: 0x%X)", pPath, pName, resourceType );
+		Error( "ResourceSystem: Failed to load resource '%s' as '%s' (type: 0x%X)", path.c_str(), pName, resourceType );
 		pResourceTypeFactory->Delete( pData );
 		return false;
 	}
-	Msg( "ResourceSystem: Loaded resource '%s' as '%s' (type: 0x%X, format: '%s')", pPath, pName, resourceType, pResourceTypeLoader->GetFormatName() );
+	Msg( "ResourceSystem: Loaded resource '%s' as '%s' (type: 0x%X, format: '%s')", path.c_str(), pName, resourceType, pResourceTypeLoader->GetFormatName() );
 
 	// Change a data in the resource
-	pResourceLocal->ChangeData( pPath, pData );
+	pResourceLocal->ChangeData( path.c_str(), pData );
 	const_cast<CResourceTypeMgr*>( this )->MarkUsedResource( pResourceLocal );
 	return true;
 }
@@ -312,8 +348,12 @@ CResourceTypeMgr::FindResource
 */
 CRefPtr<IResource> CResourceTypeMgr::FindResource( const char* pName, bool bDefaultResourceIfNotFound /* = true */ ) const
 {
+	// Normalize the resource name so equivalent names (e.g. differing only by
+	// duplicate/backslash separators) resolve to the same dictionary entry
 	PROFILER_SCOPE_FUNC();
-	auto it = resourcesDict.find( pName );
+	eastl::string name = NormalizeResourceName( pName );
+
+	auto it = resourcesDict.find( name.c_str() );
 	if ( it != resourcesDict.end() )
 	{
 		return it->second;
@@ -328,9 +368,8 @@ CResourceTypeMgr::AddResource
 */
 void CResourceTypeMgr::AddResource( IResource* pResource )
 {
-	PROFILER_SCOPE_FUNC();
-
 	// Make sure that the resource is valid and has right a resource type
+	PROFILER_SCOPE_FUNC();
 	Assert( pResource );
 	if ( !Ensure( pResource->GetType() == resourceType ) )
 	{
@@ -359,9 +398,8 @@ CResourceTypeMgr::RemoveResource
 */
 void CResourceTypeMgr::RemoveResource( IResource* pResource )
 {
-	PROFILER_SCOPE_FUNC();
-
 	// Make sure that the resource is valid and has right a resource type
+	PROFILER_SCOPE_FUNC();
 	Assert( pResource );
 	if ( !Ensure( pResource->GetType() == resourceType ) )
 	{
@@ -390,9 +428,8 @@ CResourceTypeMgr::CacheResource
 */
 bool CResourceTypeMgr::CacheResource( CResource* pResource )
 {
-	PROFILER_SCOPE_FUNC();
-
 	// Do nothing if the resource already cached
+	PROFILER_SCOPE_FUNC();
 	Assert( pResource && pResource->GetType() == resourceType );
 	if ( pResource->HasAnyFlags( RESOURCE_FLAG_CACHED ) )
 	{
@@ -454,9 +491,8 @@ CResourceTypeMgr::UncacheResource
 */
 void CResourceTypeMgr::UncacheResource( CResource* pResource, bool bIgnorePermanent /* = false */ )
 {
-	PROFILER_SCOPE_FUNC();
-
 	// Do nothing if the resource has permanent flag or it already uncached
+	PROFILER_SCOPE_FUNC();
 	Assert( pResource && pResource->GetType() == resourceType );
 	if ( !pResource->HasAnyFlags( RESOURCE_FLAG_CACHED ) || ( !bIgnorePermanent && pResource->HasAnyFlags( RESOURCE_FLAG_PERMANENT ) ) )
 	{
@@ -493,9 +529,8 @@ CResourceTypeMgr::MarkUsedResource
 */
 void CResourceTypeMgr::MarkUsedResource( CResource* pResource )
 {
-	PROFILER_SCOPE_FUNC();
-
 	// Do nothing if the resource already marked as pending to mark used
+	PROFILER_SCOPE_FUNC();
 	Assert( pResource && pResource->GetType() == resourceType );
 	if ( pResource->bPendingMarkUsed.load( eastl::memory_order_relaxed )
 		 || !pResource->HasAnyFlags( RESOURCE_FLAG_CACHED )
@@ -523,9 +558,8 @@ CResourceTypeMgr::LinkResourceToLruTail
 */
 void CResourceTypeMgr::LinkResourceToLruTail( CResource* pResource )
 {
-	PROFILER_SCOPE_FUNC();
-
 	// Do nothing if the resource already in the lru list
+	PROFILER_SCOPE_FUNC();
 	Assert( pResource && pResource->GetType() == resourceType );
 	if ( pResource->bInLruList )
 	{
@@ -545,9 +579,8 @@ CResourceTypeMgr::MoveResourceToLruTail
 */
 void CResourceTypeMgr::MoveResourceToLruTail( CResource* pResource )
 {
-	PROFILER_SCOPE_FUNC();
-
 	// Do nothing if the resource isn't in the lru list
+	PROFILER_SCOPE_FUNC();
 	Assert( pResource && pResource->GetType() == resourceType );
 	if ( !pResource->bInLruList )
 	{
@@ -565,9 +598,8 @@ CResourceTypeMgr::UnlinkResourceFromLru
 */
 void CResourceTypeMgr::UnlinkResourceFromLru( CResource* pResource )
 {
-	PROFILER_SCOPE_FUNC();
-
 	// Do nothing if the resource isn't in the lru list
+	PROFILER_SCOPE_FUNC();
 	Assert( pResource && pResource->GetType() == resourceType );
 	if ( !pResource->bInLruList )
 	{
@@ -586,9 +618,8 @@ CResourceTypeMgr::UncacheAllResources
 */
 void CResourceTypeMgr::UncacheAllResources()
 {
-	PROFILER_SCOPE_FUNC();
-
 	// Before uncache all resources we have to update the lru list
+	PROFILER_SCOPE_FUNC();
 	ProcessPendingMarkUsedResources();
 
 	// Do nothing if the lru list is empty
@@ -635,9 +666,8 @@ CResourceTypeMgr::ProcessPendingMarkUsedResources
 */
 void CResourceTypeMgr::ProcessPendingMarkUsedResources()
 {
-	PROFILER_SCOPE_FUNC();
-
 	// Swap write and read lists
+	PROFILER_SCOPE_FUNC();
 	{
 		CScopeLock scopeLock( pendingMarkUsedResourcesMutex );
 		S_Swap( pendingMarkUsedResourcesWriteList, pendingMarkUsedResourcesReadList );
@@ -692,9 +722,8 @@ CResourceTypeMgr::ProcessLruResources
 */
 void CResourceTypeMgr::ProcessLruResources()
 {
-	PROFILER_SCOPE_FUNC();
-
 	// Do nothing if the lru list is empty
+	PROFILER_SCOPE_FUNC();
 	if ( lruResourcesList.empty() )
 	{
 		return;

@@ -56,6 +56,11 @@ public:
 	void MarkUsedResource( CResource* pResource );
 
 private:
+	// Normalizes a resource name/path (backslash conversion, duplicate
+	// separator collapsing) so equivalent values always resolve to the same
+	// resource, while preserving a leading "//" search-path prefix
+	static eastl::string NormalizeResourceName( const char* pResourceName );
+
 	// Functions to process pending resources to mark as used and update LRU list
 	void ProcessPendingMarkUsedResources();
 	void ProcessLruResources();
