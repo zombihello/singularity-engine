@@ -273,6 +273,9 @@ void CModel::Init( const modelInitialData_t& initialData )
 	}
 	bDirtyMaterials = false;
 
+	// Rebuild the dependency list now that the material references changed
+	GetResource()->RebuildDependencies();
+
 	// Subscribe on material events
 	SubscribeMaterialEvents();
 
@@ -300,6 +303,9 @@ void CModel::Destroy()
 	materials.clear();
 	bDirtyMaterials = false;
 
+	// Rebuild the (now empty) dependency list, releasing any permanent holds
+	GetResource()->RebuildDependencies();
+
 	// Wait the render command fence
 	renderCmdFence.Wait();
 
@@ -309,55 +315,15 @@ void CModel::Destroy()
 
 /*
 ==================
-CModel::MarkUsedDependencies
+CModel::CollectDependencies
 ==================
 */
-void CModel::MarkUsedDependencies()
+void CModel::CollectDependencies( IResourceDependencyCollector* pCollector ) const
 {
 	PROFILER_SCOPE_FUNC();
 	for ( uint32 index = 0, count = (uint32)materials.size(); index < count; ++index )
 	{
-		IResource* pResource = materials[index];
-		if ( pResource )
-		{
-			pResource->MarkUsed();
-		}
-	}
-}
-
-/*
-==================
-CModel::MakePermanentDependencies
-==================
-*/
-void CModel::MakePermanentDependencies()
-{
-	PROFILER_SCOPE_FUNC();
-	for ( uint32 index = 0, count = (uint32)materials.size(); index < count; ++index )
-	{
-		IResource* pResource = materials[index];
-		if ( pResource )
-		{
-			pResource->MakePermanent();
-		}
-	}
-}
-
-/*
-==================
-CModel::ClearPermanentDependencies
-==================
-*/
-void CModel::ClearPermanentDependencies()
-{
-	PROFILER_SCOPE_FUNC();
-	for ( uint32 index = 0, count = (uint32)materials.size(); index < count; ++index )
-	{
-		IResource* pResource = materials[index];
-		if ( pResource )
-		{
-			pResource->ClearPermanent();
-		}
+		pCollector->AddDependency( materials[index].GetResource() );
 	}
 }
 

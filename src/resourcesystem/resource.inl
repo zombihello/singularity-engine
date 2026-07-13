@@ -33,11 +33,14 @@ FORCEINLINE void CResource::ChangeData( const char* pPath, IResourceData* pData 
 		Uncache( true );
 	}
 
-	// Set a new data
+	// Set the new data and path
+	path			 = pPath;
+	CResource::pData = pData;
+
+	// Rebuild the dependency list for the new data
 	if ( pData )
 	{
 		AddFlags( RESOURCE_FLAG_CACHED );
+		RebuildDependencies();
 	}
-	path			 = pPath;
-	CResource::pData = pData;
 }

@@ -213,10 +213,10 @@ void CMaterial::Clear()
 
 /*
 ==================
-CMaterial::MarkUsedDependencies
+CMaterial::CollectDependencies
 ==================
 */
-void CMaterial::MarkUsedDependencies()
+void CMaterial::CollectDependencies( IResourceDependencyCollector* pCollector ) const
 {
 	PROFILER_SCOPE_FUNC();
 	for ( uint32 index = 0, count = (uint32)resourceVarIds.size(); index < count; ++index )
@@ -234,63 +234,7 @@ void CMaterial::MarkUsedDependencies()
 
 		if ( pResource )
 		{
-			pResource->MarkUsed();
-		}
-	}
-}
-
-/*
-==================
-CMaterial::MakePermanentDependencies
-==================
-*/
-void CMaterial::MakePermanentDependencies()
-{
-	PROFILER_SCOPE_FUNC();
-	for ( uint32 index = 0, count = (uint32)resourceVarIds.size(); index < count; ++index )
-	{
-		CMaterialVar* pVar		= vars[resourceVarIds[index]];
-		IResource*	  pResource = NULL;
-		switch ( pVar->GetType() )
-		{
-		case MATERIALVAR_TYPE_TEXTURE: pResource = pVar->GetTextureValue(); break;
-		case MATERIALVAR_TYPE_MATERIAL: pResource = pVar->GetMaterialValue(); break;
-		default:
-			AssertMsg( false, "Unknown material variable type 0x%X", pVar->GetType() );
-			break;
-		}
-
-		if ( pResource )
-		{
-			pResource->MakePermanent();
-		}
-	}
-}
-
-/*
-==================
-CMaterial::ClearPermanentDependencies
-==================
-*/
-void CMaterial::ClearPermanentDependencies()
-{
-	PROFILER_SCOPE_FUNC();
-	for ( uint32 index = 0, count = (uint32)resourceVarIds.size(); index < count; ++index )
-	{
-		CMaterialVar* pVar		= vars[resourceVarIds[index]];
-		IResource*	  pResource = NULL;
-		switch ( pVar->GetType() )
-		{
-		case MATERIALVAR_TYPE_TEXTURE: pResource = pVar->GetTextureValue(); break;
-		case MATERIALVAR_TYPE_MATERIAL: pResource = pVar->GetMaterialValue(); break;
-		default:
-			AssertMsg( false, "Unknown material variable type 0x%X", pVar->GetType() );
-			break;
-		}
-
-		if ( pResource )
-		{
-			pResource->ClearPermanent();
+			pCollector->AddDependency( pResource );
 		}
 	}
 }
@@ -326,6 +270,13 @@ void CMaterial::ReportVarChanged( CMaterialVar* pVar, materialVarType_t oldType 
 		{
 			resourceVarIds.emplace_back( varId );
 		}
+	}
+
+	// Rebuild the dependency list, since the resource this var references may
+	// have changed even when its type (and therefore `resourceVarIds`) didn't
+	if ( bNewResourceVarType )
+	{
+		GetResource()->RebuildDependencies();
 	}
 
 	// Insert a fence to the render thread and mark the studio resource as dirty

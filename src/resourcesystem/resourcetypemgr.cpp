@@ -437,13 +437,10 @@ bool CResourceTypeMgr::CacheResource( CResource* pResource )
 	// Change a data in the resource
 	pResource->pData = pData;
 	pResource->AddFlags( RESOURCE_FLAG_CACHED );
-	MarkUsedResource( pResource );
 
-	// If the resource is permanent then mark all dependent resources
-	if ( pResource->HasAnyFlags( RESOURCE_FLAG_PERMANENT ) )
-	{
-		pData->MakePermanentDependencies();
-	}
+	// Rebuild the dependency list and place permanent holds on it if needed
+	pResource->RebuildDependencies();
+	MarkUsedResource( pResource );
 
 	// We are done
 	pResource->onCached.Invoke( pResource );
@@ -474,16 +471,17 @@ void CResourceTypeMgr::UncacheResource( CResource* pResource, bool bIgnorePerman
 		return;
 	}
 
-	// Remove cached flag and If the resource is permanent then remove flag in all dependent resources
+	// Remove cached flag
 	pResource->RemoveFlags( RESOURCE_FLAG_CACHED );
-	if ( pResource->HasAnyFlags( RESOURCE_FLAG_PERMANENT ) )
-	{
-		pResource->pData->ClearPermanentDependencies();
-	}
 
 	// Delete the resource data
 	pResourceTypeFactory->Delete( pResource->pData );
 	pResource->pData = NULL;
+
+	// Rebuild the (now empty) dependency list, releasing any permanent holds
+	// this resource had placed on its former dependencies
+	pResource->RebuildDependencies();
+
 	pResource->onUncached.Invoke( pResource );
 	Msg( "ResourceSystem: Uncached resource '%s' (type: 0x%X)", pName, resourceType );
 }
@@ -501,7 +499,8 @@ void CResourceTypeMgr::MarkUsedResource( CResource* pResource )
 	Assert( pResource && pResource->GetType() == resourceType );
 	if ( pResource->bPendingMarkUsed.load( eastl::memory_order_relaxed )
 		 || !pResource->HasAnyFlags( RESOURCE_FLAG_CACHED )
-		 || pResource->HasAnyFlags( RESOURCE_FLAG_PERMANENT | RESOURCE_FLAG_ANONYMOUS | RESOURCE_FLAG_DEFAULT ) )
+		 || pResource->HasAnyFlags( RESOURCE_FLAG_PERMANENT | RESOURCE_FLAG_ANONYMOUS | RESOURCE_FLAG_DEFAULT )
+		 || pResource->HasPermanentHolders() )
 	{
 		return;
 	}
@@ -514,10 +513,7 @@ void CResourceTypeMgr::MarkUsedResource( CResource* pResource )
 	}
 
 	// Mark all dependent resources as used
-	if ( pResource->pData )
-	{
-		pResource->pData->MarkUsedDependencies();
-	}
+	pResource->MarkUsedDependencies();
 }
 
 /*
@@ -667,7 +663,8 @@ void CResourceTypeMgr::ProcessPendingMarkUsedResources()
 
 		// Skip the resource if it has some flags
 		if ( !pResource->HasAnyFlags( RESOURCE_FLAG_CACHED )
-			 || pResource->HasAnyFlags( RESOURCE_FLAG_PERMANENT | RESOURCE_FLAG_ANONYMOUS | RESOURCE_FLAG_DEFAULT ) )
+			 || pResource->HasAnyFlags( RESOURCE_FLAG_PERMANENT | RESOURCE_FLAG_ANONYMOUS | RESOURCE_FLAG_DEFAULT )
+			 || pResource->HasPermanentHolders() )
 		{
 			continue;
 		}
@@ -726,8 +723,8 @@ void CResourceTypeMgr::ProcessLruResources()
 		// Unlink the resource from the lru list
 		UnlinkResourceFromLru( pResource );
 
-		// Uncache and remove the resource only if it isn't permanent, anonymous and default
-		if ( !pResource->HasAnyFlags( RESOURCE_FLAG_PERMANENT | RESOURCE_FLAG_ANONYMOUS | RESOURCE_FLAG_DEFAULT ) )
+		// Uncache and remove the resource only if it isn't permanent (or held), anonymous and default
+		if ( !pResource->HasAnyFlags( RESOURCE_FLAG_PERMANENT | RESOURCE_FLAG_ANONYMOUS | RESOURCE_FLAG_DEFAULT ) && !pResource->HasPermanentHolders() )
 		{
 			// Uncache the resource
 			UncacheResource( pResource );
