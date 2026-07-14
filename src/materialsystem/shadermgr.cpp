@@ -59,9 +59,7 @@ private:
 	eastl::vector<shaderLibInfo_t> shaderLibs;
 };
 
-CShaderLib g_ShaderLib( "default" );
 EXPOSE_SINGLE_INTERFACE( CShaderMgr, IShaderMgr, SHADERMGR_INTERFACE_VERSION );
-EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CShaderLib, IShaderLib, SHADERLIB_INTERFACE_VERSION, g_ShaderLib );
 
 /*
 ==================
@@ -142,7 +140,7 @@ bool CShaderMgr::LoadShaderLib( const char* pPath, bool bGameShaderLib /* = fals
 	// Allow the library try to connect to other interfaces
 	if ( !pShaderLib->Connect( g_pAppSystemFactory ) )
 	{
-		Warning( "ShaderMgr: Failed to init shader library '%s'", pPath );
+		Warning( "ShaderMgr: Failed to initialize shader library '%s'", pPath );
 		g_pFileSystem->UnloadModule( shaderModule );
 		return false;
 	}
@@ -186,7 +184,7 @@ bool CShaderMgr::InitShaderLibInfo( const shaderLibInfo_t& shaderLibInfo )
 	// Add the shaders to the dictionary of shaders and initialize the library
 	SetupShaderDictionary( shaderLibIndex );
 	shaderLibInfo.pShaderLib->Init( shaderLibIndex );
-	Msg( "ShaderMgr: Shader library '%s' initialized", shaderLibInfo.pShaderLib->GetName() );
+	Msg( "ShaderMgr: Shader library '%s' initialized", shaderLibInfo.fileName.c_str() );
 
 	// Load shader caches for the shader library
 	if ( !LoadShaderCaches( shaderLibIndex ) )
@@ -244,7 +242,7 @@ bool CShaderMgr::LoadShaderCaches( uint32 index )
 	shaderLibInfo_t& info			 = shaderLibs[index];
 	const char*		 pShaderPlatform = g_pStudioAPI->GetInfo().pShaderPlatform;
 	Assert( pShaderPlatform && info.pShaderLib );
-	eastl::string shaderCacheDir = S_Sprintf( "//%s/shaders/%s/%s/", info.bGameShaderLib ? "GAME" : "CORE", info.pShaderLib->GetName(), pShaderPlatform );
+	eastl::string shaderCacheDir = S_Sprintf( "//%s/shaders/%s", info.bGameShaderLib ? "game" : "core", pShaderPlatform );
 
 	// Load shader caches for each shader
 	uint32 numShaders		= info.pShaderLib->GetNumShaders();
@@ -408,19 +406,19 @@ void CShaderMgr::LoadShaderLibs()
 
 	// Initialize default shader library
 	shaderLibInfo_t defaultShaderLibInfo = {};
-	defaultShaderLibInfo.fileName		 = g_ShaderLib.GetName();
+	defaultShaderLibInfo.fileName		 = "default";
 	defaultShaderLibInfo.moduleHandle	 = INVALID_DLL_HANDLE;
-	defaultShaderLibInfo.pShaderLib		 = &g_ShaderLib;
+	defaultShaderLibInfo.pShaderLib		 = &GetShaderLib();
 	defaultShaderLibInfo.bGameShaderLib	 = false;
 	if ( !InitShaderLibInfo( defaultShaderLibInfo ) )
 	{
-		Sys_Error( "Failed to initialize shader library '%s'", g_ShaderLib.GetName() );
+		Sys_Error( "Failed to initialize shader library 'default'" );
 	}
 
 	// Load standard shader library
-	if ( !LoadShaderLib( "//ENGINEBIN/stdshaders" DLL_EXT_STRING ) )
+	if ( !LoadShaderLib( "//enginebin/stdshaders" DLL_EXT_STRING ) )
 	{
-		Sys_Error( "Failed to load //ENGINEBIN/stdshaders" DLL_EXT_STRING );
+		Sys_Error( "Failed to load //enginebin/stdshaders" DLL_EXT_STRING );
 	}
 }
 
@@ -453,7 +451,7 @@ void CShaderMgr::LoadGameShaderLibs()
 	UnloadGameShaderLibs();
 
 	// Load game's shader lib
-	LoadShaderLib( "//GAMEBIN/game_shaders" DLL_EXT_STRING, true );
+	LoadShaderLib( "//gamebin/game_shaders" DLL_EXT_STRING, true );
 }
 
 /*

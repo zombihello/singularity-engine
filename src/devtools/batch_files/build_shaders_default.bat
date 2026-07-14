@@ -32,7 +32,7 @@ IF NOT EXIST %SHADERCOMPILER_EXE% (
 )
 
 :: Compile shaders
-"%SHADERCOMPILER_EXE%" -mode compile -file "%SHADERLIST_MAKEFILE%" -backend shadercompiler_vk -output "%GAME_DIR%/core/shaders/default"
+"%SHADERCOMPILER_EXE%" -mode compile -file "%SHADERLIST_MAKEFILE%" -backend shadercompiler_vk -output "%GAME_DIR%/core/shaders"
 
 :EXIT
 ECHO ==============================================================================

@@ -11,9 +11,8 @@
 CShaderLib::CShaderLib
 ==================
 */
-CShaderLib::CShaderLib( const char* pName )
-	: name( pName )
-	, index( INVALID_INDEX )
+CShaderLib::CShaderLib()
+	: index( INVALID_INDEX )
 {
 }
 
@@ -108,16 +107,6 @@ void CShaderLib::Shutdown()
 
 /*
 ==================
-CShaderLib::GetName
-==================
-*/
-const char* CShaderLib::GetName() const
-{
-	return name.c_str();
-}
-
-/*
-==================
 CShaderLib::GetNumShaders
 ==================
 */
@@ -146,3 +135,17 @@ uint32 CShaderLib::GetIndex() const
 {
 	return index;
 }
+
+/*
+==================
+GetShaderLib
+==================
+*/
+CShaderLib& GetShaderLib()
+{
+	// Pattern necessary because shaders register themselves in global constructors
+	static CShaderLib s_shaderLib;
+	return s_shaderLib;
+}
+
+EXPOSE_INTERFACE_FN( GetShaderLib, IShaderLib, SHADERLIB_INTERFACE_VERSION );

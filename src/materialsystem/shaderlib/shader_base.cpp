@@ -30,7 +30,7 @@ CBaseShader::CBaseShader
 */
 CBaseShader::CBaseShader()
 {
-	g_ShaderLib.InsertShader( this );
+	GetShaderLib().InsertShader( this );
 }
 
 /*
@@ -144,7 +144,7 @@ void CBaseShader::R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, IShade
 			const shaderCacheInfoInternal_t& cacheInfo = cacheInfos[shaderIdx];
 			if ( cacheInfo.bValid )
 			{
-				studioBakeParams.pStudioAPIShaders[shaderIdx] = g_pShaderMgr->GetStudioAPIShader( g_ShaderLib.GetIndex(),
+				studioBakeParams.pStudioAPIShaders[shaderIdx] = g_pShaderMgr->GetStudioAPIShader( GetShaderLib().GetIndex(),
 																								  (studioAPIShaderType_t)shaderIdx,
 																								  comboInfo.cacheIndices[shaderIdx] + cacheInfo.indexOffset );
 			}
