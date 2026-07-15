@@ -1,6 +1,8 @@
 #pragma once
 #include "studiorender/istudiorender.h"
 #include "studiorender/studio_sceneview.h"
+#include "studiorender/studio_scenerendertargets.h"
+#include "studiorender/studio_renderpass_scene.h"
 #include "studiorender/studio_renderpass_present.h"
 
 //-----------------------------------------------------------------------------
@@ -23,6 +25,8 @@ public:
 
 	// Initialize and shutdown
 	virtual bool Init() override;
+	virtual bool PostInit() override;
+	virtual void PreShutdown() override;
 	virtual void Shutdown() override;
 
 	// IStudioRender interface
@@ -39,17 +43,28 @@ public:
 	virtual IStudioCmdBuffer* GetCommandBuffer() const override;
 	virtual bool			  IsInRenderThread() const override;
 
-	IStudioAPIBuffer* GetStudioAPIGlobalConstantBuffer() const;
+	CStudioRender();
+
+	IStudioAPIBuffer*				 GetStudioAPIGlobalConstantBuffer() const;
+	const CStudioSceneRenderTargets& GetSceneRenderTargets() const;
+	CStudioRenderPassBase*			 GetRenderPass( studioRenderPassType_t type ) const;
 
 private:
+	// Adds model/resource to a scene view for the render thread
 	void AddModelToSceneView( studioSceneView_t* pSceneView, studioEntityView_t* pEntityView );
 	template<class TResourceClass>
 	uint32 AddResourceToSceneView( studioSceneView_t* pSceneView, TResourceClass* pResource );
 	uint32 AddResourceToSceneView( studioSceneView_t* pSceneView, studioResourcePtr_t pPtr, studioResourceType_t type );
-	void   R_DrawScene( CStudioViewport* pViewport, studioSceneView_t* pSceneView );
 
-	CStudioRenderPassPresent  presentRenderPass;
+	// Draw scene and rebuild render pass' frame buffers
+	void R_DrawScene( CStudioViewport* pViewport, studioSceneView_t* pSceneView );
+	void R_RebuildFrameBuffers( const vector2i_t& bufferSize );
+
+	CStudioRenderPassScene	  renderPassScene;
+	CStudioRenderPassPresent  renderPassPresent;
+	CStudioSceneRenderTargets sceneRenderTargets;
 	CRefPtr<IStudioAPIBuffer> pStudioAPIGlobalConstantBuffer;
+	CStudioRenderPassBase*	  pRenderPasses[STUDIO_RENDERPASS_NUM_TYPES];
 };
 
 extern CStudioRender g_StudioRender;

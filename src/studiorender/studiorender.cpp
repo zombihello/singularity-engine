@@ -3,6 +3,7 @@
 #include "filesystem/ifilesystem.h"
 #include "resourcesystem/iresourcesystem.h"
 #include "materialsystem/ishadermgr.h"
+#include "materialsystem/imaterialsystem.h"
 #include "modelsystem/imodel.h"
 #include "modelsystem/imodelsystem.h"
 #include "studiorender/studio_renderthread.h"
@@ -15,6 +16,25 @@
 CCVar		  r_vsync( "r_vsync", "0", "Should use vertical synchronization (VSync)", CVAR_FLAG_ARCHIVE );
 CStudioRender g_StudioRender;
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CStudioRender, IStudioRender, STUDIORENDER_INTERFACE_VERSION, g_StudioRender );
+
+/*
+==================
+CStudioRender::CStudioRender
+==================
+*/
+CStudioRender::CStudioRender()
+{
+	// Initialize lookup table for render passes
+	Mem_Memzero( pRenderPasses, STUDIO_RENDERPASS_NUM_TYPES * sizeof( CStudioRenderPassBase* ) );
+	pRenderPasses[STUDIO_RENDERPASS_TYPE_SCENE]	  = &renderPassScene;
+	pRenderPasses[STUDIO_RENDERPASS_TYPE_PRESENT] = &renderPassPresent;
+#if DEBUG && ENABLE_ASSERT
+	for ( uint32 index = 0; index < STUDIO_RENDERPASS_NUM_TYPES; ++index )
+	{
+		AssertMsg( pRenderPasses[index], "Render pass for type 0x%X isn't registered", index );
+	}
+#endif	// DEBUG && ENABLE_ASSERT
+}
 
 /*
 ==================
@@ -53,6 +73,20 @@ bool CStudioRender::Connect( createInterfaceFn_t pFactory )
 		return false;
 	}
 
+	// Get the material system
+	g_pMaterialSystem = (IMaterialSystem*)pFactory( MATERIALSYSTEM_INTERFACE_VERSION );
+	if ( !g_pMaterialSystem )
+	{
+		return false;
+	}
+
+	// Get the model system
+	g_pModelSystem = (IModelSystem*)pFactory( MODELSYSTEM_INTERFACE_VERSION );
+	if ( !g_pModelSystem )
+	{
+		return false;
+	}
+
 	g_pStudioRender = this;
 	return true;
 }
@@ -72,6 +106,7 @@ void CStudioRender::Disconnect()
 	g_pStudioAPI	  = NULL;
 	g_pStudioRender	  = NULL;
 	g_pShaderMgr	  = NULL;
+	g_pMaterialSystem = NULL;
 	g_pModelSystem	  = NULL;
 	g_pResourceSystem = NULL;
 }
@@ -113,6 +148,37 @@ void CStudioRender::Shutdown()
 
 	// Release all global resources
 	CStudioGlobalRenderResources::ReleaseResources();
+}
+
+/*
+==================
+CStudioRender::PostInit
+==================
+*/
+bool CStudioRender::PostInit()
+{
+	// Initialize scene render targets and render passes
+	sceneRenderTargets.Init();
+	for ( uint32 index = 0; index < STUDIO_RENDERPASS_NUM_TYPES; ++index )
+	{
+		pRenderPasses[index]->Init();
+	}
+	return true;
+}
+
+/*
+==================
+CStudioRender::PreShutdown
+==================
+*/
+void CStudioRender::PreShutdown()
+{
+	// Shutdown render passes and scene render targets
+	for ( uint32 index = 0; index < STUDIO_RENDERPASS_NUM_TYPES; ++index )
+	{
+		pRenderPasses[index]->Shutdown();
+	}
+	sceneRenderTargets.Shutdown();
 }
 
 /*
@@ -198,17 +264,31 @@ void CStudioRender::DrawScene( IStudioViewport* pStudioViewport, IStudioScene* p
 	CStudioScene*	   pStudioSceneLocal = (CStudioScene*)pStudioScene;
 	studioSceneView_t* pSceneView		 = g_studioFrameAlloc.Construct<studioSceneView_t>();
 
+	// Reallocate scene render targets to cover the viewport
+	// and rebuild every render pass' frame buffers if it need
+	vector2i_t viewportSize = pStudioViewport->GetSize();
+	if ( sceneRenderTargets.Allocate( viewportSize.x, viewportSize.y ) )
+	{
+		// Send a command on the render thread to rebuild every render pass' frame buffers,
+		// because scene render targets has been changed
+		UNIQUE_RENDER_COMMAND_ONEPARAMETER( CStudioRenderCmd_RebuildFrameBuffers,
+											vector2i_t, bufferSize, sceneRenderTargets.GetBufferSize(),
+											{
+												g_StudioRender.R_RebuildFrameBuffers( bufferSize );
+											} );
+	}
+	vector2i_t bufferSize = sceneRenderTargets.GetBufferSize();
+
 	// Build the global shader params from the camera view
 	vector3_t					forward			   = cameraView.rotation * g_vectorForward;
 	vector3_t					up				   = cameraView.rotation * g_vectorUp;
-	vector2i_t					viewportSize	   = pStudioViewport->GetSize();
 	studioGlobalShaderParams_t& globalShaderParams = pSceneView->globalShaderParams;
 	globalShaderParams.viewMatrix				   = S_MatrixLookAt( cameraView.location, cameraView.location + forward, up );
 	globalShaderParams.projectionMatrix			   = S_MatrixPerspective( cameraView.fieldOfView, cameraView.aspectRatio, cameraView.nearClipPlane, cameraView.farClipPlane );
 	globalShaderParams.viewProjectionMatrix		   = globalShaderParams.projectionMatrix * globalShaderParams.viewMatrix;
 	globalShaderParams.invViewProjectionMatrix	   = S_MatrixInverse( globalShaderParams.viewProjectionMatrix );
 	globalShaderParams.position					   = vector4_t( cameraView.location, 1.f );
-	globalShaderParams.screenAndBufferSize		   = vector4_t( (float)viewportSize.x, (float)viewportSize.y, (float)viewportSize.x, (float)viewportSize.y );
+	globalShaderParams.screenAndBufferSize		   = vector4_t( (float)viewportSize.x, (float)viewportSize.y, (float)bufferSize.x, (float)bufferSize.y );
 
 	// Find all visible entities, after that creates entity views for them
 	pStudioSceneLocal->FindEntityViews( pSceneView );
@@ -275,7 +355,7 @@ void CStudioRender::AddModelToSceneView( studioSceneView_t* pSceneView, studioEn
 		pDrawSurface->numIndices		   = surface.numIndices;
 
 		// Add the draw surface into the scene view and render passes
-		studioRenderPass_t& renderPassPresent = pSceneView->renderPasses[STUDIO_RENDERPASS_TYPE_PRESENT];
+		studioRenderPass_t& renderPassPresent = pSceneView->renderPasses[STUDIO_RENDERPASS_TYPE_SCENE];
 		uint32				drawSurfaceId	  = (uint32)pSceneView->drawSurfaces.size();
 		pSceneView->drawSurfaces.emplace_back( pDrawSurface );
 		renderPassPresent.drawSurfaceIds.emplace_back( drawSurfaceId );
@@ -286,19 +366,45 @@ void CStudioRender::AddModelToSceneView( studioSceneView_t* pSceneView, studioEn
 
 /*
 ==================
+CStudioRender::R_RebuildFrameBuffers
+==================
+*/
+void CStudioRender::R_RebuildFrameBuffers( const vector2i_t& bufferSize )
+{
+	// Rebuild render pass' frame buffers
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	Assert( Studio_IsInRenderThread() );
+	for ( uint32 index = 0; index < STUDIO_RENDERPASS_NUM_TYPES; ++index )
+	{
+		pRenderPasses[index]->R_RebuildFrameBuffers( bufferSize );
+	}
+}
+
+/*
+==================
 CStudioRender::R_DrawScene
 ==================
 */
 void CStudioRender::R_DrawScene( CStudioViewport* pViewport, studioSceneView_t* pSceneView )
 {
-	// Update the global constant buffer from the scene view's global params
+	// Do nothing if the swap chain hasn't an acquired image
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( Studio_IsInRenderThread() );
+	IStudioAPISwapChain* pStudioAPISwapChain = pViewport->GetStudioAPISwapChain();
+	if ( !pStudioAPISwapChain->IsImageAcquired() )
+	{
+		return;
+	}
+
+	// Update the global constant buffer from the scene view's global params
 	pStudioAPIGlobalConstantBuffer->UpdateData( g_pStudioAPI->GetImmediateCmdContext( STUDIOAPI_QUEUE_TYPE_GRAPHICS ),
 												(byte*)&pSceneView->globalShaderParams, sizeof( studioGlobalShaderParams_t ) );
 
-	// Draw the present render pass
-	presentRenderPass.R_DrawPass( pViewport, pSceneView );
+	// Draw render passes
+	for ( uint32 index = 0; index < STUDIO_RENDERPASS_NUM_TYPES; ++index )
+	{
+		pRenderPasses[index]->R_DrawPass( pViewport, pSceneView );
+	}
 }
 
 /*

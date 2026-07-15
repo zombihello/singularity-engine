@@ -128,7 +128,7 @@ bool CMaterialSystem::Init()
 		studioAPISamplerInfo.maxLod						  = S_MaxValue<float>();
 
 		pDefaultTexture = pTexturesMgr->CreateResource( "__default" );
-		pDefaultTexture->Init( STUDIOAPI_TEXTURE_TYPE_2D, STUDIOAPI_PIXEL_FORMAT_RGBA8, 1, &mipmap0, 1, studioAPISamplerInfo, data, ARRAYSIZE( data ) );
+		pDefaultTexture->Init( STUDIOAPI_TEXTURE_TYPE_2D, STUDIOAPI_PIXEL_FORMAT_RGBA8, 1, &mipmap0, 1, STUDIOAPI_TEXTURE_USAGE_FLAG_TEXTURE, studioAPISamplerInfo, data, ARRAYSIZE( data ) );
 	}
 	pTexturesMgr->SetDefaultResource( pDefaultTexture );
 

@@ -43,3 +43,24 @@ FORCEINLINE IStudioAPIBuffer* CStudioRender::GetStudioAPIGlobalConstantBuffer() 
 {
 	return pStudioAPIGlobalConstantBuffer;
 }
+
+/*
+==================
+CStudioRender::GetSceneRenderTargets
+==================
+*/
+FORCEINLINE const CStudioSceneRenderTargets& CStudioRender::GetSceneRenderTargets() const
+{
+	return sceneRenderTargets;
+}
+
+/*
+==================
+CStudioRender::GetSceneRenderTargets
+==================
+*/
+FORCEINLINE CStudioRenderPassBase* CStudioRender::GetRenderPass( studioRenderPassType_t type ) const
+{
+	Assert( type < STUDIO_RENDERPASS_NUM_TYPES );
+	return pRenderPasses[(uint32)type];
+}

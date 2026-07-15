@@ -16,12 +16,13 @@ public:
 	virtual uint32				   GetSizeY() const override;
 	virtual uint32				   GetSizeZ() const override;
 	virtual uint32				   GetNumLayers() const override;
+	virtual uint32				   GetUsageFlags() const override;
 	virtual IStudioAPITexture*	   GetStudioAPITexture() const override;
 	virtual IStudioAPISampler*	   GetStudioAPISampler() const override;
 
 	CTextureResource();
 
-	void				   Update( studioAPITextureType_t type, studioAPIPixelFormat_t pixelFormat, uint32 sizeX, uint32 sizeY, uint32 sizeZ, uint32 numLayers, uint32 numMipmaps, const studioAPISamplerCreateInfo_t& samplerInfo, const byte* pData = NULL, uint32 dataSize = 0 );
+	void				   Update( studioAPITextureType_t type, studioAPIPixelFormat_t pixelFormat, uint32 sizeX, uint32 sizeY, uint32 sizeZ, uint32 numLayers, uint32 numMipmaps, uint32 usageFlags, const studioAPISamplerCreateInfo_t& samplerInfo, const byte* pData = NULL, uint32 dataSize = 0 );
 	void				   Clear();
 	CStudioRenderCmdFence& GetRenderCmdFence();
 
@@ -36,6 +37,7 @@ private:
 
 	studioAPITextureType_t		 type;
 	studioAPIPixelFormat_t		 pixelFormat;
+	uint32						 usageFlags;
 	studioAPISamplerCreateInfo_t studioAPISamplerCreateInfo;
 	uint32						 sizeX;
 	uint32						 sizeY;
@@ -55,11 +57,12 @@ class CTexture : public CResourceData<ITexture>
 {
 public:
 	// ITexture interface
-	virtual void Init( studioAPITextureType_t type, studioAPIPixelFormat_t pixelFormat, uint32 numLayers, const textureMipMap_t* pMipmaps, uint32 numMipmaps, const studioAPISamplerCreateInfo_t& samplerInfo, const byte* pData = NULL, uint32 dataSize = 0 ) override;
+	virtual void Init( studioAPITextureType_t type, studioAPIPixelFormat_t pixelFormat, uint32 numLayers, const textureMipMap_t* pMipmaps, uint32 numMipmaps, uint32 usageFlags, const studioAPISamplerCreateInfo_t& samplerInfo, const byte* pData = NULL, uint32 dataSize = 0 ) override;
 	virtual void Destroy() override;
 
 	virtual studioAPITextureType_t GetType() const override;
 	virtual studioAPIPixelFormat_t GetPixelFormat() const override;
+	virtual uint32				   GetUsageFlags() const override;
 	virtual uint32				   GetNumMips() const override;
 	virtual const textureMipMap_t& GetMip( uint32 mipLevel ) const override;
 	virtual uint32				   GetNumLayers() const override;
@@ -71,6 +74,7 @@ public:
 private:
 	studioAPITextureType_t		   type;
 	studioAPIPixelFormat_t		   pixelFormat;
+	uint32						   usageFlags;
 	uint32						   numLayers;
 	CRefPtr<CTextureResource>	   pStudioResource;
 	eastl::vector<textureMipMap_t> mipmaps;

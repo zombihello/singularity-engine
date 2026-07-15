@@ -1,26 +1,17 @@
 #pragma once
-#include "materialsystem/imaterial.h"
-
-//-----------------------------------------------------------------------------
-// Forward declarations
-//-----------------------------------------------------------------------------
-class IStudioAPIBoundShaderState;
-class IStudioAPIRenderPipeline;
-class IStudioAPISwapChain;
-class CStudioViewport;
-struct studioSceneView_t;
-struct studioDrawSurface_t;
+#include "studiorender/studio_renderpass_base.h"
 
 //-----------------------------------------------------------------------------
 // Studio present render pass
 //-----------------------------------------------------------------------------
-class CStudioRenderPassPresent
+class CStudioRenderPassPresent : public CStudioRenderPassBase
 {
 public:
-	void R_DrawPass( CStudioViewport* pViewport, studioSceneView_t* pSceneView );
+	// CStudioRenderPassBase interface
+	virtual void Init() override;
+	virtual void Shutdown() override;
 
-	static CRefPtr<IStudioAPIRenderPipeline> R_CreateStudioAPIRenderPipeline( CStudioViewport* pViewport, IStudioAPIBoundShaderState* pStudioAPIBoundShaderState );
-	static bool								 ShouldDrawSurfaceInPass( studioDrawSurface_t* pDrawSurface );
+	virtual void							  R_DrawPass( CStudioViewport* pViewport, studioSceneView_t* pSceneView ) const override;
+	virtual void							  R_RebuildFrameBuffers( const vector2i_t& bufferSize ) override;
+	virtual CRefPtr<IStudioAPIRenderPipeline> R_CreateStudioAPIRenderPipeline( CStudioViewport* pViewport, IStudioAPIBoundShaderState* pStudioAPIBoundShaderState ) const override;
 };
-
-#include "studiorender/studio_renderpass_present.inl"

@@ -1,7 +1,7 @@
 #include "pch_studiorender.h"
 #include "studiorender/studio_viewport.h"
 #include "studiorender/studio_renderthread.h"
-#include "studiorender/studio_renderpass_present.h"
+#include "studiorender/studiorender.h"
 #include "studiorender/studio_renderpipelineset.h"
 
 /*
@@ -164,21 +164,11 @@ IStudioAPIRenderPipeline* CStudioRenderPipelineSet::CRenderPipelineContainer::R_
 																												 bakeParams.pStudioAPIShaders[STUDIOAPI_SHADER_TYPE_HULL],
 																												 bakeParams.pStudioAPIShaders[STUDIOAPI_SHADER_TYPE_DOMAIN],
 																												 bakeParams.pStudioAPIShaders[STUDIOAPI_SHADER_TYPE_GEOMETRY] );
-	CRefPtr<IStudioAPIRenderPipeline>	pStudioAPIRenderPipeline;
-	switch ( renderPassType )
-	{
-		// Present
-	case STUDIO_RENDERPASS_TYPE_PRESENT:
-		pStudioAPIRenderPipeline = CStudioRenderPassPresent::R_CreateStudioAPIRenderPipeline( pActiveViewport, pStudioAPIBoundShaderState );
-		break;
-
-		// Unknown render pass type
-	default:
-		Sys_Error( "Unknown render pass type 0x%X", renderPassType );
-		break;
-	}
-
-	( *pStudioAPIRenderPipelines )[bakeParams.pipelineIdx] = pStudioAPIRenderPipeline;
+	// Create a render pipeline for the render pass
+	CStudioRenderPassBase* pRenderPass = g_StudioRender.GetRenderPass( renderPassType );
+	AssertMsg( pRenderPass, "No render pass registered for render pass type 0x%X", renderPassType );
+	CRefPtr<IStudioAPIRenderPipeline> pStudioAPIRenderPipeline = pRenderPass->R_CreateStudioAPIRenderPipeline( pActiveViewport, pStudioAPIBoundShaderState );
+	( *pStudioAPIRenderPipelines )[bakeParams.pipelineIdx]	   = pStudioAPIRenderPipeline;
 	return pStudioAPIRenderPipeline;
 }
 
