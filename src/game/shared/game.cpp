@@ -197,12 +197,12 @@ void CGame::FrameDraw( IStudioViewport* pStudioViewport )
 		// TODO BS yehor.pohuliaka - Hardcoded camera until game-logic camera control is implemented
 		vector2i_t		   viewportSize		= pStudioViewport->GetSize();
 		studioCameraView_t studioCameraView = {};
-		studioCameraView.location			= vector3_t( 0.f, 200.f, -550.f );
-		studioCameraView.rotation			= g_quaternionIdentity;
-		studioCameraView.fieldOfView		= 90.f;
-		studioCameraView.nearClipPlane		= 1.f;
-		studioCameraView.farClipPlane		= 10000.f;
-		studioCameraView.aspectRatio		= (float)viewportSize.x / (float)viewportSize.y;
+		studioCameraView.location			= vector3_t( -200.f, 250.f, -550.f );
+		S_AnglesToQuaternionYZX( vector3_t( 20.f, 25.f, 0.f ), studioCameraView.rotation );
+		studioCameraView.fieldOfView   = 90.f;
+		studioCameraView.nearClipPlane = 1.f;
+		studioCameraView.farClipPlane  = 10000.f;
+		studioCameraView.aspectRatio   = (float)viewportSize.x / (float)viewportSize.y;
 		g_pStudioRender->DrawScene( pStudioViewport, pActiveEcsMap->GetStudioScene(), studioCameraView );
 	}
 }

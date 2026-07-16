@@ -14,6 +14,7 @@ CModelLoader::Load
 */
 bool CModelLoader::Load( const char* pPath, IResourceData* pData ) const
 {
+	PROFILER_SCOPE_FUNC();
 	Assert( pData );
 	CSMDLCompiledModelDoc smdlCompiledModelDoc;
 	if ( !smdlCompiledModelDoc.LoadFromFile( S_GetFileExtension( pPath ) ? pPath : S_Sprintf( "%s.smdl_c", pPath ).c_str() ) )

@@ -11,6 +11,7 @@ CTextureLoader::Load
 */
 bool CTextureLoader::Load( const char* pPath, IResourceData* pData ) const
 {
+	PROFILER_SCOPE_FUNC();
 	Assert( pData );
 	CSTEXCompiledTextureDoc stexCompiledTextureDoc;
 	if ( !stexCompiledTextureDoc.LoadFromFile( S_GetFileExtension( pPath ) ? pPath : S_Sprintf( "%s.stex_c", pPath ).c_str() ) )

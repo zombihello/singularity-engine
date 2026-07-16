@@ -136,8 +136,12 @@ bool CMaterialSystem::Init()
 	CResourcePtr<CMaterial> pDefaultMaterial = pMaterialsMgr->LoadResource( "__default", "//core/materials/default" );
 	if ( !pDefaultMaterial )
 	{
-		pDefaultMaterial = pMaterialsMgr->CreateResource( "__default" );
-		pDefaultMaterial->SetShader( "wireframe" );
+		materialInitialData_t defaultMatInitialData = {};
+		defaultMatInitialData.pShaderName			= "wireframe";
+		defaultMatInitialData.numVars				= 0;
+		defaultMatInitialData.pVars					= NULL;
+		pDefaultMaterial							= pMaterialsMgr->CreateResource( "__default" );
+		pDefaultMaterial->Init( defaultMatInitialData );
 	}
 	pMaterialsMgr->SetDefaultResource( pDefaultMaterial );
 	return true;

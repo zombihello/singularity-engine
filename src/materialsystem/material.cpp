@@ -1,8 +1,6 @@
 #include "pch_materialsystem.h"
 #include "tier1/filetools.h"
-#include "resourcesystem/iresourcesystem.h"
 #include "materialsystem/ishader.h"
-#include "materialsystem/texture.h"
 #include "materialsystem/materialvar.h"
 #include "materialsystem/material.h"
 
@@ -87,24 +85,11 @@ CMaterial::CMaterial
 CMaterial::CMaterial( IResource* pResource )
 	: CResourceData<IMaterial>( pResource )
 	, bDirtyStudioResource( false )
+	, bDirtyDependencies( false )
+	, bBatchDependencies( false )
 	, pShader( NULL )
 	, pStudioResource( new CMaterialResource() )
 {
-}
-
-/*
-==================
-CMaterial::CMaterial
-==================
-*/
-CMaterial::CMaterial( IResource* pResource, const CSMATCompiledMaterialDoc& smatCompiledDoc )
-	: CResourceData<IMaterial>( pResource )
-	, bDirtyStudioResource( false )
-	, pShader( NULL )
-	, pStudioResource( new CMaterialResource() )
-{
-	// Initialize the material by SMAT compiled document
-	Init( smatCompiledDoc );
 }
 
 /*
@@ -129,72 +114,61 @@ CMaterial::~CMaterial()
 CMaterial::Init
 ==================
 */
-void CMaterial::Init( const CSMATCompiledMaterialDoc& smatCompiledDoc )
+void CMaterial::Init( const materialInitialData_t& initialData )
 {
-	// Set a shader from the SMAT compiled file
-	SetShader( smatCompiledDoc.GetShaderName() );
-
-	// Set material variable from the SMAT file
-	IResourceTypeMgr*					   pTexturesMgr	 = g_pResourceSystem->GetResourceManagerForType<CTexture>();
-	IResourceTypeMgr*					   pMaterialsMgr = g_pResourceSystem->GetResourceManagerForType<CMaterial>();
-	const eastl::vector<CSMATMaterialVar>& smatMatVars	 = smatCompiledDoc.GetVars();
-	for ( uint32 varIdx = 0, count = (uint32)smatMatVars.size(); varIdx < count; ++varIdx )
+	PROFILER_SCOPE_FUNC();
 	{
-		const CSMATMaterialVar& smatMatVar = smatMatVars[varIdx];
-		CMaterialVar*			pVar	   = (CMaterialVar*)FindVar( smatMatVar.GetName() );
-		if ( pVar )
-		{
-			switch ( smatMatVar.GetType() )
-			{
-			case SMAT_MATERIAL_VAR_TYPE_BOOL: pVar->SetBoolValue( smatMatVar.GetBoolValue() ); break;
-			case SMAT_MATERIAL_VAR_TYPE_INT: pVar->SetIntValue( smatMatVar.GetIntValue() ); break;
-			case SMAT_MATERIAL_VAR_TYPE_FLOAT: pVar->SetFloatValue( smatMatVar.GetFloatValue() ); break;
-			case SMAT_MATERIAL_VAR_TYPE_MATRIX: pVar->SetMatrixValue( smatMatVar.GetMatrixValue() ); break;
-			case SMAT_MATERIAL_VAR_TYPE_STRING: pVar->SetStringValue( smatMatVar.GetStringValue() ); break;
-			case SMAT_MATERIAL_VAR_TYPE_TEXTURE: pVar->SetTextureValue( pTexturesMgr->LoadResource( smatMatVar.GetTextureValue() ) ); break;
-			case SMAT_MATERIAL_VAR_TYPE_MATERIAL: pVar->SetMaterialValue( pMaterialsMgr->LoadResource( smatMatVar.GetMaterialValue() ) ); break;
-			case SMAT_MATERIAL_VAR_TYPE_VECTOR_2D:
-			{
-				vector2_t value = { 0.f, 0.f };
-				smatMatVar.GetVecValue( &value.x, 2 );
-				pVar->SetVecValue( &value.x, 2 );
-				break;
-			}
-			case SMAT_MATERIAL_VAR_TYPE_VECTOR_3D:
-			{
-				vector3_t value = { 0.f, 0.f, 0.f };
-				smatMatVar.GetVecValue( &value.x, 3 );
-				pVar->SetVecValue( &value.x, 3 );
-				break;
-			}
-			case SMAT_MATERIAL_VAR_TYPE_VECTOR_4D:
-			{
-				vector4_t value = { 0.f, 0.f, 0.f, 0.f };
-				smatMatVar.GetVecValue( &value.x, 4 );
-				pVar->SetVecValue( &value.x, 4 );
-				break;
-			}
+		// Batch all the dependency changes below into a single rebuild
+		CGuardValue<bool> batchDependenciesGuardValue( bBatchDependencies, true );
 
-			default:
-				Warning( "MaterialSystem: Unknown variable type 0x%X (shader '%s', variable '%s')", smatMatVar.GetType(), smatCompiledDoc.GetShaderName(), smatMatVar.GetName() );
-				break;
-			}
-		}
-		else
+		// Set a shader from the initial data
+		SetShader( initialData.pShaderName );
+
+		// Set material variable from the initial data
+		for ( uint32 varIdx = 0; varIdx < initialData.numVars; ++varIdx )
 		{
-			Warning( "MaterialSystem: Invalid variable '%s', it isn't defined in shader '%s'", smatMatVar.GetName(), pShader->GetName() );
+			const materialVarInfo_t& matVarInfo = initialData.pVars[varIdx];
+			CMaterialVar*			 pVar		= (CMaterialVar*)FindVar( matVarInfo.pName );
+			if ( pVar )
+			{
+				switch ( matVarInfo.type )
+				{
+				case MATERIALVAR_TYPE_BOOL: pVar->SetBoolValue( matVarInfo.boolValue ); break;
+				case MATERIALVAR_TYPE_INT: pVar->SetIntValue( matVarInfo.intValue ); break;
+				case MATERIALVAR_TYPE_FLOAT: pVar->SetFloatValue( matVarInfo.floatValue ); break;
+				case MATERIALVAR_TYPE_VECTOR_2D: pVar->SetVecValue( &matVarInfo.vector2DValue.x, 2 ); break;
+				case MATERIALVAR_TYPE_VECTOR_3D: pVar->SetVecValue( &matVarInfo.vector3DValue.x, 3 ); break;
+				case MATERIALVAR_TYPE_VECTOR_4D: pVar->SetVecValue( &matVarInfo.vector4DValue.x, 4 ); break;
+				case MATERIALVAR_TYPE_MATRIX: pVar->SetMatrixValue( matVarInfo.matrixValue ); break;
+				case MATERIALVAR_TYPE_STRING: pVar->SetStringValue( matVarInfo.pStringValue ); break;
+				case MATERIALVAR_TYPE_TEXTURE: pVar->SetTextureValue( matVarInfo.pResourceValue ); break;
+				case MATERIALVAR_TYPE_MATERIAL: pVar->SetMaterialValue( matVarInfo.pResourceValue ); break;
+				default:
+					Warning( "MaterialSystem: Unknown variable type 0x%X (shader '%s', variable '%s')", matVarInfo.type, pShader->GetName(), matVarInfo.pName );
+					break;
+				}
+			}
+			else
+			{
+				Warning( "MaterialSystem: Invalid variable '%s', it isn't defined in shader '%s'", matVarInfo.pName, pShader->GetName() );
+			}
 		}
 	}
+
+	// Rebuild the dependency list once for all the changes above
+	// NOTE: The batch guard must be released before it, otherwise the rebuild will be skipped
+	UpdateDependencies();
 }
 
 /*
 ==================
-CMaterial::Clear
+CMaterial::Destroy
 ==================
 */
-void CMaterial::Clear()
+void CMaterial::Destroy()
 {
 	// Clear the studio resource
+	PROFILER_SCOPE_FUNC();
 	ClearStudioResource();
 
 	// Free allocated memory for variables
@@ -209,6 +183,10 @@ void CMaterial::Clear()
 	varsDict.clear();
 	pShader				 = NULL;
 	bDirtyStudioResource = false;
+
+	// Rebuild the dependency list, since the material doesn't reference any resource anymore
+	bDirtyDependencies = true;
+	UpdateDependencies();
 }
 
 /*
@@ -247,6 +225,7 @@ CMaterial::ReportVarChanged
 void CMaterial::ReportVarChanged( CMaterialVar* pVar, materialVarType_t oldType )
 {
 	// Update resource var indices if the type has been changed
+	PROFILER_SCOPE_FUNC();
 	bool bOldResourceVarType = CMaterialVar::IsResourceVarType( oldType );
 	bool bNewResourceVarType = CMaterialVar::IsResourceVarType( pVar->GetType() );
 	if ( bNewResourceVarType != bOldResourceVarType )
@@ -272,11 +251,12 @@ void CMaterial::ReportVarChanged( CMaterialVar* pVar, materialVarType_t oldType 
 		}
 	}
 
-	// Rebuild the dependency list, since the resource this var references may
-	// have changed even when its type (and therefore `resourceVarIds`) didn't
-	if ( bNewResourceVarType )
+	// Rebuild the dependency list if the var references a resource or has just stopped referencing one.
+	// NOTE: The resource the var references may change even when its type (and therefore `resourceVarIds`) didn't
+	if ( bNewResourceVarType || bOldResourceVarType )
 	{
-		GetResource()->RebuildDependencies();
+		bDirtyDependencies = true;
+		UpdateDependencies();
 	}
 
 	// Insert a fence to the render thread and mark the studio resource as dirty
@@ -304,6 +284,25 @@ void CMaterial::UpdateStudioResource()
 
 	// Update the studio resource
 	pStudioResource->Update( pShader, vars.data() );
+}
+
+/*
+==================
+CMaterial::UpdateDependencies
+==================
+*/
+void CMaterial::UpdateDependencies()
+{
+	// Do nothing if the dependency list isn't dirty or the changes are batched
+	PROFILER_SCOPE_FUNC();
+	if ( !bDirtyDependencies || bBatchDependencies )
+	{
+		return;
+	}
+	bDirtyDependencies = false;
+
+	// Re-collect the dependency list from the current resource vars
+	GetResource()->RebuildDependencies();
 }
 
 /*
@@ -336,9 +335,9 @@ CMaterial::SetShader
 */
 void CMaterial::SetShader( const char* pShaderName )
 {
-	// Clear the material
+	// Destroy the material
 	PROFILER_SCOPE_FUNC();
-	Clear();
+	Destroy();
 
 	// Keep going until there's no more fallbacks
 	const char* pCurrentShaderName = pShaderName;
@@ -388,6 +387,10 @@ void CMaterial::SetShader( const char* pShaderName )
 	// Insert a fence to the render thread and mark the studio resource as dirty
 	pStudioResource->GetRenderCmdFence().InsertFence();
 	bDirtyStudioResource = true;
+
+	// Rebuild the dependency list, since the resource vars have been recreated
+	bDirtyDependencies = true;
+	UpdateDependencies();
 }
 
 /*
@@ -397,6 +400,7 @@ CMaterial::FindVar
 */
 IMaterialVar* CMaterial::FindVar( const char* pName ) const
 {
+	PROFILER_SCOPE_FUNC();
 	auto it = varsDict.find( pName );
 	if ( it != varsDict.end() )
 	{

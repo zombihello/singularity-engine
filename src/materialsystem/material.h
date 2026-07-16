@@ -1,5 +1,4 @@
 #pragma once
-#include "utils/smatdoc/smat_compiled_doc.h"
 #include "materialsystem/ishader.h"
 #include "materialsystem/imaterialvar.h"
 #include "materialsystem/imaterial.h"
@@ -44,7 +43,8 @@ public:
 	virtual void CollectDependencies( IResourceDependencyCollector* pCollector ) const override;
 
 	// IMaterial interface
-	virtual void		  SetShader( const char* pShaderName ) override;
+	virtual void		  Init( const materialInitialData_t& initialData ) override;
+	virtual void		  Destroy() override;
 	virtual IMaterialVar* FindVar( const char* pName ) const override;
 
 	virtual uint32			   GetNumVars() const override;
@@ -54,20 +54,21 @@ public:
 	virtual IMaterialResource* GetStudioResource() const override;
 
 	CMaterial( IResource* pResource );
-	CMaterial( IResource* pResource, const CSMATCompiledMaterialDoc& smatCompiledDoc );
 	~CMaterial();
 
-	void Init( const CSMATCompiledMaterialDoc& smatCompiledDoc );
-	void Clear();
 	void ReportVarChanged( CMaterialVar* pVar, materialVarType_t oldType );
 
 private:
 	typedef eastl::unordered_map<const char*, uint32, stlInsensitiveStringHash_t, stlInsensitiveCompareString_t> materialVarsDict_t;
 
+	void SetShader( const char* pShaderName );
 	void UpdateStudioResource();
+	void UpdateDependencies();
 	void ClearStudioResource();
 
 	bool						 bDirtyStudioResource;
+	bool						 bDirtyDependencies;
+	bool						 bBatchDependencies;
 	IShader*					 pShader;
 	eastl::vector<CMaterialVar*> vars;
 	eastl::vector<uint32>		 resourceVarIds;
