@@ -12,7 +12,8 @@ class CStudioAPIVertexDeclarationVk : public CRefCounted<IStudioAPIVertexDeclara
 public:
 	CStudioAPIVertexDeclarationVk( const studioAPIVertexInputBuffer_t* pVertexInputBuffers, uint32 numVertexInputBuffers, const studioAPIVertexInputAttribute_t* pVertexInputAttributes, uint32 numVertexInputAttributes );
 
-	const VkPipelineVertexInputStateCreateInfo& GetVkPipelineVertexInputStateInfo() const;
+	const VkPipelineVertexInputStateCreateInfo&		   GetVkPipelineVertexInputStateInfo() const;
+	static const VkPipelineVertexInputStateCreateInfo& GetVkEmptyPipelineVertexInputStateInfo();
 
 private:
 	VkPipelineVertexInputStateCreateInfo			 vkPipelineVertexInputStateInfo;

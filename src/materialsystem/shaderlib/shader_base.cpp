@@ -138,7 +138,7 @@ void CBaseShader::R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, IShade
 		studioBakeRenderPipelineParams_t studioBakeParams = {};
 		studioBakeParams.pipelineIdx					  = pipelineIdx;
 		studioBakeParams.renderPassType					  = renderPassType;
-		studioBakeParams.pVertexDeclaration				  = pVertexFactory->GetStudioAPIVertexDeclaration();
+		studioBakeParams.pVertexDeclaration				  = pVertexFactory ? pVertexFactory->GetStudioAPIVertexDeclaration() : NULL;
 		for ( uint32 shaderIdx = 0; shaderIdx < STUDIOAPI_SHADER_NUM_DRAW_TYPES; ++shaderIdx )
 		{
 			const shaderCacheInfoInternal_t& cacheInfo = cacheInfos[shaderIdx];

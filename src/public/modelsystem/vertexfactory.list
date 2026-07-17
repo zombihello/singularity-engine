@@ -1,6 +1,6 @@
 // vertexfactories
 // {
-//		<factory_name>					// 'all' forbidden as an actual factory name
+//		<factory_name>					// 'all', 'none' are forbidden as an actual factory names
 //		{
 //			index	<global_index>		// Must match modelVertexType_t
 //			source	<source_path>.hlsl	// Path to the implementation, relative to this file

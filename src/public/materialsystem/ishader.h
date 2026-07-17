@@ -88,6 +88,7 @@ public:
 	virtual void						UpdateContextData( IMaterialVar** pParams, IShaderContextData* pContextData ) const = 0;
 
 	// Place barriers into a command list
+	// NOTE: `pVertexFactory` can be NULL when the shader generates its own geometry
 	virtual void R_Barrier( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData ) const																		   = 0;
 	virtual void R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData, IVertexFactory* pVertexFactory, studioRenderPassType_t renderPassType ) = 0;
 

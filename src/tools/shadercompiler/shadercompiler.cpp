@@ -29,9 +29,19 @@ static_assert( SHADER_COMPILER_MODE_NUM == ARRAYSIZE( s_pShaderCompilerModeNames
 
 // Table of system shader flag names
 static const char* s_pShaderSystemFlagNames[] = {
-	"VERTEXFACTORY"  // SHADER_SYSTEM_FLAG_VERTEXFACTORY
+	"VERTEXFACTORY"	 // SHADER_SYSTEM_FLAG_VERTEXFACTORY
 };
 static_assert( SHADER_SYSTEM_FLAG_NUM == ARRAYSIZE( s_pShaderSystemFlagNames ), "Array size 's_pShaderSystemFlagNames' must be equal to SHADER_SYSTEM_FLAG_NUM" );
+
+// Table of vertex factory key words
+static const char* s_pVertexFactoryKeyWords[] = {
+	"all",	// VERTEXFACTORY_KEYWORD_ALL
+	"none"	// VERTEXFACTORY_KEYWORD_NONE
+};
+static_assert( ARRAYSIZE( s_pVertexFactoryKeyWords ) == VERTEXFACTORY_NUM_KEYWORDS, "Array size 's_pVertexFactoryKeyWords' must be equal to VERTEXFACTORY_NUM_KEYWORDS" );
+
+// Vertex factory 'none'
+const vertexFactory_t vertexFactory_t::s_none = { ConvVertexFactoryKeyWordToString( VERTEXFACTORY_KEYWORD_NONE ), "", (uint32)INVALID_INDEX };
 
 /*
 ==================
@@ -60,10 +70,10 @@ bool ConvStringToShaderType( const char* pShaderTypeName, studioAPIShaderType_t&
 ConvShaderTypeToString
 ==================
 */
-void ConvShaderTypeToString( studioAPIShaderType_t shaderType, const char*& pShaderTypeName )
+const char* ConvShaderTypeToString( studioAPIShaderType_t shaderType )
 {
 	Assert( shaderType < STUDIOAPI_SHADER_NUM_TYPES );
-	pShaderTypeName = s_pShaderTypeNames[(uint32)shaderType];
+	return s_pShaderTypeNames[(uint32)shaderType];
 }
 
 /*
@@ -93,10 +103,10 @@ bool ConvStringToShaderCompilerMode( const char* pShaderCompilerModeName, shader
 ConvShaderCompilerModeToString
 ==================
 */
-void ConvShaderCompilerModeToString( shaderCompilerMode_t shaderCompilerMode, const char*& pShaderCompilerModeName )
+const char* ConvShaderCompilerModeToString( shaderCompilerMode_t shaderCompilerMode )
 {
 	Assert( shaderCompilerMode < SHADER_COMPILER_MODE_NUM );
-	pShaderCompilerModeName = s_pShaderCompilerModeNames[(uint32)shaderCompilerMode];
+	return s_pShaderCompilerModeNames[(uint32)shaderCompilerMode];
 }
 
 /*
@@ -108,6 +118,39 @@ const char* ConvShaderSystemFlagToString( shaderSystemFlag_t systemFlag )
 {
 	Assert( systemFlag < SHADER_SYSTEM_FLAG_NUM );
 	return s_pShaderSystemFlagNames[(uint32)systemFlag];
+}
+
+/*
+==================
+ConvStringToVertexFactoryKeyWord
+==================
+*/
+bool ConvStringToVertexFactoryKeyWord( const char* pKeyWordName, vertexFactoryKeyWord_t& keyWord )
+{
+	for ( uint32 index = 0; index < ARRAYSIZE( s_pVertexFactoryKeyWords ); ++index )
+	{
+		if ( !S_Stricmp( pKeyWordName, s_pVertexFactoryKeyWords[index] ) )
+		{
+			// We found! Return current keyword
+			keyWord = (vertexFactoryKeyWord_t)index;
+			return true;
+		}
+	}
+
+	// We not found, return invalid keyword
+	keyWord = VERTEXFACTORY_NUM_KEYWORDS;
+	return false;
+}
+
+/*
+==================
+ConvVertexFactoryKeyWordToString
+==================
+*/
+const char* ConvVertexFactoryKeyWordToString( vertexFactoryKeyWord_t keyWord )
+{
+	Assert( keyWord < VERTEXFACTORY_NUM_KEYWORDS );
+	return s_pVertexFactoryKeyWords[(uint32)keyWord];
 }
 
 //-----------------------------------------------------------------------------
@@ -315,15 +358,11 @@ bool CShaderCompilerApp::GenerateShaderCppClass()
 		eastl::string shaderName;
 		eastl::string filePath;
 		{
-			// Convert shader type to string
-			const char* pShaderTypeName;
-			ConvShaderTypeToString( shader.type, pShaderTypeName );
-
 			// Get shader name from source file name
 			S_GetFileBaseName( shader.source, shaderName, false );
 
 			// Get file path
-			filePath = S_Sprintf( "%s/%s_%s.gen.h", outputPath.c_str(), shaderName.c_str(), pShaderTypeName );
+			filePath = S_Sprintf( "%s/%s_%s.gen.h", outputPath.c_str(), shaderName.c_str(), ConvShaderTypeToString( shader.type ) );
 			S_FixPathSeparators( filePath );
 		}
 

@@ -14,6 +14,7 @@ FORCEINLINE CShaderCompilerEnvironment::CShaderCompilerEnvironment( studioAPISha
 	defines.insert( eastl::make_pair( "GEOMETRY_SHADER", type == STUDIOAPI_SHADER_TYPE_GEOMETRY ? "1" : "0" ) );
 	defines.insert( eastl::make_pair( "PIXEL_SHADER", type == STUDIOAPI_SHADER_TYPE_PIXEL ? "1" : "0" ) );
 	defines.insert( eastl::make_pair( "COMPUTE_SHADER", type == STUDIOAPI_SHADER_TYPE_COMPUTE ? "1" : "0" ) );
+	defines.insert( eastl::make_pair( "USE_VERTEXFACTORY", "0" ) );
 }
 
 /*
@@ -67,4 +68,5 @@ CShaderCompilerEnvironment::SetVertexFactoryFile
 FORCEINLINE void CShaderCompilerEnvironment::SetVertexFactoryFile( const char* pPath )
 {
 	vertexFactoryFile = pPath;
+	AddDefine( "USE_VERTEXFACTORY", !vertexFactoryFile.empty() ? "1" : "0" );
 }

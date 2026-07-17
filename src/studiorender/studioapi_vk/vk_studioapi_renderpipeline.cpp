@@ -329,7 +329,7 @@ CStudioAPIRenderPipelineVk::CStudioAPIRenderPipelineVk( const studioAPIRenderPip
 	vkGraphicsPipelineCreateInfo.sType						  = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 	vkGraphicsPipelineCreateInfo.stageCount					  = (uint32)vkPipelineShaderStageCreateInfos.size();
 	vkGraphicsPipelineCreateInfo.pStages					  = vkPipelineShaderStageCreateInfos.data();
-	vkGraphicsPipelineCreateInfo.pVertexInputState			  = &pVertexDeclaration->GetVkPipelineVertexInputStateInfo();
+	vkGraphicsPipelineCreateInfo.pVertexInputState			  = pVertexDeclaration ? &pVertexDeclaration->GetVkPipelineVertexInputStateInfo() : &CStudioAPIVertexDeclarationVk::GetVkEmptyPipelineVertexInputStateInfo();
 	vkGraphicsPipelineCreateInfo.pInputAssemblyState		  = &vkPipelineInputAssemblyStateCreateInfo;
 	vkGraphicsPipelineCreateInfo.pViewportState				  = &vkPipelineViewportStateCreateInfo;
 	vkGraphicsPipelineCreateInfo.pRasterizationState		  = &vkPipelineRasterizationStateCreateInfo;

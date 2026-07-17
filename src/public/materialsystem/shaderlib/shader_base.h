@@ -261,7 +261,7 @@
 #define DECLARE_PIXEL_SHADER( Name )	C_##Name##_pixel_Index __pixelShaderIndex;
 #define DECLARE_COMPUTE_SHADER( Name )	C_##Name##_compute_Index __computeShaderIndex;
 
-#define SET_VERTEX_FACTORY( Name, pVertexFactory ) __vertexShaderIndex.SetVertexFactory( pVertexFactory->GetVertexType() );
+#define SET_VERTEX_FACTORY( Name, pVertexFactory ) __vertexShaderIndex.SetVertexFactory( pVertexFactory );
 #define SET_VERTEX_SHADER_COMBO( Name, Value )	   __vertexShaderIndex.Set##Name( Value );
 #define SET_HULL_SHADER_COMBO( Name, Value )	   __hullShaderIndex.Set##Name( Value );
 #define SET_DOMAIN_SHADER_COMBO( Name, Value )	   __domainShaderIndex.Set##Name( Value );
