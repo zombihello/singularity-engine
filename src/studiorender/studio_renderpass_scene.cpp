@@ -86,8 +86,8 @@ void CStudioRenderPassScene::R_DrawPass( CStudioViewport* pViewport, studioScene
 
 	// Initialize viewport and scissor
 	pGraphicsCmdList->BeginRecord();
-	pGraphicsCmdList->SetViewport( 0.f, 0.f, (float)pSceneView->globalShaderParams.screenAndBufferSize.z, (float)pSceneView->globalShaderParams.screenAndBufferSize.w, 0.f, 1.f );
-	pGraphicsCmdList->SetScissor( 0, 0, pSceneView->globalShaderParams.screenAndBufferSize.z, pSceneView->globalShaderParams.screenAndBufferSize.w );
+	pGraphicsCmdList->SetViewport( 0.f, 0.f, (float)pSceneView->globalShaderParams.screenAndBufferSize.x, (float)pSceneView->globalShaderParams.screenAndBufferSize.y, 0.f, 1.f );
+	pGraphicsCmdList->SetScissor( 0, 0, pSceneView->globalShaderParams.screenAndBufferSize.x, pSceneView->globalShaderParams.screenAndBufferSize.y );
 
 	// Place barriers into the command list
 	{

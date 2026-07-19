@@ -1,6 +1,8 @@
 #include "pch_studiorender.h"
 #include "materialsystem/ishader.h"
-#include "modelsystem/ivertexfactory.h"
+#include "materialsystem/imaterialvar.h"
+#include "materialsystem/itexture.h"
+#include "resourcesystem/iresourcesystem.h"
 #include "studiorender/studioapi/istudioapi_barrier.h"
 #include "studiorender/studio_resourcebindingslots.h"
 #include "studiorender/studio_renderpasstypes.h"
@@ -15,6 +17,18 @@ CStudioRenderPassPresent::Init
 */
 void CStudioRenderPassPresent::Init()
 {
+	PROFILER_SCOPE_FUNC();
+	IResourceTypeMgr*	  pMaterialsMgr			= g_pResourceSystem->GetResourceManagerForType<IMaterial>();
+	IResourceTypeMgr*	  pTexturesMgr			= g_pResourceSystem->GetResourceManagerForType<ITexture>();
+	materialVarInfo_t	  presentBaseTextureVar = MaterialVar_MakeTexture( "basetexture", pTexturesMgr->FindResource( "__rt_scenecolor_ldr" ) );
+	materialInitialData_t presentMatInitialData = {};
+	presentMatInitialData.pShaderName			= "screenspace";
+	presentMatInitialData.numVars				= 1;
+	presentMatInitialData.pVars					= &presentBaseTextureVar;
+
+	pPresentMaterial = pMaterialsMgr->CreateResource( "__scenecolor_present" );
+	pPresentMaterial->Init( presentMatInitialData );
+	pPresentMaterialResource = pPresentMaterial->GetStudioResource();
 }
 
 /*
@@ -24,6 +38,9 @@ CStudioRenderPassPresent::Shutdown
 */
 void CStudioRenderPassPresent::Shutdown()
 {
+	PROFILER_SCOPE_FUNC();
+	pPresentMaterialResource = NULL;
+	pPresentMaterial		 = NULL;
 }
 
 /*
@@ -35,10 +52,15 @@ void CStudioRenderPassPresent::R_DrawPass( CStudioViewport* pViewport, studioSce
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	vector2i_t						viewportSize		  = pViewport->GetSize();
+	CRefPtr<IStudioAPIBuffer>		pGlobalConstantBuffer = g_StudioRender.GetStudioAPIGlobalConstantBuffer();
 	IStudioAPISwapChain*			pStudioAPISwapChain	  = pViewport->GetStudioAPISwapChain();
 	CRefPtr<IStudioAPICmdContext>	pGraphicsCmdContext	  = g_pStudioAPI->GetImmediateCmdContext( STUDIOAPI_QUEUE_TYPE_GRAPHICS );
 	CRefPtr<IStudioAPICmdListBatch> pGraphicsCmdListBatch = g_pStudioAPI->CreateCmdListBatch( pGraphicsCmdContext );
 	CRefPtr<IStudioAPICmdList>		pGraphicsCmdList	  = g_pStudioAPI->CreateCmdList( pGraphicsCmdContext );
+
+	IMaterialResource*	pMaterialResource = pPresentMaterial->GetStudioResource();
+	IShader*			pShader			  = pMaterialResource->GetShader();
+	IShaderContextData* pContextData	  = pMaterialResource->GetContextData();
 
 	// Initialize viewport and scissor
 	pGraphicsCmdList->BeginRecord();
@@ -47,9 +69,20 @@ void CStudioRenderPassPresent::R_DrawPass( CStudioViewport* pViewport, studioSce
 
 	// Place barriers into the command list
 	{
-		studioAPIBarrier_t barrier = StudioAPI_MakeTextureBarrier( pStudioAPISwapChain->GetCurrentImage(), STUDIOAPI_TEXTURE_LAYOUT_COLOR_RENDER_TARGET, STUDIOAPI_QUEUE_TYPE_GRAPHICS );
-		pGraphicsCmdList->Barrier( &barrier, 1 );
+		studioAPIBarrier_t barriers[] = {
+			StudioAPI_MakeTextureBarrier( pStudioAPISwapChain->GetCurrentImage(), STUDIOAPI_TEXTURE_LAYOUT_COLOR_RENDER_TARGET, STUDIOAPI_QUEUE_TYPE_GRAPHICS ),
+			StudioAPI_MakeBufferBarrier( pGlobalConstantBuffer, STUDIOAPI_BUFFER_STATE_CONSTANT_BUFFER, STUDIOAPI_QUEUE_TYPE_GRAPHICS )
+		};
+		pGraphicsCmdList->Barrier( barriers, ARRAYSIZE( barriers ) );
 	}
+	pShader->R_Barrier( pGraphicsCmdList, pContextData );
+
+	// Copy `__rt_scenecolor_ldr` into a swapchain image
+	pGraphicsCmdList->BeginRenderPass( pViewport->GetStudioAPIRenderPass(), pViewport->GetStudioAPIFrameBuffer() );
+	pShader->R_PrepareForDraw( pGraphicsCmdList, pContextData, NULL, STUDIO_RENDERPASS_TYPE_PRESENT );
+	pGraphicsCmdList->SetConstantBuffer( 0, STUDIO_RESOURCE_BINDING_SLOT_GLOBAL_CB, pGlobalConstantBuffer );
+	pGraphicsCmdList->Draw( 0, 3 );
+	pGraphicsCmdList->EndRenderPass();
 
 	// Place barriers for the swapchain image
 	{

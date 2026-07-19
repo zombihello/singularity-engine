@@ -1,4 +1,5 @@
 #pragma once
+#include "materialsystem/imaterial.h"
 #include "studiorender/studio_renderpass_base.h"
 
 //-----------------------------------------------------------------------------
@@ -14,4 +15,8 @@ public:
 	virtual void							  R_DrawPass( CStudioViewport* pViewport, studioSceneView_t* pSceneView ) const override;
 	virtual void							  R_RebuildFrameBuffers( const vector2i_t& bufferSize ) override;
 	virtual CRefPtr<IStudioAPIRenderPipeline> R_CreateStudioAPIRenderPipeline( CStudioViewport* pViewport, IStudioAPIBoundShaderState* pStudioAPIBoundShaderState ) const override;
+
+private:
+	CResourcePtr<IMaterial>	   pPresentMaterial;
+	CRefPtr<IMaterialResource> pPresentMaterialResource;
 };
