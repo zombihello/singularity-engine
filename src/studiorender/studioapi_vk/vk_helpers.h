@@ -21,6 +21,7 @@
 #define STUDIOAPI_VK_MAX_VERTEX_ELEMENT_COUNT				   17
 #define STUDIOAPI_VK_NUM_FRAMES_TO_WAIT_BEFORE_RELEASING_TO_OS 3
 #define STUDIOAPI_VK_CONSTANT_RING_BUFFER_SIZE				   ( 16 * 1024 * 1024 )
+#define STUDIOAPI_VK_MAX_PUSH_CONSTANT_SIZE					   128
 #define STUDIOAPI_VK_BUFFER_OFFSET_ALIGNMENT				   4
 #define STUDIOAPI_VK_CMDBUFFER_TIME_TO_WAIT_BEFORE_DELETING	   10
 #define STUDIOAPI_VK_CMDLIST_TIME_TO_WAIT_BEFORE_DELETING	   10
@@ -28,51 +29,51 @@
 #define STUDIOAPI_VK_MAX_NUM_PENDING_BUFFER_BARRIERS		   64
 #define STUDIOAPI_VK_MAX_NUM_PENDING_IMAGE_BARRIERS			   128
 #define STUDIOAPI_VK_MAX_NUM_PENDING_MEMORY_BARRIERS		   64
-#define STUDIOAPI_VK_ACCESS_READ_FLAGS						   ( 0                                 \
-										 | VK_ACCESS_INDIRECT_COMMAND_READ_BIT                     \
-										 | VK_ACCESS_INDEX_READ_BIT                                \
-										 | VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT                     \
-										 | VK_ACCESS_UNIFORM_READ_BIT                              \
-										 | VK_ACCESS_INPUT_ATTACHMENT_READ_BIT                     \
-										 | VK_ACCESS_SHADER_READ_BIT                               \
-										 | VK_ACCESS_COLOR_ATTACHMENT_READ_BIT                     \
-										 | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT             \
-										 | VK_ACCESS_TRANSFER_READ_BIT                             \
-										 | VK_ACCESS_HOST_READ_BIT                                 \
-										 | VK_ACCESS_MEMORY_READ_BIT                               \
-										 | VK_ACCESS_TRANSFORM_FEEDBACK_COUNTER_READ_BIT_EXT       \
-										 | VK_ACCESS_CONDITIONAL_RENDERING_READ_BIT_EXT            \
-										 | VK_ACCESS_COLOR_ATTACHMENT_READ_NONCOHERENT_BIT_EXT     \
-										 | VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR           \
-										 | VK_ACCESS_FRAGMENT_DENSITY_MAP_READ_BIT_EXT             \
-										 | VK_ACCESS_FRAGMENT_SHADING_RATE_ATTACHMENT_READ_BIT_KHR \
-										 | VK_ACCESS_COMMAND_PREPROCESS_READ_BIT_NV                \
-										 | VK_ACCESS_SHADING_RATE_IMAGE_READ_BIT_NV                \
-										 | VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_NV )
-#define STUDIOAPI_VK_ACCESS_WRITE_FLAGS ( 0                                                    \
-										  | VK_ACCESS_SHADER_WRITE_BIT                         \
-										  | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT               \
-										  | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT       \
-										  | VK_ACCESS_TRANSFER_WRITE_BIT                       \
-										  | VK_ACCESS_HOST_WRITE_BIT                           \
-										  | VK_ACCESS_MEMORY_WRITE_BIT                         \
-										  | VK_ACCESS_TRANSFORM_FEEDBACK_WRITE_BIT_EXT         \
-										  | VK_ACCESS_TRANSFORM_FEEDBACK_COUNTER_WRITE_BIT_EXT \
-										  | VK_ACCESS_ACCELERATION_STRUCTURE_WRITE_BIT_KHR     \
-										  | VK_ACCESS_COMMAND_PREPROCESS_WRITE_BIT_NV          \
-										  | VK_ACCESS_ACCELERATION_STRUCTURE_WRITE_BIT_NV )
-#define STUDIOAPI_VK_ACCESS_KNOWN_FLAGS	 ( STUDIOAPI_VK_ACCESS_READ_FLAGS | STUDIOAPI_VK_ACCESS_WRITE_FLAGS )
-#define STUDIOAPI_VK_BUFFER_KNOWN_STATES ( 0                                                 \
-										   | STUDIOAPI_BUFFER_STATE_UNDEFINED                \
-										   | STUDIOAPI_BUFFER_STATE_SHADER_RESOURCE          \
-										   | STUDIOAPI_BUFFER_STATE_SHADER_RESOURCE_READONLY \
-										   | STUDIOAPI_BUFFER_STATE_TRANSFER_SRC             \
-										   | STUDIOAPI_BUFFER_STATE_TRANSFER_DST             \
-										   | STUDIOAPI_BUFFER_STATE_VERTEX_BUFFER            \
-										   | STUDIOAPI_BUFFER_STATE_INDEX_BUFFER             \
-										   | STUDIOAPI_BUFFER_STATE_CONSTANT_BUFFER          \
-										   | STUDIOAPI_BUFFER_STATE_STRUCTURED_BUFFER )
-#define STUDIOAPI_VK_SHADER_PLATFORM_NAME "vk"
+#define STUDIOAPI_VK_ACCESS_READ_FLAGS						   ( 0                                                         \
+																 | VK_ACCESS_INDIRECT_COMMAND_READ_BIT                     \
+																 | VK_ACCESS_INDEX_READ_BIT                                \
+																 | VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT                     \
+																 | VK_ACCESS_UNIFORM_READ_BIT                              \
+																 | VK_ACCESS_INPUT_ATTACHMENT_READ_BIT                     \
+																 | VK_ACCESS_SHADER_READ_BIT                               \
+																 | VK_ACCESS_COLOR_ATTACHMENT_READ_BIT                     \
+																 | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT             \
+																 | VK_ACCESS_TRANSFER_READ_BIT                             \
+																 | VK_ACCESS_HOST_READ_BIT                                 \
+																 | VK_ACCESS_MEMORY_READ_BIT                               \
+																 | VK_ACCESS_TRANSFORM_FEEDBACK_COUNTER_READ_BIT_EXT       \
+																 | VK_ACCESS_CONDITIONAL_RENDERING_READ_BIT_EXT            \
+																 | VK_ACCESS_COLOR_ATTACHMENT_READ_NONCOHERENT_BIT_EXT     \
+																 | VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_KHR           \
+																 | VK_ACCESS_FRAGMENT_DENSITY_MAP_READ_BIT_EXT             \
+																 | VK_ACCESS_FRAGMENT_SHADING_RATE_ATTACHMENT_READ_BIT_KHR \
+																 | VK_ACCESS_COMMAND_PREPROCESS_READ_BIT_NV                \
+																 | VK_ACCESS_SHADING_RATE_IMAGE_READ_BIT_NV                \
+																 | VK_ACCESS_ACCELERATION_STRUCTURE_READ_BIT_NV )
+#define STUDIOAPI_VK_ACCESS_WRITE_FLAGS						   ( 0                                                    \
+																 | VK_ACCESS_SHADER_WRITE_BIT                         \
+																 | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT               \
+																 | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT       \
+																 | VK_ACCESS_TRANSFER_WRITE_BIT                       \
+																 | VK_ACCESS_HOST_WRITE_BIT                           \
+																 | VK_ACCESS_MEMORY_WRITE_BIT                         \
+																 | VK_ACCESS_TRANSFORM_FEEDBACK_WRITE_BIT_EXT         \
+																 | VK_ACCESS_TRANSFORM_FEEDBACK_COUNTER_WRITE_BIT_EXT \
+																 | VK_ACCESS_ACCELERATION_STRUCTURE_WRITE_BIT_KHR     \
+																 | VK_ACCESS_COMMAND_PREPROCESS_WRITE_BIT_NV          \
+																 | VK_ACCESS_ACCELERATION_STRUCTURE_WRITE_BIT_NV )
+#define STUDIOAPI_VK_ACCESS_KNOWN_FLAGS						   ( STUDIOAPI_VK_ACCESS_READ_FLAGS | STUDIOAPI_VK_ACCESS_WRITE_FLAGS )
+#define STUDIOAPI_VK_BUFFER_KNOWN_STATES					   ( 0                                                 \
+																 | STUDIOAPI_BUFFER_STATE_UNDEFINED                \
+																 | STUDIOAPI_BUFFER_STATE_SHADER_RESOURCE          \
+																 | STUDIOAPI_BUFFER_STATE_SHADER_RESOURCE_READONLY \
+																 | STUDIOAPI_BUFFER_STATE_TRANSFER_SRC             \
+																 | STUDIOAPI_BUFFER_STATE_TRANSFER_DST             \
+																 | STUDIOAPI_BUFFER_STATE_VERTEX_BUFFER            \
+																 | STUDIOAPI_BUFFER_STATE_INDEX_BUFFER             \
+																 | STUDIOAPI_BUFFER_STATE_CONSTANT_BUFFER          \
+																 | STUDIOAPI_BUFFER_STATE_STRUCTURED_BUFFER )
+#define STUDIOAPI_VK_SHADER_PLATFORM_NAME					   "vk"
 
 //-----------------------------------------------------------------------------
 // Vulkan functions

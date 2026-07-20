@@ -22,6 +22,14 @@
 	#define STUDIOAPI_CONSTANT_BUFFER( valueType, valueName, bindingIndex, descriptorSetIndex ) \
 		[[vk::binding(bindingIndex, descriptorSetIndex)]] ConstantBuffer<valueType> valueName
 
+	// Macro for declaring a push constant block
+	// Usage example:
+	// STUDIOAPI_PUSH_CONSTANT( [Value type], [Value name] )
+	// STUDIOAPI_PUSH_CONSTANT( MyStruct, myPushConstants )
+	// --------------------------------------------------------------------------
+	#define STUDIOAPI_PUSH_CONSTANT( valueType, valueName ) \
+		[[vk::push_constant]] ConstantBuffer<valueType> valueName
+
 	// Macro for declaring texture value with correct binding and descriptor set
 	// Usage example:
 	// STUDIOAPI_TEXTURE_2D( [Value name], [Binding index], [Descriptor set index] )

@@ -56,6 +56,7 @@ public:
 	const eastl::vector<studioAPIDescriptorSetInfoVk_t>& GetDescriptorSetInfos() const;
 	VkPipelineLayout									 GetVkPipelineLayout() const;
 	VkDescriptorSetAllocateInfo							 GetVkAllocateInfo() const;
+	const eastl::vector<VkPushConstantRange>&			 GetVkPushConstantRanges() const;
 
 private:
 	uint32											  numDescriptorSets;
@@ -65,6 +66,7 @@ private:
 	eastl::vector<studioAPIDescriptorSetInfoVk_t>	  descriptorSetInfos;
 	VkPipelineLayout								  vkPipelineLayout;
 	VkDescriptorSetAllocateInfo						  vkDescriptorSetAllocateInfo;
+	eastl::vector<VkPushConstantRange>				  vkPushConstantRanges;
 	mutable COnStudioAPIDescriptorSetsLayoutDeletedVk onDescriptorSetsLayoutDeleted;
 };
 

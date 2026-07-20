@@ -107,6 +107,9 @@ void CStudioAPIDescriptorSetsLayoutVk::Init( const studioAPIDescriptorSetLayoutV
 		descriptorSetInfos[it->first] = it->second.descriptorSetInfo;
 	}
 
+	// Keep information about push constant ranges in the descriptor sets layout
+	CStudioAPIDescriptorSetsLayoutVk::vkPushConstantRanges = vkPushConstantRanges;
+
 	// Create a pipeline layout that is used to generate rendering pipelines that are based on this descriptor set layout
 	VkPipelineLayoutCreateInfo vkPipelineLayoutCreateInfo = {};
 	vkPipelineLayoutCreateInfo.sType					  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -163,9 +166,10 @@ void CStudioAPIDescriptorSetsLayoutVk::Destroy()
 		numUsedDescriptorTypesDict[(VkDescriptorType)index] = 0;
 	}
 
-	// Clear all descriptor set infos and layouts
+	// Clear all descriptor set infos, layouts and push constants
 	descriptorSetInfos.clear();
 	vkDescriptorSetLayouts.clear();
+	vkPushConstantRanges.clear();
 
 	// Clear fields
 	vkPipelineLayout		 = VK_NULL_HANDLE;

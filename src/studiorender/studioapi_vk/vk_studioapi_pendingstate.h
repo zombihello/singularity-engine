@@ -36,6 +36,7 @@ public:
 	void SetVertexBuffer( CStudioAPICmdListVk* pCmdList, uint32 slot, CStudioAPIBufferVk* pBuffer, uint64 offset );
 	void SetIndexBuffer( CStudioAPICmdListVk* pCmdList, CStudioAPIBufferVk* pBuffer, uint64 offset );
 	void SetConstantBuffer( CStudioAPICmdListVk* pCmdList, uint32 set, uint32 slot, CStudioAPIBufferVk* pConstantBuffer );
+	void SetPushConstants( CStudioAPICmdListVk* pCmdList, byte* pData, uint32 dataSize );
 	void SetTexture( CStudioAPICmdListVk* pCmdList, uint32 set, uint32 slot, CStudioAPITextureVk* pTexture );
 	void SetSampler( CStudioAPICmdListVk* pCmdList, uint32 set, uint32 slot, CStudioAPISamplerVk* pSampler );
 	bool SetRenderPipeline( CStudioAPIRenderPipelineVk* pRenderPipeline, bool bForceReset );
@@ -48,11 +49,7 @@ public:
 private:
 	struct vertexBuffer_t
 	{
-		vertexBuffer_t()
-			: offset( 0 )
-		{
-		}
-
+		vertexBuffer_t();
 		void Clear();
 
 		CRefPtr<CStudioAPIBufferVk> pBuffer;
@@ -61,15 +58,20 @@ private:
 
 	struct indexBuffer_t
 	{
-		indexBuffer_t()
-			: offset( 0 )
-		{
-		}
-
+		indexBuffer_t();
 		void Clear();
 
 		CRefPtr<CStudioAPIBufferVk> pBuffer;
 		VkDeviceSize				offset;
+	};
+
+	struct pushConstants_t
+	{
+		pushConstants_t();
+		void Clear();
+
+		uint32 size;
+		byte   data[STUDIOAPI_VK_MAX_PUSH_CONSTANT_SIZE];
 	};
 
 	struct descriptorStateCache_t
@@ -89,6 +91,7 @@ private:
 	bool																	  bScissorEnabled;
 	bool																	  bDirtyVertexBuffers;
 	bool																	  bDirtyIndexBuffer;
+	bool																	  bDirtyPushConstants;
 	VkViewport																  vkViewport;
 	VkRect2D																  vkScissor;
 	CStudioAPICmdContextVk&													  cmdContext;
@@ -96,6 +99,7 @@ private:
 	CStudioAPIDescriptorStateRenderVk*										  pCurrentRenderDescriptorState;
 	indexBuffer_t															  indexBuffer;
 	vertexBuffer_t															  vertexBuffers[STUDIOAPI_VK_MAX_VERTEX_ELEMENT_COUNT];
+	pushConstants_t															  pushConstants;
 	eastl::unordered_map<CStudioAPIRenderPipelineVk*, descriptorStateCache_t> descriptorStatesDict;
 };
 

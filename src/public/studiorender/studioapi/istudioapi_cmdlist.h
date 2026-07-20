@@ -43,6 +43,7 @@ public:
 	virtual void SetVertexBuffer( uint32 slot, IStudioAPIBuffer* pVertexBuffer, uint64 offset )		   = 0;
 	virtual void SetIndexBuffer( IStudioAPIBuffer* pIndexBuffer, uint64 offset )					   = 0;
 	virtual void SetConstantBuffer( uint32 set, uint32 slot, IStudioAPIBuffer* pConstantBuffer )	   = 0;
+	virtual void SetPushConstants( byte* pData, uint32 dataSize )									   = 0;
 	virtual void SetTexture( uint32 set, uint32 slot, IStudioAPITexture* pTexture )					   = 0;
 	virtual void SetSampler( uint32 set, uint32 slot, IStudioAPISampler* pSampler )					   = 0;
 	virtual void SetViewport( float minX, float minY, float minZ, float maxX, float maxY, float maxZ ) = 0;

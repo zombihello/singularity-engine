@@ -230,6 +230,17 @@ void CStudioAPICmdListVk::SetConstantBuffer( uint32 set, uint32 slot, IStudioAPI
 
 /*
 ==================
+CStudioAPICmdListVk::SetPushConstants
+==================
+*/
+void CStudioAPICmdListVk::SetPushConstants( byte* pData, uint32 dataSize )
+{
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	pCmdContext->SetPushConstants( this, pData, dataSize );
+}
+
+/*
+==================
 CStudioAPICmdListVk::SetViewport
 ==================
 */

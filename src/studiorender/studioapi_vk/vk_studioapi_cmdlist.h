@@ -42,6 +42,7 @@ public:
 	virtual void SetVertexBuffer( uint32 slot, IStudioAPIBuffer* pVertexBuffer, uint64 offset ) override;
 	virtual void SetIndexBuffer( IStudioAPIBuffer* pIndexBuffer, uint64 offset ) override;
 	virtual void SetConstantBuffer( uint32 set, uint32 slot, IStudioAPIBuffer* pConstantBuffer ) override;
+	virtual void SetPushConstants( byte* pData, uint32 dataSize ) override;
 	virtual void SetTexture( uint32 set, uint32 slot, IStudioAPITexture* pTexture ) override;
 	virtual void SetSampler( uint32 set, uint32 slot, IStudioAPISampler* pSampler ) override;
 	virtual void SetViewport( float minX, float minY, float minZ, float maxX, float maxY, float maxZ ) override;

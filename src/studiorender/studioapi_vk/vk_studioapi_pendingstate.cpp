@@ -35,6 +35,7 @@ CStudioAPIPendingRenderStateVk::CStudioAPIPendingRenderStateVk( CStudioAPICmdCon
 	: bScissorEnabled( false )
 	, bDirtyVertexBuffers( false )
 	, bDirtyIndexBuffer( false )
+	, bDirtyPushConstants( false )
 	, cmdContext( cmdContext )
 	, pCurrentRenderPipeline( NULL )
 	, pCurrentRenderDescriptorState( NULL )
@@ -71,7 +72,9 @@ void CStudioAPIPendingRenderStateVk::Reset()
 	bScissorEnabled				  = false;
 	bDirtyVertexBuffers			  = false;
 	bDirtyIndexBuffer			  = false;
+	bDirtyPushConstants			  = false;
 	indexBuffer.Clear();
+	pushConstants.Clear();
 
 	for ( uint32 index = 0; index < ARRAYSIZE( vertexBuffers ); ++index )
 	{
@@ -239,15 +242,29 @@ CStudioAPIPendingRenderStateVk::PrepareForDraw
 */
 void CStudioAPIPendingRenderStateVk::PrepareForDraw( CStudioAPICmdListVk* pCmdList )
 {
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-
 	// Update dynamic states
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	UpdateDynamicStates( pCmdList );
 
 	// Update descriptor sets and bind it
 	if ( pCurrentRenderDescriptorState->UpdateDescriptorSets( pCmdList ) )
 	{
 		pCurrentRenderDescriptorState->BindDescriptorSets( pCmdList );
+	}
+
+	// Push constants if the bound pipeline layout does declare a push-constant range
+	if ( bDirtyPushConstants )
+	{
+		const CStudioAPIDescriptorSetsLayoutVk&	  descriptorSetsLayout = pCurrentRenderPipeline->GetBoundShaderState()->GetDescriptorSetsLayout();
+		const eastl::vector<VkPushConstantRange>& vkPushConstantRanges = descriptorSetsLayout.GetVkPushConstantRanges();
+		for ( uint32 index = 0, count = (uint32)vkPushConstantRanges.size(); index < count; ++index )
+		{
+			const VkPushConstantRange& vkPushConstantRange = vkPushConstantRanges[index];
+			Assert( vkPushConstantRange.offset + vkPushConstantRange.size <= pushConstants.size );
+			vkCmdPushConstants( pCmdList->GetCmdBuffer()->GetVkCommandBuffer(), descriptorSetsLayout.GetVkPipelineLayout(), vkPushConstantRange.stageFlags, vkPushConstantRange.offset, vkPushConstantRange.size, pushConstants.data + vkPushConstantRange.offset );
+		}
+
+		bDirtyPushConstants = false;
 	}
 
 	// Update vertex buffers if it need

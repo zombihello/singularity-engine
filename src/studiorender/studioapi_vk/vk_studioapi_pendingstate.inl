@@ -46,6 +46,19 @@ FORCEINLINE void CStudioAPIPendingRenderStateVk::SetScissor( bool bEnable, int32
 
 /*
 ==================
+CStudioAPIPendingRenderStateVk::SetPushConstants
+==================
+*/
+FORCEINLINE void CStudioAPIPendingRenderStateVk::SetPushConstants( CStudioAPICmdListVk* pCmdList, byte* pData, uint32 dataSize )
+{
+	Assert( pData && dataSize > 0 && dataSize <= STUDIOAPI_VK_MAX_PUSH_CONSTANT_SIZE );
+	Mem_Memcpy( pushConstants.data, pData, dataSize );
+	pushConstants.size	= dataSize;
+	bDirtyPushConstants = true;
+}
+
+/*
+==================
 CStudioAPIPendingRenderStateVk::BindRenderPipeline
 ==================
 */
@@ -67,6 +80,16 @@ FORCEINLINE bool CStudioAPIPendingRenderStateVk::HasIndexBuffer() const
 
 /*
 ==================
+CStudioAPIPendingRenderStateVk::vertexBuffer_t::vertexBuffer_t
+==================
+*/
+FORCEINLINE CStudioAPIPendingRenderStateVk::vertexBuffer_t::vertexBuffer_t()
+	: offset( 0 )
+{
+}
+
+/*
+==================
 CStudioAPIPendingRenderStateVk::vertexBuffer_t::Clear
 ==================
 */
@@ -78,6 +101,16 @@ FORCEINLINE void CStudioAPIPendingRenderStateVk::vertexBuffer_t::Clear()
 
 /*
 ==================
+CStudioAPIPendingRenderStateVk::indexBuffer_t::indexBuffer_t
+==================
+*/
+FORCEINLINE CStudioAPIPendingRenderStateVk::indexBuffer_t::indexBuffer_t()
+	: offset( 0 )
+{
+}
+
+/*
+==================
 CStudioAPIPendingRenderStateVk::indexBuffer_t::Clear
 ==================
 */
@@ -85,4 +118,24 @@ FORCEINLINE void CStudioAPIPendingRenderStateVk::indexBuffer_t::Clear()
 {
 	pBuffer = NULL;
 	offset	= 0;
+}
+
+/*
+==================
+CStudioAPIPendingRenderStateVk::pushConstants_t::pushConstants_t
+==================
+*/
+FORCEINLINE CStudioAPIPendingRenderStateVk::pushConstants_t::pushConstants_t()
+	: size( 0 )
+{
+}
+
+/*
+==================
+CStudioAPIPendingRenderStateVk::pushConstants_t::Clear
+==================
+*/
+FORCEINLINE void CStudioAPIPendingRenderStateVk::pushConstants_t::Clear()
+{
+	size = 0;
 }

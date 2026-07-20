@@ -206,6 +206,17 @@ void CStudioAPICmdContextVk::SetConstantBuffer( CStudioAPICmdListVk* pCmdList, u
 
 /*
 ==================
+CStudioAPICmdContextVk::SetPushConstants
+==================
+*/
+void CStudioAPICmdContextVk::SetPushConstants( CStudioAPICmdListVk* pCmdList, byte* pData, uint32 dataSize )
+{
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	pPendingRenderState->SetPushConstants( pCmdList, pData, dataSize );
+}
+
+/*
+==================
 CStudioAPICmdContextVk::SetTexture
 ==================
 */
