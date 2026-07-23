@@ -417,7 +417,8 @@ void CStudioAPICmdListVk::CopyBuffer( IStudioAPIBuffer* pSrcBuffer, uint64 srcOf
 	Assert( pStudioAPISrcBuffer->GetUsageFlags() & STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_SRC );
 	Assert( pStudioAPIDstBuffer->GetUsageFlags() & STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
 
-	// Flush all pending barriers before copy
+	// Prepare the destination buffer for GPU write and flush all pending barriers before copy
+	pStudioAPIDstBuffer->PrepareForGPUWrite();
 	pCmdContext->FlushPendingBarriers( this );
 
 	VkBufferCopy vkBufferCopy = {};
@@ -486,7 +487,8 @@ void CStudioAPICmdListVk::CopyTextureToBuffer( IStudioAPITexture* pSrcTexture, u
 	Assert( pStudioAPISrcTexture->GetUsageFlags() & STUDIOAPI_TEXTURE_USAGE_FLAG_TRANSFER_DST );
 	Assert( pStudioAPIDstBuffer->GetUsageFlags() & STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_SRC );
 
-	// Flush all pending barriers before copy
+	// Prepare the destination buffer for GPU write and flush all pending barriers before copy
+	pStudioAPIDstBuffer->PrepareForGPUWrite();
 	pCmdContext->FlushPendingBarriers( this );
 
 	VkBufferImageCopy vkBufferImageCopy				  = {};

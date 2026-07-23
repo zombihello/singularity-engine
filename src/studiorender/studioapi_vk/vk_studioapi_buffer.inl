@@ -19,6 +19,7 @@ CStudioAPIBufferVk::SwapCurrentBufferIndex
 FORCEINLINE void CStudioAPIBufferVk::SwapCurrentBufferIndex()
 {
 	currentBufferIndex = ( currentBufferIndex + 1 ) % numBuffers;
+	alloc.offset	   = size * currentBufferIndex;
 }
 
 /*
@@ -28,7 +29,7 @@ CStudioAPIBufferVk::GetOffset
 */
 FORCEINLINE uint64 CStudioAPIBufferVk::GetOffset() const
 {
-	return bufferOffsets[currentBufferIndex];
+	return alloc.offset;
 }
 
 /*
@@ -38,7 +39,8 @@ CStudioAPIBufferVk::GetVkBuffer
 */
 FORCEINLINE VkBuffer CStudioAPIBufferVk::GetVkBuffer() const
 {
-	return vkBuffer;
+	Assert( IsValidAlloc() );
+	return alloc.vkBuffer;
 }
 
 /*
@@ -48,7 +50,7 @@ CStudioAPIBufferVk::GetVkIndexType
 */
 FORCEINLINE VkIndexType CStudioAPIBufferVk::GetVkIndexType() const
 {
-	return stride == 4 ? VK_INDEX_TYPE_UINT32 : VK_INDEX_TYPE_UINT16;
+	return stride == sizeof( uint32 ) ? VK_INDEX_TYPE_UINT32 : VK_INDEX_TYPE_UINT16;
 }
 
 /*

@@ -72,6 +72,16 @@ FORCEINLINE CStudioAPISyncMgrVk& CStudioAPIVk::GetSyncMgr()
 
 /*
 ==================
+CStudioAPIVk::GetTempAlloc
+==================
+*/
+FORCEINLINE studioAPITempAllocVk_t& CStudioAPIVk::GetTempAlloc()
+{
+	return tempAlloc;
+}
+
+/*
+==================
 CStudioAPIVk::GetCurrentFrameInFlight
 ==================
 */

@@ -89,6 +89,9 @@ bool CStudioAPIVk::Init()
 	// Initialize the synchronization manager
 	syncMgr.Init();
 
+	// Initialize the temp allocator used for volatile allocations
+	tempAlloc.Init();
+
 	// Initialize command contexts for each queue type
 	// Graphics queue family
 	pGraphicsCmdContext = new CStudioAPICmdContextVk( device.GetGraphicsQueue(), STUDIOAPI_VK_QUEUE_FLAG_GRAPHICS );
@@ -201,6 +204,9 @@ void CStudioAPIVk::Shutdown()
 
 	// Shutdown the descriptor pools manager
 	descriptorPoolsMgr.Shutdown();
+
+	// Shutdown the temp allocator used for volatile allocations
+	tempAlloc.Shutdown();
 
 	// Shutdown the synchronization manager
 	syncMgr.Shutdown();
@@ -479,6 +485,9 @@ void CStudioAPIVk::BeginDrawingFrame()
 
 	// Free unused descriptor pool sets
 	descriptorPoolsMgr.FreeUnusedPoolSets();
+
+	// Swap pools for a new frame in the temp allocator
+	tempAlloc.SwapPools();
 
 	// Begin a new frame in command contexts
 	pGraphicsCmdContext->BeginFrame();

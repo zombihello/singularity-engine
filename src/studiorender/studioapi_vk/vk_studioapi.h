@@ -9,6 +9,7 @@
 #include "studiorender/studioapi_vk/vk_studioapi_buffer.h"
 #include "studiorender/studioapi_vk/vk_studioapi_datauploader.h"
 #include "studiorender/studioapi_vk/vk_studioapi_syncmgr.h"
+#include "studiorender/studioapi_vk/vk_studioapi_tempalloc.h"
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -77,6 +78,7 @@ public:
 	CStudioAPIDescriptorPoolsMgrVk&	   GetDescriptorPoolsMgr();
 	CStudioAPIDataUploaderVk&		   GetDataUploader();
 	CStudioAPISyncMgrVk&			   GetSyncMgr();
+	studioAPITempAllocVk_t&			   GetTempAlloc();
 	uint32							   GetCurrentFrameInFlight() const;
 
 private:
@@ -90,6 +92,7 @@ private:
 	CStudioAPIDescriptorPoolsMgrVk			  descriptorPoolsMgr;
 	CStudioAPIDataUploaderVk				  dataUploader;
 	CStudioAPISyncMgrVk						  syncMgr;
+	studioAPITempAllocVk_t					  tempAlloc;
 	studioAPIInfo_t							  info;
 	mutable CStudioAPIBoundShaderStateCacheVk boundShaderStateCache;
 	mutable COnStudioAPIVkShutdown			  onStudioAPIVkShutdown;
