@@ -47,7 +47,7 @@ private:
 		tempMemoryBlockListIt_t currentBlockIt;
 	};
 
-	void					AllocBlock( tempMemoryPool_t& pool );
+	tempMemoryBlockListIt_t AllocBlock( tempMemoryPool_t& pool );
 	tempMemoryBlockListIt_t FreeBlock( tempMemoryPool_t& pool, tempMemoryBlockListIt_t blockIt );
 	void					FreeAllBlocks( tempMemoryPool_t& pool );
 

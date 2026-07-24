@@ -37,8 +37,7 @@ void CStudioAPITempAllocVk<blockSize, vkBufferUsageFlags>::Init()
 	{
 		tempMemoryPool_t& pool = pools[index];
 		pool.id				   = index;
-		pool.currentBlockIt	   = pool.blockList.begin();
-		AllocBlock( pool );
+		pool.currentBlockIt	   = AllocBlock( pool );
 	}
 }
 
@@ -83,8 +82,7 @@ tempAlloc_t CStudioAPITempAllocVk<blockSize, vkBufferUsageFlags>::Alloc( uint32 
 		// Allocate a new block if we ran out of them
 		if ( pool.currentBlockIt == pool.blockList.end() )
 		{
-			AllocBlock( pool );
-			pool.currentBlockIt = --pool.blockList.end();
+			pool.currentBlockIt = AllocBlock( pool );
 		}
 
 		// NOTE: We align the offset inside the buffer, not the mapped CPU pointer, because it is the
@@ -104,9 +102,21 @@ tempAlloc_t CStudioAPITempAllocVk<blockSize, vkBufferUsageFlags>::Alloc( uint32 
 			return tempAlloc;
 		}
 
+		// Not enough room left in the block. If the block was empty the request
+		// can never be satisfied and moving forward would grow the pool forever
+		if ( block.usedSize == 0 )
+		{
+			Sys_Error( "Vulkan temp allocator can't allocate %i bytes with alignment %i (block size: %i, pool: %i, name: '%s')", size, alignment, blockSize, pool.id, pAllocName );
+			return tempAlloc_t{};
+		}
+
 		// Not enough room left in the block
 		++pool.currentBlockIt;
 	}
+
+	// If we here it is fatal error
+	AssertNoEntry();
+	return tempAlloc_t{};
 }
 
 /*
@@ -139,7 +149,7 @@ CStudioAPITempAllocVk::AllocBlock
 ==================
 */
 template<uint32 blockSize, VkBufferUsageFlags vkBufferUsageFlags>
-void CStudioAPITempAllocVk<blockSize, vkBufferUsageFlags>::AllocBlock( tempMemoryPool_t& pool )
+typename CStudioAPITempAllocVk<blockSize, vkBufferUsageFlags>::tempMemoryBlockListIt_t CStudioAPITempAllocVk<blockSize, vkBufferUsageFlags>::AllocBlock( tempMemoryPool_t& pool )
 {
 	// Allocate memory for a new block in the pool
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
@@ -163,7 +173,7 @@ void CStudioAPITempAllocVk<blockSize, vkBufferUsageFlags>::AllocBlock( tempMemor
 	if ( block.vmaAllocation == VK_NULL_HANDLE )
 	{
 		Sys_Error( "Failed to allocate GPU buffer for a temp block with size %llu (pool: %i, name: '%s')", blockSize, pool.id, pAllocName );
-		return;
+		return pool.blockList.end();
 	}
 	Msg( "StudioAPIVk: Allocated GPU block for a temp block (%llu bytes, pool: %i, name: '%s')", blockSize, pool.id, pAllocName );
 
@@ -171,6 +181,7 @@ void CStudioAPITempAllocVk<blockSize, vkBufferUsageFlags>::AllocBlock( tempMemor
 	block.pData = g_StudioAPIVk.GetMemoryMgr().MapMemory<byte>( block.vmaAllocation );
 	pool.blockList.emplace_back( block );
 	PROFILER_MEM_ALLOC( (void*)block.vkBuffer, blockSize, pAllocName );
+	return --pool.blockList.end();
 }
 
 /*

@@ -36,6 +36,10 @@ public:
 	const char* GetAllocName() const;
 
 private:
+	struct memoryBlock_t;
+	using memoryBlockList_t	  = eastl::list<memoryBlock_t>;
+	using memoryBlockListIt_t = typename memoryBlockList_t::iterator;
+
 	struct destructorEntry_t
 	{
 		void ( *pDestroyObjectFn )( void* pObject );
@@ -51,16 +55,17 @@ private:
 
 	struct memoryPool_t
 	{
-		uint32					   id;
-		eastl::atomic<bool>		   bIsFree;
-		eastl::list<memoryBlock_t> blockList;
+		uint32				id;
+		eastl::atomic<bool> bIsFree;
+		memoryBlockList_t	blockList;
+		memoryBlockListIt_t currentBlockIt;
 	};
 
-	void* Alloc( size numBytes, uint32 alignment, memoryBlock_t** pBlock );
-	void  AllocBlock( memoryPool_t& pool );
-	void  FreeBlock( memoryPool_t& pool, memoryBlock_t* pBlock );
-	void  FreeAllBlocks( memoryPool_t& pool );
-	void  WaitFreePool();
+	void*				Alloc( size numBytes, uint32 alignment, memoryBlock_t** pBlock );
+	memoryBlockListIt_t AllocBlock( memoryPool_t& pool );
+	memoryBlockListIt_t FreeBlock( memoryPool_t& pool, memoryBlockListIt_t blockIt );
+	void				FreeAllBlocks( memoryPool_t& pool );
+	void				WaitFreePool();
 
 	uint32		 currentPoolId;
 	memoryPool_t pools[numPools];
