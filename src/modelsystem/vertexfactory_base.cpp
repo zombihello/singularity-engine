@@ -48,10 +48,10 @@ void CVertexFactoryBase::R_Barrier( IStudioAPICmdList* pStudioAPICmdList ) const
 
 /*
 ==================
-CVertexFactoryBase::R_PrepareForDraw
+CVertexFactoryBase::R_Bind
 ==================
 */
-void CVertexFactoryBase::R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, studioRenderPassType_t renderPassType )
+void CVertexFactoryBase::R_Bind( IStudioAPICmdList* pStudioAPICmdList )
 {
 	// Set all vertex buffers
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );

@@ -8,6 +8,7 @@
 // Forward declarations
 //-----------------------------------------------------------------------------
 class IStudioAPICmdList;
+class IStudioAPIRenderPipeline;
 class IMaterialVar;
 class IVertexFactory;
 
@@ -88,9 +89,14 @@ public:
 	virtual void						UpdateContextData( IMaterialVar** pParams, IShaderContextData* pContextData ) const = 0;
 
 	// Place barriers into a command list
+	virtual void R_Barrier( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData ) const = 0;
+
+	// Bind the shader's own resources (textures, samplers, constant buffers, etc) into the command list
+	virtual void R_Bind( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData ) = 0;
+
+	// Resolve (baking if needed) the render pipeline for the current combo
 	// NOTE: `pVertexFactory` can be NULL when the shader generates its own geometry
-	virtual void R_Barrier( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData ) const																		   = 0;
-	virtual void R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData, IVertexFactory* pVertexFactory, studioRenderPassType_t renderPassType ) = 0;
+	virtual IStudioAPIRenderPipeline* R_ResolveRenderPipeline( IShaderContextData* pContextData, IVertexFactory* pVertexFactory, studioRenderPassType_t renderPassType ) = 0;
 
 	virtual uint32		  GetNumParams() const				 = 0;
 	virtual shaderParam_t GetParam( uint32 index ) const	 = 0;

@@ -482,14 +482,31 @@ CStudioAPIBoundShaderStateVk::CStudioAPIBoundShaderStateVk( const CStudioAPIBoun
 			}
 		}
 
-		// Grab push constant ranges
+		// Grab push constant ranges - merge identical (offset,size) ranges across stages so a block
+		// shared by several stages becomes ONE range with OR'd stage flags
 		const eastl::vector<VkPushConstantRange>& shaderVkPushConstantRanges = pShaders[shaderIdx]->GetVkPushConstantRanges();
-		if ( !shaderVkPushConstantRanges.empty() )
+		for ( uint32 srcIdx = 0, srcCount = (uint32)shaderVkPushConstantRanges.size(); srcIdx < srcCount; ++srcIdx )
 		{
-			uint32 srcNumVkPushConstantRanges	  = (uint32)shaderVkPushConstantRanges.size();
-			uint32 oldDestNumVkPushConstantRanges = (uint32)vkPushConstantRanges.size();
-			vkPushConstantRanges.resize( oldDestNumVkPushConstantRanges + srcNumVkPushConstantRanges );
-			Mem_Memcpy( vkPushConstantRanges.data() + oldDestNumVkPushConstantRanges, shaderVkPushConstantRanges.data(), srcNumVkPushConstantRanges * sizeof( VkPushConstantRange ) );
+			const VkPushConstantRange& vkSrcPushConstantRange	= shaderVkPushConstantRanges[srcIdx];
+			VkPushConstantRange*	   pVkDestPushConstantRange = NULL;
+			for ( uint32 destIdx = 0, destCount = (uint32)vkPushConstantRanges.size(); destIdx < destCount; ++destIdx )
+			{
+				const VkPushConstantRange& vkCurPushConstantRange = vkPushConstantRanges[destIdx];
+				if ( vkCurPushConstantRange.offset == vkSrcPushConstantRange.offset && vkCurPushConstantRange.size == vkSrcPushConstantRange.size )
+				{
+					pVkDestPushConstantRange = (VkPushConstantRange*)&vkCurPushConstantRange;
+					break;
+				}
+			}
+
+			if ( !pVkDestPushConstantRange )
+			{
+				vkPushConstantRanges.emplace_back( vkSrcPushConstantRange );
+			}
+			else
+			{
+				pVkDestPushConstantRange->stageFlags |= vkSrcPushConstantRange.stageFlags;
+			}
 		}
 	}
 

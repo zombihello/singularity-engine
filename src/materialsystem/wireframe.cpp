@@ -77,7 +77,7 @@ BEGIN_SHADER( Wireframe, "Default shader" )
 		SET_PIXEL_SHADER( wireframe_ps );
 	}
 
-	SHADER_DRAW
+	SHADER_BIND
 	{
 		DECLARE_SHADER_CONTEXT_DATA( pWireframeContextData );
 		RES_BUFFER0.SetConstantBuffer( pStudioAPICmdList, pWireframeContextData->pStudioAPIBuffer0 );

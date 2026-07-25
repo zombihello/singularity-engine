@@ -24,43 +24,26 @@
 		{                                                                                                                                               \
 		public:                                                                                                                                         \
 			CShaderParam( const char* pName, shaderParamType_t type, const char* pHelpString, uint32 flags )                                            \
-				: info( s_ShaderParams.emplace_back() )                                                                                                 \
-				, index( (uint32)s_ShaderParams.size() - 1 )                                                                                            \
+				: index( INVALID_INDEX )                                                                                                                \
 			{                                                                                                                                           \
-				Assert( index == (uint32)s_ShaderParams.size() - 1 );                                                                                   \
-				info.pName		 = pName;                                                                                                               \
-				info.type		 = type;                                                                                                                \
-				info.pHelpString = pHelpString;                                                                                                         \
-				info.flags		 = flags;                                                                                                               \
+				index				= (uint32)s_ShaderParams.size();                                                                                    \
+				shaderParam_t& info = s_ShaderParams.emplace_back();                                                                                    \
+				info.pName			= pName;                                                                                                            \
+				info.type			= type;                                                                                                             \
+				info.pHelpString	= pHelpString;                                                                                                      \
+				info.flags			= flags;                                                                                                            \
 			}                                                                                                                                           \
 			operator uint32()                                                                                                                           \
 			{                                                                                                                                           \
 				return index;                                                                                                                           \
 			}                                                                                                                                           \
-			operator shaderParam_t()                                                                                                                    \
+			FORCEINLINE const shaderParam_t& GetInfo() const                                                                                            \
 			{                                                                                                                                           \
-				return info;                                                                                                                            \
-			}                                                                                                                                           \
-			FORCEINLINE const char* GetName() const                                                                                                     \
-			{                                                                                                                                           \
-				return info.pName;                                                                                                                      \
-			}                                                                                                                                           \
-			FORCEINLINE shaderParamType_t GetType() const                                                                                               \
-			{                                                                                                                                           \
-				return info.type;                                                                                                                       \
-			}                                                                                                                                           \
-			FORCEINLINE const char* GetHelp() const                                                                                                     \
-			{                                                                                                                                           \
-				return info.pHelpString;                                                                                                                \
-			}                                                                                                                                           \
-			FORCEINLINE uint32 GetFlags() const                                                                                                         \
-			{                                                                                                                                           \
-				return info.flags;                                                                                                                      \
+				return s_ShaderParams[index];                                                                                                           \
 			}                                                                                                                                           \
                                                                                                                                                         \
 		private:                                                                                                                                        \
-			shaderParam_t& info;                                                                                                                        \
-			uint32		   index;                                                                                                                       \
+			uint32 index;                                                                                                                               \
 		};                                                                                                                                              \
 		class CShaderBufferInfo                                                                                                                         \
 		{                                                                                                                                               \
@@ -248,7 +231,7 @@
 #define SHADER_FALLBACK			   virtual const char* GetFallbackShader() const override
 #define SHADER_UPDATE_CONTEXT_DATA virtual void OnUpdateContextData( IMaterialVar** pParams, IShaderContextData* pContextData ) const override
 #define SHADER_SELECT_COMBO		   virtual void R_SelectCombo( IShaderContextData* pContextData, IVertexFactory* pVertexFactory, shaderComboInfo_t& comboInfo ) override
-#define SHADER_DRAW				   virtual void R_OnDraw( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData ) override
+#define SHADER_BIND				   virtual void R_Bind( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData ) override
 #define SHADER_BARRIER			   virtual void R_Barrier( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData ) const override
 
 //-----------------------------------------------------------------------------
@@ -302,7 +285,10 @@ public:
 
 	// Place barriers into a command list
 	virtual void R_Barrier( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData ) const override;
-	virtual void R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData, IVertexFactory* pVertexFactory, studioRenderPassType_t renderPassType ) override;
+
+	// Resolve (baking if needed) the render pipeline for the current combo
+	// NOTE: `pVertexFactory` can be NULL when the shader generates its own geometry
+	virtual IStudioAPIRenderPipeline* R_ResolveRenderPipeline( IShaderContextData* pContextData, IVertexFactory* pVertexFactory, studioRenderPassType_t renderPassType ) override;
 
 	// Get a fallback shader
 	// Returns NULL when no have a fallback shader
@@ -317,7 +303,6 @@ protected:
 	virtual void OnInitInstance();
 	virtual void OnUpdateContextData( IMaterialVar** pParams, IShaderContextData* pContextData ) const;
 	virtual void R_SelectCombo( IShaderContextData* pContextData, IVertexFactory* pVertexFactory, shaderComboInfo_t& comboInfo ) = 0;
-	virtual void R_OnDraw( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData )								 = 0;
 
 private:
 	struct shaderCacheInfoInternal_t

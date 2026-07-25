@@ -1,6 +1,5 @@
 #pragma once
 #include "tier1/refcount.h"
-#include "studiorender/studio_renderpasstypes.h"
 #include "modelsystem/modeltypes.h"
 
 //-----------------------------------------------------------------------------
@@ -18,8 +17,10 @@ public:
 	virtual ~IVertexFactory() {}
 
 	// Place barriers into a command list
-	virtual void R_Barrier( IStudioAPICmdList* pStudioAPICmdList ) const										 = 0;
-	virtual void R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, studioRenderPassType_t renderPassType ) = 0;
+	virtual void R_Barrier( IStudioAPICmdList* pStudioAPICmdList ) const = 0;
+
+	// Bind the vertex factory's own resources (vertex/index buffers, etc) into the command list
+	virtual void R_Bind( IStudioAPICmdList* pStudioAPICmdList ) = 0;
 
 	virtual bool						 IsIndexed() const					   = 0;
 	virtual modelVertexType_t			 GetVertexType() const				   = 0;

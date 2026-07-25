@@ -118,14 +118,13 @@ void CBaseShader::R_Barrier( IStudioAPICmdList* pStudioAPICmdList, IShaderContex
 
 /*
 ==================
-CBaseShader::R_PrepareForDraw
+CBaseShader::R_ResolveRenderPipeline
 ==================
 */
-void CBaseShader::R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData, IVertexFactory* pVertexFactory, studioRenderPassType_t renderPassType )
+IStudioAPIRenderPipeline* CBaseShader::R_ResolveRenderPipeline( IShaderContextData* pContextData, IVertexFactory* pVertexFactory, studioRenderPassType_t renderPassType )
 {
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-
 	// Select a shader combination
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	shaderComboInfo_t comboInfo = {};
 	R_SelectCombo( pContextData, pVertexFactory, comboInfo );
 
@@ -154,12 +153,9 @@ void CBaseShader::R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, IShade
 		pStudioAPIRenderPipeline = pStudioRenderPipelineSet->R_BakeRenderPipeline( studioBakeParams );
 	}
 
-	// Set the render pipeline
-	Assert( pStudioAPIRenderPipeline && pStudioAPICmdList );
-	pStudioAPICmdList->SetRenderPipeline( pStudioAPIRenderPipeline );
-
-	// Prepare the shader for draw
-	R_OnDraw( pStudioAPICmdList, pContextData );
+	// We are done
+	Assert( pStudioAPIRenderPipeline );
+	return pStudioAPIRenderPipeline;
 }
 
 /*

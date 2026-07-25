@@ -132,16 +132,18 @@ void CStudioRenderPassScene::R_DrawPass( CStudioViewport* pViewport, studioScene
 	pGraphicsCmdList->BeginRenderPass( pStudioAPIRenderPass, pStudioAPIFrameBuffer );
 	for ( uint32 index = 0, count = (uint32)renderPass.drawSurfaceIds.size(); index < count; ++index )
 	{
-		studioDrawSurface_t* pDrawSurface	= pSceneView->drawSurfaces[renderPass.drawSurfaceIds[index]];
-		IModelResource*		 pModel			= pSceneView->resources[pDrawSurface->modelId]->pModel;
-		IMaterialResource*	 pMaterial		= pSceneView->resources[pDrawSurface->materialId]->pMaterial;
-		IShader*			 pShader		= pMaterial->GetShader();
-		IShaderContextData*	 pContextData	= pMaterial->GetContextData();
-		IVertexFactory*		 pVertexFactory = pModel->GetVertexFactory();
+		studioDrawSurface_t*	  pDrawSurface			   = pSceneView->drawSurfaces[renderPass.drawSurfaceIds[index]];
+		IModelResource*			  pModel				   = pSceneView->resources[pDrawSurface->modelId]->pModel;
+		IMaterialResource*		  pMaterial				   = pSceneView->resources[pDrawSurface->materialId]->pMaterial;
+		IShader*				  pShader				   = pMaterial->GetShader();
+		IShaderContextData*		  pContextData			   = pMaterial->GetContextData();
+		IVertexFactory*			  pVertexFactory		   = pModel->GetVertexFactory();
+		IStudioAPIRenderPipeline* pStudioAPIRenderPipeline = pShader->R_ResolveRenderPipeline( pContextData, pVertexFactory, STUDIO_RENDERPASS_TYPE_SCENE );
 
-		pVertexFactory->R_PrepareForDraw( pGraphicsCmdList, STUDIO_RENDERPASS_TYPE_SCENE );
-		pShader->R_PrepareForDraw( pGraphicsCmdList, pContextData, pVertexFactory, STUDIO_RENDERPASS_TYPE_SCENE );
+		pGraphicsCmdList->SetRenderPipeline( pStudioAPIRenderPipeline );
 		pGraphicsCmdList->SetConstantBuffer( 0, STUDIO_RESOURCE_BINDING_SLOT_GLOBAL_CB, pGlobalConstantBuffer );
+		pVertexFactory->R_Bind( pGraphicsCmdList );
+		pShader->R_Bind( pGraphicsCmdList, pContextData );
 		pGraphicsCmdList->DrawIndexed( pDrawSurface->baseVertexIndex, pDrawSurface->baseIndex, pDrawSurface->numIndices );
 	}
 	pGraphicsCmdList->EndRenderPass();

@@ -64,7 +64,7 @@ BEGIN_SHADER( ScreenSpace, "Help for ScreenSpace" )
 		SET_PIXEL_SHADER( screenspace_ps );
 	}
 
-	SHADER_DRAW
+	SHADER_BIND
 	{
 		DECLARE_SHADER_CONTEXT_DATA( pPresentContextData );
 		RES_BASETEXTURE.SetTexture( pStudioAPICmdList, pPresentContextData->pBaseTexture->GetStudioAPITexture() );

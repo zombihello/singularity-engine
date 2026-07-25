@@ -91,7 +91,7 @@ BEGIN_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 		SET_PIXEL_SHADER( unlitgeneric_ps );
 	}
 
-	SHADER_DRAW
+	SHADER_BIND
 	{
 		DECLARE_SHADER_CONTEXT_DATA( pUnlitGenericContextData );
 		RES_BASETEXTURE.SetTexture( pStudioAPICmdList, pUnlitGenericContextData->pBaseTexture->GetStudioAPITexture() );

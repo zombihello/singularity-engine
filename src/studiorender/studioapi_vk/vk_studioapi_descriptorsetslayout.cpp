@@ -88,6 +88,15 @@ void CStudioAPIDescriptorSetsLayoutVk::Init( const studioAPIDescriptorSetLayoutV
 	Assert( numUsedDescriptorTypesDict[VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT]
 			<= vkPhysicalDeviceLimits.maxDescriptorSetInputAttachments );
 
+	// Check push constant ranges against the CPU staging buffer and the device limit
+#if ENABLE_ASSERT
+	for ( uint32 index = 0, count = (uint32)vkPushConstantRanges.size(); index < count; ++index )
+	{
+		const VkPushConstantRange& vkPushConstantRange = vkPushConstantRanges[index];
+		Assert( vkPushConstantRange.offset + vkPushConstantRange.size <= S_Min<uint32>( vkPhysicalDeviceLimits.maxPushConstantsSize, STUDIOAPI_VK_MAX_PUSH_CONSTANT_SIZE ) );
+	}
+#endif	// ENABLE_ASSERT
+
 	// Create descriptor set layouts
 	for ( auto it = descriptorSetLayoutDict.begin(), itEnd = descriptorSetLayoutDict.end(); it != itEnd; ++it )
 	{

@@ -40,7 +40,7 @@ class CVertexFactoryBase : public CRefCounted<IVertexFactory>, public CStudioRen
 public:
 	// IVertexFactory interface
 	virtual void R_Barrier( IStudioAPICmdList* pStudioAPICmdList ) const override;
-	virtual void R_PrepareForDraw( IStudioAPICmdList* pStudioAPICmdList, studioRenderPassType_t renderPassType ) override;
+	virtual void R_Bind( IStudioAPICmdList* pStudioAPICmdList ) override;
 
 	virtual bool IsIndexed() const override;
 
