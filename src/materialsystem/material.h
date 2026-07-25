@@ -15,8 +15,8 @@ class CMaterialResource : public CRefCounted<IMaterialResource>
 {
 public:
 	// IMaterialResource interface
-	virtual IShader*			GetShader() const override;
-	virtual IShaderContextData* GetContextData() const override;
+	virtual IShader*				 GetShader() const override;
+	virtual IPerMaterialContextData* GetPerMaterialContextData() const override;
 
 	CMaterialResource();
 
@@ -27,9 +27,9 @@ public:
 	CStudioRenderCmdFence& GetRenderCmdFence();
 
 private:
-	CStudioRenderCmdFence		renderCmdFence;
-	IShader*					pShader;
-	CRefPtr<IShaderContextData> pContextData;
+	CStudioRenderCmdFence			 renderCmdFence;
+	IShader*						 pShader;
+	CRefPtr<IPerMaterialContextData> pPerMaterialContextData;
 };
 
 //-----------------------------------------------------------------------------

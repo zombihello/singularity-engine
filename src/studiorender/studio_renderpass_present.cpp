@@ -60,8 +60,8 @@ void CStudioRenderPassPresent::R_DrawPass( CStudioViewport* pViewport, studioSce
 
 	IMaterialResource*		  pMaterialResource		   = pPresentMaterial->GetStudioResource();
 	IShader*				  pShader				   = pMaterialResource->GetShader();
-	IShaderContextData*		  pContextData			   = pMaterialResource->GetContextData();
-	IStudioAPIRenderPipeline* pStudioAPIRenderPipeline = pShader->R_ResolveRenderPipeline( pContextData, NULL, STUDIO_RENDERPASS_TYPE_PRESENT );
+	IPerMaterialContextData*  pPerMaterialContextData  = pMaterialResource->GetPerMaterialContextData();
+	IStudioAPIRenderPipeline* pStudioAPIRenderPipeline = pShader->R_ResolveRenderPipeline( pPerMaterialContextData, NULL, STUDIO_RENDERPASS_TYPE_PRESENT );
 
 	// Initialize viewport and scissor
 	pGraphicsCmdList->BeginRecord();
@@ -76,13 +76,13 @@ void CStudioRenderPassPresent::R_DrawPass( CStudioViewport* pViewport, studioSce
 		};
 		pGraphicsCmdList->Barrier( barriers, ARRAYSIZE( barriers ) );
 	}
-	pShader->R_Barrier( pGraphicsCmdList, pContextData );
+	pShader->R_Barrier( pGraphicsCmdList, pPerMaterialContextData );
 
 	// Copy `__rt_scenecolor_ldr` into a swapchain image
 	pGraphicsCmdList->BeginRenderPass( pViewport->GetStudioAPIRenderPass(), pViewport->GetStudioAPIFrameBuffer() );
 	pGraphicsCmdList->SetRenderPipeline( pStudioAPIRenderPipeline );
 	pGraphicsCmdList->SetConstantBuffer( 0, STUDIO_RESOURCE_BINDING_SLOT_GLOBAL_CB, pGlobalConstantBuffer );
-	pShader->R_Bind( pGraphicsCmdList, pContextData );
+	pShader->R_Bind( pGraphicsCmdList, pPerMaterialContextData );
 	pGraphicsCmdList->Draw( 0, 3 );
 	pGraphicsCmdList->EndRenderPass();
 

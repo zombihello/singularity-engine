@@ -6,7 +6,7 @@
 //-----------------------------------------------------------------------------
 class IMaterialVar;
 class IShader;
-class IShaderContextData;
+class IPerMaterialContextData;
 struct materialVarInfo_t;
 
 //-----------------------------------------------------------------------------
@@ -27,8 +27,8 @@ class IMaterialResource : public IRefCounted
 public:
 	virtual ~IMaterialResource() {}
 
-	virtual IShader*			GetShader() const	   = 0;
-	virtual IShaderContextData* GetContextData() const = 0;
+	virtual IShader*				 GetShader() const				   = 0;
+	virtual IPerMaterialContextData* GetPerMaterialContextData() const = 0;
 };
 
 //-----------------------------------------------------------------------------

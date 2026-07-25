@@ -8,10 +8,10 @@
 
 /*
 ==================
-CBaseShaderContextData::FinalRelease
+CBasePerMaterialContextData::FinalRelease
 ==================
 */
-void CBaseShaderContextData::FinalRelease()
+void CBasePerMaterialContextData::FinalRelease()
 {
 	if ( IsNeedDeferredDestroy() )
 	{
@@ -83,7 +83,7 @@ void CBaseShader::OnInitInstance()
 CBaseShader::OnUpdateContextData
 ==================
 */
-void CBaseShader::OnUpdateContextData( IMaterialVar** pParams, IShaderContextData* pContextData ) const
+void CBaseShader::OnUpdateContextData( IMaterialVar** pParams, IPerMaterialContextData* pPerMaterialContextData ) const
 {
 }
 
@@ -112,7 +112,7 @@ void CBaseShader::InitDefaultParams( IMaterialVar** pParams ) const
 CBaseShader::R_Barrier
 ==================
 */
-void CBaseShader::R_Barrier( IStudioAPICmdList* pStudioAPICmdList, IShaderContextData* pContextData ) const
+void CBaseShader::R_Barrier( IStudioAPICmdList* pStudioAPICmdList, IPerMaterialContextData* pPerMaterialContextData ) const
 {
 }
 
@@ -121,12 +121,12 @@ void CBaseShader::R_Barrier( IStudioAPICmdList* pStudioAPICmdList, IShaderContex
 CBaseShader::R_ResolveRenderPipeline
 ==================
 */
-IStudioAPIRenderPipeline* CBaseShader::R_ResolveRenderPipeline( IShaderContextData* pContextData, IVertexFactory* pVertexFactory, studioRenderPassType_t renderPassType )
+IStudioAPIRenderPipeline* CBaseShader::R_ResolveRenderPipeline( IPerMaterialContextData* pPerMaterialContextData, IVertexFactory* pVertexFactory, studioRenderPassType_t renderPassType )
 {
 	// Select a shader combination
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	shaderComboInfo_t comboInfo = {};
-	R_SelectCombo( pContextData, pVertexFactory, comboInfo );
+	R_SelectCombo( pPerMaterialContextData, pVertexFactory, comboInfo );
 
 	// Get a render pipeline or bake it
 	uint64					  pipelineIdx			   = GetPipelineIndex( comboInfo.cacheIndices );

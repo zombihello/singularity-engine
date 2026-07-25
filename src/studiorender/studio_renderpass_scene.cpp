@@ -115,10 +115,10 @@ void CStudioRenderPassScene::R_DrawPass( CStudioViewport* pViewport, studioScene
 
 		case STUDIO_RESOURCE_TYPE_MATERIAL:
 		{
-			IMaterialResource*	pMaterial	 = pResource->pMaterial;
-			IShader*			pShader		 = pMaterial->GetShader();
-			IShaderContextData* pContextData = pMaterial->GetContextData();
-			pShader->R_Barrier( pGraphicsCmdList, pContextData );
+			IMaterialResource*		 pMaterial				 = pResource->pMaterial;
+			IShader*				 pShader				 = pMaterial->GetShader();
+			IPerMaterialContextData* pPerMaterialContextData = pMaterial->GetPerMaterialContextData();
+			pShader->R_Barrier( pGraphicsCmdList, pPerMaterialContextData );
 			break;
 		}
 
@@ -136,14 +136,14 @@ void CStudioRenderPassScene::R_DrawPass( CStudioViewport* pViewport, studioScene
 		IModelResource*			  pModel				   = pSceneView->resources[pDrawSurface->modelId]->pModel;
 		IMaterialResource*		  pMaterial				   = pSceneView->resources[pDrawSurface->materialId]->pMaterial;
 		IShader*				  pShader				   = pMaterial->GetShader();
-		IShaderContextData*		  pContextData			   = pMaterial->GetContextData();
+		IPerMaterialContextData*  pPerMaterialContextData  = pMaterial->GetPerMaterialContextData();
 		IVertexFactory*			  pVertexFactory		   = pModel->GetVertexFactory();
-		IStudioAPIRenderPipeline* pStudioAPIRenderPipeline = pShader->R_ResolveRenderPipeline( pContextData, pVertexFactory, STUDIO_RENDERPASS_TYPE_SCENE );
+		IStudioAPIRenderPipeline* pStudioAPIRenderPipeline = pShader->R_ResolveRenderPipeline( pPerMaterialContextData, pVertexFactory, STUDIO_RENDERPASS_TYPE_SCENE );
 
 		pGraphicsCmdList->SetRenderPipeline( pStudioAPIRenderPipeline );
 		pGraphicsCmdList->SetConstantBuffer( 0, STUDIO_RESOURCE_BINDING_SLOT_GLOBAL_CB, pGlobalConstantBuffer );
 		pVertexFactory->R_Bind( pGraphicsCmdList );
-		pShader->R_Bind( pGraphicsCmdList, pContextData );
+		pShader->R_Bind( pGraphicsCmdList, pPerMaterialContextData );
 		pGraphicsCmdList->DrawIndexed( pDrawSurface->baseVertexIndex, pDrawSurface->baseIndex, pDrawSurface->numIndices );
 	}
 	pGraphicsCmdList->EndRenderPass();

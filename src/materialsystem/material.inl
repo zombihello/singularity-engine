@@ -7,7 +7,7 @@ CMaterialResource::IsValid
 */
 FORCEINLINE bool CMaterialResource::IsValid() const
 {
-	return pShader && pContextData;
+	return pShader && pPerMaterialContextData;
 }
 
 /*

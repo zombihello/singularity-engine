@@ -23,44 +23,44 @@ BEGIN_SHADER( Wireframe, "Default shader" )
 		SHADER_PARAM( COLOR, SHADER_PARAM_TYPE_VECTOR_4D, "Color" )
 	END_SHADER_PARAMS
 
-	BEGIN_SHADER_CONTEXT_DATA
+	BEGIN_SHADER_PERMATERIAL_CONTEXTDATA
 		DECLARE_SHADER_BUFFER_DATA( buffer0 );
 		CRefPtr<IStudioAPIBuffer> pStudioAPIBuffer0;
 
-		SHADER_CONTEXT_DATA_INIT_STUDIO_API
+		SHADER_PERMATERIAL_CONTEXTDATA_INIT_STUDIOAPI
 		{
 			pStudioAPIBuffer0 = RES_BUFFER0.CreateBuffer( (byte*)&buffer0 );
 		}
 
-		SHADER_CONTEXT_DATA_UPDATE_STUDIO_API
+		SHADER_PERMATERIAL_CONTEXTDATA_UPDATE_STUDIOAPI
 		{
 			IStudioAPICmdContext* pStudioAPICmdContext = g_pStudioAPI->GetImmediateCmdContext( STUDIOAPI_QUEUE_TYPE_GRAPHICS );
 			RES_BUFFER0.UpdateBuffer( pStudioAPICmdContext, (byte*)&buffer0, pStudioAPIBuffer0 );
 		}
 
-		SHADER_CONTEXT_DATA_RELEASE_STUDIO_API
+		SHADER_PERMATERIAL_CONTEXTDATA_RELEASE_STUDIOAPI
 		{
 			pStudioAPIBuffer0 = NULL;
 		}
-	END_SHADER_CONTEXT_DATA
+	END_SHADER_PERMATERIAL_CONTEXTDATA
 
 	SHADER_INIT_PARAMS
 	{
 		pParams[COLOR]->SetVecValue( vector4_t( 1.f, 1.f, 1.f, 1.f ) );
 	}
 
-	SHADER_UPDATE_CONTEXT_DATA
+	SHADER_UPDATE_PERMATERIAL_CONTEXTDATA
 	{
-		DECLARE_SHADER_CONTEXT_DATA( pWireframeContextData );
-		pParams[COLOR]->GetVecValue( &pWireframeContextData->buffer0.color.x, 4 );
+		DECLARE_SHADER_PERMATERIAL_CONTEXTDATA( pPerMaterialContextDataLocal );
+		pParams[COLOR]->GetVecValue( &pPerMaterialContextDataLocal->buffer0.color.x, 4 );
 	}
 
 	SHADER_BARRIER
 	{
 		// TODO BS yehor.pohuliaka - Add the ability to get the queue type from IStudioAPICmdList
-		DECLARE_SHADER_CONTEXT_DATA( pWireframeContextData );
+		DECLARE_SHADER_PERMATERIAL_CONTEXTDATA( pPerMaterialContextDataLocal );
 		studioAPIBarrier_t studioAPIBarriers[] = {
-			StudioAPI_MakeBufferBarrier( pWireframeContextData->pStudioAPIBuffer0, STUDIOAPI_BUFFER_STATE_CONSTANT_BUFFER, STUDIOAPI_QUEUE_TYPE_GRAPHICS )
+			StudioAPI_MakeBufferBarrier( pPerMaterialContextDataLocal->pStudioAPIBuffer0, STUDIOAPI_BUFFER_STATE_CONSTANT_BUFFER, STUDIOAPI_QUEUE_TYPE_GRAPHICS )
 		};
 		pStudioAPICmdList->Barrier( studioAPIBarriers, ARRAYSIZE( studioAPIBarriers ) );
 	}
@@ -79,7 +79,7 @@ BEGIN_SHADER( Wireframe, "Default shader" )
 
 	SHADER_BIND
 	{
-		DECLARE_SHADER_CONTEXT_DATA( pWireframeContextData );
-		RES_BUFFER0.SetConstantBuffer( pStudioAPICmdList, pWireframeContextData->pStudioAPIBuffer0 );
+		DECLARE_SHADER_PERMATERIAL_CONTEXTDATA( pPerMaterialContextDataLocal );
+		RES_BUFFER0.SetConstantBuffer( pStudioAPICmdList, pPerMaterialContextDataLocal->pStudioAPIBuffer0 );
 	}
 END_SHADER

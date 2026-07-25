@@ -29,12 +29,12 @@ void CMaterialResource::Update( IShader* pShader, CMaterialVar** pVars )
 	{
 		// Remember a new shader and create a new context data
 		CMaterialResource::pShader = pShader;
-		pContextData			   = pShader->CreateContextData( (IMaterialVar**)pVars );
+		pPerMaterialContextData	   = pShader->CreatePerMaterialContextData( (IMaterialVar**)pVars );
 	}
 	// Otherwise update existing the context data
 	else
 	{
-		pShader->UpdateContextData( (IMaterialVar**)pVars, pContextData );
+		pShader->UpdatePerMaterialContextData( (IMaterialVar**)pVars, pPerMaterialContextData );
 	}
 }
 
@@ -53,8 +53,8 @@ void CMaterialResource::Clear()
 	}
 
 	// Clear all fields
-	pShader		 = NULL;
-	pContextData = NULL;
+	pShader					= NULL;
+	pPerMaterialContextData = NULL;
 }
 
 /*
@@ -69,12 +69,12 @@ IShader* CMaterialResource::GetShader() const
 
 /*
 ==================
-CMaterialResource::GetContextData
+CMaterialResource::GetPerMaterialContextData
 ==================
 */
-IShaderContextData* CMaterialResource::GetContextData() const
+IPerMaterialContextData* CMaterialResource::GetPerMaterialContextData() const
 {
-	return pContextData;
+	return pPerMaterialContextData;
 }
 
 /*

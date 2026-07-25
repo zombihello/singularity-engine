@@ -25,27 +25,27 @@ BEGIN_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 		SHADER_PARAM( BASETEXTURE, SHADER_PARAM_TYPE_TEXTURE, "Base texture" )
 	END_SHADER_PARAMS
 
-	BEGIN_SHADER_CONTEXT_DATA
+	BEGIN_SHADER_PERMATERIAL_CONTEXTDATA
 		DECLARE_SHADER_BUFFER_DATA( buffer0 );
 		CRefPtr<ITextureResource> pBaseTexture;
 		CRefPtr<IStudioAPIBuffer> pStudioAPIBuffer0;
 
-		SHADER_CONTEXT_DATA_INIT_STUDIO_API
+		SHADER_PERMATERIAL_CONTEXTDATA_INIT_STUDIOAPI
 		{
 			pStudioAPIBuffer0 = RES_BUFFER0.CreateBuffer( (byte*)&buffer0 );
 		}
 
-		SHADER_CONTEXT_DATA_UPDATE_STUDIO_API
+		SHADER_PERMATERIAL_CONTEXTDATA_UPDATE_STUDIOAPI
 		{
 			IStudioAPICmdContext* pStudioAPICmdContext = g_pStudioAPI->GetImmediateCmdContext( STUDIOAPI_QUEUE_TYPE_GRAPHICS );
 			RES_BUFFER0.UpdateBuffer( pStudioAPICmdContext, (byte*)&buffer0, pStudioAPIBuffer0 );
 		}
 
-		SHADER_CONTEXT_DATA_RELEASE_STUDIO_API
+		SHADER_PERMATERIAL_CONTEXTDATA_RELEASE_STUDIOAPI
 		{
 			pStudioAPIBuffer0 = NULL;
 		}
-	END_SHADER_CONTEXT_DATA
+	END_SHADER_PERMATERIAL_CONTEXTDATA
 
 	SHADER_INIT_PARAMS
 	{
@@ -54,9 +54,9 @@ BEGIN_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 		pParams[BASETEXTURE]->SetTextureValue( pTexturesMgr->GetDefaultResource() );
 	}
 
-	SHADER_UPDATE_CONTEXT_DATA
+	SHADER_UPDATE_PERMATERIAL_CONTEXTDATA
 	{
-		DECLARE_SHADER_CONTEXT_DATA( pUnlitGenericContextData );
+		DECLARE_SHADER_PERMATERIAL_CONTEXTDATA( pPerMaterialContextDataLocal );
 		CResourcePtr<ITexture> pBaseTexture = pParams[BASETEXTURE]->GetTextureValue();
 		if ( !pBaseTexture.IsCached() )
 		{
@@ -64,17 +64,17 @@ BEGIN_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 			pBaseTexture				   = pTexturesMgr->GetDefaultResource();
 		}
 
-		pUnlitGenericContextData->pBaseTexture = pBaseTexture->GetStudioResource();
-		pParams[COLOR]->GetVecValue( &pUnlitGenericContextData->buffer0.color.x, 4 );
+		pPerMaterialContextDataLocal->pBaseTexture = pBaseTexture->GetStudioResource();
+		pParams[COLOR]->GetVecValue( &pPerMaterialContextDataLocal->buffer0.color.x, 4 );
 	}
 
 	SHADER_BARRIER
 	{
 		// TODO BS yehor.pohuliaka - Add the ability to get the queue type from IStudioAPICmdList
-		DECLARE_SHADER_CONTEXT_DATA( pUnlitGenericContextData );
+		DECLARE_SHADER_PERMATERIAL_CONTEXTDATA( pPerMaterialContextDataLocal );
 		studioAPIBarrier_t studioAPIBarriers[] = {
-			StudioAPI_MakeTextureBarrier( pUnlitGenericContextData->pBaseTexture->GetStudioAPITexture(), STUDIOAPI_TEXTURE_LAYOUT_SHADER_RESOURCE_READONLY, STUDIOAPI_QUEUE_TYPE_GRAPHICS ),
-			StudioAPI_MakeBufferBarrier( pUnlitGenericContextData->pStudioAPIBuffer0, STUDIOAPI_BUFFER_STATE_CONSTANT_BUFFER, STUDIOAPI_QUEUE_TYPE_GRAPHICS )
+			StudioAPI_MakeTextureBarrier( pPerMaterialContextDataLocal->pBaseTexture->GetStudioAPITexture(), STUDIOAPI_TEXTURE_LAYOUT_SHADER_RESOURCE_READONLY, STUDIOAPI_QUEUE_TYPE_GRAPHICS ),
+			StudioAPI_MakeBufferBarrier( pPerMaterialContextDataLocal->pStudioAPIBuffer0, STUDIOAPI_BUFFER_STATE_CONSTANT_BUFFER, STUDIOAPI_QUEUE_TYPE_GRAPHICS )
 		};
 		pStudioAPICmdList->Barrier( studioAPIBarriers, ARRAYSIZE( studioAPIBarriers ) );
 	}
@@ -93,9 +93,9 @@ BEGIN_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 
 	SHADER_BIND
 	{
-		DECLARE_SHADER_CONTEXT_DATA( pUnlitGenericContextData );
-		RES_BASETEXTURE.SetTexture( pStudioAPICmdList, pUnlitGenericContextData->pBaseTexture->GetStudioAPITexture() );
-		RES_BASESAMPLER.SetSampler( pStudioAPICmdList, pUnlitGenericContextData->pBaseTexture->GetStudioAPISampler() );
-		RES_BUFFER0.SetConstantBuffer( pStudioAPICmdList, pUnlitGenericContextData->pStudioAPIBuffer0 );
+		DECLARE_SHADER_PERMATERIAL_CONTEXTDATA( pPerMaterialContextDataLocal );
+		RES_BASETEXTURE.SetTexture( pStudioAPICmdList, pPerMaterialContextDataLocal->pBaseTexture->GetStudioAPITexture() );
+		RES_BASESAMPLER.SetSampler( pStudioAPICmdList, pPerMaterialContextDataLocal->pBaseTexture->GetStudioAPISampler() );
+		RES_BUFFER0.SetConstantBuffer( pStudioAPICmdList, pPerMaterialContextDataLocal->pStudioAPIBuffer0 );
 	}
 END_SHADER
