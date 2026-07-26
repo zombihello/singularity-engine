@@ -21,14 +21,37 @@ BEGIN_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 	END_SHADER_RESOURCES
 
 	BEGIN_SHADER_PARAMS
-		SHADER_PARAM( COLOR, SHADER_PARAM_TYPE_VECTOR_4D, "Color" )
-		SHADER_PARAM( BASETEXTURE, SHADER_PARAM_TYPE_TEXTURE, "Base texture" )
+		SHADER_PARAM( COLOR, SHADER_PARAM_TYPE_VECTOR_4D, SHADER_PARAM_FREQUENCY_PERMATERIAL, "Color" )
+		SHADER_PARAM( BASETEXTURE, SHADER_PARAM_TYPE_TEXTURE, SHADER_PARAM_FREQUENCY_PERMATERIAL, "Base texture" )
 	END_SHADER_PARAMS
 
 	BEGIN_SHADER_PERMATERIAL_CONTEXTDATA
 		DECLARE_SHADER_BUFFER_DATA( buffer0 );
 		CRefPtr<ITextureResource> pBaseTexture;
 		CRefPtr<IStudioAPIBuffer> pStudioAPIBuffer0;
+
+		SHADER_PERMATERIAL_CONTEXTDATA_UPDATE
+		{
+			CResourcePtr<ITexture> pBaseTexture = pParams[BASETEXTURE]->GetTextureValue();
+			if ( !pBaseTexture.IsCached() )
+			{
+				IResourceTypeMgr* pTexturesMgr = g_pResourceSystem->GetResourceManagerForType<ITexture>();
+				pBaseTexture				   = pTexturesMgr->GetDefaultResource();
+			}
+
+			CThisClass::pBaseTexture = pBaseTexture->GetStudioResource();
+			pParams[COLOR]->GetVecValue( &buffer0.color.x, 4 );
+		}
+
+		SHADER_PERMATERIAL_CONTEXTDATA_BARRIER
+		{
+			// TODO BS yehor.pohuliaka - Add the ability to get the queue type from IStudioAPICmdList
+			studioAPIBarrier_t studioAPIBarriers[] = {
+				StudioAPI_MakeTextureBarrier( pBaseTexture->GetStudioAPITexture(), STUDIOAPI_TEXTURE_LAYOUT_SHADER_RESOURCE_READONLY, STUDIOAPI_QUEUE_TYPE_GRAPHICS ),
+				StudioAPI_MakeBufferBarrier( pStudioAPIBuffer0, STUDIOAPI_BUFFER_STATE_CONSTANT_BUFFER, STUDIOAPI_QUEUE_TYPE_GRAPHICS )
+			};
+			pStudioAPICmdList->Barrier( studioAPIBarriers, ARRAYSIZE( studioAPIBarriers ) );
+		}
 
 		SHADER_PERMATERIAL_CONTEXTDATA_INIT_STUDIOAPI
 		{
@@ -47,43 +70,18 @@ BEGIN_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 		}
 	END_SHADER_PERMATERIAL_CONTEXTDATA
 
-	SHADER_INIT_PARAMS
+	SHADER_INIT_PERMATERIAL_PARAMS
 	{
 		IResourceTypeMgr* pTexturesMgr = g_pResourceSystem->GetResourceManagerForType<ITexture>();
 		pParams[COLOR]->SetVecValue( vector4_t( 1.f, 1.f, 1.f, 1.f ) );
 		pParams[BASETEXTURE]->SetTextureValue( pTexturesMgr->GetDefaultResource() );
 	}
 
-	SHADER_UPDATE_PERMATERIAL_CONTEXTDATA
-	{
-		DECLARE_SHADER_PERMATERIAL_CONTEXTDATA( pPerMaterialContextDataLocal );
-		CResourcePtr<ITexture> pBaseTexture = pParams[BASETEXTURE]->GetTextureValue();
-		if ( !pBaseTexture.IsCached() )
-		{
-			IResourceTypeMgr* pTexturesMgr = g_pResourceSystem->GetResourceManagerForType<ITexture>();
-			pBaseTexture				   = pTexturesMgr->GetDefaultResource();
-		}
-
-		pPerMaterialContextDataLocal->pBaseTexture = pBaseTexture->GetStudioResource();
-		pParams[COLOR]->GetVecValue( &pPerMaterialContextDataLocal->buffer0.color.x, 4 );
-	}
-
-	SHADER_BARRIER
-	{
-		// TODO BS yehor.pohuliaka - Add the ability to get the queue type from IStudioAPICmdList
-		DECLARE_SHADER_PERMATERIAL_CONTEXTDATA( pPerMaterialContextDataLocal );
-		studioAPIBarrier_t studioAPIBarriers[] = {
-			StudioAPI_MakeTextureBarrier( pPerMaterialContextDataLocal->pBaseTexture->GetStudioAPITexture(), STUDIOAPI_TEXTURE_LAYOUT_SHADER_RESOURCE_READONLY, STUDIOAPI_QUEUE_TYPE_GRAPHICS ),
-			StudioAPI_MakeBufferBarrier( pPerMaterialContextDataLocal->pStudioAPIBuffer0, STUDIOAPI_BUFFER_STATE_CONSTANT_BUFFER, STUDIOAPI_QUEUE_TYPE_GRAPHICS )
-		};
-		pStudioAPICmdList->Barrier( studioAPIBarriers, ARRAYSIZE( studioAPIBarriers ) );
-	}
-
 	SHADER_SELECT_COMBO
 	{
 		// Set a vertex shader for the model's vertex factory
 		DECLARE_VERTEX_SHADER( unlitgeneric_vs );
-		SET_VERTEX_FACTORY( unlitgeneric_vs, pVertexFactory );
+		SET_VERTEX_FACTORY( unlitgeneric_vs, drawParams.pVertexFactory );
 		SET_VERTEX_SHADER( unlitgeneric_vs );
 
 		// Set a pixel shader

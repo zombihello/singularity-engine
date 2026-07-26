@@ -116,9 +116,8 @@ void CStudioRenderPassScene::R_DrawPass( CStudioViewport* pViewport, studioScene
 		case STUDIO_RESOURCE_TYPE_MATERIAL:
 		{
 			IMaterialResource*		 pMaterial				 = pResource->pMaterial;
-			IShader*				 pShader				 = pMaterial->GetShader();
 			IPerMaterialContextData* pPerMaterialContextData = pMaterial->GetPerMaterialContextData();
-			pShader->R_Barrier( pGraphicsCmdList, pPerMaterialContextData );
+			pPerMaterialContextData->R_Barrier( pGraphicsCmdList );
 			break;
 		}
 
@@ -132,18 +131,21 @@ void CStudioRenderPassScene::R_DrawPass( CStudioViewport* pViewport, studioScene
 	pGraphicsCmdList->BeginRenderPass( pStudioAPIRenderPass, pStudioAPIFrameBuffer );
 	for ( uint32 index = 0, count = (uint32)renderPass.drawSurfaceIds.size(); index < count; ++index )
 	{
-		studioDrawSurface_t*	  pDrawSurface			   = pSceneView->drawSurfaces[renderPass.drawSurfaceIds[index]];
-		IModelResource*			  pModel				   = pSceneView->resources[pDrawSurface->modelId]->pModel;
-		IMaterialResource*		  pMaterial				   = pSceneView->resources[pDrawSurface->materialId]->pMaterial;
-		IShader*				  pShader				   = pMaterial->GetShader();
-		IPerMaterialContextData*  pPerMaterialContextData  = pMaterial->GetPerMaterialContextData();
-		IVertexFactory*			  pVertexFactory		   = pModel->GetVertexFactory();
-		IStudioAPIRenderPipeline* pStudioAPIRenderPipeline = pShader->R_ResolveRenderPipeline( pPerMaterialContextData, pVertexFactory, STUDIO_RENDERPASS_TYPE_SCENE );
+		studioDrawSurface_t* pDrawSurface	= pSceneView->drawSurfaces[renderPass.drawSurfaceIds[index]];
+		IModelResource*		 pModel			= pSceneView->resources[pDrawSurface->modelId]->pModel;
+		IMaterialResource*	 pMaterial		= pSceneView->resources[pDrawSurface->materialId]->pMaterial;
+		IShader*			 pShader		= pMaterial->GetShader();
+		IVertexFactory*		 pVertexFactory = pModel->GetVertexFactory();
 
-		pGraphicsCmdList->SetRenderPipeline( pStudioAPIRenderPipeline );
+		shaderDrawParams_t shaderDrawParams		 = {};
+		shaderDrawParams.pPerMaterialContextData = pMaterial->GetPerMaterialContextData();
+		shaderDrawParams.pPerDrawVars			 = pShader->GetDefaultPerDrawVars();
+		shaderDrawParams.pVertexFactory			 = pVertexFactory;
+
+		pGraphicsCmdList->SetRenderPipeline( pShader->R_ResolveRenderPipeline( shaderDrawParams, STUDIO_RENDERPASS_TYPE_SCENE ) );
 		pGraphicsCmdList->SetConstantBuffer( 0, STUDIO_RESOURCE_BINDING_SLOT_GLOBAL_CB, pGlobalConstantBuffer );
 		pVertexFactory->R_Bind( pGraphicsCmdList );
-		pShader->R_Bind( pGraphicsCmdList, pPerMaterialContextData );
+		pShader->R_Bind( pGraphicsCmdList, shaderDrawParams );
 		pGraphicsCmdList->DrawIndexed( pDrawSurface->baseVertexIndex, pDrawSurface->baseIndex, pDrawSurface->numIndices );
 	}
 	pGraphicsCmdList->EndRenderPass();

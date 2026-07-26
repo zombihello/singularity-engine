@@ -20,12 +20,26 @@ BEGIN_SHADER( Wireframe, "Default shader" )
 	END_SHADER_RESOURCES
 
 	BEGIN_SHADER_PARAMS
-		SHADER_PARAM( COLOR, SHADER_PARAM_TYPE_VECTOR_4D, "Color" )
+		SHADER_PARAM( COLOR, SHADER_PARAM_TYPE_VECTOR_4D, SHADER_PARAM_FREQUENCY_PERMATERIAL, "Color" )
 	END_SHADER_PARAMS
 
 	BEGIN_SHADER_PERMATERIAL_CONTEXTDATA
 		DECLARE_SHADER_BUFFER_DATA( buffer0 );
 		CRefPtr<IStudioAPIBuffer> pStudioAPIBuffer0;
+
+		SHADER_PERMATERIAL_CONTEXTDATA_UPDATE
+		{
+			pParams[COLOR]->GetVecValue( &buffer0.color.x, 4 );
+		}
+
+		SHADER_PERMATERIAL_CONTEXTDATA_BARRIER
+		{
+			// TODO BS yehor.pohuliaka - Add the ability to get the queue type from IStudioAPICmdList
+			studioAPIBarrier_t studioAPIBarriers[] = {
+				StudioAPI_MakeBufferBarrier( pStudioAPIBuffer0, STUDIOAPI_BUFFER_STATE_CONSTANT_BUFFER, STUDIOAPI_QUEUE_TYPE_GRAPHICS )
+			};
+			pStudioAPICmdList->Barrier( studioAPIBarriers, ARRAYSIZE( studioAPIBarriers ) );
+		}
 
 		SHADER_PERMATERIAL_CONTEXTDATA_INIT_STUDIOAPI
 		{
@@ -44,32 +58,16 @@ BEGIN_SHADER( Wireframe, "Default shader" )
 		}
 	END_SHADER_PERMATERIAL_CONTEXTDATA
 
-	SHADER_INIT_PARAMS
+	SHADER_INIT_PERMATERIAL_PARAMS
 	{
 		pParams[COLOR]->SetVecValue( vector4_t( 1.f, 1.f, 1.f, 1.f ) );
-	}
-
-	SHADER_UPDATE_PERMATERIAL_CONTEXTDATA
-	{
-		DECLARE_SHADER_PERMATERIAL_CONTEXTDATA( pPerMaterialContextDataLocal );
-		pParams[COLOR]->GetVecValue( &pPerMaterialContextDataLocal->buffer0.color.x, 4 );
-	}
-
-	SHADER_BARRIER
-	{
-		// TODO BS yehor.pohuliaka - Add the ability to get the queue type from IStudioAPICmdList
-		DECLARE_SHADER_PERMATERIAL_CONTEXTDATA( pPerMaterialContextDataLocal );
-		studioAPIBarrier_t studioAPIBarriers[] = {
-			StudioAPI_MakeBufferBarrier( pPerMaterialContextDataLocal->pStudioAPIBuffer0, STUDIOAPI_BUFFER_STATE_CONSTANT_BUFFER, STUDIOAPI_QUEUE_TYPE_GRAPHICS )
-		};
-		pStudioAPICmdList->Barrier( studioAPIBarriers, ARRAYSIZE( studioAPIBarriers ) );
 	}
 
 	SHADER_SELECT_COMBO
 	{
 		// Set a vertex shader for the model's vertex factory
 		DECLARE_VERTEX_SHADER( wireframe_vs );
-		SET_VERTEX_FACTORY( wireframe_vs, pVertexFactory );
+		SET_VERTEX_FACTORY( wireframe_vs, drawParams.pVertexFactory );
 		SET_VERTEX_SHADER( wireframe_vs );
 
 		// Set a pixel shader

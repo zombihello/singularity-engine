@@ -199,7 +199,7 @@ void CShaderCompilerCppGenerator::GenerateRemapVertexFactories( const shader_t& 
 	// Begin function `SetVertexFactory`
 	const char* pVertexFactoryFlagName = ConvShaderSystemFlagToString( SHADER_SYSTEM_FLAG_VERTEXFACTORY );
 	buffer += "public:\n";
-	buffer += "\tvoid SetVertexFactory( IVertexFactory* pVertexFactory )\n";
+	buffer += "\tvoid SetVertexFactory( const IVertexFactory* pVertexFactory )\n";
 	buffer += "\t{\n";
 	buffer += "\t\tstatic const uint32 s_vertexFactoryRemap[MODEL_VERTEX_NUM_TYPES] = { ";
 	for ( uint32 index = 0; index < MODEL_VERTEX_NUM_TYPES; ++index )

@@ -24,18 +24,16 @@ void CMaterialResource::Update( IShader* pShader, CMaterialVar** pVars )
 	PROFILER_SCOPE_FUNC();
 	Assert( pShader && pVars );
 
-	// Create a new context data if shader has been changed
+	// Create a new per-material context data if shader has been changed
 	if ( CMaterialResource::pShader != pShader )
 	{
 		// Remember a new shader and create a new context data
 		CMaterialResource::pShader = pShader;
-		pPerMaterialContextData	   = pShader->CreatePerMaterialContextData( (IMaterialVar**)pVars );
+		pPerMaterialContextData	   = pShader->CreatePerMaterialContextData();
 	}
-	// Otherwise update existing the context data
-	else
-	{
-		pShader->UpdatePerMaterialContextData( (IMaterialVar**)pVars, pPerMaterialContextData );
-	}
+
+	// Update the per-material context data
+	pPerMaterialContextData->Update( (IMaterialVar**)pVars );
 }
 
 /*
@@ -360,14 +358,14 @@ void CMaterial::SetShader( const char* pShaderName )
 			delete vars[varIdx];
 		}
 
-		// Create undefined vars for all the actual material vars
-		uint32 numParams = pShader->GetNumParams();
+		// Create undefined vars for all the actual per-material shader params
+		uint32 numParams = pShader->GetNumParams( SHADER_PARAM_FREQUENCY_PERMATERIAL );
 		vars.resize( numParams );
 		resourceVarIds.clear();
 		varsDict.clear();
 		for ( uint32 paramIdx = 0; paramIdx < numParams; ++paramIdx )
 		{
-			shaderParam_t shaderParam	= pShader->GetParam( paramIdx );
+			shaderParam_t shaderParam	= pShader->GetParam( SHADER_PARAM_FREQUENCY_PERMATERIAL, paramIdx );
 			vars[paramIdx]				= new CMaterialVar( this, shaderParam.pName, paramIdx );
 			varsDict[shaderParam.pName] = paramIdx;
 		}
@@ -451,7 +449,7 @@ IShader* CMaterial::GetShader() const
 
 /*
 ==================
-CMaterial::GetShaderContextData
+CMaterial::GetStudioResource
 ==================
 */
 IMaterialResource* CMaterial::GetStudioResource() const

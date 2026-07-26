@@ -58,10 +58,11 @@ void CStudioRenderPassPresent::R_DrawPass( CStudioViewport* pViewport, studioSce
 	CRefPtr<IStudioAPICmdListBatch> pGraphicsCmdListBatch = g_pStudioAPI->CreateCmdListBatch( pGraphicsCmdContext );
 	CRefPtr<IStudioAPICmdList>		pGraphicsCmdList	  = g_pStudioAPI->CreateCmdList( pGraphicsCmdContext );
 
-	IMaterialResource*		  pMaterialResource		   = pPresentMaterial->GetStudioResource();
-	IShader*				  pShader				   = pMaterialResource->GetShader();
-	IPerMaterialContextData*  pPerMaterialContextData  = pMaterialResource->GetPerMaterialContextData();
-	IStudioAPIRenderPipeline* pStudioAPIRenderPipeline = pShader->R_ResolveRenderPipeline( pPerMaterialContextData, NULL, STUDIO_RENDERPASS_TYPE_PRESENT );
+	IMaterialResource* pMaterialResource	 = pPresentMaterial->GetStudioResource();
+	IShader*		   pShader				 = pMaterialResource->GetShader();
+	shaderDrawParams_t shaderDrawParams		 = {};
+	shaderDrawParams.pPerMaterialContextData = pMaterialResource->GetPerMaterialContextData();
+	shaderDrawParams.pPerDrawVars			 = pShader->GetDefaultPerDrawVars();
 
 	// Initialize viewport and scissor
 	pGraphicsCmdList->BeginRecord();
@@ -76,13 +77,13 @@ void CStudioRenderPassPresent::R_DrawPass( CStudioViewport* pViewport, studioSce
 		};
 		pGraphicsCmdList->Barrier( barriers, ARRAYSIZE( barriers ) );
 	}
-	pShader->R_Barrier( pGraphicsCmdList, pPerMaterialContextData );
+	shaderDrawParams.pPerMaterialContextData->R_Barrier( pGraphicsCmdList );
 
 	// Copy `__rt_scenecolor_ldr` into a swapchain image
 	pGraphicsCmdList->BeginRenderPass( pViewport->GetStudioAPIRenderPass(), pViewport->GetStudioAPIFrameBuffer() );
-	pGraphicsCmdList->SetRenderPipeline( pStudioAPIRenderPipeline );
+	pGraphicsCmdList->SetRenderPipeline( pShader->R_ResolveRenderPipeline( shaderDrawParams, STUDIO_RENDERPASS_TYPE_PRESENT ) );
 	pGraphicsCmdList->SetConstantBuffer( 0, STUDIO_RESOURCE_BINDING_SLOT_GLOBAL_CB, pGlobalConstantBuffer );
-	pShader->R_Bind( pGraphicsCmdList, pPerMaterialContextData );
+	pShader->R_Bind( pGraphicsCmdList, shaderDrawParams );
 	pGraphicsCmdList->Draw( 0, 3 );
 	pGraphicsCmdList->EndRenderPass();
 
