@@ -50,6 +50,13 @@ BEGIN_SHADER( ScreenSpace, "Help for ScreenSpace" )
 		pParams[BASETEXTURE]->SetTextureValue( pTexturesMgr->GetDefaultResource() );
 	}
 
+	SHADER_INIT_DEFAULT_RENDERSTATE
+	{
+		renderState.rasterizerState.cullMode = STUDIOAPI_RASTERIZER_CULL_MODE_NONE;
+		renderState.depthState.bTestEnable	 = false;
+		renderState.depthState.bWriteEnable	 = false;
+	}
+
 	SHADER_SELECT_COMBO
 	{
 		// Set a vertex shader for the model's vertex factory

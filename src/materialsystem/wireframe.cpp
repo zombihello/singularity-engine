@@ -63,6 +63,12 @@ BEGIN_SHADER( Wireframe, "Default shader" )
 		pParams[COLOR]->SetVecValue( vector4_t( 1.f, 1.f, 1.f, 1.f ) );
 	}
 
+	SHADER_INIT_DEFAULT_RENDERSTATE
+	{
+		renderState.rasterizerState.fillMode = STUDIOAPI_RASTERIZER_FILL_MODE_WIREFRAME;
+		renderState.rasterizerState.cullMode = STUDIOAPI_RASTERIZER_CULL_MODE_NONE;
+	}
+
 	SHADER_SELECT_COMBO
 	{
 		// Set a vertex shader for the model's vertex factory

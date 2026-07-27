@@ -12,6 +12,16 @@
 
 /*
 ==================
+CStudioRenderPassPresent::CStudioRenderPassPresent
+==================
+*/
+CStudioRenderPassPresent::CStudioRenderPassPresent()
+	: CStudioRenderPassBase( STUDIO_RENDERPASS_TYPE_PRESENT, 1 )
+{
+}
+
+/*
+==================
 CStudioRenderPassPresent::Init
 ==================
 */
@@ -109,35 +119,4 @@ void CStudioRenderPassPresent::R_RebuildFrameBuffers( const vector2i_t& bufferSi
 {
 	// The present pass draws into the viewport's own swap chain frame buffer, which the viewport
 	// already manages/resizes itself - nothing to do here
-}
-
-/*
-==================
-CStudioRenderPassPresent::CreateStudioAPIRenderPipeline
-==================
-*/
-CRefPtr<IStudioAPIRenderPipeline> CStudioRenderPassPresent::R_CreateStudioAPIRenderPipeline( CStudioViewport* pViewport, IStudioAPIBoundShaderState* pStudioAPIBoundShaderState ) const
-{
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-	Assert( Studio_IsInRenderThread() && pViewport && pStudioAPIBoundShaderState );
-	Assert( pViewport->GetStudioAPIRenderPass() );
-
-	studioAPIColorBlendAttachmentStateInfo_t studioAPIColorBlendAttachmentState = {};
-	studioAPIColorBlendAttachmentState.colorWriteMask							= STUDIOAPI_COLOR_COMPONENT_FLAG_R | STUDIOAPI_COLOR_COMPONENT_FLAG_G | STUDIOAPI_COLOR_COMPONENT_FLAG_B | STUDIOAPI_COLOR_COMPONENT_FLAG_A;
-	studioAPIColorBlendAttachmentState.bBlendEnable								= false;
-
-	studioAPIRenderPipelineCreateInfo_t studioAPIRenderPipelineCreateInfo = {};
-	studioAPIRenderPipelineCreateInfo.pBoundShaderState					  = pStudioAPIBoundShaderState;
-	studioAPIRenderPipelineCreateInfo.inputAssemblyState.topology		  = STUDIOAPI_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-	studioAPIRenderPipelineCreateInfo.rasterizerState.fillMode			  = STUDIOAPI_RASTERIZER_FILL_MODE_SOLID;
-	studioAPIRenderPipelineCreateInfo.rasterizerState.cullMode			  = STUDIOAPI_RASTERIZER_CULL_MODE_NONE;
-	studioAPIRenderPipelineCreateInfo.rasterizerState.lineWidth			  = 1.f;
-	studioAPIRenderPipelineCreateInfo.rasterizerState.bDepthBiasEnable	  = false;
-	studioAPIRenderPipelineCreateInfo.depthState.bTestEnable			  = false;
-	studioAPIRenderPipelineCreateInfo.stencilState.bTestEnable			  = false;
-	studioAPIRenderPipelineCreateInfo.colorBlendState.attachmentCount	  = 1;
-	studioAPIRenderPipelineCreateInfo.colorBlendState.pAttachments		  = &studioAPIColorBlendAttachmentState;
-	studioAPIRenderPipelineCreateInfo.colorBlendState.blendConstants	  = vector4_t( 0.f, 0.f, 0.f, 0.f );
-	studioAPIRenderPipelineCreateInfo.pRenderPass						  = pViewport->GetStudioAPIRenderPass();
-	return g_pStudioAPI->CreateRenderPipeline( studioAPIRenderPipelineCreateInfo );
 }

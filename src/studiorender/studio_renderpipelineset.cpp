@@ -64,9 +64,9 @@ void CStudioRenderPipelineSet::CRenderPipelineContainer::Destroy()
 		{
 			// Remove render pipelines, do it on the render thread to make sure that they will be destroyed at the render thread
 			dataStorageDrawRenderPasses_t* pDataStorageDraw = (dataStorageDrawRenderPasses_t*)pDataStorage;
-			UNIQUE_RENDER_COMMAND_ONEPARAMETER( CRemoveRenderPipelinesCmd, eastl::vector<CRefPtr<IStudioAPIRenderPipeline>>, studioAPIRenderPipelines, eastl::move( pDataStorageDraw->studioAPIRenderPipelines ),
+			UNIQUE_RENDER_COMMAND_ONEPARAMETER( CRemoveRenderPipelinesCmd, renderStates_t, renderStates, eastl::move( pDataStorageDraw->renderStates ),
 												{
-													studioAPIRenderPipelines.clear();
+													renderStates.clear();
 												} );
 			delete pDataStorageDraw;
 		}
@@ -79,7 +79,7 @@ void CStudioRenderPipelineSet::CRenderPipelineContainer::Destroy()
 				viewportRenderPipelines_t& viewportRenderPipelines = pDataStoragePresent->viewports[viewportIdx];
 				if ( !viewportRenderPipelines.pViewport )
 				{
-					Assert( viewportRenderPipelines.onReleaseViewportIndexHandle == INVALID_HANDLE && viewportRenderPipelines.onRenderPassUpdatedHandle == INVALID_HANDLE && viewportRenderPipelines.studioAPIRenderPipelines.empty() );
+					Assert( viewportRenderPipelines.onReleaseViewportIndexHandle == INVALID_HANDLE && viewportRenderPipelines.onRenderPassUpdatedHandle == INVALID_HANDLE && viewportRenderPipelines.renderStates.empty() );
 					continue;
 				}
 
@@ -96,9 +96,9 @@ void CStudioRenderPipelineSet::CRenderPipelineContainer::Destroy()
 
 				// Remove render pipelines, do it on the render thread to make sure that they will be destroyed at the render thread
 				viewportRenderPipelines.pViewport = NULL;
-				UNIQUE_RENDER_COMMAND_ONEPARAMETER( CRemoveRenderPipelinesCmd, eastl::vector<CRefPtr<IStudioAPIRenderPipeline>>, studioAPIRenderPipelines, eastl::move( viewportRenderPipelines.studioAPIRenderPipelines ),
+				UNIQUE_RENDER_COMMAND_ONEPARAMETER( CRemoveRenderPipelinesCmd, renderStates_t, renderStates, eastl::move( viewportRenderPipelines.renderStates ),
 													{
-														studioAPIRenderPipelines.clear();
+														renderStates.clear();
 													} );
 			}
 
@@ -120,41 +120,48 @@ IStudioAPIRenderPipeline* CStudioRenderPipelineSet::CRenderPipelineContainer::R_
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 
-	// For non-present passes we get the array as is
-	eastl::vector<CRefPtr<IStudioAPIRenderPipeline>>* pStudioAPIRenderPipelines = NULL;
-	CStudioViewport*								  pActiveViewport			= CStudioViewport::R_GetActiveViewport();
+	// For non-present passes we get the render states array as is
+	renderStates_t*	 pRenderStates	 = NULL;
+	CStudioViewport* pActiveViewport = CStudioViewport::R_GetActiveViewport();
 	if ( renderPassType != STUDIO_RENDERPASS_TYPE_PRESENT )
 	{
 		dataStorageDrawRenderPasses_t* pDataStorageDraw = (dataStorageDrawRenderPasses_t*)pDataStorage;
-		pStudioAPIRenderPipelines						= &pDataStorageDraw->studioAPIRenderPipelines;
+		pRenderStates									= &pDataStorageDraw->renderStates;
 	}
-	// For a present pass we get the array for now the active viewport
+	// For a present pass we get the render states array for now the active viewport
 	else
 	{
 		dataStoragePresentPass_t* pDataStoragePresent = (dataStoragePresentPass_t*)pDataStorage;
 		Assert( pActiveViewport );
 
-		// If we haven't a render pipelines for the viewport then initialize it now
+		// If we haven't a render states for the viewport then initialize it now
 		uint32 viewportIndex = pActiveViewport->GetIndex();
 		if ( viewportIndex >= (uint32)pDataStoragePresent->viewports.size() )
 		{
 			pDataStoragePresent->viewports.resize( viewportIndex + 1 );
 			viewportRenderPipelines_t* pViewportRenderPipelines	   = &pDataStoragePresent->viewports[viewportIndex];
-			pStudioAPIRenderPipelines							   = &pViewportRenderPipelines->studioAPIRenderPipelines;
+			pRenderStates										   = &pViewportRenderPipelines->renderStates;
 			pViewportRenderPipelines->pViewport					   = pActiveViewport;
 			pViewportRenderPipelines->onReleaseViewportIndexHandle = pActiveViewport->OnReleaseViewportIndex().Subscribe( &CRenderPipelineContainer::OnReleaseViewportIndex, this );
 			pViewportRenderPipelines->onRenderPassUpdatedHandle	   = pActiveViewport->OnRenderPassUpdated().Subscribe( &CRenderPipelineContainer::OnRenderPassUpdated, this );
 		}
 		else
 		{
-			pStudioAPIRenderPipelines = &pDataStoragePresent->viewports[viewportIndex].studioAPIRenderPipelines;
+			pRenderStates = &pDataStoragePresent->viewports[viewportIndex].renderStates;
 		}
 	}
 
-	// Leave place for a new render pipeline
-	if ( bakeParams.pipelineIdx >= (uint64)pStudioAPIRenderPipelines->size() )
+	// Leave place for the render state
+	if ( bakeParams.renderStateIdx >= (uint64)pRenderStates->size() )
 	{
-		pStudioAPIRenderPipelines->resize( bakeParams.pipelineIdx + 1 );
+		pRenderStates->resize( bakeParams.renderStateIdx + 1 );
+	}
+
+	// Leave place for a new render pipeline within the render state's own combo array
+	renderPipelines_t* pStudioAPIRenderPipelines = &( *pRenderStates )[bakeParams.renderStateIdx];
+	if ( bakeParams.shaderComboIdx >= (uint64)pStudioAPIRenderPipelines->size() )
+	{
+		pStudioAPIRenderPipelines->resize( bakeParams.shaderComboIdx + 1 );
 	}
 
 	// Create a new render pipeline
@@ -164,11 +171,11 @@ IStudioAPIRenderPipeline* CStudioRenderPipelineSet::CRenderPipelineContainer::R_
 																												 bakeParams.pStudioAPIShaders[STUDIOAPI_SHADER_TYPE_HULL],
 																												 bakeParams.pStudioAPIShaders[STUDIOAPI_SHADER_TYPE_DOMAIN],
 																												 bakeParams.pStudioAPIShaders[STUDIOAPI_SHADER_TYPE_GEOMETRY] );
-	// Create a render pipeline for the render pass
+	// Create a render pipeline for the render pass, using the shader's own render state
 	CStudioRenderPassBase* pRenderPass = g_StudioRender.GetRenderPass( renderPassType );
 	AssertMsg( pRenderPass, "No render pass registered for render pass type 0x%X", renderPassType );
-	CRefPtr<IStudioAPIRenderPipeline> pStudioAPIRenderPipeline = pRenderPass->R_CreateStudioAPIRenderPipeline( pActiveViewport, pStudioAPIBoundShaderState );
-	( *pStudioAPIRenderPipelines )[bakeParams.pipelineIdx]	   = pStudioAPIRenderPipeline;
+	CRefPtr<IStudioAPIRenderPipeline> pStudioAPIRenderPipeline = pRenderPass->R_CreateStudioAPIRenderPipeline( pActiveViewport, pStudioAPIBoundShaderState, bakeParams.renderState );
+	( *pStudioAPIRenderPipelines )[bakeParams.shaderComboIdx]  = pStudioAPIRenderPipeline;
 	return pStudioAPIRenderPipeline;
 }
 
@@ -177,29 +184,47 @@ IStudioAPIRenderPipeline* CStudioRenderPipelineSet::CRenderPipelineContainer::R_
 CStudioRenderPipelineSet::CRenderPipelineContainer::R_GetStudioAPIRenderPipeline
 ==================
 */
-IStudioAPIRenderPipeline* CStudioRenderPipelineSet::CRenderPipelineContainer::R_GetStudioAPIRenderPipeline( uint64 pipelineIdx ) const
+IStudioAPIRenderPipeline* CStudioRenderPipelineSet::CRenderPipelineContainer::R_GetStudioAPIRenderPipeline( uint64 renderStateIdx, uint64 shaderComboIdx ) const
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-
-	// Draw render pipelines
-	Assert( pDataStorage && renderPassType != STUDIO_RENDERPASS_NUM_TYPES );
-	if ( renderPassType != STUDIO_RENDERPASS_TYPE_PRESENT )
+	Assert( pDataStorage );
+	switch ( renderPassType )
+	{
+		// Draw render pipelines
+	case STUDIO_RENDERPASS_TYPE_SCENE:
 	{
 		dataStorageDrawRenderPasses_t* pDataStorageDraw = (dataStorageDrawRenderPasses_t*)pDataStorage;
-		return pipelineIdx < (uint32)pDataStorageDraw->studioAPIRenderPipelines.size() ? pDataStorageDraw->studioAPIRenderPipelines[pipelineIdx] : NULL;
+		if ( renderStateIdx >= (uint64)pDataStorageDraw->renderStates.size() || shaderComboIdx >= (uint64)pDataStorageDraw->renderStates[renderStateIdx].size() )
+		{
+			return NULL;
+		}
+		return pDataStorageDraw->renderStates[renderStateIdx][shaderComboIdx];
 	}
 
-	// Present render pipelines
-	dataStoragePresentPass_t* pDataStoragePresent = (dataStoragePresentPass_t*)pDataStorage;
-	CStudioViewport*		  pActiveViewport	  = CStudioViewport::R_GetActiveViewport();
-	Assert( pActiveViewport );
-	uint32 viewportIndex = pActiveViewport->GetIndex();
-	if ( viewportIndex >= (uint32)pDataStoragePresent->viewports.size() || pipelineIdx >= (uint32)pDataStoragePresent->viewports[viewportIndex].studioAPIRenderPipelines.size() )
+		// Present render pipelines
+	case STUDIO_RENDERPASS_TYPE_PRESENT:
 	{
+		dataStoragePresentPass_t* pDataStoragePresent = (dataStoragePresentPass_t*)pDataStorage;
+		CStudioViewport*		  pActiveViewport	  = CStudioViewport::R_GetActiveViewport();
+		Assert( pActiveViewport );
+		uint32 viewportIndex = pActiveViewport->GetIndex();
+		if ( viewportIndex >= (uint32)pDataStoragePresent->viewports.size() )
+		{
+			return NULL;
+		}
+
+		const renderStates_t& renderStates = pDataStoragePresent->viewports[viewportIndex].renderStates;
+		if ( renderStateIdx >= (uint64)renderStates.size() || shaderComboIdx >= (uint64)renderStates[renderStateIdx].size() )
+		{
+			return NULL;
+		}
+		return renderStates[renderStateIdx][shaderComboIdx];
+	}
+
+	default:
+		AssertMsg( false, "Unknown render pass type 0x%X", renderPassType );
 		return NULL;
 	}
-
-	return pDataStoragePresent->viewports[viewportIndex].studioAPIRenderPipelines[pipelineIdx];
 }
 
 /*
@@ -236,9 +261,9 @@ void CStudioRenderPipelineSet::CRenderPipelineContainer::OnReleaseViewportIndex(
 		viewportRenderPipelines.pViewport = NULL;
 
 		// Remove render pipelines, do it on the render thread to make sure that they will be destroyed at the render thread
-		UNIQUE_RENDER_COMMAND_ONEPARAMETER( CRemoveCachedPipelinesCmd, eastl::vector<CRefPtr<IStudioAPIRenderPipeline>>, studioAPIRenderPipelines, eastl::move( viewportRenderPipelines.studioAPIRenderPipelines ),
+		UNIQUE_RENDER_COMMAND_ONEPARAMETER( CRemoveCachedPipelinesCmd, renderStates_t, renderStates, eastl::move( viewportRenderPipelines.renderStates ),
 											{
-												studioAPIRenderPipelines.clear();
+												renderStates.clear();
 											} );
 	}
 }
@@ -264,9 +289,9 @@ void CStudioRenderPipelineSet::CRenderPipelineContainer::OnRenderPassUpdated( vo
 		// Remove render pipelines, do it on the render thread to make sure that they will be destroyed at the render thread
 		viewportRenderPipelines_t& viewportRenderPipelines = pDataStoragePresent->viewports[viewportIndex];
 		Assert( viewportRenderPipelines.pViewport == pViewport );
-		UNIQUE_RENDER_COMMAND_ONEPARAMETER( CRemoveCachedPipelinesCmd, eastl::vector<CRefPtr<IStudioAPIRenderPipeline>>, studioAPIRenderPipelines, eastl::move( viewportRenderPipelines.studioAPIRenderPipelines ),
+		UNIQUE_RENDER_COMMAND_ONEPARAMETER( CRemoveCachedPipelinesCmd, renderStates_t, renderStates, eastl::move( viewportRenderPipelines.renderStates ),
 											{
-												studioAPIRenderPipelines.clear();
+												renderStates.clear();
 											} );
 	}
 }
@@ -317,9 +342,9 @@ IStudioAPIRenderPipeline* CStudioRenderPipelineSet::R_BakeRenderPipeline( const 
 CStudioVertexDeclarations::R_GetStudioAPIRenderPipeline
 ==================
 */
-IStudioAPIRenderPipeline* CStudioRenderPipelineSet::R_GetStudioAPIRenderPipeline( studioRenderPassType_t renderPassType, uint64 pipelineIdx ) const
+IStudioAPIRenderPipeline* CStudioRenderPipelineSet::R_GetStudioAPIRenderPipeline( studioRenderPassType_t renderPassType, uint64 renderStateIdx, uint64 shaderComboIdx ) const
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( renderPassType < STUDIO_RENDERPASS_NUM_TYPES );
-	return renderPipelineContainers[renderPassType].R_GetStudioAPIRenderPipeline( pipelineIdx );
+	return renderPipelineContainers[renderPassType].R_GetStudioAPIRenderPipeline( renderStateIdx, shaderComboIdx );
 }

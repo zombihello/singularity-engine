@@ -243,6 +243,8 @@ CStudioAPIRenderPipelineVk::CStudioAPIRenderPipelineVk( const studioAPIRenderPip
 	vkPipelineDepthStencilStateCreateInfo.depthWriteEnable						= createInfo.depthState.bWriteEnable;
 	vkPipelineDepthStencilStateCreateInfo.depthCompareOp						= VK_TranslateCompareOp( createInfo.depthState.compareOp );
 	vkPipelineDepthStencilStateCreateInfo.depthBoundsTestEnable					= createInfo.depthState.bBoundsTestEnable;
+	vkPipelineDepthStencilStateCreateInfo.minDepthBounds						= createInfo.depthState.minBounds;
+	vkPipelineDepthStencilStateCreateInfo.maxDepthBounds						= createInfo.depthState.maxBounds;
 	vkPipelineDepthStencilStateCreateInfo.stencilTestEnable						= createInfo.stencilState.bTestEnable;
 	vkPipelineDepthStencilStateCreateInfo.front.failOp							= VK_TranslateStencilOp( createInfo.stencilState.front.failOp );
 	vkPipelineDepthStencilStateCreateInfo.front.passOp							= VK_TranslateStencilOp( createInfo.stencilState.front.passOp );

@@ -12,12 +12,15 @@ class CStudioRenderPipelineSet : public CRefCounted<IStudioRenderPipelineSet>
 public:
 	// IStudioRenderPipelineSet interface
 	virtual IStudioAPIRenderPipeline* R_BakeRenderPipeline( const studioBakeRenderPipelineParams_t& bakeParams ) override;
-	virtual IStudioAPIRenderPipeline* R_GetStudioAPIRenderPipeline( studioRenderPassType_t renderPassType, uint64 pipelineIdx ) const override;
+	virtual IStudioAPIRenderPipeline* R_GetStudioAPIRenderPipeline( studioRenderPassType_t renderPassType, uint64 renderStateIdx, uint64 shaderComboIdx ) const override;
 
 	CStudioRenderPipelineSet();
 	~CStudioRenderPipelineSet();
 
 private:
+	using renderPipelines_t = eastl::vector<CRefPtr<IStudioAPIRenderPipeline>>;	 // Indexed by shaderComboIdx
+	using renderStates_t	= eastl::vector<renderPipelines_t>;					 // Indexed by renderStateIdx
+
 	struct viewportRenderPipelines_t
 	{
 		viewportRenderPipelines_t()
@@ -30,12 +33,12 @@ private:
 		CStudioViewport*								   pViewport;
 		CStudioViewport::COnReleaseViewportIndex::handle_t onReleaseViewportIndexHandle;
 		CStudioViewport::COnRenderPassUpdated::handle_t	   onRenderPassUpdatedHandle;
-		eastl::vector<CRefPtr<IStudioAPIRenderPipeline>>   studioAPIRenderPipelines;
+		renderStates_t									   renderStates;
 	};
 
 	struct dataStorageDrawRenderPasses_t
 	{
-		eastl::vector<CRefPtr<IStudioAPIRenderPipeline>> studioAPIRenderPipelines;
+		renderStates_t renderStates;
 	};
 
 	struct dataStoragePresentPass_t
@@ -53,7 +56,7 @@ private:
 		void Destroy();
 
 		IStudioAPIRenderPipeline* R_BakeRenderPipeline( const studioBakeRenderPipelineParams_t& bakeParams );
-		IStudioAPIRenderPipeline* R_GetStudioAPIRenderPipeline( uint64 pipelineIdx ) const;
+		IStudioAPIRenderPipeline* R_GetStudioAPIRenderPipeline( uint64 renderStateIdx, uint64 shaderComboIdx ) const;
 
 	private:
 		static void OnReleaseViewportIndex( void* pUserData, CStudioViewport* pViewport );

@@ -152,7 +152,7 @@ void CStudioAPIDeviceVk::Init( uint32 engineMajorVersion, uint32 engineMinorVers
 	// Debug create info struct
 #if !RETAIL
 	VkDebugUtilsMessengerCreateInfoEXT vkDebugCreateInfo			= {};
-	VkValidationFeatureEnableEXT	   vkValidationFeatureEnables[] = { VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_EXT, VK_VALIDATION_FEATURE_ENABLE_SYNCHRONIZATION_VALIDATION_EXT };
+	VkValidationFeatureEnableEXT	   vkValidationFeatureEnables[] = { VK_VALIDATION_FEATURE_ENABLE_SYNCHRONIZATION_VALIDATION_EXT };
 	VkValidationFeaturesEXT			   vkValidationFeatures			= {};
 #endif	// !RETAIL
 

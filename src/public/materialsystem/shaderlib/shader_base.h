@@ -235,16 +235,17 @@
 //-----------------------------------------------------------------------------
 // Helper macros to implement shader functions
 //-----------------------------------------------------------------------------
-#define SHADER_INIT					   virtual void OnInitInstance() override
-#define SHADER_SHUTDOWN				   virtual void OnShutdownInstance() override
-#define SHADER_INIT_PERMATERIAL_PARAMS virtual void InitDefaultParams( IMaterialVar** pParams ) const override
-#define SHADER_INIT_PERDRAW_PARAMS	   virtual void InitDefaultParams( shaderPerDrawVar_t* pParams ) const override
-#define SHADER_FALLBACK				   virtual const char* GetFallbackShader() const override
-#define SHADER_SELECT_COMBO			   virtual void R_SelectCombo( const shaderDrawParams_t& drawParams, shaderComboInfo_t& comboInfo ) override
-#define SHADER_BIND					   virtual void R_OnBind( IStudioAPICmdList* pStudioAPICmdList, const shaderDrawParams_t& drawParams ) override
+#define SHADER_INIT						virtual void OnInitInstance() override
+#define SHADER_SHUTDOWN					virtual void OnShutdownInstance() override
+#define SHADER_INIT_PERMATERIAL_PARAMS	virtual void InitDefaultParams( IMaterialVar** pParams ) const override
+#define SHADER_INIT_PERDRAW_PARAMS		virtual void InitDefaultParams( shaderPerDrawVar_t* pParams ) const override
+#define SHADER_INIT_DEFAULT_RENDERSTATE virtual void OnInitDefaultRenderState( studioRenderState_t& renderState ) const override
+#define SHADER_FALLBACK					virtual const char* GetFallbackShader() const override
+#define SHADER_SELECT_COMBO				virtual void R_SelectCombo( const shaderDrawParams_t& drawParams, shaderComboInfo_t& comboInfo ) override
+#define SHADER_BIND						virtual void R_OnBind( IStudioAPICmdList* pStudioAPICmdList, const shaderDrawParams_t& drawParams ) override
 
 //-----------------------------------------------------------------------------
-// Helper macros to set shader caches
+// Helper macros to set shader caches and a render state
 //-----------------------------------------------------------------------------
 #define DECLARE_VERTEX_SHADER( Name )	C_##Name##_vertex_Index __vertexShaderIndex;
 #define DECLARE_HULL_SHADER( Name )		C_##Name##_hull_Index __hullShaderIndex;
@@ -261,12 +262,13 @@
 #define SET_PIXEL_SHADER_COMBO( Name, Value )	   __pixelShaderIndex.Set##Name( Value );
 #define SET_COMPUTE_SHADER_COMBO( Name, Value )	   __computeShaderIndex.Set##Name( Value );
 
-#define SET_VERTEX_SHADER( Name )	comboInfo.cacheIndices[STUDIOAPI_SHADER_TYPE_VERTEX] = __vertexShaderIndex.GetIndex();
-#define SET_HULL_SHADER( Name )		comboInfo.cacheIndices[STUDIOAPI_SHADER_TYPE_HULL] = __hullShaderIndex.GetIndex();
-#define SET_DOMAIN_SHADER( Name )	comboInfo.cacheIndices[STUDIOAPI_SHADER_TYPE_DOMAIN] = __domainShaderIndex.GetIndex();
-#define SET_GEOMETRY_SHADER( Name ) comboInfo.cacheIndices[STUDIOAPI_SHADER_TYPE_GEOMETRY] = __geometryShaderIndex.GetIndex();
-#define SET_PIXEL_SHADER( Name )	comboInfo.cacheIndices[STUDIOAPI_SHADER_TYPE_PIXEL] = __pixelShaderIndex.GetIndex();
-#define SET_COMPUTE_SHADER( Name )	comboInfo.cacheIndices[STUDIOAPI_SHADER_TYPE_COMPUTE] = __computeShaderIndex.GetIndex();
+#define SET_VERTEX_SHADER( Name )	comboInfo.cacheIds[STUDIOAPI_SHADER_TYPE_VERTEX] = __vertexShaderIndex.GetIndex();
+#define SET_HULL_SHADER( Name )		comboInfo.cacheIds[STUDIOAPI_SHADER_TYPE_HULL] = __hullShaderIndex.GetIndex();
+#define SET_DOMAIN_SHADER( Name )	comboInfo.cacheIds[STUDIOAPI_SHADER_TYPE_DOMAIN] = __domainShaderIndex.GetIndex();
+#define SET_GEOMETRY_SHADER( Name ) comboInfo.cacheIds[STUDIOAPI_SHADER_TYPE_GEOMETRY] = __geometryShaderIndex.GetIndex();
+#define SET_PIXEL_SHADER( Name )	comboInfo.cacheIds[STUDIOAPI_SHADER_TYPE_PIXEL] = __pixelShaderIndex.GetIndex();
+#define SET_COMPUTE_SHADER( Name )	comboInfo.cacheIds[STUDIOAPI_SHADER_TYPE_COMPUTE] = __computeShaderIndex.GetIndex();
+#define SET_RENDER_STATE( Index )	comboInfo.renderStateIdx = ( Index );
 
 //-----------------------------------------------------------------------------
 // Base per-material context data
@@ -318,16 +320,24 @@ public:
 protected:
 	struct shaderComboInfo_t
 	{
-		uint64 cacheIndices[STUDIOAPI_SHADER_NUM_DRAW_TYPES];
+		uint64 renderStateIdx;	// Index 0 is the shader's default render state and is already selected by default
+		uint64 cacheIds[STUDIOAPI_SHADER_NUM_DRAW_TYPES];
 	};
 
 	virtual void OnInitInstance();
 	virtual void OnShutdownInstance();
+	virtual void OnInitDefaultRenderState( studioRenderState_t& renderState ) const;
 	virtual void R_SelectCombo( const shaderDrawParams_t& drawParams, shaderComboInfo_t& comboInfo ) = 0;
 	virtual void R_OnBind( IStudioAPICmdList* pStudioAPICmdList, const shaderDrawParams_t& drawParams );
 
+	const studioRenderState_t& GetDefaultRenderState() const;
+	uint64					   FindOrCreateRenderState( const studioRenderState_t& renderState );
+
 private:
-	using paramIndicesDict_t = eastl::unordered_map<const char*, uint32, stlInsensitiveStringHash_t, stlInsensitiveCompareString_t>;
+	using shaderPerDrawVars_t  = eastl::vector<shaderPerDrawVar_t>;
+	using studioRenderStates_t = eastl::vector<studioRenderState_t>;
+	using paramIdsDict_t	   = eastl::unordered_map<const char*, uint32, stlInsensitiveStringHash_t, stlInsensitiveCompareString_t>;
+	using renderStatesDict_t   = eastl::unordered_map<hash, uint64>;
 	struct shaderCacheInfoInternal_t
 	{
 		bool   bValid;		 // Is valid the information
@@ -335,16 +345,16 @@ private:
 		uint64 indexOffset;	 // Cache index offset in the shader manager
 	};
 
-	// pCacheIndices must be array size STUDIOAPI_SHADER_NUM_DRAW_TYPES
-	uint64 GetPipelineIndex( const uint64* pCacheIndices ) const;
-
-	// Validate draw parameters (only for debug)
-	void ValidateDrawParams( const shaderDrawParams_t& drawParams ) const;
+	void   InitDefaultRenderState();
+	void   ValidateDrawParams( const shaderDrawParams_t& drawParams ) const;
+	uint64 GetShaderComboIndex( const uint64* pCacheIds ) const;  // pCacheIds must be array size STUDIOAPI_SHADER_NUM_DRAW_TYPES
 
 	CRefPtr<IStudioRenderPipelineSet> pStudioRenderPipelineSet;
 	shaderCacheInfoInternal_t		  cacheInfos[STUDIOAPI_SHADER_NUM_DRAW_TYPES];
-	eastl::vector<shaderPerDrawVar_t> defaultPerDrawVars;
-	paramIndicesDict_t				  paramIndicesDict[SHADER_PARAM_NUM_FREQUENCIES];
+	shaderPerDrawVars_t				  defaultPerDrawVars;
+	studioRenderStates_t			  renderStates;
+	paramIdsDict_t					  paramIdsDict[SHADER_PARAM_NUM_FREQUENCIES];
+	renderStatesDict_t				  renderStatesDict;
 };
 
 #include "materialsystem/shaderlib/shader_base.inl"

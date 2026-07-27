@@ -19,7 +19,7 @@ void MainVS( in vertexFactoryInput_t input, out float4 screenPosition : SV_POSIT
 MainVS
 ==================
 */
-void MainVS(in uint vertexID : SV_VertexID, out float4 screenPosition : SV_POSITION, out float2 texCoord : TEXCOORD0)
+void MainVS( in uint vertexID : SV_VertexID, out float4 screenPosition : SV_POSITION, out float2 texCoord : TEXCOORD0 )
 {
     texCoord		= float2( ( vertexID << 1 ) & 2, vertexID & 2 );
     screenPosition	= float4( texCoord * float2( 2.f, -2.f ) + float2( -1.f, 1.f ), 0.f, 1.f );

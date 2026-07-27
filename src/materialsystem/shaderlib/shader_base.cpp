@@ -96,16 +96,19 @@ void CBaseShader::Init( const shaderInitParams_t& shaderInitParams )
 	// Create a pipeline set for the shader
 	pStudioRenderPipelineSet = g_pStudioRender->CreateRenderPipelineSet();
 
+	// Initialize the default render state
+	InitDefaultRenderState();
+
 	// Initialize a lookup table to find the param index by name
 	for ( uint32 frequency = 0; frequency < SHADER_PARAM_NUM_FREQUENCIES; ++frequency )
 	{
-		paramIndicesDict_t& paramIndicesForFrequencyDict = paramIndicesDict[frequency];
-		uint32				numParams					 = GetNumParams( (shaderParamFrequency_t)frequency );
-		paramIndicesForFrequencyDict.reserve( numParams );
+		paramIdsDict_t& paramIdsForFrequencyDict = paramIdsDict[frequency];
+		uint32			numParams				 = GetNumParams( (shaderParamFrequency_t)frequency );
+		paramIdsForFrequencyDict.reserve( numParams );
 		for ( uint32 paramIdx = 0; paramIdx < numParams; ++paramIdx )
 		{
 			const shaderParam_t& param = GetParam( (shaderParamFrequency_t)frequency, paramIdx );
-			VerifyMsg( paramIndicesForFrequencyDict.insert( eastl::make_pair( param.pName, paramIdx ) ).second, "More than one param is named '%s', param names are case-insensitive (shader: '%s')", param.pName, GetName() );
+			VerifyMsg( paramIdsForFrequencyDict.insert( eastl::make_pair( param.pName, paramIdx ) ).second, "More than one param is named '%s', param names are case-insensitive (shader: '%s')", param.pName, GetName() );
 		}
 	}
 
@@ -118,6 +121,52 @@ void CBaseShader::Init( const shaderInitParams_t& shaderInitParams )
 	{
 		InitDefaultParams( defaultPerDrawVars.data() );
 	}
+}
+
+/*
+==================
+CBaseShader::InitDefaultRenderState
+==================
+*/
+void CBaseShader::InitDefaultRenderState()
+{
+	// Create the default render state
+	PROFILER_SCOPE_FUNC();
+	Assert( renderStates.empty() && renderStatesDict.empty() );
+	studioRenderState_t studioDefaultRenderState					  = {};
+	studioDefaultRenderState.inputAssemblyState.topology			  = STUDIOAPI_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+	studioDefaultRenderState.rasterizerState.fillMode				  = STUDIOAPI_RASTERIZER_FILL_MODE_SOLID;
+	studioDefaultRenderState.rasterizerState.cullMode				  = STUDIOAPI_RASTERIZER_CULL_MODE_CW;
+	studioDefaultRenderState.rasterizerState.lineWidth				  = 1.f;
+	studioDefaultRenderState.rasterizerState.bDepthBiasEnable		  = false;
+	studioDefaultRenderState.rasterizerState.depthBiasConstantFactor  = 0.f;
+	studioDefaultRenderState.rasterizerState.depthBiasSlopeFactor	  = 0.f;
+	studioDefaultRenderState.rasterizerState.depthBiasClamp			  = 0.f;
+	studioDefaultRenderState.depthState.bTestEnable					  = true;
+	studioDefaultRenderState.depthState.bWriteEnable				  = true;
+	studioDefaultRenderState.depthState.bBoundsTestEnable			  = false;
+	studioDefaultRenderState.depthState.compareOp					  = STUDIOAPI_COMPARE_OP_LESS;
+	studioDefaultRenderState.depthState.minBounds					  = 0.f;
+	studioDefaultRenderState.depthState.maxBounds					  = 1.f;
+	studioDefaultRenderState.stencilState.bTestEnable				  = false;
+	studioDefaultRenderState.stencilState.front						  = studioAPIStencilOpStateInfo_t{ STUDIOAPI_STENCIL_OP_KEEP, STUDIOAPI_STENCIL_OP_KEEP, STUDIOAPI_STENCIL_OP_KEEP, STUDIOAPI_COMPARE_OP_ALWAYS, 0xFF, 0xFF, 0 };
+	studioDefaultRenderState.stencilState.back						  = studioDefaultRenderState.stencilState.front;
+	studioDefaultRenderState.colorBlendAttachment.bBlendEnable		  = false;
+	studioDefaultRenderState.colorBlendAttachment.srcColorBlendFactor = STUDIOAPI_BLEND_FACTOR_ONE;
+	studioDefaultRenderState.colorBlendAttachment.dstColorBlendFactor = STUDIOAPI_BLEND_FACTOR_ZERO;
+	studioDefaultRenderState.colorBlendAttachment.colorBlendOp		  = STUDIOAPI_BLEND_OP_ADD;
+	studioDefaultRenderState.colorBlendAttachment.srcAlphaBlendFactor = STUDIOAPI_BLEND_FACTOR_ONE;
+	studioDefaultRenderState.colorBlendAttachment.dstAlphaBlendFactor = STUDIOAPI_BLEND_FACTOR_ZERO;
+	studioDefaultRenderState.colorBlendAttachment.alphaBlendOp		  = STUDIOAPI_BLEND_OP_ADD;
+	studioDefaultRenderState.colorBlendAttachment.colorWriteMask	  = STUDIOAPI_COLOR_COMPONENT_FLAG_R | STUDIOAPI_COLOR_COMPONENT_FLAG_G | STUDIOAPI_COLOR_COMPONENT_FLAG_B | STUDIOAPI_COLOR_COMPONENT_FLAG_A;
+	studioDefaultRenderState.blendConstants							  = vector4_t( 0.f, 0.f, 0.f, 0.f );
+
+	// Let the shader override it
+	OnInitDefaultRenderState( studioDefaultRenderState );
+
+	// Add the state into the storage
+	renderStates.emplace_back( studioDefaultRenderState );
+	renderStatesDict.insert( eastl::make_pair( FastHash( &studioDefaultRenderState, sizeof( studioRenderState_t ) ), 0 ) );
 }
 
 /*
@@ -140,6 +189,15 @@ void CBaseShader::OnShutdownInstance()
 
 /*
 ==================
+CBaseShader::OnInitDefaultRenderState
+==================
+*/
+void CBaseShader::OnInitDefaultRenderState( studioRenderState_t& renderState ) const
+{
+}
+
+/*
+==================
 CBaseShader::Shutdown
 ==================
 */
@@ -148,11 +206,13 @@ void CBaseShader::Shutdown()
 	PROFILER_SCOPE_FUNC();
 	OnShutdownInstance();
 
+	renderStates.clear();
+	renderStatesDict.clear();
 	defaultPerDrawVars.clear();
 	for ( uint32 frequency = 0; frequency < SHADER_PARAM_NUM_FREQUENCIES; ++frequency )
 	{
-		paramIndicesDict_t& paramIndicesForFrequencyDict = paramIndicesDict[(uint32)frequency];
-		paramIndicesForFrequencyDict.clear();
+		paramIdsDict_t& paramIdsForFrequencyDict = paramIdsDict[(uint32)frequency];
+		paramIdsForFrequencyDict.clear();
 	}
 
 	pStudioRenderPipelineSet = NULL;
@@ -179,6 +239,29 @@ void CBaseShader::InitDefaultParams( shaderPerDrawVar_t* pParams ) const
 
 /*
 ==================
+CBaseShader::FindOrCreateRenderState
+==================
+*/
+uint64 CBaseShader::FindOrCreateRenderState( const studioRenderState_t& renderState )
+{
+	// Try to find already created the render state
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	hash renderStateHash = FastHash( &renderState, sizeof( studioRenderState_t ) );
+	auto it				 = renderStatesDict.find( renderStateHash );
+	if ( it != renderStatesDict.end() )
+	{
+		return it->second;
+	}
+
+	// Otherwise add the new into the storage
+	uint64 renderStateIdx = (uint64)renderStates.size();
+	renderStates.emplace_back( renderState );
+	renderStatesDict.insert( eastl::make_pair( renderStateHash, renderStateIdx ) );
+	return renderStateIdx;
+}
+
+/*
+==================
 CBaseShader::R_ResolveRenderPipeline
 ==================
 */
@@ -191,15 +274,18 @@ IStudioAPIRenderPipeline* CBaseShader::R_ResolveRenderPipeline( const shaderDraw
 	// Select a shader combination
 	shaderComboInfo_t comboInfo = {};
 	R_SelectCombo( drawParams, comboInfo );
+	AssertMsg( comboInfo.renderStateIdx < (uint64)renderStates.size(), "Selected render state %i is out of range [0;%i) (shader: '%s')", comboInfo.renderStateIdx, (uint64)renderStates.size(), GetName() );
 
 	// Get a render pipeline or bake it
-	uint64					  pipelineIdx			   = GetPipelineIndex( comboInfo.cacheIndices );
-	IStudioAPIRenderPipeline* pStudioAPIRenderPipeline = pStudioRenderPipelineSet->R_GetStudioAPIRenderPipeline( renderPassType, pipelineIdx );
+	uint64					  shaderComboIdx		   = GetShaderComboIndex( comboInfo.cacheIds );
+	IStudioAPIRenderPipeline* pStudioAPIRenderPipeline = pStudioRenderPipelineSet->R_GetStudioAPIRenderPipeline( renderPassType, comboInfo.renderStateIdx, shaderComboIdx );
 	if ( !pStudioAPIRenderPipeline )
 	{
 		// Initialize an information about bake the render pipeline
 		studioBakeRenderPipelineParams_t studioBakeParams = {};
-		studioBakeParams.pipelineIdx					  = pipelineIdx;
+		studioBakeParams.shaderComboIdx					  = shaderComboIdx;
+		studioBakeParams.renderStateIdx					  = comboInfo.renderStateIdx;
+		studioBakeParams.renderState					  = renderStates[comboInfo.renderStateIdx];
 		studioBakeParams.renderPassType					  = renderPassType;
 		studioBakeParams.pVertexDeclaration				  = drawParams.pVertexFactory ? drawParams.pVertexFactory->GetStudioAPIVertexDeclaration() : NULL;
 		for ( uint32 shaderIdx = 0; shaderIdx < STUDIOAPI_SHADER_NUM_DRAW_TYPES; ++shaderIdx )
@@ -209,7 +295,7 @@ IStudioAPIRenderPipeline* CBaseShader::R_ResolveRenderPipeline( const shaderDraw
 			{
 				studioBakeParams.pStudioAPIShaders[shaderIdx] = g_pShaderMgr->GetStudioAPIShader( GetShaderLib().GetIndex(),
 																								  (studioAPIShaderType_t)shaderIdx,
-																								  comboInfo.cacheIndices[shaderIdx] + cacheInfo.indexOffset );
+																								  comboInfo.cacheIds[shaderIdx] + cacheInfo.indexOffset );
 			}
 		}
 
@@ -279,9 +365,9 @@ CBaseShader::FindParamIndex
 uint32 CBaseShader::FindParamIndex( shaderParamFrequency_t frequency, const char* pName ) const
 {
 	Assert( frequency < SHADER_PARAM_NUM_FREQUENCIES );
-	const paramIndicesDict_t& paramIndicesForFrequencyDict = paramIndicesDict[(uint32)frequency];
-	auto					  it						   = paramIndicesForFrequencyDict.find( pName );
-	return it != paramIndicesForFrequencyDict.end() ? it->second : INVALID_INDEX;
+	const paramIdsDict_t& paramIdsForFrequencyDict = paramIdsDict[(uint32)frequency];
+	auto				  it					   = paramIdsForFrequencyDict.find( pName );
+	return it != paramIdsForFrequencyDict.end() ? it->second : INVALID_INDEX;
 }
 
 /*

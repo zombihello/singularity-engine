@@ -11,6 +11,16 @@
 
 /*
 ==================
+CStudioRenderPassScene::CStudioRenderPassScene
+==================
+*/
+CStudioRenderPassScene::CStudioRenderPassScene()
+	: CStudioRenderPassBase( STUDIO_RENDERPASS_TYPE_SCENE, 1 )
+{
+}
+
+/*
+==================
 CStudioRenderPassScene::Init
 ==================
 */
@@ -176,36 +186,4 @@ void CStudioRenderPassScene::R_RebuildFrameBuffers( const vector2i_t& bufferSize
 	studioAPIFrameBufferCreateInfo.depthClearValue					 = 1.f;
 	studioAPIFrameBufferCreateInfo.stencilClearValue				 = 0;
 	pStudioAPIFrameBuffer											 = g_pStudioAPI->CreateFrameBuffer( studioAPIFrameBufferCreateInfo, "Scene FrameBuffer" );
-}
-
-/*
-==================
-CStudioRenderPassScene::CreateStudioAPIRenderPipeline
-==================
-*/
-CRefPtr<IStudioAPIRenderPipeline> CStudioRenderPassScene::R_CreateStudioAPIRenderPipeline( CStudioViewport* pViewport, IStudioAPIBoundShaderState* pStudioAPIBoundShaderState ) const
-{
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-	Assert( Studio_IsInRenderThread() && pStudioAPIRenderPass && pStudioAPIBoundShaderState );
-
-	studioAPIColorBlendAttachmentStateInfo_t studioAPIColorBlendAttachmentState = {};
-	studioAPIColorBlendAttachmentState.colorWriteMask							= STUDIOAPI_COLOR_COMPONENT_FLAG_R | STUDIOAPI_COLOR_COMPONENT_FLAG_G | STUDIOAPI_COLOR_COMPONENT_FLAG_B | STUDIOAPI_COLOR_COMPONENT_FLAG_A;
-	studioAPIColorBlendAttachmentState.bBlendEnable								= false;
-
-	studioAPIRenderPipelineCreateInfo_t studioAPIRenderPipelineCreateInfo = {};
-	studioAPIRenderPipelineCreateInfo.pBoundShaderState					  = pStudioAPIBoundShaderState;
-	studioAPIRenderPipelineCreateInfo.inputAssemblyState.topology		  = STUDIOAPI_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-	studioAPIRenderPipelineCreateInfo.rasterizerState.fillMode			  = STUDIOAPI_RASTERIZER_FILL_MODE_SOLID;
-	studioAPIRenderPipelineCreateInfo.rasterizerState.cullMode			  = STUDIOAPI_RASTERIZER_CULL_MODE_CW;
-	studioAPIRenderPipelineCreateInfo.rasterizerState.lineWidth			  = 1.f;
-	studioAPIRenderPipelineCreateInfo.rasterizerState.bDepthBiasEnable	  = false;
-	studioAPIRenderPipelineCreateInfo.depthState.bTestEnable			  = true;
-	studioAPIRenderPipelineCreateInfo.depthState.bWriteEnable			  = true;
-	studioAPIRenderPipelineCreateInfo.depthState.compareOp				  = STUDIOAPI_COMPARE_OP_LESS;
-	studioAPIRenderPipelineCreateInfo.stencilState.bTestEnable			  = false;
-	studioAPIRenderPipelineCreateInfo.colorBlendState.attachmentCount	  = 1;
-	studioAPIRenderPipelineCreateInfo.colorBlendState.pAttachments		  = &studioAPIColorBlendAttachmentState;
-	studioAPIRenderPipelineCreateInfo.colorBlendState.blendConstants	  = vector4_t( 0.f, 0.f, 0.f, 0.f );
-	studioAPIRenderPipelineCreateInfo.pRenderPass						  = pStudioAPIRenderPass;
-	return g_pStudioAPI->CreateRenderPipeline( studioAPIRenderPipelineCreateInfo );
 }
