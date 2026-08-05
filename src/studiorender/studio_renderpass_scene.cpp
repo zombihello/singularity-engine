@@ -141,16 +141,12 @@ void CStudioRenderPassScene::R_DrawPass( CStudioViewport* pViewport, studioScene
 	pGraphicsCmdList->BeginRenderPass( pStudioAPIRenderPass, pStudioAPIFrameBuffer );
 	for ( uint32 index = 0, count = (uint32)renderPass.drawSurfaceIds.size(); index < count; ++index )
 	{
-		studioDrawSurface_t* pDrawSurface	= pSceneView->drawSurfaces[renderPass.drawSurfaceIds[index]];
-		IModelResource*		 pModel			= pSceneView->resources[pDrawSurface->modelId]->pModel;
-		IMaterialResource*	 pMaterial		= pSceneView->resources[pDrawSurface->materialId]->pMaterial;
-		IShader*			 pShader		= pMaterial->GetShader();
-		IVertexFactory*		 pVertexFactory = pModel->GetVertexFactory();
-
-		shaderDrawParams_t shaderDrawParams		 = {};
-		shaderDrawParams.pPerMaterialContextData = pMaterial->GetPerMaterialContextData();
-		shaderDrawParams.pPerDrawVars			 = pShader->GetDefaultPerDrawVars();
-		shaderDrawParams.pVertexFactory			 = pVertexFactory;
+		studioDrawSurface_t* pDrawSurface	  = pSceneView->drawSurfaces[renderPass.drawSurfaceIds[index]];
+		IModelResource*		 pModel			  = pSceneView->resources[pDrawSurface->modelId]->pModel;
+		IMaterialResource*	 pMaterial		  = pSceneView->resources[pDrawSurface->materialId]->pMaterial;
+		IShader*			 pShader		  = pMaterial->GetShader();
+		IVertexFactory*		 pVertexFactory	  = pModel->GetVertexFactory();
+		shaderDrawParams_t	 shaderDrawParams = { pMaterial->GetPerMaterialContextData(), pShader->GetDefaultPerDrawVars(), pVertexFactory };
 
 		pGraphicsCmdList->SetRenderPipeline( pShader->R_ResolveRenderPipeline( shaderDrawParams, STUDIO_RENDERPASS_TYPE_SCENE ) );
 		pGraphicsCmdList->SetConstantBuffer( 0, STUDIO_RESOURCE_BINDING_SLOT_GLOBAL_CB, pGlobalConstantBuffer );
@@ -158,6 +154,9 @@ void CStudioRenderPassScene::R_DrawPass( CStudioViewport* pViewport, studioScene
 		pShader->R_Bind( pGraphicsCmdList, shaderDrawParams );
 		pGraphicsCmdList->DrawIndexed( pDrawSurface->baseVertexIndex, pDrawSurface->baseIndex, pDrawSurface->numIndices );
 	}
+
+	// Draw debug primitives on top of the scene
+	g_StudioRender.GetBatchedSimpleElements().R_Draw( pGraphicsCmdList, STUDIO_RENDERPASS_TYPE_SCENE );
 	pGraphicsCmdList->EndRenderPass();
 	pGraphicsCmdList->EndRecord();
 

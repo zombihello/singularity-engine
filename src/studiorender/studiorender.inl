@@ -64,3 +64,13 @@ FORCEINLINE CStudioRenderPassBase* CStudioRender::GetRenderPass( studioRenderPas
 	Assert( type < STUDIO_RENDERPASS_NUM_TYPES );
 	return pRenderPasses[(uint32)type];
 }
+
+/*
+==================
+CStudioRender::GetBatchedSimpleElements
+==================
+*/
+FORCEINLINE CStudioBatchedSimpleElements& CStudioRender::GetBatchedSimpleElements()
+{
+	return batchedSimpleElements;
+}

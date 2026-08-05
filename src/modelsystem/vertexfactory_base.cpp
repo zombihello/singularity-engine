@@ -15,6 +15,59 @@ void CVertexDeclarationBase::ReleaseStudioAPI()
 
 /*
 ==================
+CVertexFactoryBase::Init
+==================
+*/
+void CVertexFactoryBase::Init()
+{
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	Studio_BeginUpdateResource( this );
+}
+
+/*
+==================
+CVertexFactoryBase::Shutdown
+==================
+*/
+void CVertexFactoryBase::Shutdown()
+{
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	Studio_BeginReleaseResource( this );
+}
+
+/*
+==================
+CVertexFactoryBase::ClearStreams
+==================
+*/
+void CVertexFactoryBase::ClearStreams()
+{
+	Mem_Memzero( &indexStream, sizeof( vertexFactoryStream_t ) );
+	vertexStreams.clear();
+}
+
+/*
+==================
+CVertexFactoryBase::AddVertexStream
+==================
+*/
+void CVertexFactoryBase::AddVertexStream( const vertexFactoryStream_t& vertexStream )
+{
+	vertexStreams.emplace_back( vertexStream );
+}
+
+/*
+==================
+CVertexFactoryBase::SetIndexStream
+==================
+*/
+void CVertexFactoryBase::SetIndexStream( const vertexFactoryStream_t& indexStream )
+{
+	CVertexFactoryBase::indexStream = indexStream;
+}
+
+/*
+==================
 CVertexFactoryBase::R_Barrier
 ==================
 */
@@ -71,6 +124,39 @@ void CVertexFactoryBase::R_Bind( IStudioAPICmdList* pStudioAPICmdList )
 
 /*
 ==================
+CVertexFactoryBase::R_BindUP
+==================
+*/
+void CVertexFactoryBase::R_BindUP( IStudioAPICmdList* pStudioAPICmdList, const vertexFactoryStreamUP_t* pVertexStreams, uint32 numVertexStreams, const vertexFactoryStreamUP_t* pIndexStream /* = NULL */ )
+{
+	// Set all vertex buffers
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	Assert( pVertexStreams || numVertexStreams == 0 );
+	for ( uint32 index = 0; index < numVertexStreams; ++index )
+	{
+		const vertexFactoryStreamUP_t& vertexStream = pVertexStreams[index];
+		pStudioAPICmdList->SetVertexBufferUP( index, vertexStream.pData, vertexStream.numElements, vertexStream.stride );
+	}
+
+	// Set the index buffer
+	if ( pIndexStream )
+	{
+		pStudioAPICmdList->SetIndexBufferUP( pIndexStream->pData, pIndexStream->numElements, pIndexStream->stride );
+	}
+}
+
+/*
+==================
+CVertexFactoryBase::IsIndexed
+==================
+*/
+bool CVertexFactoryBase::IsIndexed() const
+{
+	return !!indexStream.pStudioAPIBuffer;
+}
+
+/*
+==================
 CVertexFactoryBase::FinalRelease
 ==================
 */
@@ -84,14 +170,4 @@ void CVertexFactoryBase::FinalRelease()
 	{
 		delete this;
 	}
-}
-
-/*
-==================
-CVertexFactoryBase::IsIndexed
-==================
-*/
-bool CVertexFactoryBase::IsIndexed() const
-{
-	return !!indexStream.pStudioAPIBuffer;
 }

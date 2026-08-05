@@ -35,7 +35,7 @@ private:
 
 	modelIndexType_t						  indexType;
 	CStudioRenderCmdFence					  renderCmdFence;
-	CRefPtr<CVertexFactoryBase>				  pVertexFactory;
+	CRefPtr<IVertexFactory>					  pVertexFactory;
 	CRefPtr<IStudioAPIBuffer>				  pStudioAPIVertexBuffer;
 	CRefPtr<IStudioAPIBuffer>				  pStudioAPIIndexBuffer;
 	eastl::vector<byte>						  vertices;

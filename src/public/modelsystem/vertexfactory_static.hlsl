@@ -18,3 +18,8 @@ float2 VertexFactory_GetTexCoord( vertexFactoryInput_t input )
 {
 	return input.texCoord;
 }
+
+float4 VertexFactory_GetColor( vertexFactoryInput_t input )
+{
+	return float4( 1.0, 1.0, 1.0, 1.0 );
+}

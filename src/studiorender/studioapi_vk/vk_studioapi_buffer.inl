@@ -50,6 +50,7 @@ CStudioAPIBufferVk::GetVkIndexType
 */
 FORCEINLINE VkIndexType CStudioAPIBufferVk::GetVkIndexType() const
 {
+	Assert( stride == sizeof( uint16 ) || stride == sizeof( uint32 ) );
 	return stride == sizeof( uint32 ) ? VK_INDEX_TYPE_UINT32 : VK_INDEX_TYPE_UINT16;
 }
 

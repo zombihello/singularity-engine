@@ -41,6 +41,8 @@ public:
 	virtual void SetRenderPipeline( IStudioAPIRenderPipeline* pRenderPipeline ) override;
 	virtual void SetVertexBuffer( uint32 slot, IStudioAPIBuffer* pVertexBuffer, uint64 offset ) override;
 	virtual void SetIndexBuffer( IStudioAPIBuffer* pIndexBuffer, uint64 offset ) override;
+	virtual void SetVertexBufferUP( uint32 slot, const byte* pVertexData, uint32 numVertices, uint32 vertexDataStride ) override;
+	virtual void SetIndexBufferUP( const byte* pIndexData, uint32 numIndices, uint32 indexDataStride ) override;
 	virtual void SetConstantBuffer( uint32 set, uint32 slot, IStudioAPIBuffer* pConstantBuffer ) override;
 	virtual void SetPushConstants( byte* pData, uint32 dataSize ) override;
 	virtual void SetTexture( uint32 set, uint32 slot, IStudioAPITexture* pTexture ) override;

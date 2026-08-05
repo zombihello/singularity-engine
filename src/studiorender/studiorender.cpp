@@ -157,8 +157,13 @@ CStudioRender::PostInit
 */
 bool CStudioRender::PostInit()
 {
-	// Initialize scene render targets and render passes
+	// Initialize the scene render targets
 	sceneRenderTargets.Init();
+
+	// Initialize the simple elements batcher
+	batchedSimpleElements.Init();
+
+	// Initialize render passes
 	for ( uint32 index = 0; index < STUDIO_RENDERPASS_NUM_TYPES; ++index )
 	{
 		pRenderPasses[index]->Init();
@@ -173,11 +178,16 @@ CStudioRender::PreShutdown
 */
 void CStudioRender::PreShutdown()
 {
-	// Shutdown render passes and scene render targets
+	// Shutdown render passes
 	for ( uint32 index = 0; index < STUDIO_RENDERPASS_NUM_TYPES; ++index )
 	{
 		pRenderPasses[index]->Shutdown();
 	}
+
+	// Shutdown the simple elements batcher
+	batchedSimpleElements.Shutdown();
+
+	// Shutdown the scene render targets
 	sceneRenderTargets.Shutdown();
 }
 
@@ -292,6 +302,7 @@ void CStudioRender::DrawScene( IStudioViewport* pStudioViewport, IStudioScene* p
 
 	// Find all visible entities, after that creates entity views for them
 	pStudioSceneLocal->FindEntityViews( pSceneView );
+	pStudioSceneLocal->AddDebugPrimitivesToSceneView( pSceneView );
 
 	// Go through each entity view and add draw surfaces to the scene view
 	for ( studioEntityView_t* pEntityView = pSceneView->pEntityViews; pEntityView; pEntityView = pEntityView->pNext )
@@ -399,6 +410,9 @@ void CStudioRender::R_DrawScene( CStudioViewport* pViewport, studioSceneView_t* 
 	// Update the global constant buffer from the scene view's global params
 	pStudioAPIGlobalConstantBuffer->UpdateData( g_pStudioAPI->GetImmediateCmdContext( STUDIOAPI_QUEUE_TYPE_GRAPHICS ),
 												(byte*)&pSceneView->globalShaderParams, sizeof( studioGlobalShaderParams_t ) );
+
+	// Build batches of debug primitives
+	batchedSimpleElements.R_BuildBatches( pSceneView );
 
 	// Draw render passes
 	for ( uint32 index = 0; index < STUDIO_RENDERPASS_NUM_TYPES; ++index )

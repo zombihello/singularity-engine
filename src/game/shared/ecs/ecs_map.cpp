@@ -165,6 +165,7 @@ CEcsMap::Update
 void CEcsMap::Update( float deltaTime )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_SCENE );
+	pStudioScene->Update( deltaTime );
 	ecsWorld.Update( deltaTime );
 }
 

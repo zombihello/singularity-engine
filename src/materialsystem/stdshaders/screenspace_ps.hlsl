@@ -19,6 +19,5 @@ MainPS
 */
 float4 MainPS( in float2 texCoord : TEXCOORD0 ) : SV_Target
 {
-	float2 scaledTexCoord = texCoord * ( globalShaderParams.screenAndBufferSize.xy / globalShaderParams.screenAndBufferSize.zw );
-	return baseTexture.Sample( baseSampler, scaledTexCoord );
+    return baseTexture.Sample( baseSampler, texCoord );
 }

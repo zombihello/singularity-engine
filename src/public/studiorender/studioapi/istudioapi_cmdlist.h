@@ -39,15 +39,17 @@ public:
 	virtual void BeginRenderPass( IStudioAPIRenderPass* pRenderPass, IStudioAPIFrameBuffer* pFrameBuffer ) = 0;
 	virtual void EndRenderPass()																		   = 0;
 
-	virtual void SetRenderPipeline( IStudioAPIRenderPipeline* pRenderPipeline )						   = 0;
-	virtual void SetVertexBuffer( uint32 slot, IStudioAPIBuffer* pVertexBuffer, uint64 offset )		   = 0;
-	virtual void SetIndexBuffer( IStudioAPIBuffer* pIndexBuffer, uint64 offset )					   = 0;
-	virtual void SetConstantBuffer( uint32 set, uint32 slot, IStudioAPIBuffer* pConstantBuffer )	   = 0;
-	virtual void SetPushConstants( byte* pData, uint32 dataSize )									   = 0;
-	virtual void SetTexture( uint32 set, uint32 slot, IStudioAPITexture* pTexture )					   = 0;
-	virtual void SetSampler( uint32 set, uint32 slot, IStudioAPISampler* pSampler )					   = 0;
-	virtual void SetViewport( float minX, float minY, float minZ, float maxX, float maxY, float maxZ ) = 0;
-	virtual void SetScissor( int32 x, int32 y, uint32 width, uint32 height )						   = 0;
+	virtual void SetRenderPipeline( IStudioAPIRenderPipeline* pRenderPipeline )											= 0;
+	virtual void SetVertexBuffer( uint32 slot, IStudioAPIBuffer* pVertexBuffer, uint64 offset )							= 0;
+	virtual void SetIndexBuffer( IStudioAPIBuffer* pIndexBuffer, uint64 offset )										= 0;
+	virtual void SetVertexBufferUP( uint32 slot, const byte* pVertexData, uint32 numVertices, uint32 vertexDataStride ) = 0;
+	virtual void SetIndexBufferUP( const byte* pIndexData, uint32 numIndices, uint32 indexDataStride )					= 0;
+	virtual void SetConstantBuffer( uint32 set, uint32 slot, IStudioAPIBuffer* pConstantBuffer )						= 0;
+	virtual void SetPushConstants( byte* pData, uint32 dataSize )														= 0;
+	virtual void SetTexture( uint32 set, uint32 slot, IStudioAPITexture* pTexture )										= 0;
+	virtual void SetSampler( uint32 set, uint32 slot, IStudioAPISampler* pSampler )										= 0;
+	virtual void SetViewport( float minX, float minY, float minZ, float maxX, float maxY, float maxZ )					= 0;
+	virtual void SetScissor( int32 x, int32 y, uint32 width, uint32 height )											= 0;
 
 	virtual void Draw( uint32 baseVertexIndex, uint32 numVertices, uint32 numInstances = 1 )											   = 0;
 	virtual void DrawIndexed( uint32 baseVertexIndex, uint32 baseIndex, uint32 numIndices, uint32 numInstances = 1 )					   = 0;

@@ -5,6 +5,7 @@
 #include "studiorender/studio_framealloc.h"
 #include "studiorender/studio_renderpasstypes.h"
 #include "studiorender/studio_globalshaderparams.h"
+#include "studiorender/studio_batchedsimpleelements.h"
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -106,6 +107,7 @@ struct studioSceneView_t
 	studioFrameVector_t<studioDrawSurface_t*>		  drawSurfaces;								  // Draw surfaces are the visible surfaces of the entity views
 	studioFrameVector_t<studioResource_t*>			  resources;								  // Resources are used by the draw surfaces
 	studioFrameHashMap_t<studioResourcePtr_t, uint32> resourceDict;								  // Lookup table to find a resource in `resources` by hash
+	studioFrameVector_t<studioSimplePrimitive_t>	  debugPrimitives;							  // Debug primitives
 };
 
 #include "studiorender/studio_sceneview.inl"

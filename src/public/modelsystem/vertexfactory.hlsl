@@ -8,6 +8,7 @@
 //   struct vertexFactoryInput_t { ... };
 //   float4 VertexFactory_GetLocalPosition( vertexFactoryInput_t input );
 //   float2 VertexFactory_GetTexCoord( vertexFactoryInput_t input );
+//   float4 VertexFactory_GetColor( vertexFactoryInput_t input );
 
 #error "vertexfactory.hlsl must be substituted with a concrete vertex factory implementation"
 

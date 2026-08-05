@@ -17,6 +17,9 @@ public:
 	virtual bool Init() override;
 	virtual void Shutdown() override;
 
+	// IModelSystem interface
+	virtual CRefPtr<IVertexFactory> CreateVertexFactory( modelVertexType_t vertexType ) const override;
+
 private:
 	CResourceTypeFactory<CModel> modelFactory;
 	CModelLoader				 modelLoader;

@@ -219,6 +219,28 @@ void CStudioAPICmdListVk::SetIndexBuffer( IStudioAPIBuffer* pIndexBuffer, uint64
 
 /*
 ==================
+CStudioAPICmdListVk::SetVertexBufferUP
+==================
+*/
+void CStudioAPICmdListVk::SetVertexBufferUP( uint32 slot, const byte* pVertexData, uint32 numVertices, uint32 vertexDataStride )
+{
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	pCmdContext->SetVertexBufferUP( this, slot, pVertexData, numVertices, vertexDataStride );
+}
+
+/*
+==================
+CStudioAPICmdListVk::SetIndexBufferUP
+==================
+*/
+void CStudioAPICmdListVk::SetIndexBufferUP( const byte* pIndexData, uint32 numIndices, uint32 indexDataStride )
+{
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	pCmdContext->SetIndexBufferUP( this, pIndexData, numIndices, indexDataStride );
+}
+
+/*
+==================
 CStudioAPICmdListVk::SetConstantBuffer
 ==================
 */

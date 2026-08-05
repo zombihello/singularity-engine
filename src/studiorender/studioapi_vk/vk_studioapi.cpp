@@ -82,6 +82,7 @@ bool CStudioAPIVk::Init()
 	info.bSupportMultiBuffer = true;
 	info.gpuVendorId		 = device.GetGPUVendorId();
 	info.pShaderPlatform	 = STUDIOAPI_VK_SHADER_PLATFORM_NAME;
+	info.pixelCenterOffset	 = 0.f;
 
 	// Initialize the StudioAPI memory manager
 	memoryMgr.Init( VK_API_VERSION_1_3 );

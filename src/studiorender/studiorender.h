@@ -2,6 +2,7 @@
 #include "studiorender/istudiorender.h"
 #include "studiorender/studio_sceneview.h"
 #include "studiorender/studio_scenerendertargets.h"
+#include "studiorender/studio_batchedsimpleelements.h"
 #include "studiorender/studio_renderpass_scene.h"
 #include "studiorender/studio_renderpass_present.h"
 
@@ -48,6 +49,7 @@ public:
 	IStudioAPIBuffer*				 GetStudioAPIGlobalConstantBuffer() const;
 	const CStudioSceneRenderTargets& GetSceneRenderTargets() const;
 	CStudioRenderPassBase*			 GetRenderPass( studioRenderPassType_t type ) const;
+	CStudioBatchedSimpleElements&	 GetBatchedSimpleElements();
 
 private:
 	// Adds model/resource to a scene view for the render thread
@@ -60,11 +62,12 @@ private:
 	void R_DrawScene( CStudioViewport* pViewport, studioSceneView_t* pSceneView );
 	void R_RebuildFrameBuffers( const vector2i_t& bufferSize );
 
-	CStudioRenderPassScene	  renderPassScene;
-	CStudioRenderPassPresent  renderPassPresent;
-	CStudioSceneRenderTargets sceneRenderTargets;
-	CRefPtr<IStudioAPIBuffer> pStudioAPIGlobalConstantBuffer;
-	CStudioRenderPassBase*	  pRenderPasses[STUDIO_RENDERPASS_NUM_TYPES];
+	CStudioRenderPassScene		 renderPassScene;
+	CStudioRenderPassPresent	 renderPassPresent;
+	CStudioSceneRenderTargets	 sceneRenderTargets;
+	CStudioBatchedSimpleElements batchedSimpleElements;
+	CRefPtr<IStudioAPIBuffer>	 pStudioAPIGlobalConstantBuffer;
+	CStudioRenderPassBase*		 pRenderPasses[STUDIO_RENDERPASS_NUM_TYPES];
 };
 
 extern CStudioRender g_StudioRender;

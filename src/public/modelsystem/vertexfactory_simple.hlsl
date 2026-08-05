@@ -16,3 +16,8 @@ float2 VertexFactory_GetTexCoord( vertexFactoryInput_t input )
 {
 	return input.texCoord;
 }
+
+float4 VertexFactory_GetColor( vertexFactoryInput_t input )
+{
+	return input.color;
+}

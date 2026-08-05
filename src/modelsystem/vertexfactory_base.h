@@ -4,20 +4,6 @@
 #include "modelsystem/ivertexfactory.h"
 
 //-----------------------------------------------------------------------------
-// Forward declarations
-//-----------------------------------------------------------------------------
-class IStudioAPIBuffer;
-
-//-----------------------------------------------------------------------------
-// Information about a vertex/index buffer in a vertex factory
-//-----------------------------------------------------------------------------
-struct vertexFactoryStream_t
-{
-	IStudioAPIBuffer* pStudioAPIBuffer;
-	uint64			  offset;
-};
-
-//-----------------------------------------------------------------------------
 // Base class for a vertex declaration
 //-----------------------------------------------------------------------------
 class CVertexDeclarationBase : public CStudioRenderResource<IStudioRenderResource, true>
@@ -39,14 +25,18 @@ class CVertexFactoryBase : public CRefCounted<IVertexFactory>, public CStudioRen
 {
 public:
 	// IVertexFactory interface
+	virtual void Init() override;
+	virtual void Shutdown() override;
+
+	virtual void ClearStreams() override;
+	virtual void AddVertexStream( const vertexFactoryStream_t& vertexStream ) override;
+	virtual void SetIndexStream( const vertexFactoryStream_t& indexStream ) override;
+
 	virtual void R_Barrier( IStudioAPICmdList* pStudioAPICmdList ) const override;
 	virtual void R_Bind( IStudioAPICmdList* pStudioAPICmdList ) override;
+	virtual void R_BindUP( IStudioAPICmdList* pStudioAPICmdList, const vertexFactoryStreamUP_t* pVertexStreams, uint32 numVertexStreams, const vertexFactoryStreamUP_t* pIndexStream = NULL ) override;
 
 	virtual bool IsIndexed() const override;
-
-	void ClearStreams();
-	void AddVertexStream( const vertexFactoryStream_t& vertexStream );
-	void SetIndexStream( const vertexFactoryStream_t& indexStream );
 
 protected:
 	// IRefCounted interface

@@ -22,7 +22,8 @@ CMaterialResource::Update
 void CMaterialResource::Update( IShader* pShader, CMaterialVar** pVars )
 {
 	PROFILER_SCOPE_FUNC();
-	Assert( pShader && pVars );
+	Assert( pShader );
+	Assert( pVars || pShader->GetNumParams( SHADER_PARAM_FREQUENCY_PERMATERIAL ) == 0 );
 
 	// Create a new per-material context data if shader has been changed
 	if ( CMaterialResource::pShader != pShader )

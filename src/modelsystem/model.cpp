@@ -3,8 +3,6 @@
 #include "resourcesystem/iresourcesystem.h"
 #include "resourcesystem/iresourcetypemgr.h"
 #include "materialsystem/imaterial.h"
-#include "modelsystem/vertexfactory_simple.h"
-#include "modelsystem/vertexfactory_static.h"
 #include "modelsystem/modelsystem.h"
 #include "modelsystem/model.h"
 
@@ -48,22 +46,15 @@ void CModelResource::Update( const modelInitialData_t& initialData )
 	bool bDirtyVertexFactory = false;
 	if ( !pVertexFactory || pVertexFactory->GetVertexType() != initialData.vertexType )
 	{
-		// If the old vertex factory is valid begin release one in the render thread
+		// If the old vertex factory is valid shutdown one
 		bDirtyVertexFactory = true;
 		if ( pVertexFactory )
 		{
-			Studio_BeginReleaseResource( pVertexFactory );
+			pVertexFactory->Shutdown();
 		}
 
 		// Create a new vertex factory for the vertex type
-		switch ( initialData.vertexType )
-		{
-		case MODEL_VERTEXTYPE_SIMPLE: pVertexFactory = new CVertexFactorySimple(); break;
-		case MODEL_VERTEXTYPE_STATIC: pVertexFactory = new CVertexFactoryStatic(); break;
-		default:
-			AssertMsg( false, "Unknown vertex type 0x%X", initialData.vertexType );
-			break;
-		}
+		pVertexFactory = g_modelSystem.CreateVertexFactory( initialData.vertexType );
 	}
 	pVertexFactory->ClearStreams();
 
@@ -78,10 +69,10 @@ void CModelResource::Update( const modelInitialData_t& initialData )
 	// Copy materials
 	UpdateMaterials( initialData.pMaterials, initialData.numMaterials );
 
-	// Begin update the vertex factory (if it need) and the resource in the render thread
+	// Initialize the vertex factory (if it need) and the resource in the render thread
 	if ( bDirtyVertexFactory )
 	{
-		Studio_BeginUpdateResource( pVertexFactory );
+		pVertexFactory->Init();
 	}
 	Studio_BeginUpdateResource( this );
 }
@@ -119,11 +110,11 @@ void CModelResource::Clear()
 	materials.clear();
 	surfaces.clear();
 
-	// Begin release the resource and the vertex factory (if it exists) in the render thread
+	// Begin release the resource in the render thread and shutdown the vertex factory (if it exists)
 	Studio_BeginReleaseResource( this );
 	if ( pVertexFactory )
 	{
-		Studio_BeginReleaseResource( pVertexFactory );
+		pVertexFactory->Shutdown();
 		pVertexFactory = NULL;
 	}
 }

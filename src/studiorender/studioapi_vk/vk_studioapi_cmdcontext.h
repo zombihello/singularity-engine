@@ -43,6 +43,8 @@ public:
 	void SetRenderPipeline( CStudioAPICmdListVk* pCmdList, CStudioAPIRenderPipelineVk* pRenderPipeline );
 	void SetVertexBuffer( CStudioAPICmdListVk* pCmdList, uint32 slot, CStudioAPIBufferVk* pVertexBuffer, uint64 offset );
 	void SetIndexBuffer( CStudioAPICmdListVk* pCmdList, CStudioAPIBufferVk* pIndexBuffer, uint64 offset );
+	void SetVertexBufferUP( CStudioAPICmdListVk* pCmdList, uint32 slot, const byte* pVertexData, uint32 numVertices, uint32 vertexDataStride );
+	void SetIndexBufferUP( CStudioAPICmdListVk* pCmdList, const byte* pIndexData, uint32 numIndices, uint32 indexDataStride );
 	void SetConstantBuffer( CStudioAPICmdListVk* pCmdList, uint32 set, uint32 slot, CStudioAPIBufferVk* pConstantBuffer );
 	void SetPushConstants( CStudioAPICmdListVk* pCmdList, byte* pData, uint32 dataSize );
 	void SetTexture( CStudioAPICmdListVk* pCmdList, uint32 set, uint32 slot, CStudioAPITextureVk* pTexture );

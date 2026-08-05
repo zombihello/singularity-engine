@@ -1,5 +1,6 @@
 #pragma once
 #include "materialsystem/imaterial.h"
+#include "modelsystem/ivertexfactory.h"
 #include "studiorender/studio_renderpass_base.h"
 
 //-----------------------------------------------------------------------------
@@ -19,6 +20,7 @@ public:
 	CStudioRenderPassPresent();
 
 private:
-	CResourcePtr<IMaterial>	   pPresentMaterial;
-	CRefPtr<IMaterialResource> pPresentMaterialResource;
+	CResourcePtr<IMaterial>	   pMaterial;
+	CRefPtr<IMaterialResource> pMaterialResource;
+	CRefPtr<IVertexFactory>	   pVertexFactory;
 };

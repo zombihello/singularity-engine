@@ -75,7 +75,7 @@ CStudioAPIPendingRenderStateVk::HasIndexBuffer
 */
 FORCEINLINE bool CStudioAPIPendingRenderStateVk::HasIndexBuffer() const
 {
-	return indexBuffer.pBuffer;
+	return indexBuffer.IsValid();
 }
 
 /*
@@ -84,7 +84,19 @@ CStudioAPIPendingRenderStateVk::vertexBuffer_t::vertexBuffer_t
 ==================
 */
 FORCEINLINE CStudioAPIPendingRenderStateVk::vertexBuffer_t::vertexBuffer_t()
-	: offset( 0 )
+	: vkBuffer( VK_NULL_HANDLE )
+	, offset( 0 )
+{
+}
+
+/*
+==================
+CStudioAPIPendingRenderStateVk::vertexBuffer_t::vertexBuffer_t
+==================
+*/
+FORCEINLINE CStudioAPIPendingRenderStateVk::vertexBuffer_t::vertexBuffer_t( VkBuffer vkBuffer, VkDeviceSize offset )
+	: vkBuffer( vkBuffer )
+	, offset( offset )
 {
 }
 
@@ -95,8 +107,38 @@ CStudioAPIPendingRenderStateVk::vertexBuffer_t::Clear
 */
 FORCEINLINE void CStudioAPIPendingRenderStateVk::vertexBuffer_t::Clear()
 {
-	pBuffer = NULL;
-	offset	= 0;
+	vkBuffer = VK_NULL_HANDLE;
+	offset	 = 0;
+}
+
+/*
+==================
+CStudioAPIPendingRenderStateVk::vertexBuffer_t::IsValid
+==================
+*/
+FORCEINLINE bool CStudioAPIPendingRenderStateVk::vertexBuffer_t::IsValid() const
+{
+	return vkBuffer != VK_NULL_HANDLE;
+}
+
+/*
+==================
+CStudioAPIPendingRenderStateVk::vertexBuffer_t::operator==
+==================
+*/
+FORCEINLINE bool CStudioAPIPendingRenderStateVk::vertexBuffer_t::operator==( const vertexBuffer_t& right ) const
+{
+	return vkBuffer == right.vkBuffer && offset == right.offset;
+}
+
+/*
+==================
+CStudioAPIPendingRenderStateVk::vertexBuffer_t::operator!=
+==================
+*/
+FORCEINLINE bool CStudioAPIPendingRenderStateVk::vertexBuffer_t::operator!=( const vertexBuffer_t& right ) const
+{
+	return !( *this == right );
 }
 
 /*
@@ -105,7 +147,21 @@ CStudioAPIPendingRenderStateVk::indexBuffer_t::indexBuffer_t
 ==================
 */
 FORCEINLINE CStudioAPIPendingRenderStateVk::indexBuffer_t::indexBuffer_t()
-	: offset( 0 )
+	: vkBuffer( VK_NULL_HANDLE )
+	, offset( 0 )
+	, vkIndexType( VK_INDEX_TYPE_UINT16 )
+{
+}
+
+/*
+==================
+CStudioAPIPendingRenderStateVk::indexBuffer_t::indexBuffer_t
+==================
+*/
+FORCEINLINE CStudioAPIPendingRenderStateVk::indexBuffer_t::indexBuffer_t( VkBuffer vkBuffer, VkDeviceSize offset, VkIndexType vkIndexType )
+	: vkBuffer( vkBuffer )
+	, offset( offset )
+	, vkIndexType( vkIndexType )
 {
 }
 
@@ -116,8 +172,39 @@ CStudioAPIPendingRenderStateVk::indexBuffer_t::Clear
 */
 FORCEINLINE void CStudioAPIPendingRenderStateVk::indexBuffer_t::Clear()
 {
-	pBuffer = NULL;
-	offset	= 0;
+	vkBuffer	= VK_NULL_HANDLE;
+	offset		= 0;
+	vkIndexType = VK_INDEX_TYPE_UINT16;
+}
+
+/*
+==================
+CStudioAPIPendingRenderStateVk::indexBuffer_t::IsValid
+==================
+*/
+FORCEINLINE bool CStudioAPIPendingRenderStateVk::indexBuffer_t::IsValid() const
+{
+	return vkBuffer != VK_NULL_HANDLE;
+}
+
+/*
+==================
+CStudioAPIPendingRenderStateVk::indexBuffer_t::operator==
+==================
+*/
+FORCEINLINE bool CStudioAPIPendingRenderStateVk::indexBuffer_t::operator==( const indexBuffer_t& right ) const
+{
+	return vkBuffer == right.vkBuffer && offset == right.offset && vkIndexType == right.vkIndexType;
+}
+
+/*
+==================
+CStudioAPIPendingRenderStateVk::indexBuffer_t::operator!=
+==================
+*/
+FORCEINLINE bool CStudioAPIPendingRenderStateVk::indexBuffer_t::operator!=( const indexBuffer_t& right ) const
+{
+	return !( *this == right );
 }
 
 /*

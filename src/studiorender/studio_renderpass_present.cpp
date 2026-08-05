@@ -3,10 +3,12 @@
 #include "materialsystem/imaterialvar.h"
 #include "materialsystem/itexture.h"
 #include "resourcesystem/iresourcesystem.h"
+#include "modelsystem/imodelsystem.h"
 #include "studiorender/studioapi/istudioapi_barrier.h"
 #include "studiorender/studio_resourcebindingslots.h"
 #include "studiorender/studio_renderpasstypes.h"
 #include "studiorender/studio_viewport.h"
+#include "studiorender/studio_renderutils.h"
 #include "studiorender/studiorender.h"
 #include "studiorender/studio_renderpass_present.h"
 
@@ -27,6 +29,7 @@ CStudioRenderPassPresent::Init
 */
 void CStudioRenderPassPresent::Init()
 {
+	// Create a material for present the final render target
 	PROFILER_SCOPE_FUNC();
 	IResourceTypeMgr*	  pMaterialsMgr			= g_pResourceSystem->GetResourceManagerForType<IMaterial>();
 	IResourceTypeMgr*	  pTexturesMgr			= g_pResourceSystem->GetResourceManagerForType<ITexture>();
@@ -36,9 +39,13 @@ void CStudioRenderPassPresent::Init()
 	presentMatInitialData.numVars				= 1;
 	presentMatInitialData.pVars					= &presentBaseTextureVar;
 
-	pPresentMaterial = pMaterialsMgr->CreateResource( "__scenecolor_present" );
-	pPresentMaterial->Init( presentMatInitialData );
-	pPresentMaterialResource = pPresentMaterial->GetStudioResource();
+	pMaterial = pMaterialsMgr->CreateResource( "__scenecolor_present" );
+	pMaterial->Init( presentMatInitialData );
+	pMaterialResource = pMaterial->GetStudioResource();
+
+	// Create a vertex factory for draw a quad
+	pVertexFactory = g_pModelSystem->CreateVertexFactory( MODEL_VERTEXTYPE_SIMPLE );
+	pVertexFactory->Init();
 }
 
 /*
@@ -49,8 +56,10 @@ CStudioRenderPassPresent::Shutdown
 void CStudioRenderPassPresent::Shutdown()
 {
 	PROFILER_SCOPE_FUNC();
-	pPresentMaterialResource = NULL;
-	pPresentMaterial		 = NULL;
+	pVertexFactory->Shutdown();
+	pVertexFactory	  = NULL;
+	pMaterialResource = NULL;
+	pMaterial		  = NULL;
 }
 
 /*
@@ -68,11 +77,8 @@ void CStudioRenderPassPresent::R_DrawPass( CStudioViewport* pViewport, studioSce
 	CRefPtr<IStudioAPICmdListBatch> pGraphicsCmdListBatch = g_pStudioAPI->CreateCmdListBatch( pGraphicsCmdContext );
 	CRefPtr<IStudioAPICmdList>		pGraphicsCmdList	  = g_pStudioAPI->CreateCmdList( pGraphicsCmdContext );
 
-	IMaterialResource* pMaterialResource	 = pPresentMaterial->GetStudioResource();
-	IShader*		   pShader				 = pMaterialResource->GetShader();
-	shaderDrawParams_t shaderDrawParams		 = {};
-	shaderDrawParams.pPerMaterialContextData = pMaterialResource->GetPerMaterialContextData();
-	shaderDrawParams.pPerDrawVars			 = pShader->GetDefaultPerDrawVars();
+	IShader*		   pShader	  = pMaterialResource->GetShader();
+	shaderDrawParams_t drawParams = { pMaterialResource->GetPerMaterialContextData(), pShader->GetDefaultPerDrawVars(), pVertexFactory };
 
 	// Initialize viewport and scissor
 	pGraphicsCmdList->BeginRecord();
@@ -87,14 +93,15 @@ void CStudioRenderPassPresent::R_DrawPass( CStudioViewport* pViewport, studioSce
 		};
 		pGraphicsCmdList->Barrier( barriers, ARRAYSIZE( barriers ) );
 	}
-	shaderDrawParams.pPerMaterialContextData->R_Barrier( pGraphicsCmdList );
+	drawParams.pPerMaterialContextData->R_Barrier( pGraphicsCmdList );
 
 	// Copy `__rt_scenecolor_ldr` into a swapchain image
+	studioDenormalizedQuadParams_t denormalizedQuadParams = { pVertexFactory, vector2_t( 0.f, 0.f ), viewportSize, vector2_t( 0.f, 0.f ), viewportSize, viewportSize, g_StudioRender.GetSceneRenderTargets().GetBufferSize(), 1.f, CColor::Make( 255, 255, 255 ) };
 	pGraphicsCmdList->BeginRenderPass( pViewport->GetStudioAPIRenderPass(), pViewport->GetStudioAPIFrameBuffer() );
-	pGraphicsCmdList->SetRenderPipeline( pShader->R_ResolveRenderPipeline( shaderDrawParams, STUDIO_RENDERPASS_TYPE_PRESENT ) );
+	pGraphicsCmdList->SetRenderPipeline( pShader->R_ResolveRenderPipeline( drawParams, STUDIO_RENDERPASS_TYPE_PRESENT ) );
 	pGraphicsCmdList->SetConstantBuffer( 0, STUDIO_RESOURCE_BINDING_SLOT_GLOBAL_CB, pGlobalConstantBuffer );
-	pShader->R_Bind( pGraphicsCmdList, shaderDrawParams );
-	pGraphicsCmdList->Draw( 0, 3 );
+	pShader->R_Bind( pGraphicsCmdList, drawParams );
+	R_DrawDenormalizedQuad( pGraphicsCmdList, denormalizedQuadParams );
 	pGraphicsCmdList->EndRenderPass();
 
 	// Place barriers for the swapchain image
