@@ -28,6 +28,7 @@ IF /i NOT "%BUILD_CONFIGURATION%"=="Release" ^
 IF /i NOT "%BUILD_CONFIGURATION%"=="Retail" (
 	ECHO ERROR: Invalid build configuration: '%BUILD_CONFIGURATION%'
 	ECHO ERROR: Valid configurations: Debug, Release, Retail
+	SET ERRORLEVEL=1
 	GOTO :CLEANUP
 )
 
@@ -51,4 +52,6 @@ ECHO ===========================================================================
 ROBOCOPY "%GAME_DIR%/citadel/" "%INSTALL_DIR%/game/citadel/" "gameinfo.txt"
 ROBOCOPY "%GAME_DIR%/citadel/cfg/" "%INSTALL_DIR%/game/citadel/cfg/"
 
+:CLEANUP
 ECHO ==============================================================================
+IF %ERRORLEVEL% NEQ 0 PAUSE

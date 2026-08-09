@@ -44,7 +44,7 @@ void CStudioRenderPassPresent::Init()
 	pMaterialResource = pMaterial->GetStudioResource();
 
 	// Create a vertex factory for draw a quad
-	pVertexFactory = g_pModelSystem->CreateVertexFactory( MODEL_VERTEXTYPE_SIMPLE );
+	pVertexFactory = g_pModelSystem->CreateVertexFactory<IVertexFactorySimple>();
 	pVertexFactory->Init();
 }
 

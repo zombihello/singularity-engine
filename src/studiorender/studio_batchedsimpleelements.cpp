@@ -44,7 +44,7 @@ void CStudioBatchedSimpleElements::Init()
 	}
 
 	// Create a vertex factory for the batches
-	pVertexFactory = g_pModelSystem->CreateVertexFactory( MODEL_VERTEXTYPE_SIMPLE );
+	pVertexFactory = g_pModelSystem->CreateVertexFactory<IVertexFactorySimple>();
 	pVertexFactory->Init();
 }
 
@@ -180,11 +180,14 @@ void CStudioBatchedSimpleElements::R_DrawBatch( IStudioAPICmdList* pCmdList, stu
 	}
 
 	// Draw the whole batch
-	vertexFactoryStreamUP_t vertexStream = { (byte*)batch.data(), (uint32)batch.size(), sizeof( modelSimpleVertex_t ) };
-	shaderDrawParams_t		drawParams	 = { pMaterialResource->GetPerMaterialContextData(), pPerDrawVars, pVertexFactory };
-	pCmdList->SetRenderPipeline( pShader->R_ResolveRenderPipeline( drawParams, renderPassType ) );
+	modelSimpleInstance_t	modelInstance	 = {};
+	vertexFactoryStreamUP_t vertexStream	 = { (byte*)batch.data(), (uint32)batch.size(), sizeof( modelSimpleVertex_t ) };
+	vertexFactoryStreamUP_t instanceStream	 = { (byte*)&modelInstance, 1, sizeof( modelSimpleInstance_t ) };
+	shaderDrawParams_t		shaderDrawParams = { pMaterialResource->GetPerMaterialContextData(), pPerDrawVars, pVertexFactory };
+
+	pCmdList->SetRenderPipeline( pShader->R_ResolveRenderPipeline( shaderDrawParams, renderPassType ) );
 	pCmdList->SetConstantBuffer( 0, STUDIO_RESOURCE_BINDING_SLOT_GLOBAL_CB, g_StudioRender.GetStudioAPIGlobalConstantBuffer() );
-	pVertexFactory->R_BindUP( pCmdList, &vertexStream, 1 );
-	pShader->R_Bind( pCmdList, drawParams );
+	pVertexFactory->R_BindUP( pCmdList, instanceStream, &vertexStream, 1 );
+	pShader->R_Bind( pCmdList, shaderDrawParams );
 	pCmdList->Draw( 0, (uint32)batch.size() );
 }

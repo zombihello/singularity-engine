@@ -7,21 +7,22 @@
 //-----------------------------------------------------------------------------
 class IStudioAPICmdList;
 class IMaterialResource;
+class IVertexFactorySimple;
 
 //-----------------------------------------------------------------------------
 // Render utils parameters
 //-----------------------------------------------------------------------------
 struct studioDenormalizedQuadParams_t
 {
-	IVertexFactory* pVertexFactory;	 // NOTE: Vertex factory must be for MODEL_VERTEXTYPE_SIMPLE
-	vector2_t		origin;
-	vector2_t		size;
-	vector2_t		uv;
-	vector2_t		sizeUV;
-	vector2i_t		targetSize;
-	vector2i_t		textureSize;
-	float			clipSpaceQuadZ;
-	CColor			color;
+	IVertexFactorySimple* pVertexFactory;
+	vector2_t			  origin;
+	vector2_t			  size;
+	vector2_t			  uv;
+	vector2_t			  sizeUV;
+	vector2i_t			  targetSize;
+	vector2i_t			  textureSize;
+	float				  clipSpaceQuadZ;
+	CColor				  color;
 };
 
 //-----------------------------------------------------------------------------

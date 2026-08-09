@@ -67,11 +67,4 @@
 
 // Include global constants now
 #include "globalconstants.hlsl"
-
-//-----------------------------------------------------------------------------
-// Matrix-multiply convention macros
-//-----------------------------------------------------------------------------
-#define MulMatrix( Matrix, Vect ) mul( Matrix, Vect )  // Standard transform (matrix on the left)
-#define MulBone( Matrix, Vect )   mul( Vect, Matrix )  // Skinning bones (stored transposed, vector on the left)
-
 #endif // COMMON_HLSL

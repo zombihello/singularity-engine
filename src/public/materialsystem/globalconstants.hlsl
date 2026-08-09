@@ -8,12 +8,12 @@
 //-----------------------------------------------------------------------------
 struct studioGlobalShaderParams_t
 {
-	column_major float4x4 viewMatrix;
-	column_major float4x4 projectionMatrix;
-	column_major float4x4 viewProjectionMatrix;
-	column_major float4x4 invViewProjectionMatrix;
-	float4				  position;				 // xyz = camera world position
-	float4				  screenAndBufferSize;	 // xy = screen size, zw = render target size
+	float4x4 viewMatrix;
+	float4x4 projectionMatrix;
+	float4x4 viewProjectionMatrix;
+	float4x4 invViewProjectionMatrix;
+	float4 	 position;				 	 // xyz = camera world position
+	float4 	 screenAndBufferSize;	 	 // xy = screen size, zw = render target size
 };
 STUDIOAPI_CONSTANT_BUFFER( studioGlobalShaderParams_t, globalShaderParams, STUDIO_RESOURCE_BINDING_SLOT_GLOBAL_CB, 0 );
 

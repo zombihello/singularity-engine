@@ -8,7 +8,6 @@ MainVS
 */
 void MainVS( in vertexFactoryInput_t input, out float4 screenPosition : SV_POSITION, out float2 outTexCoord : TEXCOORD0 )
 {
-	float4 localPosition = VertexFactory_GetLocalPosition( input );
-	screenPosition 		  = MulMatrix( globalShaderParams.viewProjectionMatrix, float4( localPosition.xyz, 1.0 ) );
+	screenPosition 		  = mul( globalShaderParams.viewProjectionMatrix, VertexFactory_GetWorldPosition( input ) );
 	outTexCoord 		  = VertexFactory_GetTexCoord( input );
 }

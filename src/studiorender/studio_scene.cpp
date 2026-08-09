@@ -60,6 +60,11 @@ void CStudioScene::UpdateEntity( studioEntityId_t id, const studioEntityParams_t
 	{
 		studioEntity.params.pModel = params.pModel;
 	}
+
+	if ( studioEntity.params.localToWorld != params.localToWorld )
+	{
+		studioEntity.params.localToWorld = params.localToWorld;
+	}
 }
 
 /*
@@ -95,7 +100,7 @@ void CStudioScene::FindEntityViews( studioSceneView_t* pSceneView ) const
 		const studioEntity_t& entity	  = entities[index];
 		studioEntityView_t*	  pEntityView = (studioEntityView_t*)g_studioFrameAlloc.Alloc( sizeof( studioEntityView_t ) );
 		pEntityView->pEntity			  = (studioEntity_t*)&entity;
-		pEntityView->localToWorld		  = g_matrixIdentity;
+		pEntityView->localToWorld		  = entity.params.localToWorld;
 		pEntityView->pNext				  = pSceneView->pEntityViews;
 		pSceneView->pEntityViews		  = pEntityView;
 	}

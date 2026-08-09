@@ -28,16 +28,6 @@ void CVertexDeclarationSimple::InitStudioAPI()
 
 /*
 ==================
-CVertexFactorySimple::GetVertexType
-==================
-*/
-modelVertexType_t CVertexFactorySimple::GetVertexType() const
-{
-	return MODEL_VERTEXTYPE_SIMPLE;
-}
-
-/*
-==================
 CVertexFactorySimple::GetStudioAPIVertexDeclaration
 ==================
 */

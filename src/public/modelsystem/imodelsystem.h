@@ -1,12 +1,7 @@
 #pragma once
 #include "tier1/refcount.h"
 #include "appframework/iappsystem.h"
-#include "modelsystem/modeltypes.h"
-
-//-----------------------------------------------------------------------------
-// Forward declarations
-//-----------------------------------------------------------------------------
-class IVertexFactory;
+#include "modelsystem/ivertexfactory.h"
 
 //-----------------------------------------------------------------------------
 // Model system interface
@@ -15,5 +10,9 @@ class IVertexFactory;
 class IModelSystem : public IAppSystem
 {
 public:
+	template<class TVertexFactoryClass>
+	CRefPtr<TVertexFactoryClass>	CreateVertexFactory() const;
 	virtual CRefPtr<IVertexFactory> CreateVertexFactory( modelVertexType_t vertexType ) const = 0;
 };
+
+#include "modelsystem/imodelsystem.inl"

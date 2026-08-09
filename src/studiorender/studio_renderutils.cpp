@@ -2,7 +2,7 @@
 #include "materialsystem/ishader.h"
 #include "materialsystem/imaterial.h"
 #include "modelsystem/imodelsystem.h"
-#include "modelsystem/ivertexfactory.h"
+#include "modelsystem/ivertexfactory_simple.h"
 #include "modelsystem/modeltypes.h"
 #include "studiorender/studioapi/istudioapi.h"
 #include "studiorender/studioapi/istudioapi_cmdlist.h"
@@ -47,7 +47,10 @@ void R_DrawDenormalizedQuad( IStudioAPICmdList* pCmdList, const studioDenormaliz
 	static const vertexFactoryStreamUP_t s_indexStream = { (byte*)s_indices, ARRAYSIZE( s_indices ), sizeof( uint16 ) };
 
 	// Draw the quad
-	vertexFactoryStreamUP_t vertexStream = { (byte*)vertices, ARRAYSIZE( vertices ), sizeof( modelSimpleVertex_t ) };
-	params.pVertexFactory->R_BindUP( pCmdList, &vertexStream, 1, &s_indexStream );
+	modelSimpleInstance_t	modelInstance  = {};
+	vertexFactoryStreamUP_t vertexStream   = { (byte*)vertices, ARRAYSIZE( vertices ), sizeof( modelSimpleVertex_t ) };
+	vertexFactoryStreamUP_t instanceStream = { (byte*)&modelInstance, 1, sizeof( modelSimpleInstance_t ) };
+
+	params.pVertexFactory->R_BindUP( pCmdList, instanceStream, &vertexStream, 1, &s_indexStream );
 	pCmdList->DrawIndexed( 0, 0, ARRAYSIZE( s_indices ) );
 }

@@ -146,7 +146,7 @@ bool CSMATSourceMaterialDoc::LoadFromFile( const char* pPath )
 		case SMAT_MATERIAL_VAR_TYPE_VECTOR_2D: smatMaterialVar.SetVecValue( S_VectorFromString<vector2_t>( it->GetString( NULL ) ) ); break;
 		case SMAT_MATERIAL_VAR_TYPE_VECTOR_3D: smatMaterialVar.SetVecValue( S_VectorFromString<vector3_t>( it->GetString( NULL ) ) ); break;
 		case SMAT_MATERIAL_VAR_TYPE_VECTOR_4D: smatMaterialVar.SetVecValue( S_VectorFromString<vector4_t>( it->GetString( NULL ) ) ); break;
-		case SMAT_MATERIAL_VAR_TYPE_MATRIX: smatMaterialVar.SetMatrixValue( S_MatrixFromString( it->GetString( NULL ) ) ); break;
+		case SMAT_MATERIAL_VAR_TYPE_MATRIX: smatMaterialVar.SetMatrixValue( S_MatrixFromString<matrix4x4_t>( it->GetString( NULL ) ) ); break;
 		default:
 			Error( "SMATDoc: Invalid SMAT, unknown SMAT value type '%s' in '%s/%s' (file: '%s')", ConvSMTMaterialVarTypeToText( smatMaterialVarType ), shaderName.c_str(), it->GetName(), pPath );
 			Assert( false );

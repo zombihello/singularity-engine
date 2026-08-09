@@ -201,6 +201,7 @@ void CEcsSystemQuadInit::OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity, const
 	studioEntityParams_t	   studioEntityParams	 = {};
 	ecsComponentStudioEntity_t studioEntityComponent = {};
 	studioEntityParams.pModel						 = quad.pModel;
+	studioEntityParams.localToWorld					 = g_matrix43Identity;
 	studioEntityComponent.id						 = studioScene.pStudioScene->AddEntity( studioEntityParams );
 	ecsWorld.SetComponent( entity, eastl::move( studioEntityComponent ) );
 }
@@ -213,9 +214,12 @@ CEcsSystemModelInit::OnUpdate
 void CEcsSystemModelInit::OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity, const ecsComponentModel_t& model, ecsResourceStudioScene_t& studioScene )
 {
 	// TODO BS yehor.pohuliaka - CIT-81 Implement observer/system to free a studio entity when the ecs entity has been destroyed
+	static uint32			   modelIdx				 = 0;
 	studioEntityParams_t	   studioEntityParams	 = {};
 	ecsComponentStudioEntity_t studioEntityComponent = {};
 	studioEntityParams.pModel						 = model.pModel;
+	studioEntityParams.localToWorld					 = S_MatrixTranslate<matrix4x4_t>( vector3_t( 0.f, -200.f * modelIdx, 0.f ) ) * S_QuaternionToMatrix<matrix4x4_t>( S_AnglesToQuaternionYZX( vector3_t( 0, 90.f, 0 ) ) );
 	studioEntityComponent.id						 = studioScene.pStudioScene->AddEntity( studioEntityParams );
 	ecsWorld.SetComponent( entity, eastl::move( studioEntityComponent ) );
+	++modelIdx;
 }

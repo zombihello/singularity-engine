@@ -28,10 +28,13 @@ SET GAME_DIR=%GAME_DIR%/game/
 :: Make sure that the shader compiler is exist
 IF NOT EXIST %SHADERCOMPILER_EXE% (
 	ECHO ERROR: Shader compiler not found
+	SET ERRORLEVEL=1
 	GOTO :EXIT
 )
 
 :: Compile shaders
 "%SHADERCOMPILER_EXE%" -mode compile -file "%SHADERLIST_MAKEFILE%" -backend shadercompiler_vk -output "%GAME_DIR%/core/shaders"
 
+:EXIT
 ECHO ==============================================================================
+IF %ERRORLEVEL% NEQ 0 PAUSE

@@ -7,6 +7,7 @@
 // A concrete implementation must define:
 //   struct vertexFactoryInput_t { ... };
 //   float4 VertexFactory_GetLocalPosition( vertexFactoryInput_t input );
+//   float4 VertexFactory_GetWorldPosition( vertexFactoryInput_t input );
 //   float2 VertexFactory_GetTexCoord( vertexFactoryInput_t input );
 //   float4 VertexFactory_GetColor( vertexFactoryInput_t input );
 

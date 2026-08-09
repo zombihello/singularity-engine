@@ -1,6 +1,7 @@
 #include "pch_studiorender.h"
 #include "materialsystem/ishader.h"
 #include "modelsystem/ivertexfactory.h"
+#include "modelsystem/ivertexfactory_static.h"
 #include "studiorender/studioapi/istudioapi_barrier.h"
 #include "studiorender/studio_renderthread.h"
 #include "studiorender/studio_resourcebindingslots.h"
@@ -139,20 +140,20 @@ void CStudioRenderPassScene::R_DrawPass( CStudioViewport* pViewport, studioScene
 
 	// Draw all surfaces for the pass
 	pGraphicsCmdList->BeginRenderPass( pStudioAPIRenderPass, pStudioAPIFrameBuffer );
-	for ( uint32 index = 0, count = (uint32)renderPass.drawSurfaceIds.size(); index < count; ++index )
+	for ( uint32 index = 0, count = (uint32)renderPass.surfaceBatchIds.size(); index < count; ++index )
 	{
-		studioDrawSurface_t* pDrawSurface	  = pSceneView->drawSurfaces[renderPass.drawSurfaceIds[index]];
-		IModelResource*		 pModel			  = pSceneView->resources[pDrawSurface->modelId]->pModel;
-		IMaterialResource*	 pMaterial		  = pSceneView->resources[pDrawSurface->materialId]->pMaterial;
-		IShader*			 pShader		  = pMaterial->GetShader();
-		IVertexFactory*		 pVertexFactory	  = pModel->GetVertexFactory();
-		shaderDrawParams_t	 shaderDrawParams = { pMaterial->GetPerMaterialContextData(), pShader->GetDefaultPerDrawVars(), pVertexFactory };
+		studioSurfaceBatch_t* pSurfaceBatch	   = pSceneView->surfaceBatches[renderPass.surfaceBatchIds[index]];
+		IModelResource*		  pModel		   = pSceneView->resources[pSurfaceBatch->modelId]->pModel;
+		IMaterialResource*	  pMaterial		   = pSceneView->resources[pSurfaceBatch->materialId]->pMaterial;
+		IShader*			  pShader		   = pMaterial->GetShader();
+		IVertexFactory*		  pVertexFactory   = pModel->GetVertexFactory();
+		shaderDrawParams_t	  shaderDrawParams = { pMaterial->GetPerMaterialContextData(), pShader->GetDefaultPerDrawVars(), pVertexFactory };
 
 		pGraphicsCmdList->SetRenderPipeline( pShader->R_ResolveRenderPipeline( shaderDrawParams, STUDIO_RENDERPASS_TYPE_SCENE ) );
 		pGraphicsCmdList->SetConstantBuffer( 0, STUDIO_RESOURCE_BINDING_SLOT_GLOBAL_CB, pGlobalConstantBuffer );
-		pVertexFactory->R_Bind( pGraphicsCmdList );
+		pVertexFactory->R_Bind( pGraphicsCmdList, pSurfaceBatch->instances.GetVertexFactoryStream() );
 		pShader->R_Bind( pGraphicsCmdList, shaderDrawParams );
-		pGraphicsCmdList->DrawIndexed( pDrawSurface->baseVertexIndex, pDrawSurface->baseIndex, pDrawSurface->numIndices );
+		pGraphicsCmdList->DrawIndexed( pSurfaceBatch->baseVertexIndex, pSurfaceBatch->baseIndex, pSurfaceBatch->numIndices, pSurfaceBatch->instances.GetNumInstances() );
 	}
 
 	// Draw debug primitives on top of the scene

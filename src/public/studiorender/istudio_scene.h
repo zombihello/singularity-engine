@@ -21,6 +21,7 @@ typedef uint64 studioEntityId_t;
 struct studioEntityParams_t
 {
 	CResourcePtr<IModel> pModel;
+	matrix4x3_t			 localToWorld;
 };
 
 //-----------------------------------------------------------------------------

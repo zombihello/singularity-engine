@@ -60,3 +60,4 @@ for %%T in (%BUILD_TARGETS%) do (
 POPD
 RMDIR /s /q %BUILD_DIR%
 ECHO ==============================================================================
+IF %ERRORLEVEL% NEQ 0 PAUSE

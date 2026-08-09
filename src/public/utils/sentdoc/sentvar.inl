@@ -188,7 +188,7 @@ FORCEINLINE void CSENTEntityDescVar::SetMatrixValue( const matrix4x4_t& value )
 CSENTEntityDescVar::GetMatrixValue
 ==================
 */
-FORCEINLINE matrix4x4_t CSENTEntityDescVar::GetMatrixValue( const matrix4x4_t& defaultValue /* = g_matrixIdentity */ ) const
+FORCEINLINE matrix4x4_t CSENTEntityDescVar::GetMatrixValue( const matrix4x4_t& defaultValue /* = g_matrix44Identity */ ) const
 {
 	return type == SENT_ENTITY_DESC_VAR_TYPE_MATRIX ? matrixValue : defaultValue;
 }

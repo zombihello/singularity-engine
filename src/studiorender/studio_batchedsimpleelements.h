@@ -3,7 +3,7 @@
 #include "tier1/math/color.h"
 #include "resourcesystem/resourceptr.h"
 #include "materialsystem/imaterial.h"
-#include "modelsystem/ivertexfactory.h"
+#include "modelsystem/ivertexfactory_simple.h"
 #include "modelsystem/modeltypes.h"
 #include "studiorender/istudio_scene.h"
 #include "studiorender/studio_framealloc.h"
@@ -82,11 +82,11 @@ private:
 	void R_AddBox( batch_t& batch, const CAABB& aabb, const CColor& color );
 	void R_DrawBatch( IStudioAPICmdList* pCmdList, studioRenderPassType_t renderPassType, batchType_t batchType );
 
-	CResourcePtr<IMaterial>	   pMaterial;
-	CRefPtr<IMaterialResource> pMaterialResource;
-	CRefPtr<IVertexFactory>	   pVertexFactory;
-	uint32					   depthTestParamIndex;
-	batch_t					   batches[BATCH_NUM_TYPES];
+	CResourcePtr<IMaterial>		  pMaterial;
+	CRefPtr<IMaterialResource>	  pMaterialResource;
+	CRefPtr<IVertexFactorySimple> pVertexFactory;
+	uint32						  depthTestParamIndex;
+	batch_t						  batches[BATCH_NUM_TYPES];
 };
 
 #include "studiorender/studio_batchedsimpleelements.inl"

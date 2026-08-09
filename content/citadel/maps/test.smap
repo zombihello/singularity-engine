@@ -3,7 +3,12 @@ quad
 	classname "entities/test_quad"
 }
 
-model
+model0
+{
+	classname "entities/test_model"
+}
+
+model1
 {
 	classname "entities/test_model"
 }

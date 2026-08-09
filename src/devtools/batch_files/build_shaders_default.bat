@@ -28,6 +28,7 @@ SET GAME_DIR=%GAME_DIR%/game/
 :: Make sure that the shader compiler is exist
 IF NOT EXIST %SHADERCOMPILER_EXE% (
 	ECHO ERROR: Shader compiler not found
+	SET ERRORLEVEL=1
 	GOTO :EXIT
 )
 
@@ -36,3 +37,4 @@ IF NOT EXIST %SHADERCOMPILER_EXE% (
 
 :EXIT
 ECHO ==============================================================================
+IF %ERRORLEVEL% NEQ 0 PAUSE

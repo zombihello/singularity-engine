@@ -127,6 +127,9 @@ CStudioAPIBufferVk::CStudioAPIBufferVk( const byte* pData, uint64 dataSize, uint
 			return;
 		}
 		alloc.frameNumber = g_StudioAPIVk.GetFrameNumber();
+
+		// Register in 'onStudioAPIVkShutodwn' for destroy Vulkan objects when the one is shutdown
+		onStudioAPIVkShutdownHandle = g_StudioAPIVk.OnStudioAPIVkShutdown().Subscribe( &CStudioAPIBufferVk::OnStudioAPIVkShutdown, this );
 	}
 
 	// Copy data if we have it
@@ -134,9 +137,6 @@ CStudioAPIBufferVk::CStudioAPIBufferVk( const byte* pData, uint64 dataSize, uint
 	{
 		UpdateData( g_StudioAPIVk.GetImmediateCmdContext( STUDIOAPI_QUEUE_TYPE_GRAPHICS ), (byte*)pData, dataSize );
 	}
-
-	// Register in 'onStudioAPIVkShutodwn' for destroy Vulkan objects when the one is shutdown
-	onStudioAPIVkShutdownHandle = g_StudioAPIVk.OnStudioAPIVkShutdown().Subscribe( &CStudioAPIBufferVk::OnStudioAPIVkShutdown, this );
 }
 
 /*

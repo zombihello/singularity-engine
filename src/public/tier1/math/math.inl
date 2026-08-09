@@ -1081,11 +1081,10 @@ FORCEINLINE void S_QuaternionToAngles( const quaternion_t& quaternion, vector3_t
 S_QuaternionToMatrix
 ==================
 */
-FORCEINLINE matrix4x4_t S_QuaternionToMatrix( const quaternion_t& quaternion )
+template<typename TMatrixType>
+FORCEINLINE TMatrixType S_QuaternionToMatrix( const quaternion_t& quaternion )
 {
-	matrix4x4_t result;
-	S_QuaternionToMatrix( quaternion, result );
-	return result;
+	return glm::mat3_cast( quaternion );
 }
 
 /*
@@ -1093,9 +1092,10 @@ FORCEINLINE matrix4x4_t S_QuaternionToMatrix( const quaternion_t& quaternion )
 S_QuaternionToMatrix
 ==================
 */
-FORCEINLINE void S_QuaternionToMatrix( const quaternion_t& quaternion, matrix4x4_t& result )
+template<typename TMatrixType>
+FORCEINLINE void S_QuaternionToMatrix( const quaternion_t& quaternion, TMatrixType& result )
 {
-	result = glm::mat4_cast( quaternion );
+	result = glm::mat3_cast( quaternion );
 }
 
 /*
@@ -1181,9 +1181,10 @@ FORCEINLINE void S_QuaternionNormalize( const quaternion_t& quaternion, quaterni
 S_MatrixFromString
 ==================
 */
-FORCEINLINE matrix4x4_t S_MatrixFromString( const char* pString )
+template<typename TMatrixType>
+FORCEINLINE TMatrixType S_MatrixFromString( const char* pString )
 {
-	matrix4x4_t result;
+	TMatrixType result;
 	S_MatrixFromString( pString, result );
 	return result;
 }
@@ -1193,7 +1194,33 @@ FORCEINLINE matrix4x4_t S_MatrixFromString( const char* pString )
 S_MatrixFromString
 ==================
 */
-FORCEINLINE void S_MatrixFromString( const char* pString, matrix4x4_t& matrix )
+template<typename TMatrixType>
+FORCEINLINE void S_MatrixFromString( const char* pString, TMatrixType& matrix )
+{
+	static_assert( false, "Unknown type to create a matrix from a string" );
+}
+
+/*
+==================
+S_MatrixFromString
+==================
+*/
+template<>
+FORCEINLINE void S_MatrixFromString<matrix3x3_t>( const char* pString, matrix3x3_t& matrix )
+{
+	S_Sscanf( pString, "%f %f %f %f %f %f %f %f %f",
+			  &matrix[0].x, &matrix[0].y, &matrix[0].z,
+			  &matrix[1].x, &matrix[1].y, &matrix[1].z,
+			  &matrix[2].x, &matrix[2].y, &matrix[2].z );
+}
+
+/*
+==================
+S_MatrixFromString
+==================
+*/
+template<>
+FORCEINLINE void S_MatrixFromString<matrix4x4_t>( const char* pString, matrix4x4_t& matrix )
 {
 	S_Sscanf( pString, "%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f",
 			  &matrix[0].x, &matrix[0].y, &matrix[0].z, &matrix[0].w,
@@ -1204,10 +1231,40 @@ FORCEINLINE void S_MatrixFromString( const char* pString, matrix4x4_t& matrix )
 
 /*
 ==================
+S_MatrixFromString
+==================
+*/
+template<>
+FORCEINLINE void S_MatrixFromString<matrix4x3_t>( const char* pString, matrix4x3_t& matrix )
+{
+	S_Sscanf( pString, "%f %f %f %f %f %f %f %f %f %f %f %f",
+			  &matrix[0].x, &matrix[0].y, &matrix[0].z,
+			  &matrix[1].x, &matrix[1].y, &matrix[1].z,
+			  &matrix[2].x, &matrix[2].y, &matrix[2].z,
+			  &matrix[3].x, &matrix[3].y, &matrix[3].z );
+}
+
+/*
+==================
+S_MatrixFromString
+==================
+*/
+template<>
+FORCEINLINE void S_MatrixFromString<matrix3x4_t>( const char* pString, matrix3x4_t& matrix )
+{
+	S_Sscanf( pString, "%f %f %f %f %f %f %f %f %f %f %f %f",
+			  &matrix[0].x, &matrix[0].y, &matrix[0].z, &matrix[0].w,
+			  &matrix[1].x, &matrix[1].y, &matrix[1].z, &matrix[1].w,
+			  &matrix[2].x, &matrix[2].y, &matrix[2].z, &matrix[2].w );
+}
+
+/*
+==================
 S_MatrixToString
 ==================
 */
-FORCEINLINE eastl::string S_MatrixToString( const matrix4x4_t& matrix )
+template<typename TMatrixType>
+FORCEINLINE eastl::string S_MatrixToString( const TMatrixType& matrix )
 {
 	eastl::string result;
 	S_MatrixToString( matrix, result );
@@ -1219,7 +1276,33 @@ FORCEINLINE eastl::string S_MatrixToString( const matrix4x4_t& matrix )
 S_MatrixToString
 ==================
 */
-FORCEINLINE void S_MatrixToString( const matrix4x4_t& matrix, eastl::string& result )
+template<typename TMatrixType>
+FORCEINLINE void S_MatrixToString( const TMatrixType& matrix, eastl::string& result )
+{
+	static_assert( false, "Unknown type to create a string from a matrix" );
+}
+
+/*
+==================
+S_MatrixToString
+==================
+*/
+template<>
+FORCEINLINE void S_MatrixToString<matrix3x3_t>( const matrix3x3_t& matrix, eastl::string& result )
+{
+	result = S_Sprintf( "%f %f %f %f %f %f %f %f %f",
+						matrix[0].x, matrix[0].y, matrix[0].z,
+						matrix[1].x, matrix[1].y, matrix[1].z,
+						matrix[2].x, matrix[2].y, matrix[2].z );
+}
+
+/*
+==================
+S_MatrixToString
+==================
+*/
+template<>
+FORCEINLINE void S_MatrixToString<matrix4x4_t>( const matrix4x4_t& matrix, eastl::string& result )
 {
 	result = S_Sprintf( "%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f",
 						matrix[0].x, matrix[0].y, matrix[0].z, matrix[0].w,
@@ -1230,12 +1313,31 @@ FORCEINLINE void S_MatrixToString( const matrix4x4_t& matrix, eastl::string& res
 
 /*
 ==================
-S_MatrixIdentity
+S_MatrixToString
 ==================
 */
-FORCEINLINE void S_MatrixIdentity( matrix4x4_t& matrix )
+template<>
+FORCEINLINE void S_MatrixToString<matrix4x3_t>( const matrix4x3_t& matrix, eastl::string& result )
 {
-	matrix = glm::identity<matrix4x4_t>();
+	result = S_Sprintf( "%f %f %f %f %f %f %f %f %f %f %f %f",
+						matrix[0].x, matrix[0].y, matrix[0].z,
+						matrix[1].x, matrix[1].y, matrix[1].z,
+						matrix[2].x, matrix[2].y, matrix[2].z,
+						matrix[3].x, matrix[3].y, matrix[3].z );
+}
+
+/*
+==================
+S_MatrixToString
+==================
+*/
+template<>
+FORCEINLINE void S_MatrixToString<matrix3x4_t>( const matrix3x4_t& matrix, eastl::string& result )
+{
+	result = S_Sprintf( "%f %f %f %f %f %f %f %f %f %f %f %f",
+						matrix[0].x, matrix[0].y, matrix[0].z, matrix[0].w,
+						matrix[1].x, matrix[1].y, matrix[1].z, matrix[1].w,
+						matrix[2].x, matrix[2].y, matrix[2].z, matrix[2].w );
 }
 
 /*
@@ -1243,33 +1345,21 @@ FORCEINLINE void S_MatrixIdentity( matrix4x4_t& matrix )
 S_MatrixIdentity
 ==================
 */
-FORCEINLINE matrix4x4_t S_MatrixIdentity()
+template<typename TMatrixType>
+FORCEINLINE void S_MatrixIdentity( TMatrixType& matrix )
 {
-	return glm::identity<matrix4x4_t>();
+	matrix = glm::identity<TMatrixType>();
 }
 
 /*
 ==================
-S_MatrixOrigin
+S_MatrixIdentity
 ==================
 */
-FORCEINLINE void S_MatrixOrigin( const matrix4x4_t& matrix, vector3_t& origin )
+template<typename TMatrixType>
+FORCEINLINE TMatrixType S_MatrixIdentity()
 {
-	origin.x = matrix[3].x;
-	origin.y = matrix[3].y;
-	origin.z = matrix[3].z;
-}
-
-/*
-==================
-S_MatrixOrigin
-==================
-*/
-FORCEINLINE vector3_t S_MatrixOrigin( const matrix4x4_t& matrix )
-{
-	vector3_t result;
-	S_MatrixOrigin( matrix, result );
-	return result;
+	return glm::identity<TMatrixType>();
 }
 
 /*
@@ -1277,11 +1367,10 @@ FORCEINLINE vector3_t S_MatrixOrigin( const matrix4x4_t& matrix )
 S_MatrixTranslate
 ==================
 */
-FORCEINLINE void S_MatrixTranslate( const vector3_t& location, matrix4x4_t& matrix )
+template<typename TMatrixType>
+FORCEINLINE void S_MatrixTranslate( const vector3_t& location, TMatrixType& matrix )
 {
-	matrix[3].x = location.x;
-	matrix[3].y = location.y;
-	matrix[3].z = location.z;
+	matrix = glm::translate( location );
 }
 
 /*
@@ -1289,9 +1378,10 @@ FORCEINLINE void S_MatrixTranslate( const vector3_t& location, matrix4x4_t& matr
 S_MatrixTranslate
 ==================
 */
-FORCEINLINE matrix4x4_t S_MatrixTranslate( const vector3_t& location )
+template<typename TMatrixType>
+FORCEINLINE TMatrixType S_MatrixTranslate( const vector3_t& location )
 {
-	return glm::translate( g_matrixIdentity, location );
+	return glm::translate( location );
 }
 
 /*
@@ -1299,11 +1389,10 @@ FORCEINLINE matrix4x4_t S_MatrixTranslate( const vector3_t& location )
 S_MatrixScale
 ==================
 */
-FORCEINLINE void S_MatrixScale( const vector3_t& scale, matrix4x4_t& matrix )
+template<typename TMatrixType>
+FORCEINLINE void S_MatrixScale( const vector3_t& scale, TMatrixType& matrix )
 {
-	matrix[0].x = scale.x;
-	matrix[1].y = scale.y;
-	matrix[2].z = scale.z;
+	matrix = glm::scale( scale );
 }
 
 /*
@@ -1311,9 +1400,32 @@ FORCEINLINE void S_MatrixScale( const vector3_t& scale, matrix4x4_t& matrix )
 S_MatrixScale
 ==================
 */
-FORCEINLINE matrix4x4_t S_MatrixScale( const vector3_t& scale )
+template<typename TMatrixType>
+FORCEINLINE TMatrixType S_MatrixScale( const vector3_t& scale )
 {
-	return glm::scale( g_matrixIdentity, scale );
+	return glm::scale( scale );
+}
+
+/*
+==================
+S_MatrixTranspose
+==================
+*/
+template<typename TMatrixType>
+FORCEINLINE void S_MatrixTranspose( const TMatrixType& srcMatrix, typename matrixTransposeType_t<TMatrixType>::type_t& destMatrix )
+{
+	destMatrix = glm::transpose( srcMatrix );
+}
+
+/*
+==================
+S_MatrixTranspose
+==================
+*/
+template<typename TMatrixType>
+FORCEINLINE typename matrixTransposeType_t<TMatrixType>::type_t S_MatrixTranspose( const TMatrixType& matrix )
+{
+	return glm::transpose( matrix );
 }
 
 /*
@@ -1321,9 +1433,10 @@ FORCEINLINE matrix4x4_t S_MatrixScale( const vector3_t& scale )
 S_MatrixInverse
 ==================
 */
-FORCEINLINE void S_MatrixInverse( const matrix4x4_t& srcMatrix, matrix4x4_t& destMatrix )
+template<typename TMatrixType>
+FORCEINLINE void S_MatrixInverse( const TMatrixType& srcMatrix, TMatrixType& destMatrix )
 {
-	destMatrix = glm::inverse( srcMatrix );
+	destMatrix = S_MatrixInverse( srcMatrix );
 }
 
 /*
@@ -1331,11 +1444,10 @@ FORCEINLINE void S_MatrixInverse( const matrix4x4_t& srcMatrix, matrix4x4_t& des
 S_MatrixInverse
 ==================
 */
-FORCEINLINE matrix4x4_t S_MatrixInverse( const matrix4x4_t& matrix )
+template<typename TMatrixType>
+FORCEINLINE TMatrixType S_MatrixInverse( const TMatrixType& matrix )
 {
-	matrix4x4_t result;
-	S_MatrixInverse( matrix, result );
-	return result;
+	return glm::inverse( matrix );
 }
 
 /*
