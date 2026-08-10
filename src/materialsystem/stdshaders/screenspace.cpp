@@ -31,7 +31,7 @@ BEGIN_SHADER( ScreenSpace, "Help for ScreenSpace" )
 				pBaseTexture				   = pTexturesMgr->GetDefaultResource();
 			}
 
-			CThisClass::pBaseTexture = pBaseTexture->GetStudioResource();
+			thisClass_t::pBaseTexture = pBaseTexture->GetStudioResource();
 		}
 
 		SHADER_PERMATERIAL_CONTEXTDATA_BARRIER

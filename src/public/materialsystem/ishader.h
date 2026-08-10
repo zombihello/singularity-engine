@@ -1,6 +1,7 @@
 #pragma once
-#include "studiorender/istudio_renderresource.h"
 #include "tier0/types.h"
+#include "tier1/debugname.h"
+#include "studiorender/istudio_renderresource.h"
 #include "studiorender/studioapi/istudioapi_shader.h"
 #include "studiorender/studio_renderpasstypes.h"
 
@@ -119,7 +120,7 @@ struct shaderPerDrawVar_t
 // Per-material context data interface
 // NOTE: Shaders can keep per material data in classes descended from this
 //-----------------------------------------------------------------------------
-class IPerMaterialContextData : public IRefCounted
+class IPerMaterialContextData : public IRefCounted, public IDebugNamed
 {
 public:
 	virtual ~IPerMaterialContextData() {}
@@ -155,7 +156,7 @@ public:
 	virtual void Shutdown()												= 0;
 
 	// Create a per-material context data
-	virtual CRefPtr<IPerMaterialContextData> CreatePerMaterialContextData() const = 0;
+	virtual CRefPtr<IPerMaterialContextData> CreatePerMaterialContextData( const char* pDebugName = "" ) const = 0;
 
 	// Bind the shader's own resources (textures, samplers, constant buffers, etc) into the command list
 	virtual void R_Bind( IStudioAPICmdList* pStudioAPICmdList, const shaderDrawParams_t& drawParams ) = 0;

@@ -27,6 +27,7 @@ struct studioBakeRenderPipelineParams_t
 	studioRenderPassType_t		 renderPassType;
 	IStudioAPIVertexDeclaration* pVertexDeclaration;
 	IStudioAPIShader*			 pStudioAPIShaders[STUDIOAPI_SHADER_NUM_DRAW_TYPES];
+	const char*					 pDebugName;
 };
 
 //-----------------------------------------------------------------------------

@@ -127,7 +127,7 @@ bool CStudioRender::Init()
 	// Create the global constant buffer
 	pStudioAPIGlobalConstantBuffer = g_pStudioAPI->CreateBuffer( NULL, sizeof( studioGlobalShaderParams_t ), sizeof( studioGlobalShaderParams_t ),
 																 STUDIOAPI_BUFFER_USAGE_FLAG_VOLATILE | STUDIOAPI_BUFFER_USAGE_FLAG_CONSTANT_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST,
-																 "GlobalShaderParams" );
+																 DEBUGNAME( "globalshaderparams" ) );
 
 	// Start the render thread
 	Studio_StartRenderThread();

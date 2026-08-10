@@ -6,7 +6,7 @@
 //-----------------------------------------------------------------------------
 // A texture resource which is owned by the render thread
 //-----------------------------------------------------------------------------
-class CTextureResource : public CRefCounted<ITextureResource>, public CStudioRenderResource<IStudioRenderResource>
+class CTextureResource : public CDebugNamed<CRefCounted<ITextureResource>>, public CStudioRenderResource<IStudioRenderResource>
 {
 public:
 	// ITextureResource interface
@@ -20,7 +20,7 @@ public:
 	virtual IStudioAPITexture*	   GetStudioAPITexture() const override;
 	virtual IStudioAPISampler*	   GetStudioAPISampler() const override;
 
-	CTextureResource();
+	CTextureResource( const char* pDebugName = "" );
 
 	void				   Update( studioAPITextureType_t type, studioAPIPixelFormat_t pixelFormat, uint32 sizeX, uint32 sizeY, uint32 sizeZ, uint32 numLayers, uint32 numMipmaps, uint32 usageFlags, const studioAPISamplerCreateInfo_t& samplerInfo, const byte* pData = NULL, uint32 dataSize = 0 );
 	void				   Clear();

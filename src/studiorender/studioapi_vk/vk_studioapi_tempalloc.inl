@@ -169,7 +169,7 @@ typename CStudioAPITempAllocVk<blockSize, vkBufferUsageFlags>::tempMemoryBlockLi
 	tempMemoryBlock_t				  block = {};
 	CStudioAPIQueueSharingModeSetupVk queueSharingModeSetup( graphicsQueueFamilyIndex, computeQueueFamilyIndex, transferQueueFamilyIndex );
 	queueSharingModeSetup.Setup( vkBufferCreateInfo.sharingMode, vkBufferCreateInfo.queueFamilyIndexCount, vkBufferCreateInfo.pQueueFamilyIndices );
-	block.vmaAllocation = g_StudioAPIVk.GetMemoryMgr().AllocateBuffer( "TempBlock", vkBufferCreateInfo, vmaAllocationCreateInfo, block.vkBuffer );
+	block.vmaAllocation = g_StudioAPIVk.GetMemoryMgr().AllocateBuffer( "tempblock", vkBufferCreateInfo, vmaAllocationCreateInfo, block.vkBuffer );
 	if ( block.vmaAllocation == VK_NULL_HANDLE )
 	{
 		Sys_Error( "Failed to allocate GPU buffer for a temp block with size %llu (pool: %i, name: '%s')", blockSize, pool.id, pAllocName );

@@ -11,14 +11,14 @@ class CMaterialVar;
 //-----------------------------------------------------------------------------
 // A material resource which is owned by the render thread
 //-----------------------------------------------------------------------------
-class CMaterialResource : public CRefCounted<IMaterialResource>
+class CMaterialResource : public CDebugNamed<CRefCounted<IMaterialResource>>
 {
 public:
 	// IMaterialResource interface
 	virtual IShader*				 GetShader() const override;
 	virtual IPerMaterialContextData* GetPerMaterialContextData() const override;
 
-	CMaterialResource();
+	CMaterialResource( const char* pDebugName = "" );
 
 	void Update( IShader* pShader, CMaterialVar** pVars );
 	void Clear();

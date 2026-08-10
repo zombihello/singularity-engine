@@ -25,7 +25,7 @@ protected:
 // Base class for a vertex factory
 //-----------------------------------------------------------------------------
 template<class TBaseClass, uint32 instanceStreamSlot = INVALID_INDEX>
-class CVertexFactoryBase : public CRefCounted<TBaseClass>, public CStudioRenderResource<IStudioRenderResource>
+class CVertexFactoryBase : public CDebugNamed<CRefCounted<TBaseClass>>, public CStudioRenderResource<IStudioRenderResource>
 {
 public:
 	static_assert( eastl::is_empty<typename vertexFactoryInfo_t<TBaseClass>::instance_t>::value == ( instanceStreamSlot == INVALID_INDEX ), "Empty instance type must use INVALID_INDEX; non-empty must set a slot" );
@@ -55,7 +55,7 @@ public:
 	virtual modelVertexType_t GetVertexType() const override;
 	virtual uint32			  GetInstanceStride() const override;
 
-	CVertexFactoryBase();
+	CVertexFactoryBase( const char* pDebugName = "" );
 
 protected:
 	// IRefCounted interface

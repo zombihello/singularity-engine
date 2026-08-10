@@ -1,15 +1,18 @@
 #include "pch_studiorender.h"
+#include "tier1/debugname.h"
 #include "materialsystem/ishader.h"
 #include "materialsystem/imaterialvar.h"
 #include "materialsystem/itexture.h"
 #include "resourcesystem/iresourcesystem.h"
 #include "modelsystem/imodelsystem.h"
 #include "studiorender/studioapi/istudioapi_barrier.h"
+#include "studiorender/studioapi/studioapi_event.h"
 #include "studiorender/studio_resourcebindingslots.h"
 #include "studiorender/studio_renderpasstypes.h"
 #include "studiorender/studio_viewport.h"
 #include "studiorender/studio_renderutils.h"
 #include "studiorender/studiorender.h"
+#include "studiorender/studio_draweventcolors.h"
 #include "studiorender/studio_renderpass_present.h"
 
 /*
@@ -44,7 +47,7 @@ void CStudioRenderPassPresent::Init()
 	pMaterialResource = pMaterial->GetStudioResource();
 
 	// Create a vertex factory for draw a quad
-	pVertexFactory = g_pModelSystem->CreateVertexFactory<IVertexFactorySimple>();
+	pVertexFactory = g_pModelSystem->CreateVertexFactory<IVertexFactorySimple>( DEBUGNAME( "present" ) );
 	pVertexFactory->Init();
 }
 
@@ -82,32 +85,35 @@ void CStudioRenderPassPresent::R_DrawPass( CStudioViewport* pViewport, studioSce
 
 	// Initialize viewport and scissor
 	pGraphicsCmdList->BeginRecord();
-	pGraphicsCmdList->SetViewport( 0.f, 0.f, (float)viewportSize.x, (float)viewportSize.y, 0.f, 1.f );
-	pGraphicsCmdList->SetScissor( 0, 0, viewportSize.x, viewportSize.y );
-
-	// Place barriers into the command list
 	{
-		studioAPIBarrier_t barriers[] = {
-			StudioAPI_MakeTextureBarrier( pStudioAPISwapChain->GetCurrentImage(), STUDIOAPI_TEXTURE_LAYOUT_COLOR_RENDER_TARGET, STUDIOAPI_QUEUE_TYPE_GRAPHICS ),
-			StudioAPI_MakeBufferBarrier( pGlobalConstantBuffer, STUDIOAPI_BUFFER_STATE_CONSTANT_BUFFER, STUDIOAPI_QUEUE_TYPE_GRAPHICS )
-		};
-		pGraphicsCmdList->Barrier( barriers, ARRAYSIZE( barriers ) );
-	}
-	drawParams.pPerMaterialContextData->R_Barrier( pGraphicsCmdList );
+		STUDIOAPI_SCOPED_EVENT( pGraphicsCmdList, CStudioDrawEventColors::postProcess, "present" );
+		pGraphicsCmdList->SetViewport( 0.f, 0.f, (float)viewportSize.x, (float)viewportSize.y, 0.f, 1.f );
+		pGraphicsCmdList->SetScissor( 0, 0, viewportSize.x, viewportSize.y );
 
-	// Copy `__rt_scenecolor_ldr` into a swapchain image
-	studioDenormalizedQuadParams_t denormalizedQuadParams = { pVertexFactory, vector2_t( 0.f, 0.f ), viewportSize, vector2_t( 0.f, 0.f ), viewportSize, viewportSize, g_StudioRender.GetSceneRenderTargets().GetBufferSize(), 1.f, CColor::Make( 255, 255, 255 ) };
-	pGraphicsCmdList->BeginRenderPass( pViewport->GetStudioAPIRenderPass(), pViewport->GetStudioAPIFrameBuffer() );
-	pGraphicsCmdList->SetRenderPipeline( pShader->R_ResolveRenderPipeline( drawParams, STUDIO_RENDERPASS_TYPE_PRESENT ) );
-	pGraphicsCmdList->SetConstantBuffer( 0, STUDIO_RESOURCE_BINDING_SLOT_GLOBAL_CB, pGlobalConstantBuffer );
-	pShader->R_Bind( pGraphicsCmdList, drawParams );
-	R_DrawDenormalizedQuad( pGraphicsCmdList, denormalizedQuadParams );
-	pGraphicsCmdList->EndRenderPass();
+		// Place barriers into the command list
+		{
+			studioAPIBarrier_t barriers[] = {
+				StudioAPI_MakeTextureBarrier( pStudioAPISwapChain->GetCurrentImage(), STUDIOAPI_TEXTURE_LAYOUT_COLOR_RENDER_TARGET, STUDIOAPI_QUEUE_TYPE_GRAPHICS ),
+				StudioAPI_MakeBufferBarrier( pGlobalConstantBuffer, STUDIOAPI_BUFFER_STATE_CONSTANT_BUFFER, STUDIOAPI_QUEUE_TYPE_GRAPHICS )
+			};
+			pGraphicsCmdList->Barrier( barriers, ARRAYSIZE( barriers ) );
+		}
+		drawParams.pPerMaterialContextData->R_Barrier( pGraphicsCmdList );
 
-	// Place barriers for the swapchain image
-	{
-		studioAPIBarrier_t barrier = StudioAPI_MakeTextureBarrier( pStudioAPISwapChain->GetCurrentImage(), STUDIOAPI_TEXTURE_LAYOUT_PRESENT, STUDIOAPI_QUEUE_TYPE_GRAPHICS );
-		pGraphicsCmdList->Barrier( &barrier, 1 );
+		// Copy `__rt_scenecolor_ldr` into a swapchain image
+		studioDenormalizedQuadParams_t denormalizedQuadParams = { pVertexFactory, vector2_t( 0.f, 0.f ), viewportSize, vector2_t( 0.f, 0.f ), viewportSize, viewportSize, g_StudioRender.GetSceneRenderTargets().GetBufferSize(), 1.f, CColor::Make( 255, 255, 255 ) };
+		pGraphicsCmdList->BeginRenderPass( pViewport->GetStudioAPIRenderPass(), pViewport->GetStudioAPIFrameBuffer() );
+		pGraphicsCmdList->SetRenderPipeline( pShader->R_ResolveRenderPipeline( drawParams, STUDIO_RENDERPASS_TYPE_PRESENT ) );
+		pGraphicsCmdList->SetConstantBuffer( 0, STUDIO_RESOURCE_BINDING_SLOT_GLOBAL_CB, pGlobalConstantBuffer );
+		pShader->R_Bind( pGraphicsCmdList, drawParams );
+		R_DrawDenormalizedQuad( pGraphicsCmdList, denormalizedQuadParams );
+		pGraphicsCmdList->EndRenderPass();
+
+		// Place barriers for the swapchain image
+		{
+			studioAPIBarrier_t barrier = StudioAPI_MakeTextureBarrier( pStudioAPISwapChain->GetCurrentImage(), STUDIOAPI_TEXTURE_LAYOUT_PRESENT, STUDIOAPI_QUEUE_TYPE_GRAPHICS );
+			pGraphicsCmdList->Barrier( &barrier, 1 );
+		}
 	}
 	pGraphicsCmdList->EndRecord();
 

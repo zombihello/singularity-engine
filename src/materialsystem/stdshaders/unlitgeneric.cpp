@@ -39,7 +39,7 @@ BEGIN_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 				pBaseTexture				   = pTexturesMgr->GetDefaultResource();
 			}
 
-			CThisClass::pBaseTexture = pBaseTexture->GetStudioResource();
+			thisClass_t::pBaseTexture = pBaseTexture->GetStudioResource();
 			pParams[COLOR]->GetVecValue( &buffer0.color.x, 4 );
 		}
 
@@ -55,7 +55,7 @@ BEGIN_SHADER( UnlitGeneric, "Help for UnlitGeneric" )
 
 		SHADER_PERMATERIAL_CONTEXTDATA_INIT_STUDIOAPI
 		{
-			pStudioAPIBuffer0 = RES_BUFFER0.CreateBuffer( (byte*)&buffer0 );
+			pStudioAPIBuffer0 = RES_BUFFER0.CreateBuffer( (byte*)&buffer0, DEBUGNAME( "buffer0" ) );
 		}
 
 		SHADER_PERMATERIAL_CONTEXTDATA_UPDATE_STUDIOAPI

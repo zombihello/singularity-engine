@@ -147,6 +147,11 @@ VmaAllocation CStudioAPIMemoryMgrVk::AllocateBuffer( const char* pDebugTag, cons
 		*pAllocatedSize = vmaAllocationInfo.size;
 	}
 
+	// Set debug name for the buffer
+#if !RETAIL
+	VK_SetDebugName( VK_OBJECT_TYPE_BUFFER, (uint64)vkBuffer, pDebugTag );
+#endif	// !RETAIL
+
 	// Add to track GPU memory allocation
 #if STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION
 	allocationInfo_t& allocationInfo = allocationDict[vmaAllocation];
@@ -202,6 +207,11 @@ VmaAllocation CStudioAPIMemoryMgrVk::AllocateImage( const char* pDebugTag, const
 	{
 		*pAllocatedSize = vmaAllocationInfo.size;
 	}
+
+	// Set debug name for the image
+#if !RETAIL
+	VK_SetDebugName( VK_OBJECT_TYPE_IMAGE, (uint64)vkImage, pDebugTag );
+#endif	// !RETAIL
 
 	// Add to track GPU memory allocation
 #if STUDIOAPI_VK_GPU_TRACK_MEMORY_ALLOCATION

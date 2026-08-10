@@ -9,8 +9,9 @@
 CMaterialResource::CMaterialResource
 ==================
 */
-CMaterialResource::CMaterialResource()
-	: pShader( NULL )
+CMaterialResource::CMaterialResource( const char* pDebugName /* = "" */ )
+	: CDebugNamed<CRefCounted<IMaterialResource>>( pDebugName )
+	, pShader( NULL )
 {
 }
 
@@ -30,7 +31,7 @@ void CMaterialResource::Update( IShader* pShader, CMaterialVar** pVars )
 	{
 		// Remember a new shader and create a new context data
 		CMaterialResource::pShader = pShader;
-		pPerMaterialContextData	   = pShader->CreatePerMaterialContextData();
+		pPerMaterialContextData	   = pShader->CreatePerMaterialContextData( GetDebugName() );
 	}
 
 	// Update the per-material context data
@@ -87,7 +88,7 @@ CMaterial::CMaterial( IResource* pResource )
 	, bDirtyDependencies( false )
 	, bBatchDependencies( false )
 	, pShader( NULL )
-	, pStudioResource( new CMaterialResource() )
+	, pStudioResource( new CMaterialResource( pResource->GetName() ) )
 {
 }
 

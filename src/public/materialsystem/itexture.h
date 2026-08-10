@@ -1,5 +1,6 @@
 #pragma once
 #include "tier1/refcount.h"
+#include "tier1/debugname.h"
 #include "studiorender/studioapi/istudioapi_texture.h"
 #include "studiorender/istudio_renderresource.h"
 #include "resourcesystem/iresource.h"
@@ -17,7 +18,7 @@ struct textureMipMap_t
 //-----------------------------------------------------------------------------
 // A texture resource interface which is owned by the render thread
 //-----------------------------------------------------------------------------
-class ITextureResource : public IRefCounted
+class ITextureResource : public IRefCounted, public IDebugNamed
 {
 public:
 	virtual ~ITextureResource() {}

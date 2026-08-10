@@ -1,4 +1,5 @@
 #pragma once
+#include "tier1/debugname.h"
 #include "resourcesystem/iresource.h"
 #include "resourcesystem/resourceptr.h"
 #include "modelsystem/modeltypes.h"
@@ -32,7 +33,7 @@ struct modelInitialData_t
 //-----------------------------------------------------------------------------
 // A model resource interface which is owned by the render thread
 //-----------------------------------------------------------------------------
-class IModelResource : public IRefCounted
+class IModelResource : public IRefCounted, public IDebugNamed
 {
 public:
 	virtual ~IModelResource() {}

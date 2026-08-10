@@ -17,7 +17,8 @@ CVertexDeclarationBase::CVertexFactoryBase
 ==================
 */
 template<class TBaseClass, uint32 instanceStreamSlot>
-CVertexFactoryBase<TBaseClass, instanceStreamSlot /*= INVALID_INDEX*/>::CVertexFactoryBase()
+CVertexFactoryBase<TBaseClass, instanceStreamSlot /*= INVALID_INDEX*/>::CVertexFactoryBase( const char* pDebugName /* = "" */ )
+	: CDebugNamed<CRefCounted<TBaseClass>>( pDebugName )
 {
 	Mem_Memzero( &indexStream, sizeof( vertexFactoryStream_t ) );
 }
@@ -188,7 +189,7 @@ CRefPtr<IStudioAPIBuffer> CVertexFactoryBase<TBaseClass, instanceStreamSlot>::R_
 		studioAPIMappedBufferData_t mappedInstanceData = {};
 		uint32						instanceStride	   = GetInstanceStride();
 		uint64						bufferSize		   = (uint64)instanceStride * numInstances;
-		CRefPtr<IStudioAPIBuffer>	pStudioAPIBuffer   = g_pStudioAPI->CreateBuffer( NULL, bufferSize, instanceStride, STUDIOAPI_BUFFER_USAGE_FLAG_VOLATILE | STUDIOAPI_BUFFER_USAGE_FLAG_VERTEX_BUFFER, "VertexFactory Instances" );
+		CRefPtr<IStudioAPIBuffer>	pStudioAPIBuffer   = g_pStudioAPI->CreateBuffer( NULL, bufferSize, instanceStride, STUDIOAPI_BUFFER_USAGE_FLAG_VOLATILE | STUDIOAPI_BUFFER_USAGE_FLAG_VERTEX_BUFFER, DEBUGNAME( "instances" ) );
 		pStudioAPIBuffer->MapMemory( bufferSize, 0, mappedInstanceData );
 		R_UpdateInstanceBuffer( mappedInstanceData.pData, pInstances, numInstances );
 		pStudioAPIBuffer->UnmapMemory( mappedInstanceData );

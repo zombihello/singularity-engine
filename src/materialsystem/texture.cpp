@@ -6,8 +6,9 @@
 CTextureResource::CTextureResource
 ==================
 */
-CTextureResource::CTextureResource()
-	: type( STUDIOAPI_TEXTURE_TYPE_1D )
+CTextureResource::CTextureResource( const char* pDebugName /* = "" */ )
+	: CDebugNamed<CRefCounted<ITextureResource>>( pDebugName )
+	, type( STUDIOAPI_TEXTURE_TYPE_1D )
 	, pixelFormat( STUDIOAPI_PIXEL_FORMAT_UNKNOWN )
 	, usageFlags( 0 )
 	, sizeX( 0 )
@@ -79,10 +80,10 @@ CTextureResource::InitStudioAPI
 void CTextureResource::InitStudioAPI()
 {
 	// Create a StudioAPI texture and sample (if we have flag `STUDIOAPI_TEXTURE_USAGE_FLAG_TEXTURE`)
-	pStudioAPITexture = g_pStudioAPI->CreateTexture( type, sizeX, sizeY, sizeZ, numLayers, numMipmaps, usageFlags, pixelFormat, !data.empty() ? data.data() : NULL );
+	pStudioAPITexture = g_pStudioAPI->CreateTexture( type, sizeX, sizeY, sizeZ, numLayers, numMipmaps, usageFlags, pixelFormat, !data.empty() ? data.data() : NULL, GetDebugName() );
 	if ( usageFlags & STUDIOAPI_TEXTURE_USAGE_FLAG_TEXTURE )
 	{
-		pStudioAPISampler = g_pStudioAPI->CreateSampler( studioAPISamplerCreateInfo );
+		pStudioAPISampler = g_pStudioAPI->CreateSampler( studioAPISamplerCreateInfo, GetDebugName() );
 	}
 	data.clear();
 }
@@ -216,7 +217,7 @@ CTexture::CTexture( IResource* pResource )
 	, pixelFormat( STUDIOAPI_PIXEL_FORMAT_UNKNOWN )
 	, usageFlags( 0 )
 	, numLayers( 0 )
-	, pStudioResource( new CTextureResource() )
+	, pStudioResource( new CTextureResource( pResource->GetName() ) )
 {
 }
 

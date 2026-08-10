@@ -346,6 +346,11 @@ CStudioAPIRenderPipelineVk::CStudioAPIRenderPipelineVk( const studioAPIRenderPip
 	vkGraphicsPipelineCreateInfo.basePipelineIndex			  = -1;
 	STUDIOAPI_VK_VERIFY_RESULT( vkCreateGraphicsPipelines( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), VK_NULL_HANDLE, 1, &vkGraphicsPipelineCreateInfo, NULL, &vkPipeline ) );
 
+	// Set debug name for the render pipeline
+#if !RETAIL
+	VK_SetDebugName( VK_OBJECT_TYPE_PIPELINE, (uint64)vkPipeline, pDebugName );
+#endif	// !RETAIL
+
 	// Register in 'onStudioAPIVkShutodwn' for destroy Vulkan objects when the one is shutdown
 	onStudioAPIVkShutdownHandle = g_StudioAPIVk.OnStudioAPIVkShutdown().Subscribe( &CStudioAPIRenderPipelineVk::OnStudioAPIVkShutdown, this );
 }

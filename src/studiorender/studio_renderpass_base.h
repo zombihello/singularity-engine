@@ -1,4 +1,5 @@
 #pragma once
+#include "tier1/debugname.h"
 #include "studiorender/studio_renderpasstypes.h"
 #include "studiorender/studio_renderpipelineset.h"
 
@@ -25,7 +26,7 @@ public:
 
 	virtual void					  R_DrawPass( CStudioViewport* pViewport, studioSceneView_t* pSceneView ) const = 0;
 	virtual void					  R_RebuildFrameBuffers( const vector2i_t& bufferSize )							= 0;
-	CRefPtr<IStudioAPIRenderPipeline> R_CreateStudioAPIRenderPipeline( CStudioViewport* pViewport, IStudioAPIBoundShaderState* pStudioAPIBoundShaderState, const studioRenderState_t& renderState ) const;
+	CRefPtr<IStudioAPIRenderPipeline> R_CreateStudioAPIRenderPipeline( CStudioViewport* pViewport, IStudioAPIBoundShaderState* pStudioAPIBoundShaderState, const studioRenderState_t& renderState, const char* pDebugName = "" ) const;
 
 protected:
 	const studioRenderPassType_t   type;

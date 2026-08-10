@@ -192,6 +192,11 @@ CStudioAPIShaderVk::CStudioAPIShaderVk( studioAPIShaderType_t type, const char* 
 	vkShaderModuleCreateInfo.codeSize				  = bytecodeSize;
 	STUDIOAPI_VK_VERIFY_RESULT( vkCreateShaderModule( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), &vkShaderModuleCreateInfo, NULL, &vkShaderModule ) );
 
+	// Set debug name for the shader
+#if !RETAIL
+	VK_SetDebugName( VK_OBJECT_TYPE_SHADER_MODULE, (uint64)vkShaderModule, pDebugName );
+#endif	// !RETAIL
+
 	// Initialize pipline shader stage info
 	Mem_Memzero( &vkPipelineShaderStageInfo, sizeof( VkPipelineShaderStageCreateInfo ) );
 	entryPointName					 = pEntryPointName;

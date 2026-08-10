@@ -44,7 +44,7 @@ void CStudioAPIDataUploaderVk::Init()
 		vkBufferCreateInfo.usage						= VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 		vkBufferCreateInfo.sharingMode					= VK_SHARING_MODE_EXCLUSIVE;
 
-		stagingBuffer.vmaAllocation = g_StudioAPIVk.GetMemoryMgr().AllocateBuffer( S_Sprintf( "StagingBufferUploader[%i]", index ).c_str(), vkBufferCreateInfo, vmaAllocationCreateInfo, stagingBuffer.vkBuffer );
+		stagingBuffer.vmaAllocation = g_StudioAPIVk.GetMemoryMgr().AllocateBuffer( S_Sprintf( "stagingbufferuploader %i", index ).c_str(), vkBufferCreateInfo, vmaAllocationCreateInfo, stagingBuffer.vkBuffer );
 		if ( stagingBuffer.vmaAllocation == VK_NULL_HANDLE )
 		{
 			Sys_Error( "Failed to allocate GPU staging buffer with size %llu", vkBufferCreateInfo.size );

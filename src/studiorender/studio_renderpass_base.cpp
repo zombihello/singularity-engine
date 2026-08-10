@@ -21,7 +21,7 @@ CStudioRenderPassBase::CStudioRenderPassBase( studioRenderPassType_t type, uint3
 CStudioRenderPassBase::R_CreateStudioAPIRenderPipeline
 ==================
 */
-CRefPtr<IStudioAPIRenderPipeline> CStudioRenderPassBase::R_CreateStudioAPIRenderPipeline( CStudioViewport* pViewport, IStudioAPIBoundShaderState* pStudioAPIBoundShaderState, const studioRenderState_t& renderState ) const
+CRefPtr<IStudioAPIRenderPipeline> CStudioRenderPassBase::R_CreateStudioAPIRenderPipeline( CStudioViewport* pViewport, IStudioAPIBoundShaderState* pStudioAPIBoundShaderState, const studioRenderState_t& renderState, const char* pDebugName /* = "" */ ) const
 {
 	// Get the viewport's render pass if the type is `STUDIO_RENDERPASS_TYPE_PRESENT`, otherwise use `pStudioAPIRenderPass`
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
@@ -60,5 +60,5 @@ CRefPtr<IStudioAPIRenderPipeline> CStudioRenderPassBase::R_CreateStudioAPIRender
 	studioAPIRenderPipelineCreateInfo.colorBlendState.pAttachments		  = studioAPIColorBlendAttachments;
 	studioAPIRenderPipelineCreateInfo.colorBlendState.blendConstants	  = renderState.blendConstants;
 	studioAPIRenderPipelineCreateInfo.pRenderPass						  = pRenderPass;
-	return g_pStudioAPI->CreateRenderPipeline( studioAPIRenderPipelineCreateInfo );
+	return g_pStudioAPI->CreateRenderPipeline( studioAPIRenderPipelineCreateInfo, pDebugName );
 }

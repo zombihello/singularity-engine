@@ -43,7 +43,7 @@ BEGIN_SHADER( Wireframe, "Default shader" )
 
 		SHADER_PERMATERIAL_CONTEXTDATA_INIT_STUDIOAPI
 		{
-			pStudioAPIBuffer0 = RES_BUFFER0.CreateBuffer( (byte*)&buffer0 );
+			pStudioAPIBuffer0 = RES_BUFFER0.CreateBuffer( (byte*)&buffer0, DEBUGNAME( "buffer0" ) );
 		}
 
 		SHADER_PERMATERIAL_CONTEXTDATA_UPDATE_STUDIOAPI

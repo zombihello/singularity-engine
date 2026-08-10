@@ -35,6 +35,16 @@ void CVertexDeclarationStatic::InitStudioAPI()
 
 /*
 ==================
+CVertexFactoryStatic::CVertexFactoryStatic
+==================
+*/
+CVertexFactoryStatic::CVertexFactoryStatic( const char* pDebugName /* = "" */ )
+	: CVertexFactoryBase<IVertexFactoryStatic, CVertexDeclarationStatic::STREAM_SLOT_INSTANCE>( pDebugName )
+{
+}
+
+/*
+==================
 CVertexFactoryStatic::R_UpdateInstanceBuffer
 ==================
 */

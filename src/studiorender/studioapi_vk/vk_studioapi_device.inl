@@ -112,6 +112,20 @@ FORCEINLINE studioAPIGPUVendorId_t CStudioAPIDeviceVk::GetGPUVendorId() const
 
 /*
 ==================
+CStudioAPIDeviceVk::IsDebug
+==================
+*/
+FORCEINLINE bool CStudioAPIDeviceVk::IsDebug() const
+{
+#if !RETAIL
+	return bDebug;
+#else
+	return false;
+#endif	// !RETAIL
+}
+
+/*
+==================
 CStudioAPIDeviceVk::queueFamilyIndices_t::Clear
 ==================
 */

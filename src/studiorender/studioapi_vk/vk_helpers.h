@@ -86,6 +86,7 @@ bool VK_CheckDeviceExtensionsSupported( VkPhysicalDevice vkPhysicalDevice, const
 #if !RETAIL
 // For more about parameters see https://registry.khronos.org/vulkan/specs/1.3-extensions/man/html/PFN_vkDebugUtilsMessengerCallbackEXT.html
 VkBool32 VKAPI_PTR VK_DebugCallback( VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageTypes, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData );
+void			   VK_SetDebugName( VkObjectType vkObjectType, uint64 handle, const char* pName );
 #endif	// !RETAIL
 
 // This is a helper function to try to figure out what stage a resource is (likely) used at given it's current Vulkan access mask. It's usually pretty accurate

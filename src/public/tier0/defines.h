@@ -27,6 +27,10 @@
 	#define ENABLE_PROFILING !RETAIL
 #endif	// !ENABLE_PROFILING
 
+#ifndef ENABLE_STUDIOAPI_EVENTS
+	#define ENABLE_STUDIOAPI_EVENTS !RETAIL
+#endif	// !ENABLE_STUDIOAPI_EVENTS
+
 //-----------------------------------------------------------------------------
 // Platform specific macros
 //-----------------------------------------------------------------------------

@@ -1,4 +1,5 @@
 #pragma once
+#include "tier1/math/color.h"
 #include "studiorender/studioapi/istudioapi_cmdcontext.h"
 #include "studiorender/studioapi/istudioapi_texture.h"
 
@@ -50,6 +51,10 @@ public:
 	virtual void SetSampler( uint32 set, uint32 slot, IStudioAPISampler* pSampler )										= 0;
 	virtual void SetViewport( float minX, float minY, float minZ, float maxX, float maxY, float maxZ )					= 0;
 	virtual void SetScissor( int32 x, int32 y, uint32 width, uint32 height )											= 0;
+
+	virtual void BeginEvent( const CColor& color, const char* pName )	= 0;
+	virtual void EndEvent()												= 0;
+	virtual void InsertMarker( const CColor& color, const char* pName ) = 0;
 
 	virtual void Draw( uint32 baseVertexIndex, uint32 numVertices, uint32 numInstances = 1 )											   = 0;
 	virtual void DrawIndexed( uint32 baseVertexIndex, uint32 baseIndex, uint32 numIndices, uint32 numInstances = 1 )					   = 0;

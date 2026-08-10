@@ -120,7 +120,7 @@ CStudioAPIBufferVk::CStudioAPIBufferVk( const byte* pData, uint64 dataSize, uint
 
 		CStudioAPIQueueSharingModeSetupVk queueSharingModeSetup( graphicsQueueFamilyIndex, computeQueueFamilyIndex, transferQueueFamilyIndex );
 		queueSharingModeSetup.Setup( vkBufferCreateInfo.sharingMode, vkBufferCreateInfo.queueFamilyIndexCount, vkBufferCreateInfo.pQueueFamilyIndices );
-		alloc.vmaAllocation = g_StudioAPIVk.GetMemoryMgr().AllocateBuffer( S_Sprintf( "Buffer (usageFlags: 0x%X)", usageFlags ).c_str(), vkBufferCreateInfo, vmaAllocationCreateInfo, alloc.vkBuffer );
+		alloc.vmaAllocation = g_StudioAPIVk.GetMemoryMgr().AllocateBuffer( pDebugName, vkBufferCreateInfo, vmaAllocationCreateInfo, alloc.vkBuffer );
 		if ( alloc.vmaAllocation == VK_NULL_HANDLE )
 		{
 			Sys_Error( "Failed to allocate GPU buffer with size %llu", dataSize );

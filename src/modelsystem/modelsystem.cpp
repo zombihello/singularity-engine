@@ -114,13 +114,13 @@ void CModelSystem::Shutdown()
 CModelSystem::CreateVertexFactory
 ==================
 */
-CRefPtr<IVertexFactory> CModelSystem::CreateVertexFactory( modelVertexType_t vertexType ) const
+CRefPtr<IVertexFactory> CModelSystem::CreateVertexFactory( modelVertexType_t vertexType, const char* pDebugName /* = "" */ ) const
 {
 	PROFILER_SCOPE_FUNC();
 	switch ( vertexType )
 	{
-	case MODEL_VERTEXTYPE_SIMPLE: return new CVertexFactorySimple();
-	case MODEL_VERTEXTYPE_STATIC: return new CVertexFactoryStatic();
+	case MODEL_VERTEXTYPE_SIMPLE: return new CVertexFactorySimple( pDebugName );
+	case MODEL_VERTEXTYPE_STATIC: return new CVertexFactoryStatic( pDebugName );
 	default:
 		AssertMsg( false, "Unknown vertex type 0x%X", vertexType );
 		return NULL;

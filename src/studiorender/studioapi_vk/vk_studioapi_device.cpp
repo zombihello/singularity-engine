@@ -61,6 +61,7 @@ CStudioAPIDeviceVk::CStudioAPIDeviceVk()
 	, vkLogicalDevice( VK_NULL_HANDLE )
 	, gpuVendorId( STUDIOAPI_GPU_VENDOR_ID_UNKNOWN )
 #if !RETAIL
+	, bDebug( false )
 	, vkDebugMessenger( VK_NULL_HANDLE )
 #endif	// !RETAIL
 {
@@ -139,6 +140,7 @@ void CStudioAPIDeviceVk::Init( uint32 engineMajorVersion, uint32 engineMinorVers
 	if ( bVkDebug )
 	{
 		extensionsRequired.push_back( VK_EXT_DEBUG_UTILS_EXTENSION_NAME );
+		bDebug = true;
 	}
 #endif	// !RETAIL
 

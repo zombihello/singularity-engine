@@ -1,12 +1,15 @@
 #include "pch_studiorender.h"
+#include "tier1/debugname.h"
 #include "materialsystem/ishader.h"
 #include "materialsystem/imaterialvar.h"
 #include "resourcesystem/iresourcesystem.h"
 #include "modelsystem/imodelsystem.h"
 #include "studiorender/studioapi/istudioapi_cmdlist.h"
+#include "studiorender/studioapi/studioapi_event.h"
 #include "studiorender/studio_resourcebindingslots.h"
 #include "studiorender/studio_sceneview.h"
 #include "studiorender/studiorender.h"
+#include "studiorender/studio_draweventcolors.h"
 #include "studiorender/studio_batchedsimpleelements.h"
 
 /*
@@ -44,7 +47,7 @@ void CStudioBatchedSimpleElements::Init()
 	}
 
 	// Create a vertex factory for the batches
-	pVertexFactory = g_pModelSystem->CreateVertexFactory<IVertexFactorySimple>();
+	pVertexFactory = g_pModelSystem->CreateVertexFactory<IVertexFactorySimple>( DEBUGNAME( "batchedsimpleelements" ) );
 	pVertexFactory->Init();
 }
 
@@ -168,6 +171,7 @@ void CStudioBatchedSimpleElements::R_DrawBatch( IStudioAPICmdList* pCmdList, stu
 	{
 		return;
 	}
+	STUDIOAPI_SCOPED_EVENT( pCmdList, CStudioDrawEventColors::simpleSurface, "batchedsimpleelements" );
 
 	// Take the shader's default per-draw vars and override the depth test for the batch
 	IShader*			pShader		   = pMaterialResource->GetShader();

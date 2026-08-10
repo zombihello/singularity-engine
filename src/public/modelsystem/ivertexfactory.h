@@ -1,5 +1,6 @@
 #pragma once
 #include "tier1/refcount.h"
+#include "tier1/debugname.h"
 #include "modelsystem/modeltypes.h"
 
 //-----------------------------------------------------------------------------
@@ -31,7 +32,7 @@ struct vertexFactoryStreamUP_t
 //-----------------------------------------------------------------------------
 // Vertex factory interface
 //-----------------------------------------------------------------------------
-class IVertexFactory : public IRefCounted
+class IVertexFactory : public IRefCounted, public IDebugNamed
 {
 public:
 	virtual ~IVertexFactory() {}

@@ -18,7 +18,7 @@ public:
 	virtual void Shutdown() override;
 
 	// IModelSystem interface
-	virtual CRefPtr<IVertexFactory> CreateVertexFactory( modelVertexType_t vertexType ) const override;
+	virtual CRefPtr<IVertexFactory> CreateVertexFactory( modelVertexType_t vertexType, const char* pDebugName = "" ) const override;
 
 private:
 	CResourceTypeFactory<CModel> modelFactory;

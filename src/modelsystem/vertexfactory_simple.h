@@ -20,6 +20,8 @@ class CVertexFactorySimple : public CVertexFactoryBase<IVertexFactorySimple>
 public:
 	// IVertexFactory interface
 	virtual IStudioAPIVertexDeclaration* GetStudioAPIVertexDeclaration() const override;
+
+	CVertexFactorySimple( const char* pDebugName = "" );
 };
 
 DECLARE_VERTEX_FACTORY( CVertexDeclarationSimple, IVertexFactorySimple );

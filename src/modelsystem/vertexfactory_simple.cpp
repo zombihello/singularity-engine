@@ -28,6 +28,16 @@ void CVertexDeclarationSimple::InitStudioAPI()
 
 /*
 ==================
+CVertexFactorySimple::CVertexFactorySimple
+==================
+*/
+CVertexFactorySimple::CVertexFactorySimple( const char* pDebugName /* = "" */ )
+	: CVertexFactoryBase<IVertexFactorySimple>( pDebugName )
+{
+}
+
+/*
+==================
 CVertexFactorySimple::GetStudioAPIVertexDeclaration
 ==================
 */

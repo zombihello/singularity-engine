@@ -1,5 +1,6 @@
 #pragma once
 #include "tier1/stl.h"
+#include "tier1/debugname.h"
 #include "studiorender/studioapi/istudioapi.h"
 #include "studiorender/studioapi/istudioapi_barrier.h"
 #include "studiorender/istudio_renderpipelineset.h"
@@ -72,9 +73,9 @@
 			{                                                                                                                                           \
 				return index;                                                                                                                           \
 			}                                                                                                                                           \
-			FORCEINLINE CRefPtr<IStudioAPIBuffer> CreateBuffer( byte* pData ) const                                                                     \
+			FORCEINLINE CRefPtr<IStudioAPIBuffer> CreateBuffer( byte* pData, const char* pDebugName = "" ) const                                        \
 			{                                                                                                                                           \
-				return g_pStudioAPI->CreateBuffer( pData, size, size, usageFlags );                                                                     \
+				return g_pStudioAPI->CreateBuffer( pData, size, size, usageFlags, pDebugName );                                                         \
 			}                                                                                                                                           \
 			FORCEINLINE void UpdateBuffer( IStudioAPICmdContext* pStudioAPICmdContext, byte* pData, CRefPtr<IStudioAPIBuffer>& pStudioAPIBuffer ) const \
 			{                                                                                                                                           \
@@ -181,54 +182,58 @@
 	class CPerMaterialContextData : public CBasePerMaterialContextData \
 	{                                                                  \
 	public:                                                            \
-		using CBaseClass = CBasePerMaterialContextData;                \
-		using CThisClass = CPerMaterialContextData;
+		using baseClass_t = CBasePerMaterialContextData;               \
+		using thisClass_t = CPerMaterialContextData;                   \
+		CPerMaterialContextData( const char* pDebugName = "" )         \
+			: baseClass_t( pDebugName )                                \
+		{                                                              \
+		}
 #define SHADER_PERMATERIAL_CONTEXTDATA_UPDATE			 virtual void OnUpdate( IMaterialVar** pParams ) override
 #define SHADER_PERMATERIAL_CONTEXTDATA_BARRIER			 virtual void R_Barrier( IStudioAPICmdList* pStudioAPICmdList ) const override
 #define SHADER_PERMATERIAL_CONTEXTDATA_INIT_STUDIOAPI	 virtual void InitStudioAPI() override
 #define SHADER_PERMATERIAL_CONTEXTDATA_UPDATE_STUDIOAPI	 virtual void UpdateStudioAPI() override
 #define SHADER_PERMATERIAL_CONTEXTDATA_RELEASE_STUDIOAPI virtual void ReleaseStudioAPI() override
-#define END_SHADER_PERMATERIAL_CONTEXTDATA                                                              \
-	}                                                                                                   \
-	;                                                                                                   \
-	class CShader : public CBaseShader                                                                  \
-	{                                                                                                   \
-	public:                                                                                             \
-		virtual CRefPtr<IPerMaterialContextData> CreatePerMaterialContextData() const override          \
-		{                                                                                               \
-			return new CPerMaterialContextData();                                                       \
-		}                                                                                               \
-		virtual const char* GetName() const override                                                    \
-		{                                                                                               \
-			return s_pName;                                                                             \
-		}                                                                                               \
-		virtual const char* GetHelp() const override                                                    \
-		{                                                                                               \
-			return s_pHelpString;                                                                       \
-		}                                                                                               \
-		virtual uint32 GetFlags() const override                                                        \
-		{                                                                                               \
-			return s_Flags;                                                                             \
-		}                                                                                               \
-		virtual uint32 GetNumParams( shaderParamFrequency_t frequency ) const override                  \
-		{                                                                                               \
-			Assert( frequency < SHADER_PARAM_NUM_FREQUENCIES );                                         \
-			return (uint32)s_ShaderParams[(uint32)frequency].size();                                    \
-		}                                                                                               \
-		virtual shaderParam_t GetParam( shaderParamFrequency_t frequency, uint32 index ) const override \
-		{                                                                                               \
-			Assert( frequency < SHADER_PARAM_NUM_FREQUENCIES );                                         \
-			Assert( index < (uint32)s_ShaderParams[(uint32)frequency].size() );                         \
-			return s_ShaderParams[(uint32)frequency][index];                                            \
-		}                                                                                               \
-		virtual uint32 GetNumCacheNames() const override                                                \
-		{                                                                                               \
-			return ARRAYSIZE( s_pShaderCacheNames );                                                    \
-		}                                                                                               \
-		virtual const char* GetCacheName( uint32 index ) const override                                 \
-		{                                                                                               \
-			Assert( index < ARRAYSIZE( s_pShaderCacheNames ) );                                         \
-			return s_pShaderCacheNames[index];                                                          \
+#define END_SHADER_PERMATERIAL_CONTEXTDATA                                                                                  \
+	}                                                                                                                       \
+	;                                                                                                                       \
+	class CShader : public CBaseShader                                                                                      \
+	{                                                                                                                       \
+	public:                                                                                                                 \
+		virtual CRefPtr<IPerMaterialContextData> CreatePerMaterialContextData( const char* pDebugName = "" ) const override \
+		{                                                                                                                   \
+			return new CPerMaterialContextData( pDebugName );                                                               \
+		}                                                                                                                   \
+		virtual const char* GetName() const override                                                                        \
+		{                                                                                                                   \
+			return s_pName;                                                                                                 \
+		}                                                                                                                   \
+		virtual const char* GetHelp() const override                                                                        \
+		{                                                                                                                   \
+			return s_pHelpString;                                                                                           \
+		}                                                                                                                   \
+		virtual uint32 GetFlags() const override                                                                            \
+		{                                                                                                                   \
+			return s_Flags;                                                                                                 \
+		}                                                                                                                   \
+		virtual uint32 GetNumParams( shaderParamFrequency_t frequency ) const override                                      \
+		{                                                                                                                   \
+			Assert( frequency < SHADER_PARAM_NUM_FREQUENCIES );                                                             \
+			return (uint32)s_ShaderParams[(uint32)frequency].size();                                                        \
+		}                                                                                                                   \
+		virtual shaderParam_t GetParam( shaderParamFrequency_t frequency, uint32 index ) const override                     \
+		{                                                                                                                   \
+			Assert( frequency < SHADER_PARAM_NUM_FREQUENCIES );                                                             \
+			Assert( index < (uint32)s_ShaderParams[(uint32)frequency].size() );                                             \
+			return s_ShaderParams[(uint32)frequency][index];                                                                \
+		}                                                                                                                   \
+		virtual uint32 GetNumCacheNames() const override                                                                    \
+		{                                                                                                                   \
+			return ARRAYSIZE( s_pShaderCacheNames );                                                                        \
+		}                                                                                                                   \
+		virtual const char* GetCacheName( uint32 index ) const override                                                     \
+		{                                                                                                                   \
+			Assert( index < ARRAYSIZE( s_pShaderCacheNames ) );                                                             \
+			return s_pShaderCacheNames[index];                                                                              \
 		}
 #define DECLARE_SHADER_PERMATERIAL_CONTEXTDATA( Name ) CPerMaterialContextData* Name = (CPerMaterialContextData*)drawParams.pPerMaterialContextData;
 
@@ -274,7 +279,7 @@
 // Base per-material context data
 // NOTE: Shaders can keep per material data in classes descended from this
 //-----------------------------------------------------------------------------
-class CBasePerMaterialContextData : public CRefCounted<IPerMaterialContextData>, public CStudioRenderResource<IStudioRenderResource>
+class CBasePerMaterialContextData : public CDebugNamed<CRefCounted<IPerMaterialContextData>>, public CStudioRenderResource<IStudioRenderResource>
 {
 public:
 	// IPerMaterialContextData interface
@@ -284,6 +289,8 @@ public:
 
 	// Place barriers into a command list
 	virtual void R_Barrier( IStudioAPICmdList* pStudioAPICmdList ) const override;
+
+	CBasePerMaterialContextData( const char* pDebugName = "" );
 
 protected:
 	// IRefCounted interface

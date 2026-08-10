@@ -1,4 +1,5 @@
 #include "pch_studiorender.h"
+#include "tier1/debugname.h"
 #include "materialsystem/ishader.h"
 #include "modelsystem/ivertexfactory.h"
 #include "modelsystem/ivertexfactory_static.h"
@@ -7,7 +8,9 @@
 #include "studiorender/studio_resourcebindingslots.h"
 #include "studiorender/studioapi/istudioapi_renderpass.h"
 #include "studiorender/studioapi/istudioapi_framebuffer.h"
+#include "studiorender/studioapi/studioapi_event.h"
 #include "studiorender/studiorender.h"
+#include "studiorender/studio_draweventcolors.h"
 #include "studiorender/studio_renderpass_scene.h"
 
 /*
@@ -66,7 +69,7 @@ void CStudioRenderPassScene::InitStudioAPI()
 	studioAPIDepthStencilRenderTargetInfo.stencilStoreOp						   = STUDIOAPI_RENDER_TARGET_STORE_OP_DONT_CARE;
 
 	// Create a StudioAPI render pass
-	pStudioAPIRenderPass = g_pStudioAPI->CreateRenderPass( studioAPIRenderPassCreateInfo, "Scene RenderPass" );
+	pStudioAPIRenderPass = g_pStudioAPI->CreateRenderPass( studioAPIRenderPassCreateInfo, DEBUGNAME( "scene" ) );
 }
 
 /*
@@ -97,68 +100,73 @@ void CStudioRenderPassScene::R_DrawPass( CStudioViewport* pViewport, studioScene
 
 	// Initialize viewport and scissor
 	pGraphicsCmdList->BeginRecord();
-	pGraphicsCmdList->SetViewport( 0.f, 0.f, (float)pSceneView->globalShaderParams.screenAndBufferSize.x, (float)pSceneView->globalShaderParams.screenAndBufferSize.y, 0.f, 1.f );
-	pGraphicsCmdList->SetScissor( 0, 0, pSceneView->globalShaderParams.screenAndBufferSize.x, pSceneView->globalShaderParams.screenAndBufferSize.y );
-
-	// Place barriers into the command list
 	{
-		studioAPIBarrier_t barriers[] = {
-			StudioAPI_MakeTextureBarrier( sceneRenderTargets.GetTextureResource( STUDIO_SCENE_RENDERTARGET_TYPE_SCENECOLOR_LDR )->GetStudioAPITexture(), STUDIOAPI_TEXTURE_LAYOUT_COLOR_RENDER_TARGET, STUDIOAPI_QUEUE_TYPE_GRAPHICS ),
-			StudioAPI_MakeTextureBarrier( sceneRenderTargets.GetTextureResource( STUDIO_SCENE_RENDERTARGET_TYPE_SCENEDEPTH )->GetStudioAPITexture(), STUDIOAPI_TEXTURE_LAYOUT_DEPTH_RENDER_TARGET, STUDIOAPI_QUEUE_TYPE_GRAPHICS ),
-			StudioAPI_MakeBufferBarrier( pGlobalConstantBuffer, STUDIOAPI_BUFFER_STATE_CONSTANT_BUFFER, STUDIOAPI_QUEUE_TYPE_GRAPHICS )
-		};
-		pGraphicsCmdList->Barrier( barriers, ARRAYSIZE( barriers ) );
-	}
+		STUDIOAPI_SCOPED_EVENT( pGraphicsCmdList, CStudioDrawEventColors::sceneItems, "scene" );
+		pGraphicsCmdList->SetViewport( 0.f, 0.f, (float)pSceneView->globalShaderParams.screenAndBufferSize.x, (float)pSceneView->globalShaderParams.screenAndBufferSize.y, 0.f, 1.f );
+		pGraphicsCmdList->SetScissor( 0, 0, pSceneView->globalShaderParams.screenAndBufferSize.x, pSceneView->globalShaderParams.screenAndBufferSize.y );
 
-	const studioRenderPass_t& renderPass = pSceneView->renderPasses[STUDIO_RENDERPASS_TYPE_SCENE];
-	for ( auto it = renderPass.resourceIds.begin(), itEnd = renderPass.resourceIds.end(); it != itEnd; ++it )
-	{
-		studioResource_t* pResource = pSceneView->resources[*it];
-		switch ( pResource->type )
+		// Place barriers into the command list
 		{
-		case STUDIO_RESOURCE_TYPE_MODEL:
-		{
-			IModelResource* pModel		   = pResource->pModel;
-			IVertexFactory* pVertexFactory = pModel->GetVertexFactory();
-			pVertexFactory->R_Barrier( pGraphicsCmdList );
-			break;
+			studioAPIBarrier_t barriers[] = {
+
+				StudioAPI_MakeTextureBarrier( sceneRenderTargets.GetTextureResource( STUDIO_SCENE_RENDERTARGET_TYPE_SCENECOLOR_LDR )->GetStudioAPITexture(), STUDIOAPI_TEXTURE_LAYOUT_COLOR_RENDER_TARGET, STUDIOAPI_QUEUE_TYPE_GRAPHICS ),
+				StudioAPI_MakeTextureBarrier( sceneRenderTargets.GetTextureResource( STUDIO_SCENE_RENDERTARGET_TYPE_SCENEDEPTH )->GetStudioAPITexture(), STUDIOAPI_TEXTURE_LAYOUT_DEPTH_RENDER_TARGET, STUDIOAPI_QUEUE_TYPE_GRAPHICS ),
+				StudioAPI_MakeBufferBarrier( pGlobalConstantBuffer, STUDIOAPI_BUFFER_STATE_CONSTANT_BUFFER, STUDIOAPI_QUEUE_TYPE_GRAPHICS )
+			};
+			pGraphicsCmdList->Barrier( barriers, ARRAYSIZE( barriers ) );
 		}
 
-		case STUDIO_RESOURCE_TYPE_MATERIAL:
+		const studioRenderPass_t& renderPass = pSceneView->renderPasses[STUDIO_RENDERPASS_TYPE_SCENE];
+		for ( auto it = renderPass.resourceIds.begin(), itEnd = renderPass.resourceIds.end(); it != itEnd; ++it )
 		{
-			IMaterialResource*		 pMaterial				 = pResource->pMaterial;
-			IPerMaterialContextData* pPerMaterialContextData = pMaterial->GetPerMaterialContextData();
-			pPerMaterialContextData->R_Barrier( pGraphicsCmdList );
-			break;
+			studioResource_t* pResource = pSceneView->resources[*it];
+			switch ( pResource->type )
+			{
+			case STUDIO_RESOURCE_TYPE_MODEL:
+			{
+				IModelResource* pModel		   = pResource->pModel;
+				IVertexFactory* pVertexFactory = pModel->GetVertexFactory();
+				pVertexFactory->R_Barrier( pGraphicsCmdList );
+				break;
+			}
+
+			case STUDIO_RESOURCE_TYPE_MATERIAL:
+			{
+				IMaterialResource*		 pMaterial				 = pResource->pMaterial;
+				IPerMaterialContextData* pPerMaterialContextData = pMaterial->GetPerMaterialContextData();
+				pPerMaterialContextData->R_Barrier( pGraphicsCmdList );
+				break;
+			}
+
+			default:
+				AssertMsg( false, "Unknown studio resource type 0x%X", pResource->type );
+				break;
+			}
 		}
 
-		default:
-			AssertMsg( false, "Unknown studio resource type 0x%X", pResource->type );
-			break;
+		// Draw all surfaces for the pass
+		pGraphicsCmdList->BeginRenderPass( pStudioAPIRenderPass, pStudioAPIFrameBuffer );
+		for ( uint32 index = 0, count = (uint32)renderPass.surfaceBatchIds.size(); index < count; ++index )
+		{
+			studioSurfaceBatch_t* pSurfaceBatch	   = pSceneView->surfaceBatches[renderPass.surfaceBatchIds[index]];
+			IModelResource*		  pModel		   = pSceneView->resources[pSurfaceBatch->modelId]->pModel;
+			IMaterialResource*	  pMaterial		   = pSceneView->resources[pSurfaceBatch->materialId]->pMaterial;
+			IShader*			  pShader		   = pMaterial->GetShader();
+			IVertexFactory*		  pVertexFactory   = pModel->GetVertexFactory();
+			shaderDrawParams_t	  shaderDrawParams = { pMaterial->GetPerMaterialContextData(), pShader->GetDefaultPerDrawVars(), pVertexFactory };
+
+			STUDIOAPI_SCOPED_EVENT( pGraphicsCmdList, CStudioDrawEventColors::GetColorByVertexType( pVertexFactory->GetVertexType() ), pMaterial->GetDebugName() );
+			pGraphicsCmdList->SetRenderPipeline( pShader->R_ResolveRenderPipeline( shaderDrawParams, STUDIO_RENDERPASS_TYPE_SCENE ) );
+			pGraphicsCmdList->SetConstantBuffer( 0, STUDIO_RESOURCE_BINDING_SLOT_GLOBAL_CB, pGlobalConstantBuffer );
+			pVertexFactory->R_Bind( pGraphicsCmdList, pSurfaceBatch->instances.GetVertexFactoryStream() );
+			pShader->R_Bind( pGraphicsCmdList, shaderDrawParams );
+			pGraphicsCmdList->DrawIndexed( pSurfaceBatch->baseVertexIndex, pSurfaceBatch->baseIndex, pSurfaceBatch->numIndices, pSurfaceBatch->instances.GetNumInstances() );
 		}
+
+		// Draw debug primitives on top of the scene
+		g_StudioRender.GetBatchedSimpleElements().R_Draw( pGraphicsCmdList, STUDIO_RENDERPASS_TYPE_SCENE );
+		pGraphicsCmdList->EndRenderPass();
 	}
-
-	// Draw all surfaces for the pass
-	pGraphicsCmdList->BeginRenderPass( pStudioAPIRenderPass, pStudioAPIFrameBuffer );
-	for ( uint32 index = 0, count = (uint32)renderPass.surfaceBatchIds.size(); index < count; ++index )
-	{
-		studioSurfaceBatch_t* pSurfaceBatch	   = pSceneView->surfaceBatches[renderPass.surfaceBatchIds[index]];
-		IModelResource*		  pModel		   = pSceneView->resources[pSurfaceBatch->modelId]->pModel;
-		IMaterialResource*	  pMaterial		   = pSceneView->resources[pSurfaceBatch->materialId]->pMaterial;
-		IShader*			  pShader		   = pMaterial->GetShader();
-		IVertexFactory*		  pVertexFactory   = pModel->GetVertexFactory();
-		shaderDrawParams_t	  shaderDrawParams = { pMaterial->GetPerMaterialContextData(), pShader->GetDefaultPerDrawVars(), pVertexFactory };
-
-		pGraphicsCmdList->SetRenderPipeline( pShader->R_ResolveRenderPipeline( shaderDrawParams, STUDIO_RENDERPASS_TYPE_SCENE ) );
-		pGraphicsCmdList->SetConstantBuffer( 0, STUDIO_RESOURCE_BINDING_SLOT_GLOBAL_CB, pGlobalConstantBuffer );
-		pVertexFactory->R_Bind( pGraphicsCmdList, pSurfaceBatch->instances.GetVertexFactoryStream() );
-		pShader->R_Bind( pGraphicsCmdList, shaderDrawParams );
-		pGraphicsCmdList->DrawIndexed( pSurfaceBatch->baseVertexIndex, pSurfaceBatch->baseIndex, pSurfaceBatch->numIndices, pSurfaceBatch->instances.GetNumInstances() );
-	}
-
-	// Draw debug primitives on top of the scene
-	g_StudioRender.GetBatchedSimpleElements().R_Draw( pGraphicsCmdList, STUDIO_RENDERPASS_TYPE_SCENE );
-	pGraphicsCmdList->EndRenderPass();
 	pGraphicsCmdList->EndRecord();
 
 	// Submit the command list
@@ -185,5 +193,5 @@ void CStudioRenderPassScene::R_RebuildFrameBuffers( const vector2i_t& bufferSize
 	studioAPIFrameBufferCreateInfo.bDepthStencilClearValue			 = true;
 	studioAPIFrameBufferCreateInfo.depthClearValue					 = 1.f;
 	studioAPIFrameBufferCreateInfo.stencilClearValue				 = 0;
-	pStudioAPIFrameBuffer											 = g_pStudioAPI->CreateFrameBuffer( studioAPIFrameBufferCreateInfo, "Scene FrameBuffer" );
+	pStudioAPIFrameBuffer											 = g_pStudioAPI->CreateFrameBuffer( studioAPIFrameBufferCreateInfo, DEBUGNAME( "scene" ) );
 }

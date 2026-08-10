@@ -8,6 +8,16 @@
 
 /*
 ==================
+CBasePerMaterialContextData::CBasePerMaterialContextData
+==================
+*/
+CBasePerMaterialContextData::CBasePerMaterialContextData( const char* pDebugName /* = "" */ )
+	: CDebugNamed<CRefCounted<IPerMaterialContextData>>( pDebugName )
+{
+}
+
+/*
+==================
 CBasePerMaterialContextData::Update
 ==================
 */
@@ -288,6 +298,10 @@ IStudioAPIRenderPipeline* CBaseShader::R_ResolveRenderPipeline( const shaderDraw
 		studioBakeParams.renderState					  = renderStates[comboInfo.renderStateIdx];
 		studioBakeParams.renderPassType					  = renderPassType;
 		studioBakeParams.pVertexDeclaration				  = drawParams.pVertexFactory ? drawParams.pVertexFactory->GetStudioAPIVertexDeclaration() : NULL;
+#if !RETAIL
+		eastl::string debugName		= DEBUGNAMEF( "%s %i_%i_%s", GetName(), shaderComboIdx, comboInfo.renderStateIdx, Studio_GetRenderPassName( renderPassType ) );
+		studioBakeParams.pDebugName = debugName.c_str();
+#endif	// !RETAIL
 		for ( uint32 shaderIdx = 0; shaderIdx < STUDIOAPI_SHADER_NUM_DRAW_TYPES; ++shaderIdx )
 		{
 			const shaderCacheInfoInternal_t& cacheInfo = cacheInfos[shaderIdx];

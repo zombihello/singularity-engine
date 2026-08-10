@@ -236,6 +236,11 @@ CStudioAPISamplerVk::CStudioAPISamplerVk( const studioAPISamplerCreateInfo_t& cr
 	VK_TranslateSamplerFilter( createInfo.filer, vkSamplerCreateInfo.magFilter, vkSamplerCreateInfo.minFilter, vkSamplerCreateInfo.mipmapMode );
 	STUDIOAPI_VK_VERIFY_RESULT( vkCreateSampler( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), &vkSamplerCreateInfo, NULL, &vkSampler ) );
 
+	// Set debug name for the sampler
+#if !RETAIL
+	VK_SetDebugName( VK_OBJECT_TYPE_SAMPLER, (uint64)vkSampler, pDebugName );
+#endif	// !RETAIL
+
 	// Register in 'onStudioAPIVkShutodwn' for destroy Vulkan objects when the one is shutdown
 	onStudioAPIVkShutdownHandle = g_StudioAPIVk.OnStudioAPIVkShutdown().Subscribe( &CStudioAPISamplerVk::OnStudioAPIVkShutdown, this );
 }
@@ -332,7 +337,7 @@ CStudioAPITextureVk::CStudioAPITextureVk( studioAPITextureType_t type, uint32 si
 
 	CStudioAPIQueueSharingModeSetupVk queueSharingModeSetup( graphicsQueueFamilyIndex, computeQueueFamilyIndex, transferQueueFamilyIndex );
 	queueSharingModeSetup.Setup( vkImageCreateInfo.sharingMode, vkImageCreateInfo.queueFamilyIndexCount, vkImageCreateInfo.pQueueFamilyIndices );
-	vmaAllocation = g_StudioAPIVk.GetMemoryMgr().AllocateImage( S_Sprintf( "Texture (type: 0x%X, %ix%ix%i, numLayers: %i, numMips: %i, pixelFormat: '%s', usageFlags: 0x%X)", type, sizeX, sizeY, sizeZ, numLayers, numMips, g_PixelFormatInfos[pixelFormat].pName, usageFlags ).c_str(), vkImageCreateInfo, vmaAllocationCreateInfo, vkImage );
+	vmaAllocation = g_StudioAPIVk.GetMemoryMgr().AllocateImage( pDebugName, vkImageCreateInfo, vmaAllocationCreateInfo, vkImage );
 	if ( vmaAllocation == VK_NULL_HANDLE )
 	{
 		Sys_Error( "Failed to allocate GPU texture (type: 0x%X, %ix%ix%i, numLayers: %i, numMips: %i, pixelFormat: '%s')", type, sizeX, sizeY, sizeZ, numLayers, numMips, g_PixelFormatInfos[pixelFormat].pName );

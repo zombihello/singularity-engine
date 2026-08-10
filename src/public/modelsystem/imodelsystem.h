@@ -11,8 +11,8 @@ class IModelSystem : public IAppSystem
 {
 public:
 	template<class TVertexFactoryClass>
-	CRefPtr<TVertexFactoryClass>	CreateVertexFactory() const;
-	virtual CRefPtr<IVertexFactory> CreateVertexFactory( modelVertexType_t vertexType ) const = 0;
+	CRefPtr<TVertexFactoryClass>	CreateVertexFactory( const char* pDebugName = "" ) const;
+	virtual CRefPtr<IVertexFactory> CreateVertexFactory( modelVertexType_t vertexType, const char* pDebugName = "" ) const = 0;
 };
 
 #include "modelsystem/imodelsystem.inl"

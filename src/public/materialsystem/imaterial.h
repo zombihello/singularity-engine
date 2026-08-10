@@ -1,4 +1,5 @@
 #pragma once
+#include "tier1/debugname.h"
 #include "resourcesystem/iresource.h"
 
 //-----------------------------------------------------------------------------
@@ -22,7 +23,7 @@ struct materialInitialData_t
 //-----------------------------------------------------------------------------
 // A material resource interface which is owned by the render thread
 //-----------------------------------------------------------------------------
-class IMaterialResource : public IRefCounted
+class IMaterialResource : public IRefCounted, public IDebugNamed
 {
 public:
 	virtual ~IMaterialResource() {}

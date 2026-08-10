@@ -50,6 +50,10 @@ public:
 	virtual void SetViewport( float minX, float minY, float minZ, float maxX, float maxY, float maxZ ) override;
 	virtual void SetScissor( int32 x, int32 y, uint32 width, uint32 height ) override;
 
+	virtual void BeginEvent( const CColor& color, const char* pName ) override;
+	virtual void EndEvent() override;
+	virtual void InsertMarker( const CColor& color, const char* pName ) override;
+
 	virtual void Draw( uint32 baseVertexIndex, uint32 numVertices, uint32 numInstances = 1 ) override;
 	virtual void DrawIndexed( uint32 baseVertexIndex, uint32 baseIndex, uint32 numIndices, uint32 numInstances = 1 ) override;
 	virtual void Barrier( const studioAPIBarrier_t* pBarriers, uint32 numBarriers, bool bFlush = false ) override;

@@ -1,5 +1,6 @@
 #include "pch_studioapi_vk.h"
 #include "studiorender/studioapi/istudioapi_barrier.h"
+#include "studiorender/studioapi_vk/vk_studioapi.h"
 #include "studiorender/studioapi_vk/vk_studioapi_cmdcontext.h"
 #include "studiorender/studioapi_vk/vk_studioapi_renderpass.h"
 #include "studiorender/studioapi_vk/vk_studioapi_framebuffer.h"
@@ -182,6 +183,67 @@ void CStudioAPICmdListVk::EndRenderPass()
 	AssertMsg( state == STUDIOAPI_VK_CMDLIST_STATE_IS_INSIDE_RENDER_PASS, "No rendering passes have begun yet (pCmdList: 0x%p, state: 0x%X)", this, state );
 	vkCmdEndRenderPass( pCmdBuffer->GetVkCommandBuffer() );
 	state = STUDIOAPI_VK_CMDLIST_STATE_HAS_BEGUN_RECORD;
+}
+
+/*
+==================
+CStudioAPICmdListVk::BeginEvent
+==================
+*/
+void CStudioAPICmdListVk::BeginEvent( const CColor& color, const char* pName )
+{
+#if !RETAIL
+	if ( g_StudioAPIVk.GetDevice().IsDebug() )
+	{
+		CLinearColor		 linearColor = color.ToLinearColor();
+		VkDebugUtilsLabelEXT vkLabel	 = {};
+		vkLabel.sType					 = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT;
+		vkLabel.pLabelName				 = pName;
+		vkLabel.color[0]				 = linearColor.r;
+		vkLabel.color[1]				 = linearColor.g;
+		vkLabel.color[2]				 = linearColor.b;
+		vkLabel.color[3]				 = linearColor.a;
+		vkCmdBeginDebugUtilsLabelEXT( pCmdBuffer->GetVkCommandBuffer(), &vkLabel );
+	}
+#endif	// !RETAIL
+}
+
+/*
+==================
+CStudioAPICmdListVk::EndEvent
+==================
+*/
+void CStudioAPICmdListVk::EndEvent()
+{
+#if !RETAIL
+	if ( g_StudioAPIVk.GetDevice().IsDebug() )
+	{
+		vkCmdEndDebugUtilsLabelEXT( pCmdBuffer->GetVkCommandBuffer() );
+	}
+#endif	// !RETAIL
+}
+
+/*
+==================
+CStudioAPICmdListVk::InsertMarker
+==================
+*/
+void CStudioAPICmdListVk::InsertMarker( const CColor& color, const char* pName )
+{
+#if !RETAIL
+	if ( g_StudioAPIVk.GetDevice().IsDebug() )
+	{
+		CLinearColor		 linearColor = color.ToLinearColor();
+		VkDebugUtilsLabelEXT vkLabel	 = {};
+		vkLabel.sType					 = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT;
+		vkLabel.pLabelName				 = pName;
+		vkLabel.color[0]				 = linearColor.r;
+		vkLabel.color[1]				 = linearColor.g;
+		vkLabel.color[2]				 = linearColor.b;
+		vkLabel.color[3]				 = linearColor.a;
+		vkCmdInsertDebugUtilsLabelEXT( pCmdBuffer->GetVkCommandBuffer(), &vkLabel );
+	}
+#endif	// !RETAIL
 }
 
 /*

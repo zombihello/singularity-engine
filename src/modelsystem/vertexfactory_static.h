@@ -28,6 +28,8 @@ public:
 	// IVertexFactory interface
 	virtual IStudioAPIVertexDeclaration* GetStudioAPIVertexDeclaration() const override;
 
+	CVertexFactoryStatic( const char* pDebugName = "" );
+
 protected:
 	// CVertexFactoryBase interface
 	// Update the factory's buffer

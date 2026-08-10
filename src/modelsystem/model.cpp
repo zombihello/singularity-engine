@@ -23,8 +23,9 @@ static_assert( ARRAYSIZE( s_strideIndexType ) == MODEL_INDEX_NUM_TYPES, "Array s
 CModelResource::CModelResource
 ==================
 */
-CModelResource::CModelResource()
-	: indexType( MODEL_INDEX_NUM_TYPES )
+CModelResource::CModelResource( const char* pDebugName /* = "" */ )
+	: CDebugNamed<CRefCounted<IModelResource>>( pDebugName )
+	, indexType( MODEL_INDEX_NUM_TYPES )
 {
 }
 
@@ -54,7 +55,7 @@ void CModelResource::Update( const modelInitialData_t& initialData )
 		}
 
 		// Create a new vertex factory for the vertex type
-		pVertexFactory = g_modelSystem.CreateVertexFactory( initialData.vertexType );
+		pVertexFactory = g_modelSystem.CreateVertexFactory( initialData.vertexType, GetDebugName() );
 	}
 	pVertexFactory->ClearStreams();
 
@@ -130,13 +131,13 @@ void CModelResource::InitStudioAPI()
 	Assert( pVertexFactory );
 	Assert( !vertices.empty() );
 	modelVertexType_t vertexType = pVertexFactory->GetVertexType();
-	pStudioAPIVertexBuffer		 = g_pStudioAPI->CreateBuffer( vertices.data(), (uint32)vertices.size(), s_strideVertexType[vertexType], STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_VERTEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
+	pStudioAPIVertexBuffer		 = g_pStudioAPI->CreateBuffer( vertices.data(), (uint32)vertices.size(), s_strideVertexType[vertexType], STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_VERTEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST, GetDebugName() );
 	pVertexFactory->AddVertexStream( vertexFactoryStream_t{ pStudioAPIVertexBuffer, 0 } );
 	vertices.clear();
 
 	// Create a GPU index buffer and set a index stream into the vertex factory
 	Assert( !indices.empty() );
-	pStudioAPIIndexBuffer = g_pStudioAPI->CreateBuffer( indices.data(), (uint32)indices.size(), s_strideIndexType[indexType], STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_INDEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
+	pStudioAPIIndexBuffer = g_pStudioAPI->CreateBuffer( indices.data(), (uint32)indices.size(), s_strideIndexType[indexType], STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_INDEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST, GetDebugName() );
 	pVertexFactory->SetIndexStream( vertexFactoryStream_t{ pStudioAPIIndexBuffer, 0 } );
 	indices.clear();
 }
@@ -227,7 +228,7 @@ CModel::CModel
 CModel::CModel( IResource* pResource )
 	: CResourceData<IModel>( pResource )
 	, bDirtyMaterials( false )
-	, pStudioResource( new CModelResource() )
+	, pStudioResource( new CModelResource( pResource->GetName() ) )
 {
 }
 

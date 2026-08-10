@@ -1,4 +1,5 @@
 #include "pch_materialsystem.h"
+#include "tier1/debugname.h"
 #include "filesystem/ifilesystem.h"
 #include "utils/shadercache/shadercache.h"
 #include "materialsystem/shaderlib/shaderlib.h"
@@ -278,11 +279,11 @@ bool CShaderMgr::LoadShaderCaches( uint32 index )
 				CRefPtr<IStudioAPIShader>			  pStudioAPIShader;
 				switch ( shaderType )
 				{
-				case STUDIOAPI_SHADER_TYPE_VERTEX: pStudioAPIShader = g_pStudioAPI->CreateVertexShader( shaderCache.entryPointName.c_str(), shaderCache.bytecode.data(), shaderCache.bytecode.size(), shaderCache.reflectionData.data(), shaderCache.reflectionData.size() ); break;
-				case STUDIOAPI_SHADER_TYPE_HULL: pStudioAPIShader = g_pStudioAPI->CreateHullShader( shaderCache.entryPointName.c_str(), shaderCache.bytecode.data(), shaderCache.bytecode.size(), shaderCache.reflectionData.data(), shaderCache.reflectionData.size() ); break;
-				case STUDIOAPI_SHADER_TYPE_DOMAIN: pStudioAPIShader = g_pStudioAPI->CreateDomainShader( shaderCache.entryPointName.c_str(), shaderCache.bytecode.data(), shaderCache.bytecode.size(), shaderCache.reflectionData.data(), shaderCache.reflectionData.size() ); break;
-				case STUDIOAPI_SHADER_TYPE_GEOMETRY: pStudioAPIShader = g_pStudioAPI->CreateGeometryShader( shaderCache.entryPointName.c_str(), shaderCache.bytecode.data(), shaderCache.bytecode.size(), shaderCache.reflectionData.data(), shaderCache.reflectionData.size() ); break;
-				case STUDIOAPI_SHADER_TYPE_PIXEL: pStudioAPIShader = g_pStudioAPI->CreatePixelShader( shaderCache.entryPointName.c_str(), shaderCache.bytecode.data(), shaderCache.bytecode.size(), shaderCache.reflectionData.data(), shaderCache.reflectionData.size() ); break;
+				case STUDIOAPI_SHADER_TYPE_VERTEX: pStudioAPIShader = g_pStudioAPI->CreateVertexShader( shaderCache.entryPointName.c_str(), shaderCache.bytecode.data(), shaderCache.bytecode.size(), shaderCache.reflectionData.data(), shaderCache.reflectionData.size(), DEBUGNAME( pCacheName ) ); break;
+				case STUDIOAPI_SHADER_TYPE_HULL: pStudioAPIShader = g_pStudioAPI->CreateHullShader( shaderCache.entryPointName.c_str(), shaderCache.bytecode.data(), shaderCache.bytecode.size(), shaderCache.reflectionData.data(), shaderCache.reflectionData.size(), DEBUGNAME( pCacheName ) ); break;
+				case STUDIOAPI_SHADER_TYPE_DOMAIN: pStudioAPIShader = g_pStudioAPI->CreateDomainShader( shaderCache.entryPointName.c_str(), shaderCache.bytecode.data(), shaderCache.bytecode.size(), shaderCache.reflectionData.data(), shaderCache.reflectionData.size(), DEBUGNAME( pCacheName ) ); break;
+				case STUDIOAPI_SHADER_TYPE_GEOMETRY: pStudioAPIShader = g_pStudioAPI->CreateGeometryShader( shaderCache.entryPointName.c_str(), shaderCache.bytecode.data(), shaderCache.bytecode.size(), shaderCache.reflectionData.data(), shaderCache.reflectionData.size(), DEBUGNAME( pCacheName ) ); break;
+				case STUDIOAPI_SHADER_TYPE_PIXEL: pStudioAPIShader = g_pStudioAPI->CreatePixelShader( shaderCache.entryPointName.c_str(), shaderCache.bytecode.data(), shaderCache.bytecode.size(), shaderCache.reflectionData.data(), shaderCache.reflectionData.size(), DEBUGNAME( pCacheName ) ); break;
 				default:
 					Warning( "ShaderMgr: Unsupported shader type 0x%X (cache: %i, path: '%s/%s.ssc')", shaderType, cacheIdx + 1, shaderCacheDir.c_str(), pCacheName );
 					bOk = false;

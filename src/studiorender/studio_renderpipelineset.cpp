@@ -174,7 +174,7 @@ IStudioAPIRenderPipeline* CStudioRenderPipelineSet::CRenderPipelineContainer::R_
 	// Create a render pipeline for the render pass, using the shader's own render state
 	CStudioRenderPassBase* pRenderPass = g_StudioRender.GetRenderPass( renderPassType );
 	AssertMsg( pRenderPass, "No render pass registered for render pass type 0x%X", renderPassType );
-	CRefPtr<IStudioAPIRenderPipeline> pStudioAPIRenderPipeline = pRenderPass->R_CreateStudioAPIRenderPipeline( pActiveViewport, pStudioAPIBoundShaderState, bakeParams.renderState );
+	CRefPtr<IStudioAPIRenderPipeline> pStudioAPIRenderPipeline = pRenderPass->R_CreateStudioAPIRenderPipeline( pActiveViewport, pStudioAPIBoundShaderState, bakeParams.renderState, bakeParams.pDebugName );
 	( *pStudioAPIRenderPipelines )[bakeParams.shaderComboIdx]  = pStudioAPIRenderPipeline;
 	return pStudioAPIRenderPipeline;
 }
