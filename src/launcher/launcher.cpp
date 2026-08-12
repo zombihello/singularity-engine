@@ -294,13 +294,14 @@ int32 CLauncherApp::Main()
 		pProfiler->Update();
 #endif	// ENABLE_PROFILING
 
-		// Update the resource system and the game
+		// Execute pending commands
+		g_pCmdSystem->ExecuteCommands();
+
+		// Update systems and the game
 		g_pResourceSystem->FrameUpdate();
 		g_pGame->FrameUpdate( deltaTime );
 		pStudioViewport->Update( deltaTime );
-
-		// Execute pending commands
-		g_pCmdSystem->ExecuteCommands();
+		g_pInputSystem->FrameUpdate( deltaTime );
 
 		// Flush render commands and draw the frame
 		Studio_FlushRenderCommands();

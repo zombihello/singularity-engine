@@ -122,7 +122,7 @@ VmaAllocation CStudioAPIMemoryMgrVk::AllocateBuffer( const char* pDebugTag, cons
 	if ( vmaAllocation == VK_NULL_HANDLE || vkResult != VK_SUCCESS )
 	{
 		// Print message about error
-		Error( "StudioAPIVk: Failed to allocate GPU buffer (tag: %s)", pDebugTag );
+		Error( "StudioAPIVk: Failed to allocate GPU buffer (tag: '%s')", pDebugTag );
 		Error( "StudioAPIVk:\tVMA allocation flags: 0x%X", vmaAllocationCreateInfo.flags );
 		Error( "StudioAPIVk:\tRequested size %llu", vkBufferCreateInfo.size );
 
@@ -141,7 +141,7 @@ VmaAllocation CStudioAPIMemoryMgrVk::AllocateBuffer( const char* pDebugTag, cons
 	}
 
 	// Print information about allocated the GPU buffer and save the size info
-	Msg( "StudioAPIVk: Allocated %lluB for GPU buffer (tag: %s, vkBuffer: 0x%p, vmaAllocation: 0x%p)", vmaAllocationInfo.size, pDebugTag, vkBuffer, vmaAllocation );
+	Msg( "StudioAPIVk: Allocated %lluB for GPU buffer (tag: '%s', vkBuffer: 0x%p, vmaAllocation: 0x%p)", vmaAllocationInfo.size, pDebugTag, vkBuffer, vmaAllocation );
 	if ( pAllocatedSize )
 	{
 		*pAllocatedSize = vmaAllocationInfo.size;
@@ -181,7 +181,7 @@ VmaAllocation CStudioAPIMemoryMgrVk::AllocateImage( const char* pDebugTag, const
 	if ( vmaAllocation == VK_NULL_HANDLE || vkResult != VK_SUCCESS )
 	{
 		// Print message about error
-		Error( "StudioAPIVk: Failed to allocate GPU image (tag: %s)", pDebugTag );
+		Error( "StudioAPIVk: Failed to allocate GPU image (tag: '%s')", pDebugTag );
 		Error( "StudioAPIVk:\tVMA allocation flags: 0x%X", vmaAllocationCreateInfo.flags );
 		Error( "StudioAPIVk:\tRequested size: %ix%ix%i", vkImageCreateInfo.extent.width, vkImageCreateInfo.extent.height, vkImageCreateInfo.extent.depth );
 		Error( "StudioAPIVk:\tMips: %i", vkImageCreateInfo.mipLevels );
@@ -202,7 +202,7 @@ VmaAllocation CStudioAPIMemoryMgrVk::AllocateImage( const char* pDebugTag, const
 	}
 
 	// Print information about allocated the GPU image and save the size info
-	Msg( "StudioAPIVk: Allocated %lluB for GPU image (tag: %s, vkImage: 0x%p, vmaAllocation: 0x%p)", vmaAllocationInfo.size, pDebugTag, vkImage, vmaAllocation );
+	Msg( "StudioAPIVk: Allocated %lluB for GPU image (tag: '%s', vkImage: 0x%p, vmaAllocation: 0x%p)", vmaAllocationInfo.size, pDebugTag, vkImage, vmaAllocation );
 	if ( pAllocatedSize )
 	{
 		*pAllocatedSize = vmaAllocationInfo.size;

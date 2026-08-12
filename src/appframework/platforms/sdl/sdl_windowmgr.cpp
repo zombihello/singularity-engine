@@ -9,17 +9,16 @@
 
 // Table for convert SDL scancode to engine button code
 static SDL_Scancode s_scanCodeTable[] = {
-	SDL_SCANCODE_UNKNOWN,  // BUTTON_CODE_NONE
-	SDL_SCANCODE_0,		   // KEY_0
-	SDL_SCANCODE_1,		   // KEY_1
-	SDL_SCANCODE_2,		   // KEY_2
-	SDL_SCANCODE_3,		   // KEY_3
-	SDL_SCANCODE_4,		   // KEY_4
-	SDL_SCANCODE_5,		   // KEY_5
-	SDL_SCANCODE_6,		   // KEY_6
-	SDL_SCANCODE_7,		   // KEY_7
-	SDL_SCANCODE_8,		   // KEY_8
-	SDL_SCANCODE_9,		   // KEY_9
+	SDL_SCANCODE_0,	 // KEY_0
+	SDL_SCANCODE_1,	 // KEY_1
+	SDL_SCANCODE_2,	 // KEY_2
+	SDL_SCANCODE_3,	 // KEY_3
+	SDL_SCANCODE_4,	 // KEY_4
+	SDL_SCANCODE_5,	 // KEY_5
+	SDL_SCANCODE_6,	 // KEY_6
+	SDL_SCANCODE_7,	 // KEY_7
+	SDL_SCANCODE_8,	 // KEY_8
+	SDL_SCANCODE_9,	 // KEY_9
 
 	SDL_SCANCODE_A,	 // KEY_A
 	SDL_SCANCODE_B,	 // KEY_B
@@ -118,6 +117,7 @@ static SDL_Scancode s_scanCodeTable[] = {
 	SDL_SCANCODE_F11,  // KEY_F11
 	SDL_SCANCODE_F12   // KEY_F12
 };
+static_assert( ARRAYSIZE( s_scanCodeTable ) == KEY_COUNT, "Array size 's_scanCodeTable' must be equal to KEY_COUNT" );
 
 /*
 ==================
@@ -146,13 +146,15 @@ TranslateSDLScanCode
 */
 FORCEINLINE static buttonCode_t TranslateSDLScanCode( uint32 scancode )
 {
-	for ( uint32 index = 0; index < BUTTON_CODE_COUNT; ++index )
+	for ( uint32 index = 0; index < KEY_COUNT; ++index )
 	{
 		if ( s_scanCodeTable[index] == (SDL_Scancode)scancode )
 		{
 			return (buttonCode_t)index;
 		}
 	}
+
+	DevWarning( "WindowMgrSDL: Unmapped SDL scancode 0x%X", scancode );
 	return BUTTON_CODE_NONE;
 }
 
@@ -173,7 +175,9 @@ FORCEINLINE static buttonCode_t TranslateSDLMouseButton( uint8 buttonIndex )
 	case 6: return MOUSE_6;
 	case 7: return MOUSE_7;
 	case 8: return MOUSE_8;
-	default: return BUTTON_CODE_NONE;
+	default:
+		DevWarning( "WindowMgrSDL: Unmapped SDL mouse button %i", buttonIndex );
+		return BUTTON_CODE_NONE;
 	}
 }
 
@@ -320,7 +324,7 @@ void CWindowMgrSDL::ProcessEvents()
 			}
 			else
 			{
-				inputEvent.type = INPUT_EVENT_TYPE_KEY_PRESSED;
+				inputEvent.type = sdlEvent.key.repeat ? INPUT_EVENT_TYPE_KEY_PRESSED_REPEATING : INPUT_EVENT_TYPE_KEY_PRESSED;
 			}
 
 			inputEvent.windowId			= CWindowSDL::GetIdBySDLWindowId( sdlEvent.key.windowID );
@@ -337,7 +341,7 @@ void CWindowMgrSDL::ProcessEvents()
 			}
 			else
 			{
-				inputEvent.type = INPUT_EVENT_TYPE_MOUSE_PRESSED;
+				inputEvent.type = sdlEvent.button.clicks >= 2 ? INPUT_EVENT_TYPE_MOUSE_DOUBLE_PRESSED : INPUT_EVENT_TYPE_MOUSE_PRESSED;
 			}
 
 			inputEvent.windowId					= CWindowSDL::GetIdBySDLWindowId( sdlEvent.button.windowID );

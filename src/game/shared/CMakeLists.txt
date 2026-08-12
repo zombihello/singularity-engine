@@ -65,7 +65,7 @@ add_common_target_defines( game_shared )
 #
 # Install
 #
-inherit_install_files( game_shared										TARGETS tier1 )
+inherit_install_files( game_shared										TARGETS tier1 studiorender resourcesystem inputsystem )
 
 # Binaries
 install_files( game_shared FILES ${THIRDPARTY_INSTALL_DEBUG_DLLS}		DESTINATION 	bin/${PLATFORM_BIN_DIR}/	CONFIGURATIONS 	Debug )

@@ -1,6 +1,7 @@
 #include "pch_game_shared.h"
 #include "tier1/math/math.h"
 #include "appframework/iwindowmgr.h"
+#include "inputsystem/iinputsystem.h"
 #include "studiorender/istudiorender.h"
 #include "studiorender/istudio_viewport.h"
 #include "resourcesystem/iresourcesystem.h"
@@ -45,6 +46,13 @@ bool CGame::Connect( createInterfaceFn_t pFactory )
 		return false;
 	}
 
+	// Get the input system
+	g_pInputSystem = (IInputSystem*)pFactory( INPUTSYSTEM_INTERFACE_VERSION );
+	if ( !g_pInputSystem )
+	{
+		return false;
+	}
+
 	// Get StudioRender
 	g_pStudioRender = (IStudioRender*)pFactory( STUDIORENDER_INTERFACE_VERSION );
 	if ( !g_pStudioRender )
@@ -75,6 +83,7 @@ void CGame::Disconnect()
 	DisconnectTier1();
 
 	g_pWindowMgr	  = NULL;
+	g_pInputSystem	  = NULL;
 	g_pStudioRender	  = NULL;
 	g_pResourceSystem = NULL;
 }

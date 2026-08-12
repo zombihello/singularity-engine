@@ -10,7 +10,6 @@ enum buttonCode_t
 	//
 
 	KEY_FIRST = 0,
-	KEY_NONE  = KEY_FIRST,
 
 	KEY_0 = KEY_FIRST,
 	KEY_1,
@@ -138,14 +137,35 @@ enum buttonCode_t
 	MOUSE_X,
 	MOUSE_Y,
 
-	MOUSE_LEFT	 = MOUSE_1,
-	MOUSE_MIDDLE = MOUSE_2,
-	MOUSE_RIGHT	 = MOUSE_3,
-	MOUSE_LAST	 = MOUSE_Y,
-	MOUSE_COUNT	 = MOUSE_LAST - MOUSE_FIRST + 1,
+	MOUSE_LEFT		   = MOUSE_1,
+	MOUSE_MIDDLE	   = MOUSE_2,
+	MOUSE_RIGHT		   = MOUSE_3,
+	MOUSE_LAST		   = MOUSE_Y,
+	MOUSE_BUTTON_FIRST = MOUSE_1,
+	MOUSE_BUTTON_LAST  = MOUSE_8,
+	MOUSE_WHEEL_FIRST  = MOUSE_WHEELUP,
+	MOUSE_WHEEL_LAST   = MOUSE_WHEELDOWN,
+	MOUSE_AXIS_FIRST   = MOUSE_X,
+	MOUSE_AXIS_LAST	   = MOUSE_Y,
+	MOUSE_COUNT		   = MOUSE_LAST - MOUSE_FIRST + 1,
 
-	BUTTON_CODE_NONE  = 0,
+	//
+	// Range markers
+	//
+
 	BUTTON_CODE_FIRST = KEY_FIRST,
 	BUTTON_CODE_LAST  = MOUSE_LAST,
-	BUTTON_CODE_COUNT = BUTTON_CODE_LAST - BUTTON_CODE_FIRST + 1
+	BUTTON_CODE_COUNT = BUTTON_CODE_LAST - BUTTON_CODE_FIRST + 1,
+	BUTTON_CODE_NONE  = BUTTON_CODE_COUNT
 };
+
+//-----------------------------------------------------------------------------
+// Button code range checks
+//-----------------------------------------------------------------------------
+bool Input_IsKeyCode( buttonCode_t code );
+bool Input_IsMouseCode( buttonCode_t code );
+bool Input_IsMouseWheel( buttonCode_t code );
+bool Input_IsMouseAxis( buttonCode_t code );
+bool Input_IsValidCode( buttonCode_t code );
+
+#include "inputsystem/buttoncode.inl"
