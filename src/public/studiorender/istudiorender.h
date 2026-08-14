@@ -1,5 +1,6 @@
 #pragma once
 #include "tier1/refcount.h"
+#include "tier1/math/math_types.h"
 #include "appframework/iappsystem.h"
 #include "studiorender/istudio_cmdbuffer.h"
 
@@ -15,6 +16,12 @@ class IStudioScene;
 //-----------------------------------------------------------------------------
 struct studioCameraView_t
 {
+	vector3_t	 location;
+	quaternion_t rotation;
+	float		 fieldOfView;
+	float		 nearClipPlane;
+	float		 farClipPlane;
+	float		 aspectRatio;
 };
 
 //-----------------------------------------------------------------------------

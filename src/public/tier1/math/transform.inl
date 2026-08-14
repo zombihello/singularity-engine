@@ -254,7 +254,7 @@ CTransform::ToMatrix
 */
 FORCEINLINE void CTransform::ToMatrix( matrix4x4_t& result ) const
 {
-	result = S_MatrixTranslate( location ) * S_QuaternionToMatrix( rotation ) * S_MatrixScale( scale );
+	result = S_MatrixTranslate<matrix4x4_t>( location ) * S_QuaternionToMatrix<matrix4x4_t>( rotation ) * S_MatrixScale<matrix4x4_t>( scale );
 }
 
 /*

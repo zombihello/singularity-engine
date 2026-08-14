@@ -191,7 +191,7 @@ CSMATMaterialVar::GetMatrixValue
 */
 FORCEINLINE matrix4x4_t CSMATMaterialVar::GetMatrixValue() const
 {
-	return type == SMAT_MATERIAL_VAR_TYPE_MATRIX ? matrixValue : g_matrixIdentity;
+	return type == SMAT_MATERIAL_VAR_TYPE_MATRIX ? matrixValue : g_matrix44Identity;
 }
 
 /*

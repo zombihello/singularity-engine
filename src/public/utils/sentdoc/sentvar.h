@@ -49,10 +49,10 @@ public:
 	bool					GetBoolValue( bool defaultValue = false ) const;
 	int32					GetIntValue( int32 defaultValue = 0 ) const;
 	float					GetFloatValue( float defaultValue = 0.f ) const;
-	vector2_t					GetVec2Value( const vector2_t& defaultValue = vector2_t( 0.f, 0.f ) ) const;
-	vector3_t					GetVec3Value( const vector3_t& defaultValue = g_vector000 ) const;
-	vector4_t					GetVec4Value( const vector4_t& defaultValue = vector4_t( 0.f, 0.f, 0.f, 0.f ) ) const;
-	matrix4x4_t					GetMatrixValue( const matrix4x4_t& defaultValue = g_matrixIdentity ) const;
+	vector2_t				GetVec2Value( const vector2_t& defaultValue = vector2_t( 0.f, 0.f ) ) const;
+	vector3_t				GetVec3Value( const vector3_t& defaultValue = g_vector000 ) const;
+	vector4_t				GetVec4Value( const vector4_t& defaultValue = vector4_t( 0.f, 0.f, 0.f, 0.f ) ) const;
+	matrix4x4_t				GetMatrixValue( const matrix4x4_t& defaultValue = g_matrix44Identity ) const;
 	const char*				GetStringValue( const char* pDefaultValue = "" ) const;
 
 	CSENTEntityDescVar& operator=( const CSENTEntityDescVar& right );
@@ -66,10 +66,10 @@ private:
 		bool		boolValue;
 		int32		intValue;
 		float		floatValue;
-		vector2_t		vector2DValue;
-		vector3_t		vector3DValue;
-		vector4_t		vector4DValue;
-		matrix4x4_t		matrixValue;
+		vector2_t	vector2DValue;
+		vector3_t	vector3DValue;
+		vector4_t	vector4DValue;
+		matrix4x4_t matrixValue;
 		const char* pStringValue;
 	};
 };

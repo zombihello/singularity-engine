@@ -4,4 +4,4 @@
 //-----------------------------------------------------------------------------
 // CVars
 //-----------------------------------------------------------------------------
-CCVar mouse_sensitivity( "mouse_sensitivity", "0.5", "Mouse sensitivity", CVAR_FLAG_ARCHIVE );
+CCVar mouse_sensitivity( "mouse_sensitivity", "3", "Mouse sensitivity", CVAR_FLAG_ARCHIVE );

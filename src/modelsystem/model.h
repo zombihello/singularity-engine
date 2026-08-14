@@ -7,7 +7,7 @@
 //-----------------------------------------------------------------------------
 // A model resource which is owned by the render thread
 //-----------------------------------------------------------------------------
-class CModelResource : public CRefCounted<IModelResource>, public CStudioRenderResource<IStudioRenderResource>
+class CModelResource : public CDebugNamed<CRefCounted<IModelResource>>, public CStudioRenderResource<IStudioRenderResource>
 {
 public:
 	// IModelResource interface
@@ -17,7 +17,7 @@ public:
 	virtual const modelSurface_t*			  GetSurfaces() const override;
 	virtual IVertexFactory*					  GetVertexFactory() const override;
 
-	CModelResource();
+	CModelResource( const char* pDebugName = "" );
 
 	void				   Update( const modelInitialData_t& initialData );
 	void				   UpdateMaterials( const CResourcePtr<IMaterial>* pMaterials, uint32 numMaterials );
@@ -35,7 +35,7 @@ private:
 
 	modelIndexType_t						  indexType;
 	CStudioRenderCmdFence					  renderCmdFence;
-	CRefPtr<CVertexFactoryBase>				  pVertexFactory;
+	CRefPtr<IVertexFactory>					  pVertexFactory;
 	CRefPtr<IStudioAPIBuffer>				  pStudioAPIVertexBuffer;
 	CRefPtr<IStudioAPIBuffer>				  pStudioAPIIndexBuffer;
 	eastl::vector<byte>						  vertices;

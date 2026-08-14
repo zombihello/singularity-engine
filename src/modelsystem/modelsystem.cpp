@@ -1,6 +1,8 @@
 #include "pch_modelsystem.h"
 #include "studiorender/studioapi/istudioapi.h"
 #include "resourcesystem/iresourcesystem.h"
+#include "modelsystem/vertexfactory_simple.h"
+#include "modelsystem/vertexfactory_static.h"
 #include "modelsystem/modelsystem.h"
 
 CModelSystem g_modelSystem;
@@ -105,4 +107,22 @@ void CModelSystem::Shutdown()
 
 	// Release all global resources
 	CStudioGlobalRenderResources::ReleaseResources();
+}
+
+/*
+==================
+CModelSystem::CreateVertexFactory
+==================
+*/
+CRefPtr<IVertexFactory> CModelSystem::CreateVertexFactory( modelVertexType_t vertexType, const char* pDebugName /* = "" */ ) const
+{
+	PROFILER_SCOPE_FUNC();
+	switch ( vertexType )
+	{
+	case MODEL_VERTEXTYPE_SIMPLE: return new CVertexFactorySimple( pDebugName );
+	case MODEL_VERTEXTYPE_STATIC: return new CVertexFactoryStatic( pDebugName );
+	default:
+		AssertMsg( false, "Unknown vertex type 0x%X", vertexType );
+		return NULL;
+	}
 }

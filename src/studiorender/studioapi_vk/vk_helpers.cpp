@@ -2,6 +2,7 @@
 #include "tier0/debug.h"
 #include "utils/pixelformatinfos/pixelformatinfos.h"
 #include "studiorender/studioapi_vk/vk_helpers.h"
+#include "studiorender/studioapi_vk/vk_studioapi.h"
 
 /*
 ==================
@@ -174,6 +175,26 @@ VkBool32 VKAPI_PTR VK_DebugCallback( VkDebugUtilsMessageSeverityFlagBitsEXT mess
 		Sys_DebugBreak();
 	}
 	return VK_FALSE;
+}
+
+/*
+==================
+VK_SetDebugName
+==================
+*/
+void VK_SetDebugName( VkObjectType vkObjectType, uint64 handle, const char* pName )
+{
+	if ( !g_StudioAPIVk.GetDevice().IsDebug() || !handle || !pName || !pName[0] )
+	{
+		return;
+	}
+
+	VkDebugUtilsObjectNameInfoEXT vkObjectNameInfo = {};
+	vkObjectNameInfo.sType						   = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+	vkObjectNameInfo.objectType					   = vkObjectType;
+	vkObjectNameInfo.objectHandle				   = handle;
+	vkObjectNameInfo.pObjectName				   = pName;
+	vkSetDebugUtilsObjectNameEXT( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), &vkObjectNameInfo );
 }
 #endif	// !RETAIL
 

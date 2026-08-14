@@ -32,3 +32,7 @@ vertexfactory "../../public/modelsystem/vertexfactory"
 // Shaders list (path to *.shader files, relative to the file)
 shader "unlitgeneric_vs"
 shader "unlitgeneric_ps"
+shader "screenspace_vs"
+shader "screenspace_ps"
+shader "simpleelements_vs"
+shader "simpleelements_ps"

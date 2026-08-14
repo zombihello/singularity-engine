@@ -88,6 +88,15 @@ void CStudioAPIDescriptorSetsLayoutVk::Init( const studioAPIDescriptorSetLayoutV
 	Assert( numUsedDescriptorTypesDict[VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT]
 			<= vkPhysicalDeviceLimits.maxDescriptorSetInputAttachments );
 
+	// Check push constant ranges against the CPU staging buffer and the device limit
+#if ENABLE_ASSERT
+	for ( uint32 index = 0, count = (uint32)vkPushConstantRanges.size(); index < count; ++index )
+	{
+		const VkPushConstantRange& vkPushConstantRange = vkPushConstantRanges[index];
+		Assert( vkPushConstantRange.offset + vkPushConstantRange.size <= S_Min<uint32>( vkPhysicalDeviceLimits.maxPushConstantsSize, STUDIOAPI_VK_MAX_PUSH_CONSTANT_SIZE ) );
+	}
+#endif	// ENABLE_ASSERT
+
 	// Create descriptor set layouts
 	for ( auto it = descriptorSetLayoutDict.begin(), itEnd = descriptorSetLayoutDict.end(); it != itEnd; ++it )
 	{
@@ -106,6 +115,9 @@ void CStudioAPIDescriptorSetsLayoutVk::Init( const studioAPIDescriptorSetLayoutV
 		}
 		descriptorSetInfos[it->first] = it->second.descriptorSetInfo;
 	}
+
+	// Keep information about push constant ranges in the descriptor sets layout
+	CStudioAPIDescriptorSetsLayoutVk::vkPushConstantRanges = vkPushConstantRanges;
 
 	// Create a pipeline layout that is used to generate rendering pipelines that are based on this descriptor set layout
 	VkPipelineLayoutCreateInfo vkPipelineLayoutCreateInfo = {};
@@ -163,9 +175,10 @@ void CStudioAPIDescriptorSetsLayoutVk::Destroy()
 		numUsedDescriptorTypesDict[(VkDescriptorType)index] = 0;
 	}
 
-	// Clear all descriptor set infos and layouts
+	// Clear all descriptor set infos, layouts and push constants
 	descriptorSetInfos.clear();
 	vkDescriptorSetLayouts.clear();
+	vkPushConstantRanges.clear();
 
 	// Clear fields
 	vkPipelineLayout		 = VK_NULL_HANDLE;

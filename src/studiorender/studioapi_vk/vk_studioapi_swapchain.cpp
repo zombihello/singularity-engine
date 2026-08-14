@@ -346,6 +346,11 @@ bool CStudioAPISwapChainVk::Create( windowHandle_t windowHandle, uint32 width, u
 	bImageAcquired = false;
 	status		   = STUDIOAPI_SWAPCHAIN_STATUS_OK;
 
+	// Set debug name for the swapchain
+#if !RETAIL
+	VK_SetDebugName( VK_OBJECT_TYPE_SWAPCHAIN_KHR, (uint64)vkSwapChain, "swapchain" );
+#endif	// !RETAIL
+
 	// Initialize all swap chain images
 	uint32				   numImages = 0;
 	eastl::vector<VkImage> vkImages;
@@ -356,6 +361,10 @@ bool CStudioAPISwapChainVk::Create( windowHandle_t windowHandle, uint32 width, u
 	swapChainImages.resize( numImages );
 	for ( uint32 imageIdx = 0; imageIdx < numImages; ++imageIdx )
 	{
+		// Set debug name for the swapchain image
+#if !RETAIL
+		VK_SetDebugName( VK_OBJECT_TYPE_IMAGE, (uint64)vkImages[imageIdx], va( "swapchain image %i", imageIdx ) );
+#endif	// !RETAIL
 		swapChainImages[imageIdx] = new CStudioAPISwapChainImageVk( this, imageIdx, vkImages[imageIdx], vkSurfaceFormat );
 	}
 

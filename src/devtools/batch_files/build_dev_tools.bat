@@ -35,6 +35,7 @@ IF /i NOT "%BUILD_CONFIGURATION%"=="Release" ^
 IF /i NOT "%BUILD_CONFIGURATION%"=="Retail" (
 	ECHO ERROR: Invalid build configuration: '%BUILD_CONFIGURATION%'
 	ECHO ERROR: Valid configurations: Debug, Release, Retail
+	SET ERRORLEVEL=1
 	GOTO :CLEANUP
 )
 
@@ -60,3 +61,4 @@ for %%T in (%BUILD_TARGETS%) do (
 POPD
 RMDIR /s /q %BUILD_DIR%
 ECHO ==============================================================================
+IF %ERRORLEVEL% NEQ 0 PAUSE

@@ -8,7 +8,7 @@
 VK_TranslateBufferUsageFlags
 ==================
 */
-void VK_TranslateBufferUsageFlags( uint32& usageFlags, VkBufferUsageFlags& vkBufferUsageFlags, VmaMemoryUsage& vmaMemoryUsage, uint8& memoryFlags )
+static void VK_TranslateBufferUsageFlags( uint32& usageFlags, VkBufferUsageFlags& vkBufferUsageFlags, VmaMemoryUsage& vmaMemoryUsage, uint8& memoryFlags )
 {
 	// Clear output parameters
 	vkBufferUsageFlags = 0;
@@ -57,6 +57,10 @@ void VK_TranslateBufferUsageFlags( uint32& usageFlags, VkBufferUsageFlags& vkBuf
 	{
 		vmaMemoryUsage = VMA_MEMORY_USAGE_CPU_TO_GPU;
 		memoryFlags	   = STUDIOAPI_BUFFER_MEMORY_FLAG_CPU_GPU;
+
+		// Volatile buffers share concurrently-owned temp blocks, so they must behave as if they were
+		// created with STUDIOAPI_BUFFER_USAGE_FLAG_CONCURRENT regardless of what the caller passed in
+		usageFlags |= STUDIOAPI_BUFFER_USAGE_FLAG_CONCURRENT;
 	}
 	else
 	{
@@ -65,42 +69,6 @@ void VK_TranslateBufferUsageFlags( uint32& usageFlags, VkBufferUsageFlags& vkBuf
 
 		usageFlags |= STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST;
 		vkBufferUsageFlags |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
-	}
-}
-
-/*
-==================
-VK_GetUsedQueueFamiliesFromBufferUsage
-==================
-*/
-void VK_GetUsedQueueFamiliesFromBufferUsage( uint32 usageFlags, VkBufferUsageFlags vkBufferUsageFlags, VmaMemoryUsage vmaMemoryUsage, uint32& graphicsQueueFamilyIndex, uint32& computeQueueFamilyIndex, uint32& transferQueueFamilyIndex )
-{
-	graphicsQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-	computeQueueFamilyIndex	 = VK_QUEUE_FAMILY_IGNORED;
-	transferQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-
-	// Do nothing if we haven't STUDIOAPI_BUFFER_USAGE_FLAG_CONCURRENT
-	if ( !( usageFlags & STUDIOAPI_BUFFER_USAGE_FLAG_CONCURRENT ) )
-	{
-		return;
-	}
-
-	// Graphics queue family
-	if ( vkBufferUsageFlags & VK_BUFFER_USAGE_VERTEX_BUFFER_BIT || vkBufferUsageFlags & VK_BUFFER_USAGE_INDEX_BUFFER_BIT || vkBufferUsageFlags & VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT || vkBufferUsageFlags & VK_BUFFER_USAGE_STORAGE_BUFFER_BIT )
-	{
-		graphicsQueueFamilyIndex = g_StudioAPIVk.GetDevice().GetGraphicsQueue().GetQueueFamilyIndex();
-	}
-
-	// Compute queue family
-	if ( vkBufferUsageFlags & VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT || vkBufferUsageFlags & VK_BUFFER_USAGE_STORAGE_BUFFER_BIT )
-	{
-		computeQueueFamilyIndex = g_StudioAPIVk.GetDevice().GetComputeQueue().GetQueueFamilyIndex();
-	}
-
-	// Transfer queue family
-	if ( vmaMemoryUsage == VMA_MEMORY_USAGE_GPU_ONLY )
-	{
-		transferQueueFamilyIndex = g_StudioAPIVk.GetDevice().GetTransferQueue().GetQueueFamilyIndex();
 	}
 }
 
@@ -116,46 +84,52 @@ CStudioAPIBufferVk::CStudioAPIBufferVk( const byte* pData, uint64 dataSize, uint
 	, stride( dataStride )
 	, numBuffers( GetNumBuffersFromUsage( usageFlags ) )
 	, currentBufferIndex( 0 )
-	, vkBuffer( VK_NULL_HANDLE )
-	, vmaAllocation( VK_NULL_HANDLE )
 	, onStudioAPIVkShutdownHandle( INVALID_HANDLE )
 {
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-
 	// The buffer size and data stride must be valid
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( dataSize > 0 );
 	Assert( dataSize >= dataStride );
+	Mem_Memzero( &alloc, sizeof( bufferAlloc_t ) );
 
 	// Convert to VMA memory usage and Vulkan buffer usage flags
 	VmaAllocationCreateInfo vmaAllocationCreateInfo = {};
 	VkBufferUsageFlags		vkBufferUsageFlags;
 	VK_TranslateBufferUsageFlags( CStudioAPIBufferVk::usageFlags, vkBufferUsageFlags, vmaAllocationCreateInfo.usage, memoryFlags );
 
-	// Allocate memory for buffers
-	VkBufferCreateInfo vkBufferCreateInfo = {};
-	vkBufferCreateInfo.sType			  = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	vkBufferCreateInfo.size				  = dataSize * numBuffers;
-	vkBufferCreateInfo.usage			  = vkBufferUsageFlags;
-
-	// Grab queue family indices which the buffer should be use
-	uint32 graphicsQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-	uint32 computeQueueFamilyIndex	= VK_QUEUE_FAMILY_IGNORED;
-	uint32 transferQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-	VK_GetUsedQueueFamiliesFromBufferUsage( CStudioAPIBufferVk::usageFlags, vkBufferUsageFlags, vmaAllocationCreateInfo.usage, graphicsQueueFamilyIndex, computeQueueFamilyIndex, transferQueueFamilyIndex );
-
-	CStudioAPIQueueSharingModeSetupVk queueSharingModeSetup( graphicsQueueFamilyIndex, computeQueueFamilyIndex, transferQueueFamilyIndex );
-	queueSharingModeSetup.Setup( vkBufferCreateInfo.sharingMode, vkBufferCreateInfo.queueFamilyIndexCount, vkBufferCreateInfo.pQueueFamilyIndices );
-	vmaAllocation = g_StudioAPIVk.GetMemoryMgr().AllocateBuffer( S_Sprintf( "Buffer (usageFlags: 0x%X)", usageFlags ).c_str(), vkBufferCreateInfo, vmaAllocationCreateInfo, vkBuffer );
-	if ( vmaAllocation == VK_NULL_HANDLE )
+	// Allocate a new Vulkan buffer if the buffer isn't volatile
+	// NOTE: volatile buffers don't own GPU memory of their own: every MapMemory/UpdateData grabs a
+	// fresh region from the engine-wide temp allocator instead, so past draws that reference
+	// an older region keep seeing their own data
+	if ( !( usageFlags & STUDIOAPI_BUFFER_USAGE_FLAG_VOLATILE ) )
 	{
-		Sys_Error( "Failed to allocate GPU buffer with size %llu", dataSize );
-		return;
-	}
+		// Allocate memory for buffers
+		VkBufferCreateInfo vkBufferCreateInfo = {};
+		vkBufferCreateInfo.sType			  = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+		vkBufferCreateInfo.size				  = dataSize * numBuffers;
+		vkBufferCreateInfo.usage			  = vkBufferUsageFlags;
 
-	// Initialize buffer offsets
-	for ( uint32 bufferIdx = 0; bufferIdx < numBuffers; ++bufferIdx )
-	{
-		bufferOffsets[bufferIdx] = size * bufferIdx;
+		// Grab queue family indices which the buffer should be use
+		uint32 graphicsQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		uint32 computeQueueFamilyIndex	= VK_QUEUE_FAMILY_IGNORED;
+		uint32 transferQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+		if ( usageFlags & STUDIOAPI_BUFFER_USAGE_FLAG_CONCURRENT )
+		{
+			VK_GetUsedQueueFamiliesFromVkBufferUsage( vkBufferUsageFlags, graphicsQueueFamilyIndex, computeQueueFamilyIndex, transferQueueFamilyIndex );
+		}
+
+		CStudioAPIQueueSharingModeSetupVk queueSharingModeSetup( graphicsQueueFamilyIndex, computeQueueFamilyIndex, transferQueueFamilyIndex );
+		queueSharingModeSetup.Setup( vkBufferCreateInfo.sharingMode, vkBufferCreateInfo.queueFamilyIndexCount, vkBufferCreateInfo.pQueueFamilyIndices );
+		alloc.vmaAllocation = g_StudioAPIVk.GetMemoryMgr().AllocateBuffer( pDebugName, vkBufferCreateInfo, vmaAllocationCreateInfo, alloc.vkBuffer );
+		if ( alloc.vmaAllocation == VK_NULL_HANDLE )
+		{
+			Sys_Error( "Failed to allocate GPU buffer with size %llu", dataSize );
+			return;
+		}
+		alloc.frameNumber = g_StudioAPIVk.GetFrameNumber();
+
+		// Register in 'onStudioAPIVkShutodwn' for destroy Vulkan objects when the one is shutdown
+		onStudioAPIVkShutdownHandle = g_StudioAPIVk.OnStudioAPIVkShutdown().Subscribe( &CStudioAPIBufferVk::OnStudioAPIVkShutdown, this );
 	}
 
 	// Copy data if we have it
@@ -163,9 +137,6 @@ CStudioAPIBufferVk::CStudioAPIBufferVk( const byte* pData, uint64 dataSize, uint
 	{
 		UpdateData( g_StudioAPIVk.GetImmediateCmdContext( STUDIOAPI_QUEUE_TYPE_GRAPHICS ), (byte*)pData, dataSize );
 	}
-
-	// Register in 'onStudioAPIVkShutodwn' for destroy Vulkan objects when the one is shutdown
-	onStudioAPIVkShutdownHandle = g_StudioAPIVk.OnStudioAPIVkShutdown().Subscribe( &CStudioAPIBufferVk::OnStudioAPIVkShutdown, this );
 }
 
 /*
@@ -175,15 +146,14 @@ CStudioAPIBufferVk::~CStudioAPIBufferVk
 */
 CStudioAPIBufferVk::~CStudioAPIBufferVk()
 {
+	// Destroy the buffer (volatile buffers don't own their allocation, it belongs to the shared temp allocator)
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-
-	// Destroy the buffer
-	if ( vkBuffer != VK_NULL_HANDLE )
+	if ( alloc.vmaAllocation != VK_NULL_HANDLE )
 	{
-		g_StudioAPIVk.GetMemoryMgr().FreeResource( [vkBuffer = vkBuffer, vmaAllocation = vmaAllocation]()
+		g_StudioAPIVk.GetMemoryMgr().FreeResource( [vkBuffer = alloc.vkBuffer, vmaAllocation = alloc.vmaAllocation]()
 												   { g_StudioAPIVk.GetMemoryMgr().DestroyBuffer( vkBuffer, vmaAllocation ); } );
-		vkBuffer	  = VK_NULL_HANDLE;
-		vmaAllocation = VK_NULL_HANDLE;
+		alloc.vkBuffer		= VK_NULL_HANDLE;
+		alloc.vmaAllocation = VK_NULL_HANDLE;
 	}
 
 	// Remove CStudioAPIBufferVk::OnStudioAPIVkShutdown from event 'onStudioAPIVkShutodwn'
@@ -236,21 +206,89 @@ uint8 CStudioAPIBufferVk::GetMemoryFlags() const
 
 /*
 ==================
+CStudioAPIBufferVk::AllocFromTempAlloc
+==================
+*/
+void CStudioAPIBufferVk::AllocFromTempAlloc()
+{
+	// Translate usage flags again to get the Vulkan usage flags for the alignment query below
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	Assert( usageFlags & STUDIOAPI_BUFFER_USAGE_FLAG_VOLATILE );
+	VmaAllocationCreateInfo dummyVmaAllocationCreateInfo = {};
+	uint32					dummyUsageFlags				 = usageFlags;
+	uint8					dummyMemoryFlags;
+	VkBufferUsageFlags		vkBufferUsageFlags;
+	VK_TranslateBufferUsageFlags( dummyUsageFlags, vkBufferUsageFlags, dummyVmaAllocationCreateInfo.usage, dummyMemoryFlags );
+
+	// Grab a fresh sub-allocation from the temp allocator
+	uint64		alignment = CStudioAPIMemoryMgrVk::GetBufferAlignmentFromVkUsageFlags( vkBufferUsageFlags );
+	tempAlloc_t tempAlloc = g_StudioAPIVk.GetTempAlloc().Alloc( (uint32)size, (uint32)alignment );
+	alloc.vkBuffer		  = tempAlloc.vkBuffer;
+	alloc.vmaAllocation	  = VK_NULL_HANDLE;
+	alloc.pData			  = tempAlloc.pData;
+	alloc.offset		  = tempAlloc.offset;
+	alloc.frameNumber	  = g_StudioAPIVk.GetFrameNumber();
+
+	// A fresh temp allocation is a fresh piece of memory, nothing has touched it yet
+	syncState = studioAPISyncStateBufferVk_t();
+}
+
+/*
+==================
+CStudioAPIBufferVk::IsValidAlloc
+==================
+*/
+bool CStudioAPIBufferVk::IsValidAlloc() const
+{
+	bool bVolatile = usageFlags & STUDIOAPI_BUFFER_USAGE_FLAG_VOLATILE;
+	return alloc.vkBuffer != VK_NULL_HANDLE && ( !bVolatile || alloc.frameNumber == g_StudioAPIVk.GetFrameNumber() );
+}
+
+/*
+==================
+CStudioAPIBufferVk::PrepareForGPUWrite
+==================
+*/
+void CStudioAPIBufferVk::PrepareForGPUWrite()
+{
+	// A GPU write (`CopyBuffer`/`CopyTextureToBuffer`/etc as destination) into a volatile buffer must land in a brand-new
+	// temp sub-allocation, exactly like a host write does: otherwise the copy either targets a stale block already
+	// recycled to someone else this frame, or aliases memory the buffer's own `GetVkBuffer()`/`GetOffset()` no longer
+	// point at. Grabbing a fresh block here also resets the sync state, so the subsequent transfer-write and the
+	// barrier that reads it are tracked against the block that actually received the copy.
+	// Non-volatile buffers keep their own allocation and ring-buffer via `SwapCurrentBufferIndex` instead
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	if ( usageFlags & STUDIOAPI_BUFFER_USAGE_FLAG_VOLATILE )
+	{
+		AllocFromTempAlloc();
+	}
+}
+
+/*
+==================
 CStudioAPIBufferVk::MapMemory
 ==================
 */
 void CStudioAPIBufferVk::MapMemory( uint64 size, uint64 offset, studioAPIMappedBufferData_t& mappedData )
 {
+	// We can use MapMemory only for CPU shared memory, i.e. volatile buffers
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-
-	// We can use MapMemory only for CPU shared memory
-	AssertMsg( memoryFlags & STUDIOAPI_BUFFER_MEMORY_FLAG_CPU, "The buffer doesn't support the map memory, use IStudioAPICmdList::CopyBuffer" );
+	AssertMsg( memoryFlags & STUDIOAPI_BUFFER_MEMORY_FLAG_CPU, "The buffer doesn't support the map memory, use CStudioAPICmdListVk::CopyBuffer" );
 	Assert( !mappedData.pData && offset < CStudioAPIBufferVk::size && size <= CStudioAPIBufferVk::size - offset );
 	Mem_Memzero( &mappedData, sizeof( studioAPIMappedBufferData_t ) );
 
-	// For volatile buffers we can use MapMemory to read/write data in the buffer
-	mappedData.pData = g_StudioAPIVk.GetMemoryMgr().MapMemory<byte>( vmaAllocation ) + bufferOffsets[currentBufferIndex] + offset;
-	mappedData.size	 = size;
+	// If the buffer is volatile allocate a new memory from the temp allocator
+	if ( usageFlags & STUDIOAPI_BUFFER_USAGE_FLAG_VOLATILE )
+	{
+		AllocFromTempAlloc();
+		mappedData.pData = alloc.pData + offset;
+	}
+	// Otherwise we can use MapMemory to read/write data in the buffer
+	else
+	{
+		mappedData.pData = g_StudioAPIVk.GetMemoryMgr().MapMemory<byte>( alloc.vmaAllocation ) + alloc.offset + offset;
+	}
+	mappedData.size = size;
 }
 
 /*
@@ -260,11 +298,13 @@ CStudioAPIBufferVk::UnmapMemory
 */
 void CStudioAPIBufferVk::UnmapMemory( studioAPIMappedBufferData_t& mappedData )
 {
+	// Unmap CPU shared memory if the buffer isn't volatile because the temp allocation is persistently mapped
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-
-	// For volatile buffers we can use UnmapMemory to read/write data in the buffer
 	Assert( mappedData.pData );
-	g_StudioAPIVk.GetMemoryMgr().UnmapMemory( vmaAllocation );
+	if ( !( usageFlags & STUDIOAPI_BUFFER_USAGE_FLAG_VOLATILE ) )
+	{
+		g_StudioAPIVk.GetMemoryMgr().UnmapMemory( alloc.vmaAllocation );
+	}
 	mappedData.pData = NULL;
 }
 
@@ -294,8 +334,8 @@ void CStudioAPIBufferVk::UpdateData( IStudioAPICmdContext* pCmdContext, byte* pD
 		vkBufferMemoryBarrier.sType					   = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
 		vkBufferMemoryBarrier.srcQueueFamilyIndex	   = VK_QUEUE_FAMILY_IGNORED;
 		vkBufferMemoryBarrier.dstQueueFamilyIndex	   = VK_QUEUE_FAMILY_IGNORED;
-		vkBufferMemoryBarrier.buffer				   = vkBuffer;
-		vkBufferMemoryBarrier.offset				   = bufferOffsets[currentBufferIndex] + offset;
+		vkBufferMemoryBarrier.buffer				   = alloc.vkBuffer;
+		vkBufferMemoryBarrier.offset				   = alloc.offset + offset;
 		vkBufferMemoryBarrier.size					   = size;
 		CStudioAPIDataUploaderVk& dataUploader		   = g_StudioAPIVk.GetDataUploader();
 		dataUploader.Upload( dataSize, STUDIOAPI_VK_BUFFER_OFFSET_ALIGNMENT,
@@ -316,9 +356,9 @@ void CStudioAPIBufferVk::UpdateData( IStudioAPICmdContext* pCmdContext, byte* pD
 								 // Place vkCmdCopyBuffer call
 								 VkBufferCopy vkBufferCopy = {};
 								 vkBufferCopy.srcOffset	   = uploadParams.stagingBufferOffset;
-								 vkBufferCopy.dstOffset	   = bufferOffsets[currentBufferIndex] + offset + uploadOffset;
+								 vkBufferCopy.dstOffset	   = alloc.offset + offset + uploadOffset;
 								 vkBufferCopy.size		   = uploadParams.partialUploadSize;
-								 vkCmdCopyBuffer( uploadParams.pCmdBuffer->GetVkCommandBuffer(), uploadParams.vkStagingBuffer, vkBuffer, 1, &vkBufferCopy );
+								 vkCmdCopyBuffer( uploadParams.pCmdBuffer->GetVkCommandBuffer(), uploadParams.vkStagingBuffer, alloc.vkBuffer, 1, &vkBufferCopy );
 
 								 // Make a barrier if it need
 								 if ( uploadParams.remainSizeToUpload - uploadParams.partialUploadSize == 0 )
@@ -347,7 +387,7 @@ void CStudioAPIBufferVk::UpdateData( IStudioAPICmdContext* pCmdContext, byte* pD
 	else
 	{
 		studioAPIMappedBufferData_t mappedData = {};
-		MapMemory( dataSize, 0, mappedData );
+		MapMemory( dataSize, offset, mappedData );
 		Mem_Memcpy( mappedData.pData, pData, mappedData.size );
 		UnmapMemory( mappedData );
 	}
@@ -360,10 +400,18 @@ CStudioAPIBufferVk::UpdateSyncStateWithBarrier
 */
 void CStudioAPIBufferVk::UpdateSyncStateWithBarrier( CStudioAPICmdListVk* pCmdList, VkAccessFlags vkDstAccessMask, VkPipelineStageFlags vkDstStageMask, uint32 dstQueueFamilyIndex )
 {
+	// A volatile buffer only gets its memory at the moment of a write, so a barrier placed before that write refers to
+	// a block the buffer doesn't own yet - there is nothing to synchronize against, skip it. Once the buffer has been
+	// written this frame the barrier below is emitted as usual, which is what makes a GPU write visible to a reader
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	if ( ( usageFlags & STUDIOAPI_BUFFER_USAGE_FLAG_VOLATILE ) && !IsValidAlloc() )
+	{
+		return;
+	}
+
 	studioAPIBufferMemoryBarrierVk_t bufferMemoryBarrier = {};
-	bufferMemoryBarrier.vkBufferMemoryBarrier.buffer	 = vkBuffer;
-	bufferMemoryBarrier.vkBufferMemoryBarrier.offset	 = bufferOffsets[currentBufferIndex];
+	bufferMemoryBarrier.vkBufferMemoryBarrier.buffer	 = alloc.vkBuffer;
+	bufferMemoryBarrier.vkBufferMemoryBarrier.offset	 = alloc.offset;
 	bufferMemoryBarrier.vkBufferMemoryBarrier.size		 = size;
 	if ( VK_UpdateSyncStateBufferWithBarrier( vkDstAccessMask, vkDstStageMask, dstQueueFamilyIndex, syncState, bufferMemoryBarrier, usageFlags ) )
 	{

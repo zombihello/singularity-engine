@@ -61,6 +61,7 @@ CStudioAPIDeviceVk::CStudioAPIDeviceVk()
 	, vkLogicalDevice( VK_NULL_HANDLE )
 	, gpuVendorId( STUDIOAPI_GPU_VENDOR_ID_UNKNOWN )
 #if !RETAIL
+	, bDebug( false )
 	, vkDebugMessenger( VK_NULL_HANDLE )
 #endif	// !RETAIL
 {
@@ -126,7 +127,7 @@ void CStudioAPIDeviceVk::Init( uint32 engineMajorVersion, uint32 engineMinorVers
 	}
 
 	// Add to list required instance extensions of current platform
-	uint32		  platformExtensionCount	 = 0;
+	uint32		 platformExtensionCount		= 0;
 	const char** pPatformExtensionsRequired = VK_Plat_GetRequiredInstanceExtensions( platformExtensionCount );
 	for ( uint32 index = 0; index < platformExtensionCount; ++index )
 	{
@@ -139,6 +140,7 @@ void CStudioAPIDeviceVk::Init( uint32 engineMajorVersion, uint32 engineMinorVers
 	if ( bVkDebug )
 	{
 		extensionsRequired.push_back( VK_EXT_DEBUG_UTILS_EXTENSION_NAME );
+		bDebug = true;
 	}
 #endif	// !RETAIL
 
@@ -151,7 +153,9 @@ void CStudioAPIDeviceVk::Init( uint32 engineMajorVersion, uint32 engineMinorVers
 	// ONLY FOR NON-RETAIL BUILD!
 	// Debug create info struct
 #if !RETAIL
-	VkDebugUtilsMessengerCreateInfoEXT vkDebugCreateInfo = {};
+	VkDebugUtilsMessengerCreateInfoEXT vkDebugCreateInfo			= {};
+	VkValidationFeatureEnableEXT	   vkValidationFeatureEnables[] = { VK_VALIDATION_FEATURE_ENABLE_SYNCHRONIZATION_VALIDATION_EXT };
+	VkValidationFeaturesEXT			   vkValidationFeatures			= {};
 #endif	// !RETAIL
 
 	// Check required extensions and add they to vkInstanceCreateInfo
@@ -185,17 +189,14 @@ void CStudioAPIDeviceVk::Init( uint32 engineMajorVersion, uint32 engineMinorVers
 				vkDebugCreateInfo.messageType	  = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
 				vkDebugCreateInfo.pfnUserCallback = VK_DebugCallback;
 
-				VkValidationFeatureEnableEXT vkValidationFeatureEnables[] = { VK_VALIDATION_FEATURE_ENABLE_GPU_ASSISTED_EXT, VK_VALIDATION_FEATURE_ENABLE_SYNCHRONIZATION_VALIDATION_EXT };
-				VkValidationFeaturesEXT		 vkValidationFeatures		  = {};
-				vkValidationFeatures.sType								  = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
-				vkValidationFeatures.enabledValidationFeatureCount		  = ARRAYSIZE( vkValidationFeatureEnables );
-				vkValidationFeatures.pEnabledValidationFeatures			  = vkValidationFeatureEnables;
-				vkValidationFeatures.pNext								  = &vkDebugCreateInfo;
-				vkInstanceCreateInfo.pNext								  = &vkValidationFeatures;
+				vkValidationFeatures.sType						   = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
+				vkValidationFeatures.enabledValidationFeatureCount = ARRAYSIZE( vkValidationFeatureEnables );
+				vkValidationFeatures.pEnabledValidationFeatures	   = vkValidationFeatureEnables;
+				vkValidationFeatures.pNext						   = &vkDebugCreateInfo;
 
 				vkInstanceCreateInfo.ppEnabledLayerNames = s_pValidationLayers;
 				vkInstanceCreateInfo.enabledLayerCount	 = ARRAYSIZE( s_pValidationLayers );
-				vkInstanceCreateInfo.pNext				 = (VkDebugUtilsMessengerCreateInfoEXT*)&vkDebugCreateInfo;
+				vkInstanceCreateInfo.pNext				 = &vkValidationFeatures;
 				Warning( "StudioAPIVk: Using Vulkan validation layers, expect severely degraded performance" );
 			}
 			else
@@ -366,7 +367,7 @@ void CStudioAPIDeviceVk::CreateVkDevice()
 	// Otherwise we found physical device and try create logical device
 	// Init descriptor device queue infos
 	eastl::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-	eastl::set<uint32>					 uniqueQueueFamilies = {
+	eastl::set<uint32>					   uniqueQueueFamilies = {
 		queueFamilyIndices.graphicsFamilyIndex,
 		queueFamilyIndices.presentFamilyIndex,
 		queueFamilyIndices.transferFamilyIndex,

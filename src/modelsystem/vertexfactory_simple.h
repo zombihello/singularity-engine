@@ -1,5 +1,6 @@
 #pragma once
 #include "modelsystem/vertexfactory_base.h"
+#include "modelsystem/ivertexfactory_simple.h"
 
 //-----------------------------------------------------------------------------
 // Vertex declaration for modelSimpleVertex_t
@@ -14,12 +15,14 @@ private:
 //-----------------------------------------------------------------------------
 // Vertex factory for modelSimpleVertex_t
 //-----------------------------------------------------------------------------
-class CVertexFactorySimple : public CVertexFactoryBase
+class CVertexFactorySimple : public CVertexFactoryBase<IVertexFactorySimple>
 {
 public:
 	// IVertexFactory interface
-	virtual modelVertexType_t			 GetVertexType() const override;
 	virtual IStudioAPIVertexDeclaration* GetStudioAPIVertexDeclaration() const override;
+
+	CVertexFactorySimple( const char* pDebugName = "" );
 };
 
+DECLARE_VERTEX_FACTORY( CVertexDeclarationSimple, IVertexFactorySimple );
 extern CVertexDeclarationSimple g_vertexDeclarationSimple;

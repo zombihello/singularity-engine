@@ -9,7 +9,7 @@ class IResource;
 class IMaterial;
 
 //-----------------------------------------------------------------------------
-// Material variable interface
+// Material variable types
 //-----------------------------------------------------------------------------
 enum materialVarType_t
 {
@@ -26,6 +26,30 @@ enum materialVarType_t
 	MATERIALVAR_TYPE_MATERIAL
 };
 
+//-----------------------------------------------------------------------------
+// A material variable info which is used to initialize a material
+//-----------------------------------------------------------------------------
+struct materialVarInfo_t
+{
+	const char*		  pName;
+	materialVarType_t type;
+	union
+	{
+		bool		boolValue;
+		int32		intValue;
+		float		floatValue;
+		vector2_t	vector2DValue;
+		vector3_t	vector3DValue;
+		vector4_t	vector4DValue;
+		matrix4x4_t matrixValue;
+		const char* pStringValue;
+		IResource*	pResourceValue;
+	};
+};
+
+//-----------------------------------------------------------------------------
+// Material variable interface
+//-----------------------------------------------------------------------------
 class IMaterialVar
 {
 public:
@@ -57,3 +81,20 @@ public:
 	virtual IResource*		  GetTextureValue() const							  = 0;
 	virtual IResource*		  GetMaterialValue() const							  = 0;
 };
+
+//-----------------------------------------------------------------------------
+// Functions to make a material variable info
+//-----------------------------------------------------------------------------
+materialVarInfo_t MaterialVar_MakeBool( const char* pName, bool bValue );
+materialVarInfo_t MaterialVar_MakeInt( const char* pName, int32 value );
+materialVarInfo_t MaterialVar_MakeFloat( const char* pName, float value );
+materialVarInfo_t MaterialVar_MakeVec( const char* pName, const float* pValue, uint32 numComps );
+materialVarInfo_t MaterialVar_MakeVec( const char* pName, const vector2_t& value );
+materialVarInfo_t MaterialVar_MakeVec( const char* pName, const vector3_t& value );
+materialVarInfo_t MaterialVar_MakeVec( const char* pName, const vector4_t& value );
+materialVarInfo_t MaterialVar_MakeMatrix( const char* pName, const matrix4x4_t& value );
+materialVarInfo_t MaterialVar_MakeString( const char* pName, const char* pValue );
+materialVarInfo_t MaterialVar_MakeTexture( const char* pName, IResource* pValue );
+materialVarInfo_t MaterialVar_MakeMaterial( const char* pName, IResource* pValue );
+
+#include "materialsystem/imaterialvar.inl"

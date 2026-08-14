@@ -85,6 +85,11 @@ CStudioAPIFrameBufferVk::CStudioAPIFrameBufferVk( const studioAPIFrameBufferCrea
 	vkFramebufferCreateInfo.layers					= 1;
 	STUDIOAPI_VK_VERIFY_RESULT( vkCreateFramebuffer( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), &vkFramebufferCreateInfo, NULL, &vkFrameBuffer ) );
 
+	// Set debug name for the frame buffer
+#if !RETAIL
+	VK_SetDebugName( VK_OBJECT_TYPE_FRAMEBUFFER, (uint64)vkFrameBuffer, pDebugName );
+#endif	// !RETAIL
+
 	// Register in 'onStudioAPIVkShutodwn' for destroy Vulkan objects when the one is shutdown
 	onStudioAPIVkShutdownHandle = g_StudioAPIVk.OnStudioAPIVkShutdown().Subscribe( &CStudioAPIFrameBufferVk::OnStudioAPIVkShutdown, this );
 }

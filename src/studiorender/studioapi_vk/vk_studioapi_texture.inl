@@ -159,15 +159,13 @@ CStudioAPITextureVk::GetVkImageView
 FORCEINLINE VkImageView CStudioAPITextureVk::GetVkImageView( bool bDepthOnly, bool bStencilOnly ) const
 {
 	Assert( VK_IsDepthPixelFormat( pixelFormat ) );
-	if ( bDepthOnly )
-	{
-		return vkImageViews[IMAGE_VIEW_INDEX_DEPTH_ONLY];
-	}
-	else if ( bStencilOnly )
-	{
-		return vkImageViews[IMAGE_VIEW_INDEX_STENCIL_ONLY];
-	}
-	return vkImageViews[IMAGE_VIEW_INDEX_DEPTH_AND_STENCIL];
+	uint32 index = bDepthOnly	  ? IMAGE_VIEW_INDEX_DEPTH_ONLY
+				   : bStencilOnly ? IMAGE_VIEW_INDEX_STENCIL_ONLY
+								  : IMAGE_VIEW_INDEX_DEPTH_AND_STENCIL;
+
+	// Formats without a stencil aspect only have the depth-only view
+	VkImageView vkImageView = vkImageViews[index];
+	return vkImageView != VK_NULL_HANDLE ? vkImageView : vkImageViews[IMAGE_VIEW_INDEX_DEPTH_ONLY];
 }
 
 /*

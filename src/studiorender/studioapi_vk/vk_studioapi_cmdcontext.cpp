@@ -195,6 +195,39 @@ void CStudioAPICmdContextVk::SetIndexBuffer( CStudioAPICmdListVk* pCmdList, CStu
 
 /*
 ==================
+CStudioAPICmdContextVk::SetVertexBufferUP
+==================
+*/
+void CStudioAPICmdContextVk::SetVertexBufferUP( CStudioAPICmdListVk* pCmdList, uint32 slot, const byte* pVertexData, uint32 numVertices, uint32 vertexDataStride )
+{
+	// Grab a chunk of the frame's temp memory and copy the caller's vertices into it
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	Assert( pPendingRenderState && pVertexData && numVertices > 0 && vertexDataStride > 0 );
+	uint32		dataSize = numVertices * vertexDataStride;
+	tempAlloc_t alloc	 = g_StudioAPIVk.GetTempAlloc().Alloc( dataSize, CStudioAPIMemoryMgrVk::GetBufferAlignmentFromVkUsageFlags( VK_BUFFER_USAGE_VERTEX_BUFFER_BIT ) );
+	Mem_Memcpy( alloc.pData, pVertexData, dataSize );
+	pPendingRenderState->SetVertexBufferUP( pCmdList, slot, alloc.vkBuffer, alloc.offset );
+}
+
+/*
+==================
+CStudioAPICmdContextVk::SetIndexBufferUP
+==================
+*/
+void CStudioAPICmdContextVk::SetIndexBufferUP( CStudioAPICmdListVk* pCmdList, const byte* pIndexData, uint32 numIndices, uint32 indexDataStride )
+{
+	// Grab a chunk of the frame's temp memory and copy the caller's indices into it
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	Assert( pPendingRenderState && pIndexData && numIndices > 0 );
+	AssertMsg( indexDataStride == sizeof( uint16 ) || indexDataStride == sizeof( uint32 ), "An index stride must be sizeof( uint16 ) or sizeof( uint32 ), got %i", indexDataStride );
+	uint32		dataSize = numIndices * indexDataStride;
+	tempAlloc_t alloc	 = g_StudioAPIVk.GetTempAlloc().Alloc( dataSize, CStudioAPIMemoryMgrVk::GetBufferAlignmentFromVkUsageFlags( VK_BUFFER_USAGE_INDEX_BUFFER_BIT ) );
+	Mem_Memcpy( alloc.pData, pIndexData, dataSize );
+	pPendingRenderState->SetIndexBufferUP( pCmdList, alloc.vkBuffer, alloc.offset, indexDataStride == sizeof( uint32 ) ? VK_INDEX_TYPE_UINT32 : VK_INDEX_TYPE_UINT16 );
+}
+
+/*
+==================
 CStudioAPICmdContextVk::SetConstantBuffer
 ==================
 */
@@ -202,6 +235,17 @@ void CStudioAPICmdContextVk::SetConstantBuffer( CStudioAPICmdListVk* pCmdList, u
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	pPendingRenderState->SetConstantBuffer( pCmdList, set, slot, pConstantBuffer );
+}
+
+/*
+==================
+CStudioAPICmdContextVk::SetPushConstants
+==================
+*/
+void CStudioAPICmdContextVk::SetPushConstants( CStudioAPICmdListVk* pCmdList, byte* pData, uint32 dataSize )
+{
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	pPendingRenderState->SetPushConstants( pCmdList, pData, dataSize );
 }
 
 /*

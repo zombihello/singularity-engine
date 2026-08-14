@@ -132,7 +132,7 @@ bool CSENTSourceEntityDescDoc::LoadFromFile( const char* pPath )
 			case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_2D: sentEntityDescVar.SetVec2Value( S_VectorFromString<vector2_t>( itParameter->GetString( NULL ) ) ); break;
 			case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_3D: sentEntityDescVar.SetVec3Value( S_VectorFromString<vector3_t>( itParameter->GetString( NULL ) ) ); break;
 			case SENT_ENTITY_DESC_VAR_TYPE_VECTOR_4D: sentEntityDescVar.SetVec4Value( S_VectorFromString<vector4_t>( itParameter->GetString( NULL ) ) ); break;
-			case SENT_ENTITY_DESC_VAR_TYPE_MATRIX: sentEntityDescVar.SetMatrixValue( S_MatrixFromString( itParameter->GetString( NULL ) ) ); break;
+			case SENT_ENTITY_DESC_VAR_TYPE_MATRIX: sentEntityDescVar.SetMatrixValue( S_MatrixFromString<matrix4x4_t>( itParameter->GetString( NULL ) ) ); break;
 			case SENT_ENTITY_DESC_VAR_TYPE_STRING: sentEntityDescVar.SetStringValue( itParameter->GetString( NULL ) ); break;
 			default:
 				Error( "SENTTDoc: Invalid SENT, unknown SENT value type '%s' in '%s/%s' (file: '%s')", ConvSENTEntityVarTypeToText( sentEntityDescVarType ), itComponent->GetName(), itParameter->GetName(), pPath );

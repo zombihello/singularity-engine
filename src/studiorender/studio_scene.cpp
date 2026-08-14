@@ -60,6 +60,11 @@ void CStudioScene::UpdateEntity( studioEntityId_t id, const studioEntityParams_t
 	{
 		studioEntity.params.pModel = params.pModel;
 	}
+
+	if ( studioEntity.params.localToWorld != params.localToWorld )
+	{
+		studioEntity.params.localToWorld = params.localToWorld;
+	}
 }
 
 /*
@@ -95,10 +100,79 @@ void CStudioScene::FindEntityViews( studioSceneView_t* pSceneView ) const
 		const studioEntity_t& entity	  = entities[index];
 		studioEntityView_t*	  pEntityView = (studioEntityView_t*)g_studioFrameAlloc.Alloc( sizeof( studioEntityView_t ) );
 		pEntityView->pEntity			  = (studioEntity_t*)&entity;
-		pEntityView->localToWorld		  = g_matrixIdentity;
+		pEntityView->localToWorld		  = entity.params.localToWorld;
 		pEntityView->pNext				  = pSceneView->pEntityViews;
 		pSceneView->pEntityViews		  = pEntityView;
 	}
+}
+
+/*
+==================
+CStudioScene::AddDebugPrimitivesToSceneView
+==================
+*/
+void CStudioScene::AddDebugPrimitivesToSceneView( studioSceneView_t* pSceneView ) const
+{
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_VISIBILITY );
+	pSceneView->debugPrimitives.resize( debugPrimitives.size() );
+	Mem_Memcpy( pSceneView->debugPrimitives.data(), debugPrimitives.data(), debugPrimitives.size() * sizeof( studioSimplePrimitive_t ) );
+}
+
+/*
+==================
+CStudioScene::Update
+==================
+*/
+void CStudioScene::Update( float deltaSeconds )
+{
+	// Age the debug primitives and drop the expired ones
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	for ( auto it = debugPrimitives.begin(); it != debugPrimitives.end(); )
+	{
+		studioSimplePrimitive_t& debugPrimitive = *it;
+		debugPrimitive.timeToLive -= deltaSeconds;
+		if ( debugPrimitive.timeToLive <= 0.f )
+		{
+			it = debugPrimitives.erase( it );
+		}
+		else
+		{
+			++it;
+		}
+	}
+}
+
+/*
+==================
+CStudioScene::DrawDebugLine
+==================
+*/
+void CStudioScene::DrawDebugLine( const vector3_t& start, const vector3_t& end, const CColor& color, float lifeTime /* = 0.f */, bool bDepthTest /* = true */ )
+{
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	studioSimplePrimitive_t& debugPrimitive = debugPrimitives.emplace_back();
+	debugPrimitive.type						= STUDIO_SIMPLE_PRIMITIVE_TYPE_LINE;
+	debugPrimitive.color					= color;
+	debugPrimitive.timeToLive				= lifeTime;
+	debugPrimitive.bDepthTest				= bDepthTest;
+	debugPrimitive.line.start				= start;
+	debugPrimitive.line.end					= end;
+}
+
+/*
+==================
+CStudioScene::DrawDebugBox
+==================
+*/
+void CStudioScene::DrawDebugBox( const CAABB& aabb, const CColor& color, float lifeTime /* = 0.f */, bool bDepthTest /* = true */ )
+{
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	studioSimplePrimitive_t& debugPrimitive = debugPrimitives.emplace_back();
+	debugPrimitive.type						= STUDIO_SIMPLE_PRIMITIVE_TYPE_BOX;
+	debugPrimitive.color					= color;
+	debugPrimitive.timeToLive				= lifeTime;
+	debugPrimitive.bDepthTest				= bDepthTest;
+	debugPrimitive.box.aabb					= aabb;
 }
 
 /*

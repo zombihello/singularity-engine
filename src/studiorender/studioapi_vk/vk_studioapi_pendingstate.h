@@ -35,7 +35,10 @@ public:
 	void SetScissor( bool bEnable, int32 x, int32 y, uint32 width, uint32 height );
 	void SetVertexBuffer( CStudioAPICmdListVk* pCmdList, uint32 slot, CStudioAPIBufferVk* pBuffer, uint64 offset );
 	void SetIndexBuffer( CStudioAPICmdListVk* pCmdList, CStudioAPIBufferVk* pBuffer, uint64 offset );
+	void SetVertexBufferUP( CStudioAPICmdListVk* pCmdList, uint32 slot, VkBuffer vkBuffer, VkDeviceSize offset );
+	void SetIndexBufferUP( CStudioAPICmdListVk* pCmdList, VkBuffer vkBuffer, VkDeviceSize offset, VkIndexType vkIndexType );
 	void SetConstantBuffer( CStudioAPICmdListVk* pCmdList, uint32 set, uint32 slot, CStudioAPIBufferVk* pConstantBuffer );
+	void SetPushConstants( CStudioAPICmdListVk* pCmdList, byte* pData, uint32 dataSize );
 	void SetTexture( CStudioAPICmdListVk* pCmdList, uint32 set, uint32 slot, CStudioAPITextureVk* pTexture );
 	void SetSampler( CStudioAPICmdListVk* pCmdList, uint32 set, uint32 slot, CStudioAPISamplerVk* pSampler );
 	bool SetRenderPipeline( CStudioAPIRenderPipelineVk* pRenderPipeline, bool bForceReset );
@@ -48,28 +51,40 @@ public:
 private:
 	struct vertexBuffer_t
 	{
-		vertexBuffer_t()
-			: offset( 0 )
-		{
-		}
+		vertexBuffer_t();
+		vertexBuffer_t( VkBuffer vkBuffer, VkDeviceSize offset );
 
 		void Clear();
+		bool IsValid() const;
+		bool operator==( const vertexBuffer_t& right ) const;
+		bool operator!=( const vertexBuffer_t& right ) const;
 
-		CRefPtr<CStudioAPIBufferVk> pBuffer;
-		VkDeviceSize				offset;
+		VkBuffer	 vkBuffer;
+		VkDeviceSize offset;
 	};
 
 	struct indexBuffer_t
 	{
-		indexBuffer_t()
-			: offset( 0 )
-		{
-		}
+		indexBuffer_t();
+		indexBuffer_t( VkBuffer vkBuffer, VkDeviceSize offset, VkIndexType vkIndexType );
 
 		void Clear();
+		bool IsValid() const;
+		bool operator==( const indexBuffer_t& right ) const;
+		bool operator!=( const indexBuffer_t& right ) const;
 
-		CRefPtr<CStudioAPIBufferVk> pBuffer;
-		VkDeviceSize				offset;
+		VkBuffer	 vkBuffer;
+		VkDeviceSize offset;
+		VkIndexType	 vkIndexType;
+	};
+
+	struct pushConstants_t
+	{
+		pushConstants_t();
+		void Clear();
+
+		uint32 size;
+		byte   data[STUDIOAPI_VK_MAX_PUSH_CONSTANT_SIZE];
 	};
 
 	struct descriptorStateCache_t
@@ -89,6 +104,7 @@ private:
 	bool																	  bScissorEnabled;
 	bool																	  bDirtyVertexBuffers;
 	bool																	  bDirtyIndexBuffer;
+	bool																	  bDirtyPushConstants;
 	VkViewport																  vkViewport;
 	VkRect2D																  vkScissor;
 	CStudioAPICmdContextVk&													  cmdContext;
@@ -96,6 +112,7 @@ private:
 	CStudioAPIDescriptorStateRenderVk*										  pCurrentRenderDescriptorState;
 	indexBuffer_t															  indexBuffer;
 	vertexBuffer_t															  vertexBuffers[STUDIOAPI_VK_MAX_VERTEX_ELEMENT_COUNT];
+	pushConstants_t															  pushConstants;
 	eastl::unordered_map<CStudioAPIRenderPipelineVk*, descriptorStateCache_t> descriptorStatesDict;
 };
 

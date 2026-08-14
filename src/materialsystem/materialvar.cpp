@@ -258,7 +258,7 @@ CMaterialVar::GetMatrixValue
 */
 matrix4x4_t CMaterialVar::GetMatrixValue() const
 {
-	return type == MATERIALVAR_TYPE_MATRIX ? matrixValue : g_matrixIdentity;
+	return type == MATERIALVAR_TYPE_MATRIX ? matrixValue : g_matrix44Identity;
 }
 
 /*

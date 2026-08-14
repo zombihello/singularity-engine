@@ -102,3 +102,33 @@ void CStudioAPIQueueVk::Submit( VkSubmitInfo* pVkSubmitInfos, uint32 numVkSubmit
 	VkFence vkFence = pFence ? pFence->GetVkFence() : VK_NULL_HANDLE;
 	STUDIOAPI_VK_VERIFY_RESULT( vkQueueSubmit( vkQueue, numVkSubmitInfos, pVkSubmitInfos, vkFence ) );
 }
+
+/*
+==================
+VK_GetUsedQueueFamiliesFromVkBufferUsage
+==================
+*/
+void VK_GetUsedQueueFamiliesFromVkBufferUsage( VkBufferUsageFlags vkBufferUsageFlags, uint32& graphicsQueueFamilyIndex, uint32& computeQueueFamilyIndex, uint32& transferQueueFamilyIndex )
+{
+	graphicsQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	computeQueueFamilyIndex	 = VK_QUEUE_FAMILY_IGNORED;
+	transferQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+
+	// Graphics queue family
+	if ( vkBufferUsageFlags & ( VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT ) )
+	{
+		graphicsQueueFamilyIndex = g_StudioAPIVk.GetDevice().GetGraphicsQueue().GetQueueFamilyIndex();
+	}
+
+	// Compute queue family
+	if ( vkBufferUsageFlags & ( VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT ) )
+	{
+		computeQueueFamilyIndex = g_StudioAPIVk.GetDevice().GetComputeQueue().GetQueueFamilyIndex();
+	}
+
+	// Transfer queue family
+	if ( vkBufferUsageFlags & ( VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT ) )
+	{
+		transferQueueFamilyIndex = g_StudioAPIVk.GetDevice().GetTransferQueue().GetQueueFamilyIndex();
+	}
+}

@@ -146,6 +146,11 @@ CStudioAPIRenderPassVk::CStudioAPIRenderPassVk( const studioAPIRenderPassCreateI
 	vkRenderPassCreateInfo.pDependencies		  = vkSubpassDependencies.data();
 	STUDIOAPI_VK_VERIFY_RESULT( vkCreateRenderPass( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), &vkRenderPassCreateInfo, NULL, &vkRenderPass ) );
 
+	// Set debug name for the render pass
+#if !RETAIL
+	VK_SetDebugName( VK_OBJECT_TYPE_RENDER_PASS, (uint64)vkRenderPass, pDebugName );
+#endif	// !RETAIL
+
 	// Register in 'onStudioAPIVkShutodwn' for destroy Vulkan objects when the one is shutdown
 	onStudioAPIVkShutdownHandle = g_StudioAPIVk.OnStudioAPIVkShutdown().Subscribe( &CStudioAPIRenderPassVk::OnStudioAPIVkShutdown, this );
 }

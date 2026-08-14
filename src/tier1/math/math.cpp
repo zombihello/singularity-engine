@@ -14,4 +14,7 @@ const vector3_t	   g_vectorUp( 0.f, 1.f, 0.f );
 const CRotator	   g_rotatorIdentity( 0.f, 0.f, 0.f );
 const CTransform   g_transformIdentity;
 const quaternion_t g_quaternionIdentity( 1.f, 0.f, 0.f, 0.f );
-const matrix4x4_t  g_matrixIdentity( 1.f );
+const matrix3x3_t  g_matrix33Identity( 1.f );
+const matrix3x4_t  g_matrix34Identity( 1.f );
+const matrix4x4_t  g_matrix44Identity( 1.f );
+const matrix4x3_t  g_matrix43Identity( 1.f );

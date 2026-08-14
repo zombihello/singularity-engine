@@ -197,7 +197,7 @@ CColor::ToLinearColor
 */
 FORCEINLINE CLinearColor CColor::ToLinearColor() const
 {
-	return CLinearColor( r / 255, g / 255, b / 255, a / 255 );
+	return CLinearColor( r / 255.f, g / 255.f, b / 255.f, a / 255.f );
 }
 
 /*

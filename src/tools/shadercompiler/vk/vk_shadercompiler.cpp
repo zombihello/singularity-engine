@@ -86,7 +86,7 @@ FORCEINLINE shaderReflectionVarType_t VK_TranslateShaderVarType( const spirv_cro
 
 		if ( type.columns == 4 )
 		{
-			return SHADER_REFLECTION_VAR_TYPE_MAT3;
+			return SHADER_REFLECTION_VAR_TYPE_MAT4;
 		}
 
 		if ( type.vecsize == 1 )
@@ -462,7 +462,7 @@ bool CShaderCompilerBackendVk::GrabReflect( const shaderc::SpvCompilationResult&
 	for ( uint32 storageBufferIdx = 0, numStorageBuffers = (uint32)spirvCrossShaderResources.storage_buffers.size(); storageBufferIdx < numStorageBuffers; ++storageBufferIdx )
 	{
 		// Discard unused buffers
-		const spirv_cross::Resource&					   spirvCrossResource	   = spirvCrossShaderResources.uniform_buffers[storageBufferIdx];
+		const spirv_cross::Resource&					   spirvCrossResource	   = spirvCrossShaderResources.storage_buffers[storageBufferIdx];
 		spirv_cross::SmallVector<spirv_cross::BufferRange> spirvCrossActiveBuffers = spirvCrossCompiler.get_active_buffer_ranges( spirvCrossResource.id );
 		if ( spirvCrossActiveBuffers.empty() )
 		{

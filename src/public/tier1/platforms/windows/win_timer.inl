@@ -7,8 +7,8 @@ CTimerWindows::CTimerWindows
 */
 FORCEINLINE CTimerWindows::CTimerWindows()
 	: ticksPerSecond( 0 )
-	, secondsPerTick( 0.f )
-	, startSecondsNegated( 0.f )
+	, secondsPerTick( 0.0 )
+	, startSecondsNegated( 0.0 )
 {
 	LARGE_INTEGER frequency;
 	QueryPerformanceFrequency( &frequency );
@@ -25,7 +25,9 @@ CTimerWindows::Reset
 */
 FORCEINLINE void CTimerWindows::Reset()
 {
-	startSecondsNegated = -GetSeconds();
+	uint64 ticks = 0;
+	GetTicks( ticks );
+	startSecondsNegated = -( ticks * secondsPerTick );
 }
 
 /*

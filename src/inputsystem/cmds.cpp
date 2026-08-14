@@ -16,7 +16,7 @@ CONSOLE_COMMAND( bind, "Bind a key", CMD_FLAG_NONE )
 	}
 
 	// Get button code by name
-	buttonCode_t buttonCode = g_inputSystem.GetButtonCodeByName( args.Argv( 1 ) );
+	buttonCode_t buttonCode = g_inputSystem.GetButtonByName( args.Argv( 1 ) );
 
 	// Do nothing if button isn't valid
 	if ( buttonCode == BUTTON_CODE_NONE )
@@ -45,7 +45,7 @@ CONSOLE_COMMAND( unbind, "Unbind a key", CMD_FLAG_NONE )
 	}
 
 	// Get button code by name
-	buttonCode_t buttonCode = g_inputSystem.GetButtonCodeByName( args.Argv( 1 ) );
+	buttonCode_t buttonCode = g_inputSystem.GetButtonByName( args.Argv( 1 ) );
 
 	// Do nothing if button isn't valid
 	if ( buttonCode == BUTTON_CODE_NONE )

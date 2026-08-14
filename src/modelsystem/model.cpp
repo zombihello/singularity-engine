@@ -3,8 +3,6 @@
 #include "resourcesystem/iresourcesystem.h"
 #include "resourcesystem/iresourcetypemgr.h"
 #include "materialsystem/imaterial.h"
-#include "modelsystem/vertexfactory_simple.h"
-#include "modelsystem/vertexfactory_static.h"
 #include "modelsystem/modelsystem.h"
 #include "modelsystem/model.h"
 
@@ -25,8 +23,9 @@ static_assert( ARRAYSIZE( s_strideIndexType ) == MODEL_INDEX_NUM_TYPES, "Array s
 CModelResource::CModelResource
 ==================
 */
-CModelResource::CModelResource()
-	: indexType( MODEL_INDEX_NUM_TYPES )
+CModelResource::CModelResource( const char* pDebugName /* = "" */ )
+	: CDebugNamed<CRefCounted<IModelResource>>( pDebugName )
+	, indexType( MODEL_INDEX_NUM_TYPES )
 {
 }
 
@@ -48,22 +47,15 @@ void CModelResource::Update( const modelInitialData_t& initialData )
 	bool bDirtyVertexFactory = false;
 	if ( !pVertexFactory || pVertexFactory->GetVertexType() != initialData.vertexType )
 	{
-		// If the old vertex factory is valid begin release one in the render thread
+		// If the old vertex factory is valid shutdown one
 		bDirtyVertexFactory = true;
 		if ( pVertexFactory )
 		{
-			Studio_BeginReleaseResource( pVertexFactory );
+			pVertexFactory->Shutdown();
 		}
 
 		// Create a new vertex factory for the vertex type
-		switch ( initialData.vertexType )
-		{
-		case MODEL_VERTEXTYPE_SIMPLE: pVertexFactory = new CVertexFactorySimple(); break;
-		case MODEL_VERTEXTYPE_STATIC: pVertexFactory = new CVertexFactoryStatic(); break;
-		default:
-			AssertMsg( false, "Unknown vertex type 0x%X", initialData.vertexType );
-			break;
-		}
+		pVertexFactory = g_modelSystem.CreateVertexFactory( initialData.vertexType, GetDebugName() );
 	}
 	pVertexFactory->ClearStreams();
 
@@ -78,10 +70,10 @@ void CModelResource::Update( const modelInitialData_t& initialData )
 	// Copy materials
 	UpdateMaterials( initialData.pMaterials, initialData.numMaterials );
 
-	// Begin update the vertex factory (if it need) and the resource in the render thread
+	// Initialize the vertex factory (if it need) and the resource in the render thread
 	if ( bDirtyVertexFactory )
 	{
-		Studio_BeginUpdateResource( pVertexFactory );
+		pVertexFactory->Init();
 	}
 	Studio_BeginUpdateResource( this );
 }
@@ -119,11 +111,11 @@ void CModelResource::Clear()
 	materials.clear();
 	surfaces.clear();
 
-	// Begin release the resource and the vertex factory (if it exists) in the render thread
+	// Begin release the resource in the render thread and shutdown the vertex factory (if it exists)
 	Studio_BeginReleaseResource( this );
 	if ( pVertexFactory )
 	{
-		Studio_BeginReleaseResource( pVertexFactory );
+		pVertexFactory->Shutdown();
 		pVertexFactory = NULL;
 	}
 }
@@ -139,13 +131,13 @@ void CModelResource::InitStudioAPI()
 	Assert( pVertexFactory );
 	Assert( !vertices.empty() );
 	modelVertexType_t vertexType = pVertexFactory->GetVertexType();
-	pStudioAPIVertexBuffer		 = g_pStudioAPI->CreateBuffer( vertices.data(), (uint32)vertices.size(), s_strideVertexType[vertexType], STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_VERTEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
+	pStudioAPIVertexBuffer		 = g_pStudioAPI->CreateBuffer( vertices.data(), (uint32)vertices.size(), s_strideVertexType[vertexType], STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_VERTEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST, GetDebugName() );
 	pVertexFactory->AddVertexStream( vertexFactoryStream_t{ pStudioAPIVertexBuffer, 0 } );
 	vertices.clear();
 
 	// Create a GPU index buffer and set a index stream into the vertex factory
 	Assert( !indices.empty() );
-	pStudioAPIIndexBuffer = g_pStudioAPI->CreateBuffer( indices.data(), (uint32)indices.size(), s_strideIndexType[indexType], STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_INDEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
+	pStudioAPIIndexBuffer = g_pStudioAPI->CreateBuffer( indices.data(), (uint32)indices.size(), s_strideIndexType[indexType], STUDIOAPI_BUFFER_USAGE_FLAG_STATIC | STUDIOAPI_BUFFER_USAGE_FLAG_INDEX_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST, GetDebugName() );
 	pVertexFactory->SetIndexStream( vertexFactoryStream_t{ pStudioAPIIndexBuffer, 0 } );
 	indices.clear();
 }
@@ -236,7 +228,7 @@ CModel::CModel
 CModel::CModel( IResource* pResource )
 	: CResourceData<IModel>( pResource )
 	, bDirtyMaterials( false )
-	, pStudioResource( new CModelResource() )
+	, pStudioResource( new CModelResource( pResource->GetName() ) )
 {
 }
 

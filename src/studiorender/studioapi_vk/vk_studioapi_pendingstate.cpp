@@ -35,6 +35,7 @@ CStudioAPIPendingRenderStateVk::CStudioAPIPendingRenderStateVk( CStudioAPICmdCon
 	: bScissorEnabled( false )
 	, bDirtyVertexBuffers( false )
 	, bDirtyIndexBuffer( false )
+	, bDirtyPushConstants( false )
 	, cmdContext( cmdContext )
 	, pCurrentRenderPipeline( NULL )
 	, pCurrentRenderDescriptorState( NULL )
@@ -71,7 +72,9 @@ void CStudioAPIPendingRenderStateVk::Reset()
 	bScissorEnabled				  = false;
 	bDirtyVertexBuffers			  = false;
 	bDirtyIndexBuffer			  = false;
+	bDirtyPushConstants			  = false;
 	indexBuffer.Clear();
+	pushConstants.Clear();
 
 	for ( uint32 index = 0; index < ARRAYSIZE( vertexBuffers ); ++index )
 	{
@@ -89,16 +92,38 @@ CStudioAPIPendingRenderStateVk::SetVertexBuffer
 void CStudioAPIPendingRenderStateVk::SetVertexBuffer( CStudioAPICmdListVk* pCmdList, uint32 slot, CStudioAPIBufferVk* pBuffer, uint64 offset )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	Assert( slot < ARRAYSIZE( vertexBuffers ) );
 	vertexBuffer_t& vertexBuffer = vertexBuffers[slot];
-	if ( vertexBuffer.pBuffer != pBuffer || vertexBuffer.offset != offset || vertexBuffer.pBuffer->GetVkBuffer() != pBuffer->GetVkBuffer() || vertexBuffer.pBuffer->GetOffset() != pBuffer->GetOffset() )
+	vertexBuffer_t	newVertexBuffer( pBuffer->GetVkBuffer(), (VkDeviceSize)( pBuffer->GetOffset() + offset ) );
+	if ( vertexBuffer != newVertexBuffer )
 	{
 		// Update a synchronization state of the buffer
 		pBuffer->UpdateSyncState( VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT, VK_PIPELINE_STAGE_VERTEX_INPUT_BIT, cmdContext.GetQueue().GetQueueFamilyIndex() );
 
 		// Update the vertex buffer state
-		vertexBuffers[slot].pBuffer = pBuffer;
-		vertexBuffers[slot].offset	= (VkDeviceSize)offset;
-		bDirtyVertexBuffers			= true;
+		vertexBuffer		= newVertexBuffer;
+		bDirtyVertexBuffers = true;
+	}
+}
+
+/*
+==================
+CStudioAPIPendingRenderStateVk::SetVertexBufferUP
+==================
+*/
+void CStudioAPIPendingRenderStateVk::SetVertexBufferUP( CStudioAPICmdListVk* pCmdList, uint32 slot, VkBuffer vkBuffer, VkDeviceSize offset )
+{
+	// The temp memory is host-written and persistently mapped, so there is no buffer object to track
+	// a synchronization state on
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	Assert( slot < ARRAYSIZE( vertexBuffers ) );
+	vertexBuffer_t& vertexBuffer = vertexBuffers[slot];
+	vertexBuffer_t	newVertexBuffer( vkBuffer, offset );
+	if ( vertexBuffer != newVertexBuffer )
+	{
+		// Update the vertex buffer state
+		vertexBuffer		= newVertexBuffer;
+		bDirtyVertexBuffers = true;
 	}
 }
 
@@ -110,15 +135,34 @@ CStudioAPIPendingRenderStateVk::SetIndexBuffer
 void CStudioAPIPendingRenderStateVk::SetIndexBuffer( CStudioAPICmdListVk* pCmdList, CStudioAPIBufferVk* pBuffer, uint64 offset )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-	if ( indexBuffer.pBuffer != pBuffer || indexBuffer.offset != offset || indexBuffer.pBuffer->GetVkBuffer() != pBuffer->GetVkBuffer() || indexBuffer.pBuffer->GetOffset() != pBuffer->GetOffset() )
+	indexBuffer_t newIndexBuffer( pBuffer->GetVkBuffer(), (VkDeviceSize)( pBuffer->GetOffset() + offset ), pBuffer->GetVkIndexType() );
+	if ( indexBuffer != newIndexBuffer )
 	{
 		// Update a synchronization state of the buffer
 		pBuffer->UpdateSyncState( VK_ACCESS_INDEX_READ_BIT, VK_PIPELINE_STAGE_VERTEX_INPUT_BIT, cmdContext.GetQueue().GetQueueFamilyIndex() );
 
 		// Update the index buffer state
-		indexBuffer.pBuffer = pBuffer;
-		indexBuffer.offset	= (VkDeviceSize)offset;
-		bDirtyIndexBuffer	= true;
+		indexBuffer		  = newIndexBuffer;
+		bDirtyIndexBuffer = true;
+	}
+}
+
+/*
+==================
+CStudioAPIPendingRenderStateVk::SetIndexBufferUP
+==================
+*/
+void CStudioAPIPendingRenderStateVk::SetIndexBufferUP( CStudioAPICmdListVk* pCmdList, VkBuffer vkBuffer, VkDeviceSize offset, VkIndexType vkIndexType )
+{
+	// The temp memory is host-written and persistently mapped, so there is no buffer object to track
+	// a synchronization state on
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	indexBuffer_t newIndexBuffer( vkBuffer, offset, vkIndexType );
+	if ( indexBuffer != newIndexBuffer )
+	{
+		// Update the index buffer state
+		indexBuffer		  = newIndexBuffer;
+		bDirtyIndexBuffer = true;
 	}
 }
 
@@ -239,15 +283,29 @@ CStudioAPIPendingRenderStateVk::PrepareForDraw
 */
 void CStudioAPIPendingRenderStateVk::PrepareForDraw( CStudioAPICmdListVk* pCmdList )
 {
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-
 	// Update dynamic states
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	UpdateDynamicStates( pCmdList );
 
 	// Update descriptor sets and bind it
 	if ( pCurrentRenderDescriptorState->UpdateDescriptorSets( pCmdList ) )
 	{
 		pCurrentRenderDescriptorState->BindDescriptorSets( pCmdList );
+	}
+
+	// Push constants if the bound pipeline layout does declare a push-constant range
+	if ( bDirtyPushConstants )
+	{
+		const CStudioAPIDescriptorSetsLayoutVk&	  descriptorSetsLayout = pCurrentRenderPipeline->GetBoundShaderState()->GetDescriptorSetsLayout();
+		const eastl::vector<VkPushConstantRange>& vkPushConstantRanges = descriptorSetsLayout.GetVkPushConstantRanges();
+		for ( uint32 index = 0, count = (uint32)vkPushConstantRanges.size(); index < count; ++index )
+		{
+			const VkPushConstantRange& vkPushConstantRange = vkPushConstantRanges[index];
+			Assert( vkPushConstantRange.offset + vkPushConstantRange.size <= pushConstants.size );
+			vkCmdPushConstants( pCmdList->GetCmdBuffer()->GetVkCommandBuffer(), descriptorSetsLayout.GetVkPipelineLayout(), vkPushConstantRange.stageFlags, vkPushConstantRange.offset, vkPushConstantRange.size, pushConstants.data + vkPushConstantRange.offset );
+		}
+
+		bDirtyPushConstants = false;
 	}
 
 	// Update vertex buffers if it need
@@ -259,11 +317,11 @@ void CStudioAPIPendingRenderStateVk::PrepareForDraw( CStudioAPICmdListVk* pCmdLi
 		for ( uint32 index = 0; index < STUDIOAPI_VK_MAX_VERTEX_ELEMENT_COUNT; ++index )
 		{
 			// Verify the vertex buffer is set
-			const vertexBuffer_t vertexBuffer = vertexBuffers[index];
-			if ( vertexBuffer.pBuffer )
+			const vertexBuffer_t& vertexBuffer = vertexBuffers[index];
+			if ( vertexBuffer.IsValid() )
 			{
-				vkVertexBuffers[numUsedSlots] = vertexBuffer.pBuffer->GetVkBuffer();
-				vkVertexOffsets[numUsedSlots] = vertexBuffer.pBuffer->GetOffset() + vertexBuffer.offset;
+				vkVertexBuffers[numUsedSlots] = vertexBuffer.vkBuffer;
+				vkVertexOffsets[numUsedSlots] = vertexBuffer.offset;
 				++numUsedSlots;
 			}
 		}
@@ -283,7 +341,7 @@ void CStudioAPIPendingRenderStateVk::PrepareForDraw( CStudioAPICmdListVk* pCmdLi
 	// Update index buffer if it need
 	if ( bDirtyIndexBuffer )
 	{
-		vkCmdBindIndexBuffer( pCmdList->GetCmdBuffer()->GetVkCommandBuffer(), indexBuffer.pBuffer->GetVkBuffer(), indexBuffer.pBuffer->GetOffset(), indexBuffer.pBuffer->GetVkIndexType() );
+		vkCmdBindIndexBuffer( pCmdList->GetCmdBuffer()->GetVkCommandBuffer(), indexBuffer.vkBuffer, indexBuffer.offset, indexBuffer.vkIndexType );
 		bDirtyIndexBuffer = false;
 	}
 }

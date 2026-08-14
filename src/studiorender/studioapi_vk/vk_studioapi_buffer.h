@@ -44,6 +44,7 @@ public:
 	// a buffer barrier if it need. Useful for transfer ownership and
 	void UpdateSyncStateWithBarrier( CStudioAPICmdListVk* pCmdList, VkAccessFlags vkDstAccessMask, VkPipelineStageFlags vkDstStageMask, uint32 dstQueueFamilyIndex );
 
+	void PrepareForGPUWrite();
 	void SwapCurrentBufferIndex();
 
 	uint64								GetOffset() const;
@@ -52,8 +53,19 @@ public:
 	const studioAPISyncStateBufferVk_t& GetSyncState() const;
 
 private:
+	struct bufferAlloc_t
+	{
+		VkBuffer	  vkBuffer;
+		VmaAllocation vmaAllocation;
+		byte*		  pData;
+		uint64		  offset;
+		uint64		  frameNumber;
+	};
+
 	static void	  OnStudioAPIVkShutdown( void* pUserData );
 	static uint32 GetNumBuffersFromUsage( uint32 usageFlags );
+	void		  AllocFromTempAlloc();
+	bool		  IsValidAlloc() const;
 
 	uint32							 usageFlags;
 	uint8							 memoryFlags;
@@ -61,9 +73,7 @@ private:
 	uint32							 stride;
 	uint8							 numBuffers;
 	uint8							 currentBufferIndex;
-	uint64							 bufferOffsets[NUM_BUFFERS];
-	VkBuffer						 vkBuffer;
-	VmaAllocation					 vmaAllocation;
+	bufferAlloc_t					 alloc;
 	studioAPISyncStateBufferVk_t	 syncState;
 	COnStudioAPIVkShutdown::handle_t onStudioAPIVkShutdownHandle;
 };

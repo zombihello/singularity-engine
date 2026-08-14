@@ -10,7 +10,6 @@ CStudioAPIBoundShaderStateKeyVk::CStudioAPIBoundShaderStateKeyVk
 CStudioAPIBoundShaderStateKeyVk::CStudioAPIBoundShaderStateKeyVk( CStudioAPIVertexDeclarationVk* pVertexDeclaration, CStudioAPIVertexShaderVk* pVertexShader, CStudioAPIPixelShaderVk* pPixelShader, CStudioAPIHullShaderVk* pHullShader /* = NULL */, CStudioAPIDomainShaderVk* pDomainShader /* = NULL */, CStudioAPIGeometryShaderVk* pGeometryShader /* = NULL */ )
 	: hash( 0 )
 {
-	Assert( pVertexDeclaration );
 	hash = FastHash( pVertexDeclaration );
 	hash = FastHash( pVertexShader, hash );
 	hash = FastHash( pPixelShader, hash );

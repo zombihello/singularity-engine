@@ -128,7 +128,7 @@ bool CMaterialSystem::Init()
 		studioAPISamplerInfo.maxLod						  = S_MaxValue<float>();
 
 		pDefaultTexture = pTexturesMgr->CreateResource( "__default" );
-		pDefaultTexture->Init( STUDIOAPI_TEXTURE_TYPE_2D, STUDIOAPI_PIXEL_FORMAT_RGBA8, 1, &mipmap0, 1, studioAPISamplerInfo, data, ARRAYSIZE( data ) );
+		pDefaultTexture->Init( STUDIOAPI_TEXTURE_TYPE_2D, STUDIOAPI_PIXEL_FORMAT_RGBA8, 1, &mipmap0, 1, STUDIOAPI_TEXTURE_USAGE_FLAG_TEXTURE, studioAPISamplerInfo, data, ARRAYSIZE( data ) );
 	}
 	pTexturesMgr->SetDefaultResource( pDefaultTexture );
 
@@ -136,8 +136,12 @@ bool CMaterialSystem::Init()
 	CResourcePtr<CMaterial> pDefaultMaterial = pMaterialsMgr->LoadResource( "__default", "//core/materials/default" );
 	if ( !pDefaultMaterial )
 	{
-		pDefaultMaterial = pMaterialsMgr->CreateResource( "__default" );
-		pDefaultMaterial->SetShader( "wireframe" );
+		materialInitialData_t defaultMatInitialData = {};
+		defaultMatInitialData.pShaderName			= "wireframe";
+		defaultMatInitialData.numVars				= 0;
+		defaultMatInitialData.pVars					= NULL;
+		pDefaultMaterial							= pMaterialsMgr->CreateResource( "__default" );
+		pDefaultMaterial->Init( defaultMatInitialData );
 	}
 	pMaterialsMgr->SetDefaultResource( pDefaultMaterial );
 	return true;

@@ -41,8 +41,7 @@ public:
 	virtual void Init( uint32 shaderLibIndex ) = 0;
 	virtual void Shutdown()					   = 0;
 
-	virtual const char* GetName() const					= 0;
-	virtual uint32		GetNumShaders() const			= 0;
-	virtual IShader*	GetShader( uint32 index ) const = 0;
-	virtual uint32		GetIndex() const				= 0;
+	virtual uint32	 GetNumShaders() const			 = 0;
+	virtual IShader* GetShader( uint32 index ) const = 0;
+	virtual uint32	 GetIndex() const				 = 0;
 };

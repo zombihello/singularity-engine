@@ -1,5 +1,6 @@
 #include "pch_studioapi_vk.h"
 #include "studiorender/studioapi/istudioapi_barrier.h"
+#include "studiorender/studioapi_vk/vk_studioapi.h"
 #include "studiorender/studioapi_vk/vk_studioapi_cmdcontext.h"
 #include "studiorender/studioapi_vk/vk_studioapi_renderpass.h"
 #include "studiorender/studioapi_vk/vk_studioapi_framebuffer.h"
@@ -186,6 +187,67 @@ void CStudioAPICmdListVk::EndRenderPass()
 
 /*
 ==================
+CStudioAPICmdListVk::BeginEvent
+==================
+*/
+void CStudioAPICmdListVk::BeginEvent( const CColor& color, const char* pName )
+{
+#if !RETAIL
+	if ( g_StudioAPIVk.GetDevice().IsDebug() )
+	{
+		CLinearColor		 linearColor = color.ToLinearColor();
+		VkDebugUtilsLabelEXT vkLabel	 = {};
+		vkLabel.sType					 = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT;
+		vkLabel.pLabelName				 = pName;
+		vkLabel.color[0]				 = linearColor.r;
+		vkLabel.color[1]				 = linearColor.g;
+		vkLabel.color[2]				 = linearColor.b;
+		vkLabel.color[3]				 = linearColor.a;
+		vkCmdBeginDebugUtilsLabelEXT( pCmdBuffer->GetVkCommandBuffer(), &vkLabel );
+	}
+#endif	// !RETAIL
+}
+
+/*
+==================
+CStudioAPICmdListVk::EndEvent
+==================
+*/
+void CStudioAPICmdListVk::EndEvent()
+{
+#if !RETAIL
+	if ( g_StudioAPIVk.GetDevice().IsDebug() )
+	{
+		vkCmdEndDebugUtilsLabelEXT( pCmdBuffer->GetVkCommandBuffer() );
+	}
+#endif	// !RETAIL
+}
+
+/*
+==================
+CStudioAPICmdListVk::InsertMarker
+==================
+*/
+void CStudioAPICmdListVk::InsertMarker( const CColor& color, const char* pName )
+{
+#if !RETAIL
+	if ( g_StudioAPIVk.GetDevice().IsDebug() )
+	{
+		CLinearColor		 linearColor = color.ToLinearColor();
+		VkDebugUtilsLabelEXT vkLabel	 = {};
+		vkLabel.sType					 = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT;
+		vkLabel.pLabelName				 = pName;
+		vkLabel.color[0]				 = linearColor.r;
+		vkLabel.color[1]				 = linearColor.g;
+		vkLabel.color[2]				 = linearColor.b;
+		vkLabel.color[3]				 = linearColor.a;
+		vkCmdInsertDebugUtilsLabelEXT( pCmdBuffer->GetVkCommandBuffer(), &vkLabel );
+	}
+#endif	// !RETAIL
+}
+
+/*
+==================
 CStudioAPICmdListVk::SetRenderPipeline
 ==================
 */
@@ -219,6 +281,28 @@ void CStudioAPICmdListVk::SetIndexBuffer( IStudioAPIBuffer* pIndexBuffer, uint64
 
 /*
 ==================
+CStudioAPICmdListVk::SetVertexBufferUP
+==================
+*/
+void CStudioAPICmdListVk::SetVertexBufferUP( uint32 slot, const byte* pVertexData, uint32 numVertices, uint32 vertexDataStride )
+{
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	pCmdContext->SetVertexBufferUP( this, slot, pVertexData, numVertices, vertexDataStride );
+}
+
+/*
+==================
+CStudioAPICmdListVk::SetIndexBufferUP
+==================
+*/
+void CStudioAPICmdListVk::SetIndexBufferUP( const byte* pIndexData, uint32 numIndices, uint32 indexDataStride )
+{
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	pCmdContext->SetIndexBufferUP( this, pIndexData, numIndices, indexDataStride );
+}
+
+/*
+==================
 CStudioAPICmdListVk::SetConstantBuffer
 ==================
 */
@@ -226,6 +310,17 @@ void CStudioAPICmdListVk::SetConstantBuffer( uint32 set, uint32 slot, IStudioAPI
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	pCmdContext->SetConstantBuffer( this, set, slot, (CStudioAPIBufferVk*)pConstantBuffer );
+}
+
+/*
+==================
+CStudioAPICmdListVk::SetPushConstants
+==================
+*/
+void CStudioAPICmdListVk::SetPushConstants( byte* pData, uint32 dataSize )
+{
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	pCmdContext->SetPushConstants( this, pData, dataSize );
 }
 
 /*
@@ -406,7 +501,8 @@ void CStudioAPICmdListVk::CopyBuffer( IStudioAPIBuffer* pSrcBuffer, uint64 srcOf
 	Assert( pStudioAPISrcBuffer->GetUsageFlags() & STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_SRC );
 	Assert( pStudioAPIDstBuffer->GetUsageFlags() & STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST );
 
-	// Flush all pending barriers before copy
+	// Prepare the destination buffer for GPU write and flush all pending barriers before copy
+	pStudioAPIDstBuffer->PrepareForGPUWrite();
 	pCmdContext->FlushPendingBarriers( this );
 
 	VkBufferCopy vkBufferCopy = {};
@@ -475,7 +571,8 @@ void CStudioAPICmdListVk::CopyTextureToBuffer( IStudioAPITexture* pSrcTexture, u
 	Assert( pStudioAPISrcTexture->GetUsageFlags() & STUDIOAPI_TEXTURE_USAGE_FLAG_TRANSFER_DST );
 	Assert( pStudioAPIDstBuffer->GetUsageFlags() & STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_SRC );
 
-	// Flush all pending barriers before copy
+	// Prepare the destination buffer for GPU write and flush all pending barriers before copy
+	pStudioAPIDstBuffer->PrepareForGPUWrite();
 	pCmdContext->FlushPendingBarriers( this );
 
 	VkBufferImageCopy vkBufferImageCopy				  = {};

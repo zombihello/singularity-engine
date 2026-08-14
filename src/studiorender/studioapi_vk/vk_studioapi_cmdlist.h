@@ -41,11 +41,18 @@ public:
 	virtual void SetRenderPipeline( IStudioAPIRenderPipeline* pRenderPipeline ) override;
 	virtual void SetVertexBuffer( uint32 slot, IStudioAPIBuffer* pVertexBuffer, uint64 offset ) override;
 	virtual void SetIndexBuffer( IStudioAPIBuffer* pIndexBuffer, uint64 offset ) override;
+	virtual void SetVertexBufferUP( uint32 slot, const byte* pVertexData, uint32 numVertices, uint32 vertexDataStride ) override;
+	virtual void SetIndexBufferUP( const byte* pIndexData, uint32 numIndices, uint32 indexDataStride ) override;
 	virtual void SetConstantBuffer( uint32 set, uint32 slot, IStudioAPIBuffer* pConstantBuffer ) override;
+	virtual void SetPushConstants( byte* pData, uint32 dataSize ) override;
 	virtual void SetTexture( uint32 set, uint32 slot, IStudioAPITexture* pTexture ) override;
 	virtual void SetSampler( uint32 set, uint32 slot, IStudioAPISampler* pSampler ) override;
 	virtual void SetViewport( float minX, float minY, float minZ, float maxX, float maxY, float maxZ ) override;
 	virtual void SetScissor( int32 x, int32 y, uint32 width, uint32 height ) override;
+
+	virtual void BeginEvent( const CColor& color, const char* pName ) override;
+	virtual void EndEvent() override;
+	virtual void InsertMarker( const CColor& color, const char* pName ) override;
 
 	virtual void Draw( uint32 baseVertexIndex, uint32 numVertices, uint32 numInstances = 1 ) override;
 	virtual void DrawIndexed( uint32 baseVertexIndex, uint32 baseIndex, uint32 numIndices, uint32 numInstances = 1 ) override;

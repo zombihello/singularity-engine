@@ -39,11 +39,16 @@ CStudioAPISyncMgrVk::Shutdown
 void CStudioAPISyncMgrVk::Shutdown()
 {
 	// Release all named semaphores
+	// NOTE: We can't use `ReleaseNamedSemaphore` here, because the one erases a named semaphore from
+	// `namedSemaphoresDict` and it invalidates the iterator which we walk
 	for ( auto it = namedSemaphoresDict.begin(), itEnd = namedSemaphoresDict.end(); it != itEnd; ++it )
 	{
-		ReleaseNamedSemaphore( it->second );
+		CStudioAPINamedSemaphoreVk* pNamedSemaphore = it->second;
+		AssertMsg( pNamedSemaphore->countReferences == 1, "Named semaphore '%s' at shutdown of the manager mustn't have any references (countReferences: %i)",
+				   pNamedSemaphore->name.c_str(), pNamedSemaphore->countReferences );
+		FreeNamedSemaphore( pNamedSemaphore );
 	}
-	AssertMsg( namedSemaphoresDict.empty(), "All named semaphores at shutdown of the manager mustn't have any references" );
+	namedSemaphoresDict.clear();
 
 	// Wait all frames in-flight
 	WaitAllFrameInFlights();
@@ -63,7 +68,6 @@ void CStudioAPISyncMgrVk::Shutdown()
 		delete *it;
 	}
 	freeSemaphores.clear();
-	namedSemaphoresDict.clear();
 }
 
 /*
@@ -162,6 +166,7 @@ CStudioAPISyncMgrVk::ReleaseFence
 void CStudioAPISyncMgrVk::ReleaseFence( CStudioAPIFenceVk*& pFence )
 {
 	// Remove the fence from the used list
+	Assert( pFence != NULL );
 	fences.remove( pFence );
 
 	// Add the fence into the pending list to release
@@ -198,20 +203,41 @@ void CStudioAPISyncMgrVk::ReleaseNamedSemaphore( CStudioAPINamedSemaphoreVk*& pN
 {
 	// Do nothing if a named semaphore has any references
 	// In the case decrease reference count
+	Assert( pNamedSemaphore != NULL );
 	if ( pNamedSemaphore->countReferences > 1 )
 	{
 		--pNamedSemaphore->countReferences;
+		pNamedSemaphore = NULL;
 		return;
 	}
 
+	// Remove it from the dictionary while the name is still alive, after that free the named semaphore
+	namedSemaphoresDict.erase( pNamedSemaphore->name );
+	FreeNamedSemaphore( pNamedSemaphore );
+
+	// Reset the pointer
+	pNamedSemaphore = NULL;
+}
+
+/*
+==================
+CStudioAPISyncMgrVk::FreeNamedSemaphore
+==================
+*/
+void CStudioAPISyncMgrVk::FreeNamedSemaphore( CStudioAPINamedSemaphoreVk* pNamedSemaphore )
+{
 	// Add to the pending list to release each semaphore
+	Assert( pNamedSemaphore != NULL );
 	for ( uint32 index = 0; index < STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT; ++index )
 	{
-		pendingFreeSemaphores[index].emplace_back( pNamedSemaphore->pSemaphores[index] );
+		CStudioAPISemaphoreVk* pSemaphore = pNamedSemaphore->pSemaphores[index];
+		Assert( pSemaphore != NULL );
+		semaphores.remove( pSemaphore );
+		pendingFreeSemaphores[index].emplace_back( pSemaphore );
 	}
 
-	// Remove it from the dictionary
-	namedSemaphoresDict.erase( pNamedSemaphore->name );
+	// Destroy the named semaphore
+	delete pNamedSemaphore;
 }
 
 /*

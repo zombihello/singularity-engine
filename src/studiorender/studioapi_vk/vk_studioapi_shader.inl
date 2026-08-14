@@ -12,6 +12,17 @@ FORCEINLINE const VkPipelineVertexInputStateCreateInfo& CStudioAPIVertexDeclarat
 
 /*
 ==================
+CStudioAPIVertexDeclarationVk::GetVkEmptyPipelineVertexInputStateInfo
+==================
+*/
+FORCEINLINE const VkPipelineVertexInputStateCreateInfo& CStudioAPIVertexDeclarationVk::GetVkEmptyPipelineVertexInputStateInfo()
+{
+	static VkPipelineVertexInputStateCreateInfo s_vkEmptyPipelineVertexInputStateCreateInfo = { VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO, NULL, 0, 0, NULL, 0, NULL };
+	return s_vkEmptyPipelineVertexInputStateCreateInfo;
+}
+
+/*
+==================
 CStudioAPIShaderVk::GetVkShaderModule
 ==================
 */

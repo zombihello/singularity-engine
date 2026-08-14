@@ -26,6 +26,7 @@ public:
 	const VkPhysicalDeviceProperties&		GetVkDeviceInfo() const;
 	const VkPhysicalDeviceLimits&			GetVkDeviceLimits() const;
 	studioAPIGPUVendorId_t					GetGPUVendorId() const;
+	bool									IsDebug() const;
 
 private:
 	struct queueFamilyIndices_t
@@ -65,6 +66,7 @@ private:
 	VkPhysicalDeviceProperties		 vkDeviceInfo;
 	studioAPIGPUVendorId_t			 gpuVendorId;
 #if !RETAIL
+	bool					 bDebug;
 	VkDebugUtilsMessengerEXT vkDebugMessenger;
 #endif	// !RETAIL
 };

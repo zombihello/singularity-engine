@@ -1,6 +1,7 @@
 #include <EASTL/unordered_set.h>
 
 #include "tier0/icommandline.h"
+#include "tier1/timer.h"
 #include "appframework/application.h"
 #include "appframework/appsystemgroup_windowmgr.h"
 #include "studiorender/istudio_viewport.h"
@@ -52,6 +53,7 @@ private:
 
 	bool					 bInFocus;
 	const char*				 pDefaultGameDir;
+	CTimer					 frameTimer;
 	CAppSystemGroupWindowMgr windowMgrSystemGroup;
 	CAppSystemGroupEngine	 engineSystemGroup;
 	CAppSystemGroupGame		 gameSystemGroup;
@@ -262,11 +264,17 @@ int32 CLauncherApp::Main()
 #if ENABLE_PROFILING
 	IProfiler* pProfiler = Profiler();
 #endif	// ENABLE_PROFILING
+	double lastFrameSeconds = frameTimer.GetSeconds();
 	while ( !Sys_IsRequestingExit() )
 	{
 		// Process window events
 		PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
 		g_pWindowMgr->ProcessEvents();
+
+		// Compute the frame's delta time
+		double currentFrameSeconds = frameTimer.GetSeconds();
+		float  deltaTime		   = (float)( currentFrameSeconds - lastFrameSeconds );
+		lastFrameSeconds		   = currentFrameSeconds;
 
 		// Skip the frame if it need
 		bool bSkipFrame = !bInFocus;
@@ -286,12 +294,14 @@ int32 CLauncherApp::Main()
 		pProfiler->Update();
 #endif	// ENABLE_PROFILING
 
-		// Update the resource system and the game
-		g_pResourceSystem->FrameUpdate();
-		g_pGame->FrameUpdate( 0.f );
-
 		// Execute pending commands
 		g_pCmdSystem->ExecuteCommands();
+
+		// Update systems and the game
+		g_pResourceSystem->FrameUpdate();
+		g_pGame->FrameUpdate( deltaTime );
+		pStudioViewport->Update( deltaTime );
+		g_pInputSystem->FrameUpdate( deltaTime );
 
 		// Flush render commands and draw the frame
 		Studio_FlushRenderCommands();

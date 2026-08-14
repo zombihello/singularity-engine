@@ -6,7 +6,8 @@
 #include "materialsystem/imaterialvar.h"
 #include "modelsystem/modeltypes.h"
 #include "resourcesystem/iresourcesystem.h"
-#include "game/shared/game.h"
+#include "game/shared/basegame.h"
+#include "game/shared/baseplayer.h"
 #include "game/ientity.h"
 #include "game/ientitydesc.h"
 #include "game/imap.h"
@@ -18,7 +19,7 @@
 //-----------------------------------------------------------------------------
 // Citadel game
 //-----------------------------------------------------------------------------
-class CCitadelGame : public CGame
+class CCitadelGame : public CBaseGame
 {
 public:
 	// IAppSystem interfaces
@@ -35,7 +36,7 @@ public:
 };
 
 EXPOSE_INTERFACE_FN( Game, IGame, GAME_INTERFACE_VERSION );
-EXPOSE_SINGLE_INTERFACE( CGameAppSystems, IGameAppSystems, GAME_APPSYSTEMS_INTERFACE_VERSION );
+EXPOSE_SINGLE_INTERFACE( CBaseGameAppSystems, IGameAppSystems, GAME_APPSYSTEMS_INTERFACE_VERSION );
 
 /*
 ==================
@@ -72,7 +73,7 @@ CONSOLE_COMMAND( test_load_texture_nelson, "Load texture 'materials/nelson' to t
 Game
 ==================
 */
-CGame* Game()
+CBaseGame* Game()
 {
 	static CCitadelGame s_SandboxGame;
 	return &s_SandboxGame;
@@ -86,7 +87,7 @@ CCitadelGame::Connect
 bool CCitadelGame::Connect( createInterfaceFn_t pFactory )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
-	if ( !CGame::Connect( pFactory ) )
+	if ( !CBaseGame::Connect( pFactory ) )
 	{
 		return false;
 	}
@@ -110,7 +111,7 @@ void CCitadelGame::Disconnect()
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
 	g_pStudioAPI = NULL;
-	CGame::Disconnect();
+	CBaseGame::Disconnect();
 }
 
 /*
@@ -121,7 +122,7 @@ CCitadelGame::Init
 bool CCitadelGame::Init()
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
-	if ( !CGame::Init() )
+	if ( !CBaseGame::Init() )
 	{
 		return false;
 	}
@@ -165,6 +166,14 @@ bool CCitadelGame::Init()
 		Sys_Error( "Failed to load 'maps/test'" );
 		return false;
 	}
+
+	// Teleport the player at spawn location and capture the mouse for camera control
+	IWindow* pWindow = g_pWindowMgr->GetOrCreateMainWindow();
+	pPlayer->Teleport( vector3_t( -200.f, 250.f, -550.f ), CRotator( 20.f, 25.f, 0.f ) );
+	if ( pWindow )
+	{
+		pWindow->SetCursorVisible( false );
+	}
 	return true;
 }
 
@@ -177,7 +186,7 @@ void CCitadelGame::Shutdown()
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
 	Quad().Shutdown();
-	CGame::Shutdown();
+	CBaseGame::Shutdown();
 }
 
 /*
@@ -201,6 +210,7 @@ void CEcsSystemQuadInit::OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity, const
 	studioEntityParams_t	   studioEntityParams	 = {};
 	ecsComponentStudioEntity_t studioEntityComponent = {};
 	studioEntityParams.pModel						 = quad.pModel;
+	studioEntityParams.localToWorld					 = g_matrix43Identity;
 	studioEntityComponent.id						 = studioScene.pStudioScene->AddEntity( studioEntityParams );
 	ecsWorld.SetComponent( entity, eastl::move( studioEntityComponent ) );
 }
@@ -213,9 +223,12 @@ CEcsSystemModelInit::OnUpdate
 void CEcsSystemModelInit::OnUpdate( CEcsWorld ecsWorld, ecsEntity_t entity, const ecsComponentModel_t& model, ecsResourceStudioScene_t& studioScene )
 {
 	// TODO BS yehor.pohuliaka - CIT-81 Implement observer/system to free a studio entity when the ecs entity has been destroyed
+	static uint32			   modelIdx				 = 0;
 	studioEntityParams_t	   studioEntityParams	 = {};
 	ecsComponentStudioEntity_t studioEntityComponent = {};
 	studioEntityParams.pModel						 = model.pModel;
+	studioEntityParams.localToWorld					 = S_MatrixTranslate<matrix4x4_t>( vector3_t( 0.f, -200.f * modelIdx, 0.f ) ) * S_QuaternionToMatrix<matrix4x4_t>( S_AnglesToQuaternionYZX( vector3_t( 0, 90.f, 0 ) ) );
 	studioEntityComponent.id						 = studioScene.pStudioScene->AddEntity( studioEntityParams );
 	ecsWorld.SetComponent( entity, eastl::move( studioEntityComponent ) );
+	++modelIdx;
 }

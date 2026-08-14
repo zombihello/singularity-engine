@@ -19,16 +19,12 @@ void CShaderCompilerCppGenerator::Generate( const shader_t& shader )
 	// Generate class name from base name of shader source file and the one type
 	eastl::string className;
 	{
-		// Convert shader type to string
-		const char* pShaderTypeName = "";
-		ConvShaderTypeToString( shader.type, pShaderTypeName );
-
 		// Get base name from shader source file
 		eastl::string fileBaseName;
 		S_GetFileBaseName( shader.source, fileBaseName, false );
 
 		// Get class name
-		className = S_Sprintf( "C_%s_%s_Index", fileBaseName.c_str(), pShaderTypeName );
+		className = S_Sprintf( "C_%s_%s_Index", fileBaseName.c_str(), ConvShaderTypeToString( shader.type ) );
 	}
 
 	// Generate C++ class header
@@ -184,19 +180,26 @@ CShaderCompilerCppGenerator::GenerateRemapVertexFactories
 */
 void CShaderCompilerCppGenerator::GenerateRemapVertexFactories( const shader_t& shader )
 {
-	// Build the remap table: modelVertexType_t -> shader's local vertex factory index (INVALID_INDEX if unsupported)
-	uint32 vertexFactoryRemap[MODEL_VERTEX_NUM_TYPES];
-	Mem_Memset( vertexFactoryRemap, (uint8)INVALID_INDEX, MODEL_VERTEX_NUM_TYPES * sizeof( uint32 ) );
+	// Build the remap table: modelVertexType_t -> shader's local vertex factory index (INVALID_INDEX if unsupported).
+	uint32 vertexFactoryRemap[MODEL_VERTEX_NUM_TYPES + 1];	// +1 for 'none' vertex factory
+	Mem_Memset( vertexFactoryRemap, (uint8)INVALID_INDEX, ( MODEL_VERTEX_NUM_TYPES + 1 ) * sizeof( uint32 ) );
 	for ( uint32 index = 0, count = (uint32)shader.vertexFactories.size(); index < count; ++index )
 	{
 		const vertexFactory_t* pVertexFactory = shader.vertexFactories[index];
+		if ( pVertexFactory == &vertexFactory_t::s_none )
+		{
+			vertexFactoryRemap[MODEL_VERTEX_NUM_TYPES] = index;
+			continue;
+		}
+
 		Assert( pVertexFactory->index < MODEL_VERTEX_NUM_TYPES );
 		vertexFactoryRemap[pVertexFactory->index] = index;
 	}
 
-	// Generate function to set a vertex factory by a model vertex type
+	// Begin function `SetVertexFactory`
+	const char* pVertexFactoryFlagName = ConvShaderSystemFlagToString( SHADER_SYSTEM_FLAG_VERTEXFACTORY );
 	buffer += "public:\n";
-	buffer += "\tvoid SetVertexFactory( modelVertexType_t vertexType )\n";
+	buffer += "\tvoid SetVertexFactory( const IVertexFactory* pVertexFactory )\n";
 	buffer += "\t{\n";
 	buffer += "\t\tstatic const uint32 s_vertexFactoryRemap[MODEL_VERTEX_NUM_TYPES] = { ";
 	for ( uint32 index = 0; index < MODEL_VERTEX_NUM_TYPES; ++index )
@@ -209,7 +212,27 @@ void CShaderCompilerCppGenerator::GenerateRemapVertexFactories( const shader_t& 
 		}
 	}
 	buffer += " };\n";
+
+	// Generate section to select being drawn without any vertex factory
+	buffer += "\t\tif ( !pVertexFactory )\n";
+	buffer += "\t\t{\n";
+	if ( vertexFactoryRemap[MODEL_VERTEX_NUM_TYPES] != (uint32)INVALID_INDEX )
+	{
+		buffer += S_Sprintf( "\t\t\tSet%s( %i );\n", pVertexFactoryFlagName, vertexFactoryRemap[MODEL_VERTEX_NUM_TYPES] );
+	}
+	else
+	{
+		buffer += "\t\t\tAssertMsg( false, \"This shader doesn't support being drawn without a vertex factory\" );\n";
+		buffer += S_Sprintf( "\t\t\tSet%s( 0 );\n", pVertexFactoryFlagName );
+	}
+	buffer += "\t\t\treturn;\n";
+	buffer += "\t\t}\n\n";
+
+	// Generate section to set a vertex factory by a model vertex type
+	buffer += "\t\tmodelVertexType_t vertexType = pVertexFactory->GetVertexType();\n";
 	buffer += "\t\tAssert( vertexType < MODEL_VERTEX_NUM_TYPES && s_vertexFactoryRemap[(uint32)vertexType] != INVALID_INDEX );\n";
-	buffer += S_Sprintf( "\t\tSet%s( s_vertexFactoryRemap[vertexType] );\n", ConvShaderSystemFlagToString( SHADER_SYSTEM_FLAG_VERTEXFACTORY ) );
+	buffer += S_Sprintf( "\t\tSet%s( s_vertexFactoryRemap[vertexType] );\n", pVertexFactoryFlagName );
+
+	// End function `SetVertexFactory`
 	buffer += "\t}";
 }

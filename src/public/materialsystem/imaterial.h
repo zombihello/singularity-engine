@@ -1,25 +1,35 @@
 #pragma once
+#include "tier1/debugname.h"
 #include "resourcesystem/iresource.h"
-#include "studiorender/istudio_renderresource.h"
 
 //-----------------------------------------------------------------------------
 // Forward declarations
 //-----------------------------------------------------------------------------
-class IStudioAPICmdList;
 class IMaterialVar;
 class IShader;
-class IShaderContextData;
+class IPerMaterialContextData;
+struct materialVarInfo_t;
+
+//-----------------------------------------------------------------------------
+// Initial material data
+//-----------------------------------------------------------------------------
+struct materialInitialData_t
+{
+	const char*				 pShaderName;
+	uint32					 numVars;
+	const materialVarInfo_t* pVars;
+};
 
 //-----------------------------------------------------------------------------
 // A material resource interface which is owned by the render thread
 //-----------------------------------------------------------------------------
-class IMaterialResource : public IRefCounted
+class IMaterialResource : public IRefCounted, public IDebugNamed
 {
 public:
 	virtual ~IMaterialResource() {}
 
-	virtual IShader*			GetShader() const	   = 0;
-	virtual IShaderContextData* GetContextData() const = 0;
+	virtual IShader*				 GetShader() const				   = 0;
+	virtual IPerMaterialContextData* GetPerMaterialContextData() const = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -30,8 +40,9 @@ class IMaterial : public IResourceData
 public:
 	virtual ~IMaterial() {}
 
-	virtual void		  SetShader( const char* pShaderName ) = 0;
-	virtual IMaterialVar* FindVar( const char* pName ) const   = 0;
+	virtual void		  Init( const materialInitialData_t& initialData ) = 0;
+	virtual void		  Destroy()										   = 0;
+	virtual IMaterialVar* FindVar( const char* pName ) const			   = 0;
 
 	virtual uint32			   GetNumVars() const		 = 0;
 	virtual IMaterialVar**	   GetVars() const			 = 0;

@@ -13,10 +13,10 @@ FORCEINLINE CFrameAlloc<blockSize, numPools, defaultAlignment, minAlignment>::CF
 	// Allocate one page for each pool
 	for ( uint32 index = 0; index < numPools; ++index )
 	{
-		memoryPool_t& pool = pools[index];
-		pool.id			   = index;
+		memoryPool_t& pool	= pools[index];
+		pool.id				= index;
+		pool.currentBlockIt = AllocBlock( pool );
 		pool.bIsFree.store( true, eastl::memory_order_relaxed );
-		AllocBlock( pool );
 	}
 }
 
@@ -71,57 +71,53 @@ void* CFrameAlloc<blockSize, numPools, defaultAlignment, minAlignment>::Alloc( s
 	// Calculate alignment and aligned size
 	PROFILER_SCOPE_FUNC();
 	Assert( currentPoolId != INVALID_INDEX );
-	alignment				   = S_Max<uint32>( numBytes >= defaultAlignment ? defaultAlignment : minAlignment, alignment );
-	byte*		   pPtr		   = NULL;
-	memoryBlock_t* pFoundBlock = NULL;
-	memoryPool_t&  pool		   = pools[currentPoolId];
-	size		   alignedSize = S_Align<size>( numBytes, alignment );
+	alignment		 = S_Max<uint32>( numBytes >= defaultAlignment ? defaultAlignment : minAlignment, alignment );
+	size alignedSize = S_Align<size>( numBytes, alignment );
 	AssertMsg( alignedSize <= blockSize, "A frame allocator can't allocate memory more then block size" );
 
-	// Try to allocate memory in already created blocks
-	for ( auto it = pool.blockList.begin(), itEnd = pool.blockList.end(); it != itEnd; ++it )
+	// Try to allocate memory in the current block, moving forward through already recycled blocks
+	// and growing the pool only when none of them is left
+	memoryPool_t& pool = pools[currentPoolId];
+	while ( true )
 	{
-		memoryBlock_t& block	= *it;
-		uint64		   freeSize = blockSize - block.usedSize;
-		if ( freeSize < alignedSize )
+		// Allocate a new block if we ran out of them
+		if ( pool.currentBlockIt == pool.blockList.end() )
 		{
-			continue;
+			pool.currentBlockIt = AllocBlock( pool );
 		}
 
-		byte*  pFreeMemory		  = block.pData + block.usedSize;
-		byte*  pAlignedFreeMemory = S_Align<byte*>( pFreeMemory, alignment );
-		uint64 alignPadding		  = (uint64)( pAlignedFreeMemory - pFreeMemory );
-		if ( freeSize < ( alignedSize + alignPadding ) )
+		// Try to allocate memory in the block
+		memoryBlock_t& block			  = *pool.currentBlockIt;
+		uint64		   freeSize			  = blockSize - block.usedSize;
+		byte*		   pFreeMemory		  = block.pData + block.usedSize;
+		byte*		   pAlignedFreeMemory = S_Align<byte*>( pFreeMemory, alignment );
+		uint64		   alignPadding		  = (uint64)( pAlignedFreeMemory - pFreeMemory );
+		if ( alignedSize + alignPadding <= freeSize )
 		{
-			continue;
+			if ( pBlock )
+			{
+				*pBlock = &block;
+			}
+
+			block.usedSize += alignedSize + alignPadding;
+			return pAlignedFreeMemory;
 		}
 
-		pPtr		= pAlignedFreeMemory;
-		pFoundBlock = &block;
-		block.usedSize += alignedSize + alignPadding;
-		break;
+		// Not enough room left in the block. If the block was empty the request
+		// can never be satisfied and moving forward would grow the pool forever
+		if ( block.usedSize == 0 )
+		{
+			Sys_Error( "A frame allocator can't allocate %llu bytes with alignment %i (block size: %i, pool: %i, name: '%s')", numBytes, alignment, blockSize, pool.id, pAllocName );
+			return NULL;
+		}
+
+		// Not enough room left in the block
+		++pool.currentBlockIt;
 	}
 
-	// Allocate a new block if we not found a space yet
-	if ( !pPtr )
-	{
-		AllocBlock( pool );
-
-		memoryBlock_t& block			  = pool.blockList.back();
-		byte*		   pAlignedFreeMemory = S_Align<byte*>( block.pData, alignment );
-		uint64		   alignPadding		  = (uint64)( pAlignedFreeMemory - block.pData );
-		Assert( blockSize >= alignedSize + alignPadding );
-
-		pPtr		= pAlignedFreeMemory;
-		pFoundBlock = &block;
-		block.usedSize += alignedSize + alignPadding;
-	}
-
-	if ( pBlock )
-	{
-		*pBlock = pFoundBlock;
-	}
-	return pPtr;
+	// If we here it is fatal error
+	AssertNoEntry();
+	return NULL;
 }
 
 /*
@@ -193,7 +189,8 @@ FORCEINLINE void CFrameAlloc<blockSize, numPools, defaultAlignment, minAlignment
 		curBlock.destructorList.clear();
 	}
 
-	// Mark the pool as free
+	// Reset current block to the begin and mark the pool as free
+	pool.currentBlockIt = pool.blockList.begin();
 	pools[poolId].bIsFree.store( true, eastl::memory_order_release );
 }
 
@@ -244,7 +241,7 @@ CFrameAlloc::AllocBlock
 ==================
 */
 template<uint32 blockSize, uint32 numPools, uint32 defaultAlignment, uint32 minAlignment>
-FORCEINLINE void CFrameAlloc<blockSize, numPools, defaultAlignment, minAlignment>::AllocBlock( memoryPool_t& pool )
+FORCEINLINE typename CFrameAlloc<blockSize, numPools, defaultAlignment, minAlignment>::memoryBlockListIt_t CFrameAlloc<blockSize, numPools, defaultAlignment, minAlignment>::AllocBlock( memoryPool_t& pool )
 {
 	PROFILER_SCOPE_FUNC();
 	memoryBlock_t& block = pool.blockList.emplace_back();
@@ -252,6 +249,7 @@ FORCEINLINE void CFrameAlloc<blockSize, numPools, defaultAlignment, minAlignment
 	block.pData			 = (byte*)Mem_MallocZero( blockSize );
 	Msg( "FrameAlloc: Allocated block (%llu bytes, pool: %i, name: '%s')", blockSize, pool.id, pAllocName );
 	PROFILER_MEM_ALLOC( block.pData, blockSize, pAllocName );
+	return --pool.blockList.end();
 }
 
 /*
@@ -260,32 +258,36 @@ CFrameAlloc::FreeBlock
 ==================
 */
 template<uint32 blockSize, uint32 numPools, uint32 defaultAlignment, uint32 minAlignment>
-void CFrameAlloc<blockSize, numPools, defaultAlignment, minAlignment>::FreeBlock( memoryPool_t& pool, memoryBlock_t* pBlock )
+typename CFrameAlloc<blockSize, numPools, defaultAlignment, minAlignment>::memoryBlockListIt_t CFrameAlloc<blockSize, numPools, defaultAlignment, minAlignment>::FreeBlock( memoryPool_t& pool, memoryBlockListIt_t blockIt )
 {
+	// Call destructors
 	PROFILER_SCOPE_FUNC();
-	Assert( pBlock );
-	for ( auto it = pool.blockList.begin(), itEnd = pool.blockList.end(); it != itEnd; ++it )
+	Assert( blockIt != pool.blockList.end() );
+	memoryBlock_t& block = *blockIt;
+	for ( auto itDestructorEntry = block.destructorList.begin(), itDestructorEntryEnd = block.destructorList.end(); itDestructorEntry != itDestructorEntryEnd; ++itDestructorEntry )
 	{
-		memoryBlock_t& curBlock = *it;
-		if ( &curBlock == pBlock )
-		{
-			for ( auto itDestructorEntry = curBlock.destructorList.begin(), itDestructorEntryEnd = curBlock.destructorList.end(); itDestructorEntry != itDestructorEntryEnd; ++itDestructorEntry )
-			{
-				destructorEntry_t& destructorEntry = *itDestructorEntry;
-				destructorEntry.pDestroyObjectFn( destructorEntry.pObject );
-			}
-
-			if ( curBlock.pData )
-			{
-				Mem_Free( curBlock.pData );
-				PROFILER_MEM_FREE( curBlock.pData, pAllocName );
-			}
-
-			Msg( "FrameAlloc: Freed block (%llu bytes, pool: %i, name: '%s')", blockSize, pool.id, pAllocName );
-			pool.blockList.erase( it );
-			break;
-		}
+		destructorEntry_t& destructorEntry = *itDestructorEntry;
+		destructorEntry.pDestroyObjectFn( destructorEntry.pObject );
 	}
+
+	// Free allocated memory for the block
+	if ( block.pData )
+	{
+		Mem_Free( block.pData );
+		PROFILER_MEM_FREE( block.pData, pAllocName );
+	}
+
+	// Remove the block from the list
+	bool				bCurrentBlock = pool.currentBlockIt == blockIt;
+	memoryBlockListIt_t nextBlockIt	  = pool.blockList.erase( blockIt );
+	if ( bCurrentBlock )
+	{
+		pool.currentBlockIt = nextBlockIt;
+	}
+
+	// We are done
+	Msg( "FrameAlloc: Freed block (%llu bytes, pool: %i, name: '%s')", blockSize, pool.id, pAllocName );
+	return nextBlockIt;
 }
 
 /*
@@ -296,27 +298,19 @@ CFrameAlloc::FreeAllBlocks
 template<uint32 blockSize, uint32 numPools, uint32 defaultAlignment, uint32 minAlignment>
 void CFrameAlloc<blockSize, numPools, defaultAlignment, minAlignment>::FreeAllBlocks( memoryPool_t& pool )
 {
-	// Free blocks
+	// Do nothing if the list is empty
 	PROFILER_SCOPE_FUNC();
-	uint64 numBlocks = pool.blockList.size();
-	for ( auto it = pool.blockList.begin(), itEnd = pool.blockList.end(); it != itEnd; ++it )
+	if ( pool.blockList.empty() )
 	{
-		memoryBlock_t& curBlock = *it;
-		for ( auto itDestructorEntry = curBlock.destructorList.begin(), itDestructorEntryEnd = curBlock.destructorList.end(); itDestructorEntry != itDestructorEntryEnd; ++itDestructorEntry )
-		{
-			destructorEntry_t& destructorEntry = *itDestructorEntry;
-			destructorEntry.pDestroyObjectFn( destructorEntry.pObject );
-		}
-
-		if ( curBlock.pData )
-		{
-			Mem_Free( curBlock.pData );
-			PROFILER_MEM_FREE( curBlock.pData, pAllocName );
-		}
+		return;
 	}
 
-	Msg( "FrameAlloc: Freed %i blocks (%llu bytes, pool: %i, name: '%s')", numBlocks, (uint32)pool.blockList.size() * blockSize, pool.id, pAllocName );
-	pool.blockList.clear();
+	// Free each block
+	for ( memoryBlockListIt_t it = pool.blockList.begin(); it != pool.blockList.end(); )
+	{
+		it = FreeBlock( pool, it );
+	}
+	pool.currentBlockIt = pool.blockList.end();
 }
 
 /*

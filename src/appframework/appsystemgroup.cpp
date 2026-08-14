@@ -4,10 +4,11 @@
 #include "appframework/appsystemgroup.h"
 
 static const char* s_pStageLookup[] = {
-	"Unknown",		   // APPSYSTEM_GROUP_STATE_NONE
-	"Creation",		   // APPSYSTEM_GROUP_STATE_CREATED
-	"Connection",	   // APPSYSTEM_GROUP_STATE_CONNECTED
-	"Initialization",  // APPSYSTEM_GROUP_STATE_INITIALIZED
+	"Unknown",			   // APPSYSTEM_GROUP_STATE_NONE
+	"Creation",			   // APPSYSTEM_GROUP_STATE_CREATED
+	"Connection",		   // APPSYSTEM_GROUP_STATE_CONNECTED
+	"Initialization",	   // APPSYSTEM_GROUP_STATE_INITIALIZED
+	"Post Initialization"  // APPSYSTEM_GROUP_STATE_POSTINITIALIZED
 };
 static_assert( ARRAYSIZE( s_pStageLookup ) == APPSYSTEM_GROUP_STATE_COUNT, "Array size 's_pStageLookup' must be equal to APPSYSTEM_GROUP_STATE_COUNT" );
 
@@ -68,7 +69,7 @@ void CAppSystemGroup::InitSystems()
 	ConnectSystems();
 	if ( state == APPSYSTEM_GROUP_STATE_CONNECTED )
 	{
-		// Call Init on all App Systems
+		// Call Init on all application systems
 		for ( uint32 index = 0, count = (uint32)systems.size(); index < count; ++index )
 		{
 			if ( !systems[index]->Init() )
@@ -85,6 +86,31 @@ void CAppSystemGroup::InitSystems()
 
 		state = APPSYSTEM_GROUP_STATE_INITIALIZED;
 	}
+
+	if ( state == APPSYSTEM_GROUP_STATE_INITIALIZED )
+	{
+		// Every system is initialized now, so let them do the work that needs the others to be alive
+		for ( uint32 index = 0, count = (uint32)systems.size(); index < count; ++index )
+		{
+			if ( !systems[index]->PostInit() )
+			{
+				// NOTE: PreShutdown/Shutdown are in reverse order of post initialization or initialization
+				for ( int32 systemRewindIndex = index; systemRewindIndex-- > 0; )
+				{
+					systems[systemRewindIndex]->PreShutdown();
+				}
+				for ( int32 systemRewindIndex = (int32)systems.size(); --systemRewindIndex >= 0; )
+				{
+					systems[systemRewindIndex]->Shutdown();
+				}
+
+				ReportFailure( APPSYSTEM_GROUP_STATE_POSTINITIALIZED, index );
+				return;
+			}
+		}
+
+		state = APPSYSTEM_GROUP_STATE_POSTINITIALIZED;
+	}
 }
 
 /*
@@ -95,9 +121,20 @@ CAppSystemGroup::ShutdownSystems
 void CAppSystemGroup::ShutdownSystems()
 {
 	PROFILER_SCOPE_FUNC();
+	if ( state == APPSYSTEM_GROUP_STATE_POSTINITIALIZED )
+	{
+		// Every system is still alive here, so let them release what they took in PostInit
+		for ( int32 index = (int32)systems.size(); --index >= 0; )	// NOTE: PreShutdown in reverse order of post initialization
+		{
+			systems[index]->PreShutdown();
+		}
+
+		state = APPSYSTEM_GROUP_STATE_INITIALIZED;
+	}
+
 	if ( state == APPSYSTEM_GROUP_STATE_INITIALIZED )
 	{
-		// Call Shutdown on all App Systems
+		// Call Shutdown on all application systems
 		for ( int32 index = (int32)systems.size(); --index >= 0; )	// NOTE: Shutdown in reverse order of initialization
 		{
 			systems[index]->Shutdown();

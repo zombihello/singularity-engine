@@ -11,6 +11,7 @@ CTextureLoader::Load
 */
 bool CTextureLoader::Load( const char* pPath, IResourceData* pData ) const
 {
+	PROFILER_SCOPE_FUNC();
 	Assert( pData );
 	CSTEXCompiledTextureDoc stexCompiledTextureDoc;
 	if ( !stexCompiledTextureDoc.LoadFromFile( S_GetFileExtension( pPath ) ? pPath : S_Sprintf( "%s.stex_c", pPath ).c_str() ) )
@@ -43,7 +44,7 @@ bool CTextureLoader::Load( const char* pPath, IResourceData* pData ) const
 
 	// Initialize the texture
 	CTexture* pTexture = (CTexture*)pData;
-	pTexture->Init( stexCompiledTextureDoc.GetType(), stexCompiledTextureDoc.GetPixelFormat(), stexCompiledTextureDoc.GetNumLayers(), mipmaps.data(), stexCompiledTextureDoc.GetNumMips(), studioAPISamplerInfo, data.data(), (uint32)data.size() );
+	pTexture->Init( stexCompiledTextureDoc.GetType(), stexCompiledTextureDoc.GetPixelFormat(), stexCompiledTextureDoc.GetNumLayers(), mipmaps.data(), stexCompiledTextureDoc.GetNumMips(), STUDIOAPI_TEXTURE_USAGE_FLAG_TEXTURE, studioAPISamplerInfo, data.data(), (uint32)data.size() );
 	return true;
 }
 

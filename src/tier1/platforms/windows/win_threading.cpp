@@ -154,7 +154,6 @@ DWORD STDCALL CThreadWindows::ThreadMain( LPVOID pData )
 	Sys_SetThreadName( pTheThread->handle, pTheThread->GetName() );
 	Sys_SetThreadPriority( pTheThread->handle, pTheThread->priority );
 	PROFILER_THREAD( pTheThread->GetName() );
-	PROFILER_SCOPE_FUNC();
 
 	// Initialize the thread
 	pTheThread->exitCode = -1;

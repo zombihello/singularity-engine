@@ -28,12 +28,12 @@ void CVertexDeclarationSimple::InitStudioAPI()
 
 /*
 ==================
-CVertexFactorySimple::GetVertexType
+CVertexFactorySimple::CVertexFactorySimple
 ==================
 */
-modelVertexType_t CVertexFactorySimple::GetVertexType() const
+CVertexFactorySimple::CVertexFactorySimple( const char* pDebugName /* = "" */ )
+	: CVertexFactoryBase<IVertexFactorySimple>( pDebugName )
 {
-	return MODEL_VERTEXTYPE_SIMPLE;
 }
 
 /*

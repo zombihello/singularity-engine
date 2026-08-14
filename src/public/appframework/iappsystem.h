@@ -20,8 +20,13 @@ public:
 	virtual void* QueryInterface( const char* pInterfaceName ) = 0;
 
 	// Initialize and shutdown
-	virtual bool Init()		= 0;
-	virtual void Shutdown() = 0;
+	// Call order: Init -> PostInit -> PreShutdown -> Shutdown
+	// Init/Shutdown		- Only systems above you in the group's list are alive
+	// PostInit/PreShutdown - Everyone is alive
+	virtual bool Init()		   = 0;
+	virtual bool PostInit()	   = 0;
+	virtual void PreShutdown() = 0;
+	virtual void Shutdown()	   = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -31,6 +36,7 @@ template<class TInterface>
 class CBaseAppSystem : public TInterface
 {
 public:
+	// IAppSystem interface
 	// Here's where the app systems get to learn about each other
 	virtual bool Connect( createInterfaceFn_t pFactory ) { return true; }
 	virtual void Disconnect() {}
@@ -40,6 +46,11 @@ public:
 	virtual void* QueryInterface( const char* pInterfaceName ) { return NULL; }
 
 	// Initialize and shutdown
+	// Call order: Init -> PostInit -> PreShutdown -> Shutdown
+	// Init/Shutdown		- Only systems above you in the group's list are alive
+	// PostInit/PreShutdown - Everyone is alive
 	virtual bool Init() { return true; }
+	virtual bool PostInit() { return true; }
+	virtual void PreShutdown() {}
 	virtual void Shutdown() {}
 };

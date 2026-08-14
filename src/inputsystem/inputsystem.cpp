@@ -10,7 +10,6 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CInputSystem, IInputSystem, INPUTSYSTEM_INTER
 
 // Table of button names
 static const char* s_pButtonNames[] = {
-	"",				// BUTTON_CODE_NONE
 	"0",			// KEY_0
 	"1",			// KEY_1
 	"2",			// KEY_2
@@ -128,6 +127,7 @@ static const char* s_pButtonNames[] = {
 	"mousex",	   // MOUSE_X
 	"mousey"	   // MOUSE_Y
 };
+static_assert( ARRAYSIZE( s_pButtonNames ) == BUTTON_CODE_COUNT, "Array size 's_pButtonNames' must be equal to BUTTON_CODE_COUNT" );
 
 /*
 ==================
@@ -140,7 +140,7 @@ CInputSystem::CInputSystem()
 	, mouseLocation( g_vector000 )
 	, mouseOffset( g_vector000 )
 {
-	Mem_Memset( &buttonEvents, BUTTON_EVENT_NONE, sizeof( buttonEvent_t ) * BUTTON_CODE_COUNT );
+	Mem_Memset( &buttonStates, BUTTON_STATE_FLAG_NONE, BUTTON_CODE_COUNT * sizeof( uint8 ) );
 }
 
 /*
@@ -245,26 +245,59 @@ void CInputSystem::OnInputEvent( void* pUserData, const inputEvent_t& inputEvent
 	{
 		// Key pressed
 	case INPUT_EVENT_TYPE_KEY_PRESSED:
-		pInputSystem->buttonEvents[inputEvent.key.code] = BUTTON_EVENT_PRESSED;
-		pInputSystem->ExecBindingCommand( inputEvent.key.code );
+		if ( Input_IsKeyCode( inputEvent.key.code ) )
+		{
+			pInputSystem->buttonStates[inputEvent.key.code] |= BUTTON_STATE_FLAG_DOWN | BUTTON_STATE_FLAG_PRESSED;
+			pInputSystem->ExecBindingCommand( inputEvent.key.code, BUTTON_STATE_FLAG_PRESSED );
+		}
+		break;
+
+		// Key pressed repeating
+	case INPUT_EVENT_TYPE_KEY_PRESSED_REPEATING:
+		if ( Input_IsKeyCode( inputEvent.key.code ) )
+		{
+			pInputSystem->buttonStates[inputEvent.key.code] |= BUTTON_STATE_FLAG_DOWN | BUTTON_STATE_FLAG_REPEATED;
+		}
 		break;
 
 		// Key released
 	case INPUT_EVENT_TYPE_KEY_RELEASED:
-		pInputSystem->buttonEvents[inputEvent.key.code] = BUTTON_EVENT_RELEASED;
-		pInputSystem->ExecBindingCommand( inputEvent.key.code );
+		if ( Input_IsKeyCode( inputEvent.key.code ) )
+		{
+			uint8& state = pInputSystem->buttonStates[inputEvent.key.code];
+			state &= ~BUTTON_STATE_FLAG_DOWN;
+			state |= BUTTON_STATE_FLAG_RELEASED;
+			pInputSystem->ExecBindingCommand( inputEvent.key.code, BUTTON_STATE_FLAG_RELEASED );
+		}
 		break;
 
 		// Mouse pressed
 	case INPUT_EVENT_TYPE_MOUSE_PRESSED:
-		pInputSystem->buttonEvents[inputEvent.mouseButton.code] = BUTTON_EVENT_PRESSED;
-		pInputSystem->ExecBindingCommand( inputEvent.mouseButton.code );
+		if ( Input_IsMouseCode( inputEvent.mouseButton.code ) )
+		{
+			pInputSystem->buttonStates[inputEvent.mouseButton.code] |= BUTTON_STATE_FLAG_DOWN | BUTTON_STATE_FLAG_PRESSED;
+			pInputSystem->ExecBindingCommand( inputEvent.mouseButton.code, BUTTON_STATE_FLAG_PRESSED );
+		}
+		break;
+
+		// Mouse double pressed
+	case INPUT_EVENT_TYPE_MOUSE_DOUBLE_PRESSED:
+		if ( Input_IsMouseCode( inputEvent.mouseButton.code ) )
+		{
+			pInputSystem->buttonStates[inputEvent.mouseButton.code] |= BUTTON_STATE_FLAG_DOWN | BUTTON_STATE_FLAG_DOUBLE_PRESSED;
+			pInputSystem->ExecBindingCommand( inputEvent.mouseButton.code, BUTTON_STATE_FLAG_PRESSED );
+		}
 		break;
 
 		// Mouse released
 	case INPUT_EVENT_TYPE_MOUSE_RELEASED:
-		pInputSystem->buttonEvents[inputEvent.mouseButton.code] = BUTTON_EVENT_RELEASED;
-		pInputSystem->ExecBindingCommand( inputEvent.mouseButton.code );
+		if ( Input_IsMouseCode( inputEvent.mouseButton.code ) )
+		{
+			uint8& state = pInputSystem->buttonStates[inputEvent.mouseButton.code];
+			state &= ~BUTTON_STATE_FLAG_DOWN;
+			state |= BUTTON_STATE_FLAG_RELEASED;
+			pInputSystem->ExecBindingCommand( inputEvent.mouseButton.code, BUTTON_STATE_FLAG_RELEASED );
+		}
 		break;
 
 		// Mouse move
@@ -276,23 +309,20 @@ void CInputSystem::OnInputEvent( void* pUserData, const inputEvent_t& inputEvent
 
 		if ( pInputSystem->mouseOffset.x != 0.f )
 		{
-			pInputSystem->buttonEvents[MOUSE_X] = BUTTON_EVENT_MOVED;
-			pInputSystem->ExecBindingCommand( MOUSE_X );
+			pInputSystem->buttonStates[MOUSE_X] |= BUTTON_STATE_FLAG_MOVED;
 		}
-
 		if ( pInputSystem->mouseOffset.y != 0.f )
 		{
-			pInputSystem->buttonEvents[MOUSE_Y] = BUTTON_EVENT_MOVED;
-			pInputSystem->ExecBindingCommand( MOUSE_Y );
+			pInputSystem->buttonStates[MOUSE_Y] |= BUTTON_STATE_FLAG_MOVED;
 		}
 		break;
 
 		// Mouse wheel move
 	case INPUT_EVENT_TYPE_MOUSE_WHEEL:
 	{
-		buttonCode_t button				   = inputEvent.mouseWheel.y > 0 ? MOUSE_WHEELUP : MOUSE_WHEELDOWN;
-		pInputSystem->buttonEvents[button] = BUTTON_EVENT_SCROLLED;
-		pInputSystem->ExecBindingCommand( button );
+		buttonCode_t button = inputEvent.mouseWheel.y > 0 ? MOUSE_WHEELUP : MOUSE_WHEELDOWN;
+		pInputSystem->buttonStates[button] |= BUTTON_STATE_FLAG_SCROLLED;
+		pInputSystem->ExecBindingCommand( button, BUTTON_STATE_FLAG_SCROLLED );
 		break;
 	}
 
@@ -304,20 +334,16 @@ void CInputSystem::OnInputEvent( void* pUserData, const inputEvent_t& inputEvent
 
 /*
 ==================
-CInputSystem::ClearInputState
+CInputSystem::FrameUpdate
 ==================
 */
-void CInputSystem::ClearInputState()
+void CInputSystem::FrameUpdate( float deltaTime )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_INPUT );
 	for ( uint32 index = 0; index < BUTTON_CODE_COUNT; ++index )
 	{
-		if ( buttonEvents[index] == BUTTON_EVENT_RELEASED || buttonEvents[index] == BUTTON_EVENT_SCROLLED || buttonEvents[index] == BUTTON_EVENT_MOVED )
-		{
-			buttonEvents[index] = BUTTON_EVENT_NONE;
-		}
+		buttonStates[index] &= BUTTON_STATE_FLAG_DOWN;
 	}
-
 	mouseOffset = g_vector000;
 }
 
@@ -328,9 +354,10 @@ CInputSystem::WriteBindings
 */
 void CInputSystem::WriteBindings( IStreamDataWriter* pStreamData ) const
 {
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
-
 	// Write bindings into a string buffer
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_IO );
+	Assert( pStreamData );
+
 	eastl::string buffer;
 	buffer += "unbindall\n";
 	for ( uint32 index = 0; index < BUTTON_CODE_COUNT; ++index )
@@ -355,8 +382,10 @@ CInputSystem::SetBinding
 */
 void CInputSystem::SetBinding( buttonCode_t button, const char* pCommand )
 {
-	Assert( button < BUTTON_CODE_COUNT );
-	binds[button] = pCommand;
+	if ( Ensure( Input_IsValidCode( button ) ) )
+	{
+		binds[button] = pCommand;
+	}
 }
 
 /*
@@ -366,6 +395,7 @@ CInputSystem::UnbindAll
 */
 void CInputSystem::UnbindAll()
 {
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_INPUT );
 	for ( uint32 index = 0; index < BUTTON_CODE_COUNT; ++index )
 	{
 		binds[index].clear();
@@ -379,22 +409,63 @@ CInputSystem::GetBindingCommand
 */
 const char* CInputSystem::GetBindingCommand( buttonCode_t button ) const
 {
-	return binds[button].c_str();
+	return Ensure( Input_IsValidCode( button ) ) ? binds[button].c_str() : "";
 }
 
 /*
 ==================
-CInputSystem::ExecCommand
+CInputSystem::ExecBindingCommand
 ==================
 */
-void CInputSystem::ExecBindingCommand( buttonCode_t button )
+void CInputSystem::ExecBindingCommand( buttonCode_t button, buttonStateFlag_t state )
 {
+	// Do nothing if the button hasn't a command
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_INPUT );
-	Assert( button < BUTTON_CODE_COUNT );
-	if ( !binds[button].empty() )
+	Assert( Input_IsValidCode( button ) );
+	const eastl::string& command = binds[button];
+	if ( command.empty() )
 	{
-		g_pCmdSystem->AppendCommandString( CMD_EXECUTION_APPEND_END, binds[button].c_str() );
+		return;
 	}
+
+	// +/- commands: '+cmd' on press, '-cmd' on release; wheel scroll pulses both
+	if ( command[0] == '+' )
+	{
+		const char* pCommand = command.c_str() + 1;
+		if ( state == BUTTON_STATE_FLAG_PRESSED || state == BUTTON_STATE_FLAG_SCROLLED )
+		{
+			g_pCmdSystem->AppendCommandString( CMD_EXECUTION_APPEND_END, va( "+%s %i", pCommand, (uint32)button ) );
+		}
+		if ( state == BUTTON_STATE_FLAG_RELEASED || state == BUTTON_STATE_FLAG_SCROLLED )
+		{
+			g_pCmdSystem->AppendCommandString( CMD_EXECUTION_APPEND_END, va( "-%s %i", pCommand, (uint32)button ) );
+		}
+	}
+	// Regular command: fire on press/scroll, never on release
+	else if ( state == BUTTON_STATE_FLAG_PRESSED || state == BUTTON_STATE_FLAG_SCROLLED )
+	{
+		g_pCmdSystem->AppendCommandString( CMD_EXECUTION_APPEND_END, command.c_str() );
+	}
+}
+
+/*
+==================
+CInputSystem::WasKeyPressed
+==================
+*/
+bool CInputSystem::WasKeyPressed( buttonCode_t key ) const
+{
+	return Ensure( Input_IsKeyCode( key ) ) && ( buttonStates[key] & BUTTON_STATE_FLAG_PRESSED );
+}
+
+/*
+==================
+CInputSystem::WasKeyReleased
+==================
+*/
+bool CInputSystem::WasKeyReleased( buttonCode_t key ) const
+{
+	return Ensure( Input_IsKeyCode( key ) ) && ( buttonStates[key] & BUTTON_STATE_FLAG_RELEASED );
 }
 
 /*
@@ -404,87 +475,67 @@ CInputSystem::IsKeyDown
 */
 bool CInputSystem::IsKeyDown( buttonCode_t key ) const
 {
-	if ( key < KEY_FIRST || key > KEY_LAST )
-	{
-		return false;
-	}
-
-	return buttonEvents[key] == BUTTON_EVENT_PRESSED;
+	return Ensure( Input_IsKeyCode( key ) ) && ( buttonStates[key] & BUTTON_STATE_FLAG_DOWN );
 }
 
 /*
 ==================
-CInputSystem::IsKeyUp
+CInputSystem::WasMousePressed
 ==================
 */
-bool CInputSystem::IsKeyUp( buttonCode_t key ) const
+bool CInputSystem::WasMousePressed( buttonCode_t key ) const
 {
-	if ( key < KEY_FIRST || key > KEY_LAST )
-	{
-		return false;
-	}
-
-	return buttonEvents[key] == BUTTON_EVENT_RELEASED;
+	return Ensure( Input_IsMouseCode( key ) ) && ( buttonStates[key] & BUTTON_STATE_FLAG_PRESSED );
 }
 
 /*
 ==================
-CInputSystem::IsMouseKeyDown
+CInputSystem::WasMouseDoublePressed
 ==================
 */
-bool CInputSystem::IsMouseKeyDown( buttonCode_t key ) const
+bool CInputSystem::WasMouseDoublePressed( buttonCode_t key ) const
 {
-	if ( key < MOUSE_FIRST || key > MOUSE_LAST )
-	{
-		return false;
-	}
-
-	return buttonEvents[key] == BUTTON_EVENT_PRESSED;
+	return Ensure( Input_IsMouseCode( key ) ) && ( buttonStates[key] & BUTTON_STATE_FLAG_DOUBLE_PRESSED );
 }
 
 /*
 ==================
-CInputSystem::IsMouseKeyUp
+CInputSystem::WasMouseReleased
 ==================
 */
-bool CInputSystem::IsMouseKeyUp( buttonCode_t key ) const
+bool CInputSystem::WasMouseReleased( buttonCode_t key ) const
 {
-	if ( key < MOUSE_FIRST || key > MOUSE_LAST )
-	{
-		return false;
-	}
-
-	return buttonEvents[key] == BUTTON_EVENT_RELEASED;
+	return Ensure( Input_IsMouseCode( key ) ) && ( buttonStates[key] & BUTTON_STATE_FLAG_RELEASED );
 }
 
 /*
 ==================
-CInputSystem::IsMouseWheel
+CInputSystem::IsMouseDown
 ==================
 */
-bool CInputSystem::IsMouseWheel( buttonCode_t wheel ) const
+bool CInputSystem::IsMouseDown( buttonCode_t key ) const
 {
-	if ( wheel != MOUSE_WHEELUP || wheel != MOUSE_WHEELDOWN )
-	{
-		return false;
-	}
-
-	return buttonEvents[wheel] == BUTTON_EVENT_SCROLLED;
+	return Ensure( Input_IsMouseCode( key ) ) && ( buttonStates[key] & BUTTON_STATE_FLAG_DOWN );
 }
 
 /*
 ==================
-CInputSystem::IsMouseMoved
+CInputSystem::WasMouseWheel
 ==================
 */
-bool CInputSystem::IsMouseMoved( buttonCode_t mouseAxis ) const
+bool CInputSystem::WasMouseWheel( buttonCode_t wheel ) const
 {
-	if ( mouseAxis != MOUSE_X || mouseAxis != MOUSE_Y )
-	{
-		return false;
-	}
+	return Ensure( Input_IsMouseWheel( wheel ) ) && ( buttonStates[wheel] & BUTTON_STATE_FLAG_SCROLLED );
+}
 
-	return buttonEvents[mouseAxis] == BUTTON_EVENT_MOVED;
+/*
+==================
+CInputSystem::WasMouseMoved
+==================
+*/
+bool CInputSystem::WasMouseMoved( buttonCode_t mouseAxis ) const
+{
+	return Ensure( Input_IsMouseAxis( mouseAxis ) ) && ( buttonStates[mouseAxis] & BUTTON_STATE_FLAG_MOVED );
 }
 
 /*
@@ -514,6 +565,7 @@ CInputSystem::GetMouseOffset
 */
 float CInputSystem::GetMouseOffset( buttonCode_t mouseAxis ) const
 {
+	Ensure( Input_IsMouseAxis( mouseAxis ) );
 	switch ( mouseAxis )
 	{
 	case MOUSE_X: return mouseOffset.x;
@@ -534,22 +586,22 @@ float CInputSystem::GetMouseSensitivity() const
 
 /*
 ==================
-CInputSystem::GetButtonEvent
+CInputSystem::GetButtonStateFlags
 ==================
 */
-buttonEvent_t CInputSystem::GetButtonEvent( buttonCode_t buttonCode ) const
+uint8 CInputSystem::GetButtonStateFlags( buttonCode_t buttonCode ) const
 {
-	return buttonEvents[buttonCode];
+	return Ensure( Input_IsValidCode( buttonCode ) ) ? buttonStates[buttonCode] : BUTTON_STATE_FLAG_NONE;
 }
 
 /*
 ==================
-CInputSystem::GetButtonCodeByName
+CInputSystem::GetButtonByName
 ==================
 */
-buttonCode_t CInputSystem::GetButtonCodeByName( const char* pButtonName ) const
+buttonCode_t CInputSystem::GetButtonByName( const char* pButtonName ) const
 {
-	Assert( pButtonName );
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_INPUT );
 	for ( uint32 index = 0; index < BUTTON_CODE_COUNT; ++index )
 	{
 		if ( !S_Stricmp( s_pButtonNames[index], pButtonName ) )
@@ -557,7 +609,6 @@ buttonCode_t CInputSystem::GetButtonCodeByName( const char* pButtonName ) const
 			return (buttonCode_t)index;
 		}
 	}
-
 	return BUTTON_CODE_NONE;
 }
 
@@ -568,10 +619,5 @@ CInputSystem::GetButtonName
 */
 const char* CInputSystem::GetButtonName( buttonCode_t buttonCode ) const
 {
-	if ( buttonCode == KEY_COUNT || buttonCode == MOUSE_COUNT || buttonCode == BUTTON_CODE_COUNT )
-	{
-		return "";
-	}
-
-	return s_pButtonNames[(uint32)buttonCode];
+	return Ensure( Input_IsValidCode( buttonCode ) ) ? s_pButtonNames[(uint32)buttonCode] : "";
 }

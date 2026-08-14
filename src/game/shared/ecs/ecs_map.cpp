@@ -2,7 +2,7 @@
 #include "resourcesystem/iresourcesystem.h"
 #include "resourcesystem/resourceptr.h"
 #include "game/ientitydesc.h"
-#include "game/shared/game.h"
+#include "game/shared/basegame.h"
 #include "game/shared/ecs/ecs_entitydesc.h"
 #include "game/shared/ecs/ecs_map.h"
 #include "game/shared/ecs/ecs_render.gen.h"
@@ -165,6 +165,7 @@ CEcsMap::Update
 void CEcsMap::Update( float deltaTime )
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_SCENE );
+	pStudioScene->Update( deltaTime );
 	ecsWorld.Update( deltaTime );
 }
 

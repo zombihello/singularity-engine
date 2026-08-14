@@ -236,6 +236,11 @@ CStudioAPISamplerVk::CStudioAPISamplerVk( const studioAPISamplerCreateInfo_t& cr
 	VK_TranslateSamplerFilter( createInfo.filer, vkSamplerCreateInfo.magFilter, vkSamplerCreateInfo.minFilter, vkSamplerCreateInfo.mipmapMode );
 	STUDIOAPI_VK_VERIFY_RESULT( vkCreateSampler( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), &vkSamplerCreateInfo, NULL, &vkSampler ) );
 
+	// Set debug name for the sampler
+#if !RETAIL
+	VK_SetDebugName( VK_OBJECT_TYPE_SAMPLER, (uint64)vkSampler, pDebugName );
+#endif	// !RETAIL
+
 	// Register in 'onStudioAPIVkShutodwn' for destroy Vulkan objects when the one is shutdown
 	onStudioAPIVkShutdownHandle = g_StudioAPIVk.OnStudioAPIVkShutdown().Subscribe( &CStudioAPISamplerVk::OnStudioAPIVkShutdown, this );
 }
@@ -332,7 +337,7 @@ CStudioAPITextureVk::CStudioAPITextureVk( studioAPITextureType_t type, uint32 si
 
 	CStudioAPIQueueSharingModeSetupVk queueSharingModeSetup( graphicsQueueFamilyIndex, computeQueueFamilyIndex, transferQueueFamilyIndex );
 	queueSharingModeSetup.Setup( vkImageCreateInfo.sharingMode, vkImageCreateInfo.queueFamilyIndexCount, vkImageCreateInfo.pQueueFamilyIndices );
-	vmaAllocation = g_StudioAPIVk.GetMemoryMgr().AllocateImage( S_Sprintf( "Texture (type: 0x%X, %ix%ix%i, numLayers: %i, numMips: %i, pixelFormat: '%s', usageFlags: 0x%X)", type, sizeX, sizeY, sizeZ, numLayers, numMips, g_PixelFormatInfos[pixelFormat].pName, usageFlags ).c_str(), vkImageCreateInfo, vmaAllocationCreateInfo, vkImage );
+	vmaAllocation = g_StudioAPIVk.GetMemoryMgr().AllocateImage( pDebugName, vkImageCreateInfo, vmaAllocationCreateInfo, vkImage );
 	if ( vmaAllocation == VK_NULL_HANDLE )
 	{
 		Sys_Error( "Failed to allocate GPU texture (type: 0x%X, %ix%ix%i, numLayers: %i, numMips: %i, pixelFormat: '%s')", type, sizeX, sizeY, sizeZ, numLayers, numMips, g_PixelFormatInfos[pixelFormat].pName );
@@ -355,31 +360,24 @@ CStudioAPITextureVk::CStudioAPITextureVk( studioAPITextureType_t type, uint32 si
 	// Create a main image views for depth/stencil
 	if ( VK_IsDepthPixelFormat( pixelFormat ) )
 	{
-		// Only depth
+		// Only depth view
 		vkImageViews.resize( 3 );
 		vkImageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
 		STUDIOAPI_VK_VERIFY_RESULT( vkCreateImageView( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), &vkImageViewCreateInfo, NULL, &vkImageViews[IMAGE_VIEW_INDEX_DEPTH_ONLY] ) );
-
-		// Only stencil
 		if ( VK_IsStencilPixelFormat( pixelFormat ) )
 		{
+			// Only stencil view
 			vkImageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_STENCIL_BIT;
 			STUDIOAPI_VK_VERIFY_RESULT( vkCreateImageView( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), &vkImageViewCreateInfo, NULL, &vkImageViews[IMAGE_VIEW_INDEX_STENCIL_ONLY] ) );
-		}
-		else
-		{
-			vkImageViews[IMAGE_VIEW_INDEX_STENCIL_ONLY] = vkImageViews[IMAGE_VIEW_INDEX_DEPTH_ONLY];
-		}
 
-		// Depth and stencil
-		if ( VK_IsStencilPixelFormat( pixelFormat ) )
-		{
+			// Depth and stencil view
 			vkImageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
 			STUDIOAPI_VK_VERIFY_RESULT( vkCreateImageView( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), &vkImageViewCreateInfo, NULL, &vkImageViews[IMAGE_VIEW_INDEX_DEPTH_AND_STENCIL] ) );
 		}
 		else
 		{
-			vkImageViews[IMAGE_VIEW_INDEX_DEPTH_AND_STENCIL] = vkImageViews[IMAGE_VIEW_INDEX_DEPTH_ONLY];
+			vkImageViews[IMAGE_VIEW_INDEX_STENCIL_ONLY]		 = VK_NULL_HANDLE;
+			vkImageViews[IMAGE_VIEW_INDEX_DEPTH_AND_STENCIL] = VK_NULL_HANDLE;
 		}
 	}
 	// Otherwise create a main image view for color texture
@@ -445,11 +443,15 @@ CStudioAPITextureVk::~CStudioAPITextureVk()
 	{
 		g_StudioAPIVk.GetMemoryMgr().FreeResource( [vkImageViews = vkImageViews, vkImage = vkImage, vmaAllocation = vmaAllocation]()
 												   {
-			for ( uint32 imageViewIdx = 0, numImageViews = (uint32)vkImageViews.size(); imageViewIdx < numImageViews; ++imageViewIdx )
-			{
-				vkDestroyImageView( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), vkImageViews[imageViewIdx], NULL );
-			}
-			g_StudioAPIVk.GetMemoryMgr().DestroyImage( vkImage, vmaAllocation ); } );
+													   for ( uint32 imageViewIdx = 0, numImageViews = (uint32)vkImageViews.size(); imageViewIdx < numImageViews; ++imageViewIdx )
+													   {
+														   VkImageView vkImageView = vkImageViews[imageViewIdx];
+														   if ( vkImageView != VK_NULL_HANDLE )
+														   {
+															   vkDestroyImageView( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), vkImageView, NULL );
+														   }
+													   }
+													   g_StudioAPIVk.GetMemoryMgr().DestroyImage( vkImage, vmaAllocation ); } );
 		vkImage		  = VK_NULL_HANDLE;
 		vmaAllocation = VK_NULL_HANDLE;
 		vkImageViews.clear();

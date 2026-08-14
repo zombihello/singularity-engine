@@ -327,7 +327,7 @@ bool CResourceCompilerSMdl::ParseModels( const CSMDLSourceModelDoc& smdlSourceFi
 	// Loading a model
 	Msg( "ResourceCompilerSMdl: Loading models from '%s'..", srcPath.c_str() );
 	Assimp::Importer aiImport;
-	const aiScene*	 pAIScene = aiImport.ReadFile( srcPath.c_str(), aiProcess_Triangulate | aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals | aiProcess_LimitBoneWeights | aiProcess_JoinIdenticalVertices );
+	const aiScene*	 pAIScene = aiImport.ReadFile( srcPath.c_str(), aiProcess_Triangulate | aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals | aiProcess_LimitBoneWeights | aiProcess_JoinIdenticalVertices | aiProcess_FlipUVs );
 	if ( !pAIScene )
 	{
 		Error( "ResourceCompilerSMdl: Failed to read file '%s', %s", srcPath.c_str(), aiImport.GetErrorString() );

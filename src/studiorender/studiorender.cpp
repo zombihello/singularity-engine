@@ -1,9 +1,13 @@
 #include "pch_studiorender.h"
+#include "tier1/math/math.h"
 #include "filesystem/ifilesystem.h"
 #include "resourcesystem/iresourcesystem.h"
 #include "materialsystem/ishadermgr.h"
+#include "materialsystem/imaterialsystem.h"
 #include "modelsystem/imodel.h"
 #include "modelsystem/imodelsystem.h"
+#include "modelsystem/ivertexfactory_simple.h"
+#include "modelsystem/ivertexfactory_static.h"
 #include "studiorender/studio_renderthread.h"
 #include "studiorender/studio_viewport.h"
 #include "studiorender/studio_renderpipelineset.h"
@@ -14,6 +18,25 @@
 CCVar		  r_vsync( "r_vsync", "0", "Should use vertical synchronization (VSync)", CVAR_FLAG_ARCHIVE );
 CStudioRender g_StudioRender;
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CStudioRender, IStudioRender, STUDIORENDER_INTERFACE_VERSION, g_StudioRender );
+
+/*
+==================
+CStudioRender::CStudioRender
+==================
+*/
+CStudioRender::CStudioRender()
+{
+	// Initialize lookup table for render passes
+	Mem_Memzero( pRenderPasses, STUDIO_RENDERPASS_NUM_TYPES * sizeof( CStudioRenderPassBase* ) );
+	pRenderPasses[STUDIO_RENDERPASS_TYPE_SCENE]	  = &renderPassScene;
+	pRenderPasses[STUDIO_RENDERPASS_TYPE_PRESENT] = &renderPassPresent;
+#if DEBUG && ENABLE_ASSERT
+	for ( uint32 index = 0; index < STUDIO_RENDERPASS_NUM_TYPES; ++index )
+	{
+		AssertMsg( pRenderPasses[index], "Render pass for type 0x%X isn't registered", index );
+	}
+#endif	// DEBUG && ENABLE_ASSERT
+}
 
 /*
 ==================
@@ -52,6 +75,20 @@ bool CStudioRender::Connect( createInterfaceFn_t pFactory )
 		return false;
 	}
 
+	// Get the material system
+	g_pMaterialSystem = (IMaterialSystem*)pFactory( MATERIALSYSTEM_INTERFACE_VERSION );
+	if ( !g_pMaterialSystem )
+	{
+		return false;
+	}
+
+	// Get the model system
+	g_pModelSystem = (IModelSystem*)pFactory( MODELSYSTEM_INTERFACE_VERSION );
+	if ( !g_pModelSystem )
+	{
+		return false;
+	}
+
 	g_pStudioRender = this;
 	return true;
 }
@@ -71,6 +108,7 @@ void CStudioRender::Disconnect()
 	g_pStudioAPI	  = NULL;
 	g_pStudioRender	  = NULL;
 	g_pShaderMgr	  = NULL;
+	g_pMaterialSystem = NULL;
 	g_pModelSystem	  = NULL;
 	g_pResourceSystem = NULL;
 }
@@ -85,6 +123,11 @@ bool CStudioRender::Init()
 	// Initialize all global resources
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	CStudioGlobalRenderResources::InitResources();
+
+	// Create the global constant buffer
+	pStudioAPIGlobalConstantBuffer = g_pStudioAPI->CreateBuffer( NULL, sizeof( studioGlobalShaderParams_t ), sizeof( studioGlobalShaderParams_t ),
+																 STUDIOAPI_BUFFER_USAGE_FLAG_VOLATILE | STUDIOAPI_BUFFER_USAGE_FLAG_CONSTANT_BUFFER | STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST,
+																 DEBUGNAME( "globalshaderparams" ) );
 
 	// Start the render thread
 	Studio_StartRenderThread();
@@ -102,8 +145,52 @@ void CStudioRender::Shutdown()
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Studio_StopRenderThread();
 
+	// Release the global constant buffer
+	pStudioAPIGlobalConstantBuffer = NULL;
+
 	// Release all global resources
 	CStudioGlobalRenderResources::ReleaseResources();
+}
+
+/*
+==================
+CStudioRender::PostInit
+==================
+*/
+bool CStudioRender::PostInit()
+{
+	// Initialize the scene render targets
+	sceneRenderTargets.Init();
+
+	// Initialize the simple elements batcher
+	batchedSimpleElements.Init();
+
+	// Initialize render passes
+	for ( uint32 index = 0; index < STUDIO_RENDERPASS_NUM_TYPES; ++index )
+	{
+		pRenderPasses[index]->Init();
+	}
+	return true;
+}
+
+/*
+==================
+CStudioRender::PreShutdown
+==================
+*/
+void CStudioRender::PreShutdown()
+{
+	// Shutdown render passes
+	for ( uint32 index = 0; index < STUDIO_RENDERPASS_NUM_TYPES; ++index )
+	{
+		pRenderPasses[index]->Shutdown();
+	}
+
+	// Shutdown the simple elements batcher
+	batchedSimpleElements.Shutdown();
+
+	// Shutdown the scene render targets
+	sceneRenderTargets.Shutdown();
 }
 
 /*
@@ -189,10 +276,37 @@ void CStudioRender::DrawScene( IStudioViewport* pStudioViewport, IStudioScene* p
 	CStudioScene*	   pStudioSceneLocal = (CStudioScene*)pStudioScene;
 	studioSceneView_t* pSceneView		 = g_studioFrameAlloc.Construct<studioSceneView_t>();
 
+	// Reallocate scene render targets to cover the viewport
+	// and rebuild every render pass' frame buffers if it need
+	vector2i_t viewportSize = pStudioViewport->GetSize();
+	if ( sceneRenderTargets.Allocate( viewportSize.x, viewportSize.y ) )
+	{
+		// Send a command on the render thread to rebuild every render pass' frame buffers,
+		// because scene render targets has been changed
+		UNIQUE_RENDER_COMMAND_ONEPARAMETER( CStudioRenderCmd_RebuildFrameBuffers,
+											vector2i_t, bufferSize, sceneRenderTargets.GetBufferSize(),
+											{
+												g_StudioRender.R_RebuildFrameBuffers( bufferSize );
+											} );
+	}
+	vector2i_t bufferSize = sceneRenderTargets.GetBufferSize();
+
+	// Build the global shader params from the camera view
+	vector3_t					forward			   = cameraView.rotation * g_vectorForward;
+	vector3_t					up				   = cameraView.rotation * g_vectorUp;
+	studioGlobalShaderParams_t& globalShaderParams = pSceneView->globalShaderParams;
+	globalShaderParams.viewMatrix				   = S_MatrixLookAt( cameraView.location, cameraView.location + forward, up );
+	globalShaderParams.projectionMatrix			   = S_MatrixPerspective( cameraView.fieldOfView, cameraView.aspectRatio, cameraView.nearClipPlane, cameraView.farClipPlane );
+	globalShaderParams.viewProjectionMatrix		   = globalShaderParams.projectionMatrix * globalShaderParams.viewMatrix;
+	globalShaderParams.invViewProjectionMatrix	   = S_MatrixInverse( globalShaderParams.viewProjectionMatrix );
+	globalShaderParams.position					   = vector4_t( cameraView.location, 1.f );
+	globalShaderParams.screenAndBufferSize		   = vector4_t( (float)viewportSize.x, (float)viewportSize.y, (float)bufferSize.x, (float)bufferSize.y );
+
 	// Find all visible entities, after that creates entity views for them
 	pStudioSceneLocal->FindEntityViews( pSceneView );
+	pStudioSceneLocal->AddDebugPrimitivesToSceneView( pSceneView );
 
-	// Go through each entity view and add draw surfaces to the scene view
+	// Go through each entity view and add surface batches to the scene view
 	for ( studioEntityView_t* pEntityView = pSceneView->pEntityViews; pEntityView; pEntityView = pEntityView->pNext )
 	{
 		AddModelToSceneView( pSceneView, pEntityView );
@@ -220,8 +334,8 @@ void CStudioRender::AddModelToSceneView( studioSceneView_t* pSceneView, studioEn
 	CResourcePtr<IModel> pDefaultModel = pModelsMgr->GetDefaultResource();
 
 	// Get entity's model, if it isn't cached use default one
-	CResourcePtr<IModel> pModel			= pEntityView->pEntity->params.pModel;
-	IModelResource*		 pModelResource = pModel.IsCached() ? pModel->GetStudioResource() : pDefaultModel->GetStudioResource();
+	CResourcePtr<IModel> pModel			= pEntityView->pEntity->params.pModel.IsCached() ? pEntityView->pEntity->params.pModel : pDefaultModel;
+	IModelResource*		 pModelResource = pModel->GetStudioResource();
 	if ( !pModelResource )
 	{
 		return;
@@ -241,25 +355,76 @@ void CStudioRender::AddModelToSceneView( studioSceneView_t* pSceneView, studioEn
 		pMaterialIds[index] = AddResourceToSceneView( pSceneView, pMaterialResources[index].GetRawPtr() );
 	}
 
-	// Go through each model surface and allocate draw surfaces
+	// Go through each model surface and add this entity's instance to the matching surface batch
+	IVertexFactory*		pVertexFactory	= pModelResource->GetVertexFactory();
+	studioRenderPass_t& renderPassScene = pSceneView->renderPasses[STUDIO_RENDERPASS_TYPE_SCENE];
 	for ( uint32 index = 0; index < numSurfaces; ++index )
 	{
-		const modelSurface_t& surface	   = pSurfaces[index];
-		studioDrawSurface_t*  pDrawSurface = (studioDrawSurface_t*)g_studioFrameAlloc.Alloc( sizeof( studioDrawSurface_t ) );
-		pDrawSurface->pEntityView		   = pEntityView;
-		pDrawSurface->modelId			   = modelId;
-		pDrawSurface->materialId		   = pMaterialIds[surface.materialId];
-		pDrawSurface->baseVertexIndex	   = surface.baseVertexIndex;
-		pDrawSurface->baseIndex			   = surface.baseIndex;
-		pDrawSurface->numIndices		   = surface.numIndices;
+		const modelSurface_t&	surface			= pSurfaces[index];
+		uint32					materialId		= pMaterialIds[surface.materialId];
+		studioSurfaceBatchKey_t surfaceBatchKey = { modelId, materialId, index };
 
-		// Add the draw surface into the scene view and render passes
-		studioRenderPass_t& renderPassPresent = pSceneView->renderPasses[STUDIO_RENDERPASS_TYPE_PRESENT];
-		uint32				drawSurfaceId	  = (uint32)pSceneView->drawSurfaces.size();
-		pSceneView->drawSurfaces.emplace_back( pDrawSurface );
-		renderPassPresent.drawSurfaceIds.emplace_back( drawSurfaceId );
-		renderPassPresent.resourceIds.insert( modelId );
-		renderPassPresent.resourceIds.insert( pMaterialIds[surface.materialId] );
+		// Try to find an existing batch for the surface (model, material, surface)
+		studioSurfaceBatch_t* pSurfaceBatch = NULL;
+		auto				  it			= pSceneView->surfaceBatchDict.find( surfaceBatchKey );
+		if ( it != pSceneView->surfaceBatchDict.end() )
+		{
+			pSurfaceBatch = pSceneView->surfaceBatches[it->second];
+		}
+		// Otherwise create a new one
+		else
+		{
+			pSurfaceBatch				   = g_studioFrameAlloc.Construct<studioSurfaceBatch_t>( pVertexFactory );
+			pSurfaceBatch->modelId		   = modelId;
+			pSurfaceBatch->materialId	   = materialId;
+			pSurfaceBatch->baseVertexIndex = surface.baseVertexIndex;
+			pSurfaceBatch->baseIndex	   = surface.baseIndex;
+			pSurfaceBatch->numIndices	   = surface.numIndices;
+
+			// Add the batch into the scene view and render passes
+			uint32 surfaceBatchId = (uint32)pSceneView->surfaceBatches.size();
+			pSceneView->surfaceBatches.emplace_back( pSurfaceBatch );
+			pSceneView->surfaceBatchDict.emplace( surfaceBatchKey, surfaceBatchId );
+			renderPassScene.surfaceBatchIds.emplace_back( surfaceBatchId );
+			renderPassScene.resourceIds.emplace( modelId );
+			renderPassScene.resourceIds.emplace( materialId );
+		}
+
+		// Append this entity's instance to the batch
+		switch ( pVertexFactory->GetVertexType() )
+		{
+		case MODEL_VERTEXTYPE_SIMPLE:
+		{
+			pSurfaceBatch->instances.Add<modelSimpleInstance_t>();
+			break;
+		}
+		case MODEL_VERTEXTYPE_STATIC:
+		{
+			modelStaticInstance_t* pInstance = pSurfaceBatch->instances.Add<modelStaticInstance_t>();
+			pInstance->localToWorld			 = pEntityView->localToWorld;
+			break;
+		}
+		default:
+			Warning( "StudioRender: Unsupported vertex type 0x%X, surface skipped (entity: %i, surface: %i)", pVertexFactory->GetVertexType(), pEntityView->pEntity->id, index );
+			AssertNoEntry();
+			break;
+		}
+	}
+}
+
+/*
+==================
+CStudioRender::R_RebuildFrameBuffers
+==================
+*/
+void CStudioRender::R_RebuildFrameBuffers( const vector2i_t& bufferSize )
+{
+	// Rebuild render pass' frame buffers
+	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
+	Assert( Studio_IsInRenderThread() );
+	for ( uint32 index = 0; index < STUDIO_RENDERPASS_NUM_TYPES; ++index )
+	{
+		pRenderPasses[index]->R_RebuildFrameBuffers( bufferSize );
 	}
 }
 
@@ -270,9 +435,34 @@ CStudioRender::R_DrawScene
 */
 void CStudioRender::R_DrawScene( CStudioViewport* pViewport, studioSceneView_t* pSceneView )
 {
+	// Do nothing if the swap chain hasn't an acquired image
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	Assert( Studio_IsInRenderThread() );
-	presentRenderPass.R_DrawPass( pViewport, pSceneView );
+	IStudioAPISwapChain* pStudioAPISwapChain = pViewport->GetStudioAPISwapChain();
+	if ( !pStudioAPISwapChain->IsImageAcquired() )
+	{
+		return;
+	}
+
+	// Update the global constant buffer from the scene view's global params
+	pStudioAPIGlobalConstantBuffer->UpdateData( g_pStudioAPI->GetImmediateCmdContext( STUDIOAPI_QUEUE_TYPE_GRAPHICS ),
+												(byte*)&pSceneView->globalShaderParams, sizeof( studioGlobalShaderParams_t ) );
+
+	// Build batches of debug primitives
+	batchedSimpleElements.R_BuildBatches( pSceneView );
+
+	// Create instance buffers for each surface batch
+	for ( uint32 index = 0, count = (uint32)pSceneView->surfaceBatches.size(); index < count; ++index )
+	{
+		studioSurfaceBatch_t* pSurfaceBatch = pSceneView->surfaceBatches[index];
+		pSurfaceBatch->instances.R_Upload();
+	}
+
+	// Draw render passes
+	for ( uint32 index = 0; index < STUDIO_RENDERPASS_NUM_TYPES; ++index )
+	{
+		pRenderPasses[index]->R_DrawPass( pViewport, pSceneView );
+	}
 }
 
 /*

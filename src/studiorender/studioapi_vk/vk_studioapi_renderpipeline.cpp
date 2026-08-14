@@ -243,6 +243,8 @@ CStudioAPIRenderPipelineVk::CStudioAPIRenderPipelineVk( const studioAPIRenderPip
 	vkPipelineDepthStencilStateCreateInfo.depthWriteEnable						= createInfo.depthState.bWriteEnable;
 	vkPipelineDepthStencilStateCreateInfo.depthCompareOp						= VK_TranslateCompareOp( createInfo.depthState.compareOp );
 	vkPipelineDepthStencilStateCreateInfo.depthBoundsTestEnable					= createInfo.depthState.bBoundsTestEnable;
+	vkPipelineDepthStencilStateCreateInfo.minDepthBounds						= createInfo.depthState.minBounds;
+	vkPipelineDepthStencilStateCreateInfo.maxDepthBounds						= createInfo.depthState.maxBounds;
 	vkPipelineDepthStencilStateCreateInfo.stencilTestEnable						= createInfo.stencilState.bTestEnable;
 	vkPipelineDepthStencilStateCreateInfo.front.failOp							= VK_TranslateStencilOp( createInfo.stencilState.front.failOp );
 	vkPipelineDepthStencilStateCreateInfo.front.passOp							= VK_TranslateStencilOp( createInfo.stencilState.front.passOp );
@@ -329,7 +331,7 @@ CStudioAPIRenderPipelineVk::CStudioAPIRenderPipelineVk( const studioAPIRenderPip
 	vkGraphicsPipelineCreateInfo.sType						  = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 	vkGraphicsPipelineCreateInfo.stageCount					  = (uint32)vkPipelineShaderStageCreateInfos.size();
 	vkGraphicsPipelineCreateInfo.pStages					  = vkPipelineShaderStageCreateInfos.data();
-	vkGraphicsPipelineCreateInfo.pVertexInputState			  = &pVertexDeclaration->GetVkPipelineVertexInputStateInfo();
+	vkGraphicsPipelineCreateInfo.pVertexInputState			  = pVertexDeclaration ? &pVertexDeclaration->GetVkPipelineVertexInputStateInfo() : &CStudioAPIVertexDeclarationVk::GetVkEmptyPipelineVertexInputStateInfo();
 	vkGraphicsPipelineCreateInfo.pInputAssemblyState		  = &vkPipelineInputAssemblyStateCreateInfo;
 	vkGraphicsPipelineCreateInfo.pViewportState				  = &vkPipelineViewportStateCreateInfo;
 	vkGraphicsPipelineCreateInfo.pRasterizationState		  = &vkPipelineRasterizationStateCreateInfo;
@@ -343,6 +345,11 @@ CStudioAPIRenderPipelineVk::CStudioAPIRenderPipelineVk( const studioAPIRenderPip
 	vkGraphicsPipelineCreateInfo.basePipelineHandle			  = VK_NULL_HANDLE;
 	vkGraphicsPipelineCreateInfo.basePipelineIndex			  = -1;
 	STUDIOAPI_VK_VERIFY_RESULT( vkCreateGraphicsPipelines( g_StudioAPIVk.GetDevice().GetVkLogicalDevice(), VK_NULL_HANDLE, 1, &vkGraphicsPipelineCreateInfo, NULL, &vkPipeline ) );
+
+	// Set debug name for the render pipeline
+#if !RETAIL
+	VK_SetDebugName( VK_OBJECT_TYPE_PIPELINE, (uint64)vkPipeline, pDebugName );
+#endif	// !RETAIL
 
 	// Register in 'onStudioAPIVkShutodwn' for destroy Vulkan objects when the one is shutdown
 	onStudioAPIVkShutdownHandle = g_StudioAPIVk.OnStudioAPIVkShutdown().Subscribe( &CStudioAPIRenderPipelineVk::OnStudioAPIVkShutdown, this );

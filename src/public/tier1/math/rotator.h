@@ -25,6 +25,9 @@ public:
 	// Clamps an angle to the range of (-180, 180]
 	static float NormalizeAxis( float angle );
 
+	// Clear the rotator
+	void Clear();
+
 	// Checks whether rotator is nearly zero within specified tolerance, when treated as an orientation
 	// This means that CRotator(0, 0, 360) is "zero", because it is the same final orientation as the zero rotator
 	bool IsNearlyZero( float tolerance = KINDA_SMALL_NUMBER ) const;

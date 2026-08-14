@@ -15,7 +15,7 @@ enum studioAPIBufferUsageFlag_t
 {
 	STUDIOAPI_BUFFER_USAGE_FLAG_STATIC			  = 1 << 0,																		// The buffer will be created, filled and never repacked
 	STUDIOAPI_BUFFER_USAGE_FLAG_DYNAMIC			  = 1 << 1,																		// The buffer will be repacked in-frequently
-	STUDIOAPI_BUFFER_USAGE_FLAG_VOLATILE		  = 1 << 2,																		// The buffer will be repacked every frame
+	STUDIOAPI_BUFFER_USAGE_FLAG_VOLATILE		  = 1 << 2,																		// The buffer will be repacked every frame or every draw, its contents valid only until the end of the current frame
 	STUDIOAPI_BUFFER_USAGE_FLAG_CONCURRENT		  = 1 << 3,																		// The buffer will be often used in a few queue families
 	STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_SRC	  = 1 << 4,																		// The buffer will be used as transfer source
 	STUDIOAPI_BUFFER_USAGE_FLAG_TRANSFER_DST	  = 1 << 5,																		// The buffer will be used as transfer destination

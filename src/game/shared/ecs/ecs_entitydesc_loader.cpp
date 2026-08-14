@@ -9,6 +9,7 @@ CEcsEntityDescLoader::Load
 */
 bool CEcsEntityDescLoader::Load( const char* pPath, IResourceData* pData ) const
 {
+	PROFILER_SCOPE_FUNC();
 	Assert( pData );
 	CSENTCompiledEntityDescDoc sentCompiledEntityDescDoc;
 	if ( !sentCompiledEntityDescDoc.LoadFromFile( S_GetFileExtension( pPath ) ? pPath : S_Sprintf( "%s.sent_c", pPath ).c_str() ) )

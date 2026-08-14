@@ -9,9 +9,14 @@
 #include "game/shared/ecs/ecs_map.h"
 
 //-----------------------------------------------------------------------------
-// Base class of the game
+// Forward declarations
 //-----------------------------------------------------------------------------
-class CGame : public CBaseAppSystem<IGame>
+class CBasePlayer;
+
+//-----------------------------------------------------------------------------
+// A base game class
+//-----------------------------------------------------------------------------
+class CBaseGame : public CBaseAppSystem<IGame>
 {
 public:
 	// IAppSystem interfaces
@@ -34,13 +39,16 @@ public:
 	virtual void FrameUpdate( float deltaTime ) override;
 	virtual void FrameDraw( IStudioViewport* pStudioViewport ) override;
 
-	CGame();
+	CBaseGame();
 	CEcsMap*			GetActiveEcsMap() const;
 	CEcsComponentTypes& GetEcsComponentTypes();
 
 protected:
+	virtual CBasePlayer* CreatePlayer() const;
+
 	CEcsComponentTypes ecsComponentTypes;
 	CEcsMap*		   pActiveEcsMap;
+	CBasePlayer*	   pPlayer;
 
 private:
 	CResourceTypeFactory<CEcsEntityDesc> ecsEntityDescFactory;
@@ -48,12 +56,12 @@ private:
 };
 
 // NOTE: You must implement the function to return a singleton game class
-CGame* Game();
+CBaseGame* Game();
 
 //-----------------------------------------------------------------------------
-// Base class of the game IAppSystems
+// A base class of the game IAppSystems
 //-----------------------------------------------------------------------------
-class CGameAppSystems : public IGameAppSystems
+class CBaseGameAppSystems : public IGameAppSystems
 {
 public:
 	// IGameAppSystems interfaces
@@ -67,4 +75,4 @@ private:
 	eastl::vector<gameAppSystemInfo_t> appSystems;
 };
 
-#include "game/shared/game.inl"
+#include "game/shared/basegame.inl"

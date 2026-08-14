@@ -88,6 +88,16 @@ FORCEINLINE VkDescriptorSetAllocateInfo CStudioAPIDescriptorSetsLayoutVk::GetVkA
 
 /*
 ==================
+CStudioAPIDescriptorSetsLayoutVk::GetVkPushConstantRanges
+==================
+*/
+FORCEINLINE const eastl::vector<VkPushConstantRange>& CStudioAPIDescriptorSetsLayoutVk::GetVkPushConstantRanges() const
+{
+	return vkPushConstantRanges;
+}
+
+/*
+==================
 CStudioAPIDescriptorSetsLayoutVk::OnDescriptorSetsLayoutDeleted
 ==================
 */

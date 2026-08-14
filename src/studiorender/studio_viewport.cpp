@@ -137,7 +137,7 @@ void CStudioViewport::OnSwapChainReCreated( void* pUserData, IStudioAPISwapChain
 		studioAPIColorRenderTargetInfo.bSwapChain						 = true;
 		studioAPIColorRenderTargetInfo.loadOp							 = STUDIOAPI_RENDER_TARGET_LOAD_OP_CLEAR;
 		studioAPIColorRenderTargetInfo.storeOp							 = STUDIOAPI_RENDER_TARGET_STORE_OP_STORE;
-		pStudioViewport->pStudioAPIRenderPass							 = g_pStudioAPI->CreateRenderPass( studioAPIRenderPassCreateInfo, "SwapChain RenderPass" );
+		pStudioViewport->pStudioAPIRenderPass							 = g_pStudioAPI->CreateRenderPass( studioAPIRenderPassCreateInfo, DEBUGNAME( "swapchain" ) );
 	}
 
 	// Create new frame buffers
@@ -152,7 +152,7 @@ void CStudioViewport::OnSwapChainReCreated( void* pUserData, IStudioAPISwapChain
 		studioAPIFrameBufferCreateInfo.size								= pStudioAPISwapChain->GetSize();
 		studioAPIFrameBufferCreateInfo.bClearColor						= true;
 		studioAPIFrameBufferCreateInfo.clearColor						= CLinearColor::Make( 0.f, 0.f, 0.f );
-		pStudioViewport->studioAPIFrameBuffers[swapChainImageIdx]		= g_pStudioAPI->CreateFrameBuffer( studioAPIFrameBufferCreateInfo, "SwapChain FrameBuffer" );
+		pStudioViewport->studioAPIFrameBuffers[swapChainImageIdx]		= g_pStudioAPI->CreateFrameBuffer( studioAPIFrameBufferCreateInfo, DEBUGNAME( "swapchain" ) );
 	}
 
 	// If a render pass was re-created broadcast the event

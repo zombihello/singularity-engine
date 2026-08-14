@@ -133,14 +133,18 @@ public:
 	void ReleaseNamedSemaphore( CStudioAPINamedSemaphoreVk*& pNamedSemaphore );
 
 private:
-	eastl::list<CStudioAPIFenceVk*>									  fences;
-	eastl::list<CStudioAPISemaphoreVk*>								  semaphores;
-	eastl::list<CStudioAPIFenceVk*>									  frameInFlightFences[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];
-	eastl::list<CStudioAPIFenceVk*>									  pendingFreeFences[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];
-	eastl::list<CStudioAPISemaphoreVk*>								  pendingFreeSemaphores[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];
-	eastl::list<CStudioAPIFenceVk*>									  freeFences;
-	eastl::list<CStudioAPISemaphoreVk*>								  freeSemaphores;
-	eastl::unordered_map<eastl::string_view, CStudioAPINamedSemaphoreVk*> namedSemaphoresDict;
+	// The function returns semaphores of a named semaphore into the pending lists to free and destroys the one
+	// NOTE: The function doesn't remove the one from `namedSemaphoresDict`, a caller is responsible for it
+	void FreeNamedSemaphore( CStudioAPINamedSemaphoreVk* pNamedSemaphore );
+
+	eastl::list<CStudioAPIFenceVk*>									 fences;
+	eastl::list<CStudioAPISemaphoreVk*>								 semaphores;
+	eastl::list<CStudioAPIFenceVk*>									 frameInFlightFences[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];
+	eastl::list<CStudioAPIFenceVk*>									 pendingFreeFences[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];
+	eastl::list<CStudioAPISemaphoreVk*>								 pendingFreeSemaphores[STUDIOAPI_VK_NUM_FRAMES_IN_FLIGHT];
+	eastl::list<CStudioAPIFenceVk*>									 freeFences;
+	eastl::list<CStudioAPISemaphoreVk*>								 freeSemaphores;
+	eastl::unordered_map<eastl::string, CStudioAPINamedSemaphoreVk*> namedSemaphoresDict;
 };
 
 //-----------------------------------------------------------------------------

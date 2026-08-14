@@ -2,10 +2,6 @@
 #include "tier1/keyvalues.h"
 #include "tools/shadercompiler/shadercompiler_makefile.h"
 
-// Reserved vertex factory name. A shader's 'vertexfactory "all"' entry means it uses every vertex factory
-// known to the loaded list(s). Forbidden as an actual factory name in a *.list file
-#define VERTEXFACTORY_ALL_KEYWORD "all"
-
 /*
 ==================
 CShaderCompilerMakeFile::LoadMakeFile
@@ -170,47 +166,54 @@ bool CShaderCompilerMakeFile::LoadShader( const char* pPath, const char* pBaseDi
 		}
 	}
 
-	// Make sure that the makefile has vertex factories if the shader uses any
-	if ( keyValues.FindKey( "vertexfactory" ) && vertexFactories.empty() )
-	{
-		Error( "ShaderCompiler: Invalid shader, 'vertexfactory' declared but no vertex factory list was loaded (file: '%s')", absolutePath.c_str() );
-		return false;
-	}
-
 	// Get vertex factories this shader can be used with (optional)
+	bool bVertexFactoryKeyWords[VERTEXFACTORY_NUM_KEYWORDS] = {};
 	for ( CKeyValuesSubKeysIterator it( &keyValues, "vertexfactory" ); it; ++it )
 	{
-		// Add all known vertex factories if we found a vertex factory named 'all'
-		const char* pVertexFactoryName = it->GetString( NULL );
-		if ( !S_Stricmp( pVertexFactoryName, VERTEXFACTORY_ALL_KEYWORD ) )
+		// Resolve the entry, everything that isn't a reserved keyword is an actual vertex factory name
+		const char*			   pVertexFactoryName = it->GetString( NULL );
+		vertexFactoryKeyWord_t keyWord			  = VERTEXFACTORY_NUM_KEYWORDS;
+		bool				   bIsKeyWord		  = ConvStringToVertexFactoryKeyWord( pVertexFactoryName, keyWord );
+
+		// Make sure that the makefile has vertex factories, only the reserved 'none' can do without them
+		if ( vertexFactories.empty() && keyWord != VERTEXFACTORY_KEYWORD_NONE )
 		{
-			shader.vertexFactories.resize( vertexFactories.size() );
-			for ( uint32 index = 0, count = (uint32)vertexFactories.size(); index < count; ++index )
-			{
-				shader.vertexFactories[index] = &vertexFactories[index];
-			}
-			break;
+			Error( "ShaderCompiler: Invalid shader, 'vertexfactory' declared but no vertex factory list was loaded (file: '%s')", absolutePath.c_str() );
+			return false;
 		}
 
-		// Otherwise try to find the vertex factory in the makefile
-		const vertexFactory_t* pVertexFactory = NULL;
-		for ( uint32 index = 0, count = (uint32)vertexFactories.size(); index < count; ++index )
+		// If it a key word mark we meet it
+		if ( bIsKeyWord )
 		{
-			const vertexFactory_t& curVertexFactory = vertexFactories[index];
-			if ( !S_Stricmp( curVertexFactory.name.c_str(), pVertexFactoryName ) )
-			{
-				pVertexFactory = &curVertexFactory;
-				break;
-			}
+			bVertexFactoryKeyWords[(uint32)keyWord] = true;
+			continue;
 		}
 
-		// Make sure that we found the vertex factory and add it into the array
-		if ( !pVertexFactory )
+		// Otherwise try to find an actual vertex factory in the makefile and add it into the array
+		auto itFind = vertexFactoryDict.find( pVertexFactoryName );
+		if ( itFind == vertexFactoryDict.end() )
 		{
 			Error( "ShaderCompiler: Unknown vertex factory '%s' (file: '%s')", pVertexFactoryName, absolutePath.c_str() );
 			return false;
 		}
-		shader.vertexFactories.emplace_back( pVertexFactory );
+		shader.vertexFactories.emplace_back( &vertexFactories[itFind->second] );
+	}
+
+	// Handle vertex factory key words
+	// The shader uses every vertex factory known to the loaded list(s)
+	if ( bVertexFactoryKeyWords[VERTEXFACTORY_KEYWORD_ALL] )
+	{
+		shader.vertexFactories.resize( vertexFactories.size() );
+		for ( uint32 index = 0, count = (uint32)vertexFactories.size(); index < count; ++index )
+		{
+			shader.vertexFactories[index] = &vertexFactories[index];
+		}
+	}
+
+	// The shader can also be drawn without any vertex factory
+	if ( bVertexFactoryKeyWords[VERTEXFACTORY_KEYWORD_NONE] )
+	{
+		shader.vertexFactories.emplace_back( &vertexFactory_t::s_none );
 	}
 
 	// Add a system flag covering the declared vertex factories
@@ -263,11 +266,12 @@ bool CShaderCompilerMakeFile::LoadVertexFactoryList( const char* pPath, const ch
 	{
 		for ( CKeyValuesSubKeysIterator it( pVertexFactories, false, true ); it; ++it )
 		{
-			// Make sure that the vertex factory does not use reserved 'all'
-			const char* pVertexFactoryName = it->GetName();
-			if ( !S_Stricmp( pVertexFactoryName, VERTEXFACTORY_ALL_KEYWORD ) )
+			// Make sure that the vertex factory does not use any reserved keyword
+			const char*			   pVertexFactoryName = it->GetName();
+			vertexFactoryKeyWord_t dummyKeyWord;
+			if ( ConvStringToVertexFactoryKeyWord( pVertexFactoryName, dummyKeyWord ) )
 			{
-				Error( "ShaderCompiler: Invalid vertex factory name '" VERTEXFACTORY_ALL_KEYWORD "', name is reserved (file: '%s')", absolutePath.c_str() );
+				Error( "ShaderCompiler: Invalid vertex factory name '%s', name is reserved (file: '%s')", pVertexFactoryName, absolutePath.c_str() );
 				return false;
 			}
 

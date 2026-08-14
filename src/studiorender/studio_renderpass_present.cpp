@@ -1,90 +1,120 @@
 #include "pch_studiorender.h"
+#include "tier1/debugname.h"
 #include "materialsystem/ishader.h"
-#include "modelsystem/ivertexfactory.h"
+#include "materialsystem/imaterialvar.h"
+#include "materialsystem/itexture.h"
+#include "resourcesystem/iresourcesystem.h"
+#include "modelsystem/imodelsystem.h"
 #include "studiorender/studioapi/istudioapi_barrier.h"
+#include "studiorender/studioapi/studioapi_event.h"
+#include "studiorender/studio_resourcebindingslots.h"
 #include "studiorender/studio_renderpasstypes.h"
 #include "studiorender/studio_viewport.h"
+#include "studiorender/studio_renderutils.h"
+#include "studiorender/studiorender.h"
+#include "studiorender/studio_draweventcolors.h"
 #include "studiorender/studio_renderpass_present.h"
-#include "studiorender/studio_sceneview.h"
+
+/*
+==================
+CStudioRenderPassPresent::CStudioRenderPassPresent
+==================
+*/
+CStudioRenderPassPresent::CStudioRenderPassPresent()
+	: CStudioRenderPassBase( STUDIO_RENDERPASS_TYPE_PRESENT, 1 )
+{
+}
+
+/*
+==================
+CStudioRenderPassPresent::Init
+==================
+*/
+void CStudioRenderPassPresent::Init()
+{
+	// Create a material for present the final render target
+	PROFILER_SCOPE_FUNC();
+	IResourceTypeMgr*	  pMaterialsMgr			= g_pResourceSystem->GetResourceManagerForType<IMaterial>();
+	IResourceTypeMgr*	  pTexturesMgr			= g_pResourceSystem->GetResourceManagerForType<ITexture>();
+	materialVarInfo_t	  presentBaseTextureVar = MaterialVar_MakeTexture( "basetexture", pTexturesMgr->FindResource( "__rt_scenecolor_ldr" ) );
+	materialInitialData_t presentMatInitialData = {};
+	presentMatInitialData.pShaderName			= "screenspace";
+	presentMatInitialData.numVars				= 1;
+	presentMatInitialData.pVars					= &presentBaseTextureVar;
+
+	pMaterial = pMaterialsMgr->CreateResource( "__scenecolor_present" );
+	pMaterial->Init( presentMatInitialData );
+	pMaterialResource = pMaterial->GetStudioResource();
+
+	// Create a vertex factory for draw a quad
+	pVertexFactory = g_pModelSystem->CreateVertexFactory<IVertexFactorySimple>( DEBUGNAME( "present" ) );
+	pVertexFactory->Init();
+}
+
+/*
+==================
+CStudioRenderPassPresent::Shutdown
+==================
+*/
+void CStudioRenderPassPresent::Shutdown()
+{
+	PROFILER_SCOPE_FUNC();
+	pVertexFactory->Shutdown();
+	pVertexFactory	  = NULL;
+	pMaterialResource = NULL;
+	pMaterial		  = NULL;
+}
 
 /*
 ==================
 CStudioRenderPassPresent::R_DrawPass
 ==================
 */
-void CStudioRenderPassPresent::R_DrawPass( CStudioViewport* pViewport, studioSceneView_t* pSceneView )
+void CStudioRenderPassPresent::R_DrawPass( CStudioViewport* pViewport, studioSceneView_t* pSceneView ) const
 {
-	// Do nothing if the swap chain hasn't an acquired image
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-	IStudioAPISwapChain* pStudioAPISwapChain = pViewport->GetStudioAPISwapChain();
-	if ( !pStudioAPISwapChain->IsImageAcquired() )
-	{
-		return;
-	}
-
 	vector2i_t						viewportSize		  = pViewport->GetSize();
+	CRefPtr<IStudioAPIBuffer>		pGlobalConstantBuffer = g_StudioRender.GetStudioAPIGlobalConstantBuffer();
+	IStudioAPISwapChain*			pStudioAPISwapChain	  = pViewport->GetStudioAPISwapChain();
 	CRefPtr<IStudioAPICmdContext>	pGraphicsCmdContext	  = g_pStudioAPI->GetImmediateCmdContext( STUDIOAPI_QUEUE_TYPE_GRAPHICS );
 	CRefPtr<IStudioAPICmdListBatch> pGraphicsCmdListBatch = g_pStudioAPI->CreateCmdListBatch( pGraphicsCmdContext );
 	CRefPtr<IStudioAPICmdList>		pGraphicsCmdList	  = g_pStudioAPI->CreateCmdList( pGraphicsCmdContext );
 
+	IShader*		   pShader	  = pMaterialResource->GetShader();
+	shaderDrawParams_t drawParams = { pMaterialResource->GetPerMaterialContextData(), pShader->GetDefaultPerDrawVars(), pVertexFactory };
+
 	// Initialize viewport and scissor
 	pGraphicsCmdList->BeginRecord();
-	pGraphicsCmdList->SetViewport( 0.f, 0.f, (float)viewportSize.x, (float)viewportSize.y, 0.f, 1.f );
-	pGraphicsCmdList->SetScissor( 0, 0, viewportSize.x, viewportSize.y );
-
-	// Place barriers into the command list
-	studioAPIBarrier_t barrier = StudioAPI_MakeTextureBarrier( pStudioAPISwapChain->GetCurrentImage(), STUDIOAPI_TEXTURE_LAYOUT_COLOR_RENDER_TARGET, STUDIOAPI_QUEUE_TYPE_GRAPHICS );
-	pGraphicsCmdList->Barrier( &barrier, 1 );
-
-	const studioRenderPass_t& renderPass = pSceneView->renderPasses[STUDIO_RENDERPASS_TYPE_PRESENT];
-	for ( auto it = renderPass.resourceIds.begin(), itEnd = renderPass.resourceIds.end(); it != itEnd; ++it )
 	{
-		studioResource_t* pResource = pSceneView->resources[*it];
-		switch ( pResource->type )
-		{
-		case STUDIO_RESOURCE_TYPE_MODEL:
-		{
-			IModelResource* pModel		   = pResource->pModel;
-			IVertexFactory* pVertexFactory = pModel->GetVertexFactory();
-			pVertexFactory->R_Barrier( pGraphicsCmdList );
-			break;
-		}
+		STUDIOAPI_SCOPED_EVENT( pGraphicsCmdList, CStudioDrawEventColors::postProcess, "present" );
+		pGraphicsCmdList->SetViewport( 0.f, 0.f, (float)viewportSize.x, (float)viewportSize.y, 0.f, 1.f );
+		pGraphicsCmdList->SetScissor( 0, 0, viewportSize.x, viewportSize.y );
 
-		case STUDIO_RESOURCE_TYPE_MATERIAL:
+		// Place barriers into the command list
 		{
-			IMaterialResource*	pMaterial	 = pResource->pMaterial;
-			IShader*			pShader		 = pMaterial->GetShader();
-			IShaderContextData* pContextData = pMaterial->GetContextData();
-			pShader->R_Barrier( pGraphicsCmdList, pContextData );
-			break;
+			studioAPIBarrier_t barriers[] = {
+				StudioAPI_MakeTextureBarrier( pStudioAPISwapChain->GetCurrentImage(), STUDIOAPI_TEXTURE_LAYOUT_COLOR_RENDER_TARGET, STUDIOAPI_QUEUE_TYPE_GRAPHICS ),
+				StudioAPI_MakeBufferBarrier( pGlobalConstantBuffer, STUDIOAPI_BUFFER_STATE_CONSTANT_BUFFER, STUDIOAPI_QUEUE_TYPE_GRAPHICS )
+			};
+			pGraphicsCmdList->Barrier( barriers, ARRAYSIZE( barriers ) );
 		}
+		drawParams.pPerMaterialContextData->R_Barrier( pGraphicsCmdList );
 
-		default:
-			AssertMsg( false, "Unknown studio resource type 0x%X", pResource->type );
-			break;
+		// Copy `__rt_scenecolor_ldr` into a swapchain image
+		studioDenormalizedQuadParams_t denormalizedQuadParams = { pVertexFactory, vector2_t( 0.f, 0.f ), viewportSize, vector2_t( 0.f, 0.f ), viewportSize, viewportSize, g_StudioRender.GetSceneRenderTargets().GetBufferSize(), 1.f, CColor::Make( 255, 255, 255 ) };
+		pGraphicsCmdList->BeginRenderPass( pViewport->GetStudioAPIRenderPass(), pViewport->GetStudioAPIFrameBuffer() );
+		pGraphicsCmdList->SetRenderPipeline( pShader->R_ResolveRenderPipeline( drawParams, STUDIO_RENDERPASS_TYPE_PRESENT ) );
+		pGraphicsCmdList->SetConstantBuffer( 0, STUDIO_RESOURCE_BINDING_SLOT_GLOBAL_CB, pGlobalConstantBuffer );
+		pShader->R_Bind( pGraphicsCmdList, drawParams );
+		R_DrawDenormalizedQuad( pGraphicsCmdList, denormalizedQuadParams );
+		pGraphicsCmdList->EndRenderPass();
+
+		// Place barriers for the swapchain image
+		{
+			studioAPIBarrier_t barrier = StudioAPI_MakeTextureBarrier( pStudioAPISwapChain->GetCurrentImage(), STUDIOAPI_TEXTURE_LAYOUT_PRESENT, STUDIOAPI_QUEUE_TYPE_GRAPHICS );
+			pGraphicsCmdList->Barrier( &barrier, 1 );
 		}
 	}
-
-	// Draw all surfaces for the pass
-	pGraphicsCmdList->BeginRenderPass( pViewport->GetStudioAPIRenderPass(), pViewport->GetStudioAPIFrameBuffer() );
-	for ( uint32 index = 0, count = (uint32)renderPass.drawSurfaceIds.size(); index < count; ++index )
-	{
-		studioDrawSurface_t* pDrawSurface	= pSceneView->drawSurfaces[renderPass.drawSurfaceIds[index]];
-		IModelResource*		 pModel			= pSceneView->resources[pDrawSurface->modelId]->pModel;
-		IMaterialResource*	 pMaterial		= pSceneView->resources[pDrawSurface->materialId]->pMaterial;
-		IShader*			 pShader		= pMaterial->GetShader();
-		IShaderContextData*	 pContextData	= pMaterial->GetContextData();
-		IVertexFactory*		 pVertexFactory = pModel->GetVertexFactory();
-
-		pVertexFactory->R_PrepareForDraw( pGraphicsCmdList, STUDIO_RENDERPASS_TYPE_PRESENT );
-		pShader->R_PrepareForDraw( pGraphicsCmdList, pContextData, pVertexFactory, STUDIO_RENDERPASS_TYPE_PRESENT );
-		pGraphicsCmdList->DrawIndexed( pDrawSurface->baseVertexIndex, pDrawSurface->baseIndex, pDrawSurface->numIndices );
-	}
-	pGraphicsCmdList->EndRenderPass();
-
-	// Place barriers for swapchain image
-	barrier = StudioAPI_MakeTextureBarrier( pStudioAPISwapChain->GetCurrentImage(), STUDIOAPI_TEXTURE_LAYOUT_PRESENT, STUDIOAPI_QUEUE_TYPE_GRAPHICS );
-	pGraphicsCmdList->Barrier( &barrier, 1 );
 	pGraphicsCmdList->EndRecord();
 
 	// Submit the command list
@@ -95,31 +125,11 @@ void CStudioRenderPassPresent::R_DrawPass( CStudioViewport* pViewport, studioSce
 
 /*
 ==================
-CStudioRenderPassPresent::CreateStudioAPIRenderPipeline
+CStudioRenderPassPresent::R_RebuildFrameBuffers
 ==================
 */
-CRefPtr<IStudioAPIRenderPipeline> CStudioRenderPassPresent::R_CreateStudioAPIRenderPipeline( CStudioViewport* pViewport, IStudioAPIBoundShaderState* pStudioAPIBoundShaderState )
+void CStudioRenderPassPresent::R_RebuildFrameBuffers( const vector2i_t& bufferSize )
 {
-	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
-	Assert( Studio_IsInRenderThread() && pViewport && pStudioAPIBoundShaderState );
-	Assert( pViewport->GetStudioAPIRenderPass() );
-
-	studioAPIColorBlendAttachmentStateInfo_t studioAPIColorBlendAttachmentState = {};
-	studioAPIColorBlendAttachmentState.colorWriteMask							= STUDIOAPI_COLOR_COMPONENT_FLAG_R | STUDIOAPI_COLOR_COMPONENT_FLAG_G | STUDIOAPI_COLOR_COMPONENT_FLAG_B | STUDIOAPI_COLOR_COMPONENT_FLAG_A;
-	studioAPIColorBlendAttachmentState.bBlendEnable								= false;
-
-	studioAPIRenderPipelineCreateInfo_t studioAPIRenderPipelineCreateInfo = {};
-	studioAPIRenderPipelineCreateInfo.pBoundShaderState					  = pStudioAPIBoundShaderState;
-	studioAPIRenderPipelineCreateInfo.inputAssemblyState.topology		  = STUDIOAPI_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-	studioAPIRenderPipelineCreateInfo.rasterizerState.fillMode			  = STUDIOAPI_RASTERIZER_FILL_MODE_SOLID;
-	studioAPIRenderPipelineCreateInfo.rasterizerState.cullMode			  = STUDIOAPI_RASTERIZER_CULL_MODE_CW;
-	studioAPIRenderPipelineCreateInfo.rasterizerState.lineWidth			  = 1.f;
-	studioAPIRenderPipelineCreateInfo.rasterizerState.bDepthBiasEnable	  = false;
-	studioAPIRenderPipelineCreateInfo.depthState.bTestEnable			  = false;
-	studioAPIRenderPipelineCreateInfo.stencilState.bTestEnable			  = false;
-	studioAPIRenderPipelineCreateInfo.colorBlendState.attachmentCount	  = 1;
-	studioAPIRenderPipelineCreateInfo.colorBlendState.pAttachments		  = &studioAPIColorBlendAttachmentState;
-	studioAPIRenderPipelineCreateInfo.colorBlendState.blendConstants	  = vector4_t( 0.f, 0.f, 0.f, 0.f );
-	studioAPIRenderPipelineCreateInfo.pRenderPass						  = pViewport->GetStudioAPIRenderPass();
-	return g_pStudioAPI->CreateRenderPipeline( studioAPIRenderPipelineCreateInfo );
+	// The present pass draws into the viewport's own swap chain frame buffer, which the viewport
+	// already manages/resizes itself - nothing to do here
 }

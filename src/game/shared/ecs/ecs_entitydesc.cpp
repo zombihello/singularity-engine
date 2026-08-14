@@ -1,5 +1,5 @@
 #include "pch_game_shared.h"
-#include "game/shared/game.h"
+#include "game/shared/basegame.h"
 #include "game/shared/ecs/ecs_entity.h"
 #include "game/shared/ecs/ecs_entitydesc.h"
 

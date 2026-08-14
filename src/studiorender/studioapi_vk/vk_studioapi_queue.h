@@ -63,4 +63,8 @@ private:
 	VkQueueFamilyProperties vkQueueFamilyProperties;
 };
 
+//-----------------------------------------------------------------------------
+// Queue family functions
+//-----------------------------------------------------------------------------
+void VK_GetUsedQueueFamiliesFromVkBufferUsage( VkBufferUsageFlags vkBufferUsageFlags, uint32& graphicsQueueFamilyIndex, uint32& computeQueueFamilyIndex, uint32& transferQueueFamilyIndex );
 #include "studiorender/studioapi_vk/vk_studioapi_queue.inl"

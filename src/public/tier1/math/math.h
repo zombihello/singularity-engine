@@ -41,7 +41,10 @@ extern const vector3_t	  g_vectorUp;
 extern const CRotator	  g_rotatorIdentity;
 extern const CTransform	  g_transformIdentity;
 extern const quaternion_t g_quaternionIdentity;
-extern const matrix4x4_t  g_matrixIdentity;
+extern const matrix3x3_t  g_matrix33Identity;
+extern const matrix3x4_t  g_matrix34Identity;
+extern const matrix4x4_t  g_matrix44Identity;
+extern const matrix4x3_t  g_matrix43Identity;
 
 //-----------------------------------------------------------------------------
 // General math functions
@@ -163,8 +166,10 @@ void		 S_AnglesToQuaternionZYX( float eulerAngleX, float eulerAngleY, float eule
 void		 S_AnglesToQuaternionZYX( const vector3_t& eulerAngles, quaternion_t& result );
 vector3_t	 S_QuaternionToAngles( const quaternion_t& quaternion );
 void		 S_QuaternionToAngles( const quaternion_t& quaternion, vector3_t& result );
-matrix4x4_t	 S_QuaternionToMatrix( const quaternion_t& quaternion );
-void		 S_QuaternionToMatrix( const quaternion_t& quaternion, matrix4x4_t& result );
+template<typename TMatrixType>
+TMatrixType S_QuaternionToMatrix( const quaternion_t& quaternion );
+template<typename TMatrixType>
+void		 S_QuaternionToMatrix( const quaternion_t& quaternion, TMatrixType& result );
 quaternion_t S_QuaternionInverse( const quaternion_t& quaternion );
 void		 S_QuaternionInverse( const quaternion_t& quaternion, quaternion_t& result );
 quaternion_t S_QuatenrionLookAt( const vector3_t& lookFrom, const vector3_t& lookTo, const vector3_t& up, const vector3_t& globalUp );
@@ -175,25 +180,41 @@ void		 S_QuaternionNormalize( const quaternion_t& quaternion, quaternion_t& resu
 //-----------------------------------------------------------------------------
 // Matrix functions
 //-----------------------------------------------------------------------------
-matrix4x4_t	  S_MatrixFromString( const char* pString );
-void		  S_MatrixFromString( const char* pString, matrix4x4_t& matrix );
-eastl::string S_MatrixToString( const matrix4x4_t& matrix );
-void		  S_MatrixToString( const matrix4x4_t& matrix, eastl::string& result );
-void		  S_MatrixIdentity( matrix4x4_t& matrix );
-matrix4x4_t	  S_MatrixIdentity();
-void		  S_MatrixOrigin( const matrix4x4_t& matrix, vector3_t& origin );
-vector3_t	  S_MatrixOrigin( const matrix4x4_t& matrix );
-void		  S_MatrixTranslate( const vector3_t& location, matrix4x4_t& matrix );
-matrix4x4_t	  S_MatrixTranslate( const vector3_t& location );
-void		  S_MatrixScale( const vector3_t& scale, matrix4x4_t& matrix );
-matrix4x4_t	  S_MatrixScale( const vector3_t& scale );
-void		  S_MatrixInverse( const matrix4x4_t& srcMatrix, matrix4x4_t& destMatrix );
-matrix4x4_t	  S_MatrixInverse( const matrix4x4_t& matrix );
-matrix4x4_t	  S_MatrixPerspective( float fieldOfView, float aspectRatio, float nearClipPlane, float farClipPlane );
-void		  S_MatrixPerspective( float fieldOfView, float aspectRatio, float nearClipPlane, float farClipPlane, matrix4x4_t& matrix );
-matrix4x4_t	  S_MatrixOrtho( float left, float right, float bottom, float top, float nearClipPlane, float farClipPlane );
-void		  S_MatrixOrtho( float left, float right, float bottom, float top, float nearClipPlane, float farClipPlane, matrix4x4_t& matrix );
-matrix4x4_t	  S_MatrixLookAt( const vector3_t& location, const vector3_t& direction, const vector3_t& axisUp );
-void		  S_MatrixLookAt( const vector3_t& location, const vector3_t& direction, const vector3_t& axisUp, matrix4x4_t& matrix );
+template<typename TMatrixType>
+TMatrixType S_MatrixFromString( const char* pString );
+template<typename TMatrixType>
+void S_MatrixFromString( const char* pString, TMatrixType& matrix );
+template<typename TMatrixType>
+eastl::string S_MatrixToString( const TMatrixType& matrix );
+template<typename TMatrixType>
+void S_MatrixToString( const TMatrixType& matrix, eastl::string& result );
+
+template<typename TMatrixType>
+TMatrixType S_MatrixIdentity();
+template<typename TMatrixType>
+void S_MatrixIdentity( TMatrixType& matrix );
+template<typename TMatrixType>
+void S_MatrixTranslate( const vector3_t& location, TMatrixType& matrix );
+template<typename TMatrixType>
+TMatrixType S_MatrixTranslate( const vector3_t& location );
+template<typename TMatrixType>
+void S_MatrixScale( const vector3_t& scale, TMatrixType& matrix );
+template<typename TMatrixType>
+TMatrixType S_MatrixScale( const vector3_t& scale );
+template<typename TMatrixType>
+void S_MatrixInverse( const TMatrixType& srcMatrix, TMatrixType& destMatrix );
+template<typename TMatrixType>
+TMatrixType S_MatrixInverse( const TMatrixType& matrix );
+template<typename TMatrixType>
+void S_MatrixTranspose( const TMatrixType& srcMatrix, typename matrixTransposeType_t<TMatrixType>::type_t& destMatrix );
+template<typename TMatrixType>
+typename matrixTransposeType_t<TMatrixType>::type_t S_MatrixTranspose( const TMatrixType& matrix );
+
+matrix4x4_t S_MatrixPerspective( float fieldOfView, float aspectRatio, float nearClipPlane, float farClipPlane );
+void		S_MatrixPerspective( float fieldOfView, float aspectRatio, float nearClipPlane, float farClipPlane, matrix4x4_t& matrix );
+matrix4x4_t S_MatrixOrtho( float left, float right, float bottom, float top, float nearClipPlane, float farClipPlane );
+void		S_MatrixOrtho( float left, float right, float bottom, float top, float nearClipPlane, float farClipPlane, matrix4x4_t& matrix );
+matrix4x4_t S_MatrixLookAt( const vector3_t& location, const vector3_t& direction, const vector3_t& axisUp );
+void		S_MatrixLookAt( const vector3_t& location, const vector3_t& direction, const vector3_t& axisUp, matrix4x4_t& matrix );
 
 #include "tier1/math/math.inl"

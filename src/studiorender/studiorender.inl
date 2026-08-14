@@ -33,3 +33,44 @@ FORCEINLINE uint32 CStudioRender::AddResourceToSceneView<IMaterialResource>( stu
 {
 	return AddResourceToSceneView( pSceneView, pMaterialResource, STUDIO_RESOURCE_TYPE_MATERIAL );
 }
+
+/*
+==================
+CStudioRender::GetStudioAPIGlobalConstantBuffer
+==================
+*/
+FORCEINLINE IStudioAPIBuffer* CStudioRender::GetStudioAPIGlobalConstantBuffer() const
+{
+	return pStudioAPIGlobalConstantBuffer;
+}
+
+/*
+==================
+CStudioRender::GetSceneRenderTargets
+==================
+*/
+FORCEINLINE const CStudioSceneRenderTargets& CStudioRender::GetSceneRenderTargets() const
+{
+	return sceneRenderTargets;
+}
+
+/*
+==================
+CStudioRender::GetSceneRenderTargets
+==================
+*/
+FORCEINLINE CStudioRenderPassBase* CStudioRender::GetRenderPass( studioRenderPassType_t type ) const
+{
+	Assert( type < STUDIO_RENDERPASS_NUM_TYPES );
+	return pRenderPasses[(uint32)type];
+}
+
+/*
+==================
+CStudioRender::GetBatchedSimpleElements
+==================
+*/
+FORCEINLINE CStudioBatchedSimpleElements& CStudioRender::GetBatchedSimpleElements()
+{
+	return batchedSimpleElements;
+}

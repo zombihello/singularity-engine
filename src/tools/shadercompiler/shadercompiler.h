@@ -27,6 +27,16 @@ enum shaderSystemFlag_t
 };
 
 //-----------------------------------------------------------------------------
+// Reserved vertex factory key word
+//-----------------------------------------------------------------------------
+enum vertexFactoryKeyWord_t
+{
+	VERTEXFACTORY_KEYWORD_ALL,	 // Entry means it uses every vertex factory known to the loaded list(s)
+	VERTEXFACTORY_KEYWORD_NONE,	 // Entry means it can also be drawn without any vertex factory (e.g. a shader that generates its geometry from SV_VertexID)
+	VERTEXFACTORY_NUM_KEYWORDS
+};
+
+//-----------------------------------------------------------------------------
 // Shader compiler structs
 //-----------------------------------------------------------------------------
 struct shaderFlag_t
@@ -49,6 +59,8 @@ struct vertexFactory_t
 	eastl::string name;
 	eastl::string source;
 	uint32		  index;  // Global vertex factory index (matches modelVertexType_t)
+
+	static const vertexFactory_t s_none;
 };
 
 struct shader_t
@@ -74,9 +86,11 @@ struct shader_t
 // General functions
 //-----------------------------------------------------------------------------
 bool		ConvStringToShaderType( const char* pShaderTypeName, studioAPIShaderType_t& shaderType );
-void		ConvShaderTypeToString( studioAPIShaderType_t shaderType, const char*& pShaderTypeName );
+const char* ConvShaderTypeToString( studioAPIShaderType_t shaderType );
 bool		ConvStringToShaderCompilerMode( const char* pShaderCompilerModeName, shaderCompilerMode_t& shaderCompilerMode );
-void		ConvShaderCompilerModeToString( shaderCompilerMode_t shaderCompilerMode, const char*& pShaderCompilerModeName );
+const char* ConvShaderCompilerModeToString( shaderCompilerMode_t shaderCompilerMode );
 const char* ConvShaderSystemFlagToString( shaderSystemFlag_t systemFlag );
+bool		ConvStringToVertexFactoryKeyWord( const char* pKeyWordName, vertexFactoryKeyWord_t& keyWord );
+const char* ConvVertexFactoryKeyWordToString( vertexFactoryKeyWord_t keyWord );
 
 #include "tools/shadercompiler/shadercompiler.inl"
