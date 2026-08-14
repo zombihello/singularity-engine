@@ -143,15 +143,10 @@ void CBasePlayer::MoveNoClip( const userCmd_t& userCmd, float deltaTime )
 	vector3_t	 forward		  = S_VectorNormalize( viewRotationQuat * g_vectorForward );
 	vector3_t	 right			  = S_VectorNormalize( viewRotationQuat * g_vectorRight );
 
-	// Calculate wish velocity
-	vector3_t wishVelocity = forward * userCmd.forwardMove + right * userCmd.sideMove + g_vectorUp * userCmd.upMove;
-
-	// Get the maximum speed taking into account sprint
-	float maxSpeed = move_noclipspeed.GetFloat();
-	if ( userCmd.actions & USER_ACTION_FLAG_SPEED )
-	{
-		maxSpeed *= move_sprintscale.GetFloat();
-	}
+	// Calculate wish velocity and the maximum speed taking into account sprint
+	float	  sprintScale  = ( userCmd.actions & USER_ACTION_FLAG_SPEED ) ? move_sprintscale.GetFloat() : 1.f;
+	float	  maxSpeed	   = move_noclipspeed.GetFloat() * sprintScale;
+	vector3_t wishVelocity = ( forward * userCmd.forwardMove + right * userCmd.sideMove + g_vectorUp * userCmd.upMove ) * sprintScale;
 
 	// Calculate wish speed and direction
 	float	  wishSpeed = S_VectorLength( wishVelocity );
