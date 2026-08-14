@@ -10,4 +10,4 @@
 #include "tier0/iprofiler.h"
 #include "tier1/tier1.h"
 #include "tier1/cvar.h"
-#include "game/shared/game.h"
+#include "game/shared/basegame.h"

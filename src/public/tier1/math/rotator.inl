@@ -202,6 +202,18 @@ FORCEINLINE float CRotator::NormalizeAxis( float angle )
 
 /*
 ==================
+CRotator::Clear
+==================
+*/
+FORCEINLINE void CRotator::Clear()
+{
+	pitch = 0.f;
+	yaw	  = 0.f;
+	roll  = 0.f;
+}
+
+/*
+==================
 CRotator::ToQuaternion
 ==================
 */

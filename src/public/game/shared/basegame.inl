@@ -2,50 +2,50 @@
 
 /*
 ==================
-CGame::HasActiveMap
+CBaseGame::HasActiveMap
 ==================
 */
-FORCEINLINE bool CGame::HasActiveMap() const
+FORCEINLINE bool CBaseGame::HasActiveMap() const
 {
 	return !!pActiveEcsMap;
 }
 
 /*
 ==================
-CGame::GetActiveMap
+CBaseGame::GetActiveMap
 ==================
 */
-FORCEINLINE IMap* CGame::GetActiveMap() const
+FORCEINLINE IMap* CBaseGame::GetActiveMap() const
 {
 	return pActiveEcsMap;
 }
 
 /*
 ==================
-CGame::GetActiveEcsMap
+CBaseGame::GetActiveEcsMap
 ==================
 */
-FORCEINLINE CEcsMap* CGame::GetActiveEcsMap() const
+FORCEINLINE CEcsMap* CBaseGame::GetActiveEcsMap() const
 {
 	return (CEcsMap*)GetActiveMap();
 }
 
 /*
 ==================
-CGame::GetEcsComponentTypes
+CBaseGame::GetEcsComponentTypes
 ==================
 */
-FORCEINLINE CEcsComponentTypes& CGame::GetEcsComponentTypes()
+FORCEINLINE CEcsComponentTypes& CBaseGame::GetEcsComponentTypes()
 {
 	return ecsComponentTypes;
 }
 
 /*
 ==================
-CGameAppSystems::AddAppSystem
+CBaseGameAppSystems::AddAppSystem
 ==================
 */
-FORCEINLINE void CGameAppSystems::AddAppSystem( const char* pModuleName, const char* pInterfaceName, gameAppSystemOrder_t order )
+FORCEINLINE void CBaseGameAppSystems::AddAppSystem( const char* pModuleName, const char* pInterfaceName, gameAppSystemOrder_t order )
 {
 	gameAppSystemInfo_t& appSystemInfo = appSystems.emplace_back();
 	appSystemInfo.order				   = order;
