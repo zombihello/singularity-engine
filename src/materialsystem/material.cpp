@@ -84,7 +84,7 @@ CMaterial::CMaterial
 */
 CMaterial::CMaterial( IResource* pResource )
 	: CResourceData<IMaterial>( pResource )
-	, bDirtyStudioResource( false )
+	, bPendingUpdateStudioResource( false )
 	, bDirtyDependencies( false )
 	, bBatchDependencies( false )
 	, pShader( NULL )
@@ -99,6 +99,10 @@ CMaterial::~CMaterial
 */
 CMaterial::~CMaterial()
 {
+	// Drop the pending update, otherwise the material system would update a dead material
+	PROFILER_SCOPE_FUNC();
+	CancelUpdateStudioResource();
+
 	// Clear the studio resource
 	ClearStudioResource();
 
@@ -181,8 +185,8 @@ void CMaterial::Destroy()
 	vars.clear();
 	resourceVarIds.clear();
 	varsDict.clear();
-	pShader				 = NULL;
-	bDirtyStudioResource = false;
+	pShader = NULL;
+	CancelUpdateStudioResource();
 
 	// Rebuild the dependency list, since the material doesn't reference any resource anymore
 	bDirtyDependencies = true;
@@ -259,9 +263,43 @@ void CMaterial::ReportVarChanged( CMaterialVar* pVar, materialVarType_t oldType 
 		UpdateDependencies();
 	}
 
-	// Insert a fence to the render thread and mark the studio resource as dirty
+	// Schedule an update of the studio resource
+	ScheduleUpdateStudioResource();
+}
+
+/*
+==================
+CMaterial::ScheduleUpdateStudioResource
+==================
+*/
+void CMaterial::ScheduleUpdateStudioResource()
+{
+	// Insert a fence to the render thread so the update waits for the commands already in flight
+	PROFILER_SCOPE_FUNC();
 	pStudioResource->GetRenderCmdFence().InsertFence();
-	bDirtyStudioResource = true;
+
+	// Add the studio resource to the pending list if it isn't pending yet
+	if ( !bPendingUpdateStudioResource )
+	{
+		bPendingUpdateStudioResource = true;
+		g_materialSystem.AddPendingUpdateMaterial( this );
+	}
+}
+
+/*
+==================
+CMaterial::CancelUpdateStudioResource
+==================
+*/
+void CMaterial::CancelUpdateStudioResource()
+{
+	// Remove the studio resource from the pending list if it is pending
+	PROFILER_SCOPE_FUNC();
+	if ( bPendingUpdateStudioResource )
+	{
+		bPendingUpdateStudioResource = false;
+		g_materialSystem.RemovePendingUpdateMaterial( this );
+	}
 }
 
 /*
@@ -271,13 +309,13 @@ CMaterial::UpdateStudioResource
 */
 void CMaterial::UpdateStudioResource()
 {
-	// Do nothing if the studio resource isn't dirty
+	// Do nothing if an update isn't pending
 	PROFILER_SCOPE_FUNC();
-	if ( !bDirtyStudioResource )
+	if ( !bPendingUpdateStudioResource )
 	{
 		return;
 	}
-	bDirtyStudioResource = false;
+	bPendingUpdateStudioResource = false;
 
 	// Wait fences to make sure that the render thread not using the studio resource
 	pStudioResource->GetRenderCmdFence().Wait();
@@ -384,9 +422,8 @@ void CMaterial::SetShader( const char* pShaderName )
 		pCurrentShaderName = pFallbackShaderName;
 	}
 
-	// Insert a fence to the render thread and mark the studio resource as dirty
-	pStudioResource->GetRenderCmdFence().InsertFence();
-	bDirtyStudioResource = true;
+	// Schedule an update of the studio resource
+	ScheduleUpdateStudioResource();
 
 	// Rebuild the dependency list, since the resource vars have been recreated
 	bDirtyDependencies = true;
@@ -456,10 +493,5 @@ CMaterial::GetStudioResource
 */
 IMaterialResource* CMaterial::GetStudioResource() const
 {
-	// TODO BS yehor.pohuliaka - Remove it when will be done CIT-43
-	if ( bDirtyStudioResource )
-	{
-		( (CMaterial*)this )->UpdateStudioResource();
-	}
 	return pStudioResource;
 }

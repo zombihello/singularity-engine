@@ -227,7 +227,7 @@ CModel::CModel
 */
 CModel::CModel( IResource* pResource )
 	: CResourceData<IModel>( pResource )
-	, bDirtyMaterials( false )
+	, bPendingUpdateStudioResource( false )
 	, pStudioResource( new CModelResource( pResource->GetName() ) )
 {
 }
@@ -257,13 +257,15 @@ void CModel::Init( const modelInitialData_t& initialData )
 	// Unsubscribe from material events
 	UnsubscribeMaterialEvents();
 
+	// Cancel scheduled update of the studio resource
+	CancelUpdateStudioResource();
+
 	// Copy a new materials
 	materials.resize( initialData.numMaterials );
 	for ( uint32 materialId = 0; materialId < initialData.numMaterials; ++materialId )
 	{
 		materials[materialId] = initialData.pMaterials[materialId];
 	}
-	bDirtyMaterials = false;
 
 	// Rebuild the dependency list now that the material references changed
 	GetResource()->RebuildDependencies();
@@ -290,10 +292,12 @@ void CModel::Destroy()
 	CStudioRenderCmdFence& renderCmdFence = pStudioResource->GetRenderCmdFence();
 	renderCmdFence.InsertFence();
 
+	// Cancel scheduled update of the studio resource
+	CancelUpdateStudioResource();
+
 	// Unsubscribe from material events and clear material array
 	UnsubscribeMaterialEvents();
 	materials.clear();
-	bDirtyMaterials = false;
 
 	// Rebuild the (now empty) dependency list, releasing any permanent holds
 	GetResource()->RebuildDependencies();
@@ -326,10 +330,65 @@ CModel::OnMaterialCachedUncached
 */
 void CModel::OnMaterialCachedUncached( void* pUserData, IResource* pResource )
 {
-	// Insert a fence to the render thread and mark materials as dirty
-	CModel* pModel = (CModel*)pUserData;
-	pModel->pStudioResource->GetRenderCmdFence().InsertFence();
-	pModel->bDirtyMaterials = true;
+	CModel* pThis = (CModel*)pUserData;
+	pThis->ScheduleUpdateStudioResource();
+}
+
+/*
+==================
+CModel::ScheduleUpdateStudioResource
+==================
+*/
+void CModel::ScheduleUpdateStudioResource()
+{
+	// Insert a fence to the render thread so the update waits for the commands already in flight
+	PROFILER_SCOPE_FUNC();
+	pStudioResource->GetRenderCmdFence().InsertFence();
+
+	// Add the studio resource to the pending list if it isn't pending yet
+	if ( !bPendingUpdateStudioResource )
+	{
+		bPendingUpdateStudioResource = true;
+		g_modelSystem.AddPendingUpdateModel( this );
+	}
+}
+
+/*
+==================
+CModel::CancelUpdateStudioResource
+==================
+*/
+void CModel::CancelUpdateStudioResource()
+{
+	// Remove the studio resource from the pending list if it is pending
+	PROFILER_SCOPE_FUNC();
+	if ( bPendingUpdateStudioResource )
+	{
+		bPendingUpdateStudioResource = false;
+		g_modelSystem.RemovePendingUpdateModel( this );
+	}
+}
+
+/*
+==================
+CModel::UpdateStudioResource
+==================
+*/
+void CModel::UpdateStudioResource()
+{
+	// Do nothing if an update isn't pending
+	PROFILER_SCOPE_FUNC();
+	if ( !bPendingUpdateStudioResource )
+	{
+		return;
+	}
+	bPendingUpdateStudioResource = false;
+
+	// Wait fences to make sure that the render thread not using the studio resource
+	pStudioResource->GetRenderCmdFence().Wait();
+
+	// Update materials in the studio resource
+	pStudioResource->UpdateMaterials( materials.data(), (uint32)materials.size() );
 }
 
 /*
@@ -401,17 +460,5 @@ CModel::GetStudioResource
 */
 IModelResource* CModel::GetStudioResource() const
 {
-	// TODO BS yehor.pohuliaka - Remove it when will be done CIT-43
-	if ( bDirtyMaterials )
-	{
-		// Wait fences to make sure that the render thread not using the studio resource
-		pStudioResource->GetRenderCmdFence().Wait();
-
-		// Update materials in the studio resource
-		pStudioResource->UpdateMaterials( materials.data(), (uint32)materials.size() );
-
-		// Reset the dirty materials flag
-		( (CModel*)this )->bDirtyMaterials = false;
-	}
 	return pStudioResource;
 }

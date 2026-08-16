@@ -65,6 +65,10 @@ public:
 	CModel( IResource* pResource );
 	~CModel();
 
+	// Applies the pending changes to the studio resource
+	// NOTE: Called by `CModelSystem` while it drains its pending list on `IStudioRender::OnBeginFrame`
+	void UpdateStudioResource();
+
 private:
 	struct materialEventHandles_t
 	{
@@ -74,10 +78,12 @@ private:
 	};
 
 	static void OnMaterialCachedUncached( void* pUserData, IResource* pResource );
+	void		ScheduleUpdateStudioResource();
+	void		CancelUpdateStudioResource();
 	void		SubscribeMaterialEvents();
 	void		UnsubscribeMaterialEvents();
 
-	bool								   bDirtyMaterials;
+	bool								   bPendingUpdateStudioResource;
 	CRefPtr<CModelResource>				   pStudioResource;
 	eastl::vector<CResourcePtr<IMaterial>> materials;
 	eastl::vector<materialEventHandles_t>  materialEventHandles;

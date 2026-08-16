@@ -5,10 +5,21 @@
 #include "materialsystem/materialvar.h"
 #include "materialsystem/materialsystem.h"
 
-EXPOSE_SINGLE_INTERFACE( CMaterialSystem, IMaterialSystem, MATERIALSYSTEM_INTERFACE_VERSION );
+CMaterialSystem g_materialSystem;
+EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CMaterialSystem, IMaterialSystem, MATERIALSYSTEM_INTERFACE_VERSION, g_materialSystem );
 
 // Application systems factory. It used for connect materialsystem's submodules (e.g: stdshaders)
 createInterfaceFn_t g_pAppSystemFactory = NULL;
+
+/*
+==================
+CMaterialSystem::CMaterialSystem
+==================
+*/
+CMaterialSystem::CMaterialSystem()
+	: onStudioRenderBeginFrameHandle( INVALID_HANDLE )
+{
+}
 
 /*
 ==================
@@ -144,7 +155,27 @@ bool CMaterialSystem::Init()
 		pDefaultMaterial->Init( defaultMatInitialData );
 	}
 	pMaterialsMgr->SetDefaultResource( pDefaultMaterial );
+
+	// Subscribe to the begin draw frame event
+	onStudioRenderBeginFrameHandle = g_pStudioRender->OnBeginFrame()->Subscribe( &CMaterialSystem::OnStudioRenderBeginFrame, this );
 	return true;
+}
+
+/*
+==================
+CMaterialSystem::OnStudioRenderBeginFrame
+==================
+*/
+void CMaterialSystem::OnStudioRenderBeginFrame( void* pUserData )
+{
+	// Update each pending material
+	PROFILER_SCOPE_FUNC();
+	CMaterialSystem* pThis = (CMaterialSystem*)pUserData;
+	for ( uint32 index = 0, count = (uint32)pThis->pendingUpdateMaterials.size(); index < count; ++index )
+	{
+		pThis->pendingUpdateMaterials[index]->UpdateStudioResource();
+	}
+	pThis->pendingUpdateMaterials.clear();
 }
 
 /*
@@ -154,8 +185,16 @@ CMaterialSystem::Shutdown
 */
 void CMaterialSystem::Shutdown()
 {
-	// Unregister all material resource types
+	// Unsubscribe from the begin draw frame event
 	PROFILER_SCOPE_FUNC();
+	if ( onStudioRenderBeginFrameHandle != INVALID_HANDLE )
+	{
+		g_pStudioRender->OnBeginFrame()->Unsubscribe( onStudioRenderBeginFrameHandle );
+		onStudioRenderBeginFrameHandle = INVALID_HANDLE;
+	}
+	pendingUpdateMaterials.clear();
+
+	// Unregister all material resource types
 	g_pResourceSystem->RemoveResourceManagerForType<CMaterial>();
 	g_pResourceSystem->RemoveResourceManagerForType<CTexture>();
 

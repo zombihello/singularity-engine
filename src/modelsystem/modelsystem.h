@@ -1,4 +1,5 @@
 #pragma once
+#include "studiorender/istudiorender.h"
 #include "modelsystem/imodelsystem.h"
 #include "modelsystem/model.h"
 #include "modelsystem/model_loader.h"
@@ -20,9 +21,20 @@ public:
 	// IModelSystem interface
 	virtual CRefPtr<IVertexFactory> CreateVertexFactory( modelVertexType_t vertexType, const char* pDebugName = "" ) const override;
 
+	CModelSystem();
+
+	// Add and remove a model whose studio resource has to be updated
+	void AddPendingUpdateModel( CModel* pModel );
+	void RemovePendingUpdateModel( CModel* pModel );
+
 private:
-	CResourceTypeFactory<CModel> modelFactory;
-	CModelLoader				 modelLoader;
+	static void OnStudioRenderBeginFrame( void* pUserData );
+
+	CResourceTypeFactory<CModel>		   modelFactory;
+	CModelLoader						   modelLoader;
+	eastl::vector<CModel*>				   pendingUpdateModels;
+	IStudioRender::IOnBeginFrame::handle_t onStudioRenderBeginFrameHandle;
 };
 
 extern CModelSystem g_modelSystem;
+#include "modelsystem/modelsystem.inl"

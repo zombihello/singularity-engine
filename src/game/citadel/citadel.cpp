@@ -131,10 +131,10 @@ bool CCitadelGame::Init()
 	IResourceTypeMgr*	pMaterialsMgr  = g_pResourceSystem->GetResourceManagerForType<IMaterial>();
 	IResourceTypeMgr*	pModelsMgr	   = g_pResourceSystem->GetResourceManagerForType<IModel>();
 	modelSimpleVertex_t quadVerteces[] = {
-		{ { -0.5f, -0.5f, 0.f, 1.f }, { -1.f, 0.f }, { 255, 0, 0 } },
-		{ { 0.5f, -0.5f, 0.f, 1.f }, { 0.f, 0.f }, { 0, 255, 0 } },
-		{ { 0.5f, 0.5f, 0.f, 1.f }, { 0.f, 1.f }, { 0, 0, 255 } },
-		{ { -0.5f, 0.5f, 0.f, 1.f }, { -1.f, 1.f }, { 255, 255, 255 } }
+		{ { -250.f, -250.f, 250.f, 1.f }, { -1.f, 0.f }, { 255, 0, 0 } },
+		{ { 250.f, -250.f, 250.f, 1.f }, { 0.f, 0.f }, { 0, 255, 0 } },
+		{ { 250.f, 250.f, 250.f, 1.f }, { 0.f, -1.f }, { 0, 0, 255 } },
+		{ { -250.f, 250.f, 250.f, 1.f }, { -1.f, -1.f }, { 255, 255, 255 } }
 	};
 	uint16					quadIndices[] = { 0, 1, 2, 2, 3, 0 };
 	CResourcePtr<IMaterial> pQuadMaterial = pMaterialsMgr->LoadResource( "materials/nelson" );

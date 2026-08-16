@@ -19,6 +19,9 @@ struct studioEntityView_t;
 class CStudioRender : public CBaseAppSystem<IStudioRender>
 {
 public:
+	DECLARE_EVENT( COnBeginFrame );
+	DECLARE_EVENT( COnEndFrame );
+
 	// IAppSystem interface
 	// Here's where the app systems get to learn about each other
 	virtual bool Connect( createInterfaceFn_t pFactory ) override;
@@ -43,6 +46,8 @@ public:
 	// Returns a command buffer of the render thread. If return NULL it's mean what StudioRender don't use render thread
 	virtual IStudioCmdBuffer* GetCommandBuffer() const override;
 	virtual bool			  IsInRenderThread() const override;
+	virtual IOnBeginFrame*	  OnBeginFrame() const override;
+	virtual IOnEndFrame*	  OnEndFrame() const override;
 
 	CStudioRender();
 
@@ -68,6 +73,8 @@ private:
 	CStudioBatchedSimpleElements batchedSimpleElements;
 	CRefPtr<IStudioAPIBuffer>	 pStudioAPIGlobalConstantBuffer;
 	CStudioRenderPassBase*		 pRenderPasses[STUDIO_RENDERPASS_NUM_TYPES];
+	mutable COnBeginFrame		 onBeginFrame;
+	mutable COnEndFrame			 onEndFrame;
 };
 
 extern CStudioRender g_StudioRender;
