@@ -1,5 +1,6 @@
 #pragma once
 #include "resourcesystem/iresourcetype.h"
+#include "studiorender/istudiorender.h"
 #include "materialsystem/imaterialsystem.h"
 #include "materialsystem/texture_loader.h"
 #include "materialsystem/material_loader.h"
@@ -27,9 +28,22 @@ public:
 	virtual bool Init() override;
 	virtual void Shutdown() override;
 
+	CMaterialSystem();
+
+	// Add and remove a material whose studio resource has to be updated
+	void AddPendingUpdateMaterial( CMaterial* pMaterial );
+	void RemovePendingUpdateMaterial( CMaterial* pMaterial );
+
 private:
-	CResourceTypeFactory<CTexture>	textureFactory;
-	CTextureLoader					textureLoader;
-	CResourceTypeFactory<CMaterial> materialFactory;
-	CMaterialLoader					materialLoader;
+	static void OnStudioRenderBeginFrame( void* pUserData );
+
+	CResourceTypeFactory<CTexture>		   textureFactory;
+	CTextureLoader						   textureLoader;
+	CResourceTypeFactory<CMaterial>		   materialFactory;
+	CMaterialLoader						   materialLoader;
+	eastl::vector<CMaterial*>			   pendingUpdateMaterials;
+	IStudioRender::IOnBeginFrame::handle_t onStudioRenderBeginFrameHandle;
 };
+
+extern CMaterialSystem g_materialSystem;
+#include "materialsystem/materialsystem.inl"

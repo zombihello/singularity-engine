@@ -1,4 +1,5 @@
 #pragma once
+#include "tier1/event.h"
 #include "tier1/refcount.h"
 #include "tier1/math/math_types.h"
 #include "appframework/iappsystem.h"
@@ -31,6 +32,9 @@ struct studioCameraView_t
 class IStudioRender : public IAppSystem
 {
 public:
+	DECLARE_EVENT_INTERFACE( IOnBeginFrame );
+	DECLARE_EVENT_INTERFACE( IOnEndFrame );
+
 	// Functions to draw scene
 	virtual void BeginFrame()																									 = 0;
 	virtual void EndFrame()																										 = 0;
@@ -44,4 +48,6 @@ public:
 	// Returns a command buffer of the render thread. If return NULL it's mean what the studio render not use the render thread
 	virtual IStudioCmdBuffer* GetCommandBuffer() const = 0;
 	virtual bool			  IsInRenderThread() const = 0;
+	virtual IOnBeginFrame*	  OnBeginFrame() const	   = 0;
+	virtual IOnEndFrame*	  OnEndFrame() const	   = 0;
 };

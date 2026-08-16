@@ -10,6 +10,16 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CModelSystem, IModelSystem, MODELSYSTEM_INTER
 
 /*
 ==================
+CModelSystem::CModelSystem
+==================
+*/
+CModelSystem::CModelSystem()
+	: onStudioRenderBeginFrameHandle( INVALID_HANDLE )
+{
+}
+
+/*
+==================
 CModelSystem::Connect
 ==================
 */
@@ -91,7 +101,27 @@ bool CModelSystem::Init()
 		pDefaultModel = pModelsMgr->CreateResource( "__default" );
 	}
 	pModelsMgr->SetDefaultResource( pDefaultModel );
+
+	// Subscribe to the begin draw frame event
+	onStudioRenderBeginFrameHandle = g_pStudioRender->OnBeginFrame()->Subscribe( &CModelSystem::OnStudioRenderBeginFrame, this );
 	return true;
+}
+
+/*
+==================
+CModelSystem::OnStudioRenderBeginFrame
+==================
+*/
+void CModelSystem::OnStudioRenderBeginFrame( void* pUserData )
+{
+	// Update each pending model
+	PROFILER_SCOPE_FUNC();
+	CModelSystem* pThis = (CModelSystem*)pUserData;
+	for ( uint32 index = 0, count = (uint32)pThis->pendingUpdateModels.size(); index < count; ++index )
+	{
+		pThis->pendingUpdateModels[index]->UpdateStudioResource();
+	}
+	pThis->pendingUpdateModels.clear();
 }
 
 /*
@@ -101,8 +131,16 @@ CModelSystem::Shutdown
 */
 void CModelSystem::Shutdown()
 {
-	// Unregister model resource type
+	// Unsubscribe from the begin draw frame event
 	PROFILER_SCOPE_FUNC();
+	if ( onStudioRenderBeginFrameHandle != INVALID_HANDLE )
+	{
+		g_pStudioRender->OnBeginFrame()->Unsubscribe( onStudioRenderBeginFrameHandle );
+		onStudioRenderBeginFrameHandle = INVALID_HANDLE;
+	}
+	pendingUpdateModels.clear();
+
+	// Unregister model resource type
 	g_pResourceSystem->RemoveResourceManagerForType<CModel>();
 
 	// Release all global resources

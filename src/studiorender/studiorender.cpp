@@ -234,6 +234,9 @@ void CStudioRender::BeginFrame()
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_RENDERING );
 	g_studioFrameAlloc.SwapPools();
 
+	// Notify the subscribers about begin of the frame
+	onBeginFrame.Invoke();
+
 	// Tell StudioAPI about begin of drawing frame
 	UNIQUE_RENDER_COMMAND( CStudioRenderCmd_BeginFrame,
 						   {
@@ -256,6 +259,9 @@ void CStudioRender::EndFrame()
 											g_pStudioAPI->EndDrawingFrame();
 											g_studioFrameAlloc.MarkAsFreePool( framePoolId );
 										} );
+
+	// Notify the subscribers about end of the frame
+	onEndFrame.Invoke();
 }
 
 /*
@@ -510,4 +516,24 @@ CStudioRender::IsInRenderThreads
 bool CStudioRender::IsInRenderThread() const
 {
 	return Studio_IsInRenderThread();
+}
+
+/*
+==================
+CStudioRender::OnBeginFrame
+==================
+*/
+IStudioRender::IOnBeginFrame* CStudioRender::OnBeginFrame() const
+{
+	return &onBeginFrame;
+}
+
+/*
+==================
+CStudioRender::OnEndFrame
+==================
+*/
+IStudioRender::IOnEndFrame* CStudioRender::OnEndFrame() const
+{
+	return &onEndFrame;
 }

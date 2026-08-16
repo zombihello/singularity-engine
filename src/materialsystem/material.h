@@ -58,15 +58,20 @@ public:
 
 	void ReportVarChanged( CMaterialVar* pVar, materialVarType_t oldType );
 
+	// Applies the pending changes to the studio resource
+	// NOTE: Called by `CMaterialSystem` while it drains its pending list on `IStudioRender::OnBeginFrame`
+	void UpdateStudioResource();
+
 private:
 	typedef eastl::unordered_map<const char*, uint32, stlInsensitiveStringHash_t, stlInsensitiveCompareString_t> materialVarsDict_t;
 
 	void SetShader( const char* pShaderName );
-	void UpdateStudioResource();
+	void ScheduleUpdateStudioResource();
+	void CancelUpdateStudioResource();
 	void UpdateDependencies();
 	void ClearStudioResource();
 
-	bool						 bDirtyStudioResource;
+	bool						 bPendingUpdateStudioResource;
 	bool						 bDirtyDependencies;
 	bool						 bBatchDependencies;
 	IShader*					 pShader;
