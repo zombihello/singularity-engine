@@ -13,4 +13,5 @@
 #include "tier1/cmdlink.h"
 #include "tier1/strtools.h"
 #include "tier1/filetools.h"
+#include "tier2/tier2.h"
 #include "game/shared/basegame.h"

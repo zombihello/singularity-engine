@@ -8,7 +8,8 @@
 enum streamDataType_t
 {
 	STREAMDATA_TYPE_MEMORY,
-	STREAMDATA_TYPE_FILE
+	STREAMDATA_TYPE_FILE,
+	STREAMDATA_TYPE_CUSTOM
 };
 
 class IStreamData : public IRefCounted

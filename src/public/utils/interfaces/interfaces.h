@@ -15,6 +15,7 @@ class IShaderMgr;
 class IMaterialSystem;
 class IResourceSystem;
 class IModelSystem;
+class ISchemaSystem;
 
 //-----------------------------------------------------------------------------
 // Global pointers to app systems
@@ -31,3 +32,4 @@ extern IShaderMgr*		g_pShaderMgr;
 extern IMaterialSystem* g_pMaterialSystem;
 extern IResourceSystem* g_pResourceSystem;
 extern IModelSystem*	g_pModelSystem;
+extern ISchemaSystem*	g_pSchemaSystem;

@@ -1,5 +1,6 @@
 #include "pch_game_shared.h"
 #include "tier1/math/math.h"
+#include "schemasystem/schemalib/schemalink.h"
 #include "appframework/iwindowmgr.h"
 #include "inputsystem/iinputsystem.h"
 #include "studiorender/istudiorender.h"
@@ -38,6 +39,13 @@ bool CBaseGame::Connect( createInterfaceFn_t pFactory )
 	}
 	LinkCmds();
 	LinkCVars();
+
+	// Connect Tier2 and register the types described by this module
+	if ( !ConnectTier2( pFactory ) )
+	{
+		return false;
+	}
+	LinkSchemas( "game" );
 
 	// Get the window manager
 	g_pWindowMgr = (IWindowMgr*)pFactory( WINDOWMGR_INTERFACE_VERSION );
@@ -78,8 +86,10 @@ CBaseGame::Disconnect
 void CBaseGame::Disconnect()
 {
 	PROFILER_SCOPE_FUNC_GROUP( PROFILER_SCOPE_GROUP_GAMELOGIC );
+	UnlinkSchemas();
 	UnlinkCVars();
 	UnlinkCmds();
+	DisconnectTier2();
 	DisconnectTier1();
 
 	g_pWindowMgr	  = NULL;

@@ -44,13 +44,13 @@ set_target_properties( launcher PROPERTIES PREFIX 					"" )
 
 target_link_libraries( launcher PRIVATE								tier0 tier1 appframework interfaces gameinfo ${CMAKE_DL_LIBS} )
 add_common_target_defines( launcher )
-add_dependencies( launcher											inputsystem filesystem cvar studiorender materialsystem modelsystem resourcesystem )
+add_dependencies( launcher											inputsystem filesystem cvar schemasystem studiorender materialsystem modelsystem resourcesystem )
 
 
 #
 # Install
 #
-inherit_install_files( launcher										TARGETS tier0 tier1 appframework interfaces gameinfo inputsystem filesystem cvar studiorender materialsystem modelsystem resourcesystem )
+inherit_install_files( launcher										TARGETS tier0 tier1 appframework interfaces gameinfo inputsystem filesystem cvar schemasystem studiorender materialsystem modelsystem resourcesystem )
 
 # Binaries
 install_files( launcher TARGETS RUNTIME launcher 					DESTINATION bin/${PLATFORM_BIN_DIR}/ )

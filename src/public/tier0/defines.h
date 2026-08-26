@@ -31,6 +31,10 @@
 	#define ENABLE_STUDIOAPI_EVENTS !RETAIL
 #endif	// !ENABLE_STUDIOAPI_EVENTS
 
+#ifndef ENABLE_SCHEMA_METADATA
+	#define ENABLE_SCHEMA_METADATA !RETAIL
+#endif	// !ENABLE_SCHEMA_METADATA
+
 //-----------------------------------------------------------------------------
 // Platform specific macros
 //-----------------------------------------------------------------------------

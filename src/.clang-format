@@ -38,8 +38,8 @@ IndentCaseLabels: 'false'
 IndentPPDirectives: BeforeHash
 IndentWrappedFunctionNames: 'false'
 KeepEmptyLinesAtTheStartOfBlocks: 'false'
-MacroBlockBegin: BEGIN_SHADER
-MacroBlockEnd: END_SHADER
+MacroBlockBegin: 'BEGIN_SHADER|BEGIN_SCHEMA_'
+MacroBlockEnd: 'END_SHADER|END_SCHEMA_'
 NamespaceIndentation: All
 PointerAlignment: Left
 ReflowComments: 'true'

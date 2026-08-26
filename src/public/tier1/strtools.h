@@ -71,7 +71,7 @@ bool		   S_IsSpace( wchar_t c );
 bool		   S_IsDigit( char c );
 bool		   S_IsDigit( wchar_t c );
 
-// Note: va() returns a const char* stack address that must be copied into a new memory location (e.g. eastl::string) to be persistent.
+// NOTE: va() returns a const char* stack address that must be copied into a new memory location (e.g. eastl::string) to be persistent.
 //		 This means that va() should not be assigned to a char* variable or used as a return value for a char* type function.
 //		 Once the va() expression is complete, the returned memory location will be recovered and the contents will be lost
 #define va( Format, ... ) S_Sprintf( Format, ##__VA_ARGS__ ).c_str()

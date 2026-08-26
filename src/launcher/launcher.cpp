@@ -149,6 +149,7 @@ void CLauncherApp::Init()
 	g_pInputSystem	  = (IInputSystem*)FindSystem( INPUTSYSTEM_INTERFACE_VERSION );
 	g_pStudioRender	  = (IStudioRender*)FindSystem( STUDIORENDER_INTERFACE_VERSION );
 	g_pResourceSystem = (IResourceSystem*)FindSystem( RESOURCESYSTEM_INTERFACE_VERSION );
+	g_pSchemaSystem	  = (ISchemaSystem*)FindSystem( SCHEMASYSTEM_INTERFACE_VERSION );
 	g_pGame			  = (IGame*)FindSystem( GAME_INTERFACE_VERSION );
 
 	// Initialize WindowMgr group

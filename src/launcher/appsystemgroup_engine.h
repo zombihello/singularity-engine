@@ -1,4 +1,5 @@
 #pragma once
+#include "schemasystem/ischemasystem.h"
 #include "inputsystem/iinputsystem.h"
 #include "studiorender/studioapi/istudioapi.h"
 #include "studiorender/istudiorender.h"

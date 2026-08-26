@@ -58,14 +58,14 @@ set_target_properties( game_shared PROPERTIES PREFIX 			"" )
 
 target_compile_definitions( game_shared PUBLIC					${THIRDPARTY_DEFINES} )
 target_include_directories( game_shared PUBLIC					${THIRDPARTY_INCLUDES} )
-target_link_libraries( game_shared PUBLIC 						tier1 ${THIRDPARTY_LIBS} )
+target_link_libraries( game_shared PUBLIC 						tier1 tier2 schemalib ${THIRDPARTY_LIBS} )
 add_common_target_defines( game_shared )
 
 
 #
 # Install
 #
-inherit_install_files( game_shared										TARGETS tier1 studiorender resourcesystem inputsystem )
+inherit_install_files( game_shared										TARGETS tier1 tier2 schemalib studiorender resourcesystem inputsystem )
 
 # Binaries
 install_files( game_shared FILES ${THIRDPARTY_INSTALL_DEBUG_DLLS}		DESTINATION 	bin/${PLATFORM_BIN_DIR}/	CONFIGURATIONS 	Debug )

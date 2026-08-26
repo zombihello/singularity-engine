@@ -8,6 +8,7 @@ CAppSystemGroupEngine::Create
 FORCEINLINE bool CAppSystemGroupEngine::Create()
 {
 	appSystemInfo_t appSystemInfos[] = {
+		{ "schemasystem" DLL_EXT_STRING, SCHEMASYSTEM_INTERFACE_VERSION },
 		{ "inputsystem" DLL_EXT_STRING, INPUTSYSTEM_INTERFACE_VERSION },
 		{ "studioapi_vk" DLL_EXT_STRING, STUDIOAPI_INTERFACE_VERSION },
 		{ "resourcesystem" DLL_EXT_STRING, RESOURCESYSTEM_INTERFACE_VERSION },

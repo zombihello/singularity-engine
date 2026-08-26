@@ -61,6 +61,8 @@ protected:
 //-----------------------------------------------------------------------------
 // Link and unlink commands in the command system
 // flags - Add these flags to commands
+//
+// NOTE: Call them only once `ConnectTier1` has given us the command system
 //-----------------------------------------------------------------------------
 void LinkCmds( uint32 flags = CMD_FLAG_NONE );
 void UnlinkCmds();

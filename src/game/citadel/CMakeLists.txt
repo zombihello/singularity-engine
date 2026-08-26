@@ -50,14 +50,14 @@ set_target_properties( citadel PROPERTIES FOLDER         				Game )
 set_target_properties( citadel PROPERTIES PREFIX 						"" )
 set_target_properties( citadel PROPERTIES OUTPUT_NAME					game )
 
-target_link_libraries( citadel PRIVATE									tier0 tier1 interfaces game_shared sentdoc smapdoc ${CMAKE_DL_LIBS} )
+target_link_libraries( citadel PRIVATE									tier0 interfaces game_shared sentdoc smapdoc ${CMAKE_DL_LIBS} )
 add_common_target_defines( citadel )
 
 
 #
 # Install
 #
-inherit_install_files( citadel											TARGETS tier0 tier1 interfaces sentdoc smapdoc )
+inherit_install_files( citadel											TARGETS tier0 interfaces game_shared sentdoc smapdoc )
 inherit_install_files( citadel											TARGETS game_shared								DESTINATION citadel )
 
 # Binaries
